@@ -38,9 +38,8 @@ cd ts/performance && npm install && npm test    # jasmine (must build daycountin
 ```
 
 ### Zig
-Dependencies: Zig 0.16.0-dev. The SDK is at `~/zig-sdk/zig-x86_64-linux-0.16.0-dev.2915+065c6e794/zig`.
+Dependencies: Zig 0.16.0-dev. Installed at `/usr/local/zig/` with `/usr/local/bin/zig` on PATH.
 ```bash
-export PATH="$HOME/zig-sdk/zig-x86_64-linux-0.16.0-dev.2915+065c6e794:$PATH"
 cd zig && zig build test                        # all tests (102 tests across 5 modules)
 cd zig && zig build test 2>&1 --summary all     # with per-module counts
 ```
@@ -51,9 +50,8 @@ cd zig && zig test src/daycounting/daycounting.zig --test-filter "act365Fixed" \
 ```
 
 ### Rust
-Dependencies: Rust nightly (rustc 1.96.0+), zero external deps. The toolchain is at `~/.rust/bin`.
+Dependencies: Rust 1.75.0+ (installed via apt at `/usr/bin/rustc`, `/usr/bin/cargo`), zero external deps.
 ```bash
-export PATH="$HOME/.rust/bin:$PATH"
 cd rust && cargo test                                                       # all tests (66 tests)
 cd rust && cargo test --lib daycounting                                     # daycounting tests only
 cd rust && cargo test --lib performance                                     # performance tests only
@@ -161,15 +159,15 @@ All commands run from the project root (`~/repos/portf_py/`).
 | **Python** | Python 3.10+, `numpy`, `scipy`, symlink `ln -sf py accounts`, `touch py/__init__.py` | `PYTHONPATH=. python3 -m unittest discover -s py -p "test_*.py" -t .` | 79 tests |
 | **Go** | Go 1.26+ | `cd go && go test ./...&& cd ..`| 3 packages OK |
 | **TypeScript** | Node.js 20+, TypeScript 5.3+, Jasmine 5.1+ | `cd ts/daycounting && npm install && npm test && cd ../performance && npm install && npm test && cd ..` | 92 + 92 specs |
-| **Zig** | Zig 0.16.0-dev | `export PATH="$HOME/zig-sdk/zig-x86_64-linux-0.16.0-dev.2915+065c6e794:$PATH" && cd zig && zig build test --summary all && cd ..` | 102 tests |
-| **Rust** | Rust nightly (1.96.0+) | `export PATH="$HOME/.rust/bin:$PATH" && cd rust && cargo test && cd ..` | 66 tests |
+| **Zig** | Zig 0.16.0-dev | `cd zig && zig build test --summary all && cd ..` | 102 tests |
+| **Rust** | Rust 1.75.0+ (apt) | `cd rust && cargo test && cd ..` | 66 tests |
 
 ```bash
 python3 -m unittest discover -s py -p "test_*.py" -t .
 cd go && go test ./...&& cd ..
 cd ts/daycounting && npm install && npm test && cd ../performance && npm install && npm test && cd ../..
-export PATH="$HOME/zig-sdk/zig-x86_64-linux-0.16.0-dev.2915+065c6e794:$PATH" && cd zig && zig build test --summary all && cd ..
-export PATH="$HOME/.rust/bin:$PATH" && cd rust && cargo test && cd ..
+cd zig && zig build test --summary all && cd ..
+cd rust && cargo test && cd ..
 ```
 
 ### Build Only (no tests)
@@ -179,12 +177,12 @@ export PATH="$HOME/.rust/bin:$PATH" && cd rust && cargo test && cd ..
 | **Python** | *(interpreted — no build step)* | |
 | **Go** | `cd go && go build ./...` | Compiles all packages |
 | **TypeScript** | `cd ts/daycounting && npm run build && cd ../performance && npm run build` | Build daycounting first (performance depends on it) |
-| **Zig** | `export PATH="$HOME/zig-sdk/zig-x86_64-linux-0.16.0-dev.2915+065c6e794:$PATH" && cd zig && zig build` | Build without running tests |
-| **Rust** | `export PATH="$HOME/.rust/bin:$PATH" && cd rust && cargo build` | Debug build; add `--release` for optimized |
+| **Zig** | `cd zig && zig build` | Build without running tests |
+| **Rust** | `cd rust && cargo build` | Debug build; add `--release` for optimized |
 
 ```bash
 cd go && go build ./... && cd ..
 cd ts/daycounting && npm run build && cd ../performance && npm run build && cd ../..
-export PATH="$HOME/zig-sdk/zig-x86_64-linux-0.16.0-dev.2915+065c6e794:$PATH" && cd zig && zig build && cd ..
-export PATH="$HOME/.rust/bin:$PATH" && cd rust && cargo build && cd ..
+cd zig && zig build && cd ..
+cd rust && cargo build && cd ..
 ```
