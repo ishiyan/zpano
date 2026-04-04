@@ -38,17 +38,15 @@ function kurtosisExcess(arr: number[]): number | null {
     if (arr.length <= 1) return null;
     const m = mean(arr);
     if (m === null) return null;
-    const s = std(arr, 0);
-    if (s === null || s === 0) return null;
-    
     const n = arr.length;
-    const sumFourth = arr.reduce((sum, val) => sum + Math.pow((val - m) / s, 4), 0);
     
-    // Excess kurtosis (Fisher's definition, adjusted for sample)
-    const kurtosis = (n * (n + 1) * sumFourth) / ((n - 1) * (n - 2) * (n - 3)) -
-                     (3 * Math.pow(n - 1, 2)) / ((n - 2) * (n - 3));
+    // Population excess kurtosis (matches scipy.stats.kurtosis with bias=True, fisher=True)
+    // Formula: m4 / m2^2 - 3, where m4 and m2 are population central moments
+    const m2 = arr.reduce((sum, val) => sum + Math.pow(val - m, 2), 0) / n;
+    if (m2 === 0) return null;
+    const m4 = arr.reduce((sum, val) => sum + Math.pow(val - m, 4), 0) / n;
     
-    return kurtosis;
+    return m4 / (m2 * m2) - 3;
 }
 
 /**

@@ -20,10 +20,11 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": [
-    "**/*.ts"
+    "*.ts"
   ],
   "exclude": [
     "node_modules",
-    "dist"
+    "dist",
+    "**/*_spec.ts"
   ]
 }

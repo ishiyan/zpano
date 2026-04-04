@@ -38,19 +38,9 @@ from datetime import date
 # https://github.com/AnatolyBuga/yearfrac
 
 def is_leap_year(y: int) -> bool:
-    """
-    Returns true if the given year is a leap year.
-    """
     return not(y % 4) and (bool(y % 100) or not(y % 400))
 
 def date_to_jd(year: int, month: int, day: int) -> int:
-    """
-    Converts a date to Julian Day number.
-
-    Algorithm adapted from
-    Press, W. H., Teukolsky, S. A., Vetterling, W. T., & Flannery, B. P. (2007).
-    Numerical Recipes: The Art of Scientific Computing (3rd ed.). Cambridge University Press.
-    """
     a = int((14 - month) / 12.)
     y = int(year + 4800 - a)
     m = int(month + (12 * a) - 3)
@@ -60,13 +50,6 @@ def date_to_jd(year: int, month: int, day: int) -> int:
     return jd
 
 def jd_to_date(jd: int) -> tuple[int, int, int]:
-    """   
-    Converts a Julian Day number to a date.
-
-    Algorithm adapted from
-    Press, W. H., Teukolsky, S. A., Vetterling, W. T., & Flannery, B. P. (2007).
-    Numerical Recipes: The Art of Scientific Computing (3rd ed.). Cambridge University Press.
-    """
     a = jd + 32044
     b = int(((4 * a) + 3) / 146097.)
     c = a - int((b * 146097) / 4.)

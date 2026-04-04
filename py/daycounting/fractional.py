@@ -1,10 +1,10 @@
 from datetime import datetime
 
-from conventions import DayCountConvention
-from daycounting import us_30_360, us_30_360_nasd, eur_30_360_plus, eur_30_360
-from daycounting import us_30_360_eom, eur_30_360_model_2, eur_30_360_model_3
-from daycounting import act_365_fixed, act_360, act_act_isda, act_act_afb
-from daycounting import act_act_excel, thirty_365, act_365_nonleap
+from .conventions import DayCountConvention
+from .daycounting import us_30_360, us_30_360_nasd, eur_30_360_plus, eur_30_360
+from .daycounting import us_30_360_eom, eur_30_360_model_2, eur_30_360_model_3
+from .daycounting import act_365_fixed, act_360, act_act_isda, act_act_afb
+from .daycounting import act_act_excel, thirty_365, act_365_nonleap
 
 _convention_map = {
     DayCountConvention.THIRTY_360_US: us_30_360,
@@ -29,10 +29,6 @@ _SECONDS_IN_DAY = 60*60*24
 
 def frac(date_time_1: datetime, date_time_2: datetime,
     method: DayCountConvention, day_frac: bool) -> float:
-    """
-    Calculate the fraction of time between two datetime objects
-    according to the specified day count convention.
-    """
     if date_time_1 > date_time_2:
         date_time_1, date_time_2 = date_time_2, date_time_1
 
@@ -60,16 +56,8 @@ def frac(date_time_1: datetime, date_time_2: datetime,
 
 def year_frac(date_time_1: datetime, date_time_2: datetime,
               method: DayCountConvention = DayCountConvention.RAW) -> float:
-    """
-    Calculate the year fraction between two datetime objects
-    according to the specified day count convention.
-    """
     return frac(date_time_1, date_time_2, method, False)
 
 def day_frac(date_time_1: datetime, date_time_2: datetime,
               method: DayCountConvention = DayCountConvention.RAW) -> float:
-    """
-    Calculate the day fraction between two datetime objects
-    according to the specified day count convention.
-    """
     return frac(date_time_1, date_time_2, method, True)

@@ -15,10 +15,6 @@ from enum import Enum
 # https://www.iso20022.org/15022/uhb/mt565-16-field-22f.htm
 
 class DayCountConvention(Enum):
-    """
-    Enumeration of day count conventions.
-    """
-
     RAW = 0
     """
     Take the differencein seconds between two dates and divides

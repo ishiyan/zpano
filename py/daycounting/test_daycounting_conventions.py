@@ -1,6 +1,6 @@
 import unittest
 
-from conventions import DayCountConvention
+from accounts.daycounting import DayCountConvention
 
 class TestDayCountConvention(unittest.TestCase):
     def test_from_string_valid(self):

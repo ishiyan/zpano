@@ -1,9 +1,9 @@
 // Wikipedia
 // https://en.wikipedia.org/wiki/Day_count_convention
-//
+
 // ISDA 2006 Definitions, Section 4.16 page 11
 // https://web.archive.org/web/20140913145444/http://www.hsbcnet.com/gbm/attachments/standalone/2006-isda-definitions.pdf
-//
+
 // For Excel YEARFRAC function see
 // https://support.microsoft.com/en-us/office/yearfrac-function-3844141e-c76d-4143-82b6-208454ddc6a8
 //
@@ -14,10 +14,10 @@
 // 2: Actual/360
 // 3: Actual/365
 // 4: European 30/360
-//
+
 // Day counting methods are listed in the ISO 20022, see
 // https://www.iso20022.org/15022/uhb/mt565-16-field-22f.htm
-//
+
 // Source code
 // https://github.com/devind-team/devind_yearfrac
 // https://github.com/hcnn/d30360s
@@ -35,20 +35,10 @@
 // https://github.com/hcnn/act_afb
 // https://github.com/AnatolyBuga/yearfrac
 
-/**
- * Returns true if the given year is a leap year.
- */
 export function isLeapYear(y: number): boolean {
     return !(y % 4) && (Boolean(y % 100) || !(y % 400));
 }
 
-/**
- * Converts a date to Julian Day Number.
- *
- * Algorithm adapted from
- * Press, W. H., Teukolsky, S. A., Vetterling, W. T., & Flannery, B. P. (2007).
- * Numerical Recipes: The Art of Scientific Computing (3rd ed.). Cambridge University Press.
- */
 export function dateToJd(year: number, month: number, day: number): number {
     const a = Math.floor((14 - month) / 12);
     const y = Math.floor(year + 4800 - a);
@@ -59,13 +49,6 @@ export function dateToJd(year: number, month: number, day: number): number {
     return jd;
 }
 
-/**
- * Converts a Julian Day Number to a date.
- *
- * Algorithm adapted from
- * Press, W. H., Teukolsky, S. A., Vetterling, W. T., & Flannery, B. P. (2007).
- * Numerical Recipes: The Art of Scientific Computing (3rd ed.). Cambridge University Press.
- */
 export function jdToDate(jd: number): [number, number, number] {
     const a = jd + 32044;
     const b = Math.floor(((4 * a) + 3) / 146097);
@@ -131,32 +114,6 @@ export function eur30360(
  * ISO 20022:
  *     A012
  *     https://www.iso20022.org/15022/uhb/mt565-16-field-22f.htm
- *
- * Method whereby interest is calculated based on a 30-day month and
- * a 360-day year.
- *
- * Accrued interest to a value date on the last day of a month shall
- * be the same as to the 30th calendar day of the same month, except
- * for the last day of February whose day of the month value shall
- * be adapted to the value of the first day of the interest period
- * if the latter is higher and if the period is one of a regular
- * schedule.
- *
- * This means that a 31st is assumed to be a 30th and the 28th Feb
- * of a non-leap year is assumed to be equivalent to a 29th Feb
- * when the first day of the interest period is a 29th, or to a 30th
- * Feb when the first day of the interest period is a 30th or a 31st.
- *
- * The 29th Feb of a leap year is assumed to be equivalent to a 30th
- * Feb when the first day of the interest period is a 30th or a 31st.
- *
- * Similarly, if the coupon period starts on the last day of February,
- * it is assumed to produce only one day of interest in February as if
- * it was starting on a 30th Feb when the end of the period is a 30th
- * or a 31st, or two days of interest in February when the end of the
- * period is a 29th, or 3 days of interest in February when it is the
- * 28th Feb of a non-leap year and the end of the period is before the
- * 29th.
  */
 export function eur30360Model2(
     y1: number, m1: number, d1: number,
@@ -187,20 +144,6 @@ export function eur30360Model2(
  * ISO 20022:
  *     A013
  *     https://www.iso20022.org/15022/uhb/mt565-16-field-22f.htm
- *
- * Method whereby interest is calculated based on a 30-day month
- * and a 360-day year.
- *
- * Accrued interest to a value date on the last day of a month
- * shall be the same as to the 30th calendar day of the same month.
- *
- * This means that a 31st is assumed to be a 30th and the 28 Feb
- * (or 29 Feb for a leap year) is assumed to be equivalent to a
- * 30 Feb.
- *
- * It is a variation of the 30E/360 (or Eurobond basis) method
- * where the last day of February is always assumed to be a 30th,
- * even if it is the last day of the maturity coupon period.
  */
 export function eur30360Model3(
     y1: number, m1: number, d1: number,
@@ -254,21 +197,6 @@ export function eur30360Plus(
  * ISO 20022:
  *     A001
  *     https://www.iso20022.org/15022/uhb/mt565-16-field-22f.htm
- *
- * Method whereby interest is calculated based on a 30-day month
- * and a 360-day year.
- *
- * Accrued interest to a value date on the last day of a month shall
- * be the same as to the 30th calendar day of the same month, except
- * for February, and provided that the interest period started on a
- * 30th or a 31st.
- *
- * This means that a 31st is assumed to be a 30th if the period started
- * on a 30th or a 31st and the 28 Feb (or 29 Feb for a leap year) is
- * assumed to be a 28th (or 29th).
- *
- * It is the most commonly used 30/360 method for US straight and
- * convertible bonds.
  */
 export function us30360(
     y1: number, m1: number, d1: number,
@@ -346,16 +274,6 @@ export function us30360Nasd(
  * ISO 20022:
  *     A002
  *     https://www.iso20022.org/15022/uhb/mt565-16-field-22f.htm
- *
- * Method whereby interest is calculated based on a 30-day month
- * in a way similar to the 30/360 (basic rule) and a 365-day year.
- *
- * Accrued interest to a value date on the last day of a month shall
- * be the same as to the 30th calendar day of the same month, except
- * for February.
- *
- * This means that a 31st is assumed to be a 30th and the 28 Feb (or
- * 29 Feb for a leap year) is assumed to be a 28th (or 29th).
  */
 export function thirty365(
     y1: number, m1: number, d1: number,
@@ -383,10 +301,6 @@ export function thirty365(
  * ISO 20022:
  *     A014
  *     https://www.iso20022.org/15022/uhb/mt565-16-field-22f.htm
- *
- * Method whereby interest is calculated based on the actual
- * number of accrued days in the interest period, excluding
- * any leap day from the count, and a 365-day year.
  */
 export function act365Nonleap(
     y1: number, m1: number, d1: number,
@@ -428,9 +342,6 @@ export function act365Nonleap(
  * ISO 20022:
  *     A005
  *     https://www.iso20022.org/15022/uhb/mt565-16-field-22f.htm
- *
- * Method whereby interest is calculated based on the actual
- * number of accrued days in the interest period and a 365-day year.
  */
 export function act365Fixed(
     y1: number, m1: number, d1: number,
@@ -455,9 +366,6 @@ export function act365Fixed(
  * ISO 20022:
  *     A004
  *     https://www.iso20022.org/15022/uhb/mt565-16-field-22f.htm
- *
- * Method whereby interest is calculated based on the actual
- * number of accrued days in the interest period and a 360-day year.
  */
 export function act360(
     y1: number, m1: number, d1: number,
@@ -547,11 +455,6 @@ export function actActExcel(
  * ISO 20022:
  *     A008
  *     https://www.iso20022.org/15022/uhb/mt565-16-field-22f.htm
- *
- * Method whereby interest is calculated based on the actual number
- * of accrued days of the interest period that fall on a normal year,
- * divided by 365, added to the actual number of days of the interest
- * period that fall on a leap year, divided by 366.
  */
 export function actActIsda(
     y1: number, m1: number, d1: number,
@@ -599,22 +502,6 @@ export function actActIsda(
  * ISO 20022:
  *     A010
  *     https://www.iso20022.org/15022/uhb/mt565-16-field-22f.htm
- *
- * Method whereby interest is calculated based on the actual
- * number of accrued days and a 366-day year (if 29 Feb falls
- * in the coupon period) or a 365-day year (if 29 Feb does not
- * fall in the coupon period).
- *
- * If a coupon period is longer than one year, it is split by
- * repetitively separating full year sub-periods counting backwards
- * from the end of the coupon period (a year backwards from a 28 Feb
- * being 29 Feb, if it exists).
- *
- * The first of the sub-periods starts on the start date of the
- * accrued interest period and thus is possibly shorter than a year.
- *
- * Then the interest computation is operated separately on each
- * sub-period and the intermediate results are summed up.
  */
 export function actActAfb(
     y1: number, m1: number, d1: number,

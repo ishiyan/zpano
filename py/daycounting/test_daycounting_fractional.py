@@ -1,7 +1,6 @@
 import unittest
 from datetime import datetime
-from conventions import DayCountConvention
-from fractional import year_frac, day_frac
+from accounts.daycounting import year_frac, day_frac, DayCountConvention
 
 SECONDS_IN_GREGORIAN_YEAR = 31_556_952
 SECONDS_IN_LEAP_YEAR = 31_622_400

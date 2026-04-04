@@ -6,7 +6,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "npm run build && jasmine",
+    "test": "npm run build && jasmine --config=jasmine.json",
     "test:watch": "nodemon --exec 'npm test' --watch .",
     "clean": "rimraf dist",
     "prepublishOnly": "npm run clean && npm run build"
