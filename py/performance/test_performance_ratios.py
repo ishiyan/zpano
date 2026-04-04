@@ -2080,5 +2080,273 @@ class TestMartinRatio(unittest.TestCase):
 
 ############################################
 
+def _make_ratios(rolling_window=None, min_periods=None, rf=0., mar=0.):
+    """Helper to create a Ratios instance with optional rolling/min_periods."""
+    return Ratios(
+        periodicity=Periodicity.DAILY,
+        annual_risk_free_rate=rf,
+        annual_target_return=mar,
+        day_count_convention=DayCountConvention.RAW,
+        rolling_window=rolling_window,
+        min_periods=min_periods)
+
+def _add_bacon(ratios, count=bacon_portfolio_len):
+    """Feed the first `count` bacon returns into ratios."""
+    for i in range(count):
+        ratios.add_return(
+            return_=bacon_portfolio_returns[i],
+            return_benchmark=bacon_benchmark_returns[i],
+            value=1.,
+            time_start=bacon_dates_previous[i],
+            time_end=bacon_dates[i])
+
+class TestMinPeriods(unittest.TestCase):
+    """All ratios must return None before min_periods samples are accumulated."""
+
+    def test_sharpe_none_before_min_periods(self):
+        """Sharpe returns None for every step < min_periods, valid after."""
+        min_p = 5
+        ratios = _make_ratios(min_periods=min_p)
+        ratios.reset()
+        for i in range(bacon_portfolio_len):
+            ratios.add_return(
+                return_=bacon_portfolio_returns[i],
+                return_benchmark=bacon_benchmark_returns[i],
+                value=1.,
+                time_start=bacon_dates_previous[i],
+                time_end=bacon_dates[i])
+            if i < min_p - 1:
+                self.assertIsNone(ratios.sharpe_ratio(),
+                    f'step {i}: expected None before min_periods')
+            else:
+                # After min_periods, sharpe should be a number (not None for this data)
+                self.assertIsNotNone(ratios.sharpe_ratio(),
+                    f'step {i}: expected value after min_periods')
+
+    def test_all_ratios_none_before_min_periods(self):
+        """Comprehensive check that all ratio methods return None before priming."""
+        min_p = 10
+        ratios = _make_ratios(min_periods=min_p)
+        ratios.reset()
+        # Feed 9 returns (just under min_periods)
+        _add_bacon(ratios, count=min_p - 1)
+        self.assertIsNone(ratios.sharpe_ratio())
+        self.assertIsNone(ratios.sortino_ratio())
+        self.assertIsNone(ratios.omega_ratio())
+        self.assertIsNone(ratios.kappa_ratio(1))
+        self.assertIsNone(ratios.kappa_ratio(2))
+        self.assertIsNone(ratios.kappa_ratio(3))
+        self.assertIsNone(ratios.kappa3_ratio())
+        self.assertIsNone(ratios.bernardo_ledoit_ratio())
+        self.assertIsNone(ratios.upside_potential_ratio())
+        self.assertIsNone(ratios.compound_growth_rate())
+        self.assertIsNone(ratios.calmar_ratio())
+        self.assertIsNone(ratios.sterling_ratio())
+        self.assertIsNone(ratios.burke_ratio())
+        self.assertIsNone(ratios.pain_index())
+        self.assertIsNone(ratios.pain_ratio())
+        self.assertIsNone(ratios.ulcer_index())
+        self.assertIsNone(ratios.martin_ratio())
+        self.assertIsNone(ratios.kurtosis)
+        self.assertIsNone(ratios.skew)
+        self.assertIsNone(ratios.gain_to_pain_ratio)
+        self.assertIsNone(ratios.risk_of_ruin)
+        self.assertIsNone(ratios.risk_return_ratio)
+        # Feed one more to hit min_periods
+        ratios.add_return(
+            return_=bacon_portfolio_returns[min_p - 1],
+            return_benchmark=bacon_benchmark_returns[min_p - 1],
+            value=1.,
+            time_start=bacon_dates_previous[min_p - 1],
+            time_end=bacon_dates[min_p - 1])
+        # Now ratios should be valid
+        self.assertIsNotNone(ratios.sharpe_ratio())
+        self.assertIsNotNone(ratios.kurtosis)
+
+    def test_min_periods_zero_is_ignored(self):
+        """min_periods=0 should behave like None (no minimum)."""
+        ratios = _make_ratios(min_periods=0)
+        ratios.reset()
+        ratios.add_return(
+            return_=bacon_portfolio_returns[0],
+            return_benchmark=bacon_benchmark_returns[0],
+            value=1.,
+            time_start=bacon_dates_previous[0],
+            time_end=bacon_dates[0])
+        # Single return: sharpe is None because std requires 2 samples,
+        # but cumulative_return should work
+        self.assertIsNotNone(ratios.cumulative_return)
+
+    def test_min_periods_negative_is_ignored(self):
+        """min_periods=-5 should behave like None (no minimum)."""
+        ratios = _make_ratios(min_periods=-5)
+        ratios.reset()
+        ratios.add_return(
+            return_=bacon_portfolio_returns[0],
+            return_benchmark=bacon_benchmark_returns[0],
+            value=1.,
+            time_start=bacon_dates_previous[0],
+            time_end=bacon_dates[0])
+        self.assertIsNotNone(ratios.cumulative_return)
+
+
+class TestRollingWindow(unittest.TestCase):
+    """Rolling window should produce the same results as a fresh instance
+    fed only the last N returns."""
+
+    def test_rolling_matches_fresh(self):
+        """Rolling window=10 after 24 returns == fresh instance with last 10."""
+        window = 10
+        r_rolling = _make_ratios(rolling_window=window)
+        r_rolling.reset()
+        _add_bacon(r_rolling)
+
+        r_fresh = _make_ratios()
+        r_fresh.reset()
+        start = bacon_portfolio_len - window
+        for i in range(start, bacon_portfolio_len):
+            r_fresh.add_return(
+                return_=bacon_portfolio_returns[i],
+                return_benchmark=bacon_benchmark_returns[i],
+                value=1.,
+                time_start=bacon_dates_previous[i],
+                time_end=bacon_dates[i])
+
+        self.assertAlmostEqual(r_rolling.sharpe_ratio(), r_fresh.sharpe_ratio(), places=13)
+        self.assertAlmostEqual(r_rolling.sortino_ratio(), r_fresh.sortino_ratio(), places=13)
+        self.assertAlmostEqual(r_rolling.cumulative_return, r_fresh.cumulative_return, places=13)
+        self.assertAlmostEqual(r_rolling.kurtosis, r_fresh.kurtosis, places=13)
+        self.assertAlmostEqual(r_rolling.omega_ratio(), r_fresh.omega_ratio(), places=13)
+        self.assertAlmostEqual(r_rolling.calmar_ratio(), r_fresh.calmar_ratio(), places=12)
+        self.assertAlmostEqual(r_rolling.pain_index(), r_fresh.pain_index(), places=13)
+        self.assertAlmostEqual(r_rolling.ulcer_index(), r_fresh.ulcer_index(), places=13)
+        self.assertAlmostEqual(r_rolling.martin_ratio(), r_fresh.martin_ratio(), places=12)
+        self.assertAlmostEqual(r_rolling.burke_ratio(False), r_fresh.burke_ratio(False), places=12)
+        self.assertAlmostEqual(r_rolling.burke_ratio(True), r_fresh.burke_ratio(True), places=12)
+        self.assertAlmostEqual(
+            r_rolling.worst_drawdowns_cumulative,
+            r_fresh.worst_drawdowns_cumulative, places=13)
+
+    def test_rolling_sharpe_step_by_step(self):
+        """Check rolling Sharpe at each step against known expected values."""
+        expected_sharpe = [
+            None,
+            0.8915694197569513, 1.1419253390798365,
+            0.49779248369997886, 0.6680426571226848, 0.8511810078441023,
+            0.9735918376312113, 0.8462916062735413, 0.6475912629068395,
+            0.7524743687246648,
+            # After step 10 the window is full, old returns start dropping
+            0.6988231811021255, 0.7111123104828202, 0.798675261552181,
+            0.6310757998776281, 0.3386466454024338, 0.32170438498662823,
+            0.16115775541041388, -0.022215518961695248, 0.14832204365045173,
+            0.17865069359303465, 0.05655715365926667, -0.049597686094872355,
+            -0.14538530360069923, -0.08934238062974807,
+        ]
+        ratios = _make_ratios(rolling_window=10)
+        ratios.reset()
+        for i in range(bacon_portfolio_len):
+            ratios.add_return(
+                return_=bacon_portfolio_returns[i],
+                return_benchmark=bacon_benchmark_returns[i],
+                value=1.,
+                time_start=bacon_dates_previous[i],
+                time_end=bacon_dates[i])
+            expected = expected_sharpe[i]
+            actual = ratios.sharpe_ratio()
+            if expected is None:
+                self.assertIsNone(actual, f'step {i}')
+            else:
+                self.assertAlmostEqual(actual, expected, places=13,
+                    msg=f'step {i}')
+
+    def test_rolling_cumulative_return_step_by_step(self):
+        """Check rolling cumulative return at each step."""
+        expected_cumret = [
+            0.0029999999999998916, 0.029077999999999937,
+            0.04039785799999973, 0.02999387941999987,
+            0.045443787611299635, 0.07157988230158208,
+            0.08872516041840739, 0.1616697461664407,
+            0.14540636972011045, 0.19122262450891503,
+            0.18172134734433754, 0.24506898292322488,
+            0.2807831278339803, 0.2458526788930535,
+            0.1525671581089434, 0.14357151199687346,
+            0.0704099487293568, -0.018874479983775894,
+            0.06471024991618646, 0.08313792731858194,
+            0.017823077430024314, -0.035845669483492104,
+            -0.07756388570776418, -0.050743313329589035,
+        ]
+        ratios = _make_ratios(rolling_window=10)
+        ratios.reset()
+        for i in range(bacon_portfolio_len):
+            ratios.add_return(
+                return_=bacon_portfolio_returns[i],
+                return_benchmark=bacon_benchmark_returns[i],
+                value=1.,
+                time_start=bacon_dates_previous[i],
+                time_end=bacon_dates[i])
+            self.assertAlmostEqual(ratios.cumulative_return,
+                expected_cumret[i], places=13, msg=f'step {i}')
+
+    def test_rolling_window_none_is_expanding(self):
+        """rolling_window=None should match the original expanding behavior."""
+        r_expanding = _make_ratios()
+        r_expanding.reset()
+        _add_bacon(r_expanding)
+
+        r_none = _make_ratios(rolling_window=None)
+        r_none.reset()
+        _add_bacon(r_none)
+
+        self.assertAlmostEqual(r_expanding.sharpe_ratio(),
+            r_none.sharpe_ratio(), places=13)
+        self.assertAlmostEqual(r_expanding.cumulative_return,
+            r_none.cumulative_return, places=13)
+
+
+class TestRollingWindowWithMinPeriods(unittest.TestCase):
+    """Combined rolling_window and min_periods."""
+
+    def test_combined_rolling_and_min_periods(self):
+        """rolling_window=10, min_periods=5: None for first 4, valid from step 5."""
+        ratios = _make_ratios(rolling_window=10, min_periods=5)
+        ratios.reset()
+        for i in range(bacon_portfolio_len):
+            ratios.add_return(
+                return_=bacon_portfolio_returns[i],
+                return_benchmark=bacon_benchmark_returns[i],
+                value=1.,
+                time_start=bacon_dates_previous[i],
+                time_end=bacon_dates[i])
+            if i < 4:
+                self.assertIsNone(ratios.sharpe_ratio(),
+                    f'step {i}: expected None before min_periods=5')
+                self.assertIsNone(ratios.kurtosis,
+                    f'step {i}: expected None before min_periods=5')
+            else:
+                # After 5 samples, should have values
+                # (some may still be None due to natural math constraints,
+                # e.g. sharpe needs std != 0, but kurtosis should work)
+                self.assertIsNotNone(ratios.kurtosis,
+                    f'step {i}: expected value after min_periods=5')
+
+    def test_min_periods_greater_than_window(self):
+        """min_periods > rolling_window: still returns None until min_periods reached."""
+        ratios = _make_ratios(rolling_window=5, min_periods=10)
+        ratios.reset()
+        for i in range(bacon_portfolio_len):
+            ratios.add_return(
+                return_=bacon_portfolio_returns[i],
+                return_benchmark=bacon_benchmark_returns[i],
+                value=1.,
+                time_start=bacon_dates_previous[i],
+                time_end=bacon_dates[i])
+            if i < 9:
+                self.assertIsNone(ratios.sharpe_ratio(),
+                    f'step {i}: expected None before min_periods=10')
+            else:
+                # After 10 samples with window=5, sharpe uses last 5 returns
+                self.assertIsNotNone(ratios.sharpe_ratio(),
+                    f'step {i}: expected value after min_periods=10')
+
 if __name__ == '__main__':
     unittest.main()

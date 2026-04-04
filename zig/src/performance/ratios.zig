@@ -22,9 +22,12 @@ pub const Ratios = struct {
     risk_free_rate: f64,
     required_return: f64,
     day_count_convention: DayCountConvention,
+    rolling_window: ?u32,
+    min_periods: ?u32,
 
     fractional_periods: ArrayList(f64),
     returns: ArrayList(f64),
+    sample_count: usize,
 
     logret_sum: f64,
     drawdowns_cumulative: ArrayList(f64),
@@ -65,12 +68,17 @@ pub const Ratios = struct {
 
     /// Creates a new Ratios instance with the specified parameters.
     /// Annual rates are de-annualized to per-period rates based on the periodicity.
+    /// rolling_window, if non-null, limits computations to the last N returns.
+    /// min_periods, if non-null and > 0, causes all ratio methods to return null
+    /// until at least that many samples have been added.
     pub fn init(
         allocator: Allocator,
         p: Periodicity,
         annual_risk_free_rate: f64,
         annual_target_return: f64,
         day_count_convention: DayCountConvention,
+        rolling_window: ?u32,
+        min_periods: ?u32,
     ) Ratios {
         const ppa = p.periodsPerAnnum();
         const dpp = p.daysPerPeriod();
@@ -85,6 +93,9 @@ pub const Ratios = struct {
             rr = math.pow(f64, 1.0 + annual_target_return, 1.0 / @as(f64, @floatFromInt(ppa))) - 1.0;
         }
 
+        // Treat null or <=0 min_periods as no minimum
+        const mp: ?u32 = if (min_periods != null and min_periods.? > 0) min_periods else null;
+
         var r = Ratios{
             .periodicity_val = p,
             .periods_per_annum = ppa,
@@ -92,8 +103,11 @@ pub const Ratios = struct {
             .risk_free_rate = rfr,
             .required_return = rr,
             .day_count_convention = day_count_convention,
+            .rolling_window = rolling_window,
+            .min_periods = mp,
             .fractional_periods = ArrayList(f64).empty,
             .returns = ArrayList(f64).empty,
+            .sample_count = 0,
             .logret_sum = 0,
             .drawdowns_cumulative = ArrayList(f64).empty,
             .drawdowns_cumulative_min = math.inf(f64),
@@ -147,6 +161,7 @@ pub const Ratios = struct {
     pub fn reset(self: *Ratios) void {
         self.fractional_periods.clearRetainingCapacity();
         self.returns.clearRetainingCapacity();
+        self.sample_count = 0;
         self.logret_sum = 0;
         self.drawdowns_cumulative.clearRetainingCapacity();
         self.drawdowns_cumulative_min = math.inf(f64);
@@ -207,43 +222,51 @@ pub const Ratios = struct {
             return;
         }
         self.total_duration += fractional_period;
+        self.sample_count += 1;
 
         // Normalized return
         const ret = return_val / fractional_period;
         try self.returns.append(self.allocator, ret);
-        const l = self.returns.items.len;
+
+        // Window slice: use last rolling_window returns, or all if not set
+        const all = self.returns.items;
+        const w: []const f64 = if (self.rolling_window) |rw| blk: {
+            const n: usize = @intCast(rw);
+            break :blk if (all.len > n) all[all.len - n ..] else all;
+        } else all;
+        const l = w.len;
         const lf: f64 = @floatFromInt(l);
 
         // Returns mean
-        const mean = sliceMean(self.returns.items);
+        const mean = sliceMean(w);
         self.returns_mean = mean;
 
         // Returns std (ddof=1, sample)
         if (l > 1) {
-            self.returns_std = sliceStdDdof1(self.returns.items, mean);
+            self.returns_std = sliceStdDdof1(w, mean);
         } else {
             self.returns_std = null;
         }
 
-        self.returns_autocorr_penalty = autocorrPenalty(self.returns.items);
+        self.returns_autocorr_penalty = autocorrPenalty(w);
 
         // Average return, win rate, avg win, avg loss
-        const non_zero = countNonZero(self.returns.items);
+        const non_zero = countNonZero(w);
         if (non_zero > 0) {
-            self.avg_return = meanNonZero(self.returns.items);
+            self.avg_return = meanNonZero(w);
 
-            const pos_count = countPositive(self.returns.items);
+            const pos_count = countPositive(w);
             self.win_rate = @as(f64, @floatFromInt(pos_count)) / @as(f64, @floatFromInt(non_zero));
 
             if (pos_count > 0) {
-                self.avg_win = meanPositive(self.returns.items);
+                self.avg_win = meanPositive(w);
             } else {
                 self.avg_win = null;
             }
 
-            const neg_count = countNegative(self.returns.items);
+            const neg_count = countNegative(w);
             if (neg_count > 0) {
-                self.avg_loss = meanNegative(self.returns.items);
+                self.avg_loss = meanNegative(w);
             } else {
                 self.avg_loss = null;
             }
@@ -260,16 +283,15 @@ pub const Ratios = struct {
             self.excess_std = self.returns_std;
             self.excess_autocorr_penalty = self.returns_autocorr_penalty;
         } else {
-            // Compute excess stats inline (no allocation needed)
             var excess_sum: f64 = 0;
-            for (self.returns.items) |v| {
+            for (w) |v| {
                 excess_sum += v - self.risk_free_rate;
             }
             const em = excess_sum / lf;
             self.excess_mean = em;
             if (l > 1) {
                 var sumsq: f64 = 0;
-                for (self.returns.items) |v| {
+                for (w) |v| {
                     const d = (v - self.risk_free_rate) - em;
                     sumsq += d * d;
                 }
@@ -284,7 +306,7 @@ pub const Ratios = struct {
         var lpm1_sum: f64 = 0;
         var lpm2_sum: f64 = 0;
         var lpm3_sum: f64 = 0;
-        for (self.returns.items) |v| {
+        for (w) |v| {
             var diff: f64 = undefined;
             if (self.required_return == 0) {
                 diff = -v;
@@ -306,7 +328,7 @@ pub const Ratios = struct {
             self.required_autocorr_penalty = self.returns_autocorr_penalty;
         } else {
             var rm_sum: f64 = 0;
-            for (self.returns.items) |v| {
+            for (w) |v| {
                 rm_sum += v - self.required_return;
             }
             self.required_mean = rm_sum / lf;
@@ -316,7 +338,7 @@ pub const Ratios = struct {
         var hpm1_sum: f64 = 0;
         var hpm2_sum: f64 = 0;
         var hpm3_sum: f64 = 0;
-        for (self.returns.items) |v| {
+        for (w) |v| {
             var diff: f64 = undefined;
             if (self.required_return == 0) {
                 diff = v;
@@ -332,53 +354,75 @@ pub const Ratios = struct {
         self.required_hpm2 = hpm2_sum / lf;
         self.required_hpm3 = hpm3_sum / lf;
 
-        // Cumulative returns
-        const retlog = @log(return_val + 1.0) / fractional_period;
-        self.logret_sum += retlog;
-        const ret1 = ret + 1.0;
-        _ = ret1;
-
-        var cmr: f64 = undefined;
-        if (l == 1) {
-            cmr = ret + 1.0;
-            self.cumulative_return_plus1 = cmr;
-            self.cumulative_return_geometric_mean = ret;
-        } else {
-            cmr = @exp(self.logret_sum);
-            self.cumulative_return_plus1 = cmr;
+        // Cumulative returns — recompute from window
+        const w_start = all.len - l;
+        var logret_sum_val: f64 = 0;
+        for (0..l) |j| {
+            const fp_j = self.fractional_periods.items[w_start + j];
+            if (fp_j != 0) {
+                logret_sum_val += @log(w[j] + 1.0);
+            }
+        }
+        self.logret_sum = logret_sum_val;
+        const cmr = @as(f64, @exp(logret_sum_val));
+        self.cumulative_return_plus1 = cmr;
+        if (l >= 1) {
             self.cumulative_return_geometric_mean = math.pow(f64, cmr, 1.0 / lf) - 1.0;
         }
-        if (self.cumulative_return_plus1_max < cmr) {
-            self.cumulative_return_plus1_max = cmr;
+        self.cumulative_return_plus1_max = -math.inf(f64);
+        var cumr: f64 = 1.0;
+        for (0..l) |j| {
+            cumr *= (w[j] + 1.0);
+            if (cumr > self.cumulative_return_plus1_max) {
+                self.cumulative_return_plus1_max = cumr;
+            }
         }
 
-        // Drawdowns from peaks to valleys (cumulative returns)
-        const dd = cmr / self.cumulative_return_plus1_max - 1.0;
-        if (self.drawdowns_cumulative_min > dd) {
-            self.drawdowns_cumulative_min = dd;
-        }
-        try self.drawdowns_cumulative.append(self.allocator, dd);
-
-        // Drawdown peaks (used in pain index, ulcer index)
-        var dd_peak: f64 = 1.0;
-        var j: usize = self.drawdowns_peaks_peak + 1;
-        while (j < l) : (j += 1) {
-            dd_peak *= (1.0 + self.returns.items[j] * 0.01);
-        }
-        if (dd_peak > 1.0) {
-            self.drawdowns_peaks_peak = l - 1;
-            try self.drawdowns_peaks.append(self.allocator, 0);
-        } else {
-            try self.drawdowns_peaks.append(self.allocator, (dd_peak - 1.0) * 100.0);
+        // Drawdowns from peaks to valleys (cumulative returns) — recompute from window
+        self.drawdowns_cumulative.clearRetainingCapacity();
+        self.drawdowns_cumulative_min = math.inf(f64);
+        cumr = 1.0;
+        var cumr_max: f64 = -math.inf(f64);
+        for (0..l) |j| {
+            cumr *= (w[j] + 1.0);
+            if (cumr > cumr_max) {
+                cumr_max = cumr;
+            }
+            const dd = cumr / cumr_max - 1.0;
+            try self.drawdowns_cumulative.append(self.allocator, dd);
+            if (self.drawdowns_cumulative_min > dd) {
+                self.drawdowns_cumulative_min = dd;
+            }
         }
 
-        // Drawdown continuous (used in Burke ratio)
-        if (l > 1) {
-            self.drawdown_continuous_finalized = false;
-            if (ret < 0) {
+        // Drawdown peaks (used in pain index, ulcer index) — recompute from window
+        self.drawdowns_peaks.clearRetainingCapacity();
+        self.drawdowns_peaks_peak = 0;
+        for (0..l) |j| {
+            var dd_peak: f64 = 1.0;
+            var k: usize = self.drawdowns_peaks_peak + 1;
+            while (k <= j) : (k += 1) {
+                dd_peak *= (1.0 + w[k] * 0.01);
+            }
+            if (dd_peak > 1.0) {
+                self.drawdowns_peaks_peak = j;
+                try self.drawdowns_peaks.append(self.allocator, 0);
+            } else {
+                try self.drawdowns_peaks.append(self.allocator, (dd_peak - 1.0) * 100.0);
+            }
+        }
+
+        // Drawdown continuous (used in Burke ratio) — recompute from window
+        self.drawdown_continuous.clearRetainingCapacity();
+        self.drawdown_continuous_final.clearRetainingCapacity();
+        self.drawdown_continuous_finalized = false;
+        self.drawdown_continuous_peak = 1;
+        self.drawdown_continuous_inside = false;
+        for (1..l) |j| {
+            if (w[j] < 0) {
                 if (!self.drawdown_continuous_inside) {
                     self.drawdown_continuous_inside = true;
-                    self.drawdown_continuous_peak = l - 2;
+                    self.drawdown_continuous_peak = j - 1;
                 }
                 try self.drawdown_continuous.append(self.allocator, 0);
             } else {
@@ -386,8 +430,8 @@ pub const Ratios = struct {
                     var dd_c: f64 = 1.0;
                     const j1 = self.drawdown_continuous_peak + 1;
                     var k: usize = j1;
-                    while (k < l - 1) : (k += 1) {
-                        dd_c *= (1.0 + self.returns.items[k] * 0.01);
+                    while (k < j) : (k += 1) {
+                        dd_c *= (1.0 + w[k] * 0.01);
                     }
                     try self.drawdown_continuous.append(self.allocator, (dd_c - 1.0) * 100.0);
                     self.drawdown_continuous_inside = false;
@@ -455,6 +499,7 @@ pub const Ratios = struct {
         if (self.drawdown_continuous_finalized) {
             return;
         }
+        const w = self.windowReturns();
         self.drawdown_continuous_final.clearRetainingCapacity();
         // Copy existing drawdown_continuous into final
         self.drawdown_continuous_final.appendSlice(self.allocator, self.drawdown_continuous.items) catch return;
@@ -463,8 +508,8 @@ pub const Ratios = struct {
             var dd_c: f64 = 1.0;
             const j1 = self.drawdown_continuous_peak + 1;
             var j: usize = j1;
-            while (j < self.returns.items.len) : (j += 1) {
-                dd_c *= (1.0 + self.returns.items[j] * 0.01);
+            while (j < w.len) : (j += 1) {
+                dd_c *= (1.0 + w[j] * 0.01);
             }
             self.drawdown_continuous_final.append(self.allocator, (dd_c - 1.0) * 100.0) catch return;
         } else {
@@ -473,24 +518,47 @@ pub const Ratios = struct {
         self.drawdown_continuous_finalized = true;
     }
 
+    /// Returns true if enough samples have been added to satisfy min_periods.
+    fn isPrimed(self: *const Ratios) bool {
+        if (self.min_periods) |mp| {
+            return self.sample_count >= mp;
+        }
+        return true;
+    }
+
+    /// Returns the windowed slice of returns.
+    fn windowReturns(self: *const Ratios) []const f64 {
+        const all = self.returns.items;
+        if (self.rolling_window) |rw| {
+            const n: usize = @intCast(rw);
+            if (all.len > n) return all[all.len - n ..];
+        }
+        return all;
+    }
+
     /// Returns the population skewness of the returns.
     pub fn skew(self: *const Ratios) ?f64 {
-        if (self.returns.items.len < 2) {
+        if (!self.isPrimed()) return null;
+        const w = self.windowReturns();
+        if (w.len < 2) {
             return null;
         }
-        return populationSkewness(self.returns.items);
+        return populationSkewness(w);
     }
 
     /// Returns the population excess kurtosis of the returns.
     pub fn kurtosis(self: *const Ratios) ?f64 {
-        if (self.returns.items.len < 2) {
+        if (!self.isPrimed()) return null;
+        const w = self.windowReturns();
+        if (w.len < 2) {
             return null;
         }
-        return populationExcessKurtosis(self.returns.items);
+        return populationExcessKurtosis(w);
     }
 
     /// Calculates the ex-post Sharpe ratio.
     pub fn sharpeRatio(self: *const Ratios, ignore_risk_free_rate: bool, autocorrelation_penalty: bool) ?f64 {
+        if (!self.isPrimed()) return null;
         if (ignore_risk_free_rate) {
             const rm = self.returns_mean orelse return null;
             const rs = self.returns_std orelse return null;
@@ -513,6 +581,7 @@ pub const Ratios = struct {
 
     /// Calculates the Sortino ratio.
     pub fn sortinoRatio(self: *const Ratios, autocorrelation_penalty: bool, divide_by_sqrt2: bool) ?f64 {
+        if (!self.isPrimed()) return null;
         const rm = self.required_mean orelse return null;
         const lpm2 = self.required_lpm2 orelse return null;
         if (lpm2 == 0) return null;
@@ -528,6 +597,7 @@ pub const Ratios = struct {
 
     /// Calculates the Omega ratio.
     pub fn omegaRatio(self: *const Ratios) ?f64 {
+        if (!self.isPrimed()) return null;
         const rm = self.required_mean orelse return null;
         const lpm1 = self.required_lpm1 orelse return null;
         if (lpm1 == 0) return null;
@@ -536,6 +606,7 @@ pub const Ratios = struct {
 
     /// Calculates the Kappa ratio of a given order.
     pub fn kappaRatio(self: *const Ratios, order: u32) ?f64 {
+        if (!self.isPrimed()) return null;
         const rm = self.required_mean orelse return null;
         switch (order) {
             1 => {
@@ -554,11 +625,12 @@ pub const Ratios = struct {
                 return rm / std.math.cbrt(lpm3);
             },
             else => {
-                const l = self.returns.items.len;
+                const w = self.windowReturns();
+                const l = w.len;
                 if (l == 0) return null;
                 const lf: f64 = @floatFromInt(l);
                 var lpm_sum: f64 = 0;
-                for (self.returns.items) |v| {
+                for (w) |v| {
                     var diff: f64 = undefined;
                     if (self.required_return == 0) {
                         diff = -v;
@@ -577,6 +649,7 @@ pub const Ratios = struct {
 
     /// Calculates the Kappa ratio of order 3.
     pub fn kappa3Ratio(self: *const Ratios) ?f64 {
+        if (!self.isPrimed()) return null;
         const rm = self.required_mean orelse return null;
         const lpm3 = self.required_lpm3 orelse return null;
         if (lpm3 == 0) return null;
@@ -585,13 +658,15 @@ pub const Ratios = struct {
 
     /// Calculates the Bernardo-Ledoit ratio.
     pub fn bernardoLedoitRatio(self: *const Ratios) ?f64 {
-        const l = self.returns.items.len;
+        if (!self.isPrimed()) return null;
+        const w = self.windowReturns();
+        const l = w.len;
         if (l < 1) return null;
         const lf: f64 = @floatFromInt(l);
 
         // LPM1 with threshold=0
         var lpm1_sum: f64 = 0;
-        for (self.returns.items) |v| {
+        for (w) |v| {
             const neg = -v;
             if (neg > 0) lpm1_sum += neg;
         }
@@ -600,7 +675,7 @@ pub const Ratios = struct {
 
         // HPM1 with threshold=0
         var hpm1_sum: f64 = 0;
-        for (self.returns.items) |v| {
+        for (w) |v| {
             if (v > 0) hpm1_sum += v;
         }
         const hpm1 = hpm1_sum / lf;
@@ -609,6 +684,7 @@ pub const Ratios = struct {
 
     /// Calculates the upside potential ratio.
     pub fn upsidePotentialRatio(self: *const Ratios, full: bool) ?f64 {
+        if (!self.isPrimed()) return null;
         if (full) {
             const hpm1 = self.required_hpm1 orelse return null;
             const lpm2 = self.required_lpm2 orelse return null;
@@ -616,9 +692,10 @@ pub const Ratios = struct {
             return hpm1 / @sqrt(lpm2);
         }
         // Subset version
+        const w = self.windowReturns();
         var below_count: usize = 0;
         var below_lpm2_sum: f64 = 0;
-        for (self.returns.items) |v| {
+        for (w) |v| {
             if (v < self.required_return) {
                 const diff = v - self.required_return;
                 below_lpm2_sum += diff * diff;
@@ -631,7 +708,7 @@ pub const Ratios = struct {
 
         var above_sum: f64 = 0;
         var above_count: usize = 0;
-        for (self.returns.items) |v| {
+        for (w) |v| {
             if (v > self.required_return) {
                 above_sum += v - self.required_return;
                 above_count += 1;
@@ -644,11 +721,13 @@ pub const Ratios = struct {
 
     /// Returns the compound (annual) growth rate (CAGR).
     pub fn compoundGrowthRate(self: *const Ratios) ?f64 {
+        if (!self.isPrimed()) return null;
         return self.cumulative_return_geometric_mean;
     }
 
     /// Calculates the Calmar ratio.
     pub fn calmarRatio(self: *const Ratios) ?f64 {
+        if (!self.isPrimed()) return null;
         const wdd = self.worstDrawdownsCumulative();
         if (wdd == 0) return null;
         const gm = self.cumulative_return_geometric_mean orelse return null;
@@ -657,6 +736,7 @@ pub const Ratios = struct {
 
     /// Calculates the Sterling ratio with the given annual excess rate.
     pub fn sterlingRatio(self: *const Ratios, annual_excess_rate: f64) ?f64 {
+        if (!self.isPrimed()) return null;
         var excess_rate = annual_excess_rate;
         if (annual_excess_rate != 0 and self.periods_per_annum != 1) {
             excess_rate = math.pow(f64, 1.0 + annual_excess_rate, 1.0 / @as(f64, @floatFromInt(self.periods_per_annum))) - 1.0;
@@ -669,6 +749,7 @@ pub const Ratios = struct {
 
     /// Calculates the Burke ratio.
     pub fn burkeRatio(self: *Ratios, modified: bool) ?f64 {
+        if (!self.isPrimed()) return null;
         const gm = self.cumulative_return_geometric_mean orelse return null;
         const rate = gm - self.risk_free_rate;
 
@@ -690,7 +771,7 @@ pub const Ratios = struct {
 
         var burke = rate / sqrt_sum_sq;
         if (modified) {
-            burke *= @sqrt(@as(f64, @floatFromInt(self.returns.items.len)));
+            burke *= @sqrt(@as(f64, @floatFromInt(self.windowReturns().len)));
         }
         return burke;
     }
@@ -703,6 +784,7 @@ pub const Ratios = struct {
 
     /// Calculates the pain index.
     pub fn painIndex(self: *const Ratios) ?f64 {
+        if (!self.isPrimed()) return null;
         const l = self.drawdowns_peaks.items.len;
         if (l < 1) return null;
         return -sliceSum(self.drawdowns_peaks.items) / @as(f64, @floatFromInt(l));
@@ -710,6 +792,7 @@ pub const Ratios = struct {
 
     /// Calculates the pain ratio.
     pub fn painRatio(self: *const Ratios) ?f64 {
+        if (!self.isPrimed()) return null;
         const gm = self.cumulative_return_geometric_mean orelse return null;
         const rate = gm - self.risk_free_rate;
         const l = self.drawdowns_peaks.items.len;
@@ -721,6 +804,7 @@ pub const Ratios = struct {
 
     /// Calculates the ulcer index.
     pub fn ulcerIndex(self: *const Ratios) ?f64 {
+        if (!self.isPrimed()) return null;
         const l = self.drawdowns_peaks.items.len;
         if (l < 1) return null;
         var sum_sq: f64 = 0;
@@ -732,6 +816,7 @@ pub const Ratios = struct {
 
     /// Calculates the Martin (Ulcer) ratio.
     pub fn martinRatio(self: *const Ratios) ?f64 {
+        if (!self.isPrimed()) return null;
         const gm = self.cumulative_return_geometric_mean orelse return null;
         const rate = gm - self.risk_free_rate;
         const l = self.drawdowns_peaks.items.len;
@@ -747,6 +832,7 @@ pub const Ratios = struct {
 
     /// Returns Jack Schwager's gain-to-pain ratio.
     pub fn gainToPainRatio(self: *const Ratios) ?f64 {
+        if (!self.isPrimed()) return null;
         const lpm1 = self.required_lpm1 orelse return null;
         if (lpm1 == 0) return null;
         const rm = self.returns_mean orelse return null;
@@ -755,12 +841,14 @@ pub const Ratios = struct {
 
     /// Calculates the risk of ruin.
     pub fn riskOfRuin(self: *const Ratios) ?f64 {
+        if (!self.isPrimed()) return null;
         const wr = self.win_rate orelse return null;
-        return math.pow(f64, (1.0 - wr) / (1.0 + wr), @as(f64, @floatFromInt(self.returns.items.len)));
+        return math.pow(f64, (1.0 - wr) / (1.0 + wr), @as(f64, @floatFromInt(self.windowReturns().len)));
     }
 
     /// Calculates the return/risk ratio.
     pub fn riskReturnRatio(self: *const Ratios) ?f64 {
+        if (!self.isPrimed()) return null;
         const rm = self.returns_mean orelse return null;
         const rs = self.returns_std orelse return null;
         if (rs == 0) return null;
@@ -977,14 +1065,14 @@ const bacon_len: usize = bacon_portfolio_returns.len;
 
 fn newRatiosWithRF(allocator: Allocator, rf: f64) Ratios {
     const rf_annual = math.pow(f64, 1.0 + rf, 252.0) - 1.0;
-    var r = Ratios.init(allocator, .daily, rf_annual, 0, .raw);
+    var r = Ratios.init(allocator, .daily, rf_annual, 0, .raw, null, null);
     r.reset();
     return r;
 }
 
 fn newRatiosWithMAR(allocator: Allocator, mar: f64) Ratios {
     const mar_annual = math.pow(f64, 1.0 + mar, 252.0) - 1.0;
-    var r = Ratios.init(allocator, .daily, 0, mar_annual, .raw);
+    var r = Ratios.init(allocator, .daily, 0, mar_annual, .raw, null, null);
     r.reset();
     return r;
 }
@@ -992,7 +1080,7 @@ fn newRatiosWithMAR(allocator: Allocator, mar: f64) Ratios {
 fn newRatiosWithRFandMAR(allocator: Allocator, rf: f64, mar: f64) Ratios {
     const rf_annual = math.pow(f64, 1.0 + rf, 252.0) - 1.0;
     const mar_annual = math.pow(f64, 1.0 + mar, 252.0) - 1.0;
-    var r = Ratios.init(allocator, .daily, rf_annual, mar_annual, .raw);
+    var r = Ratios.init(allocator, .daily, rf_annual, mar_annual, .raw, null, null);
     r.reset();
     return r;
 }
@@ -1734,7 +1822,7 @@ test "calmar ratio" {
 
 test "sterling ratio excess=0" {
     const allocator = testing.allocator;
-    var ratios = Ratios.init(allocator, .daily, 0, 0, .raw);
+    var ratios = Ratios.init(allocator, .daily, 0, 0, .raw, null, null);
     ratios.reset();
     defer ratios.deinit();
 
@@ -1766,7 +1854,7 @@ test "sterling ratio excess=0" {
 
 test "sterling ratio excess=0.02" {
     const allocator = testing.allocator;
-    var ratios = Ratios.init(allocator, .daily, 0, 0, .raw);
+    var ratios = Ratios.init(allocator, .daily, 0, 0, .raw, null, null);
     ratios.reset();
     defer ratios.deinit();
 
@@ -2005,6 +2093,227 @@ test "martin ratio rf=0" {
         } else {
             try testing.expect(actual != null);
             try testing.expect(almostEqual(actual.?, expected[i].?, martin_eps));
+        }
+    }
+}
+
+// ---------- Min Periods Tests ----------
+
+fn newRatiosWithWindow(allocator: Allocator, rolling_window: ?u32, min_periods: ?u32) Ratios {
+    var r = Ratios.init(allocator, .daily, 0, 0, .raw, rolling_window, min_periods);
+    r.reset();
+    return r;
+}
+
+fn addBaconReturns(r: *Ratios, count: usize) !void {
+    const n = if (count == 0) bacon_len else @min(count, bacon_len);
+    for (0..n) |i| {
+        try addBaconReturn(r, i);
+    }
+}
+
+test "min_periods: sharpe nil before min_periods" {
+    const allocator = testing.allocator;
+    var ratios = newRatiosWithWindow(allocator, null, 10);
+    defer ratios.deinit();
+
+    for (0..bacon_len) |i| {
+        try addBaconReturn(&ratios, i);
+        if (i < 9) {
+            try testing.expect(ratios.sharpeRatio(false, false) == null);
+        } else {
+            try testing.expect(ratios.sharpeRatio(false, false) != null);
+        }
+    }
+}
+
+test "min_periods: all ratios nil before min_periods" {
+    const allocator = testing.allocator;
+    var ratios = newRatiosWithWindow(allocator, null, 10);
+    defer ratios.deinit();
+
+    try addBaconReturns(&ratios, 9);
+
+    try testing.expect(ratios.sharpeRatio(false, false) == null);
+    try testing.expect(ratios.sortinoRatio(false, false) == null);
+    try testing.expect(ratios.omegaRatio() == null);
+    try testing.expect(ratios.kappaRatio(1) == null);
+    try testing.expect(ratios.kappaRatio(2) == null);
+    try testing.expect(ratios.kappaRatio(3) == null);
+    try testing.expect(ratios.kappa3Ratio() == null);
+    try testing.expect(ratios.bernardoLedoitRatio() == null);
+    try testing.expect(ratios.upsidePotentialRatio(true) == null);
+    try testing.expect(ratios.compoundGrowthRate() == null);
+    try testing.expect(ratios.calmarRatio() == null);
+    try testing.expect(ratios.sterlingRatio(0) == null);
+    try testing.expect(ratios.painIndex() == null);
+    try testing.expect(ratios.painRatio() == null);
+    try testing.expect(ratios.ulcerIndex() == null);
+    try testing.expect(ratios.martinRatio() == null);
+    try testing.expect(ratios.kurtosis() == null);
+    try testing.expect(ratios.skew() == null);
+    try testing.expect(ratios.gainToPainRatio() == null);
+    try testing.expect(ratios.riskOfRuin() == null);
+    try testing.expect(ratios.riskReturnRatio() == null);
+
+    // Feed one more to hit min_periods
+    try addBaconReturn(&ratios, 9);
+    try testing.expect(ratios.sharpeRatio(false, false) != null);
+    try testing.expect(ratios.kurtosis() != null);
+}
+
+test "min_periods: zero is ignored" {
+    const allocator = testing.allocator;
+    var ratios = newRatiosWithWindow(allocator, null, 0);
+    defer ratios.deinit();
+
+    try addBaconReturn(&ratios, 0);
+    // CumulativeReturn is always valid (f64)
+    try testing.expect(ratios.cumulativeReturn() != 0 or bacon_portfolio_returns[0] == 0);
+}
+
+// ---------- Rolling Window Tests ----------
+
+test "rolling window: matches fresh" {
+    const allocator = testing.allocator;
+    const window: u32 = 10;
+    var r_rolling = newRatiosWithWindow(allocator, window, null);
+    defer r_rolling.deinit();
+    try addBaconReturns(&r_rolling, 0); // all
+
+    var r_fresh = newRatiosWithWindow(allocator, null, null);
+    defer r_fresh.deinit();
+    const start = bacon_len - window;
+    for (start..bacon_len) |i| {
+        try addBaconReturn(&r_fresh, i);
+    }
+
+    const match_eps: f64 = 1e-13;
+    try assertNullableFloatEps("rolling sharpe", r_fresh.sharpeRatio(false, false), r_rolling.sharpeRatio(false, false), match_eps);
+    try assertNullableFloatEps("rolling sortino", r_fresh.sortinoRatio(false, false), r_rolling.sortinoRatio(false, false), match_eps);
+    try testing.expect(almostEqual(r_rolling.cumulativeReturn(), r_fresh.cumulativeReturn(), match_eps));
+    try assertNullableFloatEps("rolling kurtosis", r_fresh.kurtosis(), r_rolling.kurtosis(), match_eps);
+    try assertNullableFloatEps("rolling omega", r_fresh.omegaRatio(), r_rolling.omegaRatio(), match_eps);
+    try assertNullableFloatEps("rolling calmar", r_fresh.calmarRatio(), r_rolling.calmarRatio(), match_eps);
+    try assertNullableFloatEps("rolling pain_index", r_fresh.painIndex(), r_rolling.painIndex(), match_eps);
+    try assertNullableFloatEps("rolling ulcer_index", r_fresh.ulcerIndex(), r_rolling.ulcerIndex(), match_eps);
+    try assertNullableFloatEps("rolling martin", r_fresh.martinRatio(), r_rolling.martinRatio(), match_eps);
+    try testing.expect(almostEqual(r_rolling.worstDrawdownsCumulative(), r_fresh.worstDrawdownsCumulative(), match_eps));
+}
+
+test "rolling window: sharpe step by step" {
+    const allocator = testing.allocator;
+    var ratios = newRatiosWithWindow(allocator, 10, null);
+    defer ratios.deinit();
+
+    const expected = [_]?f64{
+        null,
+        0.8915694197569513,
+        1.1419253390798365,
+        0.49779248369997886,
+        0.6680426571226848,
+        0.8511810078441023,
+        0.9735918376312113,
+        0.8462916062735413,
+        0.6475912629068395,
+        0.7524743687246648,
+        0.6988231811021255,
+        0.7111123104828202,
+        0.798675261552181,
+        0.6310757998776281,
+        0.3386466454024338,
+        0.32170438498662823,
+        0.16115775541041388,
+        -0.022215518961695248,
+        0.14832204365045173,
+        0.17865069359303465,
+        0.05655715365926667,
+        -0.049597686094872355,
+        -0.14538530360069923,
+        -0.08934238062974807,
+    };
+
+    for (0..bacon_len) |i| {
+        try addBaconReturn(&ratios, i);
+        const actual = ratios.sharpeRatio(false, false);
+        if (expected[i] == null) {
+            try testing.expect(actual == null);
+        } else {
+            try testing.expect(actual != null);
+            try testing.expect(almostEqual(actual.?, expected[i].?, epsilon));
+        }
+    }
+}
+
+test "rolling window: cumulative return step by step" {
+    const allocator = testing.allocator;
+    var ratios = newRatiosWithWindow(allocator, 10, null);
+    defer ratios.deinit();
+
+    const expected = [_]f64{
+        0.0029999999999998916, 0.029077999999999937,
+        0.04039785799999973,   0.02999387941999987,
+        0.045443787611299635,  0.07157988230158208,
+        0.08872516041840739,   0.1616697461664407,
+        0.14540636972011045,   0.19122262450891503,
+        0.18172134734433754,   0.24506898292322488,
+        0.2807831278339803,    0.2458526788930535,
+        0.1525671581089434,    0.14357151199687346,
+        0.0704099487293568,    -0.018874479983775894,
+        0.06471024991618646,   0.08313792731858194,
+        0.017823077430024314,  -0.035845669483492104,
+        -0.07756388570776418,  -0.050743313329589035,
+    };
+
+    for (0..bacon_len) |i| {
+        try addBaconReturn(&ratios, i);
+        try testing.expect(almostEqual(ratios.cumulativeReturn(), expected[i], epsilon));
+    }
+}
+
+test "rolling window: nil is expanding" {
+    const allocator = testing.allocator;
+    var r_expanding = newRatiosWithWindow(allocator, null, null);
+    defer r_expanding.deinit();
+    try addBaconReturns(&r_expanding, 0);
+
+    var r_none = newRatiosWithWindow(allocator, null, null);
+    defer r_none.deinit();
+    try addBaconReturns(&r_none, 0);
+
+    try assertNullableFloatEps("expanding sharpe", r_expanding.sharpeRatio(false, false), r_none.sharpeRatio(false, false), epsilon);
+    try testing.expect(almostEqual(r_expanding.cumulativeReturn(), r_none.cumulativeReturn(), epsilon));
+}
+
+// ---------- Rolling Window With Min Periods Tests ----------
+
+test "rolling window with min_periods: combined" {
+    const allocator = testing.allocator;
+    var ratios = newRatiosWithWindow(allocator, 10, 5);
+    defer ratios.deinit();
+
+    for (0..bacon_len) |i| {
+        try addBaconReturn(&ratios, i);
+        if (i < 4) {
+            try testing.expect(ratios.sharpeRatio(false, false) == null);
+            try testing.expect(ratios.kurtosis() == null);
+        } else {
+            try testing.expect(ratios.kurtosis() != null);
+        }
+    }
+}
+
+test "rolling window with min_periods: min_periods > window" {
+    const allocator = testing.allocator;
+    var ratios = newRatiosWithWindow(allocator, 5, 10);
+    defer ratios.deinit();
+
+    for (0..bacon_len) |i| {
+        try addBaconReturn(&ratios, i);
+        if (i < 9) {
+            try testing.expect(ratios.sharpeRatio(false, false) == null);
+        } else {
+            try testing.expect(ratios.sharpeRatio(false, false) != null);
         }
     }
 }

@@ -17,7 +17,9 @@ class Ratios:
         periodicity: Periodicity = Periodicity.DAILY,
         annual_risk_free_rate: float = 0.,
         annual_target_return: float = 0., # TARGET RETURN !!!!
-        day_count_convention: DayCountConvention = DayCountConvention.RAW):
+        day_count_convention: DayCountConvention = DayCountConvention.RAW,
+        rolling_window: int = None,
+        min_periods: int = None):
         """
         Args:
             annual_risk_free_rate float:
@@ -51,6 +53,9 @@ class Ratios:
             if annual_target_return == 0 or periods_per_annum == 1 \
             else ((1 + annual_target_return) ** (1/periods_per_annum) - 1)
         self.day_count_convention = day_count_convention
+        self.rolling_window = rolling_window
+        self.min_periods = min_periods if min_periods is not None and min_periods > 0 \
+            else None
 
         self.fractional_periods: np.ndarray = None
         self.returns: np.ndarray = None
@@ -89,6 +94,7 @@ class Ratios:
         self._avg_loss: float = None
         self._win_rate: float = None
         self._total_duration: float = None
+        self._sample_count: int = 0
 
     def reset(self):
         self.fractional_periods = np.array([])
@@ -107,6 +113,7 @@ class Ratios:
         self._cumulative_return_plus_1_100 = 1
         self._cumulative_return_plus_1_max = -np.inf
         self._total_duration = 0
+        self._sample_count = 0
 
     def add_return(self,
                    return_: float,
@@ -120,32 +127,36 @@ class Ratios:
         else:
             fractional_period = day_frac(time_start, time_end,
                 self.day_count_convention) / self.days_per_period
-        #fractional_period = frac(time_start, time_end,
-        #    self.day_count_convention, True) / self.days_per_period
 
         self.fractional_periods = np.append(self.fractional_periods, fractional_period)
         if fractional_period == 0:
             print('Zero fractional time period, perfomance not updated')
             return
         self._total_duration += fractional_period ### DO SMTH WITH IT
+        self._sample_count += 1
 
         # Normalized returns
         ret = return_ / fractional_period
         self.returns = np.append(self.returns, ret)
-        l = len(self.returns)
-        self._returns_mean = np.mean(self.returns)
-        self._returns_std = \
-            np.std(self.returns, ddof=1) if l > 1 else None
-        self._returns_autocorr_penalty = self._autocorr_penalty(self.returns)
 
-        tmp1 = self.returns[self.returns != 0]
+        # Window slice: use last rolling_window returns, or all if not set
+        w = self.returns if self.rolling_window is None \
+            else self.returns[-self.rolling_window:]
+        l = len(w)
+
+        self._returns_mean = np.mean(w)
+        self._returns_std = \
+            np.std(w, ddof=1) if l > 1 else None
+        self._returns_autocorr_penalty = self._autocorr_penalty(w)
+
+        tmp1 = w[w != 0]
         len1 = len(tmp1)
         self._avg_return = tmp1.mean() if len1 > 0 else None
-        tmp2 = self.returns[self.returns > 0]
+        tmp2 = w[w > 0]
         len2 = len(tmp2)
         self._win_rate = len2 / len1 if len1 > 0 else None
         self._avg_win = tmp2.mean() if len2 > 0 else None
-        tmp2 = self.returns[self.returns < 0]
+        tmp2 = w[w < 0]
         len2 = len(tmp2)
         self._avg_loss = tmp2.mean() if len2 > 0 else None
 
@@ -155,16 +166,16 @@ class Ratios:
             self._excess_std = self._returns_std
             self._excess_autocorr_penalty = self._returns_autocorr_penalty
         else:
-            tmp2 = self.returns - self.risk_free_rate
+            tmp2 = w - self.risk_free_rate
             self._excess_mean = np.mean(tmp2)
             self._excess_std = np.std(tmp2, ddof=1) if l > 1 else None
             self._excess_autocorr_penalty = self._autocorr_penalty(tmp2)
 
         # Lower partial moments for the raw returns (less required return)
         if self.required_return == 0:
-            tmp2 = -self.returns
+            tmp2 = -w
         else:
-            tmp2 = self.required_return - self.returns
+            tmp2 = self.required_return - w
         # Set the minimum of each to 0
         tmp2 = tmp2.clip(min=0)
         # Calculate the sum of the excess returns to the power of order
@@ -174,12 +185,12 @@ class Ratios:
 
         # Higher partial moments for the raw returns (less required return)
         if self.required_return == 0:
-            tmp2 = self.returns
+            tmp2 = w
             self._required_mean = self._returns_mean
             self._required_autocorr_penalty = self._returns_autocorr_penalty
         else:
             # Calculate the difference between the returns and the threshold
-            tmp2 = self.returns - self.required_return
+            tmp2 = w - self.required_return
             self._required_mean = np.mean(tmp2)
             self._required_autocorr_penalty = self._autocorr_penalty(tmp2)
         # Set the minimum of each to 0
@@ -189,64 +200,78 @@ class Ratios:
         self._required_hpm_2 = np.sum(tmp2 ** 2) / l
         self._required_hpm_3 = np.sum(tmp2 ** 3) / l
 
-        # Cumulative returns
-        retlog = np.log(return_ + 1) / fractional_period
-        self._logret_sum += retlog
-        ret1 = ret + 1
-        if l == 1:
-            cmr = ret1
-            self._cumulative_return_plus_1 = ret1
-            self._cumulative_return_geometric_mean = ret
-        else:
-            prev = (self._cumulative_return_geometric_mean + 1) ** (l - 1)
-            try:
-                with warnings.catch_warnings():
-                    warnings.simplefilter("error", RuntimeWarning)
-                    cmr = prev * ret1
-            except RuntimeWarning as e:
-                print('RuntimeWarning mult cum ret: prev', prev, '* ret1', ret1, '->', cmr, 'steps', l, 'periodicity', self.periodicity)
-                print('RuntimeWarning mult cum ret message:', e)
-            cmr = np.exp(self._logret_sum)
-            self._cumulative_return_plus_1 = cmr
+        # Cumulative returns — recompute from window
+        logret_sum = 0
+        for j in range(len(self.returns) - l, len(self.returns)):
+            fp_j = self.fractional_periods[j]
+            if fp_j != 0:
+                raw_ret_j = w[j - (len(self.returns) - l)]
+                logret_sum += np.log(raw_ret_j + 1)
+        self._logret_sum = logret_sum
+        cmr = np.exp(logret_sum)
+        self._cumulative_return_plus_1 = cmr
+        if l >= 1:
             try:
                 with warnings.catch_warnings():
                     warnings.simplefilter("error", RuntimeWarning)
                     self._cumulative_return_geometric_mean = pow(cmr, 1 / l) - 1
-            except RuntimeWarning as e:
-                print('RuntimeWarning pow cum ret: cmr', cmr, '** 1/l', 1/l, 'gm', self._cumulative_return_geometric_mean, 'steps', l, 'periodicity', self.periodicity)
-                print('RuntimeWarning pow cum ret message:', e)
-        if self._cumulative_return_plus_1_max < cmr:
-            self._cumulative_return_plus_1_max = cmr
+            except RuntimeWarning:
+                pass
+        self._cumulative_return_plus_1_max = -np.inf
+        # Recompute running max of cumulative returns within window
+        cumr = 1
+        for j in range(l):
+            cumr *= (w[j] + 1)
+            if cumr > self._cumulative_return_plus_1_max:
+                self._cumulative_return_plus_1_max = cumr
 
         # Drawdowns from peaks to valleys,
-        # operates on cumulative returns.
-        dd = cmr / self._cumulative_return_plus_1_max - 1
-        if self._drawdowns_cumulative_min > dd:
-            self._drawdowns_cumulative_min = dd
-        self._drawdowns_cumulative = np.append(self._drawdowns_cumulative, dd)
+        # operates on cumulative returns — recompute from window.
+        self._drawdowns_cumulative = np.array([])
+        self._drawdowns_cumulative_min = np.inf
+        cumr = 1
+        cumr_max = -np.inf
+        for j in range(l):
+            cumr *= (w[j] + 1)
+            if cumr > cumr_max:
+                cumr_max = cumr
+            dd = cumr / cumr_max - 1
+            self._drawdowns_cumulative = np.append(self._drawdowns_cumulative, dd)
+            if dd < self._drawdowns_cumulative_min:
+                self._drawdowns_cumulative_min = dd
+
         # Different drawdown calculation used in pain index, ulcer index
-        dd = 1
-        for j in range(self._drawdowns_peaks_peak + 1, l):
-            dd *= (1 + self.returns[j] * 0.01)
-        if dd > 1:
-            self._drawdowns_peaks_peak = l - 1
-            self._drawdowns_peaks = np.append(self._drawdowns_peaks, 0)
-        else:
-            self._drawdowns_peaks = np.append(self._drawdowns_peaks, (dd - 1) * 100)
-        # Drawdown calculation used in Burke
-        if l > 1:
-            self._drawdown_continuous_finalized = False
-            if ret < 0:
+        # Recompute from window
+        self._drawdowns_peaks = np.array([])
+        self._drawdowns_peaks_peak = 0
+        for j in range(l):
+            dd = 1
+            for k in range(self._drawdowns_peaks_peak + 1, j + 1):
+                dd *= (1 + w[k] * 0.01)
+            if dd > 1:
+                self._drawdowns_peaks_peak = j
+                self._drawdowns_peaks = np.append(self._drawdowns_peaks, 0)
+            else:
+                self._drawdowns_peaks = np.append(self._drawdowns_peaks, (dd - 1) * 100)
+
+        # Drawdown calculation used in Burke — recompute from window
+        self._drawdown_continuous = np.array([])
+        self._drawdown_continuous_final = np.array([])
+        self._drawdown_continuous_finalized = False
+        self._drawdown_continuous_peak = 1
+        self._drawdown_continuous_inside = False
+        for j in range(1, l):
+            if w[j] < 0:
                 if not self._drawdown_continuous_inside:
                     self._drawdown_continuous_inside = True
-                    self._drawdown_continuous_peak = l - 2
+                    self._drawdown_continuous_peak = j - 1
                 self._drawdown_continuous = np.append(self._drawdown_continuous, 0)
             else:
                 if self._drawdown_continuous_inside:
                     dd = 1
                     j1 = self._drawdown_continuous_peak + 1
-                    for j in range(j1, l-1):
-                        dd = dd * (1 + self.returns[j] * 0.01)
+                    for k in range(j1, j):
+                        dd = dd * (1 + w[k] * 0.01)
                     self._drawdown_continuous = np.append(self._drawdown_continuous, (dd - 1) * 100)
                     self._drawdown_continuous_inside = False
                 else:
@@ -254,20 +279,21 @@ class Ratios:
 
     def _autocorr_penalty(self, returns) -> float:
         """Metric to account for auto correlation"""
-        #num = len(returns)
-        #if num < 3:
-        #    return 1
-        #try:
-        #    with warnings.catch_warnings():
-        #        warnings.simplefilter("error", RuntimeWarning)
-        #        coef = np.abs(np.corrcoef(returns[:-1], returns[1:])[0, 1])
-        #except RuntimeWarning as e:
-        #    #print('RuntimeWarning autocorr_penalty returns:', returns)
-        #    #print('RuntimeWarning autocorr_penalty message:', e)
-        #    return 1
-        #corr = [((num - x) / num) * coef**x for x in range(1, num)]
-        #return np.sqrt(1 + 2 * np.sum(corr))
         return 1
+
+    @property
+    def _is_primed(self) -> bool:
+        """Returns True if enough samples have been added to satisfy min_periods."""
+        if self.min_periods is None:
+            return True
+        return self._sample_count >= self.min_periods
+
+    @property
+    def _window_returns(self):
+        """Returns the windowed slice of returns."""
+        if self.rolling_window is None:
+            return self.returns
+        return self.returns[-self.rolling_window:]
     
     @property
     def cumulative_return(self):
@@ -326,11 +352,12 @@ class Ratios:
         """
         def finalize_calculation():
             if not self._drawdown_continuous_finalized:
+                w = self._window_returns
                 if self._drawdown_continuous_inside:
                     dd = 1
                     j1 = self._drawdown_continuous_peak + 1
-                    for j in range(j1, len(self.returns)):
-                        dd = dd * (1 + self.returns[j] * 0.01)
+                    for j in range(j1, len(w)):
+                        dd = dd * (1 + w[j] * 0.01)
                     self._drawdown_continuous_final = np.append(self._drawdown_continuous,
                         (dd - 1) * 100)
                 else:
@@ -352,7 +379,10 @@ class Ratios:
         Calculates returns' skewness
         (the degree of asymmetry of a distribution around its mean)
         """
-        return skew(self.returns) if len(self.returns) > 1 else None
+        if not self._is_primed:
+            return None
+        w = self._window_returns
+        return skew(w) if len(w) > 1 else None
 
     @property
     def kurtosis(self):
@@ -360,7 +390,10 @@ class Ratios:
         Calculates returns' kurtosis
          (the degree to which a distribution peak compared to a normal distribution)
         """
-        return kurtosis(self.returns) if len(self.returns) > 1 else None
+        if not self._is_primed:
+            return None
+        w = self._window_returns
+        return kurtosis(w) if len(w) > 1 else None
 
     # https://www.alternativesoft.com/the-difference-between-the-Sharpe-ratio-and-the-Smart-Sharpe-Ratio.html
     def sharpe_ratio(self,
@@ -383,6 +416,8 @@ class Ratios:
                 Apply autocorrelation penalty.
                 Default: False
         """
+        if not self._is_primed:
+            return None
         if ignore_risk_free_rate:
             if (self._returns_mean is None) or \
                 (self._returns_std is None) or (self._returns_std == 0):
@@ -424,6 +459,8 @@ class Ratios:
                 See here for more info: https://archive.is/wip/2rwFW                
                 Default: False
         """
+        if not self._is_primed:
+            return None
         if (self._required_mean is None) or \
             (self._required_lpm_2 is None) or (self._required_lpm_2 == 0):
             return None
@@ -438,6 +475,8 @@ class Ratios:
         """
         Omega ratio over normalized returns
         """
+        if not self._is_primed:
+            return None
         #if (self._required_hpm_1 is None) or \
         if (self._required_mean is None) or \
             (self._required_lpm_1 is None) or (self._required_lpm_1 == 0):
@@ -450,6 +489,8 @@ class Ratios:
         """
         Kappa ratio over normalized returns
         """
+        if not self._is_primed:
+            return None
         if (self._required_mean is None):
             return None
         if order == 1:
@@ -465,12 +506,13 @@ class Ratios:
                 return None
             return self._required_mean / (self._required_lpm_3 ** (1/3))
         else:
+            w = self._window_returns
             if self.required_return == 0:
-                tmp = -self.returns
+                tmp = -w
             else:
-                tmp = self.required_return - self.returns
+                tmp = self.required_return - w
             tmp = tmp.clip(min=0)
-            lpm = np.sum(tmp ** order) / len(self.returns)
+            lpm = np.sum(tmp ** order) / len(w)
             if (lpm is None) or (lpm == 0):
                 return None
             return self._required_mean / (lpm ** (1/order))
@@ -479,6 +521,8 @@ class Ratios:
         """
         Kappa order 3 ratio over normalized returns
         """
+        if not self._is_primed:
+            return None
         if (self._required_mean is None) or \
             (self._required_lpm_3 is None) or (self._required_lpm_3 == 0):
             return None
@@ -488,15 +532,17 @@ class Ratios:
         """
         Bernardo and Ledoit ratio over normalized returns
         """
-        l = len(self.returns)
+        if not self._is_primed:
+            return None
+        l = len(self._window_returns)
         if l < 1:
             return None
-        tmp = -self.returns
+        tmp = -self._window_returns
         tmp = tmp.clip(min=0)
         lpm_1 = np.sum(tmp) / l
         if lpm_1 is None or lpm_1 == 0:
             return None 
-        tmp = self.returns.clip(min=0)
+        tmp = self._window_returns.clip(min=0)
         hpm_1 = np.sum(tmp) / l
         return hpm_1 / lpm_1
 
@@ -504,13 +550,16 @@ class Ratios:
         """
         The upside-potential ratio over normalized returns
         """
+        if not self._is_primed:
+            return None
         if full:
             if (self._required_hpm_1 is None) or \
                 (self._required_lpm_2 is None) or (self._required_lpm_2 == 0):
                 return None
             return self._required_hpm_1 / np.sqrt(self._required_lpm_2)
         else:
-            tmp = self.returns[self.returns < self.required_return]
+            w = self._window_returns
+            tmp = w[w < self.required_return]
             l = len(tmp)
             if l < 1:
                 return None
@@ -518,7 +567,7 @@ class Ratios:
             lpm_2 = np.sum(tmp ** 2) / l
             if lpm_2 is None or lpm_2 == 0:
                 return None
-            tmp = self.returns[self.returns > self.required_return]
+            tmp = w[w > self.required_return]
             if len(tmp) == 0:
                 return None
             tmp = tmp - self.required_return
@@ -530,12 +579,16 @@ class Ratios:
         """
         Compound (annual) growth rate (CAGR), or the geometric mean of the returns.
         """
+        if not self._is_primed:
+            return None
         return self._cumulative_return_geometric_mean
     
     def calmar_ratio(self):
         """
         Calmar ratio over normalized returns
         """
+        if not self._is_primed:
+            return None
         wdd = self.worst_drawdowns_cumulative
         if wdd == 0:
             return None
@@ -555,6 +608,8 @@ class Ratios:
         """
         #excess_rate = annual_excess_rate if self.is_annual \
         #    else ((1 + annual_excess_rate) ** (1/252) - 1)
+        if not self._is_primed:
+            return None
         excess_rate = annual_excess_rate \
             if annual_excess_rate == 0 or self.periods_per_annum == 1 \
             else ((1 + annual_excess_rate) ** (1/self.periods_per_annum) - 1)
@@ -576,6 +631,8 @@ class Ratios:
                 Which ratio to calculate, Burke ratio or modified Burke ratio.
                 Default: False
         """
+        if not self._is_primed:
+            return None
         rate = self._cumulative_return_geometric_mean - self.risk_free_rate
         if rate is None:
             return None
@@ -587,13 +644,15 @@ class Ratios:
             return None
         burke = rate / sqrt_sum_drawdowns_squared
         if modified:
-            burke *= np.sqrt(len(self.returns))
+            burke *= np.sqrt(len(self._window_returns))
         return burke
   
     def pain_index(self):
         """
         Pain index over normalized returns
         """
+        if not self._is_primed:
+            return None
         l = len(self._drawdowns_peaks)
         if l < 1:
             return None
@@ -604,6 +663,8 @@ class Ratios:
         """
         Pain ratio over normalized returns
         """
+        if not self._is_primed:
+            return None
         rate = self._cumulative_return_geometric_mean - self.risk_free_rate
         if rate is None:
             return None
@@ -618,6 +679,8 @@ class Ratios:
         """
         Ulcer index over normalized returns
         """
+        if not self._is_primed:
+            return None
         l = len(self._drawdowns_peaks)
         if l < 1:
             return None
@@ -628,6 +691,8 @@ class Ratios:
         """
         Ulcer ratio over normalized returns
         """
+        if not self._is_primed:
+            return None
         rate = self._cumulative_return_geometric_mean - self.risk_free_rate
         if rate is None:
             return None
@@ -645,9 +710,8 @@ class Ratios:
         Jack Schwager's GPR. See here for more info:
         https://archive.is/wip/2rwFW
         """
-        # Note LPM is always positive, otherwise we have to do abs() around it
-        #downside = self._required_lpm_1 * len(self.returns)
-        #return (self.returns.sum() / downside) if downside != 0 else None
+        if not self._is_primed:
+            return None
         return (self._returns_mean / self._required_lpm_1) \
             if self._required_lpm_1 != 0 else None
 
@@ -657,8 +721,10 @@ class Ratios:
         Calculates the risk of ruin
         (the likelihood of losing all one's investment capital)
         """
+        if not self._is_primed:
+            return None
         wr = self._win_rate
-        return ((1 - wr) / (1 + wr)) ** len(self.returns)
+        return ((1 - wr) / (1 + wr)) ** len(self._window_returns)
     
 
     @property
@@ -667,6 +733,8 @@ class Ratios:
         Calculates the return / risk ratio
         (Sharpe ratio without factoring in the risk-free rate)
         """
+        if not self._is_primed:
+            return None
         if (self._returns_mean is None) or \
             (self._returns_std is None) or (self._returns_std == 0):
             return None

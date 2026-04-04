@@ -13,9 +13,12 @@ pub struct Ratios {
     risk_free_rate: f64,
     required_return: f64,
     day_count_convention: DayCountConvention,
+    rolling_window: Option<usize>,
+    min_periods: Option<usize>,
 
     fractional_periods: Vec<f64>,
     returns: Vec<f64>,
+    sample_count: usize,
 
     logret_sum: f64,
     drawdowns_cumulative: Vec<f64>,
@@ -56,11 +59,16 @@ pub struct Ratios {
 impl Ratios {
     /// Creates a new Ratios instance with the specified parameters.
     /// Annual rates are de-annualized to per-period rates based on periodicity.
+    /// rolling_window, if Some, limits computations to the last N returns.
+    /// min_periods, if Some and > 0, causes all ratio methods to return None
+    /// until at least that many samples have been added.
     pub fn new(
         periodicity: Periodicity,
         annual_risk_free_rate: f64,
         annual_target_return: f64,
         day_count_convention: DayCountConvention,
+        rolling_window: Option<usize>,
+        min_periods: Option<usize>,
     ) -> Self {
         let ppa = periodicity.periods_per_annum();
         let dpp = periodicity.days_per_period();
@@ -77,6 +85,12 @@ impl Ratios {
             annual_target_return
         };
 
+        // Treat None or <=0 min_periods as no minimum
+        let mp = match min_periods {
+            Some(v) if v > 0 => Some(v),
+            _ => None,
+        };
+
         let mut r = Self {
             periodicity,
             periods_per_annum: ppa,
@@ -84,8 +98,11 @@ impl Ratios {
             risk_free_rate: rfr,
             required_return: rr,
             day_count_convention,
+            rolling_window,
+            min_periods: mp,
             fractional_periods: Vec::new(),
             returns: Vec::new(),
+            sample_count: 0,
             logret_sum: 0.0,
             drawdowns_cumulative: Vec::new(),
             drawdowns_cumulative_min: f64::INFINITY,
@@ -128,6 +145,7 @@ impl Ratios {
     pub fn reset(&mut self) {
         self.fractional_periods = Vec::new();
         self.returns = Vec::new();
+        self.sample_count = 0;
         self.logret_sum = 0.0;
         self.drawdowns_cumulative = Vec::new();
         self.drawdowns_cumulative_min = f64::INFINITY;
@@ -189,33 +207,42 @@ impl Ratios {
             return;
         }
         self.total_duration += fractional_period;
+        self.sample_count += 1;
 
         // Normalized return
         let ret = return_val / fractional_period;
         self.returns.push(ret);
-        let l = self.returns.len();
+
+        // Window slice: use last rolling_window returns, or all if not set
+        let all_len = self.returns.len();
+        let w_start = match self.rolling_window {
+            Some(n) if all_len > n => all_len - n,
+            _ => 0,
+        };
+        let w = &self.returns[w_start..];
+        let l = w.len();
         let lf = l as f64;
 
         // Returns mean
-        let mean = slice_mean(&self.returns);
+        let mean = slice_mean(w);
         self.returns_mean = Some(mean);
 
         // Returns std (ddof=1, sample)
         if l > 1 {
-            self.returns_std = Some(slice_std_ddof1(&self.returns, mean));
+            self.returns_std = Some(slice_std_ddof1(w, mean));
         } else {
             self.returns_std = None;
         }
 
-        self.returns_autocorr_penalty = self.autocorr_penalty(&self.returns.clone());
+        self.returns_autocorr_penalty = autocorr_penalty_fn(w);
 
         // Average return, win rate, avg win, avg loss
-        let non_zero = filter_non_zero(&self.returns);
+        let non_zero = filter_non_zero(w);
         let len_non_zero = non_zero.len();
         if len_non_zero > 0 {
             self.avg_return = Some(slice_mean(&non_zero));
 
-            let positive = filter_positive(&self.returns);
+            let positive = filter_positive(w);
             let len_pos = positive.len();
             self.win_rate = Some(len_pos as f64 / len_non_zero as f64);
 
@@ -225,7 +252,7 @@ impl Ratios {
                 None
             };
 
-            let negative = filter_negative(&self.returns);
+            let negative = filter_negative(w);
             self.avg_loss = if !negative.is_empty() {
                 Some(slice_mean(&negative))
             } else {
@@ -244,7 +271,7 @@ impl Ratios {
             self.excess_std = self.returns_std;
             self.excess_autocorr_penalty = self.returns_autocorr_penalty;
         } else {
-            let excess: Vec<f64> = self.returns.iter().map(|v| v - self.risk_free_rate).collect();
+            let excess: Vec<f64> = w.iter().map(|v| v - self.risk_free_rate).collect();
             let em = slice_mean(&excess);
             self.excess_mean = Some(em);
             if l > 1 {
@@ -252,14 +279,14 @@ impl Ratios {
             } else {
                 self.excess_std = None;
             }
-            self.excess_autocorr_penalty = self.autocorr_penalty(&excess);
+            self.excess_autocorr_penalty = autocorr_penalty_fn(&excess);
         }
 
         // Lower partial moments for the raw returns (less required return)
         let mut tmp2: Vec<f64> = if self.required_return == 0.0 {
-            self.returns.iter().map(|v| -v).collect()
+            w.iter().map(|v| -v).collect()
         } else {
-            self.returns.iter().map(|v| self.required_return - v).collect()
+            w.iter().map(|v| self.required_return - v).collect()
         };
         // Clip to min 0
         for v in tmp2.iter_mut() {
@@ -274,14 +301,14 @@ impl Ratios {
         // Higher partial moments for the raw returns (less required return)
         let mut tmp3: Vec<f64>;
         if self.required_return == 0.0 {
-            tmp3 = self.returns.clone();
+            tmp3 = w.to_vec();
             self.required_mean = self.returns_mean;
             self.required_autocorr_penalty = self.returns_autocorr_penalty;
         } else {
-            tmp3 = self.returns.iter().map(|v| v - self.required_return).collect();
+            tmp3 = w.iter().map(|v| v - self.required_return).collect();
             let rm = slice_mean(&tmp3);
             self.required_mean = Some(rm);
-            self.required_autocorr_penalty = self.autocorr_penalty(&tmp3);
+            self.required_autocorr_penalty = autocorr_penalty_fn(&tmp3);
         }
         // Clip to min 0
         for v in tmp3.iter_mut() {
@@ -293,59 +320,81 @@ impl Ratios {
         self.required_hpm2 = Some(slice_sum_pow(&tmp3, 2.0) / lf);
         self.required_hpm3 = Some(slice_sum_pow(&tmp3, 3.0) / lf);
 
-        // Cumulative returns
-        let retlog = (return_val + 1.0).ln() / fractional_period;
-        self.logret_sum += retlog;
-        let _ret1 = ret + 1.0;
-
-        let cmr;
-        if l == 1 {
-            cmr = _ret1;
-            self.cumulative_return_plus1 = _ret1;
-            self.cumulative_return_geometric_mean = Some(ret);
-        } else {
-            cmr = self.logret_sum.exp();
-            self.cumulative_return_plus1 = cmr;
+        // Cumulative returns — recompute from window
+        let mut logret_sum_val = 0.0;
+        for j in 0..l {
+            let fp_j = self.fractional_periods[w_start + j];
+            if fp_j != 0.0 {
+                logret_sum_val += (w[j] + 1.0).ln();
+            }
+        }
+        self.logret_sum = logret_sum_val;
+        let cmr = logret_sum_val.exp();
+        self.cumulative_return_plus1 = cmr;
+        if l >= 1 {
             self.cumulative_return_geometric_mean = Some(cmr.powf(1.0 / lf) - 1.0);
         }
-        if self.cumulative_return_plus1_max < cmr {
-            self.cumulative_return_plus1_max = cmr;
+        self.cumulative_return_plus1_max = f64::NEG_INFINITY;
+        let mut cumr = 1.0;
+        for j in 0..l {
+            cumr *= w[j] + 1.0;
+            if cumr > self.cumulative_return_plus1_max {
+                self.cumulative_return_plus1_max = cumr;
+            }
         }
 
-        // Drawdowns from peaks to valleys (cumulative returns)
-        let dd = cmr / self.cumulative_return_plus1_max - 1.0;
-        if self.drawdowns_cumulative_min > dd {
-            self.drawdowns_cumulative_min = dd;
-        }
-        self.drawdowns_cumulative.push(dd);
-
-        // Drawdown peaks (used in pain index, ulcer index)
-        let mut dd_peak = 1.0;
-        for j in (self.drawdowns_peaks_peak + 1)..l {
-            dd_peak *= 1.0 + self.returns[j] * 0.01;
-        }
-        if dd_peak > 1.0 {
-            self.drawdowns_peaks_peak = l - 1;
-            self.drawdowns_peaks.push(0.0);
-        } else {
-            self.drawdowns_peaks.push((dd_peak - 1.0) * 100.0);
+        // Drawdowns from peaks to valleys (cumulative returns) — recompute from window
+        self.drawdowns_cumulative.clear();
+        self.drawdowns_cumulative_min = f64::INFINITY;
+        cumr = 1.0;
+        let mut cumr_max = f64::NEG_INFINITY;
+        for j in 0..l {
+            cumr *= w[j] + 1.0;
+            if cumr > cumr_max {
+                cumr_max = cumr;
+            }
+            let dd = cumr / cumr_max - 1.0;
+            self.drawdowns_cumulative.push(dd);
+            if self.drawdowns_cumulative_min > dd {
+                self.drawdowns_cumulative_min = dd;
+            }
         }
 
-        // Drawdown continuous (used in Burke ratio)
-        if l > 1 {
-            self.drawdown_continuous_finalized = false;
-            if ret < 0.0 {
+        // Drawdown peaks (used in pain index, ulcer index) — recompute from window
+        self.drawdowns_peaks.clear();
+        self.drawdowns_peaks_peak = 0;
+        for j in 0..l {
+            let mut dd_peak = 1.0;
+            for k in (self.drawdowns_peaks_peak + 1)..=j {
+                dd_peak *= 1.0 + w[k] * 0.01;
+            }
+            if dd_peak > 1.0 {
+                self.drawdowns_peaks_peak = j;
+                self.drawdowns_peaks.push(0.0);
+            } else {
+                self.drawdowns_peaks.push((dd_peak - 1.0) * 100.0);
+            }
+        }
+
+        // Drawdown continuous (used in Burke ratio) — recompute from window
+        self.drawdown_continuous.clear();
+        self.drawdown_continuous_final.clear();
+        self.drawdown_continuous_finalized = false;
+        self.drawdown_continuous_peak = 1;
+        self.drawdown_continuous_inside = false;
+        for j in 1..l {
+            if w[j] < 0.0 {
                 if !self.drawdown_continuous_inside {
                     self.drawdown_continuous_inside = true;
-                    self.drawdown_continuous_peak = l - 2;
+                    self.drawdown_continuous_peak = j - 1;
                 }
                 self.drawdown_continuous.push(0.0);
             } else {
                 if self.drawdown_continuous_inside {
                     let mut dd_c = 1.0;
                     let j1 = self.drawdown_continuous_peak + 1;
-                    for j in j1..(l - 1) {
-                        dd_c *= 1.0 + self.returns[j] * 0.01;
+                    for k in j1..j {
+                        dd_c *= 1.0 + w[k] * 0.01;
                     }
                     self.drawdown_continuous.push((dd_c - 1.0) * 100.0);
                     self.drawdown_continuous_inside = false;
@@ -356,8 +405,20 @@ impl Ratios {
         }
     }
 
-    fn autocorr_penalty(&self, _returns: &[f64]) -> f64 {
-        1.0
+    fn is_primed(&self) -> bool {
+        match self.min_periods {
+            Some(mp) => self.sample_count >= mp,
+            None => true,
+        }
+    }
+
+    fn window_returns(&self) -> &[f64] {
+        let all_len = self.returns.len();
+        let start = match self.rolling_window {
+            Some(n) if all_len > n => all_len - n,
+            _ => 0,
+        };
+        &self.returns[start..]
     }
 
     fn finalize_continuous_drawdown(&mut self) {
@@ -365,10 +426,11 @@ impl Ratios {
             return;
         }
         if self.drawdown_continuous_inside {
+            let w = self.window_returns();
             let mut dd_c = 1.0;
             let j1 = self.drawdown_continuous_peak + 1;
-            for j in j1..self.returns.len() {
-                dd_c *= 1.0 + self.returns[j] * 0.01;
+            for j in j1..w.len() {
+                dd_c *= 1.0 + w[j] * 0.01;
             }
             let mut final_vec = self.drawdown_continuous.clone();
             final_vec.push((dd_c - 1.0) * 100.0);
@@ -427,22 +489,33 @@ impl Ratios {
 
     /// Returns the population skewness of the returns.
     pub fn skew(&self) -> Option<f64> {
-        if self.returns.len() < 2 {
+        if !self.is_primed() {
             return None;
         }
-        Some(population_skewness(&self.returns))
+        let w = self.window_returns();
+        if w.len() < 2 {
+            return None;
+        }
+        Some(population_skewness(w))
     }
 
     /// Returns the population excess kurtosis of the returns.
     pub fn kurtosis(&self) -> Option<f64> {
-        if self.returns.len() < 2 {
+        if !self.is_primed() {
             return None;
         }
-        Some(population_excess_kurtosis(&self.returns))
+        let w = self.window_returns();
+        if w.len() < 2 {
+            return None;
+        }
+        Some(population_excess_kurtosis(w))
     }
 
     /// Calculates the ex-post Sharpe ratio.
     pub fn sharpe_ratio(&self, ignore_risk_free_rate: bool, autocorrelation_penalty: bool) -> Option<f64> {
+        if !self.is_primed() {
+            return None;
+        }
         if ignore_risk_free_rate {
             let mean = self.returns_mean?;
             let std = self.returns_std?;
@@ -469,6 +542,9 @@ impl Ratios {
 
     /// Calculates the Sortino ratio.
     pub fn sortino_ratio(&self, autocorrelation_penalty: bool, divide_by_sqrt2: bool) -> Option<f64> {
+        if !self.is_primed() {
+            return None;
+        }
         let mean = self.required_mean?;
         let lpm2 = self.required_lpm2?;
         if lpm2 == 0.0 {
@@ -486,6 +562,9 @@ impl Ratios {
 
     /// Calculates the Omega ratio.
     pub fn omega_ratio(&self) -> Option<f64> {
+        if !self.is_primed() {
+            return None;
+        }
         let mean = self.required_mean?;
         let lpm1 = self.required_lpm1?;
         if lpm1 == 0.0 {
@@ -496,6 +575,9 @@ impl Ratios {
 
     /// Calculates the Kappa ratio of a given order.
     pub fn kappa_ratio(&self, order: i32) -> Option<f64> {
+        if !self.is_primed() {
+            return None;
+        }
         let mean = self.required_mean?;
         match order {
             1 => {
@@ -514,14 +596,15 @@ impl Ratios {
                 Some(mean / lpm3.cbrt())
             }
             _ => {
-                let l = self.returns.len();
+                let w = self.window_returns();
+                let l = w.len();
                 if l == 0 {
                     return None;
                 }
                 let mut tmp: Vec<f64> = if self.required_return == 0.0 {
-                    self.returns.iter().map(|v| -v).collect()
+                    w.iter().map(|v| -v).collect()
                 } else {
-                    self.returns.iter().map(|v| self.required_return - v).collect()
+                    w.iter().map(|v| self.required_return - v).collect()
                 };
                 for v in tmp.iter_mut() {
                     if *v < 0.0 {
@@ -539,6 +622,9 @@ impl Ratios {
 
     /// Calculates the Kappa ratio of order 3.
     pub fn kappa3_ratio(&self) -> Option<f64> {
+        if !self.is_primed() {
+            return None;
+        }
         let mean = self.required_mean?;
         let lpm3 = self.required_lpm3?;
         if lpm3 == 0.0 {
@@ -549,27 +635,34 @@ impl Ratios {
 
     /// Calculates the Bernardo-Ledoit ratio.
     pub fn bernardo_ledoit_ratio(&self) -> Option<f64> {
-        let l = self.returns.len();
+        if !self.is_primed() {
+            return None;
+        }
+        let w = self.window_returns();
+        let l = w.len();
         if l < 1 {
             return None;
         }
         let lf = l as f64;
 
         // LPM1 with threshold=0
-        let tmp: Vec<f64> = self.returns.iter().map(|v| (-v).max(0.0)).collect();
+        let tmp: Vec<f64> = w.iter().map(|v| (-v).max(0.0)).collect();
         let lpm1 = slice_sum(&tmp) / lf;
         if lpm1 == 0.0 {
             return None;
         }
 
         // HPM1 with threshold=0
-        let tmp2: Vec<f64> = self.returns.iter().map(|v| v.max(0.0)).collect();
+        let tmp2: Vec<f64> = w.iter().map(|v| v.max(0.0)).collect();
         let hpm1 = slice_sum(&tmp2) / lf;
         Some(hpm1 / lpm1)
     }
 
     /// Calculates the upside potential ratio.
     pub fn upside_potential_ratio(&self, full: bool) -> Option<f64> {
+        if !self.is_primed() {
+            return None;
+        }
         if full {
             let hpm1 = self.required_hpm1?;
             let lpm2 = self.required_lpm2?;
@@ -579,7 +672,8 @@ impl Ratios {
             return Some(hpm1 / lpm2.sqrt());
         }
         // Subset version
-        let below: Vec<f64> = self.returns.iter()
+        let w = self.window_returns();
+        let below: Vec<f64> = w.iter()
             .filter(|&&v| v < self.required_return)
             .copied()
             .collect();
@@ -593,7 +687,7 @@ impl Ratios {
         if lpm2 == 0.0 {
             return None;
         }
-        let above: Vec<f64> = self.returns.iter()
+        let above: Vec<f64> = w.iter()
             .filter(|&&v| v > self.required_return)
             .map(|v| v - self.required_return)
             .collect();
@@ -606,11 +700,17 @@ impl Ratios {
 
     /// Returns the compound (annual) growth rate (CAGR).
     pub fn compound_growth_rate(&self) -> Option<f64> {
+        if !self.is_primed() {
+            return None;
+        }
         self.cumulative_return_geometric_mean
     }
 
     /// Calculates the Calmar ratio.
     pub fn calmar_ratio(&self) -> Option<f64> {
+        if !self.is_primed() {
+            return None;
+        }
         let wdd = self.worst_drawdowns_cumulative();
         if wdd == 0.0 {
             return None;
@@ -621,6 +721,9 @@ impl Ratios {
 
     /// Calculates the Sterling ratio with the given annual excess rate.
     pub fn sterling_ratio(&self, annual_excess_rate: f64) -> Option<f64> {
+        if !self.is_primed() {
+            return None;
+        }
         let excess_rate = if annual_excess_rate != 0.0 && self.periods_per_annum != 1 {
             (1.0 + annual_excess_rate).powf(1.0 / self.periods_per_annum as f64) - 1.0
         } else {
@@ -636,6 +739,9 @@ impl Ratios {
 
     /// Calculates the Burke ratio.
     pub fn burke_ratio(&mut self, modified: bool) -> Option<f64> {
+        if !self.is_primed() {
+            return None;
+        }
         let gm = self.cumulative_return_geometric_mean?;
         let rate = gm - self.risk_free_rate;
         let drawdowns = self.drawdowns_continuous(true, 0);
@@ -649,13 +755,16 @@ impl Ratios {
         }
         let mut burke = rate / sqrt_sum_sq;
         if modified {
-            burke *= (self.returns.len() as f64).sqrt();
+            burke *= (self.window_returns().len() as f64).sqrt();
         }
         Some(burke)
     }
 
     /// Calculates the pain index.
     pub fn pain_index(&self) -> Option<f64> {
+        if !self.is_primed() {
+            return None;
+        }
         let l = self.drawdowns_peaks.len();
         if l < 1 {
             return None;
@@ -665,6 +774,9 @@ impl Ratios {
 
     /// Calculates the pain ratio.
     pub fn pain_ratio(&self) -> Option<f64> {
+        if !self.is_primed() {
+            return None;
+        }
         let gm = self.cumulative_return_geometric_mean?;
         let rate = gm - self.risk_free_rate;
         let l = self.drawdowns_peaks.len();
@@ -680,6 +792,9 @@ impl Ratios {
 
     /// Calculates the ulcer index.
     pub fn ulcer_index(&self) -> Option<f64> {
+        if !self.is_primed() {
+            return None;
+        }
         let l = self.drawdowns_peaks.len();
         if l < 1 {
             return None;
@@ -690,6 +805,9 @@ impl Ratios {
 
     /// Calculates the Martin (Ulcer) ratio.
     pub fn martin_ratio(&self) -> Option<f64> {
+        if !self.is_primed() {
+            return None;
+        }
         let gm = self.cumulative_return_geometric_mean?;
         let rate = gm - self.risk_free_rate;
         let l = self.drawdowns_peaks.len();
@@ -706,6 +824,9 @@ impl Ratios {
 
     /// Returns Jack Schwager's gain-to-pain ratio.
     pub fn gain_to_pain_ratio(&self) -> Option<f64> {
+        if !self.is_primed() {
+            return None;
+        }
         let lpm1 = self.required_lpm1?;
         if lpm1 == 0.0 {
             return None;
@@ -716,12 +837,18 @@ impl Ratios {
 
     /// Calculates the risk of ruin.
     pub fn risk_of_ruin(&self) -> Option<f64> {
+        if !self.is_primed() {
+            return None;
+        }
         let wr = self.win_rate?;
-        Some(((1.0 - wr) / (1.0 + wr)).powf(self.returns.len() as f64))
+        Some(((1.0 - wr) / (1.0 + wr)).powf(self.window_returns().len() as f64))
     }
 
     /// Calculates the return/risk ratio.
     pub fn risk_return_ratio(&self) -> Option<f64> {
+        if !self.is_primed() {
+            return None;
+        }
         let mean = self.returns_mean?;
         let std = self.returns_std?;
         if std == 0.0 {
@@ -732,6 +859,10 @@ impl Ratios {
 }
 
 // ---------- helper functions ----------
+
+fn autocorr_penalty_fn(_returns: &[f64]) -> f64 {
+    1.0
+}
 
 fn slice_sum(s: &[f64]) -> f64 {
     s.iter().sum()
@@ -873,12 +1004,12 @@ mod tests {
 
     fn new_ratios_with_rf(rf: f64) -> Ratios {
         let annual_rf = (1.0 + rf).powf(252.0) - 1.0;
-        Ratios::new(Periodicity::Daily, annual_rf, 0.0, DayCountConvention::Raw)
+        Ratios::new(Periodicity::Daily, annual_rf, 0.0, DayCountConvention::Raw, None, None)
     }
 
     fn new_ratios_with_mar(mar: f64) -> Ratios {
         let annual_mar = (1.0 + mar).powf(252.0) - 1.0;
-        Ratios::new(Periodicity::Daily, 0.0, annual_mar, DayCountConvention::Raw)
+        Ratios::new(Periodicity::Daily, 0.0, annual_mar, DayCountConvention::Raw, None, None)
     }
 
     fn add_bacon_return(r: &mut Ratios, i: usize) {
@@ -1436,7 +1567,7 @@ mod tests {
             Some(0.07257832783270360), Some(0.08863890501902830), Some(0.06203631318696950),
             Some(0.06672377010548700), Some(0.06228923867560830), Some(0.05705690600200920),
         ];
-        let mut r = Ratios::new(Periodicity::Daily, 0.0, 0.0, DayCountConvention::Raw);
+        let mut r = Ratios::new(Periodicity::Daily, 0.0, 0.0, DayCountConvention::Raw, None, None);
         for i in 0..24 {
             add_bacon_return(&mut r, i);
             assert_nullable(i, expected[i], r.sterling_ratio(0.0), EPSILON_12, "Sterling ex=0");
@@ -1456,7 +1587,7 @@ mod tests {
             Some(0.05861997797933450), Some(0.05472403303561820), Some(0.05012718208397050),
         ];
         let excess_annual = (1.0 + 0.02_f64).powf(252.0) - 1.0;
-        let mut r = Ratios::new(Periodicity::Daily, 0.0, 0.0, DayCountConvention::Raw);
+        let mut r = Ratios::new(Periodicity::Daily, 0.0, 0.0, DayCountConvention::Raw, None, None);
         for i in 0..24 {
             add_bacon_return(&mut r, i);
             assert_nullable(i, expected[i], r.sterling_ratio(excess_annual), EPSILON_12, "Sterling ex=0.02");
@@ -1580,5 +1711,199 @@ mod tests {
             add_bacon_return(&mut r, i);
             assert_nullable(i, expected[i], r.martin_ratio(), EPSILON_12, "MartinRatio");
         }
+    }
+
+    // ===== Rolling Window / Min Periods tests =====
+
+    fn new_ratios_with_window(rolling_window: Option<usize>, min_periods: Option<usize>) -> Ratios {
+        Ratios::new(Periodicity::Daily, 0.0, 0.0, DayCountConvention::Raw, rolling_window, min_periods)
+    }
+
+    fn add_all_bacon(r: &mut Ratios) {
+        for i in 0..24 {
+            add_bacon_return(r, i);
+        }
+    }
+
+    #[test]
+    fn test_min_periods_returns_none_before_threshold() {
+        let mut r = new_ratios_with_window(None, Some(5));
+        // First 4 returns: not primed yet
+        for i in 0..4 {
+            add_bacon_return(&mut r, i);
+            assert!(r.sharpe_ratio(true, false).is_none(),
+                "step {}: expected None before min_periods", i);
+            assert!(r.sortino_ratio(false, false).is_none(),
+                "step {}: sortino expected None before min_periods", i);
+        }
+        // 5th return: now primed
+        add_bacon_return(&mut r, 4);
+        assert!(r.sharpe_ratio(true, false).is_some(),
+            "step 4: expected Some after min_periods");
+    }
+
+    #[test]
+    fn test_min_periods_zero_or_negative_ignored() {
+        // min_periods=0 should be treated as None (always primed)
+        let mut r0 = new_ratios_with_window(None, Some(0));
+        add_bacon_return(&mut r0, 0);
+        add_bacon_return(&mut r0, 1);
+        assert!(r0.sharpe_ratio(true, false).is_some());
+
+        // min_periods=-1 should be treated as None
+        // In Rust, Option<usize> can't be negative, but test the sanitization:
+        // Actually usize can't be negative. Just test 0.
+    }
+
+    #[test]
+    fn test_min_periods_none_always_primed() {
+        let mut r = new_ratios_with_window(None, None);
+        add_bacon_return(&mut r, 0);
+        add_bacon_return(&mut r, 1);
+        assert!(r.sharpe_ratio(true, false).is_some());
+    }
+
+    #[test]
+    fn test_min_periods_full_dataset_matches() {
+        // With min_periods=1 (effectively no delay), full dataset should match baseline
+        let mut r_base = new_ratios_with_window(None, None);
+        add_all_bacon(&mut r_base);
+
+        let mut r_mp = new_ratios_with_window(None, Some(1));
+        add_all_bacon(&mut r_mp);
+
+        let s1 = r_base.sharpe_ratio(true, false).unwrap();
+        let s2 = r_mp.sharpe_ratio(true, false).unwrap();
+        assert!(almost_equal(s1, s2, 1e-15), "sharpe mismatch");
+
+        let o1 = r_base.omega_ratio().unwrap();
+        let o2 = r_mp.omega_ratio().unwrap();
+        assert!(almost_equal(o1, o2, 1e-15), "omega mismatch");
+    }
+
+    #[test]
+    fn test_rolling_window_matches_fresh_instance() {
+        // A rolling window of 10 after 24 returns should match
+        // a fresh instance fed only the last 10 returns.
+        let mut r_rolling = new_ratios_with_window(Some(10), None);
+        add_all_bacon(&mut r_rolling);
+
+        // Fresh instance with last 10
+        let mut r_fresh = new_ratios_with_window(None, None);
+        for i in 14..24 {
+            add_bacon_return(&mut r_fresh, i);
+        }
+
+        let eps = 1e-13;
+
+        let s1 = r_rolling.sharpe_ratio(true, false).unwrap();
+        let s2 = r_fresh.sharpe_ratio(true, false).unwrap();
+        assert!(almost_equal(s1, s2, eps),
+            "sharpe: rolling={:.16e}, fresh={:.16e}", s1, s2);
+
+        let o1 = r_rolling.omega_ratio().unwrap();
+        let o2 = r_fresh.omega_ratio().unwrap();
+        assert!(almost_equal(o1, o2, eps),
+            "omega: rolling={:.16e}, fresh={:.16e}", o1, o2);
+
+        let sk1 = r_rolling.skew().unwrap();
+        let sk2 = r_fresh.skew().unwrap();
+        assert!(almost_equal(sk1, sk2, eps),
+            "skew: rolling={:.16e}, fresh={:.16e}", sk1, sk2);
+
+        let k1 = r_rolling.kurtosis().unwrap();
+        let k2 = r_fresh.kurtosis().unwrap();
+        assert!(almost_equal(k1, k2, eps),
+            "kurtosis: rolling={:.16e}, fresh={:.16e}", k1, k2);
+
+        let pi1 = r_rolling.pain_index().unwrap();
+        let pi2 = r_fresh.pain_index().unwrap();
+        assert!(almost_equal(pi1, pi2, eps),
+            "pain_index: rolling={:.16e}, fresh={:.16e}", pi1, pi2);
+
+        let ui1 = r_rolling.ulcer_index().unwrap();
+        let ui2 = r_fresh.ulcer_index().unwrap();
+        assert!(almost_equal(ui1, ui2, eps),
+            "ulcer_index: rolling={:.16e}, fresh={:.16e}", ui1, ui2);
+
+        let ror1 = r_rolling.risk_of_ruin().unwrap();
+        let ror2 = r_fresh.risk_of_ruin().unwrap();
+        assert!(almost_equal(ror1, ror2, eps),
+            "risk_of_ruin: rolling={:.16e}, fresh={:.16e}", ror1, ror2);
+    }
+
+    #[test]
+    fn test_rolling_window_none_is_expanding() {
+        // rolling_window=None should give same results as no window at all
+        let mut r1 = new_ratios_with_window(None, None);
+        add_all_bacon(&mut r1);
+
+        let mut r2 = new_ratios_with_rf(0.0);
+        add_all_bacon(&mut r2);
+
+        let s1 = r1.sharpe_ratio(true, false).unwrap();
+        let s2 = r2.sharpe_ratio(true, false).unwrap();
+        assert!(almost_equal(s1, s2, 1e-15));
+    }
+
+    #[test]
+    fn test_rolling_window_larger_than_data() {
+        // window=100 with 24 returns should behave like expanding
+        let mut r_large = new_ratios_with_window(Some(100), None);
+        add_all_bacon(&mut r_large);
+
+        let mut r_base = new_ratios_with_window(None, None);
+        add_all_bacon(&mut r_base);
+
+        let s1 = r_large.sharpe_ratio(true, false).unwrap();
+        let s2 = r_base.sharpe_ratio(true, false).unwrap();
+        assert!(almost_equal(s1, s2, 1e-15));
+    }
+
+    #[test]
+    fn test_rolling_window_with_min_periods() {
+        // window=10, min_periods=5: first 4 should be None
+        let mut r = new_ratios_with_window(Some(10), Some(5));
+        for i in 0..4 {
+            add_bacon_return(&mut r, i);
+            assert!(r.sharpe_ratio(true, false).is_none(),
+                "step {}: expected None before min_periods", i);
+        }
+        // 5th: now primed
+        add_bacon_return(&mut r, 4);
+        assert!(r.sharpe_ratio(true, false).is_some(),
+            "step 4: expected Some after min_periods");
+
+        // Continue to full dataset
+        for i in 5..24 {
+            add_bacon_return(&mut r, i);
+        }
+
+        // Should match a fresh instance fed last 10 returns
+        let mut r_fresh = new_ratios_with_window(None, None);
+        for i in 14..24 {
+            add_bacon_return(&mut r_fresh, i);
+        }
+
+        let eps = 1e-13;
+        let s1 = r.sharpe_ratio(true, false).unwrap();
+        let s2 = r_fresh.sharpe_ratio(true, false).unwrap();
+        assert!(almost_equal(s1, s2, eps),
+            "sharpe: rolling={:.16e}, fresh={:.16e}", s1, s2);
+    }
+
+    #[test]
+    fn test_rolling_window_with_min_periods_clamped() {
+        // min_periods > window: min_periods dominates
+        let mut r = new_ratios_with_window(Some(5), Some(10));
+        for i in 0..9 {
+            add_bacon_return(&mut r, i);
+            assert!(r.sharpe_ratio(true, false).is_none(),
+                "step {}: expected None before min_periods", i);
+        }
+        // 10th return: primed
+        add_bacon_return(&mut r, 9);
+        assert!(r.sharpe_ratio(true, false).is_some(),
+            "step 9: expected Some after min_periods");
     }
 }

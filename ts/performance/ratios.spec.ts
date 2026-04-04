@@ -431,3 +431,143 @@ describe('Kappa Ratio', () => {
         }
     });
 });
+
+// ===== Rolling Window / Min Periods tests =====
+
+function makeRatios(rollingWindow: number | null = null, minPeriods: number | null = null): Ratios {
+    return new Ratios(Periodicity.DAILY, 0, 0, DayCountConvention.RAW, rollingWindow, minPeriods);
+}
+
+function addBacon(r: Ratios, i: number): void {
+    r.addReturn(
+        baconPortfolioReturns[i],
+        baconBenchmarkReturns[i],
+        1,
+        baconDatesPrevious[i],
+        baconDates[i]
+    );
+}
+
+function addAllBacon(r: Ratios): void {
+    for (let i = 0; i < 24; i++) {
+        addBacon(r, i);
+    }
+}
+
+describe('Min Periods', () => {
+    it('should return null before threshold', () => {
+        const r = makeRatios(null, 5);
+        for (let i = 0; i < 4; i++) {
+            addBacon(r, i);
+            expect(r.sharpeRatio(true)).toBeNull();
+            expect(r.sortinoRatio()).toBeNull();
+        }
+        addBacon(r, 4);
+        expect(r.sharpeRatio(true)).not.toBeNull();
+    });
+
+    it('should treat zero minPeriods as null (always primed)', () => {
+        const r = makeRatios(null, 0);
+        addBacon(r, 0);
+        addBacon(r, 1);
+        expect(r.sharpeRatio(true)).not.toBeNull();
+    });
+
+    it('should treat negative minPeriods as null (always primed)', () => {
+        const r = makeRatios(null, -1);
+        addBacon(r, 0);
+        addBacon(r, 1);
+        expect(r.sharpeRatio(true)).not.toBeNull();
+    });
+
+    it('should match baseline with minPeriods=1', () => {
+        const rBase = makeRatios(null, null);
+        addAllBacon(rBase);
+
+        const rMp = makeRatios(null, 1);
+        addAllBacon(rMp);
+
+        expect(rMp.sharpeRatio(true)).toBeCloseTo(rBase.sharpeRatio(true)!, 15);
+        expect(rMp.omegaRatio()).toBeCloseTo(rBase.omegaRatio()!, 15);
+    });
+});
+
+describe('Rolling Window', () => {
+    it('should match fresh instance fed last N returns', () => {
+        const rRolling = makeRatios(10, null);
+        addAllBacon(rRolling);
+
+        const rFresh = makeRatios(null, null);
+        for (let i = 14; i < 24; i++) {
+            addBacon(rFresh, i);
+        }
+
+        const eps = 13;
+        expect(rRolling.sharpeRatio(true)).toBeCloseTo(rFresh.sharpeRatio(true)!, eps);
+        expect(rRolling.omegaRatio()).toBeCloseTo(rFresh.omegaRatio()!, eps);
+        expect(rRolling.skew).toBeCloseTo(rFresh.skew!, eps);
+        expect(rRolling.kurtosis).toBeCloseTo(rFresh.kurtosis!, eps);
+        expect(rRolling.painIndex()).toBeCloseTo(rFresh.painIndex()!, eps);
+        expect(rRolling.ulcerIndex()).toBeCloseTo(rFresh.ulcerIndex()!, eps);
+        expect(rRolling.riskOfRuin).toBeCloseTo(rFresh.riskOfRuin!, eps);
+    });
+
+    it('should behave like expanding when null', () => {
+        const r1 = makeRatios(null, null);
+        addAllBacon(r1);
+
+        const r2 = new Ratios(Periodicity.DAILY, 0, 0, DayCountConvention.RAW);
+        addAllBacon(r2);
+
+        expect(r1.sharpeRatio(true)).toBeCloseTo(r2.sharpeRatio(true)!, 15);
+    });
+
+    it('should behave like expanding when window > data length', () => {
+        const rLarge = makeRatios(100, null);
+        addAllBacon(rLarge);
+
+        const rBase = makeRatios(null, null);
+        addAllBacon(rBase);
+
+        expect(rLarge.sharpeRatio(true)).toBeCloseTo(rBase.sharpeRatio(true)!, 15);
+    });
+});
+
+describe('Rolling Window with Min Periods', () => {
+    it('should respect min_periods before window fills', () => {
+        const r = makeRatios(10, 5);
+        for (let i = 0; i < 4; i++) {
+            addBacon(r, i);
+            expect(r.sharpeRatio(true)).toBeNull();
+        }
+        addBacon(r, 4);
+        expect(r.sharpeRatio(true)).not.toBeNull();
+
+        addAllBacon(r);
+
+        // After full dataset, window=10: should match fresh last 10
+        // But we added 24 + 24 = 48 returns total. Let's make a clean test:
+    });
+
+    it('should match fresh after full dataset', () => {
+        const r = makeRatios(10, 5);
+        addAllBacon(r);
+
+        const rFresh = makeRatios(null, null);
+        for (let i = 14; i < 24; i++) {
+            addBacon(rFresh, i);
+        }
+
+        expect(r.sharpeRatio(true)).toBeCloseTo(rFresh.sharpeRatio(true)!, 13);
+    });
+
+    it('should handle minPeriods > window', () => {
+        const r = makeRatios(5, 10);
+        for (let i = 0; i < 9; i++) {
+            addBacon(r, i);
+            expect(r.sharpeRatio(true)).toBeNull();
+        }
+        addBacon(r, 9);
+        expect(r.sharpeRatio(true)).not.toBeNull();
+    });
+});

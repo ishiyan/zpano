@@ -68,7 +68,7 @@ func isNil(v *float64) bool {
 // newRatiosWithRF creates a Ratios instance with de-annualized risk-free rate.
 func newRatiosWithRF(rf float64) *Ratios {
 	rfAnnual := math.Pow(1+rf, 252) - 1
-	r := New(Daily, rfAnnual, 0, conventions.RAW)
+	r := New(Daily, rfAnnual, 0, conventions.RAW, nil, nil)
 	r.Reset()
 	return r
 }
@@ -76,7 +76,7 @@ func newRatiosWithRF(rf float64) *Ratios {
 // newRatiosWithMAR creates a Ratios instance with de-annualized target return.
 func newRatiosWithMAR(mar float64) *Ratios {
 	marAnnual := math.Pow(1+mar, 252) - 1
-	r := New(Daily, 0, marAnnual, conventions.RAW)
+	r := New(Daily, 0, marAnnual, conventions.RAW, nil, nil)
 	r.Reset()
 	return r
 }
@@ -85,7 +85,7 @@ func newRatiosWithMAR(mar float64) *Ratios {
 func newRatiosWithRFandMAR(rf, mar float64) *Ratios {
 	rfAnnual := math.Pow(1+rf, 252) - 1
 	marAnnual := math.Pow(1+mar, 252) - 1
-	r := New(Daily, rfAnnual, marAnnual, conventions.RAW)
+	r := New(Daily, rfAnnual, marAnnual, conventions.RAW, nil, nil)
 	r.Reset()
 	return r
 }
@@ -592,13 +592,16 @@ func TestCalmarRatio(t *testing.T) {
 		fp(0.06672377010548700), fp(0.06228923867560830), fp(0.05705690600200920),
 	}
 
+	// Note: Python tests use places=12 for Calmar Ratio
+	calmarEps := 1e-13
+
 	t.Run("conformance to R", func(t *testing.T) {
 		ratios := newRatiosWithRF(0)
 		for i := range baconLen {
 			addBaconReturn(ratios, i)
 			expected := expectedValues[i]
 			actual := ratios.CalmarRatio()
-			assertNullableFloat(t, i, expected, actual)
+			assertNullableFloatEps(t, i, expected, actual, calmarEps)
 		}
 	})
 }
@@ -629,17 +632,20 @@ func TestSterlingRatio(t *testing.T) {
 		},
 	}
 
+	// Note: Python tests use places=12 for Sterling Ratio
+	sterlingEps := 1e-13
+
 	for _, excess := range []float64{0, 0.02} {
 		excess := excess
 		t.Run(fmt.Sprintf("excess=%.2f", excess), func(t *testing.T) {
 			excessAnnual := math.Pow(1+excess, 252) - 1
-			ratios := New(Daily, 0, 0, conventions.RAW)
+			ratios := New(Daily, 0, 0, conventions.RAW, nil, nil)
 			ratios.Reset()
 			for i := range baconLen {
 				addBaconReturn(ratios, i)
 				expected := expectedExcess[excess][i]
 				actual := ratios.SterlingRatio(excessAnnual)
-				assertNullableFloat(t, i, expected, actual)
+				assertNullableFloatEps(t, i, expected, actual, sterlingEps)
 			}
 		})
 	}
@@ -851,4 +857,289 @@ func assertNullableFloatEps(t *testing.T, step int, expected *float64, actual *f
 	if !almostEqual(*actual, *expected, eps) {
 		t.Errorf("step %d: expected %.16f, got %.16f, diff=%.2e", step, *expected, *actual, math.Abs(*actual-*expected))
 	}
+}
+
+// ip creates a pointer to an int value.
+func ip(v int) *int {
+	return &v
+}
+
+// newRatiosWithWindow creates a Ratios instance with rolling window and/or min periods.
+func newRatiosWithWindow(rollingWindow *int, minPeriods *int) *Ratios {
+	r := New(Daily, 0, 0, conventions.RAW, rollingWindow, minPeriods)
+	r.Reset()
+	return r
+}
+
+// addBaconReturns adds count bacon returns (or all if count <= 0).
+func addBaconReturns(r *Ratios, count int) {
+	n := baconLen
+	if count > 0 && count < n {
+		n = count
+	}
+	for i := 0; i < n; i++ {
+		addBaconReturn(r, i)
+	}
+}
+
+// ---------- Min Periods ----------
+
+func TestMinPeriods(t *testing.T) {
+	t.Run("sharpe nil before min_periods", func(t *testing.T) {
+		minP := 10
+		ratios := newRatiosWithWindow(nil, ip(minP))
+		for i := range baconLen {
+			addBaconReturn(ratios, i)
+			if i < minP-1 {
+				if ratios.SharpeRatio(false, false) != nil {
+					t.Errorf("step %d: expected nil before min_periods", i)
+				}
+			} else {
+				if ratios.SharpeRatio(false, false) == nil {
+					t.Errorf("step %d: expected non-nil after min_periods", i)
+				}
+			}
+		}
+	})
+
+	t.Run("all ratios nil before min_periods", func(t *testing.T) {
+		minP := 10
+		ratios := newRatiosWithWindow(nil, ip(minP))
+		addBaconReturns(ratios, minP-1)
+
+		if ratios.SharpeRatio(false, false) != nil {
+			t.Error("SharpeRatio should be nil")
+		}
+		if ratios.SortinoRatio(false, false) != nil {
+			t.Error("SortinoRatio should be nil")
+		}
+		if ratios.OmegaRatio() != nil {
+			t.Error("OmegaRatio should be nil")
+		}
+		if ratios.KappaRatio(1) != nil {
+			t.Error("KappaRatio(1) should be nil")
+		}
+		if ratios.KappaRatio(2) != nil {
+			t.Error("KappaRatio(2) should be nil")
+		}
+		if ratios.KappaRatio(3) != nil {
+			t.Error("KappaRatio(3) should be nil")
+		}
+		if ratios.Kappa3Ratio() != nil {
+			t.Error("Kappa3Ratio should be nil")
+		}
+		if ratios.BernardoLedoitRatio() != nil {
+			t.Error("BernardoLedoitRatio should be nil")
+		}
+		if ratios.UpsidePotentialRatio(true) != nil {
+			t.Error("UpsidePotentialRatio should be nil")
+		}
+		if ratios.CompoundGrowthRate() != nil {
+			t.Error("CompoundGrowthRate should be nil")
+		}
+		if ratios.CalmarRatio() != nil {
+			t.Error("CalmarRatio should be nil")
+		}
+		if ratios.SterlingRatio(0) != nil {
+			t.Error("SterlingRatio should be nil")
+		}
+		if ratios.BurkeRatio(false) != nil {
+			t.Error("BurkeRatio should be nil")
+		}
+		if ratios.PainIndex() != nil {
+			t.Error("PainIndex should be nil")
+		}
+		if ratios.PainRatio() != nil {
+			t.Error("PainRatio should be nil")
+		}
+		if ratios.UlcerIndex() != nil {
+			t.Error("UlcerIndex should be nil")
+		}
+		if ratios.MartinRatio() != nil {
+			t.Error("MartinRatio should be nil")
+		}
+		if ratios.Kurtosis() != nil {
+			t.Error("Kurtosis should be nil")
+		}
+		if ratios.Skew() != nil {
+			t.Error("Skew should be nil")
+		}
+		if ratios.GainToPainRatio() != nil {
+			t.Error("GainToPainRatio should be nil")
+		}
+		if ratios.RiskOfRuin() != nil {
+			t.Error("RiskOfRuin should be nil")
+		}
+		if ratios.RiskReturnRatio() != nil {
+			t.Error("RiskReturnRatio should be nil")
+		}
+
+		// Feed one more to hit min_periods
+		addBaconReturn(ratios, minP-1)
+		if ratios.SharpeRatio(false, false) == nil {
+			t.Error("SharpeRatio should be non-nil after min_periods")
+		}
+		if ratios.Kurtosis() == nil {
+			t.Error("Kurtosis should be non-nil after min_periods")
+		}
+	})
+
+	t.Run("min_periods zero is ignored", func(t *testing.T) {
+		ratios := newRatiosWithWindow(nil, ip(0))
+		addBaconReturn(ratios, 0)
+		// CumulativeReturn is non-nil (it's a float64, always valid)
+		cr := ratios.CumulativeReturn()
+		if cr == 0 && baconPortfolioReturns[0] != 0 {
+			t.Error("CumulativeReturn should be non-zero")
+		}
+	})
+
+	t.Run("min_periods negative is ignored", func(t *testing.T) {
+		ratios := newRatiosWithWindow(nil, ip(-5))
+		addBaconReturn(ratios, 0)
+		cr := ratios.CumulativeReturn()
+		if cr == 0 && baconPortfolioReturns[0] != 0 {
+			t.Error("CumulativeReturn should be non-zero")
+		}
+	})
+}
+
+// ---------- Rolling Window ----------
+
+func TestRollingWindow(t *testing.T) {
+	t.Run("rolling matches fresh", func(t *testing.T) {
+		window := 10
+		rRolling := newRatiosWithWindow(ip(window), nil)
+		addBaconReturns(rRolling, 0) // all
+
+		rFresh := newRatiosWithWindow(nil, nil)
+		start := baconLen - window
+		for i := start; i < baconLen; i++ {
+			addBaconReturn(rFresh, i)
+		}
+
+		matchEps := 1e-13
+		assertNullableFloatEps(t, 0, rFresh.SharpeRatio(false, false), rRolling.SharpeRatio(false, false), matchEps)
+		assertNullableFloatEps(t, 1, rFresh.SortinoRatio(false, false), rRolling.SortinoRatio(false, false), matchEps)
+		crRolling := rRolling.CumulativeReturn()
+		crFresh := rFresh.CumulativeReturn()
+		if !almostEqual(crRolling, crFresh, matchEps) {
+			t.Errorf("CumulativeReturn: expected %.16f, got %.16f", crFresh, crRolling)
+		}
+		assertNullableFloatEps(t, 3, rFresh.Kurtosis(), rRolling.Kurtosis(), matchEps)
+		assertNullableFloatEps(t, 4, rFresh.OmegaRatio(), rRolling.OmegaRatio(), matchEps)
+		assertNullableFloatEps(t, 5, rFresh.CalmarRatio(), rRolling.CalmarRatio(), matchEps)
+		assertNullableFloatEps(t, 6, rFresh.PainIndex(), rRolling.PainIndex(), matchEps)
+		assertNullableFloatEps(t, 7, rFresh.UlcerIndex(), rRolling.UlcerIndex(), matchEps)
+		assertNullableFloatEps(t, 8, rFresh.MartinRatio(), rRolling.MartinRatio(), matchEps)
+		assertNullableFloatEps(t, 9, rFresh.BurkeRatio(false), rRolling.BurkeRatio(false), matchEps)
+		assertNullableFloatEps(t, 10, rFresh.BurkeRatio(true), rRolling.BurkeRatio(true), matchEps)
+		wddRolling := rRolling.WorstDrawdownsCumulative()
+		wddFresh := rFresh.WorstDrawdownsCumulative()
+		if !almostEqual(wddRolling, wddFresh, matchEps) {
+			t.Errorf("WorstDrawdownsCumulative: expected %.16f, got %.16f", wddFresh, wddRolling)
+		}
+	})
+
+	t.Run("rolling sharpe step by step", func(t *testing.T) {
+		expectedSharpe := []*float64{
+			nil,
+			fp(0.8915694197569513), fp(1.1419253390798365),
+			fp(0.49779248369997886), fp(0.6680426571226848), fp(0.8511810078441023),
+			fp(0.9735918376312113), fp(0.8462916062735413), fp(0.6475912629068395),
+			fp(0.7524743687246648),
+			// After step 10 the window is full
+			fp(0.6988231811021255), fp(0.7111123104828202), fp(0.798675261552181),
+			fp(0.6310757998776281), fp(0.3386466454024338), fp(0.32170438498662823),
+			fp(0.16115775541041388), fp(-0.022215518961695248), fp(0.14832204365045173),
+			fp(0.17865069359303465), fp(0.05655715365926667), fp(-0.049597686094872355),
+			fp(-0.14538530360069923), fp(-0.08934238062974807),
+		}
+
+		ratios := newRatiosWithWindow(ip(10), nil)
+		for i := range baconLen {
+			addBaconReturn(ratios, i)
+			assertNullableFloat(t, i, expectedSharpe[i], ratios.SharpeRatio(false, false))
+		}
+	})
+
+	t.Run("rolling cumulative return step by step", func(t *testing.T) {
+		expectedCumRet := []float64{
+			0.0029999999999998916, 0.029077999999999937,
+			0.04039785799999973, 0.02999387941999987,
+			0.045443787611299635, 0.07157988230158208,
+			0.08872516041840739, 0.1616697461664407,
+			0.14540636972011045, 0.19122262450891503,
+			0.18172134734433754, 0.24506898292322488,
+			0.2807831278339803, 0.2458526788930535,
+			0.1525671581089434, 0.14357151199687346,
+			0.0704099487293568, -0.018874479983775894,
+			0.06471024991618646, 0.08313792731858194,
+			0.017823077430024314, -0.035845669483492104,
+			-0.07756388570776418, -0.050743313329589035,
+		}
+
+		ratios := newRatiosWithWindow(ip(10), nil)
+		for i := range baconLen {
+			addBaconReturn(ratios, i)
+			actual := ratios.CumulativeReturn()
+			if !almostEqual(actual, expectedCumRet[i], epsilon) {
+				t.Errorf("step %d: expected %.16f, got %.16f, diff=%.2e", i, expectedCumRet[i], actual, math.Abs(actual-expectedCumRet[i]))
+			}
+		}
+	})
+
+	t.Run("rolling window nil is expanding", func(t *testing.T) {
+		rExpanding := newRatiosWithWindow(nil, nil)
+		addBaconReturns(rExpanding, 0)
+
+		rNone := newRatiosWithWindow(nil, nil)
+		addBaconReturns(rNone, 0)
+
+		assertNullableFloatEps(t, 0, rExpanding.SharpeRatio(false, false), rNone.SharpeRatio(false, false), epsilon)
+		crExp := rExpanding.CumulativeReturn()
+		crNone := rNone.CumulativeReturn()
+		if !almostEqual(crExp, crNone, epsilon) {
+			t.Errorf("CumulativeReturn: expected %.16f, got %.16f", crExp, crNone)
+		}
+	})
+}
+
+// ---------- Rolling Window With Min Periods ----------
+
+func TestRollingWindowWithMinPeriods(t *testing.T) {
+	t.Run("combined rolling and min_periods", func(t *testing.T) {
+		ratios := newRatiosWithWindow(ip(10), ip(5))
+		for i := range baconLen {
+			addBaconReturn(ratios, i)
+			if i < 4 {
+				if ratios.SharpeRatio(false, false) != nil {
+					t.Errorf("step %d: expected nil before min_periods=5", i)
+				}
+				if ratios.Kurtosis() != nil {
+					t.Errorf("step %d: Kurtosis expected nil before min_periods=5", i)
+				}
+			} else {
+				if ratios.Kurtosis() == nil {
+					t.Errorf("step %d: Kurtosis expected non-nil after min_periods=5", i)
+				}
+			}
+		}
+	})
+
+	t.Run("min_periods greater than window", func(t *testing.T) {
+		ratios := newRatiosWithWindow(ip(5), ip(10))
+		for i := range baconLen {
+			addBaconReturn(ratios, i)
+			if i < 9 {
+				if ratios.SharpeRatio(false, false) != nil {
+					t.Errorf("step %d: expected nil before min_periods=10", i)
+				}
+			} else {
+				if ratios.SharpeRatio(false, false) == nil {
+					t.Errorf("step %d: expected non-nil after min_periods=10", i)
+				}
+			}
+		}
+	})
 }

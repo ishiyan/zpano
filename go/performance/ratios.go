@@ -20,9 +20,12 @@ type Ratios struct {
 	riskFreeRate       float64
 	requiredReturn     float64
 	dayCountConvention conventions.DayCountConvention
+	rollingWindow      *int
+	minPeriods         *int
 
 	fractionalPeriods []float64
 	returns           []float64
+	sampleCount       int
 
 	logretSum                     float64
 	drawdownsCumulative           []float64
@@ -63,11 +66,16 @@ type Ratios struct {
 // New creates a new Ratios instance with the specified parameters.
 //
 // The annual rates are de-annualized to per-period rates based on the periodicity.
+// rollingWindow, if non-nil, limits computations to the last N returns.
+// minPeriods, if non-nil and > 0, causes all ratio methods to return nil
+// until at least that many samples have been added.
 func New(
 	periodicity Periodicity,
 	annualRiskFreeRate float64,
 	annualTargetReturn float64,
 	dayCountConvention conventions.DayCountConvention,
+	rollingWindow *int,
+	minPeriods *int,
 ) *Ratios {
 	ppa := periodicity.PeriodsPerAnnum()
 	dpp := periodicity.DaysPerPeriod()
@@ -82,6 +90,12 @@ func New(
 		rr = math.Pow(1+annualTargetReturn, 1.0/float64(ppa)) - 1
 	}
 
+	// Treat nil or <=0 minPeriods as no minimum
+	var mp *int
+	if minPeriods != nil && *minPeriods > 0 {
+		mp = minPeriods
+	}
+
 	return &Ratios{
 		periodicity:        periodicity,
 		periodsPerAnnum:    ppa,
@@ -89,6 +103,8 @@ func New(
 		riskFreeRate:       rfr,
 		requiredReturn:     rr,
 		dayCountConvention: dayCountConvention,
+		rollingWindow:      rollingWindow,
+		minPeriods:         mp,
 	}
 }
 
@@ -96,6 +112,7 @@ func New(
 func (r *Ratios) Reset() {
 	r.fractionalPeriods = []float64{}
 	r.returns = []float64{}
+	r.sampleCount = 0
 	r.logretSum = 0
 	r.drawdownsCumulative = []float64{}
 	r.drawdownsCumulativeMin = math.Inf(1)
@@ -159,35 +176,45 @@ func (r *Ratios) AddReturn(
 		return
 	}
 	r.totalDuration += fractionalPeriod
+	r.sampleCount++
 
 	// Normalized return
 	ret := returnVal / fractionalPeriod
 	r.returns = append(r.returns, ret)
-	l := len(r.returns)
+
+	// Window slice: use last rollingWindow returns, or all if not set
+	w := r.returns
+	if r.rollingWindow != nil {
+		n := *r.rollingWindow
+		if len(r.returns) > n {
+			w = r.returns[len(r.returns)-n:]
+		}
+	}
+	l := len(w)
 	lf := float64(l)
 
 	// Returns mean
-	mean := sliceMean(r.returns)
+	mean := sliceMean(w)
 	r.returnsMean = &mean
 
 	// Returns std (ddof=1, sample)
 	if l > 1 {
-		s := sliceStdDdof1(r.returns, mean)
+		s := sliceStdDdof1(w, mean)
 		r.returnsStd = &s
 	} else {
 		r.returnsStd = nil
 	}
 
-	r.returnsAutocorrPenalty = r.autocorrPenalty(r.returns)
+	r.returnsAutocorrPenalty = r.autocorrPenalty(w)
 
 	// Average return, win rate, avg win, avg loss
-	nonZero := filterNonZero(r.returns)
+	nonZero := filterNonZero(w)
 	lenNonZero := len(nonZero)
 	if lenNonZero > 0 {
 		m := sliceMean(nonZero)
 		r.avgReturn = &m
 
-		positive := filterPositive(r.returns)
+		positive := filterPositive(w)
 		lenPos := len(positive)
 		wr := float64(lenPos) / float64(lenNonZero)
 		r.winRate = &wr
@@ -199,7 +226,7 @@ func (r *Ratios) AddReturn(
 			r.avgWin = nil
 		}
 
-		negative := filterNegative(r.returns)
+		negative := filterNegative(w)
 		lenNeg := len(negative)
 		if lenNeg > 0 {
 			m3 := sliceMean(negative)
@@ -221,7 +248,7 @@ func (r *Ratios) AddReturn(
 		r.excessAutocorrPenalty = r.returnsAutocorrPenalty
 	} else {
 		excess := make([]float64, l)
-		for i, v := range r.returns {
+		for i, v := range w {
 			excess[i] = v - r.riskFreeRate
 		}
 		em := sliceMean(excess)
@@ -239,12 +266,12 @@ func (r *Ratios) AddReturn(
 	var tmp2 []float64
 	if r.requiredReturn == 0 {
 		tmp2 = make([]float64, l)
-		for i, v := range r.returns {
+		for i, v := range w {
 			tmp2[i] = -v
 		}
 	} else {
 		tmp2 = make([]float64, l)
-		for i, v := range r.returns {
+		for i, v := range w {
 			tmp2[i] = r.requiredReturn - v
 		}
 	}
@@ -265,13 +292,13 @@ func (r *Ratios) AddReturn(
 	var tmp3 []float64
 	if r.requiredReturn == 0 {
 		tmp3 = make([]float64, l)
-		copy(tmp3, r.returns)
+		copy(tmp3, w)
 		rm := *r.returnsMean
 		r.requiredMean = &rm
 		r.requiredAutocorrPenalty = r.returnsAutocorrPenalty
 	} else {
 		tmp3 = make([]float64, l)
-		for i, v := range r.returns {
+		for i, v := range w {
 			tmp3[i] = v - r.requiredReturn
 		}
 		rm := sliceMean(tmp3)
@@ -291,61 +318,83 @@ func (r *Ratios) AddReturn(
 	hpm3 := sliceSumPow(tmp3, 3) / lf
 	r.requiredHPM3 = &hpm3
 
-	// Cumulative returns
-	retlog := math.Log(returnVal+1) / fractionalPeriod
-	r.logretSum += retlog
-	ret1 := ret + 1
-
-	var cmr float64
-	if l == 1 {
-		cmr = ret1
-		r.cumulativeReturnPlus1 = ret1
-		gm := ret
-		r.cumulativeReturnGeometricMean = &gm
-	} else {
-		cmr = math.Exp(r.logretSum)
-		r.cumulativeReturnPlus1 = cmr
+	// Cumulative returns — recompute from window
+	wStart := len(r.returns) - l
+	logretSum := 0.0
+	for j := wStart; j < len(r.returns); j++ {
+		fpJ := r.fractionalPeriods[j]
+		if fpJ != 0 {
+			logretSum += math.Log(w[j-wStart] + 1)
+		}
+	}
+	r.logretSum = logretSum
+	cmr := math.Exp(logretSum)
+	r.cumulativeReturnPlus1 = cmr
+	if l >= 1 {
 		gm := math.Pow(cmr, 1.0/lf) - 1
 		r.cumulativeReturnGeometricMean = &gm
 	}
-	if r.cumulativeReturnPlus1Max < cmr {
-		r.cumulativeReturnPlus1Max = cmr
+	r.cumulativeReturnPlus1Max = math.Inf(-1)
+	cumr := 1.0
+	for j := 0; j < l; j++ {
+		cumr *= (w[j] + 1)
+		if cumr > r.cumulativeReturnPlus1Max {
+			r.cumulativeReturnPlus1Max = cumr
+		}
 	}
 
-	// Drawdowns from peaks to valleys (cumulative returns)
-	dd := cmr/r.cumulativeReturnPlus1Max - 1
-	if r.drawdownsCumulativeMin > dd {
-		r.drawdownsCumulativeMin = dd
-	}
-	r.drawdownsCumulative = append(r.drawdownsCumulative, dd)
-
-	// Drawdown peaks (used in pain index, ulcer index)
-	ddPeak := 1.0
-	for j := r.drawdownsPeaksPeak + 1; j < l; j++ {
-		ddPeak *= (1 + r.returns[j]*0.01)
-	}
-	if ddPeak > 1 {
-		r.drawdownsPeaksPeak = l - 1
-		r.drawdownsPeaks = append(r.drawdownsPeaks, 0)
-	} else {
-		r.drawdownsPeaks = append(r.drawdownsPeaks, (ddPeak-1)*100)
+	// Drawdowns from peaks to valleys (cumulative returns) — recompute from window
+	r.drawdownsCumulative = make([]float64, 0, l)
+	r.drawdownsCumulativeMin = math.Inf(1)
+	cumr = 1.0
+	cumrMax := math.Inf(-1)
+	for j := 0; j < l; j++ {
+		cumr *= (w[j] + 1)
+		if cumr > cumrMax {
+			cumrMax = cumr
+		}
+		dd := cumr/cumrMax - 1
+		r.drawdownsCumulative = append(r.drawdownsCumulative, dd)
+		if r.drawdownsCumulativeMin > dd {
+			r.drawdownsCumulativeMin = dd
+		}
 	}
 
-	// Drawdown continuous (used in Burke ratio)
-	if l > 1 {
-		r.drawdownContinuousFinalized = false
-		if ret < 0 {
+	// Drawdown peaks (used in pain index, ulcer index) — recompute from window
+	r.drawdownsPeaks = make([]float64, 0, l)
+	r.drawdownsPeaksPeak = 0
+	for j := 0; j < l; j++ {
+		ddPeak := 1.0
+		for k := r.drawdownsPeaksPeak + 1; k <= j; k++ {
+			ddPeak *= (1 + w[k]*0.01)
+		}
+		if ddPeak > 1 {
+			r.drawdownsPeaksPeak = j
+			r.drawdownsPeaks = append(r.drawdownsPeaks, 0)
+		} else {
+			r.drawdownsPeaks = append(r.drawdownsPeaks, (ddPeak-1)*100)
+		}
+	}
+
+	// Drawdown continuous (used in Burke ratio) — recompute from window
+	r.drawdownContinuous = make([]float64, 0)
+	r.drawdownContinuousFinal = make([]float64, 0)
+	r.drawdownContinuousFinalized = false
+	r.drawdownContinuousPeak = 1
+	r.drawdownContinuousInside = false
+	for j := 1; j < l; j++ {
+		if w[j] < 0 {
 			if !r.drawdownContinuousInside {
 				r.drawdownContinuousInside = true
-				r.drawdownContinuousPeak = l - 2
+				r.drawdownContinuousPeak = j - 1
 			}
 			r.drawdownContinuous = append(r.drawdownContinuous, 0)
 		} else {
 			if r.drawdownContinuousInside {
 				ddC := 1.0
 				j1 := r.drawdownContinuousPeak + 1
-				for j := j1; j < l-1; j++ {
-					ddC *= (1 + r.returns[j]*0.01)
+				for k := j1; k < j; k++ {
+					ddC *= (1 + w[k]*0.01)
 				}
 				r.drawdownContinuous = append(r.drawdownContinuous, (ddC-1)*100)
 				r.drawdownContinuousInside = false
@@ -356,7 +405,6 @@ func (r *Ratios) AddReturn(
 	}
 
 	// Suppress unused variable warnings
-	_ = ret1
 	_ = returnBenchmark
 	_ = value
 }
@@ -364,6 +412,26 @@ func (r *Ratios) AddReturn(
 // autocorrPenalty is a stub returning 1, matching all implementations.
 func (r *Ratios) autocorrPenalty(returns []float64) float64 {
 	return 1
+}
+
+// isPrimed returns true if enough samples have been added to satisfy minPeriods.
+func (r *Ratios) isPrimed() bool {
+	if r.minPeriods == nil {
+		return true
+	}
+	return r.sampleCount >= *r.minPeriods
+}
+
+// windowReturns returns the windowed slice of returns.
+func (r *Ratios) windowReturns() []float64 {
+	if r.rollingWindow == nil {
+		return r.returns
+	}
+	n := *r.rollingWindow
+	if len(r.returns) > n {
+		return r.returns[len(r.returns)-n:]
+	}
+	return r.returns
 }
 
 // CumulativeReturn returns the cumulative geometric return.
@@ -418,11 +486,12 @@ func (r *Ratios) finalizeContinuousDrawdown() {
 	if r.drawdownContinuousFinalized {
 		return
 	}
+	w := r.windowReturns()
 	if r.drawdownContinuousInside {
 		ddC := 1.0
 		j1 := r.drawdownContinuousPeak + 1
-		for j := j1; j < len(r.returns); j++ {
-			ddC *= (1 + r.returns[j]*0.01)
+		for j := j1; j < len(w); j++ {
+			ddC *= (1 + w[j]*0.01)
 		}
 		r.drawdownContinuousFinal = make([]float64, len(r.drawdownContinuous)+1)
 		copy(r.drawdownContinuousFinal, r.drawdownContinuous)
@@ -438,10 +507,14 @@ func (r *Ratios) finalizeContinuousDrawdown() {
 // Skew returns the population skewness of the returns.
 // Returns nil if fewer than 2 returns.
 func (r *Ratios) Skew() *float64 {
-	if len(r.returns) < 2 {
+	if !r.isPrimed() {
 		return nil
 	}
-	s := populationSkewness(r.returns)
+	w := r.windowReturns()
+	if len(w) < 2 {
+		return nil
+	}
+	s := populationSkewness(w)
 	return &s
 }
 
@@ -449,10 +522,14 @@ func (r *Ratios) Skew() *float64 {
 // Uses m4/m2^2 - 3, matching scipy.stats.kurtosis(bias=True, fisher=True).
 // Returns nil if fewer than 2 returns.
 func (r *Ratios) Kurtosis() *float64 {
-	if len(r.returns) < 2 {
+	if !r.isPrimed() {
 		return nil
 	}
-	k := populationExcessKurtosis(r.returns)
+	w := r.windowReturns()
+	if len(w) < 2 {
+		return nil
+	}
+	k := populationExcessKurtosis(w)
 	return &k
 }
 
@@ -460,6 +537,9 @@ func (r *Ratios) Kurtosis() *float64 {
 // If ignoreRiskFreeRate is true, the ratio is calculated over raw returns.
 // If autocorrelationPenalty is true, the autocorrelation penalty is applied.
 func (r *Ratios) SharpeRatio(ignoreRiskFreeRate bool, autocorrelationPenalty bool) *float64 {
+	if !r.isPrimed() {
+		return nil
+	}
 	if ignoreRiskFreeRate {
 		if r.returnsMean == nil || r.returnsStd == nil || *r.returnsStd == 0 {
 			return nil
@@ -486,6 +566,9 @@ func (r *Ratios) SharpeRatio(ignoreRiskFreeRate bool, autocorrelationPenalty boo
 // If autocorrelationPenalty is true, the penalty is applied.
 // If divideBySqrt2 is true, uses Jack Schwager's version for direct comparison to Sharpe.
 func (r *Ratios) SortinoRatio(autocorrelationPenalty bool, divideBySqrt2 bool) *float64 {
+	if !r.isPrimed() {
+		return nil
+	}
 	if r.requiredMean == nil || r.requiredLPM2 == nil || *r.requiredLPM2 == 0 {
 		return nil
 	}
@@ -502,6 +585,9 @@ func (r *Ratios) SortinoRatio(autocorrelationPenalty bool, divideBySqrt2 bool) *
 
 // OmegaRatio calculates the Omega ratio.
 func (r *Ratios) OmegaRatio() *float64 {
+	if !r.isPrimed() {
+		return nil
+	}
 	if r.requiredMean == nil || r.requiredLPM1 == nil || *r.requiredLPM1 == 0 {
 		return nil
 	}
@@ -511,6 +597,9 @@ func (r *Ratios) OmegaRatio() *float64 {
 
 // KappaRatio calculates the Kappa ratio of a given order.
 func (r *Ratios) KappaRatio(order int) *float64 {
+	if !r.isPrimed() {
+		return nil
+	}
 	if r.requiredMean == nil {
 		return nil
 	}
@@ -534,19 +623,20 @@ func (r *Ratios) KappaRatio(order int) *float64 {
 		v := *r.requiredMean / math.Cbrt(*r.requiredLPM3)
 		return &v
 	default:
-		l := len(r.returns)
+		w := r.windowReturns()
+		l := len(w)
 		if l == 0 {
 			return nil
 		}
 		var tmp []float64
 		if r.requiredReturn == 0 {
 			tmp = make([]float64, l)
-			for i, v := range r.returns {
+			for i, v := range w {
 				tmp[i] = -v
 			}
 		} else {
 			tmp = make([]float64, l)
-			for i, v := range r.returns {
+			for i, v := range w {
 				tmp[i] = r.requiredReturn - v
 			}
 		}
@@ -566,6 +656,9 @@ func (r *Ratios) KappaRatio(order int) *float64 {
 
 // Kappa3Ratio calculates the Kappa ratio of order 3.
 func (r *Ratios) Kappa3Ratio() *float64 {
+	if !r.isPrimed() {
+		return nil
+	}
 	if r.requiredMean == nil || r.requiredLPM3 == nil || *r.requiredLPM3 == 0 {
 		return nil
 	}
@@ -575,7 +668,11 @@ func (r *Ratios) Kappa3Ratio() *float64 {
 
 // BernardoLedoitRatio calculates the Bernardo-Ledoit ratio.
 func (r *Ratios) BernardoLedoitRatio() *float64 {
-	l := len(r.returns)
+	if !r.isPrimed() {
+		return nil
+	}
+	w := r.windowReturns()
+	l := len(w)
 	if l < 1 {
 		return nil
 	}
@@ -583,7 +680,7 @@ func (r *Ratios) BernardoLedoitRatio() *float64 {
 
 	// LPM1 with threshold=0 (using -returns clipped to min 0)
 	tmp := make([]float64, l)
-	for i, v := range r.returns {
+	for i, v := range w {
 		tmp[i] = -v
 		if tmp[i] < 0 {
 			tmp[i] = 0
@@ -595,7 +692,7 @@ func (r *Ratios) BernardoLedoitRatio() *float64 {
 	}
 
 	// HPM1 with threshold=0 (using returns clipped to min 0)
-	for i, v := range r.returns {
+	for i, v := range w {
 		tmp[i] = v
 		if tmp[i] < 0 {
 			tmp[i] = 0
@@ -609,6 +706,9 @@ func (r *Ratios) BernardoLedoitRatio() *float64 {
 // UpsidePotentialRatio calculates the upside potential ratio.
 // If full is true, uses HPM1/sqrt(LPM2); if false, uses a subset-based calculation.
 func (r *Ratios) UpsidePotentialRatio(full bool) *float64 {
+	if !r.isPrimed() {
+		return nil
+	}
 	if full {
 		if r.requiredHPM1 == nil || r.requiredLPM2 == nil || *r.requiredLPM2 == 0 {
 			return nil
@@ -617,8 +717,9 @@ func (r *Ratios) UpsidePotentialRatio(full bool) *float64 {
 		return &v
 	}
 	// Subset version
+	w := r.windowReturns()
 	var below []float64
-	for _, v := range r.returns {
+	for _, v := range w {
 		if v < r.requiredReturn {
 			below = append(below, v)
 		}
@@ -637,7 +738,7 @@ func (r *Ratios) UpsidePotentialRatio(full bool) *float64 {
 		return nil
 	}
 	var above []float64
-	for _, v := range r.returns {
+	for _, v := range w {
 		if v > r.requiredReturn {
 			above = append(above, v-r.requiredReturn)
 		}
@@ -653,11 +754,17 @@ func (r *Ratios) UpsidePotentialRatio(full bool) *float64 {
 // CompoundGrowthRate returns the compound (annual) growth rate (CAGR),
 // or the geometric mean of the returns.
 func (r *Ratios) CompoundGrowthRate() *float64 {
+	if !r.isPrimed() {
+		return nil
+	}
 	return r.cumulativeReturnGeometricMean
 }
 
 // CalmarRatio calculates the Calmar ratio.
 func (r *Ratios) CalmarRatio() *float64 {
+	if !r.isPrimed() {
+		return nil
+	}
 	wdd := r.WorstDrawdownsCumulative()
 	if wdd == 0 {
 		return nil
@@ -671,6 +778,9 @@ func (r *Ratios) CalmarRatio() *float64 {
 
 // SterlingRatio calculates the Sterling ratio with the given annual excess rate.
 func (r *Ratios) SterlingRatio(annualExcessRate float64) *float64 {
+	if !r.isPrimed() {
+		return nil
+	}
 	excessRate := annualExcessRate
 	if annualExcessRate != 0 && r.periodsPerAnnum != 1 {
 		excessRate = math.Pow(1+annualExcessRate, 1.0/float64(r.periodsPerAnnum)) - 1
@@ -689,6 +799,9 @@ func (r *Ratios) SterlingRatio(annualExcessRate float64) *float64 {
 // BurkeRatio calculates the Burke ratio.
 // If modified is true, calculates the modified Burke ratio.
 func (r *Ratios) BurkeRatio(modified bool) *float64 {
+	if !r.isPrimed() {
+		return nil
+	}
 	if r.cumulativeReturnGeometricMean == nil {
 		return nil
 	}
@@ -707,7 +820,7 @@ func (r *Ratios) BurkeRatio(modified bool) *float64 {
 	}
 	burke := rate / sqrtSumSq
 	if modified {
-		burke *= math.Sqrt(float64(len(r.returns)))
+		burke *= math.Sqrt(float64(len(r.windowReturns())))
 	}
 	v := burke
 	return &v
@@ -715,6 +828,9 @@ func (r *Ratios) BurkeRatio(modified bool) *float64 {
 
 // PainIndex calculates the pain index.
 func (r *Ratios) PainIndex() *float64 {
+	if !r.isPrimed() {
+		return nil
+	}
 	l := len(r.drawdownsPeaks)
 	if l < 1 {
 		return nil
@@ -726,6 +842,9 @@ func (r *Ratios) PainIndex() *float64 {
 
 // PainRatio calculates the pain ratio.
 func (r *Ratios) PainRatio() *float64 {
+	if !r.isPrimed() {
+		return nil
+	}
 	if r.cumulativeReturnGeometricMean == nil {
 		return nil
 	}
@@ -744,6 +863,9 @@ func (r *Ratios) PainRatio() *float64 {
 
 // UlcerIndex calculates the ulcer index.
 func (r *Ratios) UlcerIndex() *float64 {
+	if !r.isPrimed() {
+		return nil
+	}
 	l := len(r.drawdownsPeaks)
 	if l < 1 {
 		return nil
@@ -758,6 +880,9 @@ func (r *Ratios) UlcerIndex() *float64 {
 
 // MartinRatio calculates the Martin (Ulcer) ratio.
 func (r *Ratios) MartinRatio() *float64 {
+	if !r.isPrimed() {
+		return nil
+	}
 	if r.cumulativeReturnGeometricMean == nil {
 		return nil
 	}
@@ -780,6 +905,9 @@ func (r *Ratios) MartinRatio() *float64 {
 
 // GainToPainRatio returns Jack Schwager's gain-to-pain ratio.
 func (r *Ratios) GainToPainRatio() *float64 {
+	if !r.isPrimed() {
+		return nil
+	}
 	if r.requiredLPM1 == nil || *r.requiredLPM1 == 0 {
 		return nil
 	}
@@ -792,16 +920,22 @@ func (r *Ratios) GainToPainRatio() *float64 {
 
 // RiskOfRuin calculates the risk of ruin.
 func (r *Ratios) RiskOfRuin() *float64 {
+	if !r.isPrimed() {
+		return nil
+	}
 	if r.winRate == nil {
 		return nil
 	}
 	wr := *r.winRate
-	v := math.Pow((1-wr)/(1+wr), float64(len(r.returns)))
+	v := math.Pow((1-wr)/(1+wr), float64(len(r.windowReturns())))
 	return &v
 }
 
 // RiskReturnRatio calculates the return/risk ratio (Sharpe without risk-free rate).
 func (r *Ratios) RiskReturnRatio() *float64 {
+	if !r.isPrimed() {
+		return nil
+	}
 	if r.returnsMean == nil || r.returnsStd == nil || *r.returnsStd == 0 {
 		return nil
 	}
