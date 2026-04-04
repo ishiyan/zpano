@@ -4,7 +4,7 @@ import warnings
 import numpy as np
 from scipy.stats import kurtosis, skew
 
-from ..daycounting import DayCountConvention, frac
+from ..daycounting import DayCountConvention, year_frac, day_frac
 from .periodicity import Periodicity
 
 _SQRT2 = 1.4142135623730950488016887242097
@@ -115,11 +115,11 @@ class Ratios:
                    time_start: datetime,
                    time_end: datetime):
         if self.periodicity == Periodicity.ANNUAL:
-            fractional_period = frac(time_start, time_end,
-                self.day_count_convention, False)
+            fractional_period = year_frac(time_start, time_end,
+                self.day_count_convention)
         else:
-            fractional_period = frac(time_start, time_end,
-                self.day_count_convention, True) / self.days_per_period
+            fractional_period = day_frac(time_start, time_end,
+                self.day_count_convention) / self.days_per_period
         #fractional_period = frac(time_start, time_end,
         #    self.day_count_convention, True) / self.days_per_period
 

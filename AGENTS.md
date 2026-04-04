@@ -151,3 +151,40 @@ The `Ratios` struct/class accumulates portfolio returns incrementally via `addRe
 - **Large test data:** Writing Zig source files with many struct literals (backslash-heavy syntax) can cause JSON encoding issues in editor tools. If a file write fails, split the write into sections or use shell heredoc for the test data portion.
 - **The conventions enum uses lowercase snake_case** (`.raw`, `.thirty_360_us`, `.act_365_fixed`, etc.) NOT UPPER_SNAKE_CASE.
 - **Build.zig module registration:** Library modules use `b.addModule()`, test targets use `b.createModule()` + `b.addTest(.{ .root_module = mod })`. The `addTest` API in Zig 0.16 requires `root_module`, not `root_source_file`.
+
+## Quick Reference: Build & Test All Languages
+
+All commands run from the project root (`~/repos/portf_py/`).
+
+| Language | Prerequisites | Command | Expected |
+|----------|--------------|---------|----------|
+| **Python** | Python 3.10+, `numpy`, `scipy`, symlink `ln -sf py accounts`, `touch py/__init__.py` | `PYTHONPATH=. python3 -m unittest discover -s py -p "test_*.py" -t .` | 79 tests |
+| **Go** | Go 1.26+ | `cd go && go test ./...&& cd ..`| 3 packages OK |
+| **TypeScript** | Node.js 20+, TypeScript 5.3+, Jasmine 5.1+ | `cd ts/daycounting && npm install && npm test && cd ../performance && npm install && npm test && cd ..` | 92 + 92 specs |
+| **Zig** | Zig 0.16.0-dev | `export PATH="$HOME/zig-sdk/zig-x86_64-linux-0.16.0-dev.2915+065c6e794:$PATH" && cd zig && zig build test --summary all && cd ..` | 102 tests |
+| **Rust** | Rust nightly (1.96.0+) | `export PATH="$HOME/.rust/bin:$PATH" && cd rust && cargo test && cd ..` | 66 tests |
+
+```bash
+python3 -m unittest discover -s py -p "test_*.py" -t .
+cd go && go test ./...&& cd ..
+cd ts/daycounting && npm install && npm test && cd ../performance && npm install && npm test && cd ../..
+export PATH="$HOME/zig-sdk/zig-x86_64-linux-0.16.0-dev.2915+065c6e794:$PATH" && cd zig && zig build test --summary all && cd ..
+export PATH="$HOME/.rust/bin:$PATH" && cd rust && cargo test && cd ..
+```
+
+### Build Only (no tests)
+
+| Language | Command | Notes |
+|----------|---------|-------|
+| **Python** | *(interpreted — no build step)* | |
+| **Go** | `cd go && go build ./...` | Compiles all packages |
+| **TypeScript** | `cd ts/daycounting && npm run build && cd ../performance && npm run build` | Build daycounting first (performance depends on it) |
+| **Zig** | `export PATH="$HOME/zig-sdk/zig-x86_64-linux-0.16.0-dev.2915+065c6e794:$PATH" && cd zig && zig build` | Build without running tests |
+| **Rust** | `export PATH="$HOME/.rust/bin:$PATH" && cd rust && cargo build` | Debug build; add `--release` for optimized |
+
+```bash
+cd go && go build ./... && cd ..
+cd ts/daycounting && npm run build && cd ../performance && npm run build && cd ../..
+export PATH="$HOME/zig-sdk/zig-x86_64-linux-0.16.0-dev.2915+065c6e794:$PATH" && cd zig && zig build && cd ..
+export PATH="$HOME/.rust/bin:$PATH" && cd rust && cargo build && cd ..
+```

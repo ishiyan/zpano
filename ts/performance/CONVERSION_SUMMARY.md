@@ -28,9 +28,9 @@ Successfully converted Python performance metrics module to TypeScript with comp
   - Statistical measures
   - 20+ different ratio calculations
 
-#### 3. test_performance_ratios.py → ratios_spec.ts
+#### 3. test_performance_ratios.py → ratios.spec.ts
 - **Source**: `py/performatce/test_performance_ratios.py` (2082 lines)
-- **Target**: `ts/performance/ratios_spec.ts`
+- **Target**: `ts/performance/ratios.spec.ts`
 - **Description**: Jasmine test suite with key test cases
 - **Test Coverage**:
   - Kurtosis calculations
@@ -105,7 +105,7 @@ ts/performance/
 ├── index.ts                  # Module exports
 ├── periodicity.ts            # Periodicity enum
 ├── ratios.ts                 # Ratios class implementation
-├── ratios_spec.ts            # Jasmine test suite
+├── ratios.spec.ts            # Jasmine test suite
 ├── package.json              # NPM configuration
 ├── tsconfig.json             # TypeScript configuration
 ├── README.md                 # Usage documentation
@@ -213,7 +213,7 @@ All converted methods validated against R PerformanceAnalytics package:
 
 ✅ periodicity.ts - Complete
 ✅ ratios.ts - Complete (700+ lines)
-✅ ratios_spec.ts - Complete (key test cases)
+✅ ratios.spec.ts - Complete (key test cases)
 ✅ index.ts - Complete (module exports)
 ✅ package.json - Complete
 ✅ tsconfig.json - Complete

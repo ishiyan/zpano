@@ -1,8 +1,10 @@
 import unittest
 from datetime import datetime
 
-from accounts.daycounting import DayCountConvention
-from accounts.performances import Periodicity, Ratios
+# from accounts.daycounting import DayCountConvention
+# from accounts.performances import Periodicity, Ratios
+from ..daycounting import DayCountConvention
+from ..performance import Periodicity, Ratios
 
 # good links
 # https://www.kenwuyang.com/en/post/portfolio-optimization-with-python/

@@ -1,4 +1,4 @@
-import { DayCountConvention, frac } from '../daycounting';
+import { DayCountConvention, yearFrac, dayFrac } from '../daycounting';
 import { Periodicity } from './periodicity';
 
 const SQRT2 = 1.4142135623730950488016887242097;
@@ -175,9 +175,9 @@ export class Ratios {
         let fractionalPeriod: number;
         
         if (this.periodicity === Periodicity.ANNUAL) {
-            fractionalPeriod = frac(timeStart, timeEnd, this.dayCountConvention, false);
+            fractionalPeriod = yearFrac(timeStart, timeEnd, this.dayCountConvention);
         } else {
-            fractionalPeriod = frac(timeStart, timeEnd, this.dayCountConvention, true) / this.daysPerPeriod;
+            fractionalPeriod = dayFrac(timeStart, timeEnd, this.dayCountConvention) / this.daysPerPeriod;
         }
 
         this.fractionalPeriods.push(fractionalPeriod);

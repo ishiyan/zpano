@@ -173,12 +173,12 @@ impl Ratios {
         time_end: &DateTime,
     ) {
         let fractional_period = if self.periodicity == Periodicity::Annual {
-            match fractional::frac(time_start, time_end, self.day_count_convention, false) {
+            match fractional::year_frac(time_start, time_end, self.day_count_convention) {
                 Ok(fp) => fp,
                 Err(_) => return,
             }
         } else {
-            match fractional::frac(time_start, time_end, self.day_count_convention, true) {
+            match fractional::day_frac(time_start, time_end, self.day_count_convention) {
                 Ok(fp) => fp / self.days_per_period,
                 Err(_) => return,
             }

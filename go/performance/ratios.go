@@ -24,38 +24,38 @@ type Ratios struct {
 	fractionalPeriods []float64
 	returns           []float64
 
-	logretSum                    float64
-	drawdownsCumulative          []float64
-	drawdownsCumulativeMin       float64
-	drawdownsPeaks               []float64
-	drawdownsPeaksPeak           int
-	drawdownContinuous           []float64
-	drawdownContinuousFinal      []float64
-	drawdownContinuousFinalized  bool
-	drawdownContinuousPeak       int
-	drawdownContinuousInside     bool
-	cumulativeReturnPlus1        float64
-	cumulativeReturnPlus1Max     float64
+	logretSum                     float64
+	drawdownsCumulative           []float64
+	drawdownsCumulativeMin        float64
+	drawdownsPeaks                []float64
+	drawdownsPeaksPeak            int
+	drawdownContinuous            []float64
+	drawdownContinuousFinal       []float64
+	drawdownContinuousFinalized   bool
+	drawdownContinuousPeak        int
+	drawdownContinuousInside      bool
+	cumulativeReturnPlus1         float64
+	cumulativeReturnPlus1Max      float64
 	cumulativeReturnGeometricMean *float64
-	returnsMean                  *float64
-	returnsStd                   *float64
-	returnsAutocorrPenalty       float64
-	excessMean                   *float64
-	excessStd                    *float64
-	excessAutocorrPenalty        float64
-	requiredMean                 *float64
-	requiredLPM1                 *float64
-	requiredLPM2                 *float64
-	requiredLPM3                 *float64
-	requiredHPM1                 *float64
-	requiredHPM2                 *float64
-	requiredHPM3                 *float64
-	requiredAutocorrPenalty      float64
-	avgReturn                    *float64
-	avgWin                       *float64
-	avgLoss                      *float64
-	winRate                      *float64
-	totalDuration                float64
+	returnsMean                   *float64
+	returnsStd                    *float64
+	returnsAutocorrPenalty        float64
+	excessMean                    *float64
+	excessStd                     *float64
+	excessAutocorrPenalty         float64
+	requiredMean                  *float64
+	requiredLPM1                  *float64
+	requiredLPM2                  *float64
+	requiredLPM3                  *float64
+	requiredHPM1                  *float64
+	requiredHPM2                  *float64
+	requiredHPM3                  *float64
+	requiredAutocorrPenalty       float64
+	avgReturn                     *float64
+	avgWin                        *float64
+	avgLoss                       *float64
+	winRate                       *float64
+	totalDuration                 float64
 
 	resetCalled bool
 }
@@ -141,13 +141,13 @@ func (r *Ratios) AddReturn(
 ) {
 	var fractionalPeriod float64
 	if r.periodicity == Annual {
-		fp, err := daycounting.Frac(timeStart, timeEnd, r.dayCountConvention, false)
+		fp, err := daycounting.YearFrac(timeStart, timeEnd, r.dayCountConvention)
 		if err != nil {
 			return
 		}
 		fractionalPeriod = fp
 	} else {
-		fp, err := daycounting.Frac(timeStart, timeEnd, r.dayCountConvention, true)
+		fp, err := daycounting.DayFrac(timeStart, timeEnd, r.dayCountConvention)
 		if err != nil {
 			return
 		}

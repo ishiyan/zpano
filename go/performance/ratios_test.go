@@ -9,8 +9,10 @@ import (
 	"portf_py/daycounting/conventions"
 )
 
-// epsilon is the tolerance for floating-point comparisons (13+ decimal places).
-const epsilon = 1e-13
+///// //nolint:modernize // fp() helper is intentional, not replaceable by new()
+
+// epsilon is the tolerance for floating-point comparisons (14+ decimal places).
+const epsilon = 1e-14
 
 // Test data from 'Portfolio bacon' dataset from PerformanceAnalytics R package.
 // See: https://www.rdocumentation.org/packages/PerformanceAnalytics/versions/2.0.4/topics/portfolio_bacon
@@ -115,7 +117,7 @@ func TestKurtosis(t *testing.T) {
 
 	t.Run("conformance to R PerformanceAnalytics", func(t *testing.T) {
 		ratios := newRatiosWithRF(0)
-		for i := 0; i < baconLen; i++ {
+		for i := range baconLen {
 			addBaconReturn(ratios, i)
 			expected := expectedKurtosisExcess[i]
 			actual := ratios.Kurtosis()
@@ -174,7 +176,7 @@ func TestSharpeRatio(t *testing.T) {
 		rf := rf
 		t.Run(fmt.Sprintf("rf=%.2f", rf), func(t *testing.T) {
 			ratios := newRatiosWithRF(rf)
-			for i := 0; i < baconLen; i++ {
+			for i := range baconLen {
 				addBaconReturn(ratios, i)
 				expected := expectedStdDev[rf][i]
 				actual := ratios.SharpeRatio(false, false)
@@ -186,7 +188,7 @@ func TestSharpeRatio(t *testing.T) {
 	t.Run("ignore risk-free rate", func(t *testing.T) {
 		for _, rf := range []float64{0, 0.05, 0.10} {
 			ratios := newRatiosWithRF(rf)
-			for i := 0; i < baconLen; i++ {
+			for i := range baconLen {
 				addBaconReturn(ratios, i)
 				expected := expectedStdDev[0][i]
 				actual := ratios.SharpeRatio(true, false)
@@ -236,7 +238,7 @@ func TestSortinoRatio(t *testing.T) {
 		mar := mar
 		t.Run(fmt.Sprintf("mar=%.2f", mar), func(t *testing.T) {
 			ratios := newRatiosWithMAR(mar)
-			for i := 0; i < baconLen; i++ {
+			for i := range baconLen {
 				addBaconReturn(ratios, i)
 				expected := expectedMAR[mar][i]
 				actual := ratios.SortinoRatio(false, false)
@@ -248,7 +250,7 @@ func TestSortinoRatio(t *testing.T) {
 	t.Run("Jack Schwager sqrt(2) version", func(t *testing.T) {
 		for _, mar := range []float64{0, 0.05, 0.10} {
 			ratios := newRatiosWithMAR(mar)
-			for i := 0; i < baconLen; i++ {
+			for i := range baconLen {
 				addBaconReturn(ratios, i)
 				expected := expectedMAR[mar][i]
 				actual := ratios.SortinoRatio(false, true)
@@ -315,15 +317,18 @@ func TestOmegaRatio(t *testing.T) {
 		},
 	}
 
+	// Note: Python tests use places=13 for Omega Ratio
+	omegaEps := 1e-13
+
 	for _, l := range []float64{0, 0.02, 0.04, 0.06} {
 		l := l
 		t.Run(fmt.Sprintf("threshold=%.2f", l), func(t *testing.T) {
 			ratios := newRatiosWithMAR(l)
-			for i := 0; i < baconLen; i++ {
+			for i := range baconLen {
 				addBaconReturn(ratios, i)
 				expected := expectedLossThreshold[l][i]
 				actual := ratios.OmegaRatio()
-				assertNullableFloat(t, i, expected, actual)
+				assertNullableFloatEps(t, i, expected, actual, omegaEps)
 			}
 		})
 	}
@@ -344,13 +349,16 @@ func TestKappaRatio(t *testing.T) {
 		fp(0.8745247148288970), fp(0.8395522388059700), fp(0.7797833935018050),
 	}
 
+	// Note: Python tests use places=13 for order=1, mar=0 Kappa Ratio
+	kappaEps := 1e-13
+
 	t.Run("order=1, mar=0", func(t *testing.T) {
 		ratios := newRatiosWithMAR(0)
-		for i := 0; i < baconLen; i++ {
+		for i := range baconLen {
 			addBaconReturn(ratios, i)
 			expected := expectedOrder1Mar0[i]
 			actual := ratios.KappaRatio(1)
-			assertNullableFloat(t, i, expected, actual)
+			assertNullableFloatEps(t, i, expected, actual, kappaEps)
 		}
 	})
 
@@ -368,7 +376,7 @@ func TestKappaRatio(t *testing.T) {
 
 	t.Run("order=2, mar=0", func(t *testing.T) {
 		ratios := newRatiosWithMAR(0)
-		for i := 0; i < baconLen; i++ {
+		for i := range baconLen {
 			addBaconReturn(ratios, i)
 			expected := expectedOrder2Mar0[i]
 			actual := ratios.KappaRatio(2)
@@ -390,7 +398,7 @@ func TestKappaRatio(t *testing.T) {
 
 	t.Run("order=3, mar=0", func(t *testing.T) {
 		ratios := newRatiosWithMAR(0)
-		for i := 0; i < baconLen; i++ {
+		for i := range baconLen {
 			addBaconReturn(ratios, i)
 			expected := expectedOrder3Mar0[i]
 			actual := ratios.KappaRatio(3)
@@ -401,7 +409,7 @@ func TestKappaRatio(t *testing.T) {
 	// Kappa3Ratio should match KappaRatio(3)
 	t.Run("Kappa3Ratio matches KappaRatio(3)", func(t *testing.T) {
 		ratios := newRatiosWithMAR(0)
-		for i := 0; i < baconLen; i++ {
+		for i := range baconLen {
 			addBaconReturn(ratios, i)
 			expected := expectedOrder3Mar0[i]
 			actual := ratios.Kappa3Ratio()
@@ -423,7 +431,7 @@ func TestKappaRatio(t *testing.T) {
 
 	t.Run("order=4, mar=0", func(t *testing.T) {
 		ratios := newRatiosWithMAR(0)
-		for i := 0; i < baconLen; i++ {
+		for i := range baconLen {
 			addBaconReturn(ratios, i)
 			expected := expectedOrder4Mar0[i]
 			actual := ratios.KappaRatio(4)
@@ -450,7 +458,7 @@ func TestKappaRatio(t *testing.T) {
 		expected := expected
 		t.Run(fmt.Sprintf("order=1, mar=%.2f", mar), func(t *testing.T) {
 			ratios := newRatiosWithMAR(mar)
-			for i := 0; i < baconLen; i++ {
+			for i := range baconLen {
 				addBaconReturn(ratios, i)
 				actual := ratios.KappaRatio(1)
 				assertNullableFloat(t, i, expected[i], actual)
@@ -473,13 +481,16 @@ func TestBernardoLedoitRatio(t *testing.T) {
 		fp(1.874524714828900), fp(1.839552238805970), fp(1.779783393501800),
 	}
 
+	// Note: Python tests use places=13 for Bernardo-Ledoit Ratio
+	bernardoEps := 1e-13
+
 	t.Run("conformance to R", func(t *testing.T) {
 		ratios := newRatiosWithRF(0)
-		for i := 0; i < baconLen; i++ {
+		for i := range baconLen {
 			addBaconReturn(ratios, i)
 			expected := expectedValues[i]
 			actual := ratios.BernardoLedoitRatio()
-			assertNullableFloat(t, i, expected, actual)
+			assertNullableFloatEps(t, i, expected, actual, bernardoEps)
 		}
 	})
 }
@@ -500,7 +511,7 @@ func TestUpsidePotentialRatio(t *testing.T) {
 
 	t.Run("full=true, mar=0", func(t *testing.T) {
 		ratios := newRatiosWithMAR(0)
-		for i := 0; i < baconLen; i++ {
+		for i := range baconLen {
 			addBaconReturn(ratios, i)
 			expected := expectedFullMar0[i]
 			actual := ratios.UpsidePotentialRatio(true)
@@ -525,7 +536,7 @@ func TestCumulativeReturn(t *testing.T) {
 
 	t.Run("conformance to R", func(t *testing.T) {
 		ratios := newRatiosWithRF(0)
-		for i := 0; i < baconLen; i++ {
+		for i := range baconLen {
 			addBaconReturn(ratios, i)
 			actual := ratios.CumulativeReturn()
 			if !almostEqual(actual, expectedValues[i], epsilon) {
@@ -552,7 +563,7 @@ func TestDrawdownsCumulative(t *testing.T) {
 
 	t.Run("conformance to R", func(t *testing.T) {
 		ratios := newRatiosWithRF(0)
-		for i := 0; i < baconLen; i++ {
+		for i := range baconLen {
 			addBaconReturn(ratios, i)
 		}
 		actual := ratios.DrawdownsCumulative()
@@ -581,16 +592,13 @@ func TestCalmarRatio(t *testing.T) {
 		fp(0.06672377010548700), fp(0.06228923867560830), fp(0.05705690600200920),
 	}
 
-	// Note: Python tests use places=12 for Calmar
-	calmarEps := 1e-12
-
 	t.Run("conformance to R", func(t *testing.T) {
 		ratios := newRatiosWithRF(0)
-		for i := 0; i < baconLen; i++ {
+		for i := range baconLen {
 			addBaconReturn(ratios, i)
 			expected := expectedValues[i]
 			actual := ratios.CalmarRatio()
-			assertNullableFloatEps(t, i, expected, actual, calmarEps)
+			assertNullableFloat(t, i, expected, actual)
 		}
 	})
 }
@@ -621,20 +629,17 @@ func TestSterlingRatio(t *testing.T) {
 		},
 	}
 
-	// Note: Python tests use places=12 for Sterling
-	sterlingEps := 1e-12
-
 	for _, excess := range []float64{0, 0.02} {
 		excess := excess
 		t.Run(fmt.Sprintf("excess=%.2f", excess), func(t *testing.T) {
 			excessAnnual := math.Pow(1+excess, 252) - 1
 			ratios := New(Daily, 0, 0, conventions.RAW)
 			ratios.Reset()
-			for i := 0; i < baconLen; i++ {
+			for i := range baconLen {
 				addBaconReturn(ratios, i)
 				expected := expectedExcess[excess][i]
 				actual := ratios.SterlingRatio(excessAnnual)
-				assertNullableFloatEps(t, i, expected, actual, sterlingEps)
+				assertNullableFloat(t, i, expected, actual)
 			}
 		})
 	}
@@ -665,26 +670,23 @@ func TestBurkeRatio(t *testing.T) {
 		fp(0.3268871495298580), fp(0.3118172170272280), fp(0.2904776525979330),
 	}
 
-	// Note: Python tests use places=12 for Burke
-	burkeEps := 1e-12
-
 	t.Run("unmodified, rf=0", func(t *testing.T) {
 		ratios := newRatiosWithRF(0)
-		for i := 0; i < baconLen; i++ {
+		for i := range baconLen {
 			addBaconReturn(ratios, i)
 			expected := expectedUnmodifiedRf0[i]
 			actual := ratios.BurkeRatio(false)
-			assertNullableFloatEps(t, i, expected, actual, burkeEps)
+			assertNullableFloat(t, i, expected, actual)
 		}
 	})
 
 	t.Run("modified, rf=0", func(t *testing.T) {
 		ratios := newRatiosWithRF(0)
-		for i := 0; i < baconLen; i++ {
+		for i := range baconLen {
 			addBaconReturn(ratios, i)
 			expected := expectedModifiedRf0[i]
 			actual := ratios.BurkeRatio(true)
-			assertNullableFloatEps(t, i, expected, actual, burkeEps)
+			assertNullableFloat(t, i, expected, actual)
 		}
 	})
 }
@@ -705,7 +707,7 @@ func TestDrawdownPeaks(t *testing.T) {
 
 	t.Run("conformance to R", func(t *testing.T) {
 		ratios := newRatiosWithRF(0)
-		for i := 0; i < baconLen; i++ {
+		for i := range baconLen {
 			addBaconReturn(ratios, i)
 		}
 		actualPeaks := ratios.DrawdownsPeaks()
@@ -733,7 +735,7 @@ func TestPainIndex(t *testing.T) {
 
 	t.Run("conformance to R", func(t *testing.T) {
 		ratios := newRatiosWithRF(0)
-		for i := 0; i < baconLen; i++ {
+		for i := range baconLen {
 			addBaconReturn(ratios, i)
 			expected := expectedValues[i]
 			actual := ratios.PainIndex()
@@ -756,12 +758,12 @@ func TestPainRatio(t *testing.T) {
 		fp(0.2698071401733870), fp(0.2417956028428860), fp(0.2115948629646200),
 	}
 
-	// Note: Python tests use places=12 for Pain Ratio
-	painRatioEps := 1e-12
+	// Note: Python tests use places=13 for Pain Ratio
+	painRatioEps := 1e-13
 
 	t.Run("rf=0", func(t *testing.T) {
 		ratios := newRatiosWithRF(0)
-		for i := 0; i < baconLen; i++ {
+		for i := range baconLen {
 			addBaconReturn(ratios, i)
 			expected := expectedRf0[i]
 			actual := ratios.PainRatio()
@@ -786,7 +788,7 @@ func TestUlcerIndex(t *testing.T) {
 
 	t.Run("conformance to R", func(t *testing.T) {
 		ratios := newRatiosWithRF(0)
-		for i := 0; i < baconLen; i++ {
+		for i := range baconLen {
 			addBaconReturn(ratios, i)
 			expected := expectedValues[i]
 			actual := ratios.UlcerIndex()
@@ -809,16 +811,13 @@ func TestMartinRatio(t *testing.T) {
 		fp(0.1628539762413560), fp(0.1507322845601700), fp(0.1359641377846650),
 	}
 
-	// Note: Python tests use places=12 for Martin Ratio
-	martinEps := 1e-12
-
 	t.Run("rf=0", func(t *testing.T) {
 		ratios := newRatiosWithRF(0)
-		for i := 0; i < baconLen; i++ {
+		for i := range baconLen {
 			addBaconReturn(ratios, i)
 			expected := expectedRf0[i]
 			actual := ratios.MartinRatio()
-			assertNullableFloatEps(t, i, expected, actual, martinEps)
+			assertNullableFloat(t, i, expected, actual)
 		}
 	})
 }
