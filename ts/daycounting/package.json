@@ -1,0 +1,38 @@
+{
+  "name": "@portf/daycounting",
+  "version": "1.0.0",
+  "description": "Day counting conventions for financial calculations - TypeScript implementation",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "npm run build && jasmine",
+    "test:watch": "nodemon --exec 'npm test' --watch .",
+    "clean": "rimraf dist",
+    "prepublishOnly": "npm run clean && npm run build"
+  },
+  "keywords": [
+    "daycounting",
+    "finance",
+    "yearfrac",
+    "actual/actual",
+    "30/360",
+    "excel",
+    "isda",
+    "iso20022"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jasmine": "^5.1.4",
+    "@types/node": "^20.10.0",
+    "jasmine": "^5.1.0",
+    "nodemon": "^3.0.2",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.3.3"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ]
+}
