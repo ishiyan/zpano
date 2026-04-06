@@ -1,0 +1,27 @@
+{
+  "name": "@portf_py/roundtrips",
+  "version": "1.0.0",
+  "description": "Round-trip tracking and performance statistics for portfolio analysis",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "npm run build && jasmine --config=jasmine.json",
+    "clean": "rimraf dist"
+  },
+  "keywords": [
+    "roundtrip",
+    "trading",
+    "performance",
+    "finance",
+    "portfolio"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jasmine": "^5.1.4",
+    "@types/node": "^20.11.0",
+    "jasmine": "^5.1.0",
+    "typescript": "^5.3.3"
+  }
+}

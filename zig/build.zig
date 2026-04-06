@@ -48,6 +48,55 @@ pub fn build(b: *std.Build) void {
         },
     });
 
+    // --- Roundtrip library modules ---
+    const execution_mod = b.addModule("execution", .{
+        .root_source_file = b.path("src/roundtrips/execution.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+
+    const side_mod = b.addModule("side", .{
+        .root_source_file = b.path("src/roundtrips/side.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+
+    _ = b.addModule("matching", .{
+        .root_source_file = b.path("src/roundtrips/matching.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+
+    _ = b.addModule("grouping", .{
+        .root_source_file = b.path("src/roundtrips/grouping.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+
+    const roundtrip_mod = b.addModule("roundtrip", .{
+        .root_source_file = b.path("src/roundtrips/roundtrip.zig"),
+        .target = target,
+        .optimize = optimize,
+        .imports = &.{
+            .{ .name = "execution", .module = execution_mod },
+            .{ .name = "side", .module = side_mod },
+            .{ .name = "fractional", .module = fractional_mod },
+        },
+    });
+
+    _ = b.addModule("rt_performance", .{
+        .root_source_file = b.path("src/roundtrips/performance.zig"),
+        .target = target,
+        .optimize = optimize,
+        .imports = &.{
+            .{ .name = "conventions", .module = conventions_mod },
+            .{ .name = "fractional", .module = fractional_mod },
+            .{ .name = "side", .module = side_mod },
+            .{ .name = "roundtrip", .module = roundtrip_mod },
+            .{ .name = "execution", .module = execution_mod },
+        },
+    });
+
     // --- Test modules (separate modules that share the same source files) ---
     const conventions_test_mod = b.createModule(.{
         .root_source_file = b.path("src/daycounting/conventions.zig"),
@@ -92,18 +141,79 @@ pub fn build(b: *std.Build) void {
         },
     });
 
+    // --- Roundtrip test modules ---
+    const execution_test_mod = b.createModule(.{
+        .root_source_file = b.path("src/roundtrips/execution.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+
+    const side_test_mod = b.createModule(.{
+        .root_source_file = b.path("src/roundtrips/side.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+
+    const matching_test_mod = b.createModule(.{
+        .root_source_file = b.path("src/roundtrips/matching.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+
+    const grouping_test_mod = b.createModule(.{
+        .root_source_file = b.path("src/roundtrips/grouping.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+
+    const roundtrip_test_mod = b.createModule(.{
+        .root_source_file = b.path("src/roundtrips/roundtrip.zig"),
+        .target = target,
+        .optimize = optimize,
+        .imports = &.{
+            .{ .name = "execution", .module = execution_mod },
+            .{ .name = "side", .module = side_mod },
+            .{ .name = "fractional", .module = fractional_mod },
+        },
+    });
+
+    const rt_performance_test_mod = b.createModule(.{
+        .root_source_file = b.path("src/roundtrips/performance.zig"),
+        .target = target,
+        .optimize = optimize,
+        .imports = &.{
+            .{ .name = "conventions", .module = conventions_mod },
+            .{ .name = "fractional", .module = fractional_mod },
+            .{ .name = "side", .module = side_mod },
+            .{ .name = "roundtrip", .module = roundtrip_mod },
+            .{ .name = "execution", .module = execution_mod },
+        },
+    });
+
     // --- Tests ---
     const conventions_tests = b.addTest(.{ .root_module = conventions_test_mod });
     const daycounting_tests = b.addTest(.{ .root_module = daycounting_test_mod });
     const fractional_tests = b.addTest(.{ .root_module = fractional_test_mod });
     const periodicity_tests = b.addTest(.{ .root_module = periodicity_test_mod });
     const ratios_tests = b.addTest(.{ .root_module = ratios_test_mod });
+    const execution_tests = b.addTest(.{ .root_module = execution_test_mod });
+    const side_tests = b.addTest(.{ .root_module = side_test_mod });
+    const matching_tests = b.addTest(.{ .root_module = matching_test_mod });
+    const grouping_tests = b.addTest(.{ .root_module = grouping_test_mod });
+    const roundtrip_tests = b.addTest(.{ .root_module = roundtrip_test_mod });
+    const rt_performance_tests = b.addTest(.{ .root_module = rt_performance_test_mod });
 
     const run_conventions_tests = b.addRunArtifact(conventions_tests);
     const run_daycounting_tests = b.addRunArtifact(daycounting_tests);
     const run_fractional_tests = b.addRunArtifact(fractional_tests);
     const run_periodicity_tests = b.addRunArtifact(periodicity_tests);
     const run_ratios_tests = b.addRunArtifact(ratios_tests);
+    const run_execution_tests = b.addRunArtifact(execution_tests);
+    const run_side_tests = b.addRunArtifact(side_tests);
+    const run_matching_tests = b.addRunArtifact(matching_tests);
+    const run_grouping_tests = b.addRunArtifact(grouping_tests);
+    const run_roundtrip_tests = b.addRunArtifact(roundtrip_tests);
+    const run_rt_performance_tests = b.addRunArtifact(rt_performance_tests);
 
     const test_step = b.step("test", "Run all tests");
     test_step.dependOn(&run_conventions_tests.step);
@@ -111,4 +221,10 @@ pub fn build(b: *std.Build) void {
     test_step.dependOn(&run_fractional_tests.step);
     test_step.dependOn(&run_periodicity_tests.step);
     test_step.dependOn(&run_ratios_tests.step);
+    test_step.dependOn(&run_execution_tests.step);
+    test_step.dependOn(&run_side_tests.step);
+    test_step.dependOn(&run_matching_tests.step);
+    test_step.dependOn(&run_grouping_tests.step);
+    test_step.dependOn(&run_roundtrip_tests.step);
+    test_step.dependOn(&run_rt_performance_tests.step);
 }

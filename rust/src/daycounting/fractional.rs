@@ -51,7 +51,7 @@ impl DateTime {
     }
 
     /// Returns total difference in seconds between two DateTimes.
-    fn diff_seconds(&self, other: &DateTime) -> f64 {
+    pub fn diff_seconds(&self, other: &DateTime) -> f64 {
         let jd_diff = (self.jd() - other.jd()) as f64;
         let sec_diff = self.seconds_from_midnight() - other.seconds_from_midnight();
         jd_diff * SECONDS_IN_DAY + sec_diff

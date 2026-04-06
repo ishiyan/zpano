@@ -17,7 +17,7 @@ pub const DateTime = struct {
     second: u8 = 0,
 
     /// Returns the total seconds from the Julian Day epoch for this DateTime.
-    fn toTotalSeconds(self: DateTime) f64 {
+    pub fn toTotalSeconds(self: DateTime) f64 {
         const jd = dc.dateToJD(self.year, @intCast(self.month), @intCast(self.day));
         const day_seconds = @as(f64, @floatFromInt(self.hour)) * 3600.0 +
             @as(f64, @floatFromInt(self.minute)) * 60.0 +
