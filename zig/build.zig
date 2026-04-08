@@ -97,6 +97,25 @@ pub fn build(b: *std.Build) void {
         },
     });
 
+    // --- Symbology library modules (no dependencies) ---
+    _ = b.addModule("isin", .{
+        .root_source_file = b.path("src/symbology/isin.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+
+    _ = b.addModule("cusip", .{
+        .root_source_file = b.path("src/symbology/cusip.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+
+    _ = b.addModule("sedol", .{
+        .root_source_file = b.path("src/symbology/sedol.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+
     // --- Test modules (separate modules that share the same source files) ---
     const conventions_test_mod = b.createModule(.{
         .root_source_file = b.path("src/daycounting/conventions.zig"),
@@ -190,6 +209,25 @@ pub fn build(b: *std.Build) void {
         },
     });
 
+    // --- Symbology test modules ---
+    const isin_test_mod = b.createModule(.{
+        .root_source_file = b.path("src/symbology/isin.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+
+    const cusip_test_mod = b.createModule(.{
+        .root_source_file = b.path("src/symbology/cusip.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+
+    const sedol_test_mod = b.createModule(.{
+        .root_source_file = b.path("src/symbology/sedol.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+
     // --- Tests ---
     const conventions_tests = b.addTest(.{ .root_module = conventions_test_mod });
     const daycounting_tests = b.addTest(.{ .root_module = daycounting_test_mod });
@@ -202,6 +240,9 @@ pub fn build(b: *std.Build) void {
     const grouping_tests = b.addTest(.{ .root_module = grouping_test_mod });
     const roundtrip_tests = b.addTest(.{ .root_module = roundtrip_test_mod });
     const rt_performance_tests = b.addTest(.{ .root_module = rt_performance_test_mod });
+    const isin_tests = b.addTest(.{ .root_module = isin_test_mod });
+    const cusip_tests = b.addTest(.{ .root_module = cusip_test_mod });
+    const sedol_tests = b.addTest(.{ .root_module = sedol_test_mod });
 
     const run_conventions_tests = b.addRunArtifact(conventions_tests);
     const run_daycounting_tests = b.addRunArtifact(daycounting_tests);
@@ -214,6 +255,9 @@ pub fn build(b: *std.Build) void {
     const run_grouping_tests = b.addRunArtifact(grouping_tests);
     const run_roundtrip_tests = b.addRunArtifact(roundtrip_tests);
     const run_rt_performance_tests = b.addRunArtifact(rt_performance_tests);
+    const run_isin_tests = b.addRunArtifact(isin_tests);
+    const run_cusip_tests = b.addRunArtifact(cusip_tests);
+    const run_sedol_tests = b.addRunArtifact(sedol_tests);
 
     const test_step = b.step("test", "Run all tests");
     test_step.dependOn(&run_conventions_tests.step);
@@ -227,4 +271,7 @@ pub fn build(b: *std.Build) void {
     test_step.dependOn(&run_grouping_tests.step);
     test_step.dependOn(&run_roundtrip_tests.step);
     test_step.dependOn(&run_rt_performance_tests.step);
+    test_step.dependOn(&run_isin_tests.step);
+    test_step.dependOn(&run_cusip_tests.step);
+    test_step.dependOn(&run_sedol_tests.step);
 }
