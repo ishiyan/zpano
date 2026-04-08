@@ -1,5 +1,5 @@
 {
-  "name": "@portf_py/roundtrips",
+  "name": "@zpano/roundtrips",
   "version": "1.0.0",
   "description": "Round-trip tracking and performance statistics for portfolio analysis",
   "main": "dist/index.js",

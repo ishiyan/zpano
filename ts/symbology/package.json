@@ -1,5 +1,5 @@
 {
-  "name": "@portf_py/symbology",
+  "name": "@zpano/symbology",
   "version": "1.0.0",
   "description": "Financial security identifier validation (ISIN, CUSIP, SEDOL) - TypeScript implementation",
   "main": "dist/index.js",

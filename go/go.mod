@@ -1,3 +1,3 @@
-module portf_py
+module zpano
 
 go 1.26.1

@@ -34,8 +34,8 @@
 //
 //	import (
 //	    "time"
-//	    "portf_py/performance"
-//	    "portf_py/daycounting/conventions"
+//	    "zpano/performance"
+//	    "zpano/daycounting/conventions"
 //	)
 //
 //	r := performance.New(

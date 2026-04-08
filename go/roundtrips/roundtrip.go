@@ -1,7 +1,6 @@
 package roundtrips
 
 import (
-	"math"
 	"time"
 )
 
@@ -67,8 +66,8 @@ func NewRoundtrip(entry, exit Execution, quantity float64) Roundtrip {
 
 	commission := (entry.CommissionPerUnit + exit.CommissionPerUnit) * quantity
 
-	highestP := math.Max(entry.UnrealizedPriceHigh, exit.UnrealizedPriceHigh)
-	lowestP := math.Min(entry.UnrealizedPriceLow, exit.UnrealizedPriceLow)
+	highestP := max(entry.UnrealizedPriceHigh, exit.UnrealizedPriceHigh)
+	lowestP := min(entry.UnrealizedPriceLow, exit.UnrealizedPriceLow)
 	delta := highestP - lowestP
 
 	entryEfficiency := 0.0

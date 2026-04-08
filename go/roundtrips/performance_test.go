@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"portf_py/daycounting/conventions"
+	"zpano/daycounting/conventions"
 )
 
 // ---------------------------------------------------------------------------

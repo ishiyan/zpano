@@ -82,8 +82,8 @@
 //
 //	import (
 //	    "time"
-//	    "portf_py/daycounting"
-//	    "portf_py/daycounting/conventions"
+//	    "zpano/daycounting"
+//	    "zpano/daycounting/conventions"
 //	)
 //
 //	date1 := time.Date(2024, 1, 15, 0, 0, 0, 0, time.UTC)

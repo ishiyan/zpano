@@ -33,7 +33,7 @@ The package supports 15 different day count conventions used in financial calcul
 #### Convention Parsing
 
 ```go
-import "portf_py/daycounting/conventions"
+import "zpano/daycounting/conventions"
 
 // Parse string to convention
 conv, err := conventions.FromString("act/365 fixed")
@@ -44,8 +44,8 @@ conv, err := conventions.FromString("act/365 fixed")
 
 ```go
 import (
-    "portf_py/daycounting"
-    "portf_py/daycounting/conventions"
+    "zpano/daycounting"
+    "zpano/daycounting/conventions"
     "time"
 )
 
@@ -90,10 +90,10 @@ go mod download
 go test ./daycounting/...
 
 # Test conventions
-go test portf_py/daycounting/conventions -v
+go test zpano/daycounting/conventions -v
 
 # Test daycounting
-go test portf_py/daycounting -v
+go test zpano/daycounting -v
 
 # Run with coverage
 go test ./daycounting/... -cover
@@ -197,8 +197,8 @@ import (
     "log"
     "time"
 
-    "portf_py/daycounting"
-    "portf_py/daycounting/conventions"
+    "zpano/daycounting"
+    "zpano/daycounting/conventions"
 )
 
 func main() {

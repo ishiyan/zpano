@@ -81,10 +81,10 @@ go/daycounting/          — daycounting.go, fractional.go, conventions/ subpack
 go/performance/          — periodicity.go, ratios.go
 go/roundtrips/           — execution.go, side.go, matching.go, grouping.go, roundtrip.go, performance.go, tests
 go/symbology/            — isin.go, cusip.go, sedol.go, tests
-ts/daycounting/          — npm @portf/daycounting (conventions.ts, daycounting.ts, fractional.ts)
-ts/performance/          — npm @portf_py/performance (periodicity.ts, ratios.ts)
-ts/roundtrips/           — npm @portf_py/roundtrips (execution.ts, side.ts, matching.ts, grouping.ts, roundtrip.ts, performance.ts)
-ts/symbology/            — npm @portf_py/symbology (isin.ts, cusip.ts, sedol.ts)
+ts/daycounting/          — npm @zpano/daycounting (conventions.ts, daycounting.ts, fractional.ts)
+ts/performance/          — npm @zpano/performance (periodicity.ts, ratios.ts)
+ts/roundtrips/           — npm @zpano/roundtrips (execution.ts, side.ts, matching.ts, grouping.ts, roundtrip.ts, performance.ts)
+ts/symbology/            — npm @zpano/symbology (isin.ts, cusip.ts, sedol.ts)
 zig/src/daycounting/     — conventions.zig, daycounting.zig, fractional.zig
 zig/src/performance/     — periodicity.zig, ratios.zig
 zig/src/roundtrips/      — execution.zig, side.zig, matching.zig, grouping.zig, roundtrip.zig, performance.zig
@@ -207,7 +207,7 @@ Key behavioral details:
 
 ## Quick Reference: Build & Test All Languages
 
-All commands run from the project root (`~/repos/portf_py/`).
+All commands run from the project root (`~/repos/zpano/`).
 
 | Language | Prerequisites | Command | Expected |
 |----------|--------------|---------|----------|

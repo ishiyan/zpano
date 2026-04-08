@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"portf_py/daycounting/conventions"
+	"zpano/daycounting/conventions"
 )
 
 ///// //nolint:modernize // fp() helper is intentional, not replaceable by new()
@@ -832,7 +832,7 @@ func TestMartinRatio(t *testing.T) {
 
 // fp creates a pointer to a float64 value.
 func fp(v float64) *float64 {
-	return &v
+	return new(v)
 }
 
 // assertNullableFloat asserts that two nullable float64 pointers are equal within epsilon.
@@ -861,7 +861,7 @@ func assertNullableFloatEps(t *testing.T, step int, expected *float64, actual *f
 
 // ip creates a pointer to an int value.
 func ip(v int) *int {
-	return &v
+	return new(v)
 }
 
 // newRatiosWithWindow creates a Ratios instance with rolling window and/or min periods.
@@ -874,10 +874,10 @@ func newRatiosWithWindow(rollingWindow *int, minPeriods *int) *Ratios {
 // addBaconReturns adds count bacon returns (or all if count <= 0).
 func addBaconReturns(r *Ratios, count int) {
 	n := baconLen
-	if count > 0 && count < n {
-		n = count
+	if count > 0 {
+		n = min(n, count)
 	}
-	for i := 0; i < n; i++ {
+	for i := range n {
 		addBaconReturn(r, i)
 	}
 }

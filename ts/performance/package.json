@@ -1,5 +1,5 @@
 {
-  "name": "@portf_py/performance",
+  "name": "@zpano/performance",
   "version": "1.0.0",
   "description": "Performance metrics and ratio calculations for portfolio analysis",
   "main": "index.js",

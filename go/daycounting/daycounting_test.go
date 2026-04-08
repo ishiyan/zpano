@@ -2,9 +2,9 @@ package daycounting
 
 import (
 	"math"
-	"portf_py/daycounting/conventions"
 	"testing"
 	"time"
+	"zpano/daycounting/conventions"
 )
 
 // ng test mb  --code-coverage --include='**/daycounting/daycounting.spec.ts'

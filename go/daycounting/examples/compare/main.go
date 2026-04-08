@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"portf_py/daycounting"
-	"portf_py/daycounting/conventions"
+	"zpano/daycounting"
+	"zpano/daycounting/conventions"
 )
 
 // datePair holds two dates and a label

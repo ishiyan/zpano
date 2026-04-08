@@ -2,10 +2,11 @@ package roundtrips
 
 import (
 	"math"
+	"slices"
 	"time"
 
-	"portf_py/daycounting"
-	"portf_py/daycounting/conventions"
+	"zpano/daycounting"
+	"zpano/daycounting/conventions"
 )
 
 // sliceMean computes the arithmetic mean of a float64 slice.
@@ -45,9 +46,7 @@ func maxConsecutive(bools []bool) int {
 	for _, b := range bools {
 		if b {
 			current++
-			if current > maxStreak {
-				maxStreak = current
-			}
+			maxStreak = max(maxStreak, current)
 		} else {
 			current = 0
 		}
@@ -364,13 +363,11 @@ func (p *RoundtripPerformance) AddRoundtrip(rt Roundtrip) {
 	// Update first/last times and duration
 	changed := false
 	if p.FirstTime == nil || p.FirstTime.After(rt.EntryTime) {
-		t := rt.EntryTime
-		p.FirstTime = &t
+		p.FirstTime = new(rt.EntryTime)
 		changed = true
 	}
 	if p.LastTime == nil || p.LastTime.Before(rt.ExitTime) {
-		t := rt.ExitTime
-		p.LastTime = &t
+		p.LastTime = new(rt.ExitTime)
 		changed = true
 	}
 	if changed && p.FirstTime != nil && p.LastTime != nil {
@@ -382,10 +379,8 @@ func (p *RoundtripPerformance) AddRoundtrip(rt Roundtrip) {
 
 	roi := netPnl / (rt.Quantity * rt.EntryPrice)
 	p.ReturnsOnInvestments = append(p.ReturnsOnInvestments, roi)
-	m := sliceMean(p.ReturnsOnInvestments)
-	p.roiMean = &m
-	s := sliceStdPop(p.ReturnsOnInvestments)
-	p.roiStd = &s
+	p.roiMean = new(sliceMean(p.ReturnsOnInvestments))
+	p.roiStd = new(sliceStdPop(p.ReturnsOnInvestments))
 
 	downside := roi - p.AnnualRiskFreeRate
 	if downside < 0 {
@@ -395,8 +390,7 @@ func (p *RoundtripPerformance) AddRoundtrip(rt Roundtrip) {
 		for _, v := range p.SortinoDownsideReturns {
 			sumSq += v * v
 		}
-		tdd := math.Sqrt(sumSq / float64(len(p.SortinoDownsideReturns)))
-		p.roiTdd = &tdd
+		p.roiTdd = new(math.Sqrt(sumSq / float64(len(p.SortinoDownsideReturns))))
 	}
 
 	// Calculate annualized ROI
@@ -404,10 +398,8 @@ func (p *RoundtripPerformance) AddRoundtrip(rt Roundtrip) {
 	if err == nil && yf != 0 {
 		roiann := roi / yf
 		p.ReturnsOnInvestmentsAnnual = append(p.ReturnsOnInvestmentsAnnual, roiann)
-		m := sliceMean(p.ReturnsOnInvestmentsAnnual)
-		p.roiannMean = &m
-		s := sliceStdPop(p.ReturnsOnInvestmentsAnnual)
-		p.roiannStd = &s
+		p.roiannMean = new(sliceMean(p.ReturnsOnInvestmentsAnnual))
+		p.roiannStd = new(sliceStdPop(p.ReturnsOnInvestmentsAnnual))
 
 		downsideAnn := roiann - p.AnnualRiskFreeRate
 		if downsideAnn < 0 {
@@ -416,15 +408,12 @@ func (p *RoundtripPerformance) AddRoundtrip(rt Roundtrip) {
 			for _, v := range p.SortinoDownsideReturnsAnnual {
 				sumSq += v * v
 			}
-			tdd := math.Sqrt(sumSq / float64(len(p.SortinoDownsideReturnsAnnual)))
-			p.roiannTdd = &tdd
+			p.roiannTdd = new(math.Sqrt(sumSq / float64(len(p.SortinoDownsideReturnsAnnual))))
 		}
 	}
 
 	// Calculate max drawdown
-	if p.MaxNetPnl < p.netPnl {
-		p.MaxNetPnl = p.netPnl
-	}
+	p.MaxNetPnl = max(p.MaxNetPnl, p.netPnl)
 	dd := p.MaxNetPnl - p.netPnl
 	if p.MaxDrawdown < dd {
 		p.MaxDrawdown = dd
@@ -459,8 +448,7 @@ func (p *RoundtripPerformance) SharpeRatio() *float64 {
 	if p.roiMean == nil || p.roiStd == nil || *p.roiStd == 0 {
 		return nil
 	}
-	v := *p.roiMean / *p.roiStd
-	return &v
+	return new(*p.roiMean / *p.roiStd)
 }
 
 // SharpeRatioAnnual returns the Sharpe ratio over annualized returns on investments.
@@ -468,8 +456,7 @@ func (p *RoundtripPerformance) SharpeRatioAnnual() *float64 {
 	if p.roiannMean == nil || p.roiannStd == nil || *p.roiannStd == 0 {
 		return nil
 	}
-	v := *p.roiannMean / *p.roiannStd
-	return &v
+	return new(*p.roiannMean / *p.roiannStd)
 }
 
 // SortinoRatio returns the Sortino ratio over returns on investments.
@@ -477,8 +464,7 @@ func (p *RoundtripPerformance) SortinoRatio() *float64 {
 	if p.roiMean == nil || p.roiTdd == nil || *p.roiTdd == 0 {
 		return nil
 	}
-	v := (*p.roiMean - p.AnnualRiskFreeRate) / *p.roiTdd
-	return &v
+	return new((*p.roiMean - p.AnnualRiskFreeRate) / *p.roiTdd)
 }
 
 // SortinoRatioAnnual returns the Sortino ratio over annualized returns on investments.
@@ -486,8 +472,7 @@ func (p *RoundtripPerformance) SortinoRatioAnnual() *float64 {
 	if p.roiannMean == nil || p.roiannTdd == nil || *p.roiannTdd == 0 {
 		return nil
 	}
-	v := (*p.roiannMean - p.AnnualRiskFreeRate) / *p.roiannTdd
-	return &v
+	return new((*p.roiannMean - p.AnnualRiskFreeRate) / *p.roiannTdd)
 }
 
 // CalmarRatio returns the Calmar ratio over returns on investments.
@@ -495,8 +480,7 @@ func (p *RoundtripPerformance) CalmarRatio() *float64 {
 	if p.roiMean == nil || p.MaxDrawdownPercent == 0 {
 		return nil
 	}
-	v := *p.roiMean / p.MaxDrawdownPercent
-	return &v
+	return new(*p.roiMean / p.MaxDrawdownPercent)
 }
 
 // CalmarRatioAnnual returns the Calmar ratio over annualized returns on investments.
@@ -504,8 +488,7 @@ func (p *RoundtripPerformance) CalmarRatioAnnual() *float64 {
 	if p.roiannMean == nil || p.MaxDrawdownPercent == 0 {
 		return nil
 	}
-	v := *p.roiannMean / p.MaxDrawdownPercent
-	return &v
+	return new(*p.roiannMean / p.MaxDrawdownPercent)
 }
 
 // --- Rate of return ---
@@ -515,8 +498,7 @@ func (p *RoundtripPerformance) RateOfReturn() *float64 {
 	if p.InitialBalance == 0 {
 		return nil
 	}
-	v := p.netPnl / p.InitialBalance
-	return &v
+	return new(p.netPnl / p.InitialBalance)
 }
 
 // RateOfReturnAnnual returns the annualized rate of return.
@@ -524,8 +506,7 @@ func (p *RoundtripPerformance) RateOfReturnAnnual() *float64 {
 	if p.totalDurationAnnualized == 0 || p.InitialBalance == 0 {
 		return nil
 	}
-	v := (p.netPnl / p.InitialBalance) / p.totalDurationAnnualized
-	return &v
+	return new((p.netPnl / p.InitialBalance) / p.totalDurationAnnualized)
 }
 
 // RecoveryFactor returns the recovery factor.
@@ -534,8 +515,7 @@ func (p *RoundtripPerformance) RecoveryFactor() *float64 {
 	if rorann == nil || p.MaxDrawdownPercent == 0 {
 		return nil
 	}
-	v := *rorann / p.MaxDrawdownPercent
-	return &v
+	return new(*rorann / p.MaxDrawdownPercent)
 }
 
 // --- Profit ratios ---
@@ -545,8 +525,7 @@ func (p *RoundtripPerformance) GrossProfitRatio() *float64 {
 	if p.grossLoosingPnl == 0 {
 		return nil
 	}
-	v := math.Abs(p.grossWinningPnl / p.grossLoosingPnl)
-	return &v
+	return new(math.Abs(p.grossWinningPnl / p.grossLoosingPnl))
 }
 
 // NetProfitRatio returns the PnL ratio of net winning over net loosing roundtrips.
@@ -554,8 +533,7 @@ func (p *RoundtripPerformance) NetProfitRatio() *float64 {
 	if p.netLoosingPnl == 0 {
 		return nil
 	}
-	v := math.Abs(p.netWinningPnl / p.netLoosingPnl)
-	return &v
+	return new(math.Abs(p.netWinningPnl / p.netLoosingPnl))
 }
 
 // GrossProfitLongRatio returns the PnL ratio of long gross winning over long gross loosing.
@@ -563,8 +541,7 @@ func (p *RoundtripPerformance) GrossProfitLongRatio() *float64 {
 	if p.grossLongLoosingPnl == 0 {
 		return nil
 	}
-	v := math.Abs(p.grossLongWinningPnl / p.grossLongLoosingPnl)
-	return &v
+	return new(math.Abs(p.grossLongWinningPnl / p.grossLongLoosingPnl))
 }
 
 // NetProfitLongRatio returns the PnL ratio of long net winning over long net loosing.
@@ -572,8 +549,7 @@ func (p *RoundtripPerformance) NetProfitLongRatio() *float64 {
 	if p.netLongLoosingPnl == 0 {
 		return nil
 	}
-	v := math.Abs(p.netLongWinningPnl / p.netLongLoosingPnl)
-	return &v
+	return new(math.Abs(p.netLongWinningPnl / p.netLongLoosingPnl))
 }
 
 // GrossProfitShortRatio returns the PnL ratio of short gross winning over short gross loosing.
@@ -581,8 +557,7 @@ func (p *RoundtripPerformance) GrossProfitShortRatio() *float64 {
 	if p.grossShortLoosingPnl == 0 {
 		return nil
 	}
-	v := math.Abs(p.grossShortWinningPnl / p.grossShortLoosingPnl)
-	return &v
+	return new(math.Abs(p.grossShortWinningPnl / p.grossShortLoosingPnl))
 }
 
 // NetProfitShortRatio returns the PnL ratio of short net winning over short net loosing.
@@ -590,8 +565,7 @@ func (p *RoundtripPerformance) NetProfitShortRatio() *float64 {
 	if p.netShortLoosingPnl == 0 {
 		return nil
 	}
-	v := math.Abs(p.netShortWinningPnl / p.netShortLoosingPnl)
-	return &v
+	return new(math.Abs(p.netShortWinningPnl / p.netShortLoosingPnl))
 }
 
 // --- Counts ---
@@ -918,26 +892,14 @@ func minSlice(s []float64) float64 {
 	if len(s) == 0 {
 		return 0
 	}
-	m := s[0]
-	for _, v := range s[1:] {
-		if v < m {
-			m = v
-		}
-	}
-	return m
+	return slices.Min(s)
 }
 
 func maxSlice(s []float64) float64 {
 	if len(s) == 0 {
 		return 0
 	}
-	m := s[0]
-	for _, v := range s[1:] {
-		if v > m {
-			m = v
-		}
-	}
-	return m
+	return slices.Max(s)
 }
 
 func (p *RoundtripPerformance) MinimumDurationSeconds() float64 {

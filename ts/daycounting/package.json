@@ -1,5 +1,5 @@
 {
-  "name": "@portf/daycounting",
+  "name": "@zpano/daycounting",
   "version": "1.0.0",
   "description": "Day counting conventions for financial calculations - TypeScript implementation",
   "main": "dist/index.js",

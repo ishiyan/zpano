@@ -2,11 +2,11 @@ package performance
 
 import (
 	"math"
-	"sort"
+	"slices"
 	"time"
 
-	"portf_py/daycounting"
-	"portf_py/daycounting/conventions"
+	"zpano/daycounting"
+	"zpano/daycounting/conventions"
 )
 
 const sqrt2 = 1.4142135623730950488016887242097
@@ -199,8 +199,7 @@ func (r *Ratios) AddReturn(
 
 	// Returns std (ddof=1, sample)
 	if l > 1 {
-		s := sliceStdDdof1(w, mean)
-		r.returnsStd = &s
+		r.returnsStd = new(sliceStdDdof1(w, mean))
 	} else {
 		r.returnsStd = nil
 	}
@@ -211,17 +210,14 @@ func (r *Ratios) AddReturn(
 	nonZero := filterNonZero(w)
 	lenNonZero := len(nonZero)
 	if lenNonZero > 0 {
-		m := sliceMean(nonZero)
-		r.avgReturn = &m
+		r.avgReturn = new(sliceMean(nonZero))
 
 		positive := filterPositive(w)
 		lenPos := len(positive)
-		wr := float64(lenPos) / float64(lenNonZero)
-		r.winRate = &wr
+		r.winRate = new(float64(lenPos) / float64(lenNonZero))
 
 		if lenPos > 0 {
-			m2 := sliceMean(positive)
-			r.avgWin = &m2
+			r.avgWin = new(sliceMean(positive))
 		} else {
 			r.avgWin = nil
 		}
@@ -229,8 +225,7 @@ func (r *Ratios) AddReturn(
 		negative := filterNegative(w)
 		lenNeg := len(negative)
 		if lenNeg > 0 {
-			m3 := sliceMean(negative)
-			r.avgLoss = &m3
+			r.avgLoss = new(sliceMean(negative))
 		} else {
 			r.avgLoss = nil
 		}
@@ -254,8 +249,7 @@ func (r *Ratios) AddReturn(
 		em := sliceMean(excess)
 		r.excessMean = &em
 		if l > 1 {
-			es := sliceStdDdof1(excess, em)
-			r.excessStd = &es
+			r.excessStd = new(sliceStdDdof1(excess, em))
 		} else {
 			r.excessStd = nil
 		}
@@ -281,28 +275,23 @@ func (r *Ratios) AddReturn(
 			tmp2[i] = 0
 		}
 	}
-	lpm1 := sliceSum(tmp2) / lf
-	r.requiredLPM1 = &lpm1
-	lpm2 := sliceSumPow(tmp2, 2) / lf
-	r.requiredLPM2 = &lpm2
-	lpm3 := sliceSumPow(tmp2, 3) / lf
-	r.requiredLPM3 = &lpm3
+	r.requiredLPM1 = new(sliceSum(tmp2) / lf)
+	r.requiredLPM2 = new(sliceSumPow(tmp2, 2) / lf)
+	r.requiredLPM3 = new(sliceSumPow(tmp2, 3) / lf)
 
 	// Higher partial moments for the raw returns (less required return)
 	var tmp3 []float64
 	if r.requiredReturn == 0 {
 		tmp3 = make([]float64, l)
 		copy(tmp3, w)
-		rm := *r.returnsMean
-		r.requiredMean = &rm
+		r.requiredMean = new(*r.returnsMean)
 		r.requiredAutocorrPenalty = r.returnsAutocorrPenalty
 	} else {
 		tmp3 = make([]float64, l)
 		for i, v := range w {
 			tmp3[i] = v - r.requiredReturn
 		}
-		rm := sliceMean(tmp3)
-		r.requiredMean = &rm
+		r.requiredMean = new(sliceMean(tmp3))
 		r.requiredAutocorrPenalty = r.autocorrPenalty(tmp3)
 	}
 	// Clip to min 0
@@ -311,12 +300,9 @@ func (r *Ratios) AddReturn(
 			tmp3[i] = 0
 		}
 	}
-	hpm1 := sliceSum(tmp3) / lf
-	r.requiredHPM1 = &hpm1
-	hpm2 := sliceSumPow(tmp3, 2) / lf
-	r.requiredHPM2 = &hpm2
-	hpm3 := sliceSumPow(tmp3, 3) / lf
-	r.requiredHPM3 = &hpm3
+	r.requiredHPM1 = new(sliceSum(tmp3) / lf)
+	r.requiredHPM2 = new(sliceSumPow(tmp3, 2) / lf)
+	r.requiredHPM3 = new(sliceSumPow(tmp3, 3) / lf)
 
 	// Cumulative returns — recompute from window
 	wStart := len(r.returns) - l
@@ -331,16 +317,13 @@ func (r *Ratios) AddReturn(
 	cmr := math.Exp(logretSum)
 	r.cumulativeReturnPlus1 = cmr
 	if l >= 1 {
-		gm := math.Pow(cmr, 1.0/lf) - 1
-		r.cumulativeReturnGeometricMean = &gm
+		r.cumulativeReturnGeometricMean = new(math.Pow(cmr, 1.0/lf) - 1)
 	}
 	r.cumulativeReturnPlus1Max = math.Inf(-1)
 	cumr := 1.0
-	for j := 0; j < l; j++ {
+	for j := range l {
 		cumr *= (w[j] + 1)
-		if cumr > r.cumulativeReturnPlus1Max {
-			r.cumulativeReturnPlus1Max = cumr
-		}
+		r.cumulativeReturnPlus1Max = max(r.cumulativeReturnPlus1Max, cumr)
 	}
 
 	// Drawdowns from peaks to valleys (cumulative returns) — recompute from window
@@ -348,22 +331,18 @@ func (r *Ratios) AddReturn(
 	r.drawdownsCumulativeMin = math.Inf(1)
 	cumr = 1.0
 	cumrMax := math.Inf(-1)
-	for j := 0; j < l; j++ {
+	for j := range l {
 		cumr *= (w[j] + 1)
-		if cumr > cumrMax {
-			cumrMax = cumr
-		}
+		cumrMax = max(cumrMax, cumr)
 		dd := cumr/cumrMax - 1
 		r.drawdownsCumulative = append(r.drawdownsCumulative, dd)
-		if r.drawdownsCumulativeMin > dd {
-			r.drawdownsCumulativeMin = dd
-		}
+		r.drawdownsCumulativeMin = min(r.drawdownsCumulativeMin, dd)
 	}
 
 	// Drawdown peaks (used in pain index, ulcer index) — recompute from window
 	r.drawdownsPeaks = make([]float64, 0, l)
 	r.drawdownsPeaksPeak = 0
-	for j := 0; j < l; j++ {
+	for j := range l {
 		ddPeak := 1.0
 		for k := r.drawdownsPeaksPeak + 1; k <= j; k++ {
 			ddPeak *= (1 + w[k]*0.01)
@@ -474,7 +453,7 @@ func (r *Ratios) DrawdownsContinuous(peaksOnly bool, maxPeaks int) []float64 {
 		}
 	}
 	if maxPeaks > 0 && len(drawdowns) > 0 {
-		sort.Float64s(drawdowns)
+		slices.Sort(drawdowns)
 		if len(drawdowns) > maxPeaks {
 			drawdowns = drawdowns[:maxPeaks]
 		}
@@ -515,7 +494,7 @@ func (r *Ratios) Skew() *float64 {
 		return nil
 	}
 	s := populationSkewness(w)
-	return &s
+	return new(s)
 }
 
 // Kurtosis returns the population excess kurtosis of the returns.
@@ -530,7 +509,7 @@ func (r *Ratios) Kurtosis() *float64 {
 		return nil
 	}
 	k := populationExcessKurtosis(w)
-	return &k
+	return new(k)
 }
 
 // SharpeRatio calculates the ex-post Sharpe ratio.
@@ -549,7 +528,7 @@ func (r *Ratios) SharpeRatio(ignoreRiskFreeRate bool, autocorrelationPenalty boo
 			denom *= r.returnsAutocorrPenalty
 		}
 		v := *r.returnsMean / denom
-		return &v
+		return new(v)
 	}
 	if r.excessMean == nil || r.excessStd == nil || *r.excessStd == 0 {
 		return nil
@@ -559,7 +538,7 @@ func (r *Ratios) SharpeRatio(ignoreRiskFreeRate bool, autocorrelationPenalty boo
 		denom *= r.excessAutocorrPenalty
 	}
 	v := *r.excessMean / denom
-	return &v
+	return new(v)
 }
 
 // SortinoRatio calculates the Sortino ratio.
@@ -580,7 +559,7 @@ func (r *Ratios) SortinoRatio(autocorrelationPenalty bool, divideBySqrt2 bool) *
 		denom *= sqrt2
 	}
 	v := *r.requiredMean / denom
-	return &v
+	return new(v)
 }
 
 // OmegaRatio calculates the Omega ratio.
@@ -592,7 +571,7 @@ func (r *Ratios) OmegaRatio() *float64 {
 		return nil
 	}
 	v := *r.requiredMean / *r.requiredLPM1 + 1
-	return &v
+	return new(v)
 }
 
 // KappaRatio calculates the Kappa ratio of a given order.
@@ -609,19 +588,19 @@ func (r *Ratios) KappaRatio(order int) *float64 {
 			return nil
 		}
 		v := *r.requiredMean / *r.requiredLPM1
-		return &v
+		return new(v)
 	case 2:
 		if r.requiredLPM2 == nil || *r.requiredLPM2 == 0 {
 			return nil
 		}
 		v := *r.requiredMean / math.Sqrt(*r.requiredLPM2)
-		return &v
+		return new(v)
 	case 3:
 		if r.requiredLPM3 == nil || *r.requiredLPM3 == 0 {
 			return nil
 		}
 		v := *r.requiredMean / math.Cbrt(*r.requiredLPM3)
-		return &v
+		return new(v)
 	default:
 		w := r.windowReturns()
 		l := len(w)
@@ -650,7 +629,7 @@ func (r *Ratios) KappaRatio(order int) *float64 {
 			return nil
 		}
 		v := *r.requiredMean / math.Pow(lpm, 1.0/float64(order))
-		return &v
+		return new(v)
 	}
 }
 
@@ -663,7 +642,7 @@ func (r *Ratios) Kappa3Ratio() *float64 {
 		return nil
 	}
 	v := *r.requiredMean / math.Cbrt(*r.requiredLPM3)
-	return &v
+	return new(v)
 }
 
 // BernardoLedoitRatio calculates the Bernardo-Ledoit ratio.
@@ -700,7 +679,7 @@ func (r *Ratios) BernardoLedoitRatio() *float64 {
 	}
 	hpm1 := sliceSum(tmp) / lf
 	v := hpm1 / lpm1
-	return &v
+	return new(v)
 }
 
 // UpsidePotentialRatio calculates the upside potential ratio.
@@ -714,7 +693,7 @@ func (r *Ratios) UpsidePotentialRatio(full bool) *float64 {
 			return nil
 		}
 		v := *r.requiredHPM1 / math.Sqrt(*r.requiredLPM2)
-		return &v
+		return new(v)
 	}
 	// Subset version
 	w := r.windowReturns()
@@ -748,7 +727,7 @@ func (r *Ratios) UpsidePotentialRatio(full bool) *float64 {
 	}
 	hpm1 := sliceMean(above)
 	v := hpm1 / math.Sqrt(lpm2)
-	return &v
+	return new(v)
 }
 
 // CompoundGrowthRate returns the compound (annual) growth rate (CAGR),
@@ -773,7 +752,7 @@ func (r *Ratios) CalmarRatio() *float64 {
 		return nil
 	}
 	v := *r.cumulativeReturnGeometricMean / wdd
-	return &v
+	return new(v)
 }
 
 // SterlingRatio calculates the Sterling ratio with the given annual excess rate.
@@ -793,7 +772,7 @@ func (r *Ratios) SterlingRatio(annualExcessRate float64) *float64 {
 		return nil
 	}
 	v := *r.cumulativeReturnGeometricMean / wdd
-	return &v
+	return new(v)
 }
 
 // BurkeRatio calculates the Burke ratio.
@@ -823,7 +802,7 @@ func (r *Ratios) BurkeRatio(modified bool) *float64 {
 		burke *= math.Sqrt(float64(len(r.windowReturns())))
 	}
 	v := burke
-	return &v
+	return new(v)
 }
 
 // PainIndex calculates the pain index.
@@ -837,7 +816,7 @@ func (r *Ratios) PainIndex() *float64 {
 	}
 	// By calculation, all values are <= 0, so we negate the sum
 	v := -sliceSum(r.drawdownsPeaks) / float64(l)
-	return &v
+	return new(v)
 }
 
 // PainRatio calculates the pain ratio.
@@ -858,7 +837,7 @@ func (r *Ratios) PainRatio() *float64 {
 		return nil
 	}
 	v := rate / painIndex
-	return &v
+	return new(v)
 }
 
 // UlcerIndex calculates the ulcer index.
@@ -875,7 +854,7 @@ func (r *Ratios) UlcerIndex() *float64 {
 		sumSq += d * d
 	}
 	v := math.Sqrt(sumSq / float64(l))
-	return &v
+	return new(v)
 }
 
 // MartinRatio calculates the Martin (Ulcer) ratio.
@@ -900,7 +879,7 @@ func (r *Ratios) MartinRatio() *float64 {
 		return nil
 	}
 	v := rate / ulcerIndex
-	return &v
+	return new(v)
 }
 
 // GainToPainRatio returns Jack Schwager's gain-to-pain ratio.
@@ -915,7 +894,7 @@ func (r *Ratios) GainToPainRatio() *float64 {
 		return nil
 	}
 	v := *r.returnsMean / *r.requiredLPM1
-	return &v
+	return new(v)
 }
 
 // RiskOfRuin calculates the risk of ruin.
@@ -928,7 +907,7 @@ func (r *Ratios) RiskOfRuin() *float64 {
 	}
 	wr := *r.winRate
 	v := math.Pow((1-wr)/(1+wr), float64(len(r.windowReturns())))
-	return &v
+	return new(v)
 }
 
 // RiskReturnRatio calculates the return/risk ratio (Sharpe without risk-free rate).
@@ -940,7 +919,7 @@ func (r *Ratios) RiskReturnRatio() *float64 {
 		return nil
 	}
 	v := *r.returnsMean / *r.returnsStd
-	return &v
+	return new(v)
 }
 
 // ---------- helper functions ----------

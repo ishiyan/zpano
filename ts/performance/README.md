@@ -60,7 +60,7 @@ npm run test:coverage
 ## Usage
 
 ```typescript
-import { Ratios, Periodicity } from '@portf_py/performance';
+import { Ratios, Periodicity } from '@zpano/performance';
 import { DayCountConvention } from '../daycounting';
 
 // Create a ratios calculator
