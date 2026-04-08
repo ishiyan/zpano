@@ -4,6 +4,12 @@ pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
+    const test_filter = b.option([]const u8, "test-filter", "Filter tests by name");
+    const filters: []const []const u8 = if (test_filter) |f|
+        b.allocator.dupe([]const u8, &.{f}) catch @panic("OOM")
+    else
+        &.{};
+
     // --- Library modules ---
     const conventions_mod = b.addModule("conventions", .{
         .root_source_file = b.path("src/daycounting/conventions.zig"),
@@ -229,20 +235,20 @@ pub fn build(b: *std.Build) void {
     });
 
     // --- Tests ---
-    const conventions_tests = b.addTest(.{ .root_module = conventions_test_mod });
-    const daycounting_tests = b.addTest(.{ .root_module = daycounting_test_mod });
-    const fractional_tests = b.addTest(.{ .root_module = fractional_test_mod });
-    const periodicity_tests = b.addTest(.{ .root_module = periodicity_test_mod });
-    const ratios_tests = b.addTest(.{ .root_module = ratios_test_mod });
-    const execution_tests = b.addTest(.{ .root_module = execution_test_mod });
-    const side_tests = b.addTest(.{ .root_module = side_test_mod });
-    const matching_tests = b.addTest(.{ .root_module = matching_test_mod });
-    const grouping_tests = b.addTest(.{ .root_module = grouping_test_mod });
-    const roundtrip_tests = b.addTest(.{ .root_module = roundtrip_test_mod });
-    const rt_performance_tests = b.addTest(.{ .root_module = rt_performance_test_mod });
-    const isin_tests = b.addTest(.{ .root_module = isin_test_mod });
-    const cusip_tests = b.addTest(.{ .root_module = cusip_test_mod });
-    const sedol_tests = b.addTest(.{ .root_module = sedol_test_mod });
+    const conventions_tests = b.addTest(.{ .root_module = conventions_test_mod, .filters = filters });
+    const daycounting_tests = b.addTest(.{ .root_module = daycounting_test_mod, .filters = filters });
+    const fractional_tests = b.addTest(.{ .root_module = fractional_test_mod, .filters = filters });
+    const periodicity_tests = b.addTest(.{ .root_module = periodicity_test_mod, .filters = filters });
+    const ratios_tests = b.addTest(.{ .root_module = ratios_test_mod, .filters = filters });
+    const execution_tests = b.addTest(.{ .root_module = execution_test_mod, .filters = filters });
+    const side_tests = b.addTest(.{ .root_module = side_test_mod, .filters = filters });
+    const matching_tests = b.addTest(.{ .root_module = matching_test_mod, .filters = filters });
+    const grouping_tests = b.addTest(.{ .root_module = grouping_test_mod, .filters = filters });
+    const roundtrip_tests = b.addTest(.{ .root_module = roundtrip_test_mod, .filters = filters });
+    const rt_performance_tests = b.addTest(.{ .root_module = rt_performance_test_mod, .filters = filters });
+    const isin_tests = b.addTest(.{ .root_module = isin_test_mod, .filters = filters });
+    const cusip_tests = b.addTest(.{ .root_module = cusip_test_mod, .filters = filters });
+    const sedol_tests = b.addTest(.{ .root_module = sedol_test_mod, .filters = filters });
 
     const run_conventions_tests = b.addRunArtifact(conventions_tests);
     const run_daycounting_tests = b.addRunArtifact(daycounting_tests);
