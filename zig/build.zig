@@ -103,6 +103,58 @@ pub fn build(b: *std.Build) void {
         },
     });
 
+    // --- Entities library modules ---
+    const bar_mod = b.addModule("bar", .{
+        .root_source_file = b.path("src/entities/bar.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+
+    const quote_mod = b.addModule("quote", .{
+        .root_source_file = b.path("src/entities/quote.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+
+    const trade_mod = b.addModule("trade", .{
+        .root_source_file = b.path("src/entities/trade.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+
+    _ = b.addModule("scalar", .{
+        .root_source_file = b.path("src/entities/scalar.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+
+    _ = b.addModule("bar_component", .{
+        .root_source_file = b.path("src/entities/bar_component.zig"),
+        .target = target,
+        .optimize = optimize,
+        .imports = &.{
+            .{ .name = "bar", .module = bar_mod },
+        },
+    });
+
+    _ = b.addModule("quote_component", .{
+        .root_source_file = b.path("src/entities/quote_component.zig"),
+        .target = target,
+        .optimize = optimize,
+        .imports = &.{
+            .{ .name = "quote", .module = quote_mod },
+        },
+    });
+
+    _ = b.addModule("trade_component", .{
+        .root_source_file = b.path("src/entities/trade_component.zig"),
+        .target = target,
+        .optimize = optimize,
+        .imports = &.{
+            .{ .name = "trade", .module = trade_mod },
+        },
+    });
+
     // --- Symbology library modules (no dependencies) ---
     _ = b.addModule("isin", .{
         .root_source_file = b.path("src/symbology/isin.zig"),
@@ -234,6 +286,58 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
+    // --- Entities test modules ---
+    const bar_test_mod = b.createModule(.{
+        .root_source_file = b.path("src/entities/bar.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+
+    const quote_test_mod = b.createModule(.{
+        .root_source_file = b.path("src/entities/quote.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+
+    const trade_test_mod = b.createModule(.{
+        .root_source_file = b.path("src/entities/trade.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+
+    const scalar_test_mod = b.createModule(.{
+        .root_source_file = b.path("src/entities/scalar.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+
+    const bar_component_test_mod = b.createModule(.{
+        .root_source_file = b.path("src/entities/bar_component.zig"),
+        .target = target,
+        .optimize = optimize,
+        .imports = &.{
+            .{ .name = "bar", .module = bar_mod },
+        },
+    });
+
+    const quote_component_test_mod = b.createModule(.{
+        .root_source_file = b.path("src/entities/quote_component.zig"),
+        .target = target,
+        .optimize = optimize,
+        .imports = &.{
+            .{ .name = "quote", .module = quote_mod },
+        },
+    });
+
+    const trade_component_test_mod = b.createModule(.{
+        .root_source_file = b.path("src/entities/trade_component.zig"),
+        .target = target,
+        .optimize = optimize,
+        .imports = &.{
+            .{ .name = "trade", .module = trade_mod },
+        },
+    });
+
     // --- Tests ---
     const conventions_tests = b.addTest(.{ .root_module = conventions_test_mod, .filters = filters });
     const daycounting_tests = b.addTest(.{ .root_module = daycounting_test_mod, .filters = filters });
@@ -249,6 +353,13 @@ pub fn build(b: *std.Build) void {
     const isin_tests = b.addTest(.{ .root_module = isin_test_mod, .filters = filters });
     const cusip_tests = b.addTest(.{ .root_module = cusip_test_mod, .filters = filters });
     const sedol_tests = b.addTest(.{ .root_module = sedol_test_mod, .filters = filters });
+    const bar_tests = b.addTest(.{ .root_module = bar_test_mod, .filters = filters });
+    const quote_tests = b.addTest(.{ .root_module = quote_test_mod, .filters = filters });
+    const trade_tests = b.addTest(.{ .root_module = trade_test_mod, .filters = filters });
+    const scalar_tests = b.addTest(.{ .root_module = scalar_test_mod, .filters = filters });
+    const bar_component_tests = b.addTest(.{ .root_module = bar_component_test_mod, .filters = filters });
+    const quote_component_tests = b.addTest(.{ .root_module = quote_component_test_mod, .filters = filters });
+    const trade_component_tests = b.addTest(.{ .root_module = trade_component_test_mod, .filters = filters });
 
     const run_conventions_tests = b.addRunArtifact(conventions_tests);
     const run_daycounting_tests = b.addRunArtifact(daycounting_tests);
@@ -264,6 +375,13 @@ pub fn build(b: *std.Build) void {
     const run_isin_tests = b.addRunArtifact(isin_tests);
     const run_cusip_tests = b.addRunArtifact(cusip_tests);
     const run_sedol_tests = b.addRunArtifact(sedol_tests);
+    const run_bar_tests = b.addRunArtifact(bar_tests);
+    const run_quote_tests = b.addRunArtifact(quote_tests);
+    const run_trade_tests = b.addRunArtifact(trade_tests);
+    const run_scalar_tests = b.addRunArtifact(scalar_tests);
+    const run_bar_component_tests = b.addRunArtifact(bar_component_tests);
+    const run_quote_component_tests = b.addRunArtifact(quote_component_tests);
+    const run_trade_component_tests = b.addRunArtifact(trade_component_tests);
 
     const test_step = b.step("test", "Run all tests");
     test_step.dependOn(&run_conventions_tests.step);
@@ -280,4 +398,11 @@ pub fn build(b: *std.Build) void {
     test_step.dependOn(&run_isin_tests.step);
     test_step.dependOn(&run_cusip_tests.step);
     test_step.dependOn(&run_sedol_tests.step);
+    test_step.dependOn(&run_bar_tests.step);
+    test_step.dependOn(&run_quote_tests.step);
+    test_step.dependOn(&run_trade_tests.step);
+    test_step.dependOn(&run_scalar_tests.step);
+    test_step.dependOn(&run_bar_component_tests.step);
+    test_step.dependOn(&run_quote_component_tests.step);
+    test_step.dependOn(&run_trade_component_tests.step);
 }
