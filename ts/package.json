@@ -1,9 +1,8 @@
 {
-  "name": "@zpano/symbology",
+  "name": "@zpano/ts",
   "version": "1.0.0",
-  "description": "Financial security identifier validation (ISIN, CUSIP, SEDOL) - TypeScript implementation",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "private": true,
+  "description": "Multi-module financial library — TypeScript implementation",
   "scripts": {
     "build": "tsc",
     "test": "npm run build && jasmine --config=jasmine.json",
@@ -13,6 +12,7 @@
     "@types/jasmine": "^5.1.4",
     "@types/node": "^20.11.0",
     "jasmine": "^5.1.0",
+    "rimraf": "^5.0.5",
     "typescript": "^5.3.3"
   }
 }

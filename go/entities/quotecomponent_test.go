@@ -1,5 +1,5 @@
 //nolint:testpackage
-package data
+package entities
 
 import (
 	"testing"

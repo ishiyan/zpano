@@ -1,4 +1,4 @@
-package data
+package entities
 
 const (
 	timeFmtDate     = "2006-01-02"

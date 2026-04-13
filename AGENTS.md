@@ -41,13 +41,10 @@ cd go && go test ./daycounting -bench=. -benchmem                           # be
 ```
 
 ### TypeScript
-Dependencies: Node.js 20+, TypeScript 5.3+, Jasmine 5.1+. Five independent npm packages; build `ts/daycounting` before `ts/performance` or `ts/roundtrips`. `ts/symbology` and `ts/entities` are standalone.
+Dependencies: Node.js 20+, TypeScript 5.3+, Jasmine 5.1+. Single unified npm package at `ts/` with all five modules.
 ```bash
-cd ts/daycounting && npm install && npm test    # tsc && jasmine
-cd ts/performance && npm install && npm test    # jasmine (must build daycounting first)
-cd ts/roundtrips && npm install && npm test     # tsc && jasmine (must build daycounting first)
-cd ts/symbology && npm install && npm test      # tsc && jasmine (standalone)
-cd ts/entities && npm install && npm test       # tsc && jasmine (standalone)
+cd ts && npm install && npm test                                             # all tests (8935 specs)
+cd ts && npm run build                                                       # build only (tsc)
 ```
 
 ### Zig
@@ -88,11 +85,11 @@ go/performance/          — periodicity.go, ratios.go
 go/roundtrips/           — execution.go, side.go, matching.go, grouping.go, roundtrip.go, performance.go, tests
 go/symbology/            — isin.go, cusip.go, sedol.go, tests
 go/entities/             — bar.go, quote.go, trade.go, scalar.go, barcomponent.go, quotecomponent.go, tradecomponent.go, tests (package name: data)
-ts/daycounting/          — npm @zpano/daycounting (conventions.ts, daycounting.ts, fractional.ts)
-ts/performance/          — npm @zpano/performance (periodicity.ts, ratios.ts)
-ts/roundtrips/           — npm @zpano/roundtrips (execution.ts, side.ts, matching.ts, grouping.ts, roundtrip.ts, performance.ts)
-ts/symbology/            — npm @zpano/symbology (isin.ts, cusip.ts, sedol.ts)
-ts/entities/             — npm @zpano/entities (bar.ts, quote.ts, trade.ts, scalar.ts, bar-component.ts, quote-component.ts, trade-component.ts)
+ts/daycounting/          — conventions.ts, daycounting.ts, fractional.ts
+ts/performance/          — periodicity.ts, ratios.ts
+ts/roundtrips/           — execution.ts, side.ts, matching.ts, grouping.ts, roundtrip.ts, performance.ts
+ts/symbology/            — isin.ts, cusip.ts, sedol.ts
+ts/entities/             — bar.ts, quote.ts, trade.ts, scalar.ts, bar-component.ts, quote-component.ts, trade-component.ts
 zig/src/daycounting/     — conventions.zig, daycounting.zig, fractional.zig
 zig/src/performance/     — periodicity.zig, ratios.zig
 zig/src/roundtrips/      — execution.zig, side.zig, matching.zig, grouping.zig, roundtrip.zig, performance.zig
@@ -131,7 +128,7 @@ readme/performance/      — R validation scripts, reference PDFs, CSV data, SVG
 - `camelCase` functions, `PascalCase` classes/enums, `UPPER_SNAKE_CASE` enum members.
 - `number | null` for nullable results. `throw new Error(...)` for invalid inputs; return `null` for impossible computations.
 - Jasmine 5: `describe`/`it`, `toBeCloseTo(expected, 13)`, `toBeNull()`.
-- Spec naming: `.spec.ts` (daycounting, symbology), `_spec.ts` (performance).
+- Spec naming: `.spec.ts` for all modules.
 
 ### Zig
 - 4-space indent (standard Zig formatting).
@@ -242,14 +239,14 @@ All commands run from the project root (`~/repos/zpano/`).
 |----------|--------------|---------|----------|
 | **Python** | Python 3.10+, `numpy`, `scipy`, symlink `ln -sf py accounts`, `touch py/__init__.py` | `PYTHONPATH=. python3 -m unittest discover -s py -p "test_*.py" -t .` | 336 tests |
 | **Go** | Go 1.26+ | `cd go && go test ./...&& cd ..`| 6 packages OK |
-| **TypeScript** | Node.js 20+, TypeScript 5.3+, Jasmine 5.1+ | `cd ts/daycounting && npm install && npm test && cd ../performance && npm install && npm test && cd ../roundtrips && npm install && npm test && cd ../symbology && npm install && npm test && cd ../entities && npm install && npm test && cd ..` | 92 + 112 + 315 + 8539 + 61 specs |
+| **TypeScript** | Node.js 20+, TypeScript 5.3+, Jasmine 5.1+ | `cd ts && npm install && npm test && cd ..` | 8935 specs |
 | **Zig** | Zig 0.16.0-dev | `cd zig && zig build test --summary all && cd ..` | 364 tests |
 | **Rust** | Rust 1.75.0+ (apt) | `cd rust && cargo test && cd ..` | 339 tests |
 
 ```bash
 python3 -m unittest discover -s py -p "test_*.py" -t .
 cd go && go test ./...&& cd ..
-cd ts/daycounting && npm install && npm test && cd ../performance && npm install && npm test && cd ../roundtrips && npm install && npm test && cd ../symbology && npm install && npm test && cd ../entities && npm install && npm test && cd ../..
+cd ts && npm install && npm test && cd ..
 cd zig && zig build test --summary all && cd ..
 cd rust && cargo test && cd ..
 ```
@@ -260,13 +257,13 @@ cd rust && cargo test && cd ..
 |----------|---------|-------|
 | **Python** | *(interpreted — no build step)* | |
 | **Go** | `cd go && go build ./...` | Compiles all packages |
-| **TypeScript** | `cd ts/daycounting && npm run build && cd ../performance && npm run build && cd ../roundtrips && npm run build && cd ../symbology && npm run build && cd ../entities && npm run build` | Build daycounting first (performance and roundtrips depend on it) |
+| **TypeScript** | `cd ts && npm run build` | Single tsc build for all modules |
 | **Zig** | `cd zig && zig build` | Build without running tests |
 | **Rust** | `cd rust && cargo build` | Debug build; add `--release` for optimized |
 
 ```bash
 cd go && go build ./... && cd ..
-cd ts/daycounting && npm run build && cd ../performance && npm run build && cd ../roundtrips && npm run build && cd ../symbology && npm run build && cd ../entities && npm run build && cd ../..
+cd ts && npm run build && cd ..
 cd zig && zig build && cd ..
 cd rust && cargo build && cd ..
 ```

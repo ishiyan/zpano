@@ -175,8 +175,8 @@ export class Ratios {
 
     addReturn(
         return_: number,
-        returnBenchmark: number,
-        value: number,
+        _returnBenchmark: number,
+        _value: number,
         timeStart: Date,
         timeEnd: Date
     ): void {
@@ -351,7 +351,7 @@ export class Ratios {
         }
     }
 
-    private _autocorrPenalty(returns: number[]): number {
+    private _autocorrPenalty(_returns: number[]): number {
         // Simplified version - returns 1 (no penalty)
         // Full implementation would require correlation calculation
         return 1;
@@ -685,6 +685,30 @@ export class Ratios {
             this._drawdownsPeaks.reduce((sum, dd) => sum + Math.pow(dd, 2), 0) / l
         );
         return ulcerIndex !== 0 ? rate / ulcerIndex : null;
+    }
+
+    get logretSum(): number {
+        return this._logretSum;
+    }
+
+    get requiredHpm2(): number | null {
+        return this._requiredHpm2;
+    }
+
+    get requiredHpm3(): number | null {
+        return this._requiredHpm3;
+    }
+
+    get avgReturn(): number | null {
+        return this._avgReturn;
+    }
+
+    get avgWin(): number | null {
+        return this._avgWin;
+    }
+
+    get avgLoss(): number | null {
+        return this._avgLoss;
     }
 
     get gainToPainRatio(): number | null {
