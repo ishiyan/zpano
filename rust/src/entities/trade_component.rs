@@ -8,6 +8,9 @@ pub enum TradeComponent {
     Volume = 1,
 }
 
+/// The default trade component used when no explicit component is specified.
+pub const DEFAULT_TRADE_COMPONENT: TradeComponent = TradeComponent::Price;
+
 /// Returns a function that extracts the given component value from a Trade.
 pub fn component_value(component: TradeComponent) -> fn(&Trade) -> f64 {
     match component {
@@ -44,5 +47,10 @@ mod tests {
     fn test_component_mnemonic() {
         assert_eq!(component_mnemonic(TradeComponent::Price), "p");
         assert_eq!(component_mnemonic(TradeComponent::Volume), "v");
+    }
+
+    #[test]
+    fn test_default_trade_component() {
+        assert_eq!(DEFAULT_TRADE_COMPONENT, TradeComponent::Price);
     }
 }

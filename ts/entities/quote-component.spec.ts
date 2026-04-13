@@ -1,6 +1,5 @@
 import { Quote } from './quote';
-import { QuoteComponent } from './quote-component.enum';
-import { quoteComponentValue, quoteComponentMnemonic } from './quote-component';
+import { QuoteComponent, quoteComponentValue, quoteComponentMnemonic } from './quote-component';
 
 describe('QuoteComponent', () => {
     const q = new Quote({

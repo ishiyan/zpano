@@ -19,6 +19,10 @@ class BarComponent(IntEnum):
     AVERAGE = 8
 
 
+# Default bar component used when no explicit component is specified.
+DEFAULT_BAR_COMPONENT = BarComponent.CLOSE
+
+
 def bar_component_value(component: BarComponent) -> Callable[[Bar], float]:
     """Returns a function that extracts the given component value from a Bar."""
     if component == BarComponent.OPEN:

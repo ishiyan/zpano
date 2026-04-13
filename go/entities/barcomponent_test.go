@@ -92,6 +92,38 @@ func TestBarComponentString(t *testing.T) {
 	}
 }
 
+func TestBarComponentMnemonic(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		c    BarComponent
+		text string
+	}{
+		{BarOpenPrice, barMnemonicOpen},
+		{BarHighPrice, barMnemonicHigh},
+		{BarLowPrice, barMnemonicLow},
+		{BarClosePrice, barMnemonicClose},
+		{BarVolume, barMnemonicVolume},
+		{BarMedianPrice, barMnemonicMedian},
+		{BarTypicalPrice, barMnemonicTypical},
+		{BarWeightedPrice, barMnemonicWeighted},
+		{BarAveragePrice, barMnemonicAverage},
+		{barLast, unknown},
+		{BarComponent(0), unknown},
+		{BarComponent(9999), unknown},
+		{BarComponent(-9999), unknown},
+	}
+
+	for _, tt := range tests {
+		exp := tt.text
+		act := tt.c.Mnemonic()
+
+		if exp != act {
+			t.Errorf("'%v'.Mnemonic(): expected '%v', actual '%v'", tt.c, exp, act)
+		}
+	}
+}
+
 func TestBarComponentIsKnown(t *testing.T) {
 	t.Parallel()
 

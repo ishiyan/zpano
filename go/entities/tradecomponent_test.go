@@ -78,6 +78,31 @@ func TestTradeComponentString(t *testing.T) {
 	}
 }
 
+func TestTradeComponentMnemonic(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		c    TradeComponent
+		text string
+	}{
+		{TradePrice, tradeMnemonicPrice},
+		{TradeVolume, tradeMnemonicVolume},
+		{tradeLast, unknown},
+		{TradeComponent(0), unknown},
+		{TradeComponent(9999), unknown},
+		{TradeComponent(-9999), unknown},
+	}
+
+	for _, tt := range tests {
+		exp := tt.text
+		act := tt.c.Mnemonic()
+
+		if exp != act {
+			t.Errorf("'%v'.Mnemonic(): expected '%v', actual '%v'", tt.c, exp, act)
+		}
+	}
+}
+
 func TestTradeComponentIsKnown(t *testing.T) {
 	t.Parallel()
 

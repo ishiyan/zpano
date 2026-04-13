@@ -4,11 +4,11 @@ import unittest
 from datetime import datetime
 
 from .bar import Bar
-from .bar_component import BarComponent, bar_component_value, bar_component_mnemonic
+from .bar_component import BarComponent, bar_component_value, bar_component_mnemonic, DEFAULT_BAR_COMPONENT
 from .quote import Quote
-from .quote_component import QuoteComponent, quote_component_value, quote_component_mnemonic
+from .quote_component import QuoteComponent, quote_component_value, quote_component_mnemonic, DEFAULT_QUOTE_COMPONENT
 from .trade import Trade
-from .trade_component import TradeComponent, trade_component_value, trade_component_mnemonic
+from .trade_component import TradeComponent, trade_component_value, trade_component_mnemonic, DEFAULT_TRADE_COMPONENT
 
 
 def _bar(o: float, h: float, l: float, c: float, v: float) -> Bar:
@@ -122,6 +122,11 @@ class TestBarComponentMnemonic(unittest.TestCase):
         self.assertEqual(bar_component_mnemonic(9999), '??')
 
 
+class TestDefaultBarComponent(unittest.TestCase):
+    def test_default(self):
+        self.assertEqual(DEFAULT_BAR_COMPONENT, BarComponent.CLOSE)
+
+
 class TestQuoteMid(unittest.TestCase):
     def test_mid(self):
         q = Quote(datetime(2021, 4, 1), 3.0, 2.0, 0, 0)
@@ -220,6 +225,11 @@ class TestQuoteComponentMnemonic(unittest.TestCase):
         self.assertEqual(quote_component_mnemonic(9999), '??')
 
 
+class TestDefaultQuoteComponent(unittest.TestCase):
+    def test_default(self):
+        self.assertEqual(DEFAULT_QUOTE_COMPONENT, QuoteComponent.MID)
+
+
 class TestTradeComponentValue(unittest.TestCase):
     def setUp(self):
         self.t = Trade(datetime(2021, 4, 1), 1.0, 2.0)
@@ -245,6 +255,11 @@ class TestTradeComponentMnemonic(unittest.TestCase):
 
     def test_unknown(self):
         self.assertEqual(trade_component_mnemonic(9999), '??')
+
+
+class TestDefaultTradeComponent(unittest.TestCase):
+    def test_default(self):
+        self.assertEqual(DEFAULT_TRADE_COMPONENT, TradeComponent.PRICE)
 
 
 if __name__ == '__main__':

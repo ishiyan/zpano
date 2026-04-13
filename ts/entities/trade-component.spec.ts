@@ -1,6 +1,5 @@
 import { Trade } from './trade';
-import { TradeComponent } from './trade-component.enum';
-import { tradeComponentValue, tradeComponentMnemonic } from './trade-component';
+import { TradeComponent, tradeComponentValue, tradeComponentMnemonic } from './trade-component';
 
 describe('TradeComponent', () => {
     const t = new Trade({

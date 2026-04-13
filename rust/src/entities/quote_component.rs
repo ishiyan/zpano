@@ -14,6 +14,9 @@ pub enum QuoteComponent {
     SpreadBp = 7,
 }
 
+/// The default quote component used when no explicit component is specified.
+pub const DEFAULT_QUOTE_COMPONENT: QuoteComponent = QuoteComponent::Mid;
+
 /// Returns a function that extracts the given component value from a Quote.
 pub fn component_value(component: QuoteComponent) -> fn(&Quote) -> f64 {
     match component {
@@ -108,5 +111,10 @@ mod tests {
         assert_eq!(component_mnemonic(QuoteComponent::Weighted), "(bbs+aas)/(bs+as)");
         assert_eq!(component_mnemonic(QuoteComponent::WeightedMid), "(bas+abs)/(bs+as)");
         assert_eq!(component_mnemonic(QuoteComponent::SpreadBp), "spread bp");
+    }
+
+    #[test]
+    fn test_default_quote_component() {
+        assert_eq!(DEFAULT_QUOTE_COMPONENT, QuoteComponent::Mid);
     }
 }

@@ -14,6 +14,9 @@ pub const QuoteComponent = enum(u8) {
     spread_bp = 7,
 };
 
+/// The default quote component used when no explicit component is specified.
+pub const default_quote_component: QuoteComponent = .mid;
+
 /// Function type that extracts a component value from a Quote.
 pub const QuoteFunc = *const fn (Quote) f64;
 
@@ -124,4 +127,8 @@ test "quote component mnemonic" {
     try testing.expectEqualStrings("(bbs+aas)/(bs+as)", componentMnemonic(.weighted));
     try testing.expectEqualStrings("(bas+abs)/(bs+as)", componentMnemonic(.weighted_mid));
     try testing.expectEqualStrings("spread bp", componentMnemonic(.spread_bp));
+}
+
+test "default quote component" {
+    try testing.expectEqual(QuoteComponent.mid, default_quote_component);
 }

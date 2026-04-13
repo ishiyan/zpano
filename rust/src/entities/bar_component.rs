@@ -15,6 +15,9 @@ pub enum BarComponent {
     Average = 8,
 }
 
+/// The default bar component used when no explicit component is specified.
+pub const DEFAULT_BAR_COMPONENT: BarComponent = BarComponent::Close;
+
 /// Returns a function that extracts the given component value from a Bar.
 pub fn component_value(component: BarComponent) -> fn(&Bar) -> f64 {
     match component {
@@ -118,5 +121,10 @@ mod tests {
         assert_eq!(component_mnemonic(BarComponent::Typical), "hlc/3");
         assert_eq!(component_mnemonic(BarComponent::Weighted), "hlcc/4");
         assert_eq!(component_mnemonic(BarComponent::Average), "ohlc/4");
+    }
+
+    #[test]
+    fn test_default_bar_component() {
+        assert_eq!(DEFAULT_BAR_COMPONENT, BarComponent::Close);
     }
 }

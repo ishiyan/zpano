@@ -1,5 +1,16 @@
 import { Trade } from './trade';
-import { TradeComponent } from './trade-component.enum';
+
+/** Enumerates components of a _Trade_. */
+export enum TradeComponent {
+  /** The price. */
+  Price,
+
+  /** The volume. */
+  Volume,
+}
+
+/** The default trade component used when none is specified. */
+export const DefaultTradeComponent = TradeComponent.Price;
 
 /** Function for calculating a component of a _Trade_. */
 export const tradeComponentValue = (component: TradeComponent): (trade: Trade) => number => {

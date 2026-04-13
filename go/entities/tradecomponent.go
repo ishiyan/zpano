@@ -12,6 +12,9 @@ type TradeComponent int
 // TradeFunc defines a function to get a component value from the Trade type.
 type TradeFunc func(t *Trade) float64
 
+// DefaultTradeComponent is the default trade component used when no explicit component is specified.
+const DefaultTradeComponent = TradePrice
+
 const (
 	// TradePrice is the price component.
 	TradePrice TradeComponent = iota + 1
@@ -24,6 +27,11 @@ const (
 const (
 	tradePrice  = "price"
 	tradeVolume = "volume"
+)
+
+const (
+	tradeMnemonicPrice  = "p"
+	tradeMnemonicVolume = "v"
 )
 
 var errUnknownTradeComponent = errors.New("unknown trade component")
@@ -47,6 +55,18 @@ func (c TradeComponent) String() string {
 		return tradePrice
 	case TradeVolume:
 		return tradeVolume
+	default:
+		return unknown
+	}
+}
+
+// Mnemonic returns a short mnemonic code for the trade component.
+func (c TradeComponent) Mnemonic() string {
+	switch c {
+	case TradePrice:
+		return tradeMnemonicPrice
+	case TradeVolume:
+		return tradeMnemonicVolume
 	default:
 		return unknown
 	}

@@ -50,7 +50,7 @@ cd ts && npm run build                                                       # b
 ### Zig
 Dependencies: Zig 0.16.0-dev. Installed at `/usr/local/zig/` with `/usr/local/bin/zig` on PATH.
 ```bash
-cd zig && zig build test                        # all tests (364 tests across 21 modules)
+cd zig && zig build test                        # all tests (367 tests across 21 modules)
 cd zig && zig build test 2>&1 --summary all     # with per-module counts
 ```
 Zig has no built-in way to run a single named test from the build system. To filter, use the `zig test` command directly with `--test-filter`:
@@ -62,7 +62,7 @@ cd zig && zig test src/daycounting/daycounting.zig --test-filter "act365Fixed" \
 ### Rust
 Dependencies: Rust 1.75.0+ (installed via apt at `/usr/bin/rustc`, `/usr/bin/cargo`), zero external deps.
 ```bash
-cd rust && cargo test                                                       # all tests (339 tests)
+cd rust && cargo test                                                       # all tests (342 tests)
 cd rust && cargo test --lib daycounting                                     # daycounting tests only
 cd rust && cargo test --lib performance                                     # performance tests only
 cd rust && cargo test --lib roundtrips                                      # roundtrips tests only
@@ -84,7 +84,7 @@ go/daycounting/          — daycounting.go, fractional.go, conventions/ subpack
 go/performance/          — periodicity.go, ratios.go
 go/roundtrips/           — execution.go, side.go, matching.go, grouping.go, roundtrip.go, performance.go, tests
 go/symbology/            — isin.go, cusip.go, sedol.go, tests
-go/entities/             — bar.go, quote.go, trade.go, scalar.go, barcomponent.go, quotecomponent.go, tradecomponent.go, tests (package name: data)
+go/entities/             — bar.go, quote.go, trade.go, scalar.go, barcomponent.go, quotecomponent.go, tradecomponent.go, tests
 ts/daycounting/          — conventions.ts, daycounting.ts, fractional.ts
 ts/performance/          — periodicity.ts, ratios.ts
 ts/roundtrips/           — execution.ts, side.ts, matching.ts, grouping.ts, roundtrip.ts, performance.ts
@@ -181,11 +181,13 @@ Four source files per language implement financial trading data types, plus thre
 
 Key behavioral details:
 - **No inter-entity dependencies**: Bar, Quote, Trade, Scalar are fully standalone. Component modules depend only on their parent entity type.
-- **Go package name**: The `go/entities/` directory uses package name `data` (not `entities`).
+- **Go package name**: The `go/entities/` directory uses package name `entities`.
 - **Field naming**: Go uses `Bid`/`Ask` (exported PascalCase); TS uses `bidPrice`/`askPrice` (camelCase); Python/Zig/Rust use `bid_price`/`ask_price` (snake_case).
 - **Enum numbering**: Go uses `iota+1` (1-based); Python `IntEnum` starts at 0; TS numeric enum starts at 0; Zig `enum(u8)` starts at 0; Rust `#[repr(u8)]` starts at 0.
 - **Component return types**: Go returns `(BarFunc, error)` for unknown components; Python/TS return closures with default fallback; Zig/Rust return function pointers with default fallback.
 - **Mnemonics**: bar: o, h, l, c, v, hl/2, hlc/3, hlcc/4, ohlc/4; quote: b, a, bs, as, ba/2, (bbs+aas)/(bs+as), (bas+abs)/(bs+as), spread bp; trade: p, v. Unknown returns "??".
+- **Default component constants**: Each component module exports a default: `DefaultBarComponent = Close`, `DefaultQuoteComponent = Mid`, `DefaultTradeComponent = Price`. Naming: Go `DefaultBarComponent`, TS `DefaultBarComponent`, Python `DEFAULT_BAR_COMPONENT`, Zig `default_bar_component`, Rust `DEFAULT_BAR_COMPONENT`.
+- **Go `Mnemonic()` method**: Go component enums have a `Mnemonic() string` method on the enum type itself (in addition to the standalone `ComponentValue`/mnemonic functions). Unknown values return `"unknown"`. Other languages use standalone functions and return `"??"` for unknown values.
 
 ### Performance Module
 The `Ratios` struct/class accumulates portfolio returns incrementally via `addReturn()` and computes 20+ financial ratios at each step. All ratio methods are read-only accessors that derive values from internal state. The test dataset ("Bacon data") is a 24-element array of returns with corresponding dates, shared across all languages.
@@ -237,11 +239,11 @@ All commands run from the project root (`~/repos/zpano/`).
 
 | Language | Prerequisites | Command | Expected |
 |----------|--------------|---------|----------|
-| **Python** | Python 3.10+, `numpy`, `scipy`, symlink `ln -sf py accounts`, `touch py/__init__.py` | `PYTHONPATH=. python3 -m unittest discover -s py -p "test_*.py" -t .` | 336 tests |
+| **Python** | Python 3.10+, `numpy`, `scipy`, symlink `ln -sf py accounts`, `touch py/__init__.py` | `PYTHONPATH=. python3 -m unittest discover -s py -p "test_*.py" -t .` | 339 tests |
 | **Go** | Go 1.26+ | `cd go && go test ./...&& cd ..`| 6 packages OK |
 | **TypeScript** | Node.js 20+, TypeScript 5.3+, Jasmine 5.1+ | `cd ts && npm install && npm test && cd ..` | 8935 specs |
-| **Zig** | Zig 0.16.0-dev | `cd zig && zig build test --summary all && cd ..` | 364 tests |
-| **Rust** | Rust 1.75.0+ (apt) | `cd rust && cargo test && cd ..` | 339 tests |
+| **Zig** | Zig 0.16.0-dev | `cd zig && zig build test --summary all && cd ..` | 367 tests |
+| **Rust** | Rust 1.75.0+ (apt) | `cd rust && cargo test && cd ..` | 342 tests |
 
 ```bash
 python3 -m unittest discover -s py -p "test_*.py" -t .

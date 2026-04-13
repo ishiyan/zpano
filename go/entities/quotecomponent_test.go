@@ -90,6 +90,37 @@ func TestQuoteComponentString(t *testing.T) {
 	}
 }
 
+func TestQuoteComponentMnemonic(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		c    QuoteComponent
+		text string
+	}{
+		{QuoteBidPrice, quoteMnemonicBid},
+		{QuoteAskPrice, quoteMnemonicAsk},
+		{QuoteBidSize, quoteMnemonicBidSize},
+		{QuoteAskSize, quoteMnemonicAskSize},
+		{QuoteMidPrice, quoteMnemonicMid},
+		{QuoteWeightedPrice, quoteMnemonicWeighted},
+		{QuoteWeightedMidPrice, quoteMnemonicWeightedMid},
+		{QuoteSpreadBp, quoteMnemonicSpreadBp},
+		{quoteLast, unknown},
+		{QuoteComponent(0), unknown},
+		{QuoteComponent(9999), unknown},
+		{QuoteComponent(-9999), unknown},
+	}
+
+	for _, tt := range tests {
+		exp := tt.text
+		act := tt.c.Mnemonic()
+
+		if exp != act {
+			t.Errorf("'%v'.Mnemonic(): expected '%v', actual '%v'", tt.c, exp, act)
+		}
+	}
+}
+
 func TestQuoteComponentIsKnown(t *testing.T) {
 	t.Parallel()
 

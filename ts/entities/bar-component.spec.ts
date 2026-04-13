@@ -1,6 +1,5 @@
 import { Bar } from './bar';
-import { BarComponent } from './bar-component.enum';
-import { barComponentValue, barComponentMnemonic } from './bar-component';
+import { BarComponent, barComponentValue, barComponentMnemonic } from './bar-component';
 
 describe('BarComponent', () => {
     const b = new Bar({

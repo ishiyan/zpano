@@ -12,6 +12,9 @@ type QuoteComponent int
 // QuoteFunc defines a function to get a component value from the Quote type.
 type QuoteFunc func(q *Quote) float64
 
+// DefaultQuoteComponent is the default quote component used when no explicit component is specified.
+const DefaultQuoteComponent = QuoteMidPrice
+
 const (
 	// QuoteBidPrice is the bid price component.
 	QuoteBidPrice QuoteComponent = iota + 1
@@ -52,6 +55,17 @@ const (
 	quoteWeighted    = "weighted"
 	quoteWeightedMid = "weightedMid"
 	quoteSpreadBp    = "spreadBp"
+)
+
+const (
+	quoteMnemonicBid         = "b"
+	quoteMnemonicAsk         = "a"
+	quoteMnemonicBidSize     = "bs"
+	quoteMnemonicAskSize     = "as"
+	quoteMnemonicMid         = "ba/2"
+	quoteMnemonicWeighted    = "(bbs+aas)/(bs+as)"
+	quoteMnemonicWeightedMid = "(bas+abs)/(bs+as)"
+	quoteMnemonicSpreadBp    = "spread bp"
 )
 
 var errUnknownQuoteComponent = errors.New("unknown quote component")
@@ -99,6 +113,30 @@ func (c QuoteComponent) String() string {
 		return quoteWeightedMid
 	case QuoteSpreadBp:
 		return quoteSpreadBp
+	default:
+		return unknown
+	}
+}
+
+// Mnemonic returns a short mnemonic code for the quote component.
+func (c QuoteComponent) Mnemonic() string {
+	switch c {
+	case QuoteBidPrice:
+		return quoteMnemonicBid
+	case QuoteAskPrice:
+		return quoteMnemonicAsk
+	case QuoteBidSize:
+		return quoteMnemonicBidSize
+	case QuoteAskSize:
+		return quoteMnemonicAskSize
+	case QuoteMidPrice:
+		return quoteMnemonicMid
+	case QuoteWeightedPrice:
+		return quoteMnemonicWeighted
+	case QuoteWeightedMidPrice:
+		return quoteMnemonicWeightedMid
+	case QuoteSpreadBp:
+		return quoteMnemonicSpreadBp
 	default:
 		return unknown
 	}

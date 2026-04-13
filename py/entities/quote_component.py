@@ -18,6 +18,10 @@ class QuoteComponent(IntEnum):
     SPREAD_BP = 7
 
 
+# Default quote component used when no explicit component is specified.
+DEFAULT_QUOTE_COMPONENT = QuoteComponent.MID
+
+
 def quote_component_value(component: QuoteComponent) -> Callable[[Quote], float]:
     """Returns a function that extracts the given component value from a Quote."""
     if component == QuoteComponent.BID:

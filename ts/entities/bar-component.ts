@@ -1,5 +1,37 @@
 import { Bar } from './bar';
-import { BarComponent } from './bar-component.enum';
+
+/** Enumerates price components of a _Bar_. */
+export enum BarComponent {
+  /** The opening price. */
+  Open,
+
+  /** The highest price. */
+  High,
+
+  /** The lowest price. */
+  Low,
+
+  /** The closing price. */
+  Close,
+
+  /** The volume. */
+  Volume,
+
+  /** The median price, calculated as _(high + low) / 2_. */
+  Median,
+
+  /** The typical price, calculated as _(high + low + close) / 3_. */
+  Typical,
+
+  /** The weighted price, calculated as _(high + low + 2*close) / 4_. */
+  Weighted,
+
+  /** The average price, calculated as _(open + high + low + close) / 4_. */
+  Average,
+}
+
+/** The default bar component used when none is specified. */
+export const DefaultBarComponent = BarComponent.Close;
 
 /** Function for calculating a price component of a _Bar_. */
 export const barComponentValue = (component: BarComponent): (bar: Bar) => number => {

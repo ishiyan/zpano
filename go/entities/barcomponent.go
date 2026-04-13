@@ -12,6 +12,9 @@ type BarComponent int
 // BarFunc defines a function to get a component value from the Bar type.
 type BarFunc func(b *Bar) float64
 
+// DefaultBarComponent is the default bar component used when no explicit component is specified.
+const DefaultBarComponent = BarClosePrice
+
 const (
 	// BarOpenPrice is the opening price component.
 	BarOpenPrice BarComponent = iota + 1
@@ -56,6 +59,18 @@ const (
 	barTypical  = "typical"
 	barWeighted = "weighted"
 	barAverage  = "average"
+)
+
+const (
+	barMnemonicOpen     = "o"
+	barMnemonicHigh     = "h"
+	barMnemonicLow      = "l"
+	barMnemonicClose    = "c"
+	barMnemonicVolume   = "v"
+	barMnemonicMedian   = "hl/2"
+	barMnemonicTypical  = "hlc/3"
+	barMnemonicWeighted = "hlcc/4"
+	barMnemonicAverage  = "ohlc/4"
 )
 
 var errUnknownBarComponent = errors.New("unknown bar component")
@@ -107,6 +122,32 @@ func (c BarComponent) String() string {
 		return barWeighted
 	case BarAveragePrice:
 		return barAverage
+	default:
+		return unknown
+	}
+}
+
+// Mnemonic returns a short mnemonic code for the bar component.
+func (c BarComponent) Mnemonic() string {
+	switch c {
+	case BarOpenPrice:
+		return barMnemonicOpen
+	case BarHighPrice:
+		return barMnemonicHigh
+	case BarLowPrice:
+		return barMnemonicLow
+	case BarClosePrice:
+		return barMnemonicClose
+	case BarVolume:
+		return barMnemonicVolume
+	case BarMedianPrice:
+		return barMnemonicMedian
+	case BarTypicalPrice:
+		return barMnemonicTypical
+	case BarWeightedPrice:
+		return barMnemonicWeighted
+	case BarAveragePrice:
+		return barMnemonicAverage
 	default:
 		return unknown
 	}

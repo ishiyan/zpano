@@ -15,6 +15,9 @@ pub const BarComponent = enum(u8) {
     average = 8,
 };
 
+/// The default bar component used when no explicit component is specified.
+pub const default_bar_component: BarComponent = .close;
+
 /// Function type that extracts a component value from a Bar.
 pub const BarFunc = *const fn (Bar) f64;
 
@@ -136,4 +139,8 @@ test "bar component mnemonic" {
     try testing.expectEqualStrings("hlc/3", componentMnemonic(.typical));
     try testing.expectEqualStrings("hlcc/4", componentMnemonic(.weighted));
     try testing.expectEqualStrings("ohlc/4", componentMnemonic(.average));
+}
+
+test "default bar component" {
+    try testing.expectEqual(BarComponent.close, default_bar_component);
 }

@@ -12,6 +12,10 @@ class TradeComponent(IntEnum):
     VOLUME = 1
 
 
+# Default trade component used when no explicit component is specified.
+DEFAULT_TRADE_COMPONENT = TradeComponent.PRICE
+
+
 def trade_component_value(component: TradeComponent) -> Callable[[Trade], float]:
     """Returns a function that extracts the given component value from a Trade."""
     if component == TradeComponent.PRICE:

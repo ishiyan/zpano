@@ -8,6 +8,9 @@ pub const TradeComponent = enum(u8) {
     volume = 1,
 };
 
+/// The default trade component used when no explicit component is specified.
+pub const default_trade_component: TradeComponent = .price;
+
 /// Function type that extracts a component value from a Trade.
 pub const TradeFunc = *const fn (Trade) f64;
 
@@ -48,4 +51,8 @@ test "trade component value volume" {
 test "trade component mnemonic" {
     try testing.expectEqualStrings("p", componentMnemonic(.price));
     try testing.expectEqualStrings("v", componentMnemonic(.volume));
+}
+
+test "default trade component" {
+    try testing.expectEqual(TradeComponent.price, default_trade_component);
 }
