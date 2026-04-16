@@ -62,5 +62,26 @@ export enum IndicatorType {
   StandardDeviation,
 
   /** Identifies the __Goertzel power spectrum__ (GOERTZEL) indicator. */
-  GoertzelSpectrum
+  GoertzelSpectrum,
+
+  /** Identifies the Ehler's __Center of Gravity Oscillator__ (COG) indicator. */
+  CenterOfGravityOscillator,
+
+  /** Identifies the Ehler's __Cyber Cycle__ (CC) indicator. */
+  CyberCycle,
+
+  /** Identifies the Ehler's __Instantaneous Trend Line__ (iTrend) indicator. */
+  InstantaneousTrendLine,
+
+  /** Identifies the Ehler's __Super Smoother__ (SS) indicator. */
+  SuperSmoother,
+
+  /** Identifies the Ehler's __Zero-lag Exponential Moving Average__ (ZEMA) indicator. */
+  ZeroLagExponentialMovingAverage,
+
+  /** Identifies the Ehler's __Zero-lag Error-Correcting Exponential Moving Average__ (ZECEMA) indicator. */
+  ZeroLagErrorCorrectingExponentialMovingAverage,
+
+  /** Identifies the Ehler's __Roofing Filter__ indicator. */
+  RoofingFilter
 }

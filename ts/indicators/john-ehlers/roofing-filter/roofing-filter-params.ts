@@ -1,0 +1,55 @@
+import { BarComponent } from '../../../entities/bar-component';
+import { QuoteComponent } from '../../../entities/quote-component';
+import { TradeComponent } from '../../../entities/trade-component';
+
+/** Describes parameters to create an instance of the Roofing Filter indicator. */
+export interface RoofingFilterParams {
+    /**
+     * The shortest cycle period in bars.
+     * The Roofing Filter attenuates all cycle periods shorter than this one.
+     *
+     * The value should be greater than 1. The default value is 10.
+     */
+    shortestCyclePeriod: number;
+
+    /**
+     * The longest cycle period in bars.
+     * The Roofing Filter attenuates all cycle periods longer than this one.
+     *
+     * The value should be greater than shortestCyclePeriod. The default value is 48.
+     */
+    longestCyclePeriod: number;
+
+    /**
+     * Whether to use a two-pole high-pass filter instead of the default one-pole high-pass filter.
+     */
+    hasTwoPoleHighpassFilter?: boolean;
+
+    /**
+     * Whether to apply a zero-mean filter after the super smoother.
+     * Only applicable when hasTwoPoleHighpassFilter is false.
+     */
+    hasZeroMean?: boolean;
+
+    /**
+     * A component of a bar to use when updating the indicator with a bar sample.
+     *
+     * If _undefined_, the bar component will have a default value (MedianPrice)
+     * and will not be shown in the indicator mnemonic.
+     */
+    barComponent?: BarComponent;
+
+    /**
+     * A component of a quote to use when updating the indicator with a quote sample.
+     *
+     * If _undefined_, the quote component will have a default value and will not be shown in the indicator mnemonic.
+     */
+    quoteComponent?: QuoteComponent;
+
+    /**
+     * A component of a trade to use when updating the indicator with a trade sample.
+     *
+     * If _undefined_, the trade component will have a default value and will not be shown in the indicator mnemonic.
+     */
+    tradeComponent?: TradeComponent;
+}

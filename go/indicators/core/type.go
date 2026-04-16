@@ -71,32 +71,60 @@ const (
 
 	// GoertzelSpectrum identifies the Goertzel power spectrum (GOERTZEL) indicator.
 	GoertzelSpectrum
+
+	// CenterOfGravityOscillator identifies the Ehlers Center of Gravity (COG) oscillator indicator.
+	CenterOfGravityOscillator
+
+	// CyberCycle identifies the Ehlers Cyber Cycle (CC) indicator.
+	CyberCycle
+
+	// InstantaneousTrendLine identifies the Ehlers Instantaneous Trend Line (iTrend) indicator.
+	InstantaneousTrendLine
+
+	// SuperSmoother identifies the Ehlers Super Smoother (SS) indicator.
+	SuperSmoother
+
+	// ZeroLagExponentialMovingAverage identifies the Ehlers Zero-lag Exponential Moving Average (ZEMA) indicator.
+	ZeroLagExponentialMovingAverage
+
+	// ZeroLagErrorCorrectingExponentialMovingAverage identifies the Ehlers Zero-lag Error-Correcting Exponential Moving Average (ZECEMA) indicator.
+	ZeroLagErrorCorrectingExponentialMovingAverage
+
+	// RoofingFilter identifies the Ehlers Roofing Filter indicator.
+	RoofingFilter
 	last
 )
 
 const (
-	unknown                        = "unknown"
-	simpleMovingAverage            = "simpleMovingAverage"
-	weightedMovingAverage          = "weightedMovingAverage"
-	triangularMovingAverage        = "triangularMovingAverage"
-	exponentialMovingAverage       = "exponentialMovingAverage"
-	doubleExponentialMovingAverage = "doubleExponentialMovingAverage"
-	tripleExponentialMovingAverage = "tripleExponentialMovingAverage"
-	t2ExponentialMovingAverage     = "t2ExponentialMovingAverage"
-	t3ExponentialMovingAverage     = "t3ExponentialMovingAverage"
-	kaufmanAdaptiveMovingAverage   = "kaufmanAdaptiveMovingAverageMovingAverage"
-	jurikMovingAverage             = "jurikMovingAverage"
-	mesaAdaptiveMovingAverage      = "mesaAdaptiveMovingAverage"
-	fractalAdaptiveMovingAverage   = "fractalAdaptiveMovingAverage"
-	momentum                       = "momentum"
-	rateOfChange                   = "rateOfChange"
-	rateOfChangePercent            = "rateOfChangePercent"
-	relativeStrengthIndex          = "relativeStrengthIndex"
-	chandeMomentumOscillator       = "chandeMomentumOscillator"
-	bollingerBands                 = "bollingerBands"
-	variance                       = "variance"
-	standardDeviation              = "standardDeviation"
-	goertzelSpectrum               = "goertzelSpectrum"
+	unknown                                        = "unknown"
+	simpleMovingAverage                            = "simpleMovingAverage"
+	weightedMovingAverage                          = "weightedMovingAverage"
+	triangularMovingAverage                        = "triangularMovingAverage"
+	exponentialMovingAverage                       = "exponentialMovingAverage"
+	doubleExponentialMovingAverage                 = "doubleExponentialMovingAverage"
+	tripleExponentialMovingAverage                 = "tripleExponentialMovingAverage"
+	t2ExponentialMovingAverage                     = "t2ExponentialMovingAverage"
+	t3ExponentialMovingAverage                     = "t3ExponentialMovingAverage"
+	kaufmanAdaptiveMovingAverage                   = "kaufmanAdaptiveMovingAverageMovingAverage"
+	jurikMovingAverage                             = "jurikMovingAverage"
+	mesaAdaptiveMovingAverage                      = "mesaAdaptiveMovingAverage"
+	fractalAdaptiveMovingAverage                   = "fractalAdaptiveMovingAverage"
+	momentum                                       = "momentum"
+	rateOfChange                                   = "rateOfChange"
+	rateOfChangePercent                            = "rateOfChangePercent"
+	relativeStrengthIndex                          = "relativeStrengthIndex"
+	chandeMomentumOscillator                       = "chandeMomentumOscillator"
+	bollingerBands                                 = "bollingerBands"
+	variance                                       = "variance"
+	standardDeviation                              = "standardDeviation"
+	goertzelSpectrum                               = "goertzelSpectrum"
+	centerOfGravityOscillator                      = "centerOfGravityOscillator"
+	cyberCycle                                     = "cyberCycle"
+	instantaneousTrendLine                         = "instantaneousTrendLine"
+	superSmoother                                  = "superSmoother"
+	zeroLagExponentialMovingAverage                = "zeroLagExponentialMovingAverage"
+	zeroLagErrorCorrectingExponentialMovingAverage = "zeroLagErrorCorrectingExponentialMovingAverage"
+	roofingFilter                                  = "roofingFilter"
 )
 
 // String implements the Stringer interface.
@@ -146,6 +174,20 @@ func (t Type) String() string {
 		return standardDeviation
 	case GoertzelSpectrum:
 		return goertzelSpectrum
+	case CenterOfGravityOscillator:
+		return centerOfGravityOscillator
+	case CyberCycle:
+		return cyberCycle
+	case InstantaneousTrendLine:
+		return instantaneousTrendLine
+	case SuperSmoother:
+		return superSmoother
+	case ZeroLagExponentialMovingAverage:
+		return zeroLagExponentialMovingAverage
+	case ZeroLagErrorCorrectingExponentialMovingAverage:
+		return zeroLagErrorCorrectingExponentialMovingAverage
+	case RoofingFilter:
+		return roofingFilter
 	default:
 		return unknown
 	}
@@ -232,6 +274,20 @@ func (t *Type) UnmarshalJSON(data []byte) error {
 		*t = StandardDeviation
 	case goertzelSpectrum:
 		*t = GoertzelSpectrum
+	case centerOfGravityOscillator:
+		*t = CenterOfGravityOscillator
+	case cyberCycle:
+		*t = CyberCycle
+	case instantaneousTrendLine:
+		*t = InstantaneousTrendLine
+	case superSmoother:
+		*t = SuperSmoother
+	case zeroLagExponentialMovingAverage:
+		*t = ZeroLagExponentialMovingAverage
+	case zeroLagErrorCorrectingExponentialMovingAverage:
+		*t = ZeroLagErrorCorrectingExponentialMovingAverage
+	case roofingFilter:
+		*t = RoofingFilter
 	default:
 		return fmt.Errorf(errFmt, s)
 	}
