@@ -92,6 +92,57 @@ const (
 
 	// RoofingFilter identifies the Ehlers Roofing Filter indicator.
 	RoofingFilter
+
+	// TrueRange identifies the Welles Wilder True Range (TR) indicator.
+	TrueRange
+
+	// AverageTrueRange identifies the Welles Wilder Average True Range (ATR) indicator.
+	AverageTrueRange
+
+	// NormalizedAverageTrueRange identifies the Welles Wilder Normalized Average True Range (NATR) indicator.
+	NormalizedAverageTrueRange
+
+	// DirectionalMovementMinus identifies the Welles Wilder Directional Movement Minus (-DM) indicator.
+	DirectionalMovementMinus
+
+	// DirectionalMovementPlus identifies the Welles Wilder Directional Movement Plus (+DM) indicator.
+	DirectionalMovementPlus
+
+	// DirectionalIndicatorMinus identifies the Welles Wilder Directional Indicator Minus (-DI) indicator.
+	DirectionalIndicatorMinus
+
+	// DirectionalIndicatorPlus identifies the Welles Wilder Directional Indicator Plus (+DI) indicator.
+	DirectionalIndicatorPlus
+
+	// DirectionalMovementIndex identifies the Welles Wilder Directional Movement Index (DX) indicator.
+	DirectionalMovementIndex
+
+	// AverageDirectionalMovementIndex identifies the Welles Wilder Average Directional Movement Index (ADX) indicator.
+	AverageDirectionalMovementIndex
+
+	// AverageDirectionalMovementIndexRating identifies the Welles Wilder Average Directional Movement Index Rating (ADXR) indicator.
+	AverageDirectionalMovementIndexRating
+
+	// WilliamsPercentR identifies the Larry Williams Williams %R (WILL%R) indicator.
+	WilliamsPercentR
+
+	// PercentagePriceOscillator identifies the Gerald Appel Percentage Price Oscillator (PPO) indicator.
+	PercentagePriceOscillator
+
+	// AbsolutePriceOscillator identifies the Absolute Price Oscillator (APO) indicator.
+	AbsolutePriceOscillator
+
+	// CommodityChannelIndex identifies the Donald Lambert Commodity Channel Index (CCI) indicator.
+	CommodityChannelIndex
+
+	// MoneyFlowIndex identifies the Gene Quong Money Flow Index (MFI) indicator.
+	MoneyFlowIndex
+
+	// OnBalanceVolume identifies the Joseph Granville On-Balance Volume (OBV) indicator.
+	OnBalanceVolume
+
+	// BalanceOfPower identifies the Igor Livshin Balance of Power (BOP) indicator.
+	BalanceOfPower
 	last
 )
 
@@ -125,6 +176,23 @@ const (
 	zeroLagExponentialMovingAverage                = "zeroLagExponentialMovingAverage"
 	zeroLagErrorCorrectingExponentialMovingAverage = "zeroLagErrorCorrectingExponentialMovingAverage"
 	roofingFilter                                  = "roofingFilter"
+	trueRange                                      = "trueRange"
+	averageTrueRange                               = "averageTrueRange"
+	normalizedAverageTrueRange                     = "normalizedAverageTrueRange"
+	directionalMovementMinus                       = "directionalMovementMinus"
+	directionalMovementPlus                        = "directionalMovementPlus"
+	directionalIndicatorMinus                      = "directionalIndicatorMinus"
+	directionalIndicatorPlus                       = "directionalIndicatorPlus"
+	directionalMovementIndex                       = "directionalMovementIndex"
+	averageDirectionalMovementIndex                = "averageDirectionalMovementIndex"
+	averageDirectionalMovementIndexRating          = "averageDirectionalMovementIndexRating"
+	williamsPercentR                               = "williamsPercentR"
+	percentagePriceOscillator                      = "percentagePriceOscillator"
+	absolutePriceOscillator                        = "absolutePriceOscillator"
+	commodityChannelIndex                          = "commodityChannelIndex"
+	moneyFlowIndex                                 = "moneyFlowIndex"
+	onBalanceVolume                                = "onBalanceVolume"
+	balanceOfPower                                 = "balanceOfPower"
 )
 
 // String implements the Stringer interface.
@@ -188,6 +256,40 @@ func (t Type) String() string {
 		return zeroLagErrorCorrectingExponentialMovingAverage
 	case RoofingFilter:
 		return roofingFilter
+	case TrueRange:
+		return trueRange
+	case AverageTrueRange:
+		return averageTrueRange
+	case NormalizedAverageTrueRange:
+		return normalizedAverageTrueRange
+	case DirectionalMovementMinus:
+		return directionalMovementMinus
+	case DirectionalMovementPlus:
+		return directionalMovementPlus
+	case DirectionalIndicatorMinus:
+		return directionalIndicatorMinus
+	case DirectionalIndicatorPlus:
+		return directionalIndicatorPlus
+	case DirectionalMovementIndex:
+		return directionalMovementIndex
+	case AverageDirectionalMovementIndex:
+		return averageDirectionalMovementIndex
+	case AverageDirectionalMovementIndexRating:
+		return averageDirectionalMovementIndexRating
+	case WilliamsPercentR:
+		return williamsPercentR
+	case PercentagePriceOscillator:
+		return percentagePriceOscillator
+	case AbsolutePriceOscillator:
+		return absolutePriceOscillator
+	case CommodityChannelIndex:
+		return commodityChannelIndex
+	case MoneyFlowIndex:
+		return moneyFlowIndex
+	case OnBalanceVolume:
+		return onBalanceVolume
+	case BalanceOfPower:
+		return balanceOfPower
 	default:
 		return unknown
 	}
@@ -288,6 +390,40 @@ func (t *Type) UnmarshalJSON(data []byte) error {
 		*t = ZeroLagErrorCorrectingExponentialMovingAverage
 	case roofingFilter:
 		*t = RoofingFilter
+	case trueRange:
+		*t = TrueRange
+	case averageTrueRange:
+		*t = AverageTrueRange
+	case normalizedAverageTrueRange:
+		*t = NormalizedAverageTrueRange
+	case directionalMovementMinus:
+		*t = DirectionalMovementMinus
+	case directionalMovementPlus:
+		*t = DirectionalMovementPlus
+	case directionalIndicatorMinus:
+		*t = DirectionalIndicatorMinus
+	case directionalIndicatorPlus:
+		*t = DirectionalIndicatorPlus
+	case directionalMovementIndex:
+		*t = DirectionalMovementIndex
+	case averageDirectionalMovementIndex:
+		*t = AverageDirectionalMovementIndex
+	case averageDirectionalMovementIndexRating:
+		*t = AverageDirectionalMovementIndexRating
+	case williamsPercentR:
+		*t = WilliamsPercentR
+	case percentagePriceOscillator:
+		*t = PercentagePriceOscillator
+	case absolutePriceOscillator:
+		*t = AbsolutePriceOscillator
+	case commodityChannelIndex:
+		*t = CommodityChannelIndex
+	case moneyFlowIndex:
+		*t = MoneyFlowIndex
+	case onBalanceVolume:
+		*t = OnBalanceVolume
+	case balanceOfPower:
+		*t = BalanceOfPower
 	default:
 		return fmt.Errorf(errFmt, s)
 	}

@@ -83,5 +83,56 @@ export enum IndicatorType {
   ZeroLagErrorCorrectingExponentialMovingAverage,
 
   /** Identifies the Ehler's __Roofing Filter__ indicator. */
-  RoofingFilter
+  RoofingFilter,
+
+  /** Identifies Welles Wilder's __True Range__ (TR) indicator. */
+  TrueRange,
+
+  /** Identifies Welles Wilder's __Average True Range__ (ATR) indicator. */
+  AverageTrueRange,
+
+  /** Identifies Welles Wilder's __Normalized Average True Range__ (NATR) indicator. */
+  NormalizedAverageTrueRange,
+
+  /** Identifies Welles Wilder's __Directional Movement Minus__ (-DM) indicator. */
+  DirectionalMovementMinus,
+
+  /** Identifies Welles Wilder's __Directional Movement Plus__ (+DM) indicator. */
+  DirectionalMovementPlus,
+
+  /** Identifies Welles Wilder's __Directional Indicator Minus__ (-DI) indicator. */
+  DirectionalIndicatorMinus,
+
+  /** Identifies Welles Wilder's __Directional Indicator Plus__ (+DI) indicator. */
+  DirectionalIndicatorPlus,
+
+  /** Identifies Welles Wilder's __Directional Movement Index__ (DX) indicator. */
+  DirectionalMovementIndex,
+
+  /** Identifies Welles Wilder's __Average Directional Movement Index__ (ADX) indicator. */
+  AverageDirectionalMovementIndex,
+
+  /** Identifies Welles Wilder's __Average Directional Movement Index Rating__ (ADXR) indicator. */
+  AverageDirectionalMovementIndexRating,
+
+  /** Identifies Larry Williams' __Williams %R__ (WILL%R) indicator. */
+  WilliamsPercentR,
+
+  /** Identifies Gerald Appel's __Percentage Price Oscillator__ (PPO) indicator. */
+  PercentagePriceOscillator,
+
+  /** Identifies the __Absolute Price Oscillator__ (APO) indicator. */
+  AbsolutePriceOscillator,
+
+  /** Identifies Donald Lambert's __Commodity Channel Index__ (CCI) indicator. */
+  CommodityChannelIndex,
+
+  /** Identifies Gene Quong's __Money Flow Index__ (MFI) indicator. */
+  MoneyFlowIndex,
+
+  /** Identifies Joseph Granville's __On-Balance Volume__ (OBV) indicator. */
+  OnBalanceVolume,
+
+  /** Identifies Igor Livshin's __Balance of Power__ (BOP) indicator. */
+  BalanceOfPower
 }

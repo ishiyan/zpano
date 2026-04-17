@@ -424,6 +424,212 @@ Because CoG has two outputs (Value, Trigger) and extends `Indicator` directly (n
 
 ---
 
+## Bar-Based Indicators (Non-LineIndicator Pattern)
+
+Some indicators require bar data (high, low, close) rather than a single scalar component.
+These indicators implement the `Indicator` interface directly without using `LineIndicator`
+embedding/inheritance. Example: **TrueRange**.
+
+### Key Differences from LineIndicator
+
+| Aspect | LineIndicator | Bar-Based (e.g., TrueRange) |
+|---|---|---|
+| Base type | Embeds `LineIndicator` (Go) / `extends LineIndicator` (TS) | Implements `Indicator` directly |
+| Core method | `Update(float64)` / `update(number)` — single scalar | `Update(close, high, low float64)` — multiple values |
+| Bar handling | Extracts one component via `barComponentFunc` | Extracts H, L, C directly from bar |
+| Scalar/Quote/Trade | Routed through component function | Use single value as H=L=C substitute |
+| Params | Typically has `Length`, component fields | May be empty (parameterless) |
+| Components | `BarComponent`, `QuoteComponent`, `TradeComponent` | None — bar fields accessed directly |
+
+### Go Pattern
+
+```go
+type TrueRange struct {
+    mu            sync.RWMutex
+    previousClose float64
+    value         float64
+    primed        bool
+}
+
+func (tr *TrueRange) Update(close, high, low float64) float64 { ... }
+func (tr *TrueRange) UpdateSample(sample float64) float64 {
+    return tr.Update(sample, sample, sample)
+}
+func (tr *TrueRange) UpdateBar(sample *entities.Bar) core.Output {
+    output := make([]any, 1)
+    output[0] = entities.Scalar{Time: sample.Time, Value: tr.Update(sample.Close, sample.High, sample.Low)}
+    return output
+}
+func (tr *TrueRange) UpdateScalar(sample *entities.Scalar) core.Output {
+    v := sample.Value
+    output := make([]any, 1)
+    output[0] = entities.Scalar{Time: sample.Time, Value: tr.Update(v, v, v)}
+    return output
+}
+```
+
+### TS Pattern
+
+```typescript
+export class TrueRange implements Indicator {
+    public update(close: number, high: number, low: number): number { ... }
+    public updateSample(sample: number): number {
+        return this.update(sample, sample, sample);
+    }
+    public updateBar(sample: Bar): IndicatorOutput {
+        const scalar = new Scalar();
+        scalar.time = sample.time;
+        scalar.value = this.update(sample.close, sample.high, sample.low);
+        return [scalar];
+    }
+}
+```
+
+### Test Data Extraction
+
+For large test datasets (e.g., 252-entry TA-Lib arrays), extract data **programmatically**
+from the C# test file using a Python script rather than manual transcription:
+
+```python
+import re
+pattern = rf'readonly List<double> {name} = new List<double>\s*\{{(.*?)\}};'
+# Remove C-style comments before extracting numbers
+body = re.sub(r'/\*.*?\*/', '', body)
+```
+
+This avoids transcription errors that can be very hard to debug.
+
+---
+
+## Composite Indicators (Indicator-inside-Indicator Pattern)
+
+Some indicators internally create and use other indicator instances. Example: **AverageTrueRange**
+creates an internal **TrueRange** instance and delegates bar processing to it.
+
+### Key Points
+
+- The inner indicator is a private field, created in the constructor
+- The outer indicator calls the inner indicator's `Update()` method and processes the result
+- Both Go and TS follow the same pattern: import the inner indicator's package and instantiate it
+- The outer indicator manages its own priming state independently of the inner indicator
+- In Go, the inner indicator's mutex is separate — no nested locking issues because `Update()`
+  on the inner indicator acquires/releases its own lock before the outer lock is held
+
+### Go Example (AverageTrueRange)
+
+```go
+import "zpano/indicators/welleswilder/truerange"
+
+type AverageTrueRange struct {
+    mu        sync.RWMutex
+    trueRange *truerange.TrueRange  // internal indicator instance
+    // ... other fields
+}
+
+func NewAverageTrueRange(length int) (*AverageTrueRange, error) {
+    return &AverageTrueRange{
+        trueRange: truerange.NewTrueRange(),
+        // ...
+    }, nil
+}
+
+func (a *AverageTrueRange) Update(close, high, low float64) float64 {
+    trueRangeValue := a.trueRange.Update(close, high, low)  // delegate to inner
+    // ... apply Wilder smoothing to trueRangeValue
+}
+```
+
+### TS Example (AverageTrueRange)
+
+```typescript
+import { TrueRange } from '../true-range/true-range';
+
+export class AverageTrueRange implements Indicator {
+    private readonly trueRange: TrueRange;
+
+    constructor(length: number) {
+        this.trueRange = new TrueRange();
+    }
+
+    public update(close: number, high: number, low: number): number {
+        const trueRangeValue = this.trueRange.update(close, high, low);
+        // ... apply Wilder smoothing to trueRangeValue
+    }
+}
+```
+
+**Important:** Call the inner indicator's `Update()` **before** acquiring the outer lock in Go,
+or call it inside the lock if the inner indicator uses its own separate mutex (as TrueRange does).
+In the ATR implementation, `trueRange.Update()` is called inside the outer lock — this works
+because TrueRange's mutex is independent.
+
+---
+
+## Volume-Aware Indicators (UpdateWithVolume Pattern)
+
+Some indicators require both a price sample and volume. Since `LineIndicator` only
+supports `Update(float64)` / `update(number)`, these indicators need special handling.
+
+**Example: MoneyFlowIndex (MFI)**
+
+### Pattern
+
+1. **Embed `LineIndicator`** as usual (single scalar output).
+2. **Add `UpdateWithVolume(sample, volume float64)`** as the real computation method.
+3. **`Update(sample)`** delegates to `UpdateWithVolume(sample, 1)` (volume=1 fallback).
+4. **Shadow/override `UpdateBar`** to extract both price (via `barFunc`) AND volume from
+   the bar, then call `UpdateWithVolume`.
+
+### Go: Shadow `UpdateBar`
+
+```go
+// MoneyFlowIndex shadows LineIndicator.UpdateBar to extract volume.
+func (s *MoneyFlowIndex) UpdateBar(sample *entities.Bar) core.Output {
+    s.mu.Lock()
+    defer s.mu.Unlock()
+    price := s.barFunc(sample)
+    v := s.updateWithVolume(price, sample.Volume)
+    output := make([]any, 1)
+    output[0] = entities.Scalar{Time: sample.Time, Value: v}
+    return output
+}
+```
+
+The shadowed `UpdateBar` on the concrete type takes precedence over `LineIndicator.UpdateBar`
+when called on `*MoneyFlowIndex` directly or through the `Indicator` interface.
+
+### TS: Override `updateBar`
+
+```typescript
+public override updateBar(sample: Bar): IndicatorOutput {
+    const price = this.barFunc(sample);
+    const v = this.updateWithVolume(price, sample.volume);
+    const scalar = new Scalar();
+    scalar.time = sample.time;
+    scalar.value = v;
+    return [scalar];
+}
+```
+
+### Default BarComponent
+
+MFI defaults to `BarTypicalPrice` / `BarComponent.Typical` (not `BarClosePrice`),
+matching the C# default of `OhlcvComponent.TypicalPrice`.
+
+### Mnemonic
+
+MFI uses `mfi(LENGTH)` — no component suffix, matching C# behavior.
+
+### Testing Volume-Aware Indicators
+
+Test with two datasets:
+1. **Real volume** — `updateWithVolume(price, volume)` against expected values.
+2. **Volume=1** — `update(price)` (which uses volume=1) against a separate expected dataset.
+3. **UpdateBar test** — Feed `Bar` entities with real OHLCV data, verify first computed
+   value matches the real-volume expected data.
+
+---
+
 ## Test Data from Julia/CSV Reference (No C# Tests)
 
 Some MBST indicators lack C# unit tests but have Julia reference implementations and CSV
