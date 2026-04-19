@@ -143,6 +143,36 @@ const (
 
 	// BalanceOfPower identifies the Igor Livshin Balance of Power (BOP) indicator.
 	BalanceOfPower
+
+	// RateOfChangeRatio identifies the Rate of Change Ratio (ROCR / ROCR100) indicator.
+	RateOfChangeRatio
+
+	// PearsonsCorrelationCoefficient identifies the Pearson's Correlation Coefficient (CORREL) indicator.
+	PearsonsCorrelationCoefficient
+
+	// LinearRegression identifies the Linear Regression (LINEARREG) indicator.
+	LinearRegression
+
+	// UltimateOscillator identifies the Larry Williams Ultimate Oscillator (ULTOSC) indicator.
+	UltimateOscillator
+
+	// StochasticRelativeStrengthIndex identifies the Tushar Chande Stochastic RSI (STOCHRSI) indicator.
+	StochasticRelativeStrengthIndex
+
+	// Stochastic identifies the George Lane Stochastic Oscillator (STOCH) indicator.
+	Stochastic
+
+	// Aroon identifies the Tushar Chande Aroon (AROON) indicator.
+	Aroon
+
+	// AdvanceDecline identifies the Marc Chaikin Advance-Decline (AD) indicator.
+	AdvanceDecline
+
+	// AdvanceDeclineOscillator identifies the Marc Chaikin Advance-Decline Oscillator (ADOSC) indicator.
+	AdvanceDeclineOscillator
+
+	// ParabolicStopAndReverse identifies the Welles Wilder Parabolic Stop And Reverse (SAR) indicator.
+	ParabolicStopAndReverse
 	last
 )
 
@@ -193,6 +223,16 @@ const (
 	moneyFlowIndex                                 = "moneyFlowIndex"
 	onBalanceVolume                                = "onBalanceVolume"
 	balanceOfPower                                 = "balanceOfPower"
+	rateOfChangeRatio                              = "rateOfChangeRatio"
+	pearsonsCorrelationCoefficient                 = "pearsonsCorrelationCoefficient"
+	linearRegression                               = "linearRegression"
+	ultimateOscillator                             = "ultimateOscillator"
+	stochasticRelativeStrengthIndex                = "stochasticRelativeStrengthIndex"
+	stochastic                                     = "stochastic"
+	aroon                                          = "aroon"
+	advanceDecline                                 = "advanceDecline"
+	advanceDeclineOscillator                       = "advanceDeclineOscillator"
+	parabolicStopAndReverse                        = "parabolicStopAndReverse"
 )
 
 // String implements the Stringer interface.
@@ -290,6 +330,26 @@ func (t Type) String() string {
 		return onBalanceVolume
 	case BalanceOfPower:
 		return balanceOfPower
+	case RateOfChangeRatio:
+		return rateOfChangeRatio
+	case PearsonsCorrelationCoefficient:
+		return pearsonsCorrelationCoefficient
+	case LinearRegression:
+		return linearRegression
+	case UltimateOscillator:
+		return ultimateOscillator
+	case StochasticRelativeStrengthIndex:
+		return stochasticRelativeStrengthIndex
+	case Stochastic:
+		return stochastic
+	case Aroon:
+		return aroon
+	case AdvanceDecline:
+		return advanceDecline
+	case AdvanceDeclineOscillator:
+		return advanceDeclineOscillator
+	case ParabolicStopAndReverse:
+		return parabolicStopAndReverse
 	default:
 		return unknown
 	}
@@ -424,6 +484,26 @@ func (t *Type) UnmarshalJSON(data []byte) error {
 		*t = OnBalanceVolume
 	case balanceOfPower:
 		*t = BalanceOfPower
+	case rateOfChangeRatio:
+		*t = RateOfChangeRatio
+	case pearsonsCorrelationCoefficient:
+		*t = PearsonsCorrelationCoefficient
+	case linearRegression:
+		*t = LinearRegression
+	case ultimateOscillator:
+		*t = UltimateOscillator
+	case stochasticRelativeStrengthIndex:
+		*t = StochasticRelativeStrengthIndex
+	case stochastic:
+		*t = Stochastic
+	case aroon:
+		*t = Aroon
+	case advanceDecline:
+		*t = AdvanceDecline
+	case advanceDeclineOscillator:
+		*t = AdvanceDeclineOscillator
+	case parabolicStopAndReverse:
+		*t = ParabolicStopAndReverse
 	default:
 		return fmt.Errorf(errFmt, s)
 	}

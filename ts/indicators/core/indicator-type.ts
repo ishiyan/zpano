@@ -134,5 +134,35 @@ export enum IndicatorType {
   OnBalanceVolume,
 
   /** Identifies Igor Livshin's __Balance of Power__ (BOP) indicator. */
-  BalanceOfPower
+  BalanceOfPower,
+
+  /** Identifies the __Rate of Change Ratio__ (ROCR / ROCR100) indicator. */
+  RateOfChangeRatio,
+
+  /** Identifies __Pearson's Correlation Coefficient__ (CORREL) indicator. */
+  PearsonsCorrelationCoefficient,
+
+  /** Identifies the __Linear Regression__ (LINREG) indicator. */
+  LinearRegression,
+
+  /** Identifies Larry Williams' __Ultimate Oscillator__ (ULTOSC) indicator. */
+  UltimateOscillator,
+
+  /** Identifies Tushar Chande's __Stochastic Relative Strength Index__ (STOCHRSI) indicator. */
+  StochasticRelativeStrengthIndex,
+
+  /** Identifies George Lane's __Stochastic Oscillator__ (STOCH) indicator. */
+  Stochastic,
+
+  /** Identifies Tushar Chande's __Aroon__ (AROON) indicator. */
+  Aroon,
+
+  /** Identifies Marc Chaikin's __Advance-Decline__ (A/D) indicator. */
+  AdvanceDecline,
+
+  /** Identifies Marc Chaikin's __Advance-Decline Oscillator__ (ADOSC) indicator. */
+  AdvanceDeclineOscillator,
+
+  /** Identifies Welles Wilder's __Parabolic Stop And Reverse__ (SAR) indicator. */
+  ParabolicStopAndReverse,
 }
