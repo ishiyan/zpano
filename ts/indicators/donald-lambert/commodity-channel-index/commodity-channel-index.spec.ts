@@ -1,9 +1,9 @@
 import { } from 'jasmine';
 
 import { CommodityChannelIndex } from './commodity-channel-index';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
-import { CommodityChannelIndexOutput } from './commodity-channel-index-output';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
+import { CommodityChannelIndexOutput } from './output';
 
 // Test data from TA-Lib (252 entries), used by MBST C# tests.
 // Typical price input: test_CCI.xsl, TYPPRICE, F4…F255.
@@ -121,12 +121,12 @@ describe('CommodityChannelIndex', () => {
     const cci = new CommodityChannelIndex({ length: 20 });
     const meta = cci.metadata();
 
-    expect(meta.type).toBe(IndicatorType.CommodityChannelIndex);
+    expect(meta.identifier).toBe(IndicatorIdentifier.CommodityChannelIndex);
     expect(meta.mnemonic).toBe('cci(20)');
     expect(meta.description).toBe('Commodity Channel Index cci(20)');
     expect(meta.outputs.length).toBe(1);
     expect(meta.outputs[0].kind).toBe(CommodityChannelIndexOutput.CommodityChannelIndexValue);
-    expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+    expect(meta.outputs[0].shape).toBe(Shape.Scalar);
   });
 
   it('should accept custom inverse scaling factor', () => {

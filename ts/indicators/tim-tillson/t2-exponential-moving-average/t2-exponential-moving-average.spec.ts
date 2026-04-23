@@ -1,9 +1,9 @@
 import { } from 'jasmine';
 
 import { T2ExponentialMovingAverage } from './t2-exponential-moving-average';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
-import { T2ExponentialMovingAverageOutput } from './t2-exponential-moving-average-output';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
+import { T2ExponentialMovingAverageOutput } from './output';
 import { BarComponent } from '../../../entities/bar-component';
 import { QuoteComponent } from '../../../entities/quote-component';
 import { TradeComponent } from '../../../entities/trade-component';
@@ -113,12 +113,12 @@ describe('T2ExponentialMovingAverage', () => {
     const t2 = new T2ExponentialMovingAverage({length: 10, volumeFactor: 0.3333, firstIsAverage: true});
     const meta = t2.metadata();
 
-    expect(meta.type).toBe(IndicatorType.T2ExponentialMovingAverage);
+    expect(meta.identifier).toBe(IndicatorIdentifier.T2ExponentialMovingAverage);
     expect(meta.mnemonic).toBe('t2(10, 0.33330000)');
     expect(meta.description).toBe('T2 exponential moving average t2(10, 0.33330000)');
     expect(meta.outputs.length).toBe(1);
     expect(meta.outputs[0].kind).toBe(T2ExponentialMovingAverageOutput.T2ExponentialMovingAverageValue);
-    expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+    expect(meta.outputs[0].shape).toBe(Shape.Scalar);
     expect(meta.outputs[0].mnemonic).toBe('t2(10, 0.33330000)');
     expect(meta.outputs[0].description).toBe('T2 exponential moving average t2(10, 0.33330000)');
   });
@@ -129,12 +129,12 @@ describe('T2ExponentialMovingAverage', () => {
     const t2 = new T2ExponentialMovingAverage({smoothingFactor: alpha, volumeFactor: 0.3333333, firstIsAverage: false});
     const meta = t2.metadata();
 
-    expect(meta.type).toBe(IndicatorType.T2ExponentialMovingAverage);
+    expect(meta.identifier).toBe(IndicatorIdentifier.T2ExponentialMovingAverage);
     expect(meta.mnemonic).toBe('t2(10, 0.18181818, 0.33333330)');
     expect(meta.description).toBe('T2 exponential moving average t2(10, 0.18181818, 0.33333330)');
     expect(meta.outputs.length).toBe(1);
     expect(meta.outputs[0].kind).toBe(T2ExponentialMovingAverageOutput.T2ExponentialMovingAverageValue);
-    expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+    expect(meta.outputs[0].shape).toBe(Shape.Scalar);
     expect(meta.outputs[0].mnemonic).toBe('t2(10, 0.18181818, 0.33333330)');
     expect(meta.outputs[0].description).toBe('T2 exponential moving average t2(10, 0.18181818, 0.33333330)');
   });

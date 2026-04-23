@@ -6,7 +6,6 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
 )
 
 // AdvanceDecline is Marc Chaikin's Advance-Decline (A/D) Line.
@@ -18,7 +17,7 @@ import (
 // The value is calculated as:
 //
 //	CLV = ((Close - Low) - (High - Close)) / (High - Low)
-//	AD  = AD_prev + CLV × Volume
+//	AD  = AD_previous + CLV × Volume
 //
 // When High equals Low, the A/D value is unchanged (no division by zero).
 //
@@ -53,64 +52,59 @@ func NewAdvanceDecline(_ *AdvanceDeclineParams) (*AdvanceDecline, error) {
 }
 
 // IsPrimed indicates whether the indicator is primed.
-func (a *AdvanceDecline) IsPrimed() bool {
-	a.mu.RLock()
-	defer a.mu.RUnlock()
+func (s *AdvanceDecline) IsPrimed() bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
-	return a.primed
+	return s.primed
 }
 
 // Metadata describes the output data of the indicator.
-func (a *AdvanceDecline) Metadata() core.Metadata {
-	return core.Metadata{
-		Type:        core.AdvanceDecline,
-		Mnemonic:    a.LineIndicator.Mnemonic,
-		Description: a.LineIndicator.Description,
-		Outputs: []outputs.Metadata{
-			{
-				Kind:        int(AdvanceDeclineValue),
-				Type:        outputs.ScalarType,
-				Mnemonic:    a.LineIndicator.Mnemonic,
-				Description: a.LineIndicator.Description,
-			},
+func (s *AdvanceDecline) Metadata() core.Metadata {
+	return core.BuildMetadata(
+		core.AdvanceDecline,
+		s.LineIndicator.Mnemonic,
+		s.LineIndicator.Description,
+		[]core.OutputText{
+			{Mnemonic: s.LineIndicator.Mnemonic, Description: s.LineIndicator.Description},
 		},
-	}
+	)
 }
 
 // Update updates the indicator with the given sample.
 // Since scalar updates use the same value for H, L, C, the range is 0 and AD is unchanged.
-func (a *AdvanceDecline) Update(sample float64) float64 {
+func (s *AdvanceDecline) Update(sample float64) float64 {
 	if math.IsNaN(sample) {
 		return math.NaN()
 	}
 
-	return a.UpdateHLCV(sample, sample, sample, 1)
+	return s.UpdateHLCV(sample, sample, sample, 1)
 }
 
 // UpdateHLCV updates the indicator with the given high, low, close, and volume values.
-func (a *AdvanceDecline) UpdateHLCV(high, low, close, volume float64) float64 {
+func (s *AdvanceDecline) UpdateHLCV(high, low, close, volume float64) float64 {
 	if math.IsNaN(high) || math.IsNaN(low) || math.IsNaN(close) || math.IsNaN(volume) {
 		return math.NaN()
 	}
 
-	a.mu.Lock()
-	defer a.mu.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
-	tmp := high - low
-	if tmp > 0 {
-		a.ad += ((close - low) - (high - close)) / tmp * volume
+	temp := high - low
+	if temp > 0 {
+		s.ad += ((close - low) - (high - close)) / temp * volume
 	}
 
-	a.value = a.ad
-	a.primed = true
+	s.value = s.ad
+	s.primed = true
 
-	return a.value
+	return s.value
 }
 
 // UpdateBar updates the indicator given the next bar sample.
 // This shadows LineIndicator.UpdateBar to extract HLCV from the bar.
-func (a *AdvanceDecline) UpdateBar(sample *entities.Bar) core.Output {
-	value := a.UpdateHLCV(sample.High, sample.Low, sample.Close, sample.Volume)
+func (s *AdvanceDecline) UpdateBar(sample *entities.Bar) core.Output {
+	value := s.UpdateHLCV(sample.High, sample.Low, sample.Close, sample.Volume)
 
 	output := make([]any, 1)
 	output[0] = entities.Scalar{Time: sample.Time, Value: value}

@@ -9,7 +9,6 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
 )
 
 // CenterOfGravityOscillator (Ehler's Center of Gravity oscillator, COG) is
@@ -142,25 +141,15 @@ func (s *CenterOfGravityOscillator) IsPrimed() bool {
 
 // Metadata describes an output data of the indicator.
 func (s *CenterOfGravityOscillator) Metadata() core.Metadata {
-	return core.Metadata{
-		Type:        core.CenterOfGravityOscillator,
-		Mnemonic:    s.mnemonic,
-		Description: s.description,
-		Outputs: []outputs.Metadata{
-			{
-				Kind:        int(Value),
-				Type:        outputs.ScalarType,
-				Mnemonic:    s.mnemonic,
-				Description: s.description,
-			},
-			{
-				Kind:        int(Trigger),
-				Type:        outputs.ScalarType,
-				Mnemonic:    s.mnemonicTrig,
-				Description: s.descriptionTrig,
-			},
+	return core.BuildMetadata(
+		core.CenterOfGravityOscillator,
+		s.mnemonic,
+		s.description,
+		[]core.OutputText{
+			{Mnemonic: s.mnemonic, Description: s.description},
+			{Mnemonic: s.mnemonicTrig, Description: s.descriptionTrig},
 		},
-	}
+	)
 }
 
 // Update updates the value of the center of gravity oscillator given the next sample.

@@ -1,10 +1,10 @@
 import { } from 'jasmine';
 
 import { RoofingFilter } from './roofing-filter';
-import { RoofingFilterParams } from './roofing-filter-params';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
-import { RoofingFilterOutput } from './roofing-filter-output';
+import { RoofingFilterParams } from './params';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
+import { RoofingFilterOutput } from './output';
 
 // Test data from CSV reference files.
 
@@ -186,12 +186,12 @@ describe('RoofingFilter', () => {
     const rf = new RoofingFilter({ shortestCyclePeriod: 10, longestCyclePeriod: 48 });
     const meta = rf.metadata();
 
-    expect(meta.type).toBe(IndicatorType.RoofingFilter);
+    expect(meta.identifier).toBe(IndicatorIdentifier.RoofingFilter);
     expect(meta.mnemonic).toBe('roof1hp(10, 48, hl/2)');
     expect(meta.description).toBe('Roofing Filter roof1hp(10, 48, hl/2)');
     expect(meta.outputs.length).toBe(1);
     expect(meta.outputs[0].kind).toBe(RoofingFilterOutput.RoofingFilterValue);
-    expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+    expect(meta.outputs[0].shape).toBe(Shape.Scalar);
   });
 
   it('should return correct mnemonic for 2-pole', () => {

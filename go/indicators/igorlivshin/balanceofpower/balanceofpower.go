@@ -6,7 +6,6 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
 )
 
 const epsilon = 1e-8
@@ -53,60 +52,55 @@ func NewBalanceOfPower(_ *BalanceOfPowerParams) (*BalanceOfPower, error) {
 
 // IsPrimed indicates whether the indicator is primed.
 // Balance of Power is always primed.
-func (b *BalanceOfPower) IsPrimed() bool {
+func (s *BalanceOfPower) IsPrimed() bool {
 	return true
 }
 
 // Metadata describes the output data of the indicator.
-func (b *BalanceOfPower) Metadata() core.Metadata {
-	return core.Metadata{
-		Type:        core.BalanceOfPower,
-		Mnemonic:    b.LineIndicator.Mnemonic,
-		Description: b.LineIndicator.Description,
-		Outputs: []outputs.Metadata{
-			{
-				Kind:        int(BalanceOfPowerValue),
-				Type:        outputs.ScalarType,
-				Mnemonic:    b.LineIndicator.Mnemonic,
-				Description: b.LineIndicator.Description,
-			},
+func (s *BalanceOfPower) Metadata() core.Metadata {
+	return core.BuildMetadata(
+		core.BalanceOfPower,
+		s.LineIndicator.Mnemonic,
+		s.LineIndicator.Description,
+		[]core.OutputText{
+			{Mnemonic: s.LineIndicator.Mnemonic, Description: s.LineIndicator.Description},
 		},
-	}
+	)
 }
 
 // Update updates the indicator with the given sample.
 // Since scalar updates use the same value for O, H, L, C, the result is always 0.
-func (b *BalanceOfPower) Update(sample float64) float64 {
+func (s *BalanceOfPower) Update(sample float64) float64 {
 	if math.IsNaN(sample) {
 		return math.NaN()
 	}
 
-	return b.UpdateOHLC(sample, sample, sample, sample)
+	return s.UpdateOHLC(sample, sample, sample, sample)
 }
 
 // UpdateOHLC updates the indicator with the given OHLC values.
-func (b *BalanceOfPower) UpdateOHLC(open, high, low, close float64) float64 {
+func (s *BalanceOfPower) UpdateOHLC(open, high, low, close float64) float64 {
 	if math.IsNaN(open) || math.IsNaN(high) || math.IsNaN(low) || math.IsNaN(close) {
 		return math.NaN()
 	}
 
-	b.mu.Lock()
-	defer b.mu.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
 	r := high - low
 	if r < epsilon {
-		b.value = 0
+		s.value = 0
 	} else {
-		b.value = (close - open) / r
+		s.value = (close - open) / r
 	}
 
-	return b.value
+	return s.value
 }
 
 // UpdateBar updates the indicator given the next bar sample.
 // This shadows LineIndicator.UpdateBar to extract OHLC from the bar.
-func (b *BalanceOfPower) UpdateBar(sample *entities.Bar) core.Output {
-	value := b.UpdateOHLC(sample.Open, sample.High, sample.Low, sample.Close)
+func (s *BalanceOfPower) UpdateBar(sample *entities.Bar) core.Output {
+	value := s.UpdateOHLC(sample.Open, sample.High, sample.Low, sample.Close)
 
 	output := make([]any, 1)
 	output[0] = entities.Scalar{Time: sample.Time, Value: value}

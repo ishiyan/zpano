@@ -8,12 +8,11 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
 )
 
 // ZeroLagExponentialMovingAverage is Ehler's Zero-lag Exponential Moving Average (ZEMA).
 //
-// ZEMA = alpha*(Price + gainFactor*(Price - Price[momentumLength ago])) + (1 - alpha)*ZEMA[prev]
+// ZEMA = alpha*(Price + gainFactor*(Price - Price[momentumLength ago])) + (1 - alpha)*ZEMA[previous]
 //
 // The indicator is not primed during the first VelocityMomentumLength updates.
 //
@@ -121,68 +120,63 @@ func NewZeroLagExponentialMovingAverage(p *ZeroLagExponentialMovingAverageParams
 }
 
 // IsPrimed indicates whether the indicator is primed.
-func (z *ZeroLagExponentialMovingAverage) IsPrimed() bool {
-	z.mu.RLock()
-	defer z.mu.RUnlock()
+func (s *ZeroLagExponentialMovingAverage) IsPrimed() bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
-	return z.primed
+	return s.primed
 }
 
 // Metadata describes the output data of the indicator.
-func (z *ZeroLagExponentialMovingAverage) Metadata() core.Metadata {
-	return core.Metadata{
-		Type:        core.ZeroLagExponentialMovingAverage,
-		Mnemonic:    z.LineIndicator.Mnemonic,
-		Description: z.LineIndicator.Description,
-		Outputs: []outputs.Metadata{
-			{
-				Kind:        int(ZeroLagExponentialMovingAverageValue),
-				Type:        outputs.ScalarType,
-				Mnemonic:    z.LineIndicator.Mnemonic,
-				Description: z.LineIndicator.Description,
-			},
+func (s *ZeroLagExponentialMovingAverage) Metadata() core.Metadata {
+	return core.BuildMetadata(
+		core.ZeroLagExponentialMovingAverage,
+		s.LineIndicator.Mnemonic,
+		s.LineIndicator.Description,
+		[]core.OutputText{
+			{Mnemonic: s.LineIndicator.Mnemonic, Description: s.LineIndicator.Description},
 		},
-	}
+	)
 }
 
 // Update updates the value of the indicator given the next sample.
 //
 // The indicator is not primed during the first VelocityMomentumLength updates.
-func (z *ZeroLagExponentialMovingAverage) Update(sample float64) float64 {
+func (s *ZeroLagExponentialMovingAverage) Update(sample float64) float64 {
 	if math.IsNaN(sample) {
 		return sample
 	}
 
-	z.mu.Lock()
-	defer z.mu.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
-	if z.primed {
+	if s.primed {
 		// Shift momentum window left by 1.
-		copy(z.momentumWindow, z.momentumWindow[1:])
-		z.momentumWindow[z.momentumLength] = sample
-		z.value = z.calculate(sample)
+		copy(s.momentumWindow, s.momentumWindow[1:])
+		s.momentumWindow[s.momentumLength] = sample
+		s.value = s.calculate(sample)
 
-		return z.value
+		return s.value
 	}
 
-	z.momentumWindow[z.count] = sample
-	z.count++
+	s.momentumWindow[s.count] = sample
+	s.count++
 
-	if z.count <= z.momentumLength {
-		z.value = sample
+	if s.count <= s.momentumLength {
+		s.value = sample
 
 		return math.NaN()
 	}
 
 	// count == momentumLength + 1: prime the indicator.
-	z.value = z.calculate(sample)
-	z.primed = true
+	s.value = s.calculate(sample)
+	s.primed = true
 
-	return z.value
+	return s.value
 }
 
-func (z *ZeroLagExponentialMovingAverage) calculate(sample float64) float64 {
-	momentum := sample - z.momentumWindow[0]
+func (s *ZeroLagExponentialMovingAverage) calculate(sample float64) float64 {
+	momentum := sample - s.momentumWindow[0]
 
-	return z.alpha*(sample+z.gainFactor*momentum) + z.oneMinAlpha*z.value
+	return s.alpha*(sample+s.gainFactor*momentum) + s.oneMinAlpha*s.value
 }

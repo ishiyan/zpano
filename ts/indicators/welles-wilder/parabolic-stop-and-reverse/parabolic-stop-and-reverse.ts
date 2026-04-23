@@ -1,12 +1,11 @@
+import { buildMetadata } from '../../core/build-metadata';
 import { Bar } from '../../../entities/bar';
 import { Scalar } from '../../../entities/scalar';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
 import { IndicatorOutput } from '../../core/indicator-output';
-import { IndicatorType } from '../../core/indicator-type';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { LineIndicator } from '../../core/line-indicator';
-import { OutputType } from '../../core/outputs/output-type';
-import { ParabolicStopAndReverseOutput } from './parabolic-stop-and-reverse-output';
-import { ParabolicStopAndReverseParams } from './parabolic-stop-and-reverse-params';
+import { ParabolicStopAndReverseParams } from './params';
 
 const defaultAccelerationInit = 0.02;
 const defaultAccelerationStep = 0.02;
@@ -70,8 +69,8 @@ export class ParabolicStopAndReverse extends LineIndicator {
   private ep: number;
   private afLong: number;
   private afShort: number;
-  private prevHigh: number;
-  private prevLow: number;
+  private previousHigh: number;
+  private previousLow: number;
   private newHigh: number;
   private newLow: number;
 
@@ -131,8 +130,8 @@ export class ParabolicStopAndReverse extends LineIndicator {
     this.ep = 0;
     this.afLong = afInitLong;
     this.afShort = afInitShort;
-    this.prevHigh = 0;
-    this.prevLow = 0;
+    this.previousHigh = 0;
+    this.previousLow = 0;
     this.newHigh = 0;
     this.newLow = 0;
     this.primed = false;
@@ -140,17 +139,14 @@ export class ParabolicStopAndReverse extends LineIndicator {
 
   /** Describes the output data of the indicator. */
   public metadata(): IndicatorMetadata {
-    return {
-      type: IndicatorType.ParabolicStopAndReverse,
-      mnemonic: this.mnemonic,
-      description: this.description,
-      outputs: [{
-        kind: ParabolicStopAndReverseOutput.ParabolicStopAndReverseValue,
-        type: OutputType.Scalar,
-        mnemonic: this.mnemonic,
-        description: this.description,
-      }],
-    };
+    return buildMetadata(
+      IndicatorIdentifier.ParabolicStopAndReverse,
+      this.mnemonic,
+      this.description,
+      [
+        { mnemonic: this.mnemonic, description: this.description },
+      ],
+    );
   }
 
   /** Updates the indicator with the given scalar sample. */
@@ -178,13 +174,13 @@ export class ParabolicStopAndReverse extends LineIndicator {
 
     // Second bar: initialize SAR, EP, and direction.
     if (this.count === 2) {
-      const prevHigh = this.newHigh;
-      const prevLow = this.newLow;
+      const previousHigh = this.newHigh;
+      const previousLow = this.newLow;
 
       if (this.startValue === 0) {
         // Auto-detect direction using MINUS_DM logic.
-        let minusDM = prevLow - low;
-        let plusDM = high - prevHigh;
+        let minusDM = previousLow - low;
+        let plusDM = high - previousHigh;
         if (minusDM < 0) minusDM = 0;
         if (plusDM < 0) plusDM = 0;
 
@@ -192,10 +188,10 @@ export class ParabolicStopAndReverse extends LineIndicator {
 
         if (this.isLong) {
           this.ep = high;
-          this.sar = prevLow;
+          this.sar = previousLow;
         } else {
           this.ep = low;
-          this.sar = prevHigh;
+          this.sar = previousHigh;
         }
       } else if (this.startValue > 0) {
         this.isLong = true;
@@ -214,15 +210,15 @@ export class ParabolicStopAndReverse extends LineIndicator {
 
     // Main SAR calculation (bars 2+).
     if (this.count >= 2) {
-      this.prevLow = this.newLow;
-      this.prevHigh = this.newHigh;
+      this.previousLow = this.newLow;
+      this.previousHigh = this.newHigh;
       this.newLow = low;
       this.newHigh = high;
 
       if (this.count === 2) {
         // On the second call, match TaLib's "cheat" for first iteration.
-        this.prevLow = this.newLow;
-        this.prevHigh = this.newHigh;
+        this.previousLow = this.newLow;
+        this.previousHigh = this.newHigh;
       }
 
       if (this.isLong) {
@@ -240,7 +236,7 @@ export class ParabolicStopAndReverse extends LineIndicator {
       this.isLong = false;
       this.sar = this.ep;
 
-      if (this.sar < this.prevHigh) this.sar = this.prevHigh;
+      if (this.sar < this.previousHigh) this.sar = this.previousHigh;
       if (this.sar < this.newHigh) this.sar = this.newHigh;
 
       if (this.offsetOnReverse !== 0) {
@@ -255,7 +251,7 @@ export class ParabolicStopAndReverse extends LineIndicator {
 
       // Calculate the new SAR.
       this.sar = this.sar + this.afShort * (this.ep - this.sar);
-      if (this.sar < this.prevHigh) this.sar = this.prevHigh;
+      if (this.sar < this.previousHigh) this.sar = this.previousHigh;
       if (this.sar < this.newHigh) this.sar = this.newHigh;
 
       return result;
@@ -273,7 +269,7 @@ export class ParabolicStopAndReverse extends LineIndicator {
 
     // Calculate the new SAR.
     this.sar = this.sar + this.afLong * (this.ep - this.sar);
-    if (this.sar > this.prevLow) this.sar = this.prevLow;
+    if (this.sar > this.previousLow) this.sar = this.previousLow;
     if (this.sar > this.newLow) this.sar = this.newLow;
 
     return result;
@@ -285,7 +281,7 @@ export class ParabolicStopAndReverse extends LineIndicator {
       this.isLong = true;
       this.sar = this.ep;
 
-      if (this.sar > this.prevLow) this.sar = this.prevLow;
+      if (this.sar > this.previousLow) this.sar = this.previousLow;
       if (this.sar > this.newLow) this.sar = this.newLow;
 
       if (this.offsetOnReverse !== 0) {
@@ -300,7 +296,7 @@ export class ParabolicStopAndReverse extends LineIndicator {
 
       // Calculate the new SAR.
       this.sar = this.sar + this.afLong * (this.ep - this.sar);
-      if (this.sar > this.prevLow) this.sar = this.prevLow;
+      if (this.sar > this.previousLow) this.sar = this.previousLow;
       if (this.sar > this.newLow) this.sar = this.newLow;
 
       return result;
@@ -318,7 +314,7 @@ export class ParabolicStopAndReverse extends LineIndicator {
 
     // Calculate the new SAR.
     this.sar = this.sar + this.afShort * (this.ep - this.sar);
-    if (this.sar < this.prevHigh) this.sar = this.prevHigh;
+    if (this.sar < this.previousHigh) this.sar = this.previousHigh;
     if (this.sar < this.newHigh) this.sar = this.newHigh;
 
     return result;

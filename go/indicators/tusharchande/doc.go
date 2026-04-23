@@ -1,2 +1,2 @@
-// Package tillson implements indicators developed by Tushar Chande.
+// Package tusharchande implements indicators developed by Tushar Chande.
 package tusharchande

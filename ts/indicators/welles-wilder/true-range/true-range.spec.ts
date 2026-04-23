@@ -1,9 +1,9 @@
 import { } from 'jasmine';
 
 import { TrueRange } from './true-range';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
-import { TrueRangeOutput } from './true-range-output';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
+import { TrueRangeOutput } from './output';
 
 // TA-Lib test data (252 entries), extracted programmatically from TrueRangeTest.cs.
 const inputHigh = [
@@ -179,11 +179,11 @@ describe('TrueRange', () => {
     const tr = new TrueRange();
     const meta = tr.metadata();
 
-    expect(meta.type).toBe(IndicatorType.TrueRange);
+    expect(meta.identifier).toBe(IndicatorIdentifier.TrueRange);
     expect(meta.mnemonic).toBe('tr');
     expect(meta.description).toBe('True Range');
     expect(meta.outputs.length).toBe(1);
     expect(meta.outputs[0].kind).toBe(TrueRangeOutput.TrueRangeValue);
-    expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+    expect(meta.outputs[0].shape).toBe(Shape.Scalar);
   });
 });

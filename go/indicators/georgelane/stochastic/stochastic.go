@@ -9,7 +9,6 @@ import (
 	"zpano/indicators/common/exponentialmovingaverage"
 	"zpano/indicators/common/simplemovingaverage"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
 )
 
 // lineUpdater is an interface for indicators that accept a single scalar and return a value.
@@ -21,8 +20,11 @@ type lineUpdater interface {
 // passthrough is a no-op smoother for period of 1.
 type passthrough struct{}
 
+// Update returns v unchanged (no smoothing).
 func (p *passthrough) Update(v float64) float64 { return v }
-func (p *passthrough) IsPrimed() bool           { return true }
+
+// IsPrimed always reports true; a passthrough has no warmup.
+func (p *passthrough) IsPrimed() bool { return true }
 
 // Stochastic is George Lane's Stochastic Oscillator.
 //
@@ -44,10 +46,10 @@ type Stochastic struct {
 	fastKLength int
 
 	// Circular buffers for high and low values (size = fastKLength).
-	highBuf []float64
-	lowBuf  []float64
-	bufIdx  int
-	count   int
+	highBuf     []float64
+	lowBuf      []float64
+	bufferIndex int
+	count       int
 
 	slowKMA lineUpdater
 	slowDMA lineUpdater
@@ -149,31 +151,16 @@ func (s *Stochastic) IsPrimed() bool {
 func (s *Stochastic) Metadata() core.Metadata {
 	desc := "Stochastic Oscillator " + s.mnemonic
 
-	return core.Metadata{
-		Type:        core.Stochastic,
-		Mnemonic:    s.mnemonic,
-		Description: desc,
-		Outputs: []outputs.Metadata{
-			{
-				Kind:        int(StochasticFastK),
-				Type:        outputs.ScalarType,
-				Mnemonic:    s.mnemonic + " fastK",
-				Description: desc + " Fast-K",
-			},
-			{
-				Kind:        int(StochasticSlowK),
-				Type:        outputs.ScalarType,
-				Mnemonic:    s.mnemonic + " slowK",
-				Description: desc + " Slow-K",
-			},
-			{
-				Kind:        int(StochasticSlowD),
-				Type:        outputs.ScalarType,
-				Mnemonic:    s.mnemonic + " slowD",
-				Description: desc + " Slow-D",
-			},
+	return core.BuildMetadata(
+		core.Stochastic,
+		s.mnemonic,
+		desc,
+		[]core.OutputText{
+			{Mnemonic: s.mnemonic + " fastK", Description: desc + " Fast-K"},
+			{Mnemonic: s.mnemonic + " slowK", Description: desc + " Slow-K"},
+			{Mnemonic: s.mnemonic + " slowD", Description: desc + " Slow-D"},
 		},
-	}
+	)
 }
 
 // Update updates the indicator given the next bar's close, high, and low values.
@@ -187,9 +174,9 @@ func (s *Stochastic) Update(close, high, low float64) (float64, float64, float64
 	defer s.mu.Unlock()
 
 	// Store high and low in circular buffer.
-	s.highBuf[s.bufIdx] = high
-	s.lowBuf[s.bufIdx] = low
-	s.bufIdx = (s.bufIdx + 1) % s.fastKLength
+	s.highBuf[s.bufferIndex] = high
+	s.lowBuf[s.bufferIndex] = low
+	s.bufferIndex = (s.bufferIndex + 1) % s.fastKLength
 	s.count++
 
 	// Need at least fastKLength bars.

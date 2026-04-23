@@ -9,7 +9,7 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
+	"zpano/indicators/core/outputs/shape"
 )
 
 func testCyberCycleTime() time.Time {
@@ -273,7 +273,7 @@ func TestCyberCycleUpdate(t *testing.T) { //nolint: funlen
 		t.Parallel()
 
 		cc := testCyberCycleCreateDefault()
-		expSig := testCyberCycleExpectedSignal()
+		expSignal := testCyberCycleExpectedSignal()
 
 		for i := range lprimed {
 			cc.Update(input[i])
@@ -282,7 +282,7 @@ func TestCyberCycleUpdate(t *testing.T) { //nolint: funlen
 		for i := lprimed; i < len(input); i++ {
 			cc.Update(input[i])
 			act := cc.signal
-			check(i, expSig[i], act)
+			check(i, expSignal[i], act)
 		}
 	})
 }
@@ -300,7 +300,7 @@ func TestCyberCycleUpdateEntity(t *testing.T) { //nolint: funlen,cyclop
 	expCycle := testCyberCycleExpectedCycle()
 	expSignal := testCyberCycleExpectedSignal()
 
-	check := func(index int, expValue, expSig float64, act core.Output) {
+	check := func(index int, expValue, expSignal float64, act core.Output) {
 		t.Helper()
 
 		const outputLen = 2
@@ -343,8 +343,8 @@ func TestCyberCycleUpdateEntity(t *testing.T) { //nolint: funlen,cyclop
 			t.Errorf("[%v] output[0] value: expected %v, actual %v", index, expValue, s0.Value)
 		}
 
-		if math.Abs(expSig-s1.Value) > 1e-8 {
-			t.Errorf("[%v] output[1] value: expected %v, actual %v", index, expSig, s1.Value)
+		if math.Abs(expSignal-s1.Value) > 1e-8 {
+			t.Errorf("[%v] output[1] value: expected %v, actual %v", index, expSignal, s1.Value)
 		}
 	}
 
@@ -456,24 +456,24 @@ func TestCyberCycleMetadata(t *testing.T) {
 		act := cc.Metadata()
 
 		mn := "cc(28, hl/2)"
-		mnSig := "ccSignal(28, hl/2)"
+		mnSignal := "ccSignal(28, hl/2)"
 		descr := "Cyber Cycle "
-		descrSig := "Cyber Cycle signal "
+		descrSignal := "Cyber Cycle signal "
 
-		check("Type", core.CyberCycle, act.Type)
+		check("Identifier", core.CyberCycle, act.Identifier)
 		check("Mnemonic", mn, act.Mnemonic)
 		check("Description", descr+mn, act.Description)
 		check("len(Outputs)", 2, len(act.Outputs))
 
 		check("Outputs[0].Kind", int(Value), act.Outputs[0].Kind)
-		check("Outputs[0].Type", outputs.ScalarType, act.Outputs[0].Type)
+		check("Outputs[0].Shape", shape.Scalar, act.Outputs[0].Shape)
 		check("Outputs[0].Mnemonic", mn, act.Outputs[0].Mnemonic)
 		check("Outputs[0].Description", descr+mn, act.Outputs[0].Description)
 
 		check("Outputs[1].Kind", int(Signal), act.Outputs[1].Kind)
-		check("Outputs[1].Type", outputs.ScalarType, act.Outputs[1].Type)
-		check("Outputs[1].Mnemonic", mnSig, act.Outputs[1].Mnemonic)
-		check("Outputs[1].Description", descrSig+mnSig, act.Outputs[1].Description)
+		check("Outputs[1].Shape", shape.Scalar, act.Outputs[1].Shape)
+		check("Outputs[1].Mnemonic", mnSignal, act.Outputs[1].Mnemonic)
+		check("Outputs[1].Description", descrSignal+mnSignal, act.Outputs[1].Description)
 	})
 
 	t.Run("length-based with non-default trade component", func(t *testing.T) {

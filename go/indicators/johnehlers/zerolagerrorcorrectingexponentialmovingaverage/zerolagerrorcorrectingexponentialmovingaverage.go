@@ -8,7 +8,6 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
 )
 
 // ZeroLagErrorCorrectingExponentialMovingAverage is Ehler's adaptive zero-lag
@@ -127,81 +126,76 @@ func NewZeroLagErrorCorrectingExponentialMovingAverage(p *ZeroLagErrorCorrecting
 }
 
 // IsPrimed indicates whether the indicator is primed.
-func (z *ZeroLagErrorCorrectingExponentialMovingAverage) IsPrimed() bool {
-	z.mu.RLock()
-	defer z.mu.RUnlock()
+func (s *ZeroLagErrorCorrectingExponentialMovingAverage) IsPrimed() bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
-	return z.primed
+	return s.primed
 }
 
 // Metadata describes the output data of the indicator.
-func (z *ZeroLagErrorCorrectingExponentialMovingAverage) Metadata() core.Metadata {
-	return core.Metadata{
-		Type:        core.ZeroLagErrorCorrectingExponentialMovingAverage,
-		Mnemonic:    z.LineIndicator.Mnemonic,
-		Description: z.LineIndicator.Description,
-		Outputs: []outputs.Metadata{
-			{
-				Kind:        int(ZeroLagErrorCorrectingExponentialMovingAverageValue),
-				Type:        outputs.ScalarType,
-				Mnemonic:    z.LineIndicator.Mnemonic,
-				Description: z.LineIndicator.Description,
-			},
+func (s *ZeroLagErrorCorrectingExponentialMovingAverage) Metadata() core.Metadata {
+	return core.BuildMetadata(
+		core.ZeroLagErrorCorrectingExponentialMovingAverage,
+		s.LineIndicator.Mnemonic,
+		s.LineIndicator.Description,
+		[]core.OutputText{
+			{Mnemonic: s.LineIndicator.Mnemonic, Description: s.LineIndicator.Description},
 		},
-	}
+	)
 }
 
 // Update updates the value of the indicator given the next sample.
 //
 // The indicator is not primed during the first two updates; it primes on the third.
-func (z *ZeroLagErrorCorrectingExponentialMovingAverage) Update(sample float64) float64 {
+func (s *ZeroLagErrorCorrectingExponentialMovingAverage) Update(sample float64) float64 {
 	if math.IsNaN(sample) {
 		return sample
 	}
 
-	z.mu.Lock()
-	defer z.mu.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
-	if z.primed {
-		z.value = z.calculate(sample)
+	if s.primed {
+		s.value = s.calculate(sample)
 
-		return z.value
+		return s.value
 	}
 
-	z.count++
+	s.count++
 
-	if z.count == 1 {
-		z.emaValue = sample
+	if s.count == 1 {
+		s.emaValue = sample
 
 		return math.NaN()
 	}
 
-	if z.count == 2 {
-		z.emaValue = z.calculateEma(sample)
-		z.value = z.emaValue
+	if s.count == 2 {
+		s.emaValue = s.calculateEma(sample)
+		s.value = s.emaValue
 
 		return math.NaN()
 	}
 
 	// count == 3: prime the indicator.
-	z.value = z.calculate(sample)
-	z.primed = true
+	s.value = s.calculate(sample)
+	s.primed = true
 
-	return z.value
+	return s.value
 }
 
-func (z *ZeroLagErrorCorrectingExponentialMovingAverage) calculateEma(sample float64) float64 {
-	return z.alpha*sample + z.oneMinAlpha*z.emaValue
+func (s *ZeroLagErrorCorrectingExponentialMovingAverage) calculateEma(sample float64) float64 {
+	return s.alpha*sample + s.oneMinAlpha*s.emaValue
 }
 
-func (z *ZeroLagErrorCorrectingExponentialMovingAverage) calculate(sample float64) float64 {
-	z.emaValue = z.calculateEma(sample)
+func (s *ZeroLagErrorCorrectingExponentialMovingAverage) calculate(sample float64) float64 {
+	s.emaValue = s.calculateEma(sample)
 
 	leastError := math.MaxFloat64
 	bestEC := 0.0
 
-	for gain := -z.gainLimit; gain <= z.gainLimit; gain += z.gainStep {
-		ec := z.alpha*(z.emaValue+gain*(sample-z.value)) + z.oneMinAlpha*z.value
+	for gain := -s.gainLimit; gain <= s.gainLimit; gain += s.gainStep {
+		ec := s.alpha*(s.emaValue+gain*(sample-s.value)) + s.oneMinAlpha*s.value
 		err := math.Abs(sample - ec)
 
 		if leastError > err {

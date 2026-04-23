@@ -1,3 +1,4 @@
+import { buildMetadata } from '../../core/build-metadata';
 import { Bar } from '../../../entities/bar';
 import { Quote } from '../../../entities/quote';
 import { Scalar } from '../../../entities/scalar';
@@ -5,11 +6,8 @@ import { Trade } from '../../../entities/trade';
 import { Indicator } from '../../core/indicator';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
 import { IndicatorOutput } from '../../core/indicator-output';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputMetadata } from '../../core/outputs/output-metadata';
-import { OutputType } from '../../core/outputs/output-type';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { AverageTrueRange } from '../average-true-range/average-true-range';
-import { NormalizedAverageTrueRangeOutput } from './normalized-average-true-range-output';
 
 const natrMnemonic = 'natr';
 const natrDescription = 'Normalized Average True Range';
@@ -49,19 +47,14 @@ export class NormalizedAverageTrueRange implements Indicator {
 
   /** Describes the output data of the indicator. */
   public metadata(): IndicatorMetadata {
-    const outputMeta: OutputMetadata = {
-      kind: NormalizedAverageTrueRangeOutput.NormalizedAverageTrueRangeValue,
-      type: OutputType.Scalar,
-      mnemonic: natrMnemonic,
-      description: natrDescription,
-    };
-
-    return {
-      type: IndicatorType.NormalizedAverageTrueRange,
-      mnemonic: natrMnemonic,
-      description: natrDescription,
-      outputs: [outputMeta],
-    };
+    return buildMetadata(
+      IndicatorIdentifier.NormalizedAverageTrueRange,
+      natrMnemonic,
+      natrDescription,
+      [
+        { mnemonic: natrMnemonic, description: natrDescription },
+      ],
+    );
   }
 
   /** Updates the Normalized Average True Range given the next bar's close, high, and low values. */

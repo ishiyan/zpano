@@ -7,7 +7,6 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
 )
 
 const (
@@ -59,37 +58,32 @@ func NewDirectionalMovementMinus(length int) (*DirectionalMovementMinus, error) 
 }
 
 // Length returns the length parameter.
-func (d *DirectionalMovementMinus) Length() int {
-	return d.length
+func (s *DirectionalMovementMinus) Length() int {
+	return s.length
 }
 
 // IsPrimed indicates whether the indicator is primed.
-func (d *DirectionalMovementMinus) IsPrimed() bool {
-	d.mu.RLock()
-	defer d.mu.RUnlock()
+func (s *DirectionalMovementMinus) IsPrimed() bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
-	return d.primed
+	return s.primed
 }
 
 // Metadata describes the output data of the indicator.
-func (d *DirectionalMovementMinus) Metadata() core.Metadata {
-	return core.Metadata{
-		Type:        core.DirectionalMovementMinus,
-		Mnemonic:    dmmMnemonic,
-		Description: dmmDescription,
-		Outputs: []outputs.Metadata{
-			{
-				Kind:        int(DirectionalMovementMinusValue),
-				Type:        outputs.ScalarType,
-				Mnemonic:    dmmMnemonic,
-				Description: dmmDescription,
-			},
+func (s *DirectionalMovementMinus) Metadata() core.Metadata {
+	return core.BuildMetadata(
+		core.DirectionalMovementMinus,
+		dmmMnemonic,
+		dmmDescription,
+		[]core.OutputText{
+			{Mnemonic: dmmMnemonic, Description: dmmDescription},
 		},
-	}
+	)
 }
 
 // Update updates the Directional Movement Minus given the next bar's high and low values.
-func (d *DirectionalMovementMinus) Update(high, low float64) float64 {
+func (s *DirectionalMovementMinus) Update(high, low float64) float64 {
 	if math.IsNaN(high) || math.IsNaN(low) {
 		return math.NaN()
 	}
@@ -98,118 +92,118 @@ func (d *DirectionalMovementMinus) Update(high, low float64) float64 {
 		high, low = low, high
 	}
 
-	d.mu.Lock()
-	defer d.mu.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
-	if d.noSmoothing {
-		if d.primed {
-			deltaMinus := d.previousLow - low
-			deltaPlus := high - d.previousHigh
+	if s.noSmoothing {
+		if s.primed {
+			deltaMinus := s.previousLow - low
+			deltaPlus := high - s.previousHigh
 
 			if deltaMinus > 0 && deltaPlus < deltaMinus {
-				d.value = deltaMinus
+				s.value = deltaMinus
 			} else {
-				d.value = 0
+				s.value = 0
 			}
 		} else {
-			if d.count > 0 {
-				deltaMinus := d.previousLow - low
-				deltaPlus := high - d.previousHigh
+			if s.count > 0 {
+				deltaMinus := s.previousLow - low
+				deltaPlus := high - s.previousHigh
 
 				if deltaMinus > 0 && deltaPlus < deltaMinus {
-					d.value = deltaMinus
+					s.value = deltaMinus
 				} else {
-					d.value = 0
+					s.value = 0
 				}
 
-				d.primed = true
+				s.primed = true
 			}
 
-			d.count++
+			s.count++
 		}
 	} else {
-		if d.primed {
-			deltaMinus := d.previousLow - low
-			deltaPlus := high - d.previousHigh
+		if s.primed {
+			deltaMinus := s.previousLow - low
+			deltaPlus := high - s.previousHigh
 
 			if deltaMinus > 0 && deltaPlus < deltaMinus {
-				d.accumulator += -d.accumulator/float64(d.length) + deltaMinus
+				s.accumulator += -s.accumulator/float64(s.length) + deltaMinus
 			} else {
-				d.accumulator += -d.accumulator / float64(d.length)
+				s.accumulator += -s.accumulator / float64(s.length)
 			}
 
-			d.value = d.accumulator
+			s.value = s.accumulator
 		} else {
-			if d.count > 0 && d.length >= d.count {
-				deltaMinus := d.previousLow - low
-				deltaPlus := high - d.previousHigh
+			if s.count > 0 && s.length >= s.count {
+				deltaMinus := s.previousLow - low
+				deltaPlus := high - s.previousHigh
 
-				if d.length > d.count {
+				if s.length > s.count {
 					if deltaMinus > 0 && deltaPlus < deltaMinus {
-						d.accumulator += deltaMinus
+						s.accumulator += deltaMinus
 					}
 				} else {
 					if deltaMinus > 0 && deltaPlus < deltaMinus {
-						d.accumulator += -d.accumulator/float64(d.length) + deltaMinus
+						s.accumulator += -s.accumulator/float64(s.length) + deltaMinus
 					} else {
-						d.accumulator += -d.accumulator / float64(d.length)
+						s.accumulator += -s.accumulator / float64(s.length)
 					}
 
-					d.value = d.accumulator
-					d.primed = true
+					s.value = s.accumulator
+					s.primed = true
 				}
 			}
 
-			d.count++
+			s.count++
 		}
 	}
 
-	d.previousLow = low
-	d.previousHigh = high
+	s.previousLow = low
+	s.previousHigh = high
 
-	return d.value
+	return s.value
 }
 
 // UpdateSample updates the Directional Movement Minus using a single sample value
 // as a substitute for high and low.
-func (d *DirectionalMovementMinus) UpdateSample(sample float64) float64 {
-	return d.Update(sample, sample)
+func (s *DirectionalMovementMinus) UpdateSample(sample float64) float64 {
+	return s.Update(sample, sample)
 }
 
 // UpdateScalar updates the indicator given the next scalar sample.
-func (d *DirectionalMovementMinus) UpdateScalar(sample *entities.Scalar) core.Output {
+func (s *DirectionalMovementMinus) UpdateScalar(sample *entities.Scalar) core.Output {
 	v := sample.Value
 
 	output := make([]any, 1)
-	output[0] = entities.Scalar{Time: sample.Time, Value: d.Update(v, v)}
+	output[0] = entities.Scalar{Time: sample.Time, Value: s.Update(v, v)}
 
 	return output
 }
 
 // UpdateBar updates the indicator given the next bar sample.
-func (d *DirectionalMovementMinus) UpdateBar(sample *entities.Bar) core.Output {
+func (s *DirectionalMovementMinus) UpdateBar(sample *entities.Bar) core.Output {
 	output := make([]any, 1)
-	output[0] = entities.Scalar{Time: sample.Time, Value: d.Update(sample.High, sample.Low)}
+	output[0] = entities.Scalar{Time: sample.Time, Value: s.Update(sample.High, sample.Low)}
 
 	return output
 }
 
 // UpdateQuote updates the indicator given the next quote sample.
-func (d *DirectionalMovementMinus) UpdateQuote(sample *entities.Quote) core.Output {
+func (s *DirectionalMovementMinus) UpdateQuote(sample *entities.Quote) core.Output {
 	v := (sample.Bid + sample.Ask) / 2 //nolint:mnd
 
 	output := make([]any, 1)
-	output[0] = entities.Scalar{Time: sample.Time, Value: d.Update(v, v)}
+	output[0] = entities.Scalar{Time: sample.Time, Value: s.Update(v, v)}
 
 	return output
 }
 
 // UpdateTrade updates the indicator given the next trade sample.
-func (d *DirectionalMovementMinus) UpdateTrade(sample *entities.Trade) core.Output {
+func (s *DirectionalMovementMinus) UpdateTrade(sample *entities.Trade) core.Output {
 	v := sample.Price
 
 	output := make([]any, 1)
-	output[0] = entities.Scalar{Time: sample.Time, Value: d.Update(v, v)}
+	output[0] = entities.Scalar{Time: sample.Time, Value: s.Update(v, v)}
 
 	return output
 }

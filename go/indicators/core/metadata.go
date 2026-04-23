@@ -4,10 +4,10 @@ import (
 	"zpano/indicators/core/outputs"
 )
 
-// Metadata describes a type and outputs of an indicator.
+// Metadata describes an indicator and its outputs.
 type Metadata struct {
-	// Type identifies a type this indicator.
-	Type Type `json:"type"`
+	// Identifier identifies this indicator.
+	Identifier Identifier `json:"identifier"`
 
 	// Mnemonic is a short name (mnemonic) of this indicator.
 	Mnemonic string `json:"mnemonic"`

@@ -9,7 +9,7 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
+	"zpano/indicators/core/outputs/shape"
 )
 
 // Standard test data (252 entries) — same H/L as TrueRange, Stochastic, etc.
@@ -81,7 +81,7 @@ func testTime() time.Time {
 
 // Expected outputs from excel-length-14-aaron.csv (252 rows, period=14).
 // First 14 rows (indices 0-13) are NaN; first valid output at index 14.
-// Columns: AroonUp, AroonDown, AroonOsc.
+// Columns: Up, Down, Osc.
 type expectedRow struct {
 	up   float64
 	down float64
@@ -366,22 +366,22 @@ func TestAroon_Length14_FullData(t *testing.T) {
 
 		if math.IsNaN(expected[i].up) {
 			if !math.IsNaN(up) {
-				t.Errorf("[%d] AroonUp: expected NaN, got %v", i, up)
+				t.Errorf("[%d] Up: expected NaN, got %v", i, up)
 			}
 
 			continue
 		}
 
 		if math.Abs(up-expected[i].up) > tolerance {
-			t.Errorf("[%d] AroonUp: expected %v, got %v", i, expected[i].up, up)
+			t.Errorf("[%d] Up: expected %v, got %v", i, expected[i].up, up)
 		}
 
 		if math.Abs(down-expected[i].down) > tolerance {
-			t.Errorf("[%d] AroonDown: expected %v, got %v", i, expected[i].down, down)
+			t.Errorf("[%d] Down: expected %v, got %v", i, expected[i].down, down)
 		}
 
 		if math.Abs(osc-expected[i].osc) > tolerance {
-			t.Errorf("[%d] AroonOsc: expected %v, got %v", i, expected[i].osc, osc)
+			t.Errorf("[%d] Osc: expected %v, got %v", i, expected[i].osc, osc)
 		}
 	}
 }
@@ -427,15 +427,15 @@ func TestAroonNaN(t *testing.T) {
 
 	up, down, osc := ind.Update(math.NaN(), 1.0)
 	if !math.IsNaN(up) {
-		t.Errorf("expected NaN AroonUp, got %v", up)
+		t.Errorf("expected NaN Up, got %v", up)
 	}
 
 	if !math.IsNaN(down) {
-		t.Errorf("expected NaN AroonDown, got %v", down)
+		t.Errorf("expected NaN Down, got %v", down)
 	}
 
 	if !math.IsNaN(osc) {
-		t.Errorf("expected NaN AroonOsc, got %v", osc)
+		t.Errorf("expected NaN Osc, got %v", osc)
 	}
 }
 
@@ -449,8 +449,8 @@ func TestAroonMetadata(t *testing.T) {
 
 	meta := ind.Metadata()
 
-	if meta.Type != core.Aroon {
-		t.Errorf("expected type Aroon, got %v", meta.Type)
+	if meta.Identifier != core.Aroon {
+		t.Errorf("expected identifier Aroon, got %v", meta.Identifier)
 	}
 
 	exp := "aroon(14)"
@@ -462,20 +462,20 @@ func TestAroonMetadata(t *testing.T) {
 		t.Fatalf("expected 3 outputs, got %d", len(meta.Outputs))
 	}
 
-	if meta.Outputs[0].Kind != int(AroonUp) {
-		t.Errorf("expected output 0 kind %d, got %d", AroonUp, meta.Outputs[0].Kind)
+	if meta.Outputs[0].Kind != int(Up) {
+		t.Errorf("expected output 0 kind %d, got %d", Up, meta.Outputs[0].Kind)
 	}
 
-	if meta.Outputs[0].Type != outputs.ScalarType {
-		t.Errorf("expected scalar output type, got %v", meta.Outputs[0].Type)
+	if meta.Outputs[0].Shape != shape.Scalar {
+		t.Errorf("expected scalar output type, got %v", meta.Outputs[0].Shape)
 	}
 
-	if meta.Outputs[1].Kind != int(AroonDown) {
-		t.Errorf("expected output 1 kind %d, got %d", AroonDown, meta.Outputs[1].Kind)
+	if meta.Outputs[1].Kind != int(Down) {
+		t.Errorf("expected output 1 kind %d, got %d", Down, meta.Outputs[1].Kind)
 	}
 
-	if meta.Outputs[2].Kind != int(AroonOsc) {
-		t.Errorf("expected output 2 kind %d, got %d", AroonOsc, meta.Outputs[2].Kind)
+	if meta.Outputs[2].Kind != int(Osc) {
+		t.Errorf("expected output 2 kind %d, got %d", Osc, meta.Outputs[2].Kind)
 	}
 }
 
@@ -501,7 +501,7 @@ func TestAroonUpdateBar(t *testing.T) {
 
 		v := out[0].(entities.Scalar).Value //nolint:forcetypeassert
 		if !math.IsNaN(v) {
-			t.Errorf("[%d] expected NaN AroonUp, got %v", i, v)
+			t.Errorf("[%d] expected NaN Up, got %v", i, v)
 		}
 	}
 
@@ -513,15 +513,15 @@ func TestAroonUpdateBar(t *testing.T) {
 	osc := out[2].(entities.Scalar).Value  //nolint:forcetypeassert
 
 	if math.Abs(up-expected[14].up) > tolerance {
-		t.Errorf("[14] AroonUp: expected %v, got %v", expected[14].up, up)
+		t.Errorf("[14] Up: expected %v, got %v", expected[14].up, up)
 	}
 
 	if math.Abs(down-expected[14].down) > tolerance {
-		t.Errorf("[14] AroonDown: expected %v, got %v", expected[14].down, down)
+		t.Errorf("[14] Down: expected %v, got %v", expected[14].down, down)
 	}
 
 	if math.Abs(osc-expected[14].osc) > tolerance {
-		t.Errorf("[14] AroonOsc: expected %v, got %v", expected[14].osc, osc)
+		t.Errorf("[14] Osc: expected %v, got %v", expected[14].osc, osc)
 	}
 }
 

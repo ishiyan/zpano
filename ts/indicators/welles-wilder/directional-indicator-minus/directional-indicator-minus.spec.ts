@@ -1,9 +1,9 @@
 import { } from 'jasmine';
 
 import { DirectionalIndicatorMinus } from './directional-indicator-minus';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
-import { DirectionalIndicatorMinusOutput } from './directional-indicator-minus-output';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
+import { DirectionalIndicatorMinusOutput } from './output';
 
 // TA-Lib test data (252 entries), extracted programmatically from DirectionalIndicatorMinusTest.cs.
 const inputHigh = [
@@ -204,12 +204,12 @@ describe('DirectionalIndicatorMinus', () => {
     it('should return correct metadata', () => {
       const dim = new DirectionalIndicatorMinus(14);
       const meta = dim.metadata();
-      expect(meta.type).toBe(IndicatorType.DirectionalIndicatorMinus);
+      expect(meta.identifier).toBe(IndicatorIdentifier.DirectionalIndicatorMinus);
       expect(meta.mnemonic).toBe('-di');
       expect(meta.description).toBe('Directional Indicator Minus');
       expect(meta.outputs.length).toBe(4);
       expect(meta.outputs[0].kind).toBe(DirectionalIndicatorMinusOutput.DirectionalIndicatorMinusValue);
-      expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+      expect(meta.outputs[0].shape).toBe(Shape.Scalar);
       expect(meta.outputs[0].mnemonic).toBe('-di');
       expect(meta.outputs[0].description).toBe('Directional Indicator Minus');
       expect(meta.outputs[1].kind).toBe(DirectionalIndicatorMinusOutput.DirectionalMovementMinusValue);

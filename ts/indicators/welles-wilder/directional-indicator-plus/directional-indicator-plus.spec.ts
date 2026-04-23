@@ -1,9 +1,9 @@
 import { } from 'jasmine';
 
 import { DirectionalIndicatorPlus } from './directional-indicator-plus';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
-import { DirectionalIndicatorPlusOutput } from './directional-indicator-plus-output';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
+import { DirectionalIndicatorPlusOutput } from './output';
 
 // TA-Lib test data (252 entries), extracted programmatically from DirectionalIndicatorPlusTest.cs.
 const inputHigh = [
@@ -204,12 +204,12 @@ describe('DirectionalIndicatorPlus', () => {
     it('should return correct metadata', () => {
       const dip = new DirectionalIndicatorPlus(14);
       const meta = dip.metadata();
-      expect(meta.type).toBe(IndicatorType.DirectionalIndicatorPlus);
+      expect(meta.identifier).toBe(IndicatorIdentifier.DirectionalIndicatorPlus);
       expect(meta.mnemonic).toBe('+di');
       expect(meta.description).toBe('Directional Indicator Plus');
       expect(meta.outputs.length).toBe(4);
       expect(meta.outputs[0].kind).toBe(DirectionalIndicatorPlusOutput.DirectionalIndicatorPlusValue);
-      expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+      expect(meta.outputs[0].shape).toBe(Shape.Scalar);
       expect(meta.outputs[0].mnemonic).toBe('+di');
       expect(meta.outputs[0].description).toBe('Directional Indicator Plus');
       expect(meta.outputs[1].kind).toBe(DirectionalIndicatorPlusOutput.DirectionalMovementPlusValue);

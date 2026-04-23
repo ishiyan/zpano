@@ -1,9 +1,9 @@
 import { } from 'jasmine';
 
 import { CyberCycle } from './cyber-cycle';
-import { CyberCycleOutput } from './cyber-cycle-output';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
+import { CyberCycleOutput } from './output';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
 import { BarComponent } from '../../../entities/bar-component';
 import { QuoteComponent } from '../../../entities/quote-component';
 import { TradeComponent } from '../../../entities/trade-component';
@@ -265,24 +265,24 @@ describe('CyberCycle', () => {
     const meta = cc.metadata();
 
     const mn = 'cc(28, hl/2)';
-    const mnSig = 'ccSignal(28, hl/2)';
+    const mnSignal = 'ccSignal(28, hl/2)';
     const descr = 'Cyber Cycle ';
-    const descrSig = 'Cyber Cycle signal ';
+    const descrSignal = 'Cyber Cycle signal ';
 
-    expect(meta.type).toBe(IndicatorType.CyberCycle);
+    expect(meta.identifier).toBe(IndicatorIdentifier.CyberCycle);
     expect(meta.mnemonic).toBe(mn);
     expect(meta.description).toBe(descr + mn);
     expect(meta.outputs.length).toBe(2);
 
     expect(meta.outputs[0].kind).toBe(CyberCycleOutput.Value);
-    expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+    expect(meta.outputs[0].shape).toBe(Shape.Scalar);
     expect(meta.outputs[0].mnemonic).toBe(mn);
     expect(meta.outputs[0].description).toBe(descr + mn);
 
     expect(meta.outputs[1].kind).toBe(CyberCycleOutput.Signal);
-    expect(meta.outputs[1].type).toBe(OutputType.Scalar);
-    expect(meta.outputs[1].mnemonic).toBe(mnSig);
-    expect(meta.outputs[1].description).toBe(descrSig + mnSig);
+    expect(meta.outputs[1].shape).toBe(Shape.Scalar);
+    expect(meta.outputs[1].mnemonic).toBe(mnSignal);
+    expect(meta.outputs[1].description).toBe(descrSignal + mnSignal);
   });
 
   it('should return expected metadata with length-based and non-default trade component', () => {

@@ -1,10 +1,9 @@
+import { buildMetadata } from '../../core/build-metadata';
 import { componentTripleMnemonic } from '../../core/component-triple-mnemonic';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
-import { IndicatorType } from '../../core/indicator-type';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { LineIndicator } from '../../core/line-indicator';
-import { OutputType } from '../../core/outputs/output-type';
-import { WeightedMovingAverageOutput } from './weighted-moving-average-output';
-import { WeightedMovingAverageParams } from './weighted-moving-average-params';
+import { WeightedMovingAverageParams } from './params';
 
 /** Function to calculate mnemonic of a __WeightedMovingAverage__ indicator. */
 export const weightedMovingAverageMnemonic = (params: WeightedMovingAverageParams): string =>
@@ -75,17 +74,14 @@ export class WeightedMovingAverage extends LineIndicator {
 
   /** Describes the output data of the indicator. */
   public metadata(): IndicatorMetadata {
-    return {
-      type: IndicatorType.WeightedMovingAverage,
-      mnemonic: this.mnemonic,
-      description: this.description,
-      outputs: [{
-        kind: WeightedMovingAverageOutput.WeightedMovingAverageValue,
-        type: OutputType.Scalar,
-        mnemonic: this.mnemonic,
-        description: this.description,
-      }],
-    };
+    return buildMetadata(
+      IndicatorIdentifier.WeightedMovingAverage,
+      this.mnemonic,
+      this.description,
+      [
+        { mnemonic: this.mnemonic, description: this.description },
+      ],
+    );
   }
 
   /** Updates the value of the indicator given the next sample. */

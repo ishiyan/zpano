@@ -1,8 +1,8 @@
 import { } from 'jasmine';
 
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
-import { VarianceOutput } from './variance-output';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
+import { VarianceOutput } from './output';
 import { Variance } from './variance';
 
 // Variance input test data.
@@ -17,12 +17,12 @@ describe('Variance', () => {
     const v = new Variance({length: 7, unbiased: true});
     const m = v.metadata();
 
-    expect(m.type).toBe(IndicatorType.Variance);
+    expect(m.identifier).toBe(IndicatorIdentifier.Variance);
     expect(m.mnemonic).toBe('var.s(7)');
     expect(m.description).toBe('Unbiased estimation of the sample variance var.s(7)');
     expect(m.outputs.length).toBe(1);
     expect(m.outputs[0].kind).toBe(VarianceOutput.VarianceValue);
-    expect(m.outputs[0].type).toBe(OutputType.Scalar);
+    expect(m.outputs[0].shape).toBe(Shape.Scalar);
     expect(m.outputs[0].mnemonic).toBe('var.s(7)');
     expect(m.outputs[0].description).toBe('Unbiased estimation of the sample variance var.s(7)');
   });
@@ -31,12 +31,12 @@ describe('Variance', () => {
     const v = new Variance({length: 7, unbiased: false});
     const m = v.metadata();
 
-    expect(m.type).toBe(IndicatorType.Variance);
+    expect(m.identifier).toBe(IndicatorIdentifier.Variance);
     expect(m.mnemonic).toBe('var.p(7)');
     expect(m.description).toBe('Estimation of the population variance var.p(7)');
     expect(m.outputs.length).toBe(1);
     expect(m.outputs[0].kind).toBe(VarianceOutput.VarianceValue);
-    expect(m.outputs[0].type).toBe(OutputType.Scalar);
+    expect(m.outputs[0].shape).toBe(Shape.Scalar);
     expect(m.outputs[0].mnemonic).toBe('var.p(7)');
     expect(m.outputs[0].description).toBe('Estimation of the population variance var.p(7)');
   });

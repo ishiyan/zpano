@@ -1,3 +1,4 @@
+import { buildMetadata } from '../../core/build-metadata';
 import { Bar } from '../../../entities/bar';
 import { Quote } from '../../../entities/quote';
 import { Scalar } from '../../../entities/scalar';
@@ -5,12 +6,10 @@ import { Trade } from '../../../entities/trade';
 import { Indicator } from '../../core/indicator';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
 import { IndicatorOutput } from '../../core/indicator-output';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { ExponentialMovingAverage } from '../../common/exponential-moving-average/exponential-moving-average';
 import { SimpleMovingAverage } from '../../common/simple-moving-average/simple-moving-average';
-import { StochasticOutput } from './stochastic-output';
-import { StochasticParams, MovingAverageType } from './stochastic-params';
+import { StochasticParams, MovingAverageType } from './params';
 
 /** Interface for an indicator that accepts a scalar and returns a value. */
 interface LineUpdater {
@@ -66,7 +65,7 @@ export class Stochastic implements Indicator {
 
   private readonly highBuf: Float64Array;
   private readonly lowBuf: Float64Array;
-  private bufIdx = 0;
+  private bufferIndex = 0;
   private count = 0;
 
   private readonly slowKMA: LineUpdater;
@@ -116,31 +115,16 @@ export class Stochastic implements Indicator {
 
   /** Describes the output data of the indicator. */
   public metadata(): IndicatorMetadata {
-    return {
-      type: IndicatorType.Stochastic,
-      mnemonic: this.mnemonic_,
-      description: this.description_,
-      outputs: [
-        {
-          kind: StochasticOutput.FastK,
-          type: OutputType.Scalar,
-          mnemonic: this.mnemonic_ + ' fastK',
-          description: this.description_ + ' Fast-K',
-        },
-        {
-          kind: StochasticOutput.SlowK,
-          type: OutputType.Scalar,
-          mnemonic: this.mnemonic_ + ' slowK',
-          description: this.description_ + ' Slow-K',
-        },
-        {
-          kind: StochasticOutput.SlowD,
-          type: OutputType.Scalar,
-          mnemonic: this.mnemonic_ + ' slowD',
-          description: this.description_ + ' Slow-D',
-        },
+    return buildMetadata(
+      IndicatorIdentifier.Stochastic,
+      this.mnemonic_,
+      this.description_,
+      [
+        { mnemonic: this.mnemonic_ + ' fastK', description: this.description_ + ' Fast-K' },
+        { mnemonic: this.mnemonic_ + ' slowK', description: this.description_ + ' Slow-K' },
+        { mnemonic: this.mnemonic_ + ' slowD', description: this.description_ + ' Slow-D' },
       ],
-    };
+    );
   }
 
   /** Updates the indicator given the next bar's close, high, and low values. Returns [FastK, SlowK, SlowD]. */
@@ -150,9 +134,9 @@ export class Stochastic implements Indicator {
     }
 
     // Store high and low in circular buffer.
-    this.highBuf[this.bufIdx] = high;
-    this.lowBuf[this.bufIdx] = low;
-    this.bufIdx = (this.bufIdx + 1) % this.fastKLength_;
+    this.highBuf[this.bufferIndex] = high;
+    this.lowBuf[this.bufferIndex] = low;
+    this.bufferIndex = (this.bufferIndex + 1) % this.fastKLength_;
     this.count++;
 
     // Need at least fastKLength bars.

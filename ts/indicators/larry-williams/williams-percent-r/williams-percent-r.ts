@@ -1,3 +1,4 @@
+import { buildMetadata } from '../../core/build-metadata';
 import { Bar } from '../../../entities/bar';
 import { Quote } from '../../../entities/quote';
 import { Scalar } from '../../../entities/scalar';
@@ -5,10 +6,7 @@ import { Trade } from '../../../entities/trade';
 import { Indicator } from '../../core/indicator';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
 import { IndicatorOutput } from '../../core/indicator-output';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputMetadata } from '../../core/outputs/output-metadata';
-import { OutputType } from '../../core/outputs/output-type';
-import { WilliamsPercentROutput } from './williams-percent-r-output';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 
 const willrMnemonic = 'willr';
 const willrDescription = 'Williams %R';
@@ -60,19 +58,14 @@ export class WilliamsPercentR implements Indicator {
 
   /** Describes the output data of the indicator. */
   public metadata(): IndicatorMetadata {
-    const outputMeta: OutputMetadata = {
-      kind: WilliamsPercentROutput.WilliamsPercentRValue,
-      type: OutputType.Scalar,
-      mnemonic: willrMnemonic,
-      description: willrDescription,
-    };
-
-    return {
-      type: IndicatorType.WilliamsPercentR,
-      mnemonic: willrMnemonic,
-      description: willrDescription,
-      outputs: [outputMeta],
-    };
+    return buildMetadata(
+      IndicatorIdentifier.WilliamsPercentR,
+      willrMnemonic,
+      willrDescription,
+      [
+        { mnemonic: willrMnemonic, description: willrDescription },
+      ],
+    );
   }
 
   /** Updates the Williams %R given the next bar's close, high, and low values. */
@@ -81,9 +74,9 @@ export class WilliamsPercentR implements Indicator {
       return NaN;
     }
 
-    const index = this.circularIndex;
-    this.lowCircular[index] = low;
-    this.highCircular[index] = high;
+    const startIndex = this.circularIndex;
+    this.lowCircular[startIndex] = low;
+    this.highCircular[startIndex] = high;
 
     // Advance circular buffer index.
     this.circularIndex++;
@@ -94,18 +87,18 @@ export class WilliamsPercentR implements Indicator {
     if (this.length > this.circularCount) {
       if (this.lengthMinOne === this.circularCount) {
         // We have exactly `length` samples; compute for the first time.
-        let minLow = this.lowCircular[index];
-        let maxHigh = this.highCircular[index];
-        let idx = index;
+        let minLow = this.lowCircular[startIndex];
+        let maxHigh = this.highCircular[startIndex];
+        let index = startIndex;
 
         for (let i = 0; i < this.lengthMinOne; i++) {
-          // The value of idx is always positive here.
-          idx--;
-          const tempLow = this.lowCircular[idx];
+          // The value of index is always positive here.
+          index--;
+          const tempLow = this.lowCircular[index];
           if (minLow > tempLow) {
             minLow = tempLow;
           }
-          const tempHigh = this.highCircular[idx];
+          const tempHigh = this.highCircular[index];
           if (maxHigh < tempHigh) {
             maxHigh = tempHigh;
           }
@@ -125,21 +118,21 @@ export class WilliamsPercentR implements Indicator {
     }
 
     // Already primed, compute normally with wrapping.
-    let minLow = this.lowCircular[index];
-    let maxHigh = this.highCircular[index];
-    let idx = index;
+    let minLow = this.lowCircular[startIndex];
+    let maxHigh = this.highCircular[startIndex];
+    let index = startIndex;
 
     for (let i = 0; i < this.lengthMinOne; i++) {
-      if (idx === 0) {
-        idx = this.lengthMinOne;
+      if (index === 0) {
+        index = this.lengthMinOne;
       } else {
-        idx--;
+        index--;
       }
-      const tempLow = this.lowCircular[idx];
+      const tempLow = this.lowCircular[index];
       if (minLow > tempLow) {
         minLow = tempLow;
       }
-      const tempHigh = this.highCircular[idx];
+      const tempHigh = this.highCircular[index];
       if (maxHigh < tempHigh) {
         maxHigh = tempHigh;
       }

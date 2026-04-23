@@ -9,7 +9,7 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
+	"zpano/indicators/core/outputs/shape"
 )
 
 // Standard test data (252 entries) — same H/L/C as TrueRange and other HLC indicators.
@@ -296,8 +296,8 @@ func TestUltimateOscillatorMetadata(t *testing.T) {
 
 	meta := ind.Metadata()
 
-	if meta.Type != core.UltimateOscillator {
-		t.Errorf("expected type %v, got %v", core.UltimateOscillator, meta.Type)
+	if meta.Identifier != core.UltimateOscillator {
+		t.Errorf("expected type %v, got %v", core.UltimateOscillator, meta.Identifier)
 	}
 
 	if meta.Mnemonic != "ultosc(7, 14, 28)" {
@@ -308,12 +308,12 @@ func TestUltimateOscillatorMetadata(t *testing.T) {
 		t.Fatalf("expected 1 output, got %d", len(meta.Outputs))
 	}
 
-	if meta.Outputs[0].Kind != int(UltimateOscillatorValue) {
-		t.Errorf("expected output kind %d, got %d", UltimateOscillatorValue, meta.Outputs[0].Kind)
+	if meta.Outputs[0].Kind != int(Value) {
+		t.Errorf("expected output kind %d, got %d", Value, meta.Outputs[0].Kind)
 	}
 
-	if meta.Outputs[0].Type != outputs.ScalarType {
-		t.Errorf("expected output type %v, got %v", outputs.ScalarType, meta.Outputs[0].Type)
+	if meta.Outputs[0].Shape != shape.Scalar {
+		t.Errorf("expected output type %v, got %v", shape.Scalar, meta.Outputs[0].Shape)
 	}
 }
 
@@ -413,9 +413,9 @@ func TestUltimateOscillatorTaLibSpotChecks(t *testing.T) {
 	// { 0, TA_ULTOSC_TEST, 0, 251, 7, 14, 28, TA_SUCCESS, 0, 47.1713, 28, 252-28 }
 	// { 0, TA_ULTOSC_TEST, 0, 251, 7, 14, 28, TA_SUCCESS, 1, 46.2802, 28, 252-28 }
 	// { 1, TA_ULTOSC_TEST, 0, 251, 7, 14, 28, TA_SUCCESS, 252-29, 40.0854, 28, 252-28 }
-	// Output index 0 at begIdx 28 -> input index 28
-	// Output index 1 at begIdx 28 -> input index 29
-	// Output index 252-29=223 at begIdx 28 -> input index 251
+	// Output index 0 at begIndex 28 -> input index 28
+	// Output index 1 at begIndex 28 -> input index 29
+	// Output index 252-29=223 at begIndex 28 -> input index 251
 
 	const tolerance = 1e-4
 

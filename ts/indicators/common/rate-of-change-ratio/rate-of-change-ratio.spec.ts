@@ -1,9 +1,9 @@
 import { } from 'jasmine';
 
 import { RateOfChangeRatio } from './rate-of-change-ratio';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
-import { RateOfChangeRatioOutput } from './rate-of-change-ratio-output';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
+import { RateOfChangeRatioOutput } from './output';
 import { BarComponent } from '../../../entities/bar-component';
 import { QuoteComponent } from '../../../entities/quote-component';
 import { TradeComponent } from '../../../entities/trade-component';
@@ -15,13 +15,13 @@ import { TradeComponent } from '../../../entities/trade-component';
 // Output data, length=14.
 // Taken from TA-Lib (http://ta-lib.org/) tests, test_mom.c.
 //
-// ROCR TEST (price/prevPrice):
+// ROCR TEST (price/previousPrice):
 // { 1, TA_ROCR_TEST, 0, 251, 14, TA_SUCCESS,      0, 0.994536,  14,  252-14 },
 // { 0, TA_ROCR_TEST, 0, 251, 14, TA_SUCCESS,      1, 0.978906,  14,  252-14 },
 // { 0, TA_ROCR_TEST, 0, 251, 14, TA_SUCCESS,      2, 0.944689,  14,  252-14 },
 // { 0, TA_ROCR_TEST, 0, 251, 14, TA_SUCCESS, 252-15, 0.989633,  14,  252-14 },
 //
-// ROCR100 TEST (price/prevPrice)*100:
+// ROCR100 TEST (price/previousPrice)*100:
 // { 1, TA_ROCR100_TEST, 0, 251, 14, TA_SUCCESS,      0, 99.4536,  14,  252-14 },
 // { 0, TA_ROCR100_TEST, 0, 251, 14, TA_SUCCESS,      1, 97.8906,  14,  252-14 },
 // { 0, TA_ROCR100_TEST, 0, 251, 14, TA_SUCCESS,      2, 94.4689,  14,  252-14 },
@@ -94,12 +94,12 @@ describe('RateOfChangeRatio', () => {
     const rocr = new RateOfChangeRatio({length: 5});
     const meta = rocr.metadata();
 
-    expect(meta.type).toBe(IndicatorType.RateOfChangeRatio);
+    expect(meta.identifier).toBe(IndicatorIdentifier.RateOfChangeRatio);
     expect(meta.mnemonic).toBe('rocr(5)');
     expect(meta.description).toBe('Rate of Change Ratio rocr(5)');
     expect(meta.outputs.length).toBe(1);
     expect(meta.outputs[0].kind).toBe(RateOfChangeRatioOutput.RateOfChangeRatioValue);
-    expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+    expect(meta.outputs[0].shape).toBe(Shape.Scalar);
     expect(meta.outputs[0].mnemonic).toBe('rocr(5)');
     expect(meta.outputs[0].description).toBe('Rate of Change Ratio rocr(5)');
   });

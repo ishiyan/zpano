@@ -8,7 +8,6 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
 )
 
 // PearsonsCorrelationCoefficient computes Pearson's Correlation Coefficient (r) over a rolling window.
@@ -101,113 +100,108 @@ func New(p *Params) (*PearsonsCorrelationCoefficient, error) {
 }
 
 // IsPrimed indicates whether an indicator is primed.
-func (c *PearsonsCorrelationCoefficient) IsPrimed() bool {
-	c.mu.RLock()
-	defer c.mu.RUnlock()
+func (s *PearsonsCorrelationCoefficient) IsPrimed() bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
-	return c.primed
+	return s.primed
 }
 
 // Metadata describes an output data of the indicator.
-func (c *PearsonsCorrelationCoefficient) Metadata() core.Metadata {
-	return core.Metadata{
-		Type:        core.PearsonsCorrelationCoefficient,
-		Mnemonic:    c.LineIndicator.Mnemonic,
-		Description: c.LineIndicator.Description,
-		Outputs: []outputs.Metadata{
-			{
-				Kind:        int(Value),
-				Type:        outputs.ScalarType,
-				Mnemonic:    c.LineIndicator.Mnemonic,
-				Description: c.LineIndicator.Description,
-			},
+func (s *PearsonsCorrelationCoefficient) Metadata() core.Metadata {
+	return core.BuildMetadata(
+		core.PearsonsCorrelationCoefficient,
+		s.LineIndicator.Mnemonic,
+		s.LineIndicator.Description,
+		[]core.OutputText{
+			{Mnemonic: s.LineIndicator.Mnemonic, Description: s.LineIndicator.Description},
 		},
-	}
+	)
 }
 
 // Update updates the indicator given a single scalar sample.
 // For a single-input update, both X and Y are set to the same value (degenerate case, always returns 1 or 0).
-func (c *PearsonsCorrelationCoefficient) Update(sample float64) float64 {
-	return c.UpdatePair(sample, sample)
+func (s *PearsonsCorrelationCoefficient) Update(sample float64) float64 {
+	return s.UpdatePair(sample, sample)
 }
 
 // UpdatePair updates the indicator given an (x, y) pair.
-func (c *PearsonsCorrelationCoefficient) UpdatePair(x, y float64) float64 {
+func (s *PearsonsCorrelationCoefficient) UpdatePair(x, y float64) float64 {
 	if math.IsNaN(x) || math.IsNaN(y) {
 		return math.NaN()
 	}
 
-	c.mu.Lock()
-	defer c.mu.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
-	n := float64(c.length)
+	n := float64(s.length)
 
-	if c.primed {
+	if s.primed {
 		// Remove the oldest values.
-		oldX := c.windowX[c.pos]
-		oldY := c.windowY[c.pos]
+		oldX := s.windowX[s.pos]
+		oldY := s.windowY[s.pos]
 
-		c.sumX -= oldX
-		c.sumY -= oldY
-		c.sumX2 -= oldX * oldX
-		c.sumY2 -= oldY * oldY
-		c.sumXY -= oldX * oldY
+		s.sumX -= oldX
+		s.sumY -= oldY
+		s.sumX2 -= oldX * oldX
+		s.sumY2 -= oldY * oldY
+		s.sumXY -= oldX * oldY
 
 		// Add new values.
-		c.windowX[c.pos] = x
-		c.windowY[c.pos] = y
-		c.pos = (c.pos + 1) % c.length
+		s.windowX[s.pos] = x
+		s.windowY[s.pos] = y
+		s.pos = (s.pos + 1) % s.length
 
-		c.sumX += x
-		c.sumY += y
-		c.sumX2 += x * x
-		c.sumY2 += y * y
-		c.sumXY += x * y
+		s.sumX += x
+		s.sumY += y
+		s.sumX2 += x * x
+		s.sumY2 += y * y
+		s.sumXY += x * y
 
-		return c.correlate(n)
+		return s.correlate(n)
 	}
 
 	// Accumulating phase.
-	c.windowX[c.count] = x
-	c.windowY[c.count] = y
+	s.windowX[s.count] = x
+	s.windowY[s.count] = y
 
-	c.sumX += x
-	c.sumY += y
-	c.sumX2 += x * x
-	c.sumY2 += y * y
-	c.sumXY += x * y
+	s.sumX += x
+	s.sumY += y
+	s.sumX2 += x * x
+	s.sumY2 += y * y
+	s.sumXY += x * y
 
-	c.count++
+	s.count++
 
-	if c.count == c.length {
-		c.primed = true
-		c.pos = 0
+	if s.count == s.length {
+		s.primed = true
+		s.pos = 0
 
-		return c.correlate(n)
+		return s.correlate(n)
 	}
 
 	return math.NaN()
 }
 
 // correlate computes the Pearson correlation from the running sums.
-func (c *PearsonsCorrelationCoefficient) correlate(n float64) float64 {
-	varX := c.sumX2 - (c.sumX*c.sumX)/n
-	varY := c.sumY2 - (c.sumY*c.sumY)/n
+func (s *PearsonsCorrelationCoefficient) correlate(n float64) float64 {
+	varX := s.sumX2 - (s.sumX*s.sumX)/n
+	varY := s.sumY2 - (s.sumY*s.sumY)/n
 	tempReal := varX * varY
 
 	if tempReal <= 0 {
 		return 0
 	}
 
-	return (c.sumXY - (c.sumX*c.sumY)/n) / math.Sqrt(tempReal)
+	return (s.sumXY - (s.sumX*s.sumY)/n) / math.Sqrt(tempReal)
 }
 
 // UpdateBar updates the indicator given the next bar sample.
 // This shadows LineIndicator.UpdateBar to extract both high (X) and low (Y) from the bar.
-func (c *PearsonsCorrelationCoefficient) UpdateBar(sample *entities.Bar) core.Output {
+func (s *PearsonsCorrelationCoefficient) UpdateBar(sample *entities.Bar) core.Output {
 	x := sample.High
 	y := sample.Low
-	value := c.UpdatePair(x, y)
+	value := s.UpdatePair(x, y)
 
 	output := make([]any, 1)
 	output[0] = entities.Scalar{Time: sample.Time, Value: value}

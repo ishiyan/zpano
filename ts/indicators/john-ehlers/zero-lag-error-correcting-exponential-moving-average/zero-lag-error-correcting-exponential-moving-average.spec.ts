@@ -1,10 +1,10 @@
 import { } from 'jasmine';
 
 import { ZeroLagErrorCorrectingExponentialMovingAverage } from './zero-lag-error-correcting-exponential-moving-average';
-import { ZeroLagErrorCorrectingExponentialMovingAverageParams } from './zero-lag-error-correcting-exponential-moving-average-params';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
-import { ZeroLagErrorCorrectingExponentialMovingAverageOutput } from './zero-lag-error-correcting-exponential-moving-average-output';
+import { ZeroLagErrorCorrectingExponentialMovingAverageParams } from './params';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
+import { ZeroLagErrorCorrectingExponentialMovingAverageOutput } from './output';
 
 const defaultParams: ZeroLagErrorCorrectingExponentialMovingAverageParams = {
   smoothingFactor: 0.095,
@@ -86,18 +86,18 @@ describe('ZeroLagErrorCorrectingExponentialMovingAverage', () => {
 
   it('should converge to constant for constant input', () => {
     const z = new ZeroLagErrorCorrectingExponentialMovingAverage(defaultParams);
-    const val = 42;
+    const value = 42;
 
     // Prime with constant.
-    z.update(val);
-    z.update(val);
+    z.update(value);
+    z.update(value);
 
-    const result = z.update(val);
-    expect(Math.abs(result - val)).toBeLessThan(1e-6);
+    const result = z.update(value);
+    expect(Math.abs(result - value)).toBeLessThan(1e-6);
 
     // Further constant updates.
     for (let i = 0; i < 10; i++) {
-      expect(Math.abs(z.update(val) - val)).toBeLessThan(1e-6);
+      expect(Math.abs(z.update(value) - value)).toBeLessThan(1e-6);
     }
   });
 
@@ -105,11 +105,11 @@ describe('ZeroLagErrorCorrectingExponentialMovingAverage', () => {
     const z = new ZeroLagErrorCorrectingExponentialMovingAverage(defaultParams);
     const meta = z.metadata();
 
-    expect(meta.type).toBe(IndicatorType.ZeroLagErrorCorrectingExponentialMovingAverage);
+    expect(meta.identifier).toBe(IndicatorIdentifier.ZeroLagErrorCorrectingExponentialMovingAverage);
     expect(meta.mnemonic).toBe('zecema(0.095, 5, 0.1)');
     expect(meta.description).toBe('Zero-lag Error-Correcting Exponential Moving Average zecema(0.095, 5, 0.1)');
     expect(meta.outputs.length).toBe(1);
     expect(meta.outputs[0].kind).toBe(ZeroLagErrorCorrectingExponentialMovingAverageOutput.ZeroLagErrorCorrectingExponentialMovingAverageValue);
-    expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+    expect(meta.outputs[0].shape).toBe(Shape.Scalar);
   });
 });

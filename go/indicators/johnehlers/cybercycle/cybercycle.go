@@ -9,7 +9,6 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
 )
 
 // CyberCycle (Ehler's Cyber Cycle, CC) is described in Ehler's book
@@ -35,8 +34,8 @@ type CyberCycle struct {
 	signalLag         int
 	mnemonic          string
 	description       string
-	mnemonicSig       string
-	descriptionSig    string
+	mnemonicSignal    string
+	descriptionSignal string
 	coeff1            float64
 	coeff2            float64
 	coeff3            float64
@@ -78,15 +77,15 @@ func newCyberCycle(length int, alpha float64, signalLag int,
 	bc entities.BarComponent, qc entities.QuoteComponent, tc entities.TradeComponent,
 ) (*CyberCycle, error) {
 	const (
-		invalid  = "invalid cyber cycle parameters"
-		fmts     = "%s: %s"
-		fmtw     = "%s: %w"
-		fmtn     = "cc(%d%s)"
-		fmtns    = "ccSignal(%d%s)"
-		descr    = "Cyber Cycle "
-		descrSig = "Cyber Cycle signal "
-		epsilon  = 0.00000001
-		two      = 2.
+		invalid     = "invalid cyber cycle parameters"
+		fmts        = "%s: %s"
+		fmtw        = "%s: %w"
+		fmtn        = "cc(%d%s)"
+		fmtns       = "ccSignal(%d%s)"
+		descr       = "Cyber Cycle "
+		descrSignal = "Cyber Cycle signal "
+		epsilon     = 0.00000001
+		two         = 2.
 	)
 
 	var (
@@ -136,7 +135,7 @@ func newCyberCycle(length int, alpha float64, signalLag int,
 
 	componentMnemonic := core.ComponentTripleMnemonic(bc, qc, tc)
 	mnemonic := fmt.Sprintf(fmtn, length, componentMnemonic)
-	mnemonicSig := fmt.Sprintf(fmtns, length, componentMnemonic)
+	mnemonicSignal := fmt.Sprintf(fmtns, length, componentMnemonic)
 
 	if barFunc, err = entities.BarComponentFunc(bc); err != nil {
 		return nil, fmt.Errorf(fmtw, invalid, err)
@@ -163,24 +162,24 @@ func newCyberCycle(length int, alpha float64, signalLag int,
 	c5 := 1 - x
 
 	return &CyberCycle{
-		length:          length,
-		smoothingFactor: alpha,
-		signalLag:       signalLag,
-		mnemonic:        mnemonic,
-		description:     descr + mnemonic,
-		mnemonicSig:     mnemonicSig,
-		descriptionSig:  descrSig + mnemonicSig,
-		coeff1:          c1,
-		coeff2:          c2,
-		coeff3:          c3,
-		coeff4:          c4,
-		coeff5:          c5,
-		value:           math.NaN(),
-		signal:          math.NaN(),
-		primed:          false,
-		barFunc:         barFunc,
-		quoteFunc:       quoteFunc,
-		tradeFunc:       tradeFunc,
+		length:            length,
+		smoothingFactor:   alpha,
+		signalLag:         signalLag,
+		mnemonic:          mnemonic,
+		description:       descr + mnemonic,
+		mnemonicSignal:    mnemonicSignal,
+		descriptionSignal: descrSignal + mnemonicSignal,
+		coeff1:            c1,
+		coeff2:            c2,
+		coeff3:            c3,
+		coeff4:            c4,
+		coeff5:            c5,
+		value:             math.NaN(),
+		signal:            math.NaN(),
+		primed:            false,
+		barFunc:           barFunc,
+		quoteFunc:         quoteFunc,
+		tradeFunc:         tradeFunc,
 	}, nil
 }
 
@@ -194,25 +193,15 @@ func (s *CyberCycle) IsPrimed() bool {
 
 // Metadata describes an output data of the indicator.
 func (s *CyberCycle) Metadata() core.Metadata {
-	return core.Metadata{
-		Type:        core.CyberCycle,
-		Mnemonic:    s.mnemonic,
-		Description: s.description,
-		Outputs: []outputs.Metadata{
-			{
-				Kind:        int(Value),
-				Type:        outputs.ScalarType,
-				Mnemonic:    s.mnemonic,
-				Description: s.description,
-			},
-			{
-				Kind:        int(Signal),
-				Type:        outputs.ScalarType,
-				Mnemonic:    s.mnemonicSig,
-				Description: s.descriptionSig,
-			},
+	return core.BuildMetadata(
+		core.CyberCycle,
+		s.mnemonic,
+		s.description,
+		[]core.OutputText{
+			{Mnemonic: s.mnemonic, Description: s.description},
+			{Mnemonic: s.mnemonicSignal, Description: s.descriptionSignal},
 		},
-	}
+	)
 }
 
 // Update updates the value of the cyber cycle given the next sample.
@@ -350,15 +339,15 @@ func (s *CyberCycle) updateEntity(
 	output := make([]any, length)
 	v := s.Update(sample)
 
-	sig := s.signal
+	signal := s.signal
 	if math.IsNaN(v) {
-		sig = math.NaN()
+		signal = math.NaN()
 	}
 
 	i := 0
 	output[i] = entities.Scalar{Time: time, Value: v}
 	i++
-	output[i] = entities.Scalar{Time: time, Value: sig}
+	output[i] = entities.Scalar{Time: time, Value: signal}
 
 	return output
 }

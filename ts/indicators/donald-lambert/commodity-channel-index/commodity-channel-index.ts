@@ -1,10 +1,9 @@
+import { buildMetadata } from '../../core/build-metadata';
 import { componentTripleMnemonic } from '../../core/component-triple-mnemonic';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
-import { IndicatorType } from '../../core/indicator-type';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { LineIndicator } from '../../core/line-indicator';
-import { OutputType } from '../../core/outputs/output-type';
-import { CommodityChannelIndexOutput } from './commodity-channel-index-output';
-import { CommodityChannelIndexParams, DefaultInverseScalingFactor } from './commodity-channel-index-params';
+import { CommodityChannelIndexParams, DefaultInverseScalingFactor } from './params';
 
 /** Function to calculate mnemonic of a __CommodityChannelIndex__ indicator. */
 export const commodityChannelIndexMnemonic = (params: CommodityChannelIndexParams): string => {
@@ -73,17 +72,14 @@ export class CommodityChannelIndex extends LineIndicator {
 
   /** Describes the output data of the indicator. */
   public metadata(): IndicatorMetadata {
-    return {
-      type: IndicatorType.CommodityChannelIndex,
-      mnemonic: this.mnemonic,
-      description: this.description,
-      outputs: [{
-        kind: CommodityChannelIndexOutput.CommodityChannelIndexValue,
-        type: OutputType.Scalar,
-        mnemonic: this.mnemonic,
-        description: this.description,
-      }],
-    };
+    return buildMetadata(
+      IndicatorIdentifier.CommodityChannelIndex,
+      this.mnemonic,
+      this.description,
+      [
+        { mnemonic: this.mnemonic, description: this.description },
+      ],
+    );
   }
 
   /** Updates the value of the indicator given the next sample. */

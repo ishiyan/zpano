@@ -1,17 +1,21 @@
+import { buildMetadata } from '../../core/build-metadata';
 import { Bar } from '../../../entities/bar';
 import { BarComponent, barComponentValue } from '../../../entities/bar-component';
 import { Scalar } from '../../../entities/scalar';
+import { componentTripleMnemonic } from '../../core/component-triple-mnemonic';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
 import { IndicatorOutput } from '../../core/indicator-output';
-import { IndicatorType } from '../../core/indicator-type';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { LineIndicator } from '../../core/line-indicator';
-import { OutputType } from '../../core/outputs/output-type';
-import { OnBalanceVolumeOutput } from './on-balance-volume-output';
-import { OnBalanceVolumeParams } from './on-balance-volume-params';
+import { OnBalanceVolumeParams } from './params';
 
 /** Function to calculate mnemonic of an __OnBalanceVolume__ indicator. */
-export const onBalanceVolumeMnemonic = (): string => {
-  return 'obv';
+export const onBalanceVolumeMnemonic = (params: OnBalanceVolumeParams = {}): string => {
+  const suffix = componentTripleMnemonic(params.barComponent, params.quoteComponent, params.tradeComponent);
+  if (suffix === '') {
+    return 'obv';
+  }
+  return `obv(${suffix.slice(2)})`; // strip leading ", "
 };
 
 /**
@@ -41,7 +45,7 @@ export class OnBalanceVolume extends LineIndicator {
     this.value = Number.NaN;
     this.primed = false;
 
-    this.mnemonic = onBalanceVolumeMnemonic();
+    this.mnemonic = onBalanceVolumeMnemonic(params);
     this.description = 'On-Balance Volume OBV';
 
     // OBV defaults to ClosePrice, not TypicalPrice.
@@ -54,17 +58,14 @@ export class OnBalanceVolume extends LineIndicator {
 
   /** Describes the output data of the indicator. */
   public metadata(): IndicatorMetadata {
-    return {
-      type: IndicatorType.OnBalanceVolume,
-      mnemonic: this.mnemonic,
-      description: this.description,
-      outputs: [{
-        kind: OnBalanceVolumeOutput.OnBalanceVolumeValue,
-        type: OutputType.Scalar,
-        mnemonic: this.mnemonic,
-        description: this.description,
-      }],
-    };
+    return buildMetadata(
+      IndicatorIdentifier.OnBalanceVolume,
+      this.mnemonic,
+      this.description,
+      [
+        { mnemonic: this.mnemonic, description: this.description },
+      ],
+    );
   }
 
   /** Updates the value of the indicator given the next sample (volume = 1). */

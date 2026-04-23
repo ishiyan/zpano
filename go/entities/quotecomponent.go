@@ -95,8 +95,8 @@ func QuoteComponentFunc(c QuoteComponent) (QuoteFunc, error) {
 }
 
 // String implements the Stringer interface.
-func (c QuoteComponent) String() string {
-	switch c {
+func (s QuoteComponent) String() string {
+	switch s {
 	case QuoteBidPrice:
 		return quoteBid
 	case QuoteAskPrice:
@@ -119,8 +119,8 @@ func (c QuoteComponent) String() string {
 }
 
 // Mnemonic returns a short mnemonic code for the quote component.
-func (c QuoteComponent) Mnemonic() string {
-	switch c {
+func (s QuoteComponent) Mnemonic() string {
+	switch s {
 	case QuoteBidPrice:
 		return quoteMnemonicBid
 	case QuoteAskPrice:
@@ -143,51 +143,51 @@ func (c QuoteComponent) Mnemonic() string {
 }
 
 // IsKnown determines if this quote component is known.
-func (c QuoteComponent) IsKnown() bool {
-	return c >= QuoteBidPrice && c < quoteLast
+func (s QuoteComponent) IsKnown() bool {
+	return s >= QuoteBidPrice && s < quoteLast
 }
 
 // MarshalJSON implements the Marshaler interface.
-func (c QuoteComponent) MarshalJSON() ([]byte, error) {
-	s := c.String()
-	if s == unknown {
-		return nil, fmt.Errorf(marshalErrFmt, s, errUnknownQuoteComponent)
+func (s QuoteComponent) MarshalJSON() ([]byte, error) {
+	str := s.String()
+	if str == unknown {
+		return nil, fmt.Errorf(marshalErrFmt, str, errUnknownQuoteComponent)
 	}
 
 	const extra = 2 // Two bytes for quotes.
 
-	b := make([]byte, 0, len(s)+extra)
+	b := make([]byte, 0, len(str)+extra)
 	b = append(b, dqc)
-	b = append(b, s...)
+	b = append(b, str...)
 	b = append(b, dqc)
 
 	return b, nil
 }
 
 // UnmarshalJSON implements the Unmarshaler interface.
-func (c *QuoteComponent) UnmarshalJSON(data []byte) error {
+func (s *QuoteComponent) UnmarshalJSON(data []byte) error {
 	d := bytes.Trim(data, dqs)
-	s := string(d)
+	str := string(d)
 
-	switch s {
+	switch str {
 	case quoteBid:
-		*c = QuoteBidPrice
+		*s = QuoteBidPrice
 	case quoteAsk:
-		*c = QuoteAskPrice
+		*s = QuoteAskPrice
 	case quoteBidSize:
-		*c = QuoteBidSize
+		*s = QuoteBidSize
 	case quoteAskSize:
-		*c = QuoteAskSize
+		*s = QuoteAskSize
 	case quoteMid:
-		*c = QuoteMidPrice
+		*s = QuoteMidPrice
 	case quoteWeighted:
-		*c = QuoteWeightedPrice
+		*s = QuoteWeightedPrice
 	case quoteWeightedMid:
-		*c = QuoteWeightedMidPrice
+		*s = QuoteWeightedMidPrice
 	case quoteSpreadBp:
-		*c = QuoteSpreadBp
+		*s = QuoteSpreadBp
 	default:
-		return fmt.Errorf(unmarshalErrFmt, s, errUnknownQuoteComponent)
+		return fmt.Errorf(unmarshalErrFmt, str, errUnknownQuoteComponent)
 	}
 
 	return nil

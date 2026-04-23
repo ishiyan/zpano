@@ -1,10 +1,9 @@
+import { buildMetadata } from '../../core/build-metadata';
 import { componentTripleMnemonic } from '../../core/component-triple-mnemonic';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
-import { IndicatorType } from '../../core/indicator-type';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { LineIndicator } from '../../core/line-indicator';
-import { OutputType } from '../../core/outputs/output-type';
-import { SimpleMovingAverageOutput } from './simple-moving-average-output';
-import { SimpleMovingAverageParams } from './simple-moving-average-params';
+import { SimpleMovingAverageParams } from './params';
 
 /** Function to calculate mnemonic of a __SimpleMovingAverage__ indicator. */
 export const simpleMovingAverageMnemonic = (params: SimpleMovingAverageParams): string =>
@@ -44,17 +43,12 @@ export class SimpleMovingAverage extends LineIndicator {
 
   /** Describes the output data of the indicator. */
   public metadata(): IndicatorMetadata {
-    return {
-      type: IndicatorType.SimpleMovingAverage,
-      mnemonic: this.mnemonic,
-      description: this.description,
-      outputs: [{
-        kind: SimpleMovingAverageOutput.SimpleMovingAverageValue,
-        type: OutputType.Scalar,
-        mnemonic: this.mnemonic,
-        description: this.description,
-      }],
-    };
+    return buildMetadata(
+      IndicatorIdentifier.SimpleMovingAverage,
+      this.mnemonic,
+      this.description,
+      [{ mnemonic: this.mnemonic, description: this.description }],
+    );
   }
 
   /** Updates the value of the indicator given the next sample. */

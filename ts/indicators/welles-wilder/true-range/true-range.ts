@@ -1,3 +1,4 @@
+import { buildMetadata } from '../../core/build-metadata';
 import { Bar } from '../../../entities/bar';
 import { Quote } from '../../../entities/quote';
 import { Scalar } from '../../../entities/scalar';
@@ -5,10 +6,7 @@ import { Trade } from '../../../entities/trade';
 import { Indicator } from '../../core/indicator';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
 import { IndicatorOutput } from '../../core/indicator-output';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputMetadata } from '../../core/outputs/output-metadata';
-import { OutputType } from '../../core/outputs/output-type';
-import { TrueRangeOutput } from './true-range-output';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 
 const trMnemonic = 'tr';
 const trDescription = 'True Range';
@@ -41,19 +39,14 @@ export class TrueRange implements Indicator {
 
   /** Describes the output data of the indicator. */
   public metadata(): IndicatorMetadata {
-    const outputMeta: OutputMetadata = {
-      kind: TrueRangeOutput.TrueRangeValue,
-      type: OutputType.Scalar,
-      mnemonic: trMnemonic,
-      description: trDescription,
-    };
-
-    return {
-      type: IndicatorType.TrueRange,
-      mnemonic: trMnemonic,
-      description: trDescription,
-      outputs: [outputMeta],
-    };
+    return buildMetadata(
+      IndicatorIdentifier.TrueRange,
+      trMnemonic,
+      trDescription,
+      [
+        { mnemonic: trMnemonic, description: trDescription },
+      ],
+    );
   }
 
   /** Updates the True Range given the next bar's close, high, and low values. */

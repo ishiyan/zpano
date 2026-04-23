@@ -9,7 +9,7 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
+	"zpano/indicators/core/outputs/shape"
 )
 
 // TA-Lib test data (252 entries), extracted programmatically from DirectionalMovementPlusTest.cs.
@@ -443,12 +443,12 @@ func TestDirectionalMovementPlusMetadata(t *testing.T) {
 		}
 	}
 
-	check("Type", core.DirectionalMovementPlus, act.Type)
+	check("Identifier", core.DirectionalMovementPlus, act.Identifier)
 	check("Mnemonic", "+dm", act.Mnemonic)
 	check("Description", "Directional Movement Plus", act.Description)
 	check("len(Outputs)", 1, len(act.Outputs))
-	check("Outputs[0].Kind", int(DirectionalMovementPlusValue), act.Outputs[0].Kind)
-	check("Outputs[0].Type", outputs.ScalarType, act.Outputs[0].Type)
+	check("Outputs[0].Kind", int(Value), act.Outputs[0].Kind)
+	check("Outputs[0].Shape", shape.Scalar, act.Outputs[0].Shape)
 	check("Outputs[0].Mnemonic", "+dm", act.Outputs[0].Mnemonic)
 	check("Outputs[0].Description", "Directional Movement Plus", act.Outputs[0].Description)
 }

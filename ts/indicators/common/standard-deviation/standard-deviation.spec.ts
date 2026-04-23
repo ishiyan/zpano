@@ -1,8 +1,8 @@
 import { } from 'jasmine';
 
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
-import { StandardDeviationOutput } from './standard-deviation-output';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
+import { StandardDeviationOutput } from './output';
 import { StandardDeviation } from './standard-deviation';
 
 // Standard deviation input test data.
@@ -42,12 +42,12 @@ describe('StandardDeviation', () => {
     const sd = new StandardDeviation({length: 7, unbiased: true});
     const m = sd.metadata();
 
-    expect(m.type).toBe(IndicatorType.StandardDeviation);
+    expect(m.identifier).toBe(IndicatorIdentifier.StandardDeviation);
     expect(m.mnemonic).toBe('stdev.s(7)');
     expect(m.description).toBe('Standard deviation based on unbiased estimation of the sample variance stdev.s(7)');
     expect(m.outputs.length).toBe(1);
     expect(m.outputs[0].kind).toBe(StandardDeviationOutput.StandardDeviationValue);
-    expect(m.outputs[0].type).toBe(OutputType.Scalar);
+    expect(m.outputs[0].shape).toBe(Shape.Scalar);
     expect(m.outputs[0].mnemonic).toBe('stdev.s(7)');
     expect(m.outputs[0].description).toBe('Standard deviation based on unbiased estimation of the sample variance stdev.s(7)');
   });
@@ -56,12 +56,12 @@ describe('StandardDeviation', () => {
     const sd = new StandardDeviation({length: 7, unbiased: false});
     const m = sd.metadata();
 
-    expect(m.type).toBe(IndicatorType.StandardDeviation);
+    expect(m.identifier).toBe(IndicatorIdentifier.StandardDeviation);
     expect(m.mnemonic).toBe('stdev.p(7)');
     expect(m.description).toBe('Standard deviation based on estimation of the population variance stdev.p(7)');
     expect(m.outputs.length).toBe(1);
     expect(m.outputs[0].kind).toBe(StandardDeviationOutput.StandardDeviationValue);
-    expect(m.outputs[0].type).toBe(OutputType.Scalar);
+    expect(m.outputs[0].shape).toBe(Shape.Scalar);
     expect(m.outputs[0].mnemonic).toBe('stdev.p(7)');
     expect(m.outputs[0].description).toBe('Standard deviation based on estimation of the population variance stdev.p(7)');
   });

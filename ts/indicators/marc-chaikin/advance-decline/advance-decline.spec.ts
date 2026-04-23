@@ -1,9 +1,9 @@
 import { } from 'jasmine';
 
 import { AdvanceDecline } from './advance-decline';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
-import { AdvanceDeclineOutput } from './advance-decline-output';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
+import { AdvanceDeclineOutput } from './output';
 
 // High test data, 252 entries. From TA-Lib excel-sma3-sma10-chaikin.csv.
 const testHighs = [
@@ -253,12 +253,12 @@ describe('AdvanceDecline', () => {
     const ad = new AdvanceDecline();
     const meta = ad.metadata();
 
-    expect(meta.type).toBe(IndicatorType.AdvanceDecline);
+    expect(meta.identifier).toBe(IndicatorIdentifier.AdvanceDecline);
     expect(meta.mnemonic).toBe('ad');
     expect(meta.description).toBe('Advance-Decline');
     expect(meta.outputs.length).toBe(1);
     expect(meta.outputs[0].kind).toBe(AdvanceDeclineOutput.AdvanceDeclineValue);
-    expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+    expect(meta.outputs[0].shape).toBe(Shape.Scalar);
   });
 
   it('should not change AD when high equals low', () => {

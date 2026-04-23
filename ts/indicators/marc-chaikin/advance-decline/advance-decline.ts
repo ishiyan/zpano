@@ -1,11 +1,10 @@
+import { buildMetadata } from '../../core/build-metadata';
 import { Bar } from '../../../entities/bar';
 import { Scalar } from '../../../entities/scalar';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
 import { IndicatorOutput } from '../../core/indicator-output';
-import { IndicatorType } from '../../core/indicator-type';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { LineIndicator } from '../../core/line-indicator';
-import { OutputType } from '../../core/outputs/output-type';
-import { AdvanceDeclineOutput } from './advance-decline-output';
 
 /**
  * AdvanceDecline is Marc Chaikin's Advance-Decline (A/D) Line.
@@ -17,7 +16,7 @@ import { AdvanceDeclineOutput } from './advance-decline-output';
  * The value is calculated as:
  *
  *   CLV = ((Close - Low) - (High - Close)) / (High - Low)
- *   AD  = AD_prev + CLV x Volume
+ *   AD  = AD_previous + CLV x Volume
  *
  * When High equals Low, the A/D value is unchanged (no division by zero).
  *
@@ -45,17 +44,14 @@ export class AdvanceDecline extends LineIndicator {
 
   /** Describes the output data of the indicator. */
   public metadata(): IndicatorMetadata {
-    return {
-      type: IndicatorType.AdvanceDecline,
-      mnemonic: this.mnemonic,
-      description: this.description,
-      outputs: [{
-        kind: AdvanceDeclineOutput.AdvanceDeclineValue,
-        type: OutputType.Scalar,
-        mnemonic: this.mnemonic,
-        description: this.description,
-      }],
-    };
+    return buildMetadata(
+      IndicatorIdentifier.AdvanceDecline,
+      this.mnemonic,
+      this.description,
+      [
+        { mnemonic: this.mnemonic, description: this.description },
+      ],
+    );
   }
 
   /** Updates the indicator with the given sample (H=L=C, volume=1, so AD is unchanged). */
@@ -73,9 +69,9 @@ export class AdvanceDecline extends LineIndicator {
       return Number.NaN;
     }
 
-    const tmp = high - low;
-    if (tmp > 0) {
-      this.ad += ((close - low) - (high - close)) / tmp * volume;
+    const temp = high - low;
+    if (temp > 0) {
+      this.ad += ((close - low) - (high - close)) / temp * volume;
     }
 
     this.value = this.ad;

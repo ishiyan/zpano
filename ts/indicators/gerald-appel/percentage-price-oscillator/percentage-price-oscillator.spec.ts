@@ -1,10 +1,10 @@
 import { } from 'jasmine';
 
 import { PercentagePriceOscillator } from './percentage-price-oscillator';
-import { MovingAverageType } from './percentage-price-oscillator-params';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
-import { PercentagePriceOscillatorOutput } from './percentage-price-oscillator-output';
+import { MovingAverageType } from './params';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
+import { PercentagePriceOscillatorOutput } from './output';
 
 // Test data from TA-Lib (252 entries), used by MBST C# tests.
 const input = [
@@ -160,12 +160,12 @@ describe('PercentagePriceOscillator', () => {
     const ppo = new PercentagePriceOscillator({ fastLength: 12, slowLength: 26 });
     const meta = ppo.metadata();
 
-    expect(meta.type).toBe(IndicatorType.PercentagePriceOscillator);
+    expect(meta.identifier).toBe(IndicatorIdentifier.PercentagePriceOscillator);
     expect(meta.mnemonic).toBe('ppo(SMA12/SMA26)');
     expect(meta.description).toBe('Percentage Price Oscillator ppo(SMA12/SMA26)');
     expect(meta.outputs.length).toBe(1);
     expect(meta.outputs[0].kind).toBe(PercentagePriceOscillatorOutput.PercentagePriceOscillatorValue);
-    expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+    expect(meta.outputs[0].shape).toBe(Shape.Scalar);
   });
 
   it('should return correct metadata (EMA)', () => {

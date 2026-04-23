@@ -9,7 +9,7 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
+	"zpano/indicators/core/outputs/shape"
 )
 
 //nolint:lll
@@ -304,12 +304,12 @@ func TestChandeMomentumOscillatorMetadata(t *testing.T) {
 		}
 	}
 
-	check("Type", core.ChandeMomentumOscillator, act.Type)
+	check("Identifier", core.ChandeMomentumOscillator, act.Identifier)
 	check("Mnemonic", "cmo(5)", act.Mnemonic)
 	check("Description", "Chande Momentum Oscillator cmo(5)", act.Description)
 	check("len(Outputs)", 1, len(act.Outputs))
 	check("Outputs[0].Kind", int(Value), act.Outputs[0].Kind)
-	check("Outputs[0].Type", outputs.ScalarType, act.Outputs[0].Type)
+	check("Outputs[0].Shape", shape.Scalar, act.Outputs[0].Shape)
 	check("Outputs[0].Mnemonic", "cmo(5)", act.Outputs[0].Mnemonic)
 	check("Outputs[0].Description", "Chande Momentum Oscillator cmo(5)", act.Outputs[0].Description)
 }
@@ -351,7 +351,7 @@ func TestNewChandeMomentumOscillator(t *testing.T) { //nolint: funlen
 		check("len(ringBuffer)", length, len(cmo.ringBuffer))
 		check("ringHead", 0, cmo.ringHead)
 		check("count", 0, cmo.count)
-		check("prevSample", 0., cmo.prevSample)
+		check("previousSample", 0., cmo.previousSample)
 		check("gainSum", 0., cmo.gainSum)
 		check("lossSum", 0., cmo.lossSum)
 	})
@@ -371,7 +371,7 @@ func TestNewChandeMomentumOscillator(t *testing.T) { //nolint: funlen
 		check("len(ringBuffer)", 1, len(cmo.ringBuffer))
 		check("ringHead", 0, cmo.ringHead)
 		check("count", 0, cmo.count)
-		check("prevSample", 0., cmo.prevSample)
+		check("previousSample", 0., cmo.previousSample)
 		check("gainSum", 0., cmo.gainSum)
 		check("lossSum", 0., cmo.lossSum)
 	})

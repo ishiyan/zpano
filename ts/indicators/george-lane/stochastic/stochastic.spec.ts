@@ -1,9 +1,9 @@
 import { } from 'jasmine';
 
 import { Stochastic } from './stochastic';
-import { StochasticOutput } from './stochastic-output';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
+import { StochasticOutput } from './output';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
 
 // Standard HLC test data (252 entries) from TA-Lib.
 const highs = [
@@ -96,7 +96,7 @@ const closes = [
 describe('Stochastic', () => {
 
   // Test 1: fastK=5, slowK=3/SMA, slowD=4/SMA.
-  // begIdx=9, SlowK[0]=38.139, SlowD[0]=36.725.
+  // begIndex=9, SlowK[0]=38.139, SlowD[0]=36.725.
   it('should calculate 5/SMA3/SMA4 single value at index 9', () => {
     const tolerance = 1e-2;
     const ind = new Stochastic({ fastKLength: 5, slowKLength: 3, slowDLength: 4 });
@@ -112,7 +112,7 @@ describe('Stochastic', () => {
   });
 
   // Test 2: fastK=5, slowK=3/SMA, slowD=3/SMA.
-  // begIdx=8, first: SlowK[0]=24.0128, SlowD[0]=36.254.
+  // begIndex=8, first: SlowK[0]=24.0128, SlowD[0]=36.254.
   it('should calculate 5/SMA3/SMA3 first value at index 8', () => {
     const tolerance = 1e-2;
     const ind = new Stochastic({ fastKLength: 5, slowKLength: 3, slowDLength: 3 });
@@ -188,11 +188,11 @@ describe('Stochastic', () => {
     const ind = new Stochastic({ fastKLength: 5, slowKLength: 3, slowDLength: 3 });
     const meta = ind.metadata();
 
-    expect(meta.type).toBe(IndicatorType.Stochastic);
+    expect(meta.identifier).toBe(IndicatorIdentifier.Stochastic);
     expect(meta.mnemonic).toBe('stoch(5/SMA3/SMA3)');
     expect(meta.outputs.length).toBe(3);
     expect(meta.outputs[0].kind).toBe(StochasticOutput.FastK);
-    expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+    expect(meta.outputs[0].shape).toBe(Shape.Scalar);
     expect(meta.outputs[1].kind).toBe(StochasticOutput.SlowK);
     expect(meta.outputs[2].kind).toBe(StochasticOutput.SlowD);
   });

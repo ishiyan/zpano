@@ -8,7 +8,6 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
 )
 
 // Variance computes the variance of the samples within a moving window of length ℓ:
@@ -122,19 +121,14 @@ func (v *Variance) IsPrimed() bool {
 // Metadata describes an output data of the indicator.
 // It always has a single scalar output -- the calculated value of the variance.
 func (v *Variance) Metadata() core.Metadata {
-	return core.Metadata{
-		Type:        core.Variance,
-		Mnemonic:    v.LineIndicator.Mnemonic,
-		Description: v.LineIndicator.Description,
-		Outputs: []outputs.Metadata{
-			{
-				Kind:        int(VarianceValue),
-				Type:        outputs.ScalarType,
-				Mnemonic:    v.LineIndicator.Mnemonic,
-				Description: v.LineIndicator.Description,
-			},
+	return core.BuildMetadata(
+		core.Variance,
+		v.LineIndicator.Mnemonic,
+		v.LineIndicator.Description,
+		[]core.OutputText{
+			{Mnemonic: v.LineIndicator.Mnemonic, Description: v.LineIndicator.Description},
 		},
-	}
+	)
 }
 
 // Update updates the value of the variance, σ², given the next sample.

@@ -9,7 +9,6 @@ import (
 	"zpano/indicators/common/exponentialmovingaverage"
 	"zpano/indicators/common/simplemovingaverage"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
 )
 
 // lineUpdater is an interface for indicators that accept a single scalar and return a value.
@@ -146,50 +145,45 @@ func NewAbsolutePriceOscillator(p *AbsolutePriceOscillatorParams) (*AbsolutePric
 }
 
 // IsPrimed indicates whether the indicator is primed.
-func (a *AbsolutePriceOscillator) IsPrimed() bool {
-	a.mu.RLock()
-	defer a.mu.RUnlock()
+func (s *AbsolutePriceOscillator) IsPrimed() bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
-	return a.primed
+	return s.primed
 }
 
 // Metadata describes the output data of the indicator.
-func (a *AbsolutePriceOscillator) Metadata() core.Metadata {
-	return core.Metadata{
-		Type:        core.AbsolutePriceOscillator,
-		Mnemonic:    a.LineIndicator.Mnemonic,
-		Description: a.LineIndicator.Description,
-		Outputs: []outputs.Metadata{
-			{
-				Kind:        int(AbsolutePriceOscillatorValue),
-				Type:        outputs.ScalarType,
-				Mnemonic:    a.LineIndicator.Mnemonic,
-				Description: a.LineIndicator.Description,
-			},
+func (s *AbsolutePriceOscillator) Metadata() core.Metadata {
+	return core.BuildMetadata(
+		core.AbsolutePriceOscillator,
+		s.LineIndicator.Mnemonic,
+		s.LineIndicator.Description,
+		[]core.OutputText{
+			{Mnemonic: s.LineIndicator.Mnemonic, Description: s.LineIndicator.Description},
 		},
-	}
+	)
 }
 
 // Update updates the value of the indicator given the next sample.
-func (a *AbsolutePriceOscillator) Update(sample float64) float64 {
+func (s *AbsolutePriceOscillator) Update(sample float64) float64 {
 	if math.IsNaN(sample) {
 		return sample
 	}
 
-	a.mu.Lock()
-	defer a.mu.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
-	slow := a.slowMA.Update(sample)
-	fast := a.fastMA.Update(sample)
-	a.primed = a.slowMA.IsPrimed() && a.fastMA.IsPrimed()
+	slow := s.slowMA.Update(sample)
+	fast := s.fastMA.Update(sample)
+	s.primed = s.slowMA.IsPrimed() && s.fastMA.IsPrimed()
 
 	if math.IsNaN(fast) || math.IsNaN(slow) {
-		a.value = math.NaN()
+		s.value = math.NaN()
 
-		return a.value
+		return s.value
 	}
 
-	a.value = fast - slow
+	s.value = fast - slow
 
-	return a.value
+	return s.value
 }

@@ -9,7 +9,6 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
 )
 
 // InstantaneousTrendLine (Ehler's Instantaneous Trend Line, iTrend) is described
@@ -183,25 +182,15 @@ func (s *InstantaneousTrendLine) IsPrimed() bool {
 
 // Metadata describes an output data of the indicator.
 func (s *InstantaneousTrendLine) Metadata() core.Metadata {
-	return core.Metadata{
-		Type:        core.InstantaneousTrendLine,
-		Mnemonic:    s.mnemonic,
-		Description: s.description,
-		Outputs: []outputs.Metadata{
-			{
-				Kind:        int(Value),
-				Type:        outputs.ScalarType,
-				Mnemonic:    s.mnemonic,
-				Description: s.description,
-			},
-			{
-				Kind:        int(Trigger),
-				Type:        outputs.ScalarType,
-				Mnemonic:    s.mnemonicTrig,
-				Description: s.descriptionTrig,
-			},
+	return core.BuildMetadata(
+		core.InstantaneousTrendLine,
+		s.mnemonic,
+		s.description,
+		[]core.OutputText{
+			{Mnemonic: s.mnemonic, Description: s.description},
+			{Mnemonic: s.mnemonicTrig, Description: s.descriptionTrig},
 		},
-	}
+	)
 }
 
 // Update updates the value of the instantaneous trend line given the next sample.

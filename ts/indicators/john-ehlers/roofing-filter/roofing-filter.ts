@@ -1,11 +1,10 @@
+import { buildMetadata } from '../../core/build-metadata';
 import { BarComponent } from '../../../entities/bar-component';
 import { componentTripleMnemonic } from '../../core/component-triple-mnemonic';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
-import { IndicatorType } from '../../core/indicator-type';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { LineIndicator } from '../../core/line-indicator';
-import { OutputType } from '../../core/outputs/output-type';
-import { RoofingFilterOutput } from './roofing-filter-output';
-import { RoofingFilterParams } from './roofing-filter-params';
+import { RoofingFilterParams } from './params';
 
 /** Function to calculate mnemonic of a __RoofingFilter__ indicator. */
 export const roofingFilterMnemonic = (params: RoofingFilterParams): string => {
@@ -50,13 +49,13 @@ export class RoofingFilter extends LineIndicator {
   private hasZeroMeanFilter: boolean;
 
   private count: number;
-  private samplePrev: number;
-  private samplePrev2: number;
-  private hpPrev: number;
-  private hpPrev2: number;
-  private ssPrev: number;
-  private ssPrev2: number;
-  private zmPrev: number;
+  private samplePrevious: number;
+  private samplePrevious2: number;
+  private hpPrevious: number;
+  private hpPrevious2: number;
+  private ssPrevious: number;
+  private ssPrevious2: number;
+  private zmPrevious: number;
   private value: number;
 
   /**
@@ -111,30 +110,27 @@ export class RoofingFilter extends LineIndicator {
     this.ssCoeff1 = (1 - this.ssCoeff2 - this.ssCoeff3) / 2;
 
     this.count = 0;
-    this.samplePrev = 0;
-    this.samplePrev2 = 0;
-    this.hpPrev = 0;
-    this.hpPrev2 = 0;
-    this.ssPrev = 0;
-    this.ssPrev2 = 0;
-    this.zmPrev = 0;
+    this.samplePrevious = 0;
+    this.samplePrevious2 = 0;
+    this.hpPrevious = 0;
+    this.hpPrevious2 = 0;
+    this.ssPrevious = 0;
+    this.ssPrevious2 = 0;
+    this.zmPrevious = 0;
     this.value = Number.NaN;
     this.primed = false;
   }
 
   /** Describes the output data of the indicator. */
   public metadata(): IndicatorMetadata {
-    return {
-      type: IndicatorType.RoofingFilter,
-      mnemonic: this.mnemonic,
-      description: this.description,
-      outputs: [{
-        kind: RoofingFilterOutput.RoofingFilterValue,
-        type: OutputType.Scalar,
-        mnemonic: this.mnemonic,
-        description: this.description,
-      }],
-    };
+    return buildMetadata(
+      IndicatorIdentifier.RoofingFilter,
+      this.mnemonic,
+      this.description,
+      [
+        { mnemonic: this.mnemonic, description: this.description },
+      ],
+    );
   }
 
   /** Updates the value of the indicator given the next sample. */
@@ -156,11 +152,11 @@ export class RoofingFilter extends LineIndicator {
     let zm = 0;
 
     if (this.primed) {
-      hp = this.hpCoeff1 * (sample - this.samplePrev) + this.hpCoeff2 * this.hpPrev;
-      ss = this.ssCoeff1 * (hp + this.hpPrev) + this.ssCoeff2 * this.ssPrev + this.ssCoeff3 * this.ssPrev2;
+      hp = this.hpCoeff1 * (sample - this.samplePrevious) + this.hpCoeff2 * this.hpPrevious;
+      ss = this.ssCoeff1 * (hp + this.hpPrevious) + this.ssCoeff2 * this.ssPrevious + this.ssCoeff3 * this.ssPrevious2;
 
       if (this.hasZeroMeanFilter) {
-        zm = this.hpCoeff1 * (ss - this.ssPrev) + this.hpCoeff2 * this.zmPrev;
+        zm = this.hpCoeff1 * (ss - this.ssPrevious) + this.hpCoeff2 * this.zmPrevious;
         this.value = zm;
       } else {
         this.value = ss;
@@ -172,11 +168,11 @@ export class RoofingFilter extends LineIndicator {
         hp = 0;
         ss = 0;
       } else {
-        hp = this.hpCoeff1 * (sample - this.samplePrev) + this.hpCoeff2 * this.hpPrev;
-        ss = this.ssCoeff1 * (hp + this.hpPrev) + this.ssCoeff2 * this.ssPrev + this.ssCoeff3 * this.ssPrev2;
+        hp = this.hpCoeff1 * (sample - this.samplePrevious) + this.hpCoeff2 * this.hpPrevious;
+        ss = this.ssCoeff1 * (hp + this.hpPrevious) + this.ssCoeff2 * this.ssPrevious + this.ssCoeff3 * this.ssPrevious2;
 
         if (this.hasZeroMeanFilter) {
-          zm = this.hpCoeff1 * (ss - this.ssPrev) + this.hpCoeff2 * this.zmPrev;
+          zm = this.hpCoeff1 * (ss - this.ssPrevious) + this.hpCoeff2 * this.zmPrevious;
           if (this.count === 5) {
             this.primed = true;
             this.value = zm;
@@ -188,13 +184,13 @@ export class RoofingFilter extends LineIndicator {
       }
     }
 
-    this.samplePrev = sample;
-    this.hpPrev = hp;
-    this.ssPrev2 = this.ssPrev;
-    this.ssPrev = ss;
+    this.samplePrevious = sample;
+    this.hpPrevious = hp;
+    this.ssPrevious2 = this.ssPrevious;
+    this.ssPrevious = ss;
 
     if (this.hasZeroMeanFilter) {
-      this.zmPrev = zm;
+      this.zmPrevious = zm;
     }
 
     return this.value;
@@ -205,9 +201,9 @@ export class RoofingFilter extends LineIndicator {
     let ss = 0;
 
     if (this.primed) {
-      hp = this.hpCoeff1 * (sample - 2 * this.samplePrev + this.samplePrev2) +
-        this.hpCoeff2 * this.hpPrev - this.hpCoeff3 * this.hpPrev2;
-      ss = this.ssCoeff1 * (hp + this.hpPrev) + this.ssCoeff2 * this.ssPrev + this.ssCoeff3 * this.ssPrev2;
+      hp = this.hpCoeff1 * (sample - 2 * this.samplePrevious + this.samplePrevious2) +
+        this.hpCoeff2 * this.hpPrevious - this.hpCoeff3 * this.hpPrevious2;
+      ss = this.ssCoeff1 * (hp + this.hpPrevious) + this.ssCoeff2 * this.ssPrevious + this.ssCoeff3 * this.ssPrevious2;
       this.value = ss;
     } else {
       this.count++;
@@ -216,9 +212,9 @@ export class RoofingFilter extends LineIndicator {
         hp = 0;
         ss = 0;
       } else {
-        hp = this.hpCoeff1 * (sample - 2 * this.samplePrev + this.samplePrev2) +
-          this.hpCoeff2 * this.hpPrev - this.hpCoeff3 * this.hpPrev2;
-        ss = this.ssCoeff1 * (hp + this.hpPrev) + this.ssCoeff2 * this.ssPrev + this.ssCoeff3 * this.ssPrev2;
+        hp = this.hpCoeff1 * (sample - 2 * this.samplePrevious + this.samplePrevious2) +
+          this.hpCoeff2 * this.hpPrevious - this.hpCoeff3 * this.hpPrevious2;
+        ss = this.ssCoeff1 * (hp + this.hpPrevious) + this.ssCoeff2 * this.ssPrevious + this.ssCoeff3 * this.ssPrevious2;
 
         if (this.count === 5) {
           this.primed = true;
@@ -227,12 +223,12 @@ export class RoofingFilter extends LineIndicator {
       }
     }
 
-    this.samplePrev2 = this.samplePrev;
-    this.samplePrev = sample;
-    this.hpPrev2 = this.hpPrev;
-    this.hpPrev = hp;
-    this.ssPrev2 = this.ssPrev;
-    this.ssPrev = ss;
+    this.samplePrevious2 = this.samplePrevious;
+    this.samplePrevious = sample;
+    this.hpPrevious2 = this.hpPrevious;
+    this.hpPrevious = hp;
+    this.ssPrevious2 = this.ssPrevious;
+    this.ssPrevious = ss;
 
     return this.value;
   }

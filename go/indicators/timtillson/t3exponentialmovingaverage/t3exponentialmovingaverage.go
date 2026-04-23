@@ -8,7 +8,6 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
 )
 
 // https://store.traders.com/-v16-c01-005smo-pdf.html
@@ -220,19 +219,14 @@ func (s *T3ExponentialMovingAverage) IsPrimed() bool {
 // Metadata describes an output data of the indicator.
 // It always has a single scalar output -- the calculated value of the T3 exponential moving average.
 func (s *T3ExponentialMovingAverage) Metadata() core.Metadata {
-	return core.Metadata{
-		Type:        core.T3ExponentialMovingAverage,
-		Mnemonic:    s.LineIndicator.Mnemonic,
-		Description: s.LineIndicator.Description,
-		Outputs: []outputs.Metadata{
-			{
-				Kind:        int(T3ExponentialMovingAverageValue),
-				Type:        outputs.ScalarType,
-				Mnemonic:    s.LineIndicator.Mnemonic,
-				Description: s.LineIndicator.Description,
-			},
+	return core.BuildMetadata(
+		core.T3ExponentialMovingAverage,
+		s.LineIndicator.Mnemonic,
+		s.LineIndicator.Description,
+		[]core.OutputText{
+			{Mnemonic: s.LineIndicator.Mnemonic, Description: s.LineIndicator.Description},
 		},
-	}
+	)
 }
 
 // Update updates the value of the indicator given the next sample.

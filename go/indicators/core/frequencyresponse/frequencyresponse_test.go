@@ -11,11 +11,11 @@ import (
 
 type testFrequencyResponseIdentytyFilter int
 
-func (f testFrequencyResponseIdentytyFilter) Metadata() core.Metadata {
+func (s testFrequencyResponseIdentytyFilter) Metadata() core.Metadata {
 	return core.Metadata{Mnemonic: "identity"}
 }
 
-func (f testFrequencyResponseIdentytyFilter) Update(sample float64) float64 {
+func (s testFrequencyResponseIdentytyFilter) Update(sample float64) float64 {
 	return sample
 }
 

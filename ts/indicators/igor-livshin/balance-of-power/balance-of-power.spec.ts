@@ -1,9 +1,9 @@
 import { } from 'jasmine';
 
 import { BalanceOfPower } from './balance-of-power';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
-import { BalanceOfPowerOutput } from './balance-of-power-output';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
+import { BalanceOfPowerOutput } from './output';
 
 // First 20 entries from the C# TA-Lib test data.
 const inputOpen = [
@@ -73,12 +73,12 @@ describe('BalanceOfPower', () => {
     const bop = new BalanceOfPower();
     const meta = bop.metadata();
 
-    expect(meta.type).toBe(IndicatorType.BalanceOfPower);
+    expect(meta.identifier).toBe(IndicatorIdentifier.BalanceOfPower);
     expect(meta.mnemonic).toBe('bop');
     expect(meta.description).toBe('Balance of Power');
     expect(meta.outputs.length).toBe(1);
     expect(meta.outputs[0].kind).toBe(BalanceOfPowerOutput.BalanceOfPowerValue);
-    expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+    expect(meta.outputs[0].shape).toBe(Shape.Scalar);
   });
 
   it('should return 0 for zero range', () => {

@@ -9,7 +9,7 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
+	"zpano/indicators/core/outputs/shape"
 )
 
 // Typical price test data: (high + low + close) / 3, 252 entries.
@@ -301,11 +301,11 @@ func TestMoneyFlowIndexMetadata(t *testing.T) {
 
 	meta := mfi.Metadata()
 
-	if meta.Type != core.MoneyFlowIndex {
-		t.Errorf("expected type MoneyFlowIndex, got %v", meta.Type)
+	if meta.Identifier != core.MoneyFlowIndex {
+		t.Errorf("expected identifier MoneyFlowIndex, got %v", meta.Identifier)
 	}
 
-	exp := "mfi(14)"
+	exp := "mfi(14, hlc/3)"
 	if meta.Mnemonic != exp {
 		t.Errorf("expected mnemonic '%s', got '%s'", exp, meta.Mnemonic)
 	}
@@ -314,12 +314,12 @@ func TestMoneyFlowIndexMetadata(t *testing.T) {
 		t.Fatalf("expected 1 output, got %d", len(meta.Outputs))
 	}
 
-	if meta.Outputs[0].Kind != int(MoneyFlowIndexValue) {
-		t.Errorf("expected output kind %d, got %d", MoneyFlowIndexValue, meta.Outputs[0].Kind)
+	if meta.Outputs[0].Kind != int(Value) {
+		t.Errorf("expected output kind %d, got %d", Value, meta.Outputs[0].Kind)
 	}
 
-	if meta.Outputs[0].Type != outputs.ScalarType {
-		t.Errorf("expected scalar output type, got %v", meta.Outputs[0].Type)
+	if meta.Outputs[0].Shape != shape.Scalar {
+		t.Errorf("expected scalar output type, got %v", meta.Outputs[0].Shape)
 	}
 }
 

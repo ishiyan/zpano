@@ -9,7 +9,7 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
+	"zpano/indicators/core/outputs/shape"
 )
 
 //nolint:lll
@@ -292,12 +292,12 @@ func TestRateOfChangePercentMetadata(t *testing.T) {
 		}
 	}
 
-	check("Type", core.RateOfChangePercent, act.Type)
+	check("Identifier", core.RateOfChangePercent, act.Identifier)
 	check("Mnemonic", "rocp(5)", act.Mnemonic)
 	check("Description", "Rate of Change Percent rocp(5)", act.Description)
 	check("len(Outputs)", 1, len(act.Outputs))
 	check("Outputs[0].Kind", int(Value), act.Outputs[0].Kind)
-	check("Outputs[0].Type", outputs.ScalarType, act.Outputs[0].Type)
+	check("Outputs[0].Shape", shape.Scalar, act.Outputs[0].Shape)
 	check("Outputs[0].Mnemonic", "rocp(5)", act.Outputs[0].Mnemonic)
 	check("Outputs[0].Description", "Rate of Change Percent rocp(5)", act.Outputs[0].Description)
 }

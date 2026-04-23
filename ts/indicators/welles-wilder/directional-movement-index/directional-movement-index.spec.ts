@@ -1,9 +1,9 @@
 import { } from 'jasmine';
 
 import { DirectionalMovementIndex } from './directional-movement-index';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
-import { DirectionalMovementIndexOutput } from './directional-movement-index-output';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
+import { DirectionalMovementIndexOutput } from './output';
 
 // TA-Lib test data (252 entries), extracted programmatically from DirectionalMovementIndexTest.cs.
 const inputHigh = [
@@ -188,12 +188,12 @@ describe('DirectionalMovementIndex', () => {
     it('should return correct metadata', () => {
       const dx = new DirectionalMovementIndex(14);
       const meta = dx.metadata();
-      expect(meta.type).toBe(IndicatorType.DirectionalMovementIndex);
+      expect(meta.identifier).toBe(IndicatorIdentifier.DirectionalMovementIndex);
       expect(meta.mnemonic).toBe('dx');
       expect(meta.description).toBe('Directional Movement Index');
       expect(meta.outputs.length).toBe(7);
       expect(meta.outputs[0].kind).toBe(DirectionalMovementIndexOutput.DirectionalMovementIndexValue);
-      expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+      expect(meta.outputs[0].shape).toBe(Shape.Scalar);
       expect(meta.outputs[0].mnemonic).toBe('dx');
       expect(meta.outputs[0].description).toBe('Directional Movement Index');
       expect(meta.outputs[1].kind).toBe(DirectionalMovementIndexOutput.DirectionalIndicatorPlusValue);

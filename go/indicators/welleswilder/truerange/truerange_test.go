@@ -9,7 +9,7 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
+	"zpano/indicators/core/outputs/shape"
 )
 
 // TA-Lib test data (252 entries), extracted programmatically from TrueRangeTest.cs.
@@ -331,12 +331,12 @@ func TestTrueRangeMetadata(t *testing.T) {
 		}
 	}
 
-	check("Type", core.TrueRange, act.Type)
+	check("Identifier", core.TrueRange, act.Identifier)
 	check("Mnemonic", "tr", act.Mnemonic)
 	check("Description", "True Range", act.Description)
 	check("len(Outputs)", 1, len(act.Outputs))
-	check("Outputs[0].Kind", int(TrueRangeValue), act.Outputs[0].Kind)
-	check("Outputs[0].Type", outputs.ScalarType, act.Outputs[0].Type)
+	check("Outputs[0].Kind", int(Value), act.Outputs[0].Kind)
+	check("Outputs[0].Shape", shape.Scalar, act.Outputs[0].Shape)
 	check("Outputs[0].Mnemonic", "tr", act.Outputs[0].Mnemonic)
 	check("Outputs[0].Description", "True Range", act.Outputs[0].Description)
 }

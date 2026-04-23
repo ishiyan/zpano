@@ -1,9 +1,9 @@
 import { } from 'jasmine';
 
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
 import { TriangularMovingAverage } from './triangular-moving-average';
-import { TriangularMovingAverageOutput } from './triangular-moving-average-output';
+import { TriangularMovingAverageOutput } from './output';
 
 // ng test mb  --code-coverage --include='**/indicators/**/*.spec.ts'
 // ng test mb  --code-coverage --include='**/indicators/*.spec.ts'
@@ -68,12 +68,12 @@ describe('TriangularMovingAverage', () => {
   it('should return expected metadata', () => {
     const trima = new TriangularMovingAverage({length: 5});
     const meta = trima.metadata();
-    expect(meta.type).toBe(IndicatorType.TriangularMovingAverage);
+    expect(meta.identifier).toBe(IndicatorIdentifier.TriangularMovingAverage);
     expect(meta.mnemonic).toBe('trima(5)');
     expect(meta.description).toBe('Triangular moving average trima(5)');
     expect(meta.outputs.length).toBe(1);
     expect(meta.outputs[0].kind).toBe(TriangularMovingAverageOutput.TriangularMovingAverageValue);
-    expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+    expect(meta.outputs[0].shape).toBe(Shape.Scalar);
     expect(meta.outputs[0].mnemonic).toBe('trima(5)');
     expect(meta.outputs[0].description).toBe('Triangular moving average trima(5)');
   });

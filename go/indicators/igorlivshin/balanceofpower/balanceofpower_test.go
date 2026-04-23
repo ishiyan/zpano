@@ -8,7 +8,7 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
+	"zpano/indicators/core/outputs/shape"
 )
 
 // First 20 entries from the C# TA-Lib test data.
@@ -193,8 +193,8 @@ func TestBalanceOfPowerMetadata(t *testing.T) {
 
 	meta := bop.Metadata()
 
-	if meta.Type != core.BalanceOfPower {
-		t.Errorf("expected type BalanceOfPower, got %v", meta.Type)
+	if meta.Identifier != core.BalanceOfPower {
+		t.Errorf("expected identifier BalanceOfPower, got %v", meta.Identifier)
 	}
 
 	exp := "bop"
@@ -210,12 +210,12 @@ func TestBalanceOfPowerMetadata(t *testing.T) {
 		t.Fatalf("expected 1 output, got %d", len(meta.Outputs))
 	}
 
-	if meta.Outputs[0].Kind != int(BalanceOfPowerValue) {
-		t.Errorf("expected output kind %d, got %d", BalanceOfPowerValue, meta.Outputs[0].Kind)
+	if meta.Outputs[0].Kind != int(Value) {
+		t.Errorf("expected output kind %d, got %d", Value, meta.Outputs[0].Kind)
 	}
 
-	if meta.Outputs[0].Type != outputs.ScalarType {
-		t.Errorf("expected scalar output type, got %v", meta.Outputs[0].Type)
+	if meta.Outputs[0].Shape != shape.Scalar {
+		t.Errorf("expected scalar output type, got %v", meta.Outputs[0].Shape)
 	}
 }
 

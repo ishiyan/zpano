@@ -8,7 +8,6 @@ import (
 	"zpano/entities"
 	"zpano/indicators/common/variance"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
 )
 
 // StandardDeviation computes the standard deviation of the samples within a moving window of length ℓ
@@ -112,19 +111,14 @@ func (s *StandardDeviation) IsPrimed() bool {
 
 // Metadata describes an output data of the indicator.
 func (s *StandardDeviation) Metadata() core.Metadata {
-	return core.Metadata{
-		Type:        core.StandardDeviation,
-		Mnemonic:    s.LineIndicator.Mnemonic,
-		Description: s.LineIndicator.Description,
-		Outputs: []outputs.Metadata{
-			{
-				Kind:        int(StandardDeviationValue),
-				Type:        outputs.ScalarType,
-				Mnemonic:    s.LineIndicator.Mnemonic,
-				Description: s.LineIndicator.Description,
-			},
+	return core.BuildMetadata(
+		core.StandardDeviation,
+		s.LineIndicator.Mnemonic,
+		s.LineIndicator.Description,
+		[]core.OutputText{
+			{Mnemonic: s.LineIndicator.Mnemonic, Description: s.LineIndicator.Description},
 		},
-	}
+	)
 }
 
 // Update updates the value of the standard deviation given the next sample.

@@ -8,7 +8,6 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
 )
 
 const epsilon = 1e-12
@@ -27,14 +26,14 @@ const epsilon = 1e-12
 type ChandeMomentumOscillator struct {
 	mu sync.RWMutex
 	core.LineIndicator
-	length     int
-	count      int
-	ringBuffer []float64
-	ringHead   int
-	prevSample float64
-	gainSum    float64
-	lossSum    float64
-	primed     bool
+	length         int
+	count          int
+	ringBuffer     []float64
+	ringHead       int
+	previousSample float64
+	gainSum        float64
+	lossSum        float64
+	primed         bool
 }
 
 // New returns an instance of the indicator created using supplied parameters.
@@ -113,19 +112,14 @@ func (s *ChandeMomentumOscillator) IsPrimed() bool {
 // Metadata describes an output data of the indicator.
 // It always has a single scalar output -- the calculated value of the indicator.
 func (s *ChandeMomentumOscillator) Metadata() core.Metadata {
-	return core.Metadata{
-		Type:        core.ChandeMomentumOscillator,
-		Mnemonic:    s.LineIndicator.Mnemonic,
-		Description: s.LineIndicator.Description,
-		Outputs: []outputs.Metadata{
-			{
-				Kind:        int(Value),
-				Type:        outputs.ScalarType,
-				Mnemonic:    s.LineIndicator.Mnemonic,
-				Description: s.LineIndicator.Description,
-			},
+	return core.BuildMetadata(
+		core.ChandeMomentumOscillator,
+		s.LineIndicator.Mnemonic,
+		s.LineIndicator.Description,
+		[]core.OutputText{
+			{Mnemonic: s.LineIndicator.Mnemonic, Description: s.LineIndicator.Description},
 		},
-	}
+	)
 }
 
 // Update updates the value of the Chande momentum oscillator given the next sample.
@@ -141,14 +135,14 @@ func (s *ChandeMomentumOscillator) Update(sample float64) float64 {
 
 	s.count++
 	if s.count == 1 {
-		s.prevSample = sample
+		s.previousSample = sample
 
 		return math.NaN()
 	}
 
 	// New delta
-	delta := sample - s.prevSample
-	s.prevSample = sample
+	delta := sample - s.previousSample
+	s.previousSample = sample
 
 	if !s.primed {
 		// Fill until we have s.length deltas (i.e., s.length+1 samples)

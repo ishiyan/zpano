@@ -1,0 +1,45 @@
+package coronasignaltonoiseratio
+
+import "zpano/entities"
+
+// Params describes parameters to create an instance of the CoronaSignalToNoiseRatio indicator.
+type Params struct {
+	// RasterLength is the number of elements in the heatmap raster. The default value is 50.
+	RasterLength int
+
+	// MaxRasterValue is the maximal raster value (z) of the heatmap. The default value is 20.
+	MaxRasterValue float64
+
+	// MinParameterValue is the minimal ordinate (y) value of the heatmap. The default value is 1.
+	MinParameterValue float64
+
+	// MaxParameterValue is the maximal ordinate (y) value of the heatmap. The default value is 11.
+	MaxParameterValue float64
+
+	// HighPassFilterCutoff is the high-pass filter cutoff (de-trending period) used by
+	// the inner Corona engine. Suggested values are 20, 30, 100. The default value is 30.
+	HighPassFilterCutoff int
+
+	// MinimalPeriod is the minimal period of the inner Corona engine. The default value is 6.
+	MinimalPeriod int
+
+	// MaximalPeriod is the maximal period of the inner Corona engine. The default value is 30.
+	MaximalPeriod int
+
+	// BarComponent indicates the component of a bar to use when updating the indicator with a bar sample.
+	//
+	// If zero, the default (BarMedianPrice) is used, matching Ehlers' reference which operates on
+	// (High+Low)/2. Since this differs from the framework-wide default, it is always shown in the
+	// indicator mnemonic.
+	BarComponent entities.BarComponent
+
+	// QuoteComponent indicates the component of a quote to use when updating the indicator with a quote sample.
+	//
+	// If zero, the default (QuoteMidPrice) is used and the component is not shown in the indicator mnemonic.
+	QuoteComponent entities.QuoteComponent
+
+	// TradeComponent indicates the component of a trade to use when updating the indicator with a trade sample.
+	//
+	// If zero, the default (TradePrice) is used and the component is not shown in the indicator mnemonic.
+	TradeComponent entities.TradeComponent
+}

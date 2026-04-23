@@ -1,9 +1,9 @@
 import { } from 'jasmine';
 
 import { NormalizedAverageTrueRange } from './normalized-average-true-range';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
-import { NormalizedAverageTrueRangeOutput } from './normalized-average-true-range-output';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
+import { NormalizedAverageTrueRangeOutput } from './output';
 
 // TA-Lib test data (252 entries), extracted programmatically from NormalizedAverageTrueRangeTest.cs.
 const inputHigh = [
@@ -276,12 +276,12 @@ describe('NormalizedAverageTrueRange', () => {
     it('should return correct metadata', () => {
       const natr = new NormalizedAverageTrueRange(14);
       const meta = natr.metadata();
-      expect(meta.type).toBe(IndicatorType.NormalizedAverageTrueRange);
+      expect(meta.identifier).toBe(IndicatorIdentifier.NormalizedAverageTrueRange);
       expect(meta.mnemonic).toBe('natr');
       expect(meta.description).toBe('Normalized Average True Range');
       expect(meta.outputs.length).toBe(1);
       expect(meta.outputs[0].kind).toBe(NormalizedAverageTrueRangeOutput.NormalizedAverageTrueRangeValue);
-      expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+      expect(meta.outputs[0].shape).toBe(Shape.Scalar);
       expect(meta.outputs[0].mnemonic).toBe('natr');
       expect(meta.outputs[0].description).toBe('Normalized Average True Range');
     });

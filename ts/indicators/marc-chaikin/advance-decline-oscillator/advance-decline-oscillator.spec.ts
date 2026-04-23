@@ -1,10 +1,10 @@
 import { } from 'jasmine';
 
 import { AdvanceDeclineOscillator } from './advance-decline-oscillator';
-import { AdvanceDeclineOscillatorOutput } from './advance-decline-oscillator-output';
-import { MovingAverageType } from './advance-decline-oscillator-params';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
+import { AdvanceDeclineOscillatorOutput } from './output';
+import { MovingAverageType } from './params';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
 
 // High test data, 252 entries. From TA-Lib excel-sma3-sma10-chaikin.csv.
 const testHighs = [
@@ -322,7 +322,7 @@ describe('AdvanceDeclineOscillator', () => {
       values.push(adosc.updateHLCV(testHighs[i], testLows[i], testCloses[i], testVolumes[i]));
     }
 
-    // begIdx=4, output[0] at index 4.
+    // begIndex=4, output[0] at index 4.
     expect(roundTo(values[4], digits)).toBe(roundTo(585361.29, digits));
   });
 
@@ -366,12 +366,12 @@ describe('AdvanceDeclineOscillator', () => {
     });
     const meta = adosc.metadata();
 
-    expect(meta.type).toBe(IndicatorType.AdvanceDeclineOscillator);
+    expect(meta.identifier).toBe(IndicatorIdentifier.AdvanceDeclineOscillator);
     expect(meta.mnemonic).toBe('adosc(EMA3/EMA10)');
     expect(meta.description).toBe('Chaikin Advance-Decline Oscillator adosc(EMA3/EMA10)');
     expect(meta.outputs.length).toBe(1);
     expect(meta.outputs[0].kind).toBe(AdvanceDeclineOscillatorOutput.AdvanceDeclineOscillatorValue);
-    expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+    expect(meta.outputs[0].shape).toBe(Shape.Scalar);
   });
 
   it('should return SMA mnemonic', () => {

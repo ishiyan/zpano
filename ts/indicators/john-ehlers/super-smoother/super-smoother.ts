@@ -1,11 +1,10 @@
+import { buildMetadata } from '../../core/build-metadata';
 import { BarComponent } from '../../../entities/bar-component';
 import { componentTripleMnemonic } from '../../core/component-triple-mnemonic';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
-import { IndicatorType } from '../../core/indicator-type';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { LineIndicator } from '../../core/line-indicator';
-import { OutputType } from '../../core/outputs/output-type';
-import { SuperSmootherOutput } from './super-smoother-output';
-import { SuperSmootherParams } from './super-smoother-params';
+import { SuperSmootherParams } from './params';
 
 /** Function to calculate mnemonic of a __SuperSmoother__ indicator. */
 export const superSmootherMnemonic = (params: SuperSmootherParams): string => {
@@ -46,9 +45,9 @@ export class SuperSmoother extends LineIndicator {
   private coeff2: number;
   private coeff3: number;
   private count: number;
-  private samplePrev: number;
-  private filterPrev: number;
-  private filterPrev2: number;
+  private samplePrevious: number;
+  private filterPrevious: number;
+  private filterPrevious2: number;
   private value: number;
 
   /**
@@ -79,26 +78,23 @@ export class SuperSmoother extends LineIndicator {
     this.coeff2 = gamma2;
     this.coeff3 = gamma3;
     this.count = 0;
-    this.samplePrev = 0;
-    this.filterPrev = 0;
-    this.filterPrev2 = 0;
+    this.samplePrevious = 0;
+    this.filterPrevious = 0;
+    this.filterPrevious2 = 0;
     this.value = Number.NaN;
     this.primed = false;
   }
 
   /** Describes the output data of the indicator. */
   public metadata(): IndicatorMetadata {
-    return {
-      type: IndicatorType.SuperSmoother,
-      mnemonic: this.mnemonic,
-      description: this.description,
-      outputs: [{
-        kind: SuperSmootherOutput.SuperSmootherValue,
-        type: OutputType.Scalar,
-        mnemonic: this.mnemonic,
-        description: this.description,
-      }],
-    };
+    return buildMetadata(
+      IndicatorIdentifier.SuperSmoother,
+      this.mnemonic,
+      this.description,
+      [
+        { mnemonic: this.mnemonic, description: this.description },
+      ],
+    );
   }
 
   /** Updates the value of the indicator given the next sample. */
@@ -108,12 +104,12 @@ export class SuperSmoother extends LineIndicator {
     }
 
     if (this.primed) {
-      const filter = this.coeff1 * (sample + this.samplePrev) +
-        this.coeff2 * this.filterPrev + this.coeff3 * this.filterPrev2;
+      const filter = this.coeff1 * (sample + this.samplePrevious) +
+        this.coeff2 * this.filterPrevious + this.coeff3 * this.filterPrevious2;
       this.value = filter;
-      this.samplePrev = sample;
-      this.filterPrev2 = this.filterPrev;
-      this.filterPrev = filter;
+      this.samplePrevious = sample;
+      this.filterPrevious2 = this.filterPrevious;
+      this.filterPrevious = filter;
 
       return this.value;
     }
@@ -121,22 +117,22 @@ export class SuperSmoother extends LineIndicator {
     this.count++;
 
     if (this.count === 1) {
-      this.samplePrev = sample;
-      this.filterPrev = sample;
-      this.filterPrev2 = sample;
+      this.samplePrevious = sample;
+      this.filterPrevious = sample;
+      this.filterPrevious2 = sample;
     }
 
-    const filter = this.coeff1 * (sample + this.samplePrev) +
-      this.coeff2 * this.filterPrev + this.coeff3 * this.filterPrev2;
+    const filter = this.coeff1 * (sample + this.samplePrevious) +
+      this.coeff2 * this.filterPrevious + this.coeff3 * this.filterPrevious2;
 
     if (this.count === 3) {
       this.primed = true;
       this.value = filter;
     }
 
-    this.samplePrev = sample;
-    this.filterPrev2 = this.filterPrev;
-    this.filterPrev = filter;
+    this.samplePrevious = sample;
+    this.filterPrevious2 = this.filterPrevious;
+    this.filterPrevious = filter;
 
     return this.value;
   }

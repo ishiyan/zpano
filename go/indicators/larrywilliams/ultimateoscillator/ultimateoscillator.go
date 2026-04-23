@@ -7,7 +7,6 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
 )
 
 const (
@@ -47,9 +46,9 @@ type UltimateOscillator struct {
 
 	// Circular buffers for buying pressure and true range values.
 	// Size = p3 (longest period).
-	bpBuffer []float64
-	trBuffer []float64
-	bufIdx   int
+	bpBuffer    []float64
+	trBuffer    []float64
+	bufferIndex int
 
 	// Running sums for each period window.
 	bpSum1, bpSum2, bpSum3 float64
@@ -125,157 +124,152 @@ func sortThree(a, b, c int) (int, int, int) {
 }
 
 // IsPrimed indicates whether the indicator is primed.
-func (u *UltimateOscillator) IsPrimed() bool {
-	u.mu.RLock()
-	defer u.mu.RUnlock()
+func (s *UltimateOscillator) IsPrimed() bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
-	return u.primed
+	return s.primed
 }
 
 // Metadata describes the output data of the indicator.
-func (u *UltimateOscillator) Metadata() core.Metadata {
-	return core.Metadata{
-		Type:        core.UltimateOscillator,
-		Mnemonic:    u.mnemonic,
-		Description: ultoscDescription + " " + u.mnemonic,
-		Outputs: []outputs.Metadata{
-			{
-				Kind:        int(UltimateOscillatorValue),
-				Type:        outputs.ScalarType,
-				Mnemonic:    u.mnemonic,
-				Description: ultoscDescription + " " + u.mnemonic,
-			},
+func (s *UltimateOscillator) Metadata() core.Metadata {
+	return core.BuildMetadata(
+		core.UltimateOscillator,
+		s.mnemonic,
+		ultoscDescription+" "+s.mnemonic,
+		[]core.OutputText{
+			{Mnemonic: s.mnemonic, Description: ultoscDescription + " " + s.mnemonic},
 		},
-	}
+	)
 }
 
 // Update updates the Ultimate Oscillator given the next bar's close, high, and low values.
-func (u *UltimateOscillator) Update(close, high, low float64) float64 {
+func (s *UltimateOscillator) Update(close, high, low float64) float64 {
 	if math.IsNaN(close) || math.IsNaN(high) || math.IsNaN(low) {
 		return math.NaN()
 	}
 
-	u.mu.Lock()
-	defer u.mu.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
 	// First bar: just store close, return NaN.
-	if math.IsNaN(u.previousClose) {
-		u.previousClose = close
+	if math.IsNaN(s.previousClose) {
+		s.previousClose = close
 
 		return math.NaN()
 	}
 
 	// Calculate buying pressure and true range.
-	trueLow := math.Min(low, u.previousClose)
+	trueLow := math.Min(low, s.previousClose)
 	bp := close - trueLow
 
 	tr := high - low
-	if d := math.Abs(u.previousClose - high); d > tr {
+	if d := math.Abs(s.previousClose - high); d > tr {
 		tr = d
 	}
 
-	if d := math.Abs(u.previousClose - low); d > tr {
+	if d := math.Abs(s.previousClose - low); d > tr {
 		tr = d
 	}
 
-	u.previousClose = close
+	s.previousClose = close
 
-	u.count++
+	s.count++
 
 	// Remove trailing values BEFORE storing the new value in the circular buffer,
-	// because for p3 the old index equals bufIdx (the buffer wraps exactly).
-	if u.count > u.p1 {
-		oldIdx := (u.bufIdx - u.p1 + u.p3) % u.p3
-		u.bpSum1 -= u.bpBuffer[oldIdx]
-		u.trSum1 -= u.trBuffer[oldIdx]
+	// because for p3 the old index equals bufferIndex (the buffer wraps exactly).
+	if s.count > s.p1 {
+		oldIndex := (s.bufferIndex - s.p1 + s.p3) % s.p3
+		s.bpSum1 -= s.bpBuffer[oldIndex]
+		s.trSum1 -= s.trBuffer[oldIndex]
 	}
 
-	if u.count > u.p2 {
-		oldIdx := (u.bufIdx - u.p2 + u.p3) % u.p3
-		u.bpSum2 -= u.bpBuffer[oldIdx]
-		u.trSum2 -= u.trBuffer[oldIdx]
+	if s.count > s.p2 {
+		oldIndex := (s.bufferIndex - s.p2 + s.p3) % s.p3
+		s.bpSum2 -= s.bpBuffer[oldIndex]
+		s.trSum2 -= s.trBuffer[oldIndex]
 	}
 
-	if u.count > u.p3 {
-		oldIdx := (u.bufIdx - u.p3 + u.p3) % u.p3
-		u.bpSum3 -= u.bpBuffer[oldIdx]
-		u.trSum3 -= u.trBuffer[oldIdx]
+	if s.count > s.p3 {
+		oldIndex := (s.bufferIndex - s.p3 + s.p3) % s.p3
+		s.bpSum3 -= s.bpBuffer[oldIndex]
+		s.trSum3 -= s.trBuffer[oldIndex]
 	}
 
 	// Add to running sums.
-	u.bpSum1 += bp
-	u.bpSum2 += bp
-	u.bpSum3 += bp
-	u.trSum1 += tr
-	u.trSum2 += tr
-	u.trSum3 += tr
+	s.bpSum1 += bp
+	s.bpSum2 += bp
+	s.bpSum3 += bp
+	s.trSum1 += tr
+	s.trSum2 += tr
+	s.trSum3 += tr
 
 	// Store in circular buffer (after subtraction so p3 trailing reads the old value).
-	u.bpBuffer[u.bufIdx] = bp
-	u.trBuffer[u.bufIdx] = tr
+	s.bpBuffer[s.bufferIndex] = bp
+	s.trBuffer[s.bufferIndex] = tr
 
 	// Advance buffer index.
-	u.bufIdx = (u.bufIdx + 1) % u.p3
+	s.bufferIndex = (s.bufferIndex + 1) % s.p3
 
 	// Need at least p3 values (the longest period) to produce output.
-	if u.count < u.p3 {
+	if s.count < s.p3 {
 		return math.NaN()
 	}
 
-	u.primed = true
+	s.primed = true
 
 	// Calculate output.
 	var output float64
 
-	if u.trSum1 != 0 {
-		output += weight1 * (u.bpSum1 / u.trSum1)
+	if s.trSum1 != 0 {
+		output += weight1 * (s.bpSum1 / s.trSum1)
 	}
 
-	if u.trSum2 != 0 {
-		output += weight2 * (u.bpSum2 / u.trSum2)
+	if s.trSum2 != 0 {
+		output += weight2 * (s.bpSum2 / s.trSum2)
 	}
 
-	if u.trSum3 != 0 {
-		output += weight3 * (u.bpSum3 / u.trSum3)
+	if s.trSum3 != 0 {
+		output += weight3 * (s.bpSum3 / s.trSum3)
 	}
 
 	return hundred * (output / totalWeight)
 }
 
 // UpdateScalar updates the indicator given the next scalar sample.
-func (u *UltimateOscillator) UpdateScalar(sample *entities.Scalar) core.Output {
+func (s *UltimateOscillator) UpdateScalar(sample *entities.Scalar) core.Output {
 	v := sample.Value
 
 	output := make([]any, 1)
-	output[0] = entities.Scalar{Time: sample.Time, Value: u.Update(v, v, v)}
+	output[0] = entities.Scalar{Time: sample.Time, Value: s.Update(v, v, v)}
 
 	return output
 }
 
 // UpdateBar updates the indicator given the next bar sample.
-func (u *UltimateOscillator) UpdateBar(sample *entities.Bar) core.Output {
+func (s *UltimateOscillator) UpdateBar(sample *entities.Bar) core.Output {
 	output := make([]any, 1)
-	output[0] = entities.Scalar{Time: sample.Time, Value: u.Update(sample.Close, sample.High, sample.Low)}
+	output[0] = entities.Scalar{Time: sample.Time, Value: s.Update(sample.Close, sample.High, sample.Low)}
 
 	return output
 }
 
 // UpdateQuote updates the indicator given the next quote sample.
-func (u *UltimateOscillator) UpdateQuote(sample *entities.Quote) core.Output {
+func (s *UltimateOscillator) UpdateQuote(sample *entities.Quote) core.Output {
 	v := (sample.Bid + sample.Ask) / 2 //nolint:mnd
 
 	output := make([]any, 1)
-	output[0] = entities.Scalar{Time: sample.Time, Value: u.Update(v, v, v)}
+	output[0] = entities.Scalar{Time: sample.Time, Value: s.Update(v, v, v)}
 
 	return output
 }
 
 // UpdateTrade updates the indicator given the next trade sample.
-func (u *UltimateOscillator) UpdateTrade(sample *entities.Trade) core.Output {
+func (s *UltimateOscillator) UpdateTrade(sample *entities.Trade) core.Output {
 	v := sample.Price
 
 	output := make([]any, 1)
-	output[0] = entities.Scalar{Time: sample.Time, Value: u.Update(v, v, v)}
+	output[0] = entities.Scalar{Time: sample.Time, Value: s.Update(v, v, v)}
 
 	return output
 }

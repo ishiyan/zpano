@@ -1,9 +1,9 @@
 import { } from 'jasmine';
 
 import { PearsonsCorrelationCoefficient } from './pearsons-correlation-coefficient';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
-import { PearsonsCorrelationCoefficientOutput } from './pearsons-correlation-coefficient-output';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
+import { PearsonsCorrelationCoefficientOutput } from './output';
 import { Bar } from '../../../entities/bar';
 
 // High input data from TA-Lib test_data.c (252 entries).
@@ -223,12 +223,12 @@ describe('PearsonsCorrelationCoefficient', () => {
     const c = new PearsonsCorrelationCoefficient({ length: 20 });
     const meta = c.metadata();
 
-    expect(meta.type).toBe(IndicatorType.PearsonsCorrelationCoefficient);
+    expect(meta.identifier).toBe(IndicatorIdentifier.PearsonsCorrelationCoefficient);
     expect(meta.mnemonic).toBe('correl(20)');
     expect(meta.description).toBe('Pearsons Correlation Coefficient correl(20)');
     expect(meta.outputs.length).toBe(1);
     expect(meta.outputs[0].kind).toBe(PearsonsCorrelationCoefficientOutput.PearsonsCorrelationCoefficientValue);
-    expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+    expect(meta.outputs[0].shape).toBe(Shape.Scalar);
   });
 
   it('should work with updateBar extracting high and low', () => {

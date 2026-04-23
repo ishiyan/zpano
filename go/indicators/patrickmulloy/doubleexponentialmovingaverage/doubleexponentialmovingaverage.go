@@ -8,7 +8,6 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
 )
 
 // DoubleExponentialMovingAverage computes the Double Exponential Moving Average (DEMA),
@@ -156,19 +155,14 @@ func (s *DoubleExponentialMovingAverage) IsPrimed() bool {
 // Metadata describes an output data of the indicator.
 // It always has a single scalar output -- the calculated value of the double exponential moving average.
 func (s *DoubleExponentialMovingAverage) Metadata() core.Metadata {
-	return core.Metadata{
-		Type:        core.DoubleExponentialMovingAverage,
-		Mnemonic:    s.LineIndicator.Mnemonic,
-		Description: s.LineIndicator.Description,
-		Outputs: []outputs.Metadata{
-			{
-				Kind:        int(DoubleExponentialMovingAverageValue),
-				Type:        outputs.ScalarType,
-				Mnemonic:    s.LineIndicator.Mnemonic,
-				Description: s.LineIndicator.Description,
-			},
+	return core.BuildMetadata(
+		core.DoubleExponentialMovingAverage,
+		s.LineIndicator.Mnemonic,
+		s.LineIndicator.Description,
+		[]core.OutputText{
+			{Mnemonic: s.LineIndicator.Mnemonic, Description: s.LineIndicator.Description},
 		},
-	}
+	)
 }
 
 // Update updates the value of the indicator given the next sample.

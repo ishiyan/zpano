@@ -7,7 +7,6 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
 	"zpano/indicators/welleswilder/averagetruerange"
 	"zpano/indicators/welleswilder/directionalmovementplus"
 )
@@ -67,75 +66,55 @@ func NewDirectionalIndicatorPlus(length int) (*DirectionalIndicatorPlus, error) 
 }
 
 // Length returns the length parameter.
-func (d *DirectionalIndicatorPlus) Length() int {
-	return d.length
+func (s *DirectionalIndicatorPlus) Length() int {
+	return s.length
 }
 
 // IsPrimed indicates whether the indicator is primed.
-func (d *DirectionalIndicatorPlus) IsPrimed() bool {
-	d.mu.RLock()
-	defer d.mu.RUnlock()
+func (s *DirectionalIndicatorPlus) IsPrimed() bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
-	return d.averageTrueRange.IsPrimed() && d.directionalMovementPlus.IsPrimed()
+	return s.averageTrueRange.IsPrimed() && s.directionalMovementPlus.IsPrimed()
 }
 
 // Metadata describes the output data of the indicator.
-func (d *DirectionalIndicatorPlus) Metadata() core.Metadata {
-	return core.Metadata{
-		Type:        core.DirectionalIndicatorPlus,
-		Mnemonic:    dipMnemonic,
-		Description: dipDescription,
-		Outputs: []outputs.Metadata{
-			{
-				Kind:        int(DirectionalIndicatorPlusValue),
-				Type:        outputs.ScalarType,
-				Mnemonic:    dipMnemonic,
-				Description: dipDescription,
-			},
-			{
-				Kind:        int(DirectionalMovementPlusValue),
-				Type:        outputs.ScalarType,
-				Mnemonic:    "+dm",
-				Description: "Directional Movement Plus",
-			},
-			{
-				Kind:        int(AverageTrueRangeValue),
-				Type:        outputs.ScalarType,
-				Mnemonic:    "atr",
-				Description: "Average True Range",
-			},
-			{
-				Kind:        int(TrueRangeValue),
-				Type:        outputs.ScalarType,
-				Mnemonic:    "tr",
-				Description: "True Range",
-			},
+func (s *DirectionalIndicatorPlus) Metadata() core.Metadata {
+	return core.BuildMetadata(
+		core.DirectionalIndicatorPlus,
+		dipMnemonic,
+		dipDescription,
+		[]core.OutputText{
+			{Mnemonic: dipMnemonic, Description: dipDescription},
+			{Mnemonic: "+dm", Description: "Directional Movement Plus"},
+			{Mnemonic: "atr", Description: "Average True Range"},
+			{Mnemonic: "tr", Description: "True Range"},
 		},
-	}
+	)
 }
 
 // Update updates the Directional Indicator Plus given the next bar's close, high, and low values.
-func (d *DirectionalIndicatorPlus) Update(close, high, low float64) float64 {
+func (s *DirectionalIndicatorPlus) Update(close, high, low float64) float64 {
 	if math.IsNaN(close) || math.IsNaN(high) || math.IsNaN(low) {
 		return math.NaN()
 	}
 
-	d.mu.Lock()
-	defer d.mu.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
-	atrValue := d.averageTrueRange.Update(close, high, low)
-	dmpValue := d.directionalMovementPlus.Update(high, low)
+	atrValue := s.averageTrueRange.Update(close, high, low)
+	dmpValue := s.directionalMovementPlus.Update(high, low)
 
-	if d.averageTrueRange.IsPrimed() && d.directionalMovementPlus.IsPrimed() {
-		atrScaled := atrValue * float64(d.length)
+	if s.averageTrueRange.IsPrimed() && s.directionalMovementPlus.IsPrimed() {
+		atrScaled := atrValue * float64(s.length)
 
 		if math.Abs(atrScaled) < epsilon {
-			d.value = 0
+			s.value = 0
 		} else {
-			d.value = 100 * dmpValue / atrScaled //nolint:mnd
+			s.value = 100 * dmpValue / atrScaled //nolint:mnd
 		}
 
-		return d.value
+		return s.value
 	}
 
 	return math.NaN()
@@ -143,44 +122,44 @@ func (d *DirectionalIndicatorPlus) Update(close, high, low float64) float64 {
 
 // UpdateSample updates the Directional Indicator Plus using a single sample value
 // as a substitute for close, high, and low.
-func (d *DirectionalIndicatorPlus) UpdateSample(sample float64) float64 {
-	return d.Update(sample, sample, sample)
+func (s *DirectionalIndicatorPlus) UpdateSample(sample float64) float64 {
+	return s.Update(sample, sample, sample)
 }
 
 // UpdateScalar updates the indicator given the next scalar sample.
-func (d *DirectionalIndicatorPlus) UpdateScalar(sample *entities.Scalar) core.Output {
+func (s *DirectionalIndicatorPlus) UpdateScalar(sample *entities.Scalar) core.Output {
 	v := sample.Value
 
 	output := make([]any, 1)
-	output[0] = entities.Scalar{Time: sample.Time, Value: d.Update(v, v, v)}
+	output[0] = entities.Scalar{Time: sample.Time, Value: s.Update(v, v, v)}
 
 	return output
 }
 
 // UpdateBar updates the indicator given the next bar sample.
-func (d *DirectionalIndicatorPlus) UpdateBar(sample *entities.Bar) core.Output {
+func (s *DirectionalIndicatorPlus) UpdateBar(sample *entities.Bar) core.Output {
 	output := make([]any, 1)
-	output[0] = entities.Scalar{Time: sample.Time, Value: d.Update(sample.Close, sample.High, sample.Low)}
+	output[0] = entities.Scalar{Time: sample.Time, Value: s.Update(sample.Close, sample.High, sample.Low)}
 
 	return output
 }
 
 // UpdateQuote updates the indicator given the next quote sample.
-func (d *DirectionalIndicatorPlus) UpdateQuote(sample *entities.Quote) core.Output {
+func (s *DirectionalIndicatorPlus) UpdateQuote(sample *entities.Quote) core.Output {
 	v := (sample.Bid + sample.Ask) / 2 //nolint:mnd
 
 	output := make([]any, 1)
-	output[0] = entities.Scalar{Time: sample.Time, Value: d.Update(v, v, v)}
+	output[0] = entities.Scalar{Time: sample.Time, Value: s.Update(v, v, v)}
 
 	return output
 }
 
 // UpdateTrade updates the indicator given the next trade sample.
-func (d *DirectionalIndicatorPlus) UpdateTrade(sample *entities.Trade) core.Output {
+func (s *DirectionalIndicatorPlus) UpdateTrade(sample *entities.Trade) core.Output {
 	v := sample.Price
 
 	output := make([]any, 1)
-	output[0] = entities.Scalar{Time: sample.Time, Value: d.Update(v, v, v)}
+	output[0] = entities.Scalar{Time: sample.Time, Value: s.Update(v, v, v)}
 
 	return output
 }

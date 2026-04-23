@@ -9,7 +9,6 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
 )
 
 // LinearRegression computes the least-squares regression line over a rolling window
@@ -129,43 +128,18 @@ func (s *LinearRegression) IsPrimed() bool {
 
 // Metadata describes the output data of the indicator.
 func (s *LinearRegression) Metadata() core.Metadata {
-	return core.Metadata{
-		Type:        core.LinearRegression,
-		Mnemonic:    s.mnemonic,
-		Description: s.description,
-		Outputs: []outputs.Metadata{
-			{
-				Kind:        int(Value),
-				Type:        outputs.ScalarType,
-				Mnemonic:    s.mnemonic,
-				Description: s.description + " value",
-			},
-			{
-				Kind:        int(Forecast),
-				Type:        outputs.ScalarType,
-				Mnemonic:    s.mnemonic,
-				Description: s.description + " forecast",
-			},
-			{
-				Kind:        int(Intercept),
-				Type:        outputs.ScalarType,
-				Mnemonic:    s.mnemonic,
-				Description: s.description + " intercept",
-			},
-			{
-				Kind:        int(SlopeRad),
-				Type:        outputs.ScalarType,
-				Mnemonic:    s.mnemonic,
-				Description: s.description + " slope",
-			},
-			{
-				Kind:        int(SlopeDeg),
-				Type:        outputs.ScalarType,
-				Mnemonic:    s.mnemonic,
-				Description: s.description + " angle",
-			},
+	return core.BuildMetadata(
+		core.LinearRegression,
+		s.mnemonic,
+		s.description,
+		[]core.OutputText{
+			{Mnemonic: s.mnemonic, Description: s.description + " value"},
+			{Mnemonic: s.mnemonic, Description: s.description + " forecast"},
+			{Mnemonic: s.mnemonic, Description: s.description + " intercept"},
+			{Mnemonic: s.mnemonic, Description: s.description + " slope"},
+			{Mnemonic: s.mnemonic, Description: s.description + " angle"},
 		},
-	}
+	)
 }
 
 // Update updates the indicator given the next sample and returns the Value output.
@@ -255,9 +229,9 @@ func (s *LinearRegression) updateEntity(
 	const numOutputs = 5
 
 	output := make([]any, numOutputs)
-	val := s.Update(sample)
+	value := s.Update(sample)
 
-	if math.IsNaN(val) {
+	if math.IsNaN(value) {
 		nan := math.NaN()
 
 		i := 0

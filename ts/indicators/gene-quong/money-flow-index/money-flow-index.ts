@@ -1,17 +1,19 @@
+import { buildMetadata } from '../../core/build-metadata';
 import { Bar } from '../../../entities/bar';
 import { BarComponent, barComponentValue } from '../../../entities/bar-component';
 import { Scalar } from '../../../entities/scalar';
+import { componentTripleMnemonic } from '../../core/component-triple-mnemonic';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
 import { IndicatorOutput } from '../../core/indicator-output';
-import { IndicatorType } from '../../core/indicator-type';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { LineIndicator } from '../../core/line-indicator';
-import { OutputType } from '../../core/outputs/output-type';
-import { MoneyFlowIndexOutput } from './money-flow-index-output';
-import { MoneyFlowIndexParams } from './money-flow-index-params';
+import { MoneyFlowIndexParams } from './params';
 
 /** Function to calculate mnemonic of a __MoneyFlowIndex__ indicator. */
 export const moneyFlowIndexMnemonic = (params: MoneyFlowIndexParams): string => {
-  return `mfi(${params.length})`;
+  // MFI's own default bar component is HLC/3 (typical price), not Close. Show it.
+  const bc = params.barComponent ?? BarComponent.Typical;
+  return `mfi(${params.length}${componentTripleMnemonic(bc, params.quoteComponent, params.tradeComponent)})`;
 };
 
 /**
@@ -81,17 +83,14 @@ export class MoneyFlowIndex extends LineIndicator {
 
   /** Describes the output data of the indicator. */
   public metadata(): IndicatorMetadata {
-    return {
-      type: IndicatorType.MoneyFlowIndex,
-      mnemonic: this.mnemonic,
-      description: this.description,
-      outputs: [{
-        kind: MoneyFlowIndexOutput.MoneyFlowIndexValue,
-        type: OutputType.Scalar,
-        mnemonic: this.mnemonic,
-        description: this.description,
-      }],
-    };
+    return buildMetadata(
+      IndicatorIdentifier.MoneyFlowIndex,
+      this.mnemonic,
+      this.description,
+      [
+        { mnemonic: this.mnemonic, description: this.description },
+      ],
+    );
   }
 
   /** Updates the value of the indicator given the next sample (volume = 1). */

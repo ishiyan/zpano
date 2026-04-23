@@ -8,7 +8,6 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
 )
 
 // SimpleMovingAverage computes the simple, or arithmetic, moving average (SMA) by adding the samples
@@ -111,19 +110,14 @@ func (s *SimpleMovingAverage) IsPrimed() bool {
 // Metadata describes an output data of the indicator.
 // It always has a single scalar output -- the calculated value of the simple moving average.
 func (s *SimpleMovingAverage) Metadata() core.Metadata {
-	return core.Metadata{
-		Type:        core.SimpleMovingAverage,
-		Mnemonic:    s.LineIndicator.Mnemonic,
-		Description: s.LineIndicator.Description,
-		Outputs: []outputs.Metadata{
-			{
-				Kind:        int(SimpleMovingAverageValue),
-				Type:        outputs.ScalarType,
-				Mnemonic:    s.LineIndicator.Mnemonic,
-				Description: s.LineIndicator.Description,
-			},
+	return core.BuildMetadata(
+		core.SimpleMovingAverage,
+		s.LineIndicator.Mnemonic,
+		s.LineIndicator.Description,
+		[]core.OutputText{
+			{Mnemonic: s.LineIndicator.Mnemonic, Description: s.LineIndicator.Description},
 		},
-	}
+	)
 }
 
 // Update updates the value of the simple moving average given the next sample.
@@ -134,22 +128,20 @@ func (s *SimpleMovingAverage) Update(sample float64) float64 {
 		return sample
 	}
 
-	temp := sample
-
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	if s.primed {
-		s.windowSum += temp - s.window[0]
+		s.windowSum += sample - s.window[0]
 
 		for i := 0; i < s.lastIndex; i++ {
 			s.window[i] = s.window[i+1]
 		}
 
-		s.window[s.lastIndex] = temp
+		s.window[s.lastIndex] = sample
 	} else {
-		s.windowSum += temp
-		s.window[s.windowCount] = temp
+		s.windowSum += sample
+		s.window[s.windowCount] = sample
 		s.windowCount++
 
 		if s.windowLength > s.windowCount {

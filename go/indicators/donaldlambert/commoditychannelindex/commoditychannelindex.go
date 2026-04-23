@@ -7,7 +7,6 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
 )
 
 // CommodityChannelIndex is Donald Lambert's Commodity Channel Index (CCI).
@@ -106,80 +105,75 @@ func NewCommodityChannelIndex(p *CommodityChannelIndexParams) (*CommodityChannel
 }
 
 // IsPrimed indicates whether the indicator is primed.
-func (c *CommodityChannelIndex) IsPrimed() bool {
-	c.mu.RLock()
-	defer c.mu.RUnlock()
+func (s *CommodityChannelIndex) IsPrimed() bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
-	return c.primed
+	return s.primed
 }
 
 // Metadata describes the output data of the indicator.
-func (c *CommodityChannelIndex) Metadata() core.Metadata {
-	return core.Metadata{
-		Type:        core.CommodityChannelIndex,
-		Mnemonic:    c.LineIndicator.Mnemonic,
-		Description: c.LineIndicator.Description,
-		Outputs: []outputs.Metadata{
-			{
-				Kind:        int(CommodityChannelIndexValue),
-				Type:        outputs.ScalarType,
-				Mnemonic:    c.LineIndicator.Mnemonic,
-				Description: c.LineIndicator.Description,
-			},
+func (s *CommodityChannelIndex) Metadata() core.Metadata {
+	return core.BuildMetadata(
+		core.CommodityChannelIndex,
+		s.LineIndicator.Mnemonic,
+		s.LineIndicator.Description,
+		[]core.OutputText{
+			{Mnemonic: s.LineIndicator.Mnemonic, Description: s.LineIndicator.Description},
 		},
-	}
+	)
 }
 
 // Update updates the value of the indicator given the next sample.
-func (c *CommodityChannelIndex) Update(sample float64) float64 {
+func (s *CommodityChannelIndex) Update(sample float64) float64 {
 	if math.IsNaN(sample) {
 		return sample
 	}
 
-	c.mu.Lock()
-	defer c.mu.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
-	lastIndex := c.length - 1
+	lastIndex := s.length - 1
 
-	if c.primed {
-		c.windowSum += sample - c.window[0]
-		copy(c.window, c.window[1:])
-		c.window[lastIndex] = sample
+	if s.primed {
+		s.windowSum += sample - s.window[0]
+		copy(s.window, s.window[1:])
+		s.window[lastIndex] = sample
 
-		average := c.windowSum / float64(c.length)
+		average := s.windowSum / float64(s.length)
 
 		var temp float64
-		for i := 0; i < c.length; i++ {
-			temp += math.Abs(c.window[i] - average)
+		for i := 0; i < s.length; i++ {
+			temp += math.Abs(s.window[i] - average)
 		}
 
 		if math.Abs(temp) < math.SmallestNonzeroFloat64 {
-			c.value = 0
+			s.value = 0
 		} else {
-			c.value = c.scalingFactor * (sample - average) / temp
+			s.value = s.scalingFactor * (sample - average) / temp
 		}
 	} else {
-		c.windowSum += sample
-		c.window[c.windowCount] = sample
-		c.windowCount++
+		s.windowSum += sample
+		s.window[s.windowCount] = sample
+		s.windowCount++
 
-		if c.windowCount == c.length {
-			c.primed = true
+		if s.windowCount == s.length {
+			s.primed = true
 
-			average := c.windowSum / float64(c.length)
+			average := s.windowSum / float64(s.length)
 
 			var temp float64
-			for i := 0; i < c.length; i++ {
-				temp += math.Abs(c.window[i] - average)
+			for i := 0; i < s.length; i++ {
+				temp += math.Abs(s.window[i] - average)
 			}
 
 			if math.Abs(temp) < math.SmallestNonzeroFloat64 {
-				c.value = 0
+				s.value = 0
 			} else {
-				c.value = c.scalingFactor * (sample - average) / temp
+				s.value = s.scalingFactor * (sample - average) / temp
 			}
 		}
 	}
 
-	return c.value
+	return s.value
 }

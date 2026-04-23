@@ -8,7 +8,7 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
+	"zpano/indicators/core/outputs/shape"
 )
 
 // C# test data: 12 entries.
@@ -129,8 +129,8 @@ func TestOnBalanceVolumeMetadata(t *testing.T) {
 
 	meta := obv.Metadata()
 
-	if meta.Type != core.OnBalanceVolume {
-		t.Errorf("expected type OnBalanceVolume, got %v", meta.Type)
+	if meta.Identifier != core.OnBalanceVolume {
+		t.Errorf("expected identifier OnBalanceVolume, got %v", meta.Identifier)
 	}
 
 	exp := "obv"
@@ -142,12 +142,12 @@ func TestOnBalanceVolumeMetadata(t *testing.T) {
 		t.Fatalf("expected 1 output, got %d", len(meta.Outputs))
 	}
 
-	if meta.Outputs[0].Kind != int(OnBalanceVolumeValue) {
-		t.Errorf("expected output kind %d, got %d", OnBalanceVolumeValue, meta.Outputs[0].Kind)
+	if meta.Outputs[0].Kind != int(Value) {
+		t.Errorf("expected output kind %d, got %d", Value, meta.Outputs[0].Kind)
 	}
 
-	if meta.Outputs[0].Type != outputs.ScalarType {
-		t.Errorf("expected scalar output type, got %v", meta.Outputs[0].Type)
+	if meta.Outputs[0].Shape != shape.Scalar {
+		t.Errorf("expected scalar output type, got %v", meta.Outputs[0].Shape)
 	}
 }
 

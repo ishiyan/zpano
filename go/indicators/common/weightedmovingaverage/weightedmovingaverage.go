@@ -8,7 +8,6 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
 )
 
 // WeightedMovingAverage computes the weighted moving average (WMA) that has multiplying factors
@@ -119,67 +118,62 @@ func NewWeightedMovingAverage(p *WeightedMovingAverageParams) (*WeightedMovingAv
 }
 
 // IsPrimed indicates whether an indicator is primed.
-func (w *WeightedMovingAverage) IsPrimed() bool {
-	w.mu.RLock()
-	defer w.mu.RUnlock()
+func (s *WeightedMovingAverage) IsPrimed() bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
-	return w.primed
+	return s.primed
 }
 
 // Metadata describes an output data of the indicator.
 // It always has a single scalar output -- the calculated value of the weighted moving average.
-func (w *WeightedMovingAverage) Metadata() core.Metadata {
-	return core.Metadata{
-		Type:        core.WeightedMovingAverage,
-		Mnemonic:    w.LineIndicator.Mnemonic,
-		Description: w.LineIndicator.Description,
-		Outputs: []outputs.Metadata{
-			{
-				Kind:        int(WeightedMovingAverageValue),
-				Type:        outputs.ScalarType,
-				Mnemonic:    w.LineIndicator.Mnemonic,
-				Description: w.LineIndicator.Description,
-			},
+func (s *WeightedMovingAverage) Metadata() core.Metadata {
+	return core.BuildMetadata(
+		core.WeightedMovingAverage,
+		s.LineIndicator.Mnemonic,
+		s.LineIndicator.Description,
+		[]core.OutputText{
+			{Mnemonic: s.LineIndicator.Mnemonic, Description: s.LineIndicator.Description},
 		},
-	}
+	)
 }
 
 // Update updates the value of the moving average given the next sample.
 //
 // The indicator is not primed during the first ℓ-1 updates.
-func (w *WeightedMovingAverage) Update(sample float64) float64 {
+func (s *WeightedMovingAverage) Update(sample float64) float64 {
 	if math.IsNaN(sample) {
 		return sample
 	}
 
 	temp := sample
 
-	w.mu.Lock()
-	defer w.mu.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
-	if w.primed {
-		w.windowSum -= w.windowSub
-		w.windowSum += temp * float64(w.windowLength)
-		w.windowSub -= w.window[0]
-		w.windowSub += temp
+	if s.primed {
+		s.windowSum -= s.windowSub
+		s.windowSum += temp * float64(s.windowLength)
+		s.windowSub -= s.window[0]
+		s.windowSub += temp
 
-		for i := 0; i < w.lastIndex; i++ {
-			w.window[i] = w.window[i+1]
+		for i := 0; i < s.lastIndex; i++ {
+			s.window[i] = s.window[i+1]
 		}
 
-		w.window[w.lastIndex] = temp
+		s.window[s.lastIndex] = temp
 	} else { // Not primed.
-		w.window[w.windowCount] = temp
-		w.windowSub += temp
-		w.windowCount++
-		w.windowSum += temp * float64(w.windowCount)
+		s.window[s.windowCount] = temp
+		s.windowSub += temp
+		s.windowCount++
+		s.windowSum += temp * float64(s.windowCount)
 
-		if w.windowLength > w.windowCount {
+		if s.windowLength > s.windowCount {
 			return math.NaN()
 		}
 
-		w.primed = true
+		s.primed = true
 	}
 
-	return w.windowSum / w.divider
+	return s.windowSum / s.divider
 }

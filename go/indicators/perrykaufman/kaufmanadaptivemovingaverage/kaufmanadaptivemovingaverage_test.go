@@ -9,7 +9,7 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
+	"zpano/indicators/core/outputs/shape"
 )
 
 func testKaufmanAdaptiveMovingAverageTime() time.Time {
@@ -378,12 +378,12 @@ func TestKaufmanAdaptiveMovingAverageMetadata(t *testing.T) {
 		kama := testKaufmanAdaptiveMovingAverageCreateLength(10, 2, 30)
 		act := kama.Metadata()
 
-		check("Type", core.KaufmanAdaptiveMovingAverage, act.Type)
+		check("Identifier", core.KaufmanAdaptiveMovingAverage, act.Identifier)
 		check("Mnemonic", "kama(10, 2, 30)", act.Mnemonic)
 		check("Description", "Kaufman adaptive moving average kama(10, 2, 30)", act.Description)
 		check("len(Outputs)", 1, len(act.Outputs))
-		check("Outputs[0].Kind", int(KaufmanAdaptiveMovingAverageValue), act.Outputs[0].Kind)
-		check("Outputs[0].Type", outputs.ScalarType, act.Outputs[0].Type)
+		check("Outputs[0].Kind", int(Value), act.Outputs[0].Kind)
+		check("Outputs[0].Shape", shape.Scalar, act.Outputs[0].Shape)
 		check("Outputs[0].Mnemonic", "kama(10, 2, 30)", act.Outputs[0].Mnemonic)
 		check("Outputs[0].Description", "Kaufman adaptive moving average kama(10, 2, 30)", act.Outputs[0].Description)
 	})
@@ -400,12 +400,12 @@ func TestKaufmanAdaptiveMovingAverageMetadata(t *testing.T) {
 		kama := testKaufmanAdaptiveMovingAverageCreateAlpha(l, f, s)
 		act := kama.Metadata()
 
-		check("Type", core.KaufmanAdaptiveMovingAverage, act.Type)
+		check("Identifier", core.KaufmanAdaptiveMovingAverage, act.Identifier)
 		check("Mnemonic", "kama(10, 0.6667, 0.0645)", act.Mnemonic)
 		check("Description", "Kaufman adaptive moving average kama(10, 0.6667, 0.0645)", act.Description)
 		check("len(Outputs)", 1, len(act.Outputs))
-		check("Outputs[0].Kind", int(KaufmanAdaptiveMovingAverageValue), act.Outputs[0].Kind)
-		check("Outputs[0].Type", outputs.ScalarType, act.Outputs[0].Type)
+		check("Outputs[0].Kind", int(Value), act.Outputs[0].Kind)
+		check("Outputs[0].Shape", shape.Scalar, act.Outputs[0].Shape)
 		check("Outputs[0].Mnemonic", "kama(10, 0.6667, 0.0645)", act.Outputs[0].Mnemonic)
 		check("Outputs[0].Description", "Kaufman adaptive moving average kama(10, 0.6667, 0.0645)", act.Outputs[0].Description)
 	})

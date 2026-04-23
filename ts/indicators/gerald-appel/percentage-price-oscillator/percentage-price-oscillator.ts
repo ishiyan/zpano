@@ -1,12 +1,11 @@
+import { buildMetadata } from '../../core/build-metadata';
 import { componentTripleMnemonic } from '../../core/component-triple-mnemonic';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
-import { IndicatorType } from '../../core/indicator-type';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { LineIndicator } from '../../core/line-indicator';
-import { OutputType } from '../../core/outputs/output-type';
 import { ExponentialMovingAverage } from '../../common/exponential-moving-average/exponential-moving-average';
 import { SimpleMovingAverage } from '../../common/simple-moving-average/simple-moving-average';
-import { PercentagePriceOscillatorOutput } from './percentage-price-oscillator-output';
-import { PercentagePriceOscillatorParams, MovingAverageType } from './percentage-price-oscillator-params';
+import { PercentagePriceOscillatorParams, MovingAverageType } from './params';
 
 /** Interface for an indicator that accepts a scalar and returns a value. */
 interface LineUpdater {
@@ -87,17 +86,14 @@ export class PercentagePriceOscillator extends LineIndicator {
 
   /** Describes the output data of the indicator. */
   public metadata(): IndicatorMetadata {
-    return {
-      type: IndicatorType.PercentagePriceOscillator,
-      mnemonic: this.mnemonic,
-      description: this.description,
-      outputs: [{
-        kind: PercentagePriceOscillatorOutput.PercentagePriceOscillatorValue,
-        type: OutputType.Scalar,
-        mnemonic: this.mnemonic,
-        description: this.description,
-      }],
-    };
+    return buildMetadata(
+      IndicatorIdentifier.PercentagePriceOscillator,
+      this.mnemonic,
+      this.description,
+      [
+        { mnemonic: this.mnemonic, description: this.description },
+      ],
+    );
   }
 
   /** Updates the value of the indicator given the next sample. */

@@ -1,14 +1,13 @@
+import { buildMetadata } from '../../core/build-metadata';
 import { Bar } from '../../../entities/bar';
 import { Scalar } from '../../../entities/scalar';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
 import { IndicatorOutput } from '../../core/indicator-output';
-import { IndicatorType } from '../../core/indicator-type';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { LineIndicator } from '../../core/line-indicator';
-import { OutputType } from '../../core/outputs/output-type';
 import { ExponentialMovingAverage } from '../../common/exponential-moving-average/exponential-moving-average';
 import { SimpleMovingAverage } from '../../common/simple-moving-average/simple-moving-average';
-import { AdvanceDeclineOscillatorOutput } from './advance-decline-oscillator-output';
-import { AdvanceDeclineOscillatorParams, MovingAverageType } from './advance-decline-oscillator-params';
+import { AdvanceDeclineOscillatorParams, MovingAverageType } from './params';
 
 /** Interface for an indicator that accepts a scalar and returns a value. */
 interface LineUpdater {
@@ -33,7 +32,7 @@ export const advanceDeclineOscillatorMnemonic = (params: AdvanceDeclineOscillato
  * The value is calculated as:
  *
  *   CLV = ((Close - Low) - (High - Close)) / (High - Low)
- *   AD  = AD_prev + CLV × Volume
+ *   AD  = AD_previous + CLV × Volume
  *   ADOSC = FastMA(AD) - SlowMA(AD)
  *
  * When High equals Low, the A/D value is unchanged (no division by zero).
@@ -90,17 +89,14 @@ export class AdvanceDeclineOscillator extends LineIndicator {
 
   /** Describes the output data of the indicator. */
   public metadata(): IndicatorMetadata {
-    return {
-      type: IndicatorType.AdvanceDeclineOscillator,
-      mnemonic: this.mnemonic,
-      description: this.description,
-      outputs: [{
-        kind: AdvanceDeclineOscillatorOutput.AdvanceDeclineOscillatorValue,
-        type: OutputType.Scalar,
-        mnemonic: this.mnemonic,
-        description: this.description,
-      }],
-    };
+    return buildMetadata(
+      IndicatorIdentifier.AdvanceDeclineOscillator,
+      this.mnemonic,
+      this.description,
+      [
+        { mnemonic: this.mnemonic, description: this.description },
+      ],
+    );
   }
 
   /** Updates the indicator with the given sample (H=L=C, volume=1, so AD is unchanged). */
@@ -119,9 +115,9 @@ export class AdvanceDeclineOscillator extends LineIndicator {
     }
 
     // Compute cumulative AD.
-    const tmp = high - low;
-    if (tmp > 0) {
-      this.ad += ((close - low) - (high - close)) / tmp * volume;
+    const temp = high - low;
+    if (temp > 0) {
+      this.ad += ((close - low) - (high - close)) / temp * volume;
     }
 
     // Feed AD to both MAs.

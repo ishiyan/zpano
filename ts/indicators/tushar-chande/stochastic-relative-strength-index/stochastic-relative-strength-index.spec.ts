@@ -1,10 +1,10 @@
 import { } from 'jasmine';
 
 import { StochasticRelativeStrengthIndex } from './stochastic-relative-strength-index';
-import { MovingAverageType } from './stochastic-relative-strength-index-params';
-import { StochasticRelativeStrengthIndexOutput } from './stochastic-relative-strength-index-output';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
+import { MovingAverageType } from './params';
+import { StochasticRelativeStrengthIndexOutput } from './output';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
 
 // Test data from TA-Lib (252 entries).
 const input = [
@@ -38,7 +38,7 @@ const input = [
 describe('StochasticRelativeStrengthIndex', () => {
 
   // Test case 1: period=14, fastK=14, fastD=1, SMA.
-  // begIdx=27, first: FastK=94.156709, FastD=94.156709.
+  // begIndex=27, first: FastK=94.156709, FastD=94.156709.
   // last(251): FastK=0.0, FastD=0.0.
   it('should calculate 14/14/1 SMA correctly', () => {
     const tolerance = 1e-4;
@@ -70,7 +70,7 @@ describe('StochasticRelativeStrengthIndex', () => {
   });
 
   // Test case 2: period=14, fastK=45, fastD=1, SMA.
-  // begIdx=58, first: FastK=79.729186, FastD=79.729186.
+  // begIndex=58, first: FastK=79.729186, FastD=79.729186.
   // last(251): FastK=48.1550743, FastD=48.1550743.
   it('should calculate 14/45/1 SMA correctly', () => {
     const tolerance = 1e-4;
@@ -102,7 +102,7 @@ describe('StochasticRelativeStrengthIndex', () => {
   });
 
   // Test case 3: period=11, fastK=13, fastD=16, SMA.
-  // begIdx=38, first: FastK=5.25947, FastD=57.1711.
+  // begIndex=38, first: FastK=5.25947, FastD=57.1711.
   // last(251): FastK=0.0, FastD=15.7303.
   it('should calculate 11/13/16 SMA correctly', () => {
     const tolerance = 1e-3;
@@ -178,13 +178,13 @@ describe('StochasticRelativeStrengthIndex', () => {
     });
     const meta = ind.metadata();
 
-    expect(meta.type).toBe(IndicatorType.StochasticRelativeStrengthIndex);
+    expect(meta.identifier).toBe(IndicatorIdentifier.StochasticRelativeStrengthIndex);
     expect(meta.mnemonic).toBe('stochrsi(14/14/SMA3)');
     expect(meta.outputs.length).toBe(2);
     expect(meta.outputs[0].kind).toBe(StochasticRelativeStrengthIndexOutput.FastK);
-    expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+    expect(meta.outputs[0].shape).toBe(Shape.Scalar);
     expect(meta.outputs[1].kind).toBe(StochasticRelativeStrengthIndexOutput.FastD);
-    expect(meta.outputs[1].type).toBe(OutputType.Scalar);
+    expect(meta.outputs[1].shape).toBe(Shape.Scalar);
   });
 
   it('should return correct metadata (EMA)', () => {

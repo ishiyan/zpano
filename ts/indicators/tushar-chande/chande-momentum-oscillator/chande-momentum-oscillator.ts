@@ -1,10 +1,9 @@
+import { buildMetadata } from '../../core/build-metadata';
 import { componentTripleMnemonic } from '../../core/component-triple-mnemonic';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
-import { IndicatorType } from '../../core/indicator-type';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { LineIndicator } from '../../core/line-indicator';
-import { OutputType } from '../../core/outputs/output-type';
-import { ChandeMomentumOscillatorOutput } from './chande-momentum-oscillator-output';
-import { ChandeMomentumOscillatorParams } from './chande-momentum-oscillator-params';
+import { ChandeMomentumOscillatorParams } from './params';
 
 const epsilon = 1e-12;
 
@@ -26,7 +25,7 @@ export class ChandeMomentumOscillator extends LineIndicator {
   private readonly ringBuffer: number[];
   private ringHead = 0;
   private count = 0;
-  private prevSample = 0;
+  private previousSample = 0;
   private gainSum = 0;
   private lossSum = 0;
 
@@ -54,17 +53,14 @@ export class ChandeMomentumOscillator extends LineIndicator {
 
   /** Describes the output data of the indicator. */
   public metadata(): IndicatorMetadata {
-    return {
-      type: IndicatorType.ChandeMomentumOscillator,
-      mnemonic: this.mnemonic,
-      description: this.description,
-      outputs: [{
-        kind: ChandeMomentumOscillatorOutput.ChandeMomentumOscillatorValue,
-        type: OutputType.Scalar,
-        mnemonic: this.mnemonic,
-        description: this.description,
-      }],
-    };
+    return buildMetadata(
+      IndicatorIdentifier.ChandeMomentumOscillator,
+      this.mnemonic,
+      this.description,
+      [
+        { mnemonic: this.mnemonic, description: this.description },
+      ],
+    );
   }
 
   /** Updates the value of the Chande momentum oscillator given the next sample. */
@@ -75,14 +71,14 @@ export class ChandeMomentumOscillator extends LineIndicator {
 
     this.count++;
     if (this.count === 1) {
-      this.prevSample = sample;
+      this.previousSample = sample;
 
       return Number.NaN;
     }
 
     // New delta
-    const delta = sample - this.prevSample;
-    this.prevSample = sample;
+    const delta = sample - this.previousSample;
+    this.previousSample = sample;
 
     if (!this.primed) {
       // Fill until we have this.length deltas (i.e., this.length+1 samples)

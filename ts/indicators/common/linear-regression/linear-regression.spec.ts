@@ -1,9 +1,9 @@
 import { } from 'jasmine';
 
 import { LinearRegression } from './linear-regression';
-import { LinearRegressionOutput } from './linear-regression-output';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
+import { LinearRegressionOutput } from './output';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
 import { BarComponent } from '../../../entities/bar-component';
 import { QuoteComponent } from '../../../entities/quote-component';
 import { TradeComponent } from '../../../entities/trade-component';
@@ -521,13 +521,13 @@ describe('LinearRegression', () => {
     const lr = new LinearRegression({ length: 14 });
     const meta = lr.metadata();
 
-    expect(meta.type).toBe(IndicatorType.LinearRegression);
+    expect(meta.identifier).toBe(IndicatorIdentifier.LinearRegression);
     expect(meta.mnemonic).toBe('linreg(14)');
     expect(meta.description).toBe('Linear Regression linreg(14)');
     expect(meta.outputs.length).toBe(5);
 
     expect(meta.outputs[0].kind).toBe(LinearRegressionOutput.Value);
-    expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+    expect(meta.outputs[0].shape).toBe(Shape.Scalar);
     expect(meta.outputs[0].description).toBe('Linear Regression linreg(14) value');
     expect(meta.outputs[1].kind).toBe(LinearRegressionOutput.Forecast);
     expect(meta.outputs[1].description).toBe('Linear Regression linreg(14) forecast');
@@ -558,9 +558,9 @@ describe('LinearRegression', () => {
     }
 
     for (let i = 13; i < input.length; i++) {
-      const val = lr.update(input[i]);
+      const value = lr.update(input[i]);
       expect(lr.isPrimed()).toBe(true);
-      expect(Math.abs(val - expectedValue[i]))
+      expect(Math.abs(value - expectedValue[i]))
         .withContext(`Value [${i}]`).toBeLessThan(eps);
     }
 

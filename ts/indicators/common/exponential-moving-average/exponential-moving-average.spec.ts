@@ -1,9 +1,9 @@
 import { } from 'jasmine';
 
 import { ExponentialMovingAverage } from './exponential-moving-average';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
-import { ExponentialMovingAverageOutput } from './exponential-moving-average-output';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
+import { ExponentialMovingAverageOutput } from './output';
 
 // ng test mb  --code-coverage --include='**/indicators/**/*.spec.ts'
 // ng test mb  --code-coverage --include='**/indicators/*.spec.ts'
@@ -120,12 +120,12 @@ describe('ExponentialMovingAverage', () => {
     const ema = new ExponentialMovingAverage({length: 10, firstIsAverage: true});
     const meta = ema.metadata();
 
-    expect(meta.type).toBe(IndicatorType.ExponentialMovingAverage);
+    expect(meta.identifier).toBe(IndicatorIdentifier.ExponentialMovingAverage);
     expect(meta.mnemonic).toBe('ema(10)');
     expect(meta.description).toBe('Exponential moving average ema(10)');
     expect(meta.outputs.length).toBe(1);
     expect(meta.outputs[0].kind).toBe(ExponentialMovingAverageOutput.ExponentialMovingAverageValue);
-    expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+    expect(meta.outputs[0].shape).toBe(Shape.Scalar);
     expect(meta.outputs[0].mnemonic).toBe('ema(10)');
     expect(meta.outputs[0].description).toBe('Exponential moving average ema(10)');
   });

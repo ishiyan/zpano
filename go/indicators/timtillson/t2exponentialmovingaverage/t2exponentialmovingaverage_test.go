@@ -9,7 +9,7 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
+	"zpano/indicators/core/outputs/shape"
 )
 
 //nolint:lll
@@ -340,12 +340,12 @@ func TestT2ExponentialMovingAverageMetadata(t *testing.T) {
 		t2 := testT2ExponentialMovingAverageCreateLength(10, true, 0.3333)
 		act := t2.Metadata()
 
-		check("Type", core.T2ExponentialMovingAverage, act.Type)
+		check("Identifier", core.T2ExponentialMovingAverage, act.Identifier)
 		check("Mnemonic", "t2(10, 0.33330000)", act.Mnemonic)
 		check("Description", "T2 exponential moving average t2(10, 0.33330000)", act.Description)
 		check("len(Outputs)", 1, len(act.Outputs))
-		check("Outputs[0].Kind", int(T2ExponentialMovingAverageValue), act.Outputs[0].Kind)
-		check("Outputs[0].Type", outputs.ScalarType, act.Outputs[0].Type)
+		check("Outputs[0].Kind", int(Value), act.Outputs[0].Kind)
+		check("Outputs[0].Shape", shape.Scalar, act.Outputs[0].Shape)
 		check("Outputs[0].Mnemonic", "t2(10, 0.33330000)", act.Outputs[0].Mnemonic)
 		check("Outputs[0].Description", "T2 exponential moving average t2(10, 0.33330000)", act.Outputs[0].Description)
 	})
@@ -359,12 +359,12 @@ func TestT2ExponentialMovingAverageMetadata(t *testing.T) {
 		t2 := testT2ExponentialMovingAverageCreateAlpha(alpha, false, 0.3333333)
 		act := t2.Metadata()
 
-		check("Type", core.T2ExponentialMovingAverage, act.Type)
+		check("Identifier", core.T2ExponentialMovingAverage, act.Identifier)
 		check("Mnemonic", "t2(10, 0.18181818, 0.33333330)", act.Mnemonic)
 		check("Description", "T2 exponential moving average t2(10, 0.18181818, 0.33333330)", act.Description)
 		check("len(Outputs)", 1, len(act.Outputs))
-		check("Outputs[0].Kind", int(T2ExponentialMovingAverageValue), act.Outputs[0].Kind)
-		check("Outputs[0].Type", outputs.ScalarType, act.Outputs[0].Type)
+		check("Outputs[0].Kind", int(Value), act.Outputs[0].Kind)
+		check("Outputs[0].Shape", shape.Scalar, act.Outputs[0].Shape)
 		check("Outputs[0].Mnemonic", "t2(10, 0.18181818, 0.33333330)", act.Outputs[0].Mnemonic)
 		check("Outputs[0].Description", "T2 exponential moving average t2(10, 0.18181818, 0.33333330)", act.Outputs[0].Description)
 	})

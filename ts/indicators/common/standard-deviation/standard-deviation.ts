@@ -1,11 +1,10 @@
+import { buildMetadata } from '../../core/build-metadata';
 import { componentTripleMnemonic } from '../../core/component-triple-mnemonic';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
-import { IndicatorType } from '../../core/indicator-type';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { LineIndicator } from '../../core/line-indicator';
-import { OutputType } from '../../core/outputs/output-type';
 import { Variance } from '../variance/variance';
-import { StandardDeviationOutput } from './standard-deviation-output';
-import { StandardDeviationParams } from './standard-deviation-params';
+import { StandardDeviationParams } from './params';
 
 /** Function to calculate mnemonic of a __StandardDeviation__ indicator. */
 export const standardDeviationMnemonic = (params: StandardDeviationParams): string =>
@@ -55,17 +54,14 @@ export class StandardDeviation extends LineIndicator {
 
   /** Describes the output data of the indicator. */
   public metadata(): IndicatorMetadata {
-    return {
-      type: IndicatorType.StandardDeviation,
-      mnemonic: this.mnemonic,
-      description: this.description,
-      outputs: [{
-        kind: StandardDeviationOutput.StandardDeviationValue,
-        type: OutputType.Scalar,
-        mnemonic: this.mnemonic,
-        description: this.description,
-      }],
-    };
+    return buildMetadata(
+      IndicatorIdentifier.StandardDeviation,
+      this.mnemonic,
+      this.description,
+      [
+        { mnemonic: this.mnemonic, description: this.description },
+      ],
+    );
   }
 
   /** Updates the value of the indicator given the next sample. */

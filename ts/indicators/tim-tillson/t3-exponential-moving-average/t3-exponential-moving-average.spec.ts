@@ -1,9 +1,9 @@
 import { } from 'jasmine';
 
 import { T3ExponentialMovingAverage } from './t3-exponential-moving-average';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
-import { T3ExponentialMovingAverageOutput } from './t3-exponential-moving-average-output';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
+import { T3ExponentialMovingAverageOutput } from './output';
 
 /* eslint-disable max-len */
 // Input data is taken from the TA-Lib (http://ta-lib.org/) tests,
@@ -116,12 +116,12 @@ describe('T3ExponentialMovingAverage', () => {
     const t3 = new T3ExponentialMovingAverage({length: 10, volumeFactor: 0.3333, firstIsAverage: true});
     const meta = t3.metadata();
 
-    expect(meta.type).toBe(IndicatorType.T3ExponentialMovingAverage);
+    expect(meta.identifier).toBe(IndicatorIdentifier.T3ExponentialMovingAverage);
     expect(meta.mnemonic).toBe('t3(10, 0.33330000)');
     expect(meta.description).toBe('T3 exponential moving average t3(10, 0.33330000)');
     expect(meta.outputs.length).toBe(1);
     expect(meta.outputs[0].kind).toBe(T3ExponentialMovingAverageOutput.T3ExponentialMovingAverageValue);
-    expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+    expect(meta.outputs[0].shape).toBe(Shape.Scalar);
     expect(meta.outputs[0].mnemonic).toBe('t3(10, 0.33330000)');
     expect(meta.outputs[0].description).toBe('T3 exponential moving average t3(10, 0.33330000)');
   });
@@ -132,12 +132,12 @@ describe('T3ExponentialMovingAverage', () => {
     const t3 = new T3ExponentialMovingAverage({smoothingFactor: alpha, volumeFactor: 0.3333333, firstIsAverage: false});
     const meta = t3.metadata();
 
-    expect(meta.type).toBe(IndicatorType.T3ExponentialMovingAverage);
+    expect(meta.identifier).toBe(IndicatorIdentifier.T3ExponentialMovingAverage);
     expect(meta.mnemonic).toBe('t3(10, 0.18181818, 0.33333330)');
     expect(meta.description).toBe('T3 exponential moving average t3(10, 0.18181818, 0.33333330)');
     expect(meta.outputs.length).toBe(1);
     expect(meta.outputs[0].kind).toBe(T3ExponentialMovingAverageOutput.T3ExponentialMovingAverageValue);
-    expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+    expect(meta.outputs[0].shape).toBe(Shape.Scalar);
     expect(meta.outputs[0].mnemonic).toBe('t3(10, 0.18181818, 0.33333330)');
     expect(meta.outputs[0].description).toBe('T3 exponential moving average t3(10, 0.18181818, 0.33333330)');
   });

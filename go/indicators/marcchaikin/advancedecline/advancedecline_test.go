@@ -9,7 +9,7 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
+	"zpano/indicators/core/outputs/shape"
 )
 
 // High test data, 252 entries. From TA-Lib excel-sma3-sma10-chaikin.csv.
@@ -407,8 +407,8 @@ func TestAdvanceDeclineMetadata(t *testing.T) {
 
 	meta := ad.Metadata()
 
-	if meta.Type != core.AdvanceDecline {
-		t.Errorf("expected type AdvanceDecline, got %v", meta.Type)
+	if meta.Identifier != core.AdvanceDecline {
+		t.Errorf("expected identifier AdvanceDecline, got %v", meta.Identifier)
 	}
 
 	if meta.Mnemonic != "ad" {
@@ -423,11 +423,11 @@ func TestAdvanceDeclineMetadata(t *testing.T) {
 		t.Fatalf("expected 1 output, got %d", len(meta.Outputs))
 	}
 
-	if meta.Outputs[0].Kind != int(AdvanceDeclineValue) {
-		t.Errorf("expected output kind %d, got %d", AdvanceDeclineValue, meta.Outputs[0].Kind)
+	if meta.Outputs[0].Kind != int(Value) {
+		t.Errorf("expected output kind %d, got %d", Value, meta.Outputs[0].Kind)
 	}
 
-	if meta.Outputs[0].Type != outputs.ScalarType {
-		t.Errorf("expected output type Scalar, got %v", meta.Outputs[0].Type)
+	if meta.Outputs[0].Shape != shape.Scalar {
+		t.Errorf("expected output type Scalar, got %v", meta.Outputs[0].Shape)
 	}
 }

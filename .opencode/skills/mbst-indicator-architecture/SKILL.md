@@ -199,8 +199,10 @@ public abstract class BandIndicator : Indicator, IBandIndicator
 ```
 
 Note: `BandIndicator.Update(double, DateTime)` takes a `DateTime` parameter that
-`LineIndicator.Update(double)` does not. The zpano equivalent for band indicators has
-not yet been established — handle on a case-by-case basis.
+`LineIndicator.Update(double)` does not. In zpano, band outputs are emitted as
+`outputs.Band{Upper, Lower}` entries in the `Output` array; see "Band Output
+Semantics When Wrapping MBST's `Band`" in the conversion skill for the
+upper/lower assignment convention.
 
 ---
 

@@ -20,4 +20,48 @@ export class Heatmap {
 
   /** The values (z) of the heatmap column. */
   values!: number[];
+
+  /** Creates a populated heatmap column. */
+  public static newHeatmap(
+    time: Date,
+    parameterFirst: number,
+    parameterLast: number,
+    parameterResolution: number,
+    valueMin: number,
+    valueMax: number,
+    values: number[],
+  ): Heatmap {
+    const h = new Heatmap();
+    h.time = time;
+    h.parameterFirst = parameterFirst;
+    h.parameterLast = parameterLast;
+    h.parameterResolution = parameterResolution;
+    h.valueMin = valueMin;
+    h.valueMax = valueMax;
+    h.values = values;
+    return h;
+  }
+
+  /** Creates an empty heatmap column with valid axis metadata but no values. */
+  public static newEmptyHeatmap(
+    time: Date,
+    parameterFirst: number,
+    parameterLast: number,
+    parameterResolution: number,
+  ): Heatmap {
+    const h = new Heatmap();
+    h.time = time;
+    h.parameterFirst = parameterFirst;
+    h.parameterLast = parameterLast;
+    h.parameterResolution = parameterResolution;
+    h.valueMin = Number.NaN;
+    h.valueMax = Number.NaN;
+    h.values = [];
+    return h;
+  }
+
+  /** Indicates whether this heatmap column has no values. */
+  public isEmpty(): boolean {
+    return !this.values || this.values.length < 1;
+  }
 }

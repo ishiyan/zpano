@@ -1,9 +1,9 @@
 import { } from 'jasmine';
 
 import { AverageDirectionalMovementIndex } from './average-directional-movement-index';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
-import { AverageDirectionalMovementIndexOutput } from './average-directional-movement-index-output';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
+import { AverageDirectionalMovementIndexOutput } from './output';
 
 // TA-Lib test data (252 entries).
 const inputHigh = [
@@ -188,12 +188,12 @@ describe('AverageDirectionalMovementIndex', () => {
     it('should return correct metadata', () => {
       const adx = new AverageDirectionalMovementIndex(14);
       const meta = adx.metadata();
-      expect(meta.type).toBe(IndicatorType.AverageDirectionalMovementIndex);
+      expect(meta.identifier).toBe(IndicatorIdentifier.AverageDirectionalMovementIndex);
       expect(meta.mnemonic).toBe('adx');
       expect(meta.description).toBe('Average Directional Movement Index');
       expect(meta.outputs.length).toBe(8);
       expect(meta.outputs[0].kind).toBe(AverageDirectionalMovementIndexOutput.AverageDirectionalMovementIndexValue);
-      expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+      expect(meta.outputs[0].shape).toBe(Shape.Scalar);
       expect(meta.outputs[0].mnemonic).toBe('adx');
       expect(meta.outputs[0].description).toBe('Average Directional Movement Index');
       expect(meta.outputs[1].kind).toBe(AverageDirectionalMovementIndexOutput.DirectionalMovementIndexValue);

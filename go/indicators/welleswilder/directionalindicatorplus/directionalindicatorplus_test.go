@@ -9,7 +9,7 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
+	"zpano/indicators/core/outputs/shape"
 )
 
 // TA-Lib test data (252 entries), extracted programmatically from DirectionalIndicatorPlusTest.cs.
@@ -352,18 +352,18 @@ func TestDirectionalIndicatorPlusMetadata(t *testing.T) {
 		}
 	}
 
-	check("Type", core.DirectionalIndicatorPlus, act.Type)
+	check("Identifier", core.DirectionalIndicatorPlus, act.Identifier)
 	check("Mnemonic", "+di", act.Mnemonic)
 	check("Description", "Directional Indicator Plus", act.Description)
 	check("len(Outputs)", 4, len(act.Outputs))
-	check("Outputs[0].Kind", int(DirectionalIndicatorPlusValue), act.Outputs[0].Kind)
-	check("Outputs[0].Type", outputs.ScalarType, act.Outputs[0].Type)
+	check("Outputs[0].Kind", int(Value), act.Outputs[0].Kind)
+	check("Outputs[0].Shape", shape.Scalar, act.Outputs[0].Shape)
 	check("Outputs[0].Mnemonic", "+di", act.Outputs[0].Mnemonic)
 	check("Outputs[0].Description", "Directional Indicator Plus", act.Outputs[0].Description)
-	check("Outputs[1].Kind", int(DirectionalMovementPlusValue), act.Outputs[1].Kind)
-	check("Outputs[1].Type", outputs.ScalarType, act.Outputs[1].Type)
-	check("Outputs[2].Kind", int(AverageTrueRangeValue), act.Outputs[2].Kind)
-	check("Outputs[2].Type", outputs.ScalarType, act.Outputs[2].Type)
-	check("Outputs[3].Kind", int(TrueRangeValue), act.Outputs[3].Kind)
-	check("Outputs[3].Type", outputs.ScalarType, act.Outputs[3].Type)
+	check("Outputs[1].Kind", int(DirectionalMovementPlus), act.Outputs[1].Kind)
+	check("Outputs[1].Shape", shape.Scalar, act.Outputs[1].Shape)
+	check("Outputs[2].Kind", int(AverageTrueRange), act.Outputs[2].Kind)
+	check("Outputs[2].Shape", shape.Scalar, act.Outputs[2].Shape)
+	check("Outputs[3].Kind", int(TrueRange), act.Outputs[3].Kind)
+	check("Outputs[3].Shape", shape.Scalar, act.Outputs[3].Shape)
 }

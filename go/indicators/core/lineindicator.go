@@ -43,24 +43,24 @@ func NewLineIndicator(
 }
 
 // UpdateScalar updates the indicator given the next scalar sample.
-func (l *LineIndicator) UpdateScalar(sample *entities.Scalar) Output {
+func (s *LineIndicator) UpdateScalar(sample *entities.Scalar) Output {
 	output := make([]any, 1)
-	output[0] = entities.Scalar{Time: sample.Time, Value: l.updateFn(sample.Value)}
+	output[0] = entities.Scalar{Time: sample.Time, Value: s.updateFn(sample.Value)}
 
 	return output
 }
 
 // UpdateBar updates the indicator given the next bar sample.
-func (l *LineIndicator) UpdateBar(sample *entities.Bar) Output {
-	return l.UpdateScalar(&entities.Scalar{Time: sample.Time, Value: l.barFunc(sample)})
+func (s *LineIndicator) UpdateBar(sample *entities.Bar) Output {
+	return s.UpdateScalar(&entities.Scalar{Time: sample.Time, Value: s.barFunc(sample)})
 }
 
 // UpdateQuote updates the indicator given the next quote sample.
-func (l *LineIndicator) UpdateQuote(sample *entities.Quote) Output {
-	return l.UpdateScalar(&entities.Scalar{Time: sample.Time, Value: l.quoteFunc(sample)})
+func (s *LineIndicator) UpdateQuote(sample *entities.Quote) Output {
+	return s.UpdateScalar(&entities.Scalar{Time: sample.Time, Value: s.quoteFunc(sample)})
 }
 
 // UpdateTrade updates the indicator given the next trade sample.
-func (l *LineIndicator) UpdateTrade(sample *entities.Trade) Output {
-	return l.UpdateScalar(&entities.Scalar{Time: sample.Time, Value: l.tradeFunc(sample)})
+func (s *LineIndicator) UpdateTrade(sample *entities.Trade) Output {
+	return s.UpdateScalar(&entities.Scalar{Time: sample.Time, Value: s.tradeFunc(sample)})
 }

@@ -1,2 +1,2 @@
-// Package tillson implements indicators developed by Tim Tillson.
+// Package timtillson implements indicators developed by Tim Tillson.
 package timtillson

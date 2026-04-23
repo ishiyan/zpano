@@ -1,3 +1,4 @@
+import { buildMetadata } from '../../core/build-metadata';
 import { Bar } from '../../../entities/bar';
 import { BarComponent, DefaultBarComponent, barComponentValue } from '../../../entities/bar-component';
 import { Quote } from '../../../entities/quote';
@@ -9,13 +10,11 @@ import { componentTripleMnemonic } from '../../core/component-triple-mnemonic';
 import { Indicator } from '../../core/indicator';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
 import { IndicatorOutput } from '../../core/indicator-output';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { ExponentialMovingAverage } from '../../common/exponential-moving-average/exponential-moving-average';
 import { SimpleMovingAverage } from '../../common/simple-moving-average/simple-moving-average';
 import { RelativeStrengthIndex } from '../../welles-wilder/relative-strength-index/relative-strength-index';
-import { StochasticRelativeStrengthIndexOutput } from './stochastic-relative-strength-index-output';
-import { StochasticRelativeStrengthIndexParams, MovingAverageType } from './stochastic-relative-strength-index-params';
+import { StochasticRelativeStrengthIndexParams, MovingAverageType } from './params';
 
 /** Interface for an indicator that accepts a scalar and returns a value. */
 interface LineUpdater {
@@ -62,7 +61,7 @@ export class StochasticRelativeStrengthIndex implements Indicator {
   private readonly rsi: RelativeStrengthIndex;
 
   private readonly rsiBuf: Float64Array;
-  private rsiBufIdx = 0;
+  private rsiBufferIndex = 0;
   private rsiCount = 0;
 
   private readonly fastKLength_: number;
@@ -130,25 +129,15 @@ export class StochasticRelativeStrengthIndex implements Indicator {
 
   /** Describes the output data of the indicator. */
   public metadata(): IndicatorMetadata {
-    return {
-      type: IndicatorType.StochasticRelativeStrengthIndex,
-      mnemonic: this.mnemonic_,
-      description: this.description_,
-      outputs: [
-        {
-          kind: StochasticRelativeStrengthIndexOutput.FastK,
-          type: OutputType.Scalar,
-          mnemonic: this.mnemonic_ + ' fastK',
-          description: this.description_ + ' Fast-K',
-        },
-        {
-          kind: StochasticRelativeStrengthIndexOutput.FastD,
-          type: OutputType.Scalar,
-          mnemonic: this.mnemonic_ + ' fastD',
-          description: this.description_ + ' Fast-D',
-        },
+    return buildMetadata(
+      IndicatorIdentifier.StochasticRelativeStrengthIndex,
+      this.mnemonic_,
+      this.description_,
+      [
+        { mnemonic: this.mnemonic_ + ' fastK', description: this.description_ + ' Fast-K' },
+        { mnemonic: this.mnemonic_ + ' fastD', description: this.description_ + ' Fast-D' },
       ],
-    };
+    );
   }
 
   /** Updates the indicator given the next sample and returns both FastK and FastD values. */
@@ -158,14 +147,14 @@ export class StochasticRelativeStrengthIndex implements Indicator {
     }
 
     // Feed to internal RSI.
-    const rsiVal = this.rsi.update(sample);
-    if (isNaN(rsiVal)) {
+    const rsiValue = this.rsi.update(sample);
+    if (isNaN(rsiValue)) {
       return [this.fastK_, this.fastD_];
     }
 
     // Store RSI value in circular buffer.
-    this.rsiBuf[this.rsiBufIdx] = rsiVal;
-    this.rsiBufIdx = (this.rsiBufIdx + 1) % this.fastKLength_;
+    this.rsiBuf[this.rsiBufferIndex] = rsiValue;
+    this.rsiBufferIndex = (this.rsiBufferIndex + 1) % this.fastKLength_;
     this.rsiCount++;
 
     // Need at least fastKLength RSI values for stochastic calculation.
@@ -190,7 +179,7 @@ export class StochasticRelativeStrengthIndex implements Indicator {
     // Calculate Fast-K.
     const diff = maxRSI - minRSI;
     if (diff > 0) {
-      this.fastK_ = 100 * (rsiVal - minRSI) / diff;
+      this.fastK_ = 100 * (rsiValue - minRSI) / diff;
     } else {
       this.fastK_ = 0;
     }

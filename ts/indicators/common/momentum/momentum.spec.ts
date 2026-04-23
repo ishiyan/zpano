@@ -1,9 +1,9 @@
 import { } from 'jasmine';
 
 import { Momentum } from './momentum';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
-import { MomentumOutput } from './momentum-output';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
+import { MomentumOutput } from './output';
 import { BarComponent } from '../../../entities/bar-component';
 import { QuoteComponent } from '../../../entities/quote-component';
 import { TradeComponent } from '../../../entities/trade-component';
@@ -76,12 +76,12 @@ describe('Momentum', () => {
     const mom = new Momentum({length: 5});
     const meta = mom.metadata();
 
-    expect(meta.type).toBe(IndicatorType.Momentum);
+    expect(meta.identifier).toBe(IndicatorIdentifier.Momentum);
     expect(meta.mnemonic).toBe('mom(5)');
     expect(meta.description).toBe('Momentum mom(5)');
     expect(meta.outputs.length).toBe(1);
     expect(meta.outputs[0].kind).toBe(MomentumOutput.MomentumValue);
-    expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+    expect(meta.outputs[0].shape).toBe(Shape.Scalar);
     expect(meta.outputs[0].mnemonic).toBe('mom(5)');
     expect(meta.outputs[0].description).toBe('Momentum mom(5)');
   });

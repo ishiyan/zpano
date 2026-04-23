@@ -9,7 +9,7 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
+	"zpano/indicators/core/outputs/shape"
 )
 
 // Test data from TA-Lib (252 entries).
@@ -48,8 +48,8 @@ func testTime() time.Time {
 }
 
 // Test case 1: period=14, fastK=14, fastD=1, SMA.
-// begIdx=27, first value: FastK=94.156709, FastD=94.156709.
-// last value (idx 251): FastK=0.0, FastD=0.0.
+// begIndex=27, first value: FastK=94.156709, FastD=94.156709.
+// last value (index 251): FastK=0.0, FastD=0.0.
 func TestStochasticRSI_14_14_1_SMA(t *testing.T) {
 	t.Parallel()
 
@@ -105,8 +105,8 @@ func TestStochasticRSI_14_14_1_SMA(t *testing.T) {
 }
 
 // Test case 2: period=14, fastK=45, fastD=1, SMA.
-// begIdx=58, first value: FastK=79.729186, FastD=79.729186.
-// last value (idx 251): FastK=48.1550743, FastD=48.1550743.
+// begIndex=58, first value: FastK=79.729186, FastD=79.729186.
+// last value (index 251): FastK=48.1550743, FastD=48.1550743.
 func TestStochasticRSI_14_45_1_SMA(t *testing.T) {
 	t.Parallel()
 
@@ -162,8 +162,8 @@ func TestStochasticRSI_14_45_1_SMA(t *testing.T) {
 }
 
 // Test case 3: period=11, fastK=13, fastD=16, SMA.
-// begIdx=38, first value: FastK=5.25947, FastD=57.1711.
-// last value (idx 251): FastK=0.0, FastD=15.7303.
+// begIndex=38, first value: FastK=5.25947, FastD=57.1711.
+// last value (index 251): FastK=0.0, FastD=15.7303.
 func TestStochasticRSI_11_13_16_SMA(t *testing.T) {
 	t.Parallel()
 
@@ -180,13 +180,13 @@ func TestStochasticRSI_11_13_16_SMA(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// begIdx=38: RSI lookback(11)=11, STOCHF lookback(13, 16, SMA) = 12 + 15 = 27, total = 38.
+	// begIndex=38: RSI lookback(11)=11, STOCHF lookback(13, 16, SMA) = 12 + 15 = 27, total = 38.
 	// But FastD (SMA(16)) won't be primed until 16 FastK values are collected.
-	// First primed at: RSI primes after 11+1=12 inputs (indices 0..11, first RSI at idx 11).
+	// First primed at: RSI primes after 11+1=12 inputs (indices 0..11, first RSI at index 11).
 	// Wait, RSI lookback = 11 means first RSI at index 11.
 	// FastK needs 13 RSI values: first FastK at index 11+12 = 23.
 	// FastD SMA(16) needs 16 FastK values: first FastD at index 23+15 = 38.
-	// So begIdx=38: FastD is first valid here.
+	// So begIndex=38: FastD is first valid here.
 
 	// Feed first 38 values.
 	for i := 0; i < 38; i++ {
@@ -292,8 +292,8 @@ func TestStochasticRSIMetadata(t *testing.T) {
 
 	meta := ind.Metadata()
 
-	if meta.Type != core.StochasticRelativeStrengthIndex {
-		t.Errorf("expected type StochasticRelativeStrengthIndex, got %v", meta.Type)
+	if meta.Identifier != core.StochasticRelativeStrengthIndex {
+		t.Errorf("expected identifier StochasticRelativeStrengthIndex, got %v", meta.Identifier)
 	}
 
 	exp := "stochrsi(14/14/SMA3)"
@@ -305,16 +305,16 @@ func TestStochasticRSIMetadata(t *testing.T) {
 		t.Fatalf("expected 2 outputs, got %d", len(meta.Outputs))
 	}
 
-	if meta.Outputs[0].Kind != int(StochasticRelativeStrengthIndexFastK) {
-		t.Errorf("expected output 0 kind %d, got %d", StochasticRelativeStrengthIndexFastK, meta.Outputs[0].Kind)
+	if meta.Outputs[0].Kind != int(FastK) {
+		t.Errorf("expected output 0 kind %d, got %d", FastK, meta.Outputs[0].Kind)
 	}
 
-	if meta.Outputs[0].Type != outputs.ScalarType {
-		t.Errorf("expected scalar output type, got %v", meta.Outputs[0].Type)
+	if meta.Outputs[0].Shape != shape.Scalar {
+		t.Errorf("expected scalar output type, got %v", meta.Outputs[0].Shape)
 	}
 
-	if meta.Outputs[1].Kind != int(StochasticRelativeStrengthIndexFastD) {
-		t.Errorf("expected output 1 kind %d, got %d", StochasticRelativeStrengthIndexFastD, meta.Outputs[1].Kind)
+	if meta.Outputs[1].Kind != int(FastD) {
+		t.Errorf("expected output 1 kind %d, got %d", FastD, meta.Outputs[1].Kind)
 	}
 }
 

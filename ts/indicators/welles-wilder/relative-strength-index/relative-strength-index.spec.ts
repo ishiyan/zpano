@@ -1,9 +1,9 @@
 import { } from 'jasmine';
 
 import { RelativeStrengthIndex } from './relative-strength-index';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
-import { RelativeStrengthIndexOutput } from './relative-strength-index-output';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
+import { RelativeStrengthIndexOutput } from './output';
 
 // Test data from TA-Lib reference (length=9, 25 entries).
 const input = [
@@ -72,12 +72,12 @@ describe('RelativeStrengthIndex', () => {
     const rsi = new RelativeStrengthIndex({ length: 14 });
     const meta = rsi.metadata();
 
-    expect(meta.type).toBe(IndicatorType.RelativeStrengthIndex);
+    expect(meta.identifier).toBe(IndicatorIdentifier.RelativeStrengthIndex);
     expect(meta.mnemonic).toBe('rsi(14)');
     expect(meta.description).toBe('Relative Strength Index rsi(14)');
     expect(meta.outputs.length).toBe(1);
     expect(meta.outputs[0].kind).toBe(RelativeStrengthIndexOutput.RelativeStrengthIndexValue);
-    expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+    expect(meta.outputs[0].shape).toBe(Shape.Scalar);
   });
 
   it('should return RSI values in [0, 100] range', () => {

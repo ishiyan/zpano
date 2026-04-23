@@ -1,11 +1,10 @@
+import { buildMetadata } from '../../core/build-metadata';
 import { Bar } from '../../../entities/bar';
 import { Scalar } from '../../../entities/scalar';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
 import { IndicatorOutput } from '../../core/indicator-output';
-import { IndicatorType } from '../../core/indicator-type';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { LineIndicator } from '../../core/line-indicator';
-import { OutputType } from '../../core/outputs/output-type';
-import { BalanceOfPowerOutput } from './balance-of-power-output';
 
 const epsilon = 1e-8;
 
@@ -44,17 +43,14 @@ export class BalanceOfPower extends LineIndicator {
 
   /** Describes the output data of the indicator. */
   public metadata(): IndicatorMetadata {
-    return {
-      type: IndicatorType.BalanceOfPower,
-      mnemonic: this.mnemonic,
-      description: this.description,
-      outputs: [{
-        kind: BalanceOfPowerOutput.BalanceOfPowerValue,
-        type: OutputType.Scalar,
-        mnemonic: this.mnemonic,
-        description: this.description,
-      }],
-    };
+    return buildMetadata(
+      IndicatorIdentifier.BalanceOfPower,
+      this.mnemonic,
+      this.description,
+      [
+        { mnemonic: this.mnemonic, description: this.description },
+      ],
+    );
   }
 
   /** Updates the indicator with the given sample (O=H=L=C, so result is always 0). */

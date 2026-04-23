@@ -1,3 +1,4 @@
+import { buildMetadata } from '../../core/build-metadata';
 import { Bar } from '../../../entities/bar';
 import { Quote } from '../../../entities/quote';
 import { Scalar } from '../../../entities/scalar';
@@ -5,11 +6,8 @@ import { Trade } from '../../../entities/trade';
 import { Indicator } from '../../core/indicator';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
 import { IndicatorOutput } from '../../core/indicator-output';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputMetadata } from '../../core/outputs/output-metadata';
-import { OutputType } from '../../core/outputs/output-type';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { TrueRange } from '../true-range/true-range';
-import { AverageTrueRangeOutput } from './average-true-range-output';
 
 const atrMnemonic = 'atr';
 const atrDescription = 'Average True Range';
@@ -60,19 +58,14 @@ export class AverageTrueRange implements Indicator {
 
   /** Describes the output data of the indicator. */
   public metadata(): IndicatorMetadata {
-    const outputMeta: OutputMetadata = {
-      kind: AverageTrueRangeOutput.AverageTrueRangeValue,
-      type: OutputType.Scalar,
-      mnemonic: atrMnemonic,
-      description: atrDescription,
-    };
-
-    return {
-      type: IndicatorType.AverageTrueRange,
-      mnemonic: atrMnemonic,
-      description: atrDescription,
-      outputs: [outputMeta],
-    };
+    return buildMetadata(
+      IndicatorIdentifier.AverageTrueRange,
+      atrMnemonic,
+      atrDescription,
+      [
+        { mnemonic: atrMnemonic, description: atrDescription },
+      ],
+    );
   }
 
   /** Updates the Average True Range given the next bar's close, high, and low values. */

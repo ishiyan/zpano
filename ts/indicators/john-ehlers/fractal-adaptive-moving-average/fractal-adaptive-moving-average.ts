@@ -1,3 +1,4 @@
+import { buildMetadata } from '../../core/build-metadata';
 import { Bar } from '../../../entities/bar';
 import { BarComponent, DefaultBarComponent, barComponentValue } from '../../../entities/bar-component';
 import { Quote } from '../../../entities/quote';
@@ -8,11 +9,9 @@ import { TradeComponent, DefaultTradeComponent, tradeComponentValue } from '../.
 import { Indicator } from '../../core/indicator';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
 import { IndicatorOutput } from '../../core/indicator-output';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { componentTripleMnemonic } from '../../core/component-triple-mnemonic';
-import { FractalAdaptiveMovingAverageParams } from './fractal-adaptive-moving-average-params';
-import { FractalAdaptiveMovingAverageOutput } from './fractal-adaptive-moving-average-output';
+import { FractalAdaptiveMovingAverageParams } from './params';
 
 /** __Fractal Adaptive Moving Average__ (Ehler's fractal adaptive moving average, _FRAMA_)
  * is an EMA with the smoothing factor, a, being changed with each new sample:
@@ -124,25 +123,15 @@ export class FractalAdaptiveMovingAverage implements Indicator {
 
   /** Describes a requested output data of an indicator. */
   public metadata(): IndicatorMetadata {
-    return {
-      type: IndicatorType.FractalAdaptiveMovingAverage,
-      mnemonic: this.mnemonic,
-      description: this.description,
-      outputs: [
-        {
-          kind: FractalAdaptiveMovingAverageOutput.Value,
-          type: OutputType.Scalar,
-          mnemonic: this.mnemonic,
-          description: this.description,
-        },
-        {
-          kind: FractalAdaptiveMovingAverageOutput.Fdim,
-          type: OutputType.Scalar,
-          mnemonic: this.mnemonicFdim,
-          description: this.descriptionFdim,
-        },
+    return buildMetadata(
+      IndicatorIdentifier.FractalAdaptiveMovingAverage,
+      this.mnemonic,
+      this.description,
+      [
+        { mnemonic: this.mnemonic, description: this.description },
+        { mnemonic: this.mnemonicFdim, description: this.descriptionFdim },
       ],
-    };
+    );
   }
 
   /** Updates an indicator given the next scalar sample. */

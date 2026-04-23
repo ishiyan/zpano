@@ -9,7 +9,7 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
+	"zpano/indicators/core/outputs/shape"
 )
 
 // Test data from TA-Lib (252 entries), used by MBST C# tests.
@@ -219,8 +219,8 @@ func TestAbsolutePriceOscillatorMetadata(t *testing.T) {
 
 	meta := apo.Metadata()
 
-	if meta.Type != core.AbsolutePriceOscillator {
-		t.Errorf("expected type AbsolutePriceOscillator, got %v", meta.Type)
+	if meta.Identifier != core.AbsolutePriceOscillator {
+		t.Errorf("expected identifier AbsolutePriceOscillator, got %v", meta.Identifier)
 	}
 
 	exp := "apo(SMA12/SMA26)"
@@ -232,12 +232,12 @@ func TestAbsolutePriceOscillatorMetadata(t *testing.T) {
 		t.Fatalf("expected 1 output, got %d", len(meta.Outputs))
 	}
 
-	if meta.Outputs[0].Kind != int(AbsolutePriceOscillatorValue) {
-		t.Errorf("expected output kind %d, got %d", AbsolutePriceOscillatorValue, meta.Outputs[0].Kind)
+	if meta.Outputs[0].Kind != int(Value) {
+		t.Errorf("expected output kind %d, got %d", Value, meta.Outputs[0].Kind)
 	}
 
-	if meta.Outputs[0].Type != outputs.ScalarType {
-		t.Errorf("expected scalar output type, got %v", meta.Outputs[0].Type)
+	if meta.Outputs[0].Shape != shape.Scalar {
+		t.Errorf("expected scalar output type, got %v", meta.Outputs[0].Shape)
 	}
 }
 

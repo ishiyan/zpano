@@ -1,10 +1,10 @@
 import { OutputMetadata } from './outputs/output-metadata';
-import { IndicatorType } from './indicator-type';
+import { IndicatorIdentifier } from './indicator-identifier';
 
-/** Describes a type and requested outputs of an indicator. */
+/** Describes an indicator and its outputs. */
 export interface IndicatorMetadata {
-    /** Identifies a type this indicator. */
-    type: IndicatorType;
+    /** Identifies this indicator. */
+    identifier: IndicatorIdentifier;
 
     /** A short name (mnemonic) of this indicator. */
     mnemonic: string;

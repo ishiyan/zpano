@@ -1,10 +1,10 @@
 import { } from 'jasmine';
 
 import { ZeroLagExponentialMovingAverage } from './zero-lag-exponential-moving-average';
-import { ZeroLagExponentialMovingAverageParams } from './zero-lag-exponential-moving-average-params';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
-import { ZeroLagExponentialMovingAverageOutput } from './zero-lag-exponential-moving-average-output';
+import { ZeroLagExponentialMovingAverageParams } from './params';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
+import { ZeroLagExponentialMovingAverageOutput } from './output';
 
 const defaultParams: ZeroLagExponentialMovingAverageParams = {
   smoothingFactor: 0.25,
@@ -82,19 +82,19 @@ describe('ZeroLagExponentialMovingAverage', () => {
 
   it('should converge to constant for constant input', () => {
     const z = new ZeroLagExponentialMovingAverage(defaultParams);
-    const val = 42;
+    const value = 42;
 
     // Prime with constant.
     for (let i = 0; i < 3; i++) {
-      z.update(val);
+      z.update(value);
     }
 
-    const result = z.update(val);
-    expect(Math.abs(result - val)).toBeLessThan(1e-10);
+    const result = z.update(value);
+    expect(Math.abs(result - value)).toBeLessThan(1e-10);
 
     // Further constant updates.
     for (let i = 0; i < 10; i++) {
-      expect(Math.abs(z.update(val) - val)).toBeLessThan(1e-10);
+      expect(Math.abs(z.update(value) - value)).toBeLessThan(1e-10);
     }
   });
 
@@ -102,11 +102,11 @@ describe('ZeroLagExponentialMovingAverage', () => {
     const z = new ZeroLagExponentialMovingAverage(defaultParams);
     const meta = z.metadata();
 
-    expect(meta.type).toBe(IndicatorType.ZeroLagExponentialMovingAverage);
+    expect(meta.identifier).toBe(IndicatorIdentifier.ZeroLagExponentialMovingAverage);
     expect(meta.mnemonic).toBe('zema(0.25, 0.5, 3)');
     expect(meta.description).toBe('Zero-lag Exponential Moving Average zema(0.25, 0.5, 3)');
     expect(meta.outputs.length).toBe(1);
     expect(meta.outputs[0].kind).toBe(ZeroLagExponentialMovingAverageOutput.ZeroLagExponentialMovingAverageValue);
-    expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+    expect(meta.outputs[0].shape).toBe(Shape.Scalar);
   });
 });

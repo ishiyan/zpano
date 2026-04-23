@@ -1,9 +1,9 @@
 import { } from 'jasmine';
 
 import { AverageTrueRange } from './average-true-range';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
-import { AverageTrueRangeOutput } from './average-true-range-output';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
+import { AverageTrueRangeOutput } from './output';
 
 // TA-Lib test data (252 entries), extracted programmatically from AverageTrueRangeTest.cs.
 const inputHigh = [
@@ -242,12 +242,12 @@ describe('AverageTrueRange', () => {
     it('should return correct metadata', () => {
       const atr = new AverageTrueRange(14);
       const meta = atr.metadata();
-      expect(meta.type).toBe(IndicatorType.AverageTrueRange);
+      expect(meta.identifier).toBe(IndicatorIdentifier.AverageTrueRange);
       expect(meta.mnemonic).toBe('atr');
       expect(meta.description).toBe('Average True Range');
       expect(meta.outputs.length).toBe(1);
       expect(meta.outputs[0].kind).toBe(AverageTrueRangeOutput.AverageTrueRangeValue);
-      expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+      expect(meta.outputs[0].shape).toBe(Shape.Scalar);
       expect(meta.outputs[0].mnemonic).toBe('atr');
       expect(meta.outputs[0].description).toBe('Average True Range');
     });

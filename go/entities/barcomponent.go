@@ -102,8 +102,8 @@ func BarComponentFunc(c BarComponent) (BarFunc, error) {
 }
 
 // String implements the Stringer interface.
-func (c BarComponent) String() string {
-	switch c {
+func (s BarComponent) String() string {
+	switch s {
 	case BarOpenPrice:
 		return barOpen
 	case BarHighPrice:
@@ -128,8 +128,8 @@ func (c BarComponent) String() string {
 }
 
 // Mnemonic returns a short mnemonic code for the bar component.
-func (c BarComponent) Mnemonic() string {
-	switch c {
+func (s BarComponent) Mnemonic() string {
+	switch s {
 	case BarOpenPrice:
 		return barMnemonicOpen
 	case BarHighPrice:
@@ -154,53 +154,53 @@ func (c BarComponent) Mnemonic() string {
 }
 
 // IsKnown determines if this bar component is known.
-func (c BarComponent) IsKnown() bool {
-	return c >= BarOpenPrice && c < barLast
+func (s BarComponent) IsKnown() bool {
+	return s >= BarOpenPrice && s < barLast
 }
 
 // MarshalJSON implements the Marshaler interface.
-func (c BarComponent) MarshalJSON() ([]byte, error) {
-	s := c.String()
-	if s == unknown {
-		return nil, fmt.Errorf(marshalErrFmt, s, errUnknownBarComponent)
+func (s BarComponent) MarshalJSON() ([]byte, error) {
+	str := s.String()
+	if str == unknown {
+		return nil, fmt.Errorf(marshalErrFmt, str, errUnknownBarComponent)
 	}
 
 	const extra = 2 // Two bytes for quotes.
 
-	b := make([]byte, 0, len(s)+extra)
+	b := make([]byte, 0, len(str)+extra)
 	b = append(b, dqc)
-	b = append(b, s...)
+	b = append(b, str...)
 	b = append(b, dqc)
 
 	return b, nil
 }
 
 // UnmarshalJSON implements the Unmarshaler interface.
-func (c *BarComponent) UnmarshalJSON(data []byte) error {
+func (s *BarComponent) UnmarshalJSON(data []byte) error {
 	d := bytes.Trim(data, dqs)
-	s := string(d)
+	str := string(d)
 
-	switch s {
+	switch str {
 	case barOpen:
-		*c = BarOpenPrice
+		*s = BarOpenPrice
 	case barHigh:
-		*c = BarHighPrice
+		*s = BarHighPrice
 	case barLow:
-		*c = BarLowPrice
+		*s = BarLowPrice
 	case barClose:
-		*c = BarClosePrice
+		*s = BarClosePrice
 	case barVolume:
-		*c = BarVolume
+		*s = BarVolume
 	case barMedian:
-		*c = BarMedianPrice
+		*s = BarMedianPrice
 	case barTypical:
-		*c = BarTypicalPrice
+		*s = BarTypicalPrice
 	case barWeighted:
-		*c = BarWeightedPrice
+		*s = BarWeightedPrice
 	case barAverage:
-		*c = BarAveragePrice
+		*s = BarAveragePrice
 	default:
-		return fmt.Errorf(unmarshalErrFmt, s, errUnknownBarComponent)
+		return fmt.Errorf(unmarshalErrFmt, str, errUnknownBarComponent)
 	}
 
 	return nil

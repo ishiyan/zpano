@@ -1,13 +1,12 @@
+import { buildMetadata } from '../../core/build-metadata';
 import { Bar } from '../../../entities/bar';
 import { Scalar } from '../../../entities/scalar';
 import { componentTripleMnemonic } from '../../core/component-triple-mnemonic';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
 import { IndicatorOutput } from '../../core/indicator-output';
-import { IndicatorType } from '../../core/indicator-type';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { LineIndicator } from '../../core/line-indicator';
-import { OutputType } from '../../core/outputs/output-type';
-import { PearsonsCorrelationCoefficientOutput } from './pearsons-correlation-coefficient-output';
-import { PearsonsCorrelationCoefficientParams } from './pearsons-correlation-coefficient-params';
+import { PearsonsCorrelationCoefficientParams } from './params';
 
 /**
  * __Pearson's Correlation Coefficient__ (__CORREL__) computes the Pearson correlation
@@ -54,17 +53,14 @@ export class PearsonsCorrelationCoefficient extends LineIndicator {
 
   /** Describes the output data of the indicator. */
   public metadata(): IndicatorMetadata {
-    return {
-      type: IndicatorType.PearsonsCorrelationCoefficient,
-      mnemonic: this.mnemonic,
-      description: this.description,
-      outputs: [{
-        kind: PearsonsCorrelationCoefficientOutput.PearsonsCorrelationCoefficientValue,
-        type: OutputType.Scalar,
-        mnemonic: this.mnemonic,
-        description: this.description,
-      }],
-    };
+    return buildMetadata(
+      IndicatorIdentifier.PearsonsCorrelationCoefficient,
+      this.mnemonic,
+      this.description,
+      [
+        { mnemonic: this.mnemonic, description: this.description },
+      ],
+    );
   }
 
   /**

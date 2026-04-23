@@ -9,7 +9,7 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
+	"zpano/indicators/core/outputs/shape"
 )
 
 // Standard test data (252 entries) — same H/L/C as TrueRange and other HLC indicators.
@@ -111,7 +111,7 @@ func testTime() time.Time {
 }
 
 // Test case 1: fastK=5, slowK=3/SMA, slowD=4/SMA.
-// begIdx=9, SlowK[0]=38.139, SlowD[0]=36.725.
+// begIndex=9, SlowK[0]=38.139, SlowD[0]=36.725.
 func TestStochastic_5_SMA3_SMA4_SingleValue(t *testing.T) {
 	t.Parallel()
 
@@ -152,7 +152,7 @@ func TestStochastic_5_SMA3_SMA4_SingleValue(t *testing.T) {
 }
 
 // Test case 2: fastK=5, slowK=3/SMA, slowD=3/SMA.
-// begIdx=8, first: SlowK[0]=24.0128, SlowD[0]=36.254.
+// begIndex=8, first: SlowK[0]=24.0128, SlowD[0]=36.254.
 func TestStochastic_5_SMA3_SMA3_FirstValue(t *testing.T) {
 	t.Parallel()
 
@@ -228,7 +228,7 @@ func TestStochastic_5_SMA3_SMA3_LastValue(t *testing.T) {
 }
 
 // Test case 3: fastK=5, slowK=3/SMA, slowD=4/SMA.
-// Last values (output idx 242 = input idx 251): SlowK=30.194, SlowD=46.641.
+// Last values (output index 242 = input index 251): SlowK=30.194, SlowD=46.641.
 func TestStochastic_5_SMA3_SMA4_LastValue(t *testing.T) {
 	t.Parallel()
 
@@ -278,7 +278,7 @@ func TestStochasticIsPrimed(t *testing.T) {
 	low := testInputLow()
 	close := testInputClose()
 
-	// begIdx=8 for fastK=5, slowK=3/SMA, slowD=3/SMA.
+	// begIndex=8 for fastK=5, slowK=3/SMA, slowD=3/SMA.
 	// lookback = (5-1) + (3-1) + (3-1) = 8.
 	if ind.IsPrimed() {
 		t.Error("expected not primed initially")
@@ -338,8 +338,8 @@ func TestStochasticMetadata(t *testing.T) {
 
 	meta := ind.Metadata()
 
-	if meta.Type != core.Stochastic {
-		t.Errorf("expected type Stochastic, got %v", meta.Type)
+	if meta.Identifier != core.Stochastic {
+		t.Errorf("expected identifier Stochastic, got %v", meta.Identifier)
 	}
 
 	exp := "stoch(5/SMA3/SMA3)"
@@ -351,20 +351,20 @@ func TestStochasticMetadata(t *testing.T) {
 		t.Fatalf("expected 3 outputs, got %d", len(meta.Outputs))
 	}
 
-	if meta.Outputs[0].Kind != int(StochasticFastK) {
-		t.Errorf("expected output 0 kind %d, got %d", StochasticFastK, meta.Outputs[0].Kind)
+	if meta.Outputs[0].Kind != int(FastK) {
+		t.Errorf("expected output 0 kind %d, got %d", FastK, meta.Outputs[0].Kind)
 	}
 
-	if meta.Outputs[0].Type != outputs.ScalarType {
-		t.Errorf("expected scalar output type, got %v", meta.Outputs[0].Type)
+	if meta.Outputs[0].Shape != shape.Scalar {
+		t.Errorf("expected scalar output type, got %v", meta.Outputs[0].Shape)
 	}
 
-	if meta.Outputs[1].Kind != int(StochasticSlowK) {
-		t.Errorf("expected output 1 kind %d, got %d", StochasticSlowK, meta.Outputs[1].Kind)
+	if meta.Outputs[1].Kind != int(SlowK) {
+		t.Errorf("expected output 1 kind %d, got %d", SlowK, meta.Outputs[1].Kind)
 	}
 
-	if meta.Outputs[2].Kind != int(StochasticSlowD) {
-		t.Errorf("expected output 2 kind %d, got %d", StochasticSlowD, meta.Outputs[2].Kind)
+	if meta.Outputs[2].Kind != int(SlowD) {
+		t.Errorf("expected output 2 kind %d, got %d", SlowD, meta.Outputs[2].Kind)
 	}
 }
 

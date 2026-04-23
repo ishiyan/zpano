@@ -211,12 +211,12 @@ func directRealFastFourierTransform(array []float64) {
 		i := two*ii - 1
 
 		if j > i {
-			tmpR := array[j-1]
-			tmpI := array[j]
+			tempR := array[j-1]
+			tempI := array[j]
 			array[j-1] = array[i-1]
 			array[j] = array[i]
-			array[i-1] = tmpR
-			array[i] = tmpI
+			array[i-1] = tempR
+			array[i] = tempI
 		}
 
 		m := nn
@@ -245,17 +245,17 @@ func directRealFastFourierTransform(array []float64) {
 			for jj := 0; jj <= (n-m)/istep; jj++ {
 				i := m + jj*istep
 				j = i + mMax
-				tmpR := wR*array[j-1] - wI*array[j]
-				tmpI := wR*array[j] + wI*array[j-1]
-				array[j-1] = array[i-1] - tmpR
-				array[j] = array[i] - tmpI
-				array[i-1] = array[i-1] + tmpR
-				array[i] = array[i] + tmpI
+				tempR := wR*array[j-1] - wI*array[j]
+				tempI := wR*array[j] + wI*array[j-1]
+				array[j-1] = array[i-1] - tempR
+				array[j] = array[i] - tempI
+				array[i-1] = array[i-1] + tempR
+				array[i] = array[i] + tempI
 			}
 
-			wTmp := wR
+			wTemp := wR
 			wR = wR*wpR - wI*wpI + wR
-			wI = wI*wpR + wTmp*wpI + wI
+			wI = wI*wpR + wTemp*wpI + wI
 		}
 
 		mMax = istep
@@ -283,9 +283,9 @@ func directRealFastFourierTransform(array []float64) {
 		array[i2] = h1I + wRs*h2I + wIs*h2R
 		array[i3] = h1R - wRs*h2R + wIs*h2I
 		array[i4] = -h1I + wRs*h2I + wIs*h2R
-		twTmp := twR
+		twTemp := twR
 		twR = twR*twpR - twI*twpI + twR
-		twI = twI*twpR + twTmp*twpI + twI
+		twI = twI*twpR + twTemp*twpI + twI
 	}
 
 	twR = array[0]

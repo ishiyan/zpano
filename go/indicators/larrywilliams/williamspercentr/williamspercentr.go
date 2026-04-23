@@ -6,7 +6,6 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
 )
 
 const (
@@ -65,151 +64,146 @@ func NewWilliamsPercentR(length int) *WilliamsPercentR {
 }
 
 // IsPrimed indicates whether the indicator is primed.
-func (w *WilliamsPercentR) IsPrimed() bool {
-	w.mu.RLock()
-	defer w.mu.RUnlock()
+func (s *WilliamsPercentR) IsPrimed() bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
-	return w.primed
+	return s.primed
 }
 
 // Metadata describes the output data of the indicator.
-func (w *WilliamsPercentR) Metadata() core.Metadata {
-	return core.Metadata{
-		Type:        core.WilliamsPercentR,
-		Mnemonic:    willrMnemonic,
-		Description: willrDescription,
-		Outputs: []outputs.Metadata{
-			{
-				Kind:        int(WilliamsPercentRValue),
-				Type:        outputs.ScalarType,
-				Mnemonic:    willrMnemonic,
-				Description: willrDescription,
-			},
+func (s *WilliamsPercentR) Metadata() core.Metadata {
+	return core.BuildMetadata(
+		core.WilliamsPercentR,
+		willrMnemonic,
+		willrDescription,
+		[]core.OutputText{
+			{Mnemonic: willrMnemonic, Description: willrDescription},
 		},
-	}
+	)
 }
 
 // Update updates the Williams %R given the next bar's close, high, and low values.
-func (w *WilliamsPercentR) Update(close, high, low float64) float64 {
+func (s *WilliamsPercentR) Update(close, high, low float64) float64 {
 	if math.IsNaN(close) || math.IsNaN(high) || math.IsNaN(low) {
 		return math.NaN()
 	}
 
-	w.mu.Lock()
-	defer w.mu.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
-	index := w.circularIndex
-	w.lowCircular[index] = low
-	w.highCircular[index] = high
+	index := s.circularIndex
+	s.lowCircular[index] = low
+	s.highCircular[index] = high
 
 	// Advance circular buffer index.
-	w.circularIndex++
-	if w.circularIndex > w.lengthMinOne {
-		w.circularIndex = 0
+	s.circularIndex++
+	if s.circularIndex > s.lengthMinOne {
+		s.circularIndex = 0
 	}
 
-	if w.length > w.circularCount {
-		if w.lengthMinOne == w.circularCount {
+	if s.length > s.circularCount {
+		if s.lengthMinOne == s.circularCount {
 			// We have exactly `length` samples; compute for the first time.
-			minLow := w.lowCircular[index]
-			maxHigh := w.highCircular[index]
+			minLow := s.lowCircular[index]
+			maxHigh := s.highCircular[index]
 
-			for i := 0; i < w.lengthMinOne; i++ {
+			for i := 0; i < s.lengthMinOne; i++ {
 				// The value of index is always positive here (we started at lengthMinOne).
 				index--
 
-				if temp := w.lowCircular[index]; minLow > temp {
+				if temp := s.lowCircular[index]; minLow > temp {
 					minLow = temp
 				}
 
-				if temp := w.highCircular[index]; maxHigh < temp {
+				if temp := s.highCircular[index]; maxHigh < temp {
 					maxHigh = temp
 				}
 			}
 
 			if math.Abs(maxHigh-minLow) < math.SmallestNonzeroFloat64 {
-				w.value = 0
+				s.value = 0
 			} else {
-				w.value = -100 * (maxHigh - close) / (maxHigh - minLow)
+				s.value = -100 * (maxHigh - close) / (maxHigh - minLow)
 			}
 
-			w.primed = true
+			s.primed = true
 		}
 
-		w.circularCount++
+		s.circularCount++
 
-		return w.value
+		return s.value
 	}
 
 	// Already primed, compute normally with wrapping.
-	minLow := w.lowCircular[index]
-	maxHigh := w.highCircular[index]
+	minLow := s.lowCircular[index]
+	maxHigh := s.highCircular[index]
 
-	for i := 0; i < w.lengthMinOne; i++ {
+	for i := 0; i < s.lengthMinOne; i++ {
 		if index == 0 {
-			index = w.lengthMinOne
+			index = s.lengthMinOne
 		} else {
 			index--
 		}
 
-		if temp := w.lowCircular[index]; minLow > temp {
+		if temp := s.lowCircular[index]; minLow > temp {
 			minLow = temp
 		}
 
-		if temp := w.highCircular[index]; maxHigh < temp {
+		if temp := s.highCircular[index]; maxHigh < temp {
 			maxHigh = temp
 		}
 	}
 
 	if math.Abs(maxHigh-minLow) < math.SmallestNonzeroFloat64 {
-		w.value = 0
+		s.value = 0
 	} else {
-		w.value = -100 * (maxHigh - close) / (maxHigh - minLow)
+		s.value = -100 * (maxHigh - close) / (maxHigh - minLow)
 	}
 
-	return w.value
+	return s.value
 }
 
 // UpdateSample updates the Williams %R using a single sample value
 // as a substitute for high, low, and close.
-func (w *WilliamsPercentR) UpdateSample(sample float64) float64 {
-	return w.Update(sample, sample, sample)
+func (s *WilliamsPercentR) UpdateSample(sample float64) float64 {
+	return s.Update(sample, sample, sample)
 }
 
 // UpdateScalar updates the indicator given the next scalar sample.
-func (w *WilliamsPercentR) UpdateScalar(sample *entities.Scalar) core.Output {
+func (s *WilliamsPercentR) UpdateScalar(sample *entities.Scalar) core.Output {
 	v := sample.Value
 
 	output := make([]any, 1)
-	output[0] = entities.Scalar{Time: sample.Time, Value: w.Update(v, v, v)}
+	output[0] = entities.Scalar{Time: sample.Time, Value: s.Update(v, v, v)}
 
 	return output
 }
 
 // UpdateBar updates the indicator given the next bar sample.
-func (w *WilliamsPercentR) UpdateBar(sample *entities.Bar) core.Output {
+func (s *WilliamsPercentR) UpdateBar(sample *entities.Bar) core.Output {
 	output := make([]any, 1)
-	output[0] = entities.Scalar{Time: sample.Time, Value: w.Update(sample.Close, sample.High, sample.Low)}
+	output[0] = entities.Scalar{Time: sample.Time, Value: s.Update(sample.Close, sample.High, sample.Low)}
 
 	return output
 }
 
 // UpdateQuote updates the indicator given the next quote sample.
-func (w *WilliamsPercentR) UpdateQuote(sample *entities.Quote) core.Output {
+func (s *WilliamsPercentR) UpdateQuote(sample *entities.Quote) core.Output {
 	v := (sample.Bid + sample.Ask) / 2 //nolint:mnd
 
 	output := make([]any, 1)
-	output[0] = entities.Scalar{Time: sample.Time, Value: w.Update(v, v, v)}
+	output[0] = entities.Scalar{Time: sample.Time, Value: s.Update(v, v, v)}
 
 	return output
 }
 
 // UpdateTrade updates the indicator given the next trade sample.
-func (w *WilliamsPercentR) UpdateTrade(sample *entities.Trade) core.Output {
+func (s *WilliamsPercentR) UpdateTrade(sample *entities.Trade) core.Output {
 	v := sample.Price
 
 	output := make([]any, 1)
-	output[0] = entities.Scalar{Time: sample.Time, Value: w.Update(v, v, v)}
+	output[0] = entities.Scalar{Time: sample.Time, Value: s.Update(v, v, v)}
 
 	return output
 }

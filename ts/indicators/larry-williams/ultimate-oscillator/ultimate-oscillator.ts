@@ -1,3 +1,4 @@
+import { buildMetadata } from '../../core/build-metadata';
 import { Bar } from '../../../entities/bar';
 import { Quote } from '../../../entities/quote';
 import { Scalar } from '../../../entities/scalar';
@@ -5,11 +6,8 @@ import { Trade } from '../../../entities/trade';
 import { Indicator } from '../../core/indicator';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
 import { IndicatorOutput } from '../../core/indicator-output';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputMetadata } from '../../core/outputs/output-metadata';
-import { OutputType } from '../../core/outputs/output-type';
-import { UltimateOscillatorOutput } from './ultimate-oscillator-output';
-import { UltimateOscillatorParams } from './ultimate-oscillator-params';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { UltimateOscillatorParams } from './params';
 
 const defaultLength1 = 7;
 const defaultLength2 = 14;
@@ -45,7 +43,7 @@ export class UltimateOscillator implements Indicator {
 
   private readonly bpBuffer: Float64Array;
   private readonly trBuffer: Float64Array;
-  private bufIdx = 0;
+  private bufferIndex = 0;
 
   private bpSum1 = 0;
   private bpSum2 = 0;
@@ -95,19 +93,14 @@ export class UltimateOscillator implements Indicator {
   /** Describes the output data of the indicator. */
   public metadata(): IndicatorMetadata {
     const description = 'Ultimate Oscillator';
-    const outputMeta: OutputMetadata = {
-      kind: UltimateOscillatorOutput.UltimateOscillatorValue,
-      type: OutputType.Scalar,
-      mnemonic: this.mnemonic_,
-      description: `${description} ${this.mnemonic_}`,
-    };
-
-    return {
-      type: IndicatorType.UltimateOscillator,
-      mnemonic: this.mnemonic_,
-      description: `${description} ${this.mnemonic_}`,
-      outputs: [outputMeta],
-    };
+    return buildMetadata(
+      IndicatorIdentifier.UltimateOscillator,
+      this.mnemonic_,
+      `${description} ${this.mnemonic_}`,
+      [
+        { mnemonic: this.mnemonic_, description: `${description} ${this.mnemonic_}` },
+      ],
+    );
   }
 
   /** Updates the Ultimate Oscillator given the next bar's close, high, and low values. */
@@ -142,23 +135,23 @@ export class UltimateOscillator implements Indicator {
     this.count++;
 
     // Remove trailing values BEFORE storing the new value in the circular buffer,
-    // because for p3 the old index equals bufIdx (the buffer wraps exactly).
+    // because for p3 the old index equals bufferIndex (the buffer wraps exactly).
     if (this.count > this.p1) {
-      const oldIdx = (this.bufIdx - this.p1 + this.p3) % this.p3;
-      this.bpSum1 -= this.bpBuffer[oldIdx];
-      this.trSum1 -= this.trBuffer[oldIdx];
+      const oldIndex = (this.bufferIndex - this.p1 + this.p3) % this.p3;
+      this.bpSum1 -= this.bpBuffer[oldIndex];
+      this.trSum1 -= this.trBuffer[oldIndex];
     }
 
     if (this.count > this.p2) {
-      const oldIdx = (this.bufIdx - this.p2 + this.p3) % this.p3;
-      this.bpSum2 -= this.bpBuffer[oldIdx];
-      this.trSum2 -= this.trBuffer[oldIdx];
+      const oldIndex = (this.bufferIndex - this.p2 + this.p3) % this.p3;
+      this.bpSum2 -= this.bpBuffer[oldIndex];
+      this.trSum2 -= this.trBuffer[oldIndex];
     }
 
     if (this.count > this.p3) {
-      const oldIdx = (this.bufIdx - this.p3 + this.p3) % this.p3;
-      this.bpSum3 -= this.bpBuffer[oldIdx];
-      this.trSum3 -= this.trBuffer[oldIdx];
+      const oldIndex = (this.bufferIndex - this.p3 + this.p3) % this.p3;
+      this.bpSum3 -= this.bpBuffer[oldIndex];
+      this.trSum3 -= this.trBuffer[oldIndex];
     }
 
     // Add to running sums.
@@ -170,11 +163,11 @@ export class UltimateOscillator implements Indicator {
     this.trSum3 += tr;
 
     // Store in circular buffer (after subtraction so p3 trailing reads the old value).
-    this.bpBuffer[this.bufIdx] = bp;
-    this.trBuffer[this.bufIdx] = tr;
+    this.bpBuffer[this.bufferIndex] = bp;
+    this.trBuffer[this.bufferIndex] = tr;
 
     // Advance buffer index.
-    this.bufIdx = (this.bufIdx + 1) % this.p3;
+    this.bufferIndex = (this.bufferIndex + 1) % this.p3;
 
     // Need at least p3 values (the longest period) to produce output.
     if (this.count < this.p3) {

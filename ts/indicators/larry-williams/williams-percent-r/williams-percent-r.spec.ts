@@ -1,9 +1,9 @@
 import { } from 'jasmine';
 
 import { WilliamsPercentR } from './williams-percent-r';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
-import { WilliamsPercentROutput } from './williams-percent-r-output';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
+import { WilliamsPercentROutput } from './output';
 
 // MBST/TA-Lib test data (252 entries), extracted from WilliamsPercentRTest.cs.
 const inputHigh = [
@@ -225,11 +225,11 @@ describe('WilliamsPercentR', () => {
     const w = new WilliamsPercentR(14);
     const meta = w.metadata();
 
-    expect(meta.type).toBe(IndicatorType.WilliamsPercentR);
+    expect(meta.identifier).toBe(IndicatorIdentifier.WilliamsPercentR);
     expect(meta.mnemonic).toBe('willr');
     expect(meta.description).toBe('Williams %R');
     expect(meta.outputs.length).toBe(1);
     expect(meta.outputs[0].kind).toBe(WilliamsPercentROutput.WilliamsPercentRValue);
-    expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+    expect(meta.outputs[0].shape).toBe(Shape.Scalar);
   });
 });

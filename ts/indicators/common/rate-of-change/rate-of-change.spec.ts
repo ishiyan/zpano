@@ -1,9 +1,9 @@
 import { } from 'jasmine';
 
 import { RateOfChange } from './rate-of-change';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
-import { RateOfChangeOutput } from './rate-of-change-output';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
+import { RateOfChangeOutput } from './output';
 import { BarComponent } from '../../../entities/bar-component';
 import { QuoteComponent } from '../../../entities/quote-component';
 import { TradeComponent } from '../../../entities/trade-component';
@@ -76,12 +76,12 @@ describe('RateOfChange', () => {
     const roc = new RateOfChange({length: 5});
     const meta = roc.metadata();
 
-    expect(meta.type).toBe(IndicatorType.RateOfChange);
+    expect(meta.identifier).toBe(IndicatorIdentifier.RateOfChange);
     expect(meta.mnemonic).toBe('roc(5)');
     expect(meta.description).toBe('Rate of Change roc(5)');
     expect(meta.outputs.length).toBe(1);
     expect(meta.outputs[0].kind).toBe(RateOfChangeOutput.RateOfChangeValue);
-    expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+    expect(meta.outputs[0].shape).toBe(Shape.Scalar);
     expect(meta.outputs[0].mnemonic).toBe('roc(5)');
     expect(meta.outputs[0].description).toBe('Rate of Change roc(5)');
   });

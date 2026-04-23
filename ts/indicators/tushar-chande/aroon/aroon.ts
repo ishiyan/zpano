@@ -1,3 +1,4 @@
+import { buildMetadata } from '../../core/build-metadata';
 import { Bar } from '../../../entities/bar';
 import { Quote } from '../../../entities/quote';
 import { Scalar } from '../../../entities/scalar';
@@ -5,10 +6,8 @@ import { Trade } from '../../../entities/trade';
 import { Indicator } from '../../core/indicator';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
 import { IndicatorOutput } from '../../core/indicator-output';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
-import { AroonOutput } from './aroon-output';
-import { AroonParams } from './aroon-params';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { AroonParams } from './params';
 
 /** Function to calculate mnemonic of an __Aroon__ indicator. */
 export const aroonMnemonic = (params: AroonParams): string => `aroon(${params.length})`;
@@ -36,11 +35,11 @@ export class Aroon implements Indicator {
 
   private readonly highBuf: Float64Array;
   private readonly lowBuf: Float64Array;
-  private bufIdx = 0;
+  private bufferIndex = 0;
   private count = 0;
 
-  private highestIdx = 0;
-  private lowestIdx = 0;
+  private highestIndex = 0;
+  private lowestIndex = 0;
 
   private up_ = NaN;
   private down_ = NaN;
@@ -75,31 +74,16 @@ export class Aroon implements Indicator {
 
   /** Describes the output data of the indicator. */
   public metadata(): IndicatorMetadata {
-    return {
-      type: IndicatorType.Aroon,
-      mnemonic: this.mnemonic_,
-      description: this.description_,
-      outputs: [
-        {
-          kind: AroonOutput.Up,
-          type: OutputType.Scalar,
-          mnemonic: this.mnemonic_ + ' up',
-          description: this.description_ + ' Up',
-        },
-        {
-          kind: AroonOutput.Down,
-          type: OutputType.Scalar,
-          mnemonic: this.mnemonic_ + ' down',
-          description: this.description_ + ' Down',
-        },
-        {
-          kind: AroonOutput.Osc,
-          type: OutputType.Scalar,
-          mnemonic: this.mnemonic_ + ' osc',
-          description: this.description_ + ' Oscillator',
-        },
+    return buildMetadata(
+      IndicatorIdentifier.Aroon,
+      this.mnemonic_,
+      this.description_,
+      [
+        { mnemonic: this.mnemonic_ + ' up', description: this.description_ + ' Up' },
+        { mnemonic: this.mnemonic_ + ' down', description: this.description_ + ' Down' },
+        { mnemonic: this.mnemonic_ + ' osc', description: this.description_ + ' Oscillator' },
       ],
-    };
+    );
   }
 
   /** Updates the indicator given the next bar's high and low values. Returns [AroonUp, AroonDown, AroonOsc]. */
@@ -112,10 +96,10 @@ export class Aroon implements Indicator {
     const today = this.count;
 
     // Store in circular buffer.
-    const pos = this.bufIdx;
+    const pos = this.bufferIndex;
     this.highBuf[pos] = high;
     this.lowBuf[pos] = low;
-    this.bufIdx = (this.bufIdx + 1) % windowSize;
+    this.bufferIndex = (this.bufferIndex + 1) % windowSize;
     this.count++;
 
     // Need at least length+1 bars.
@@ -123,55 +107,55 @@ export class Aroon implements Indicator {
       return [this.up_, this.down_, this.osc_];
     }
 
-    const trailingIdx = today - this.length_;
+    const trailingIndex = today - this.length_;
 
     if (this.count === windowSize) {
       // First time: scan entire window.
-      this.highestIdx = trailingIdx;
-      this.lowestIdx = trailingIdx;
+      this.highestIndex = trailingIndex;
+      this.lowestIndex = trailingIndex;
 
-      for (let i = trailingIdx + 1; i <= today; i++) {
+      for (let i = trailingIndex + 1; i <= today; i++) {
         const bufPos = i % windowSize;
 
-        if (this.highBuf[bufPos] >= this.highBuf[this.highestIdx % windowSize]) {
-          this.highestIdx = i;
+        if (this.highBuf[bufPos] >= this.highBuf[this.highestIndex % windowSize]) {
+          this.highestIndex = i;
         }
 
-        if (this.lowBuf[bufPos] <= this.lowBuf[this.lowestIdx % windowSize]) {
-          this.lowestIdx = i;
+        if (this.lowBuf[bufPos] <= this.lowBuf[this.lowestIndex % windowSize]) {
+          this.lowestIndex = i;
         }
       }
     } else {
       // Subsequent: optimized update.
-      if (this.highestIdx < trailingIdx) {
-        this.highestIdx = trailingIdx;
+      if (this.highestIndex < trailingIndex) {
+        this.highestIndex = trailingIndex;
 
-        for (let i = trailingIdx + 1; i <= today; i++) {
+        for (let i = trailingIndex + 1; i <= today; i++) {
           const bufPos = i % windowSize;
-          if (this.highBuf[bufPos] >= this.highBuf[this.highestIdx % windowSize]) {
-            this.highestIdx = i;
+          if (this.highBuf[bufPos] >= this.highBuf[this.highestIndex % windowSize]) {
+            this.highestIndex = i;
           }
         }
-      } else if (high >= this.highBuf[this.highestIdx % windowSize]) {
-        this.highestIdx = today;
+      } else if (high >= this.highBuf[this.highestIndex % windowSize]) {
+        this.highestIndex = today;
       }
 
-      if (this.lowestIdx < trailingIdx) {
-        this.lowestIdx = trailingIdx;
+      if (this.lowestIndex < trailingIndex) {
+        this.lowestIndex = trailingIndex;
 
-        for (let i = trailingIdx + 1; i <= today; i++) {
+        for (let i = trailingIndex + 1; i <= today; i++) {
           const bufPos = i % windowSize;
-          if (this.lowBuf[bufPos] <= this.lowBuf[this.lowestIdx % windowSize]) {
-            this.lowestIdx = i;
+          if (this.lowBuf[bufPos] <= this.lowBuf[this.lowestIndex % windowSize]) {
+            this.lowestIndex = i;
           }
         }
-      } else if (low <= this.lowBuf[this.lowestIdx % windowSize]) {
-        this.lowestIdx = today;
+      } else if (low <= this.lowBuf[this.lowestIndex % windowSize]) {
+        this.lowestIndex = today;
       }
     }
 
-    this.up_ = this.factor * (this.length_ - (today - this.highestIdx));
-    this.down_ = this.factor * (this.length_ - (today - this.lowestIdx));
+    this.up_ = this.factor * (this.length_ - (today - this.highestIndex));
+    this.down_ = this.factor * (this.length_ - (today - this.lowestIndex));
     this.osc_ = this.up_ - this.down_;
 
     if (!this.primed_) {

@@ -9,7 +9,7 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
+	"zpano/indicators/core/outputs/shape"
 )
 
 // High test data, 252 entries. From TA-Lib excel-sma3-sma10-chaikin.csv.
@@ -402,7 +402,7 @@ func TestAdvanceDeclineOscillatorTaLibSpotChecks(t *testing.T) {
 			values = append(values, v)
 		}
 
-		// TA-Lib: begIdx=9, so output[0] corresponds to index 9.
+		// TA-Lib: begIndex=9, so output[0] corresponds to index 9.
 		spotChecks := []struct {
 			index    int
 			expected float64
@@ -442,7 +442,7 @@ func TestAdvanceDeclineOscillatorTaLibSpotChecks(t *testing.T) {
 			values = append(values, v)
 		}
 
-		// begIdx=4, output[0] at index 4.
+		// begIndex=4, output[0] at index 4.
 		got := roundTo(values[4], digits)
 		exp := roundTo(585361.29, digits)
 
@@ -578,8 +578,8 @@ func TestAdvanceDeclineOscillatorMetadata(t *testing.T) {
 
 	meta := adosc.Metadata()
 
-	if meta.Type != core.AdvanceDeclineOscillator {
-		t.Errorf("expected type AdvanceDeclineOscillator, got %v", meta.Type)
+	if meta.Identifier != core.AdvanceDeclineOscillator {
+		t.Errorf("expected identifier AdvanceDeclineOscillator, got %v", meta.Identifier)
 	}
 
 	if meta.Mnemonic != "adosc(EMA3/EMA10)" {
@@ -594,12 +594,12 @@ func TestAdvanceDeclineOscillatorMetadata(t *testing.T) {
 		t.Fatalf("expected 1 output, got %d", len(meta.Outputs))
 	}
 
-	if meta.Outputs[0].Kind != int(AdvanceDeclineOscillatorValue) {
-		t.Errorf("expected output kind %d, got %d", AdvanceDeclineOscillatorValue, meta.Outputs[0].Kind)
+	if meta.Outputs[0].Kind != int(Value) {
+		t.Errorf("expected output kind %d, got %d", Value, meta.Outputs[0].Kind)
 	}
 
-	if meta.Outputs[0].Type != outputs.ScalarType {
-		t.Errorf("expected output type Scalar, got %v", meta.Outputs[0].Type)
+	if meta.Outputs[0].Shape != shape.Scalar {
+		t.Errorf("expected output type Scalar, got %v", meta.Outputs[0].Shape)
 	}
 }
 

@@ -7,7 +7,6 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
 	"zpano/indicators/welleswilder/truerange"
 )
 
@@ -63,132 +62,127 @@ func NewAverageTrueRange(length int) (*AverageTrueRange, error) {
 }
 
 // Length returns the length parameter.
-func (a *AverageTrueRange) Length() int {
-	return a.length
+func (s *AverageTrueRange) Length() int {
+	return s.length
 }
 
 // IsPrimed indicates whether the indicator is primed.
-func (a *AverageTrueRange) IsPrimed() bool {
-	a.mu.RLock()
-	defer a.mu.RUnlock()
+func (s *AverageTrueRange) IsPrimed() bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
-	return a.primed
+	return s.primed
 }
 
 // Metadata describes the output data of the indicator.
-func (a *AverageTrueRange) Metadata() core.Metadata {
-	return core.Metadata{
-		Type:        core.AverageTrueRange,
-		Mnemonic:    atrMnemonic,
-		Description: atrDescription,
-		Outputs: []outputs.Metadata{
-			{
-				Kind:        int(AverageTrueRangeValue),
-				Type:        outputs.ScalarType,
-				Mnemonic:    atrMnemonic,
-				Description: atrDescription,
-			},
+func (s *AverageTrueRange) Metadata() core.Metadata {
+	return core.BuildMetadata(
+		core.AverageTrueRange,
+		atrMnemonic,
+		atrDescription,
+		[]core.OutputText{
+			{Mnemonic: atrMnemonic, Description: atrDescription},
 		},
-	}
+	)
 }
 
 // Update updates the Average True Range given the next bar's close, high, and low values.
-func (a *AverageTrueRange) Update(close, high, low float64) float64 {
+func (s *AverageTrueRange) Update(close, high, low float64) float64 {
 	if math.IsNaN(close) || math.IsNaN(high) || math.IsNaN(low) {
 		return math.NaN()
 	}
 
-	a.mu.Lock()
-	defer a.mu.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
-	trueRangeValue := a.trueRange.Update(close, high, low)
+	trueRangeValue := s.trueRange.Update(close, high, low)
 
-	if a.lastIndex == 0 {
-		a.value = trueRangeValue
+	if s.lastIndex == 0 {
+		s.value = trueRangeValue
 
-		if a.stage == 0 {
-			a.stage++
-		} else if a.stage == 1 {
-			a.stage++
-			a.primed = true
+		if s.stage == 0 {
+			s.stage++
+		} else if s.stage == 1 {
+			s.stage++
+			s.primed = true
 		}
 
-		return a.value
+		return s.value
 	}
 
-	if a.stage > 1 {
+	if s.stage > 1 {
 		// Wilder smoothing method.
-		a.value *= float64(a.lastIndex)
-		a.value += trueRangeValue
-		a.value /= float64(a.length)
+		s.value *= float64(s.lastIndex)
+		s.value += trueRangeValue
+		s.value /= float64(s.length)
 
-		return a.value
+		return s.value
 	}
 
-	if a.stage == 1 {
-		a.windowSum += trueRangeValue
-		a.window[a.windowCount] = trueRangeValue
-		a.windowCount++
+	if s.stage == 1 {
+		s.windowSum += trueRangeValue
+		s.window[s.windowCount] = trueRangeValue
+		s.windowCount++
 
-		if a.windowCount == a.length {
-			a.stage++
-			a.primed = true
-			a.value = a.windowSum / float64(a.length)
+		if s.windowCount == s.length {
+			s.stage++
+			s.primed = true
+			s.value = s.windowSum / float64(s.length)
 		}
 
-		if a.primed {
-			return a.value
+		if s.primed {
+			return s.value
 		}
 
 		return math.NaN()
 	}
 
 	// The very first sample is used by the True Range.
-	a.stage++
+	s.stage++
 
 	return math.NaN()
 }
 
 // UpdateSample updates the Average True Range using a single sample value
 // as a substitute for high, low, and close.
-func (a *AverageTrueRange) UpdateSample(sample float64) float64 {
-	return a.Update(sample, sample, sample)
+func (s *AverageTrueRange) UpdateSample(sample float64) float64 {
+	return s.Update(sample, sample, sample)
 }
 
 // UpdateScalar updates the indicator given the next scalar sample.
-func (a *AverageTrueRange) UpdateScalar(sample *entities.Scalar) core.Output {
+func (s *AverageTrueRange) UpdateScalar(sample *entities.Scalar) core.Output {
 	v := sample.Value
 
 	output := make([]any, 1)
-	output[0] = entities.Scalar{Time: sample.Time, Value: a.Update(v, v, v)}
+	output[0] = entities.Scalar{Time: sample.Time, Value: s.Update(v, v, v)}
 
 	return output
 }
 
 // UpdateBar updates the indicator given the next bar sample.
-func (a *AverageTrueRange) UpdateBar(sample *entities.Bar) core.Output {
+func (s *AverageTrueRange) UpdateBar(sample *entities.Bar) core.Output {
 	output := make([]any, 1)
-	output[0] = entities.Scalar{Time: sample.Time, Value: a.Update(sample.Close, sample.High, sample.Low)}
+	output[0] = entities.Scalar{Time: sample.Time, Value: s.Update(sample.Close, sample.High, sample.Low)}
 
 	return output
 }
 
 // UpdateQuote updates the indicator given the next quote sample.
-func (a *AverageTrueRange) UpdateQuote(sample *entities.Quote) core.Output {
+func (s *AverageTrueRange) UpdateQuote(sample *entities.Quote) core.Output {
 	v := (sample.Bid + sample.Ask) / 2 //nolint:mnd
 
 	output := make([]any, 1)
-	output[0] = entities.Scalar{Time: sample.Time, Value: a.Update(v, v, v)}
+	output[0] = entities.Scalar{Time: sample.Time, Value: s.Update(v, v, v)}
 
 	return output
 }
 
 // UpdateTrade updates the indicator given the next trade sample.
-func (a *AverageTrueRange) UpdateTrade(sample *entities.Trade) core.Output {
+func (s *AverageTrueRange) UpdateTrade(sample *entities.Trade) core.Output {
 	v := sample.Price
 
 	output := make([]any, 1)
-	output[0] = entities.Scalar{Time: sample.Time, Value: a.Update(v, v, v)}
+	output[0] = entities.Scalar{Time: sample.Time, Value: s.Update(v, v, v)}
 
 	return output
 }

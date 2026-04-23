@@ -7,7 +7,6 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
 )
 
 // OnBalanceVolume is Joseph Granville's On-Balance Volume (OBV).
@@ -71,6 +70,10 @@ func NewOnBalanceVolume(p *OnBalanceVolumeParams) (*OnBalanceVolume, error) {
 	}
 
 	mnemonic := "obv"
+	if suffix := core.ComponentTripleMnemonic(bc, qc, tc); suffix != "" {
+		mnemonic = "obv(" + suffix[2:] + ")" // strip leading ", "
+	}
+
 	desc := "On-Balance Volume OBV"
 
 	o := &OnBalanceVolume{
@@ -85,66 +88,61 @@ func NewOnBalanceVolume(p *OnBalanceVolumeParams) (*OnBalanceVolume, error) {
 }
 
 // IsPrimed indicates whether the indicator is primed.
-func (o *OnBalanceVolume) IsPrimed() bool {
-	o.mu.RLock()
-	defer o.mu.RUnlock()
+func (s *OnBalanceVolume) IsPrimed() bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
-	return o.primed
+	return s.primed
 }
 
 // Metadata describes the output data of the indicator.
-func (o *OnBalanceVolume) Metadata() core.Metadata {
-	return core.Metadata{
-		Type:        core.OnBalanceVolume,
-		Mnemonic:    o.LineIndicator.Mnemonic,
-		Description: o.LineIndicator.Description,
-		Outputs: []outputs.Metadata{
-			{
-				Kind:        int(OnBalanceVolumeValue),
-				Type:        outputs.ScalarType,
-				Mnemonic:    o.LineIndicator.Mnemonic,
-				Description: o.LineIndicator.Description,
-			},
+func (s *OnBalanceVolume) Metadata() core.Metadata {
+	return core.BuildMetadata(
+		core.OnBalanceVolume,
+		s.LineIndicator.Mnemonic,
+		s.LineIndicator.Description,
+		[]core.OutputText{
+			{Mnemonic: s.LineIndicator.Mnemonic, Description: s.LineIndicator.Description},
 		},
-	}
+	)
 }
 
 // Update updates the indicator with the given sample using volume = 1.
 // This satisfies the LineIndicator updateFn signature.
-func (o *OnBalanceVolume) Update(sample float64) float64 {
-	return o.UpdateWithVolume(sample, 1)
+func (s *OnBalanceVolume) Update(sample float64) float64 {
+	return s.UpdateWithVolume(sample, 1)
 }
 
 // UpdateWithVolume updates the indicator with the given sample and volume.
-func (o *OnBalanceVolume) UpdateWithVolume(sample, volume float64) float64 {
+func (s *OnBalanceVolume) UpdateWithVolume(sample, volume float64) float64 {
 	if math.IsNaN(sample) || math.IsNaN(volume) {
 		return math.NaN()
 	}
 
-	o.mu.Lock()
-	defer o.mu.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
-	if !o.primed {
-		o.value = volume
-		o.primed = true
+	if !s.primed {
+		s.value = volume
+		s.primed = true
 	} else {
-		if sample > o.previousSample {
-			o.value += volume
-		} else if sample < o.previousSample {
-			o.value -= volume
+		if sample > s.previousSample {
+			s.value += volume
+		} else if sample < s.previousSample {
+			s.value -= volume
 		}
 	}
 
-	o.previousSample = sample
+	s.previousSample = sample
 
-	return o.value
+	return s.value
 }
 
 // UpdateBar updates the indicator given the next bar sample.
 // This shadows LineIndicator.UpdateBar to use bar volume.
-func (o *OnBalanceVolume) UpdateBar(sample *entities.Bar) core.Output {
-	price := o.barFunc(sample)
-	value := o.UpdateWithVolume(price, sample.Volume)
+func (s *OnBalanceVolume) UpdateBar(sample *entities.Bar) core.Output {
+	price := s.barFunc(sample)
+	value := s.UpdateWithVolume(price, sample.Volume)
 
 	output := make([]any, 1)
 	output[0] = entities.Scalar{Time: sample.Time, Value: value}

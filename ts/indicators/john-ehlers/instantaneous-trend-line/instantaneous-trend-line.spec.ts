@@ -1,9 +1,9 @@
 import { } from 'jasmine';
 
 import { InstantaneousTrendLine } from './instantaneous-trend-line';
-import { InstantaneousTrendLineOutput } from './instantaneous-trend-line-output';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
+import { InstantaneousTrendLineOutput } from './output';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
 import { BarComponent } from '../../../entities/bar-component';
 import { QuoteComponent } from '../../../entities/quote-component';
 import { TradeComponent } from '../../../entities/trade-component';
@@ -252,18 +252,18 @@ describe('InstantaneousTrendLine', () => {
     const descr = 'Instantaneous Trend Line ';
     const descrTr = 'Instantaneous Trend Line trigger ';
 
-    expect(meta.type).toBe(IndicatorType.InstantaneousTrendLine);
+    expect(meta.identifier).toBe(IndicatorIdentifier.InstantaneousTrendLine);
     expect(meta.mnemonic).toBe(mn);
     expect(meta.description).toBe(descr + mn);
     expect(meta.outputs.length).toBe(2);
 
     expect(meta.outputs[0].kind).toBe(InstantaneousTrendLineOutput.Value);
-    expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+    expect(meta.outputs[0].shape).toBe(Shape.Scalar);
     expect(meta.outputs[0].mnemonic).toBe(mn);
     expect(meta.outputs[0].description).toBe(descr + mn);
 
     expect(meta.outputs[1].kind).toBe(InstantaneousTrendLineOutput.Trigger);
-    expect(meta.outputs[1].type).toBe(OutputType.Scalar);
+    expect(meta.outputs[1].shape).toBe(Shape.Scalar);
     expect(meta.outputs[1].mnemonic).toBe(mnTrig);
     expect(meta.outputs[1].description).toBe(descrTr + mnTrig);
   });

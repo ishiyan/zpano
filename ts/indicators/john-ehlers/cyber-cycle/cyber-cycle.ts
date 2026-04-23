@@ -1,3 +1,4 @@
+import { buildMetadata } from '../../core/build-metadata';
 import { Bar } from '../../../entities/bar';
 import { BarComponent, barComponentValue } from '../../../entities/bar-component';
 import { Quote } from '../../../entities/quote';
@@ -8,12 +9,10 @@ import { DefaultTradeComponent, tradeComponentValue } from '../../../entities/tr
 import { Indicator } from '../../core/indicator';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
 import { IndicatorOutput } from '../../core/indicator-output';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { componentTripleMnemonic } from '../../core/component-triple-mnemonic';
-import { CyberCycleLengthParams } from './cyber-cycle-length-params';
-import { CyberCycleSmoothingFactorParams } from './cyber-cycle-smoothing-factor-params';
-import { CyberCycleOutput } from './cyber-cycle-output';
+import { CyberCycleLengthParams } from './length-params';
+import { CyberCycleSmoothingFactorParams } from './smoothing-factor-params';
 
 const guardLength = (object: any): object is CyberCycleLengthParams => 'length' in object;
 
@@ -82,8 +81,8 @@ export class CyberCycle implements Indicator {
   private primed: boolean = false;
   private readonly mnemonicStr: string;
   private readonly descriptionStr: string;
-  private readonly mnemonicSig: string;
-  private readonly descriptionSig: string;
+  private readonly mnemonicSignal: string;
+  private readonly descriptionSignal: string;
 
   private readonly barComponentFunc: (bar: Bar) => number;
   private readonly quoteComponentFunc: (quote: Quote) => number;
@@ -156,12 +155,12 @@ export class CyberCycle implements Indicator {
     );
 
     this.mnemonicStr = `cc(${length}${cm})`;
-    this.mnemonicSig = `ccSignal(${length}${cm})`;
+    this.mnemonicSignal = `ccSignal(${length}${cm})`;
 
     const descr = 'Cyber Cycle ';
-    const descrSig = 'Cyber Cycle signal ';
+    const descrSignal = 'Cyber Cycle signal ';
     this.descriptionStr = descr + this.mnemonicStr;
-    this.descriptionSig = descrSig + this.mnemonicSig;
+    this.descriptionSignal = descrSignal + this.mnemonicSignal;
   }
 
   /** Indicates whether an indicator is primed. */
@@ -169,25 +168,15 @@ export class CyberCycle implements Indicator {
 
   /** Describes a requested output data of an indicator. */
   public metadata(): IndicatorMetadata {
-    return {
-      type: IndicatorType.CyberCycle,
-      mnemonic: this.mnemonicStr,
-      description: this.descriptionStr,
-      outputs: [
-        {
-          kind: CyberCycleOutput.Value,
-          type: OutputType.Scalar,
-          mnemonic: this.mnemonicStr,
-          description: this.descriptionStr,
-        },
-        {
-          kind: CyberCycleOutput.Signal,
-          type: OutputType.Scalar,
-          mnemonic: this.mnemonicSig,
-          description: this.descriptionSig,
-        },
+    return buildMetadata(
+      IndicatorIdentifier.CyberCycle,
+      this.mnemonicStr,
+      this.descriptionStr,
+      [
+        { mnemonic: this.mnemonicStr, description: this.descriptionStr },
+        { mnemonic: this.mnemonicSignal, description: this.descriptionSignal },
       ],
-    };
+    );
   }
 
   /** Updates an indicator given the next scalar sample. */
@@ -315,9 +304,9 @@ export class CyberCycle implements Indicator {
   private updateEntity(time: Date, sample: number): IndicatorOutput {
     const v = this.update(sample);
 
-    let sig = this.signal;
+    let signal = this.signal;
     if (Number.isNaN(v)) {
-      sig = Number.NaN;
+      signal = Number.NaN;
     }
 
     const scalarValue = new Scalar();
@@ -326,7 +315,7 @@ export class CyberCycle implements Indicator {
 
     const scalarSignal = new Scalar();
     scalarSignal.time = time;
-    scalarSignal.value = sig;
+    scalarSignal.value = signal;
 
     return [scalarValue, scalarSignal];
   }

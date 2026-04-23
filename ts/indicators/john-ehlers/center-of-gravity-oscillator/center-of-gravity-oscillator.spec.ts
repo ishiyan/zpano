@@ -1,9 +1,9 @@
 import { } from 'jasmine';
 
 import { CenterOfGravityOscillator } from './center-of-gravity-oscillator';
-import { CenterOfGravityOscillatorOutput } from './center-of-gravity-oscillator-output';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
+import { CenterOfGravityOscillatorOutput } from './output';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
 import { BarComponent } from '../../../entities/bar-component';
 import { QuoteComponent } from '../../../entities/quote-component';
 import { TradeComponent } from '../../../entities/trade-component';
@@ -294,18 +294,18 @@ describe('CenterOfGravityOscillator', () => {
     const descr = 'Center of Gravity oscillator ';
     const descrTrig = 'Center of Gravity trigger ';
 
-    expect(meta.type).toBe(IndicatorType.CenterOfGravityOscillator);
+    expect(meta.identifier).toBe(IndicatorIdentifier.CenterOfGravityOscillator);
     expect(meta.mnemonic).toBe(mn);
     expect(meta.description).toBe(descr + mn);
     expect(meta.outputs.length).toBe(2);
 
     expect(meta.outputs[0].kind).toBe(CenterOfGravityOscillatorOutput.Value);
-    expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+    expect(meta.outputs[0].shape).toBe(Shape.Scalar);
     expect(meta.outputs[0].mnemonic).toBe(mn);
     expect(meta.outputs[0].description).toBe(descr + mn);
 
     expect(meta.outputs[1].kind).toBe(CenterOfGravityOscillatorOutput.Trigger);
-    expect(meta.outputs[1].type).toBe(OutputType.Scalar);
+    expect(meta.outputs[1].shape).toBe(Shape.Scalar);
     expect(meta.outputs[1].mnemonic).toBe(mnTrig);
     expect(meta.outputs[1].description).toBe(descrTrig + mnTrig);
   });

@@ -1,3 +1,4 @@
+import { buildMetadata } from '../../core/build-metadata';
 import { Bar } from '../../../entities/bar';
 import { Quote } from '../../../entities/quote';
 import { Scalar } from '../../../entities/scalar';
@@ -5,12 +6,9 @@ import { Trade } from '../../../entities/trade';
 import { Indicator } from '../../core/indicator';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
 import { IndicatorOutput } from '../../core/indicator-output';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputMetadata } from '../../core/outputs/output-metadata';
-import { OutputType } from '../../core/outputs/output-type';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { AverageTrueRange } from '../average-true-range/average-true-range';
 import { DirectionalMovementMinus } from '../directional-movement-minus/directional-movement-minus';
-import { DirectionalIndicatorMinusOutput } from './directional-indicator-minus-output';
 
 const dimMnemonic = '-di';
 const dimDescription = 'Directional Indicator Minus';
@@ -58,39 +56,17 @@ export class DirectionalIndicatorMinus implements Indicator {
 
   /** Describes the output data of the indicator. */
   public metadata(): IndicatorMetadata {
-    const outputs: OutputMetadata[] = [
-      {
-        kind: DirectionalIndicatorMinusOutput.DirectionalIndicatorMinusValue,
-        type: OutputType.Scalar,
-        mnemonic: dimMnemonic,
-        description: dimDescription,
-      },
-      {
-        kind: DirectionalIndicatorMinusOutput.DirectionalMovementMinusValue,
-        type: OutputType.Scalar,
-        mnemonic: '-dm',
-        description: 'Directional Movement Minus',
-      },
-      {
-        kind: DirectionalIndicatorMinusOutput.AverageTrueRangeValue,
-        type: OutputType.Scalar,
-        mnemonic: 'atr',
-        description: 'Average True Range',
-      },
-      {
-        kind: DirectionalIndicatorMinusOutput.TrueRangeValue,
-        type: OutputType.Scalar,
-        mnemonic: 'tr',
-        description: 'True Range',
-      },
-    ];
-
-    return {
-      type: IndicatorType.DirectionalIndicatorMinus,
-      mnemonic: dimMnemonic,
-      description: dimDescription,
-      outputs,
-    };
+    return buildMetadata(
+      IndicatorIdentifier.DirectionalIndicatorMinus,
+      dimMnemonic,
+      dimDescription,
+      [
+        { mnemonic: dimMnemonic, description: dimDescription },
+        { mnemonic: '-dm', description: 'Directional Movement Minus' },
+        { mnemonic: 'atr', description: 'Average True Range' },
+        { mnemonic: 'tr', description: 'True Range' },
+      ],
+    );
   }
 
   /** Updates the Directional Indicator Minus given the next bar's close, high, and low values. */

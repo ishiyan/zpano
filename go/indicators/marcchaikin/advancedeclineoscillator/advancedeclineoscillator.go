@@ -9,7 +9,6 @@ import (
 	"zpano/indicators/common/exponentialmovingaverage"
 	"zpano/indicators/common/simplemovingaverage"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
 )
 
 // lineUpdater is an interface for indicators that accept a single scalar and return a value.
@@ -27,7 +26,7 @@ type lineUpdater interface {
 // The value is calculated as:
 //
 //	CLV = ((Close - Low) - (High - Close)) / (High - Low)
-//	AD  = AD_prev + CLV × Volume
+//	AD  = AD_previous + CLV × Volume
 //	ADOSC = FastMA(AD) - SlowMA(AD)
 //
 // When High equals Low, the A/D value is unchanged (no division by zero).
@@ -128,76 +127,71 @@ func NewAdvanceDeclineOscillator(p *AdvanceDeclineOscillatorParams) (*AdvanceDec
 }
 
 // IsPrimed indicates whether the indicator is primed.
-func (a *AdvanceDeclineOscillator) IsPrimed() bool {
-	a.mu.RLock()
-	defer a.mu.RUnlock()
+func (s *AdvanceDeclineOscillator) IsPrimed() bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
-	return a.primed
+	return s.primed
 }
 
 // Metadata describes the output data of the indicator.
-func (a *AdvanceDeclineOscillator) Metadata() core.Metadata {
-	return core.Metadata{
-		Type:        core.AdvanceDeclineOscillator,
-		Mnemonic:    a.LineIndicator.Mnemonic,
-		Description: a.LineIndicator.Description,
-		Outputs: []outputs.Metadata{
-			{
-				Kind:        int(AdvanceDeclineOscillatorValue),
-				Type:        outputs.ScalarType,
-				Mnemonic:    a.LineIndicator.Mnemonic,
-				Description: a.LineIndicator.Description,
-			},
+func (s *AdvanceDeclineOscillator) Metadata() core.Metadata {
+	return core.BuildMetadata(
+		core.AdvanceDeclineOscillator,
+		s.LineIndicator.Mnemonic,
+		s.LineIndicator.Description,
+		[]core.OutputText{
+			{Mnemonic: s.LineIndicator.Mnemonic, Description: s.LineIndicator.Description},
 		},
-	}
+	)
 }
 
 // Update updates the indicator with the given sample.
 // Since scalar updates use the same value for H, L, C, the range is 0 and AD is unchanged,
 // but the unchanged AD value is still fed to the MAs.
-func (a *AdvanceDeclineOscillator) Update(sample float64) float64 {
+func (s *AdvanceDeclineOscillator) Update(sample float64) float64 {
 	if math.IsNaN(sample) {
 		return math.NaN()
 	}
 
-	return a.UpdateHLCV(sample, sample, sample, 1)
+	return s.UpdateHLCV(sample, sample, sample, 1)
 }
 
 // UpdateHLCV updates the indicator with the given high, low, close, and volume values.
-func (a *AdvanceDeclineOscillator) UpdateHLCV(high, low, close, volume float64) float64 {
+func (s *AdvanceDeclineOscillator) UpdateHLCV(high, low, close, volume float64) float64 {
 	if math.IsNaN(high) || math.IsNaN(low) || math.IsNaN(close) || math.IsNaN(volume) {
 		return math.NaN()
 	}
 
-	a.mu.Lock()
-	defer a.mu.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
 	// Compute cumulative AD.
-	tmp := high - low
-	if tmp > 0 {
-		a.ad += ((close - low) - (high - close)) / tmp * volume
+	temp := high - low
+	if temp > 0 {
+		s.ad += ((close - low) - (high - close)) / temp * volume
 	}
 
 	// Feed AD to both MAs.
-	fast := a.fastMA.Update(a.ad)
-	slow := a.slowMA.Update(a.ad)
-	a.primed = a.fastMA.IsPrimed() && a.slowMA.IsPrimed()
+	fast := s.fastMA.Update(s.ad)
+	slow := s.slowMA.Update(s.ad)
+	s.primed = s.fastMA.IsPrimed() && s.slowMA.IsPrimed()
 
 	if math.IsNaN(fast) || math.IsNaN(slow) {
-		a.value = math.NaN()
+		s.value = math.NaN()
 
-		return a.value
+		return s.value
 	}
 
-	a.value = fast - slow
+	s.value = fast - slow
 
-	return a.value
+	return s.value
 }
 
 // UpdateBar updates the indicator given the next bar sample.
 // This shadows LineIndicator.UpdateBar to extract HLCV from the bar.
-func (a *AdvanceDeclineOscillator) UpdateBar(sample *entities.Bar) core.Output {
-	value := a.UpdateHLCV(sample.High, sample.Low, sample.Close, sample.Volume)
+func (s *AdvanceDeclineOscillator) UpdateBar(sample *entities.Bar) core.Output {
+	value := s.UpdateHLCV(sample.High, sample.Low, sample.Close, sample.Volume)
 
 	output := make([]any, 1)
 	output[0] = entities.Scalar{Time: sample.Time, Value: value}

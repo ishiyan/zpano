@@ -9,7 +9,7 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
+	"zpano/indicators/core/outputs/shape"
 )
 
 func testZemaTime() time.Time {
@@ -76,28 +76,28 @@ func TestZemaUpdateNaN(t *testing.T) {
 func TestZemaUpdateConstant(t *testing.T) {
 	t.Parallel()
 
-	const val = 42.0
+	const value = 42.0
 
 	z := testZemaCreateDefault()
 
 	// Feed constant values. After priming, momentum=0 so output should equal input.
 	for i := 0; i < 3; i++ {
-		act := z.Update(val)
+		act := z.Update(value)
 		if !math.IsNaN(act) {
 			t.Errorf("[%d] expected NaN during priming, got %v", i, act)
 		}
 	}
 
-	act := z.Update(val)
-	if math.Abs(act-val) > 1e-10 {
-		t.Errorf("expected %v after priming with constant input, got %v", val, act)
+	act := z.Update(value)
+	if math.Abs(act-value) > 1e-10 {
+		t.Errorf("expected %v after priming with constant input, got %v", value, act)
 	}
 
-	// Further updates with same constant should stay at val.
+	// Further updates with same constant should stay at value.
 	for i := 0; i < 10; i++ {
-		act = z.Update(val)
-		if math.Abs(act-val) > 1e-10 {
-			t.Errorf("[%d] expected %v, got %v", i, val, act)
+		act = z.Update(value)
+		if math.Abs(act-value) > 1e-10 {
+			t.Errorf("[%d] expected %v, got %v", i, value, act)
 		}
 	}
 }
@@ -200,10 +200,10 @@ func TestZemaMetadata(t *testing.T) {
 		}
 	}
 
-	check("Type", core.ZeroLagExponentialMovingAverage, act.Type)
+	check("Identifier", core.ZeroLagExponentialMovingAverage, act.Identifier)
 	check("len(Outputs)", 1, len(act.Outputs))
-	check("Outputs[0].Kind", int(ZeroLagExponentialMovingAverageValue), act.Outputs[0].Kind)
-	check("Outputs[0].Type", outputs.ScalarType, act.Outputs[0].Type)
+	check("Outputs[0].Kind", int(Value), act.Outputs[0].Kind)
+	check("Outputs[0].Shape", shape.Scalar, act.Outputs[0].Shape)
 	check("Outputs[0].Mnemonic", "zema(0.25, 0.5, 3)", act.Outputs[0].Mnemonic)
 	check("Outputs[0].Description", "Zero-lag Exponential Moving Average zema(0.25, 0.5, 3)", act.Outputs[0].Description)
 }

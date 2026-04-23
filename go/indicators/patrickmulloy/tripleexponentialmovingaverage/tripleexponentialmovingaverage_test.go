@@ -9,7 +9,7 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
+	"zpano/indicators/core/outputs/shape"
 )
 
 //nolint:lll
@@ -443,12 +443,12 @@ func TestTripleExponentialMovingAverageMetadata(t *testing.T) {
 		tema := testTripleExponentialMovingAverageCreateLength(10, true)
 		act := tema.Metadata()
 
-		check("Type", core.TripleExponentialMovingAverage, act.Type)
+		check("Identifier", core.TripleExponentialMovingAverage, act.Identifier)
 		check("Mnemonic", "tema(10)", act.Mnemonic)
 		check("Description", "Triple exponential moving average tema(10)", act.Description)
 		check("len(Outputs)", 1, len(act.Outputs))
-		check("Outputs[0].Kind", int(TripleExponentialMovingAverageValue), act.Outputs[0].Kind)
-		check("Outputs[0].Type", outputs.ScalarType, act.Outputs[0].Type)
+		check("Outputs[0].Kind", int(Value), act.Outputs[0].Kind)
+		check("Outputs[0].Shape", shape.Scalar, act.Outputs[0].Shape)
 		check("Outputs[0].Mnemonic", "tema(10)", act.Outputs[0].Mnemonic)
 		check("Outputs[0].Description", "Triple exponential moving average tema(10)", act.Outputs[0].Description)
 	})
@@ -462,12 +462,12 @@ func TestTripleExponentialMovingAverageMetadata(t *testing.T) {
 		tema := testTripleExponentialMovingAverageCreateAlpha(alpha, false)
 		act := tema.Metadata()
 
-		check("Type", core.TripleExponentialMovingAverage, act.Type)
+		check("Identifier", core.TripleExponentialMovingAverage, act.Identifier)
 		check("Mnemonic", "tema(10, 0.18181818)", act.Mnemonic)
 		check("Description", "Triple exponential moving average tema(10, 0.18181818)", act.Description)
 		check("len(Outputs)", 1, len(act.Outputs))
-		check("Outputs[0].Kind", int(TripleExponentialMovingAverageValue), act.Outputs[0].Kind)
-		check("Outputs[0].Type", outputs.ScalarType, act.Outputs[0].Type)
+		check("Outputs[0].Kind", int(Value), act.Outputs[0].Kind)
+		check("Outputs[0].Shape", shape.Scalar, act.Outputs[0].Shape)
 		check("Outputs[0].Mnemonic", "tema(10, 0.18181818)", act.Outputs[0].Mnemonic)
 		check("Outputs[0].Description", "Triple exponential moving average tema(10, 0.18181818)", act.Outputs[0].Description)
 	})

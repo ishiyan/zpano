@@ -9,7 +9,7 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
+	"zpano/indicators/core/outputs/shape"
 )
 
 //nolint:lll
@@ -540,12 +540,12 @@ func TestDoubleExponentialMovingAverageMetadata(t *testing.T) {
 		dema := testDoubleExponentialMovingAverageCreateLength(10, true)
 		act := dema.Metadata()
 
-		check("Type", core.DoubleExponentialMovingAverage, act.Type)
+		check("Identifier", core.DoubleExponentialMovingAverage, act.Identifier)
 		check("Mnemonic", "dema(10)", act.Mnemonic)
 		check("Description", "Double exponential moving average dema(10)", act.Description)
 		check("len(Outputs)", 1, len(act.Outputs))
-		check("Outputs[0].Kind", int(DoubleExponentialMovingAverageValue), act.Outputs[0].Kind)
-		check("Outputs[0].Type", outputs.ScalarType, act.Outputs[0].Type)
+		check("Outputs[0].Kind", int(Value), act.Outputs[0].Kind)
+		check("Outputs[0].Shape", shape.Scalar, act.Outputs[0].Shape)
 		check("Outputs[0].Mnemonic", "dema(10)", act.Outputs[0].Mnemonic)
 		check("Outputs[0].Description", "Double exponential moving average dema(10)", act.Outputs[0].Description)
 	})
@@ -559,12 +559,12 @@ func TestDoubleExponentialMovingAverageMetadata(t *testing.T) {
 		dema := testDoubleExponentialMovingAverageCreateAlpha(alpha, false)
 		act := dema.Metadata()
 
-		check("Type", core.DoubleExponentialMovingAverage, act.Type)
+		check("Identifier", core.DoubleExponentialMovingAverage, act.Identifier)
 		check("Mnemonic", "dema(10, 0.18181818)", act.Mnemonic)
 		check("Description", "Double exponential moving average dema(10, 0.18181818)", act.Description)
 		check("len(Outputs)", 1, len(act.Outputs))
-		check("Outputs[0].Kind", int(DoubleExponentialMovingAverageValue), act.Outputs[0].Kind)
-		check("Outputs[0].Type", outputs.ScalarType, act.Outputs[0].Type)
+		check("Outputs[0].Kind", int(Value), act.Outputs[0].Kind)
+		check("Outputs[0].Shape", shape.Scalar, act.Outputs[0].Shape)
 		check("Outputs[0].Mnemonic", "dema(10, 0.18181818)", act.Outputs[0].Mnemonic)
 		check("Outputs[0].Description", "Double exponential moving average dema(10, 0.18181818)", act.Outputs[0].Description)
 	})

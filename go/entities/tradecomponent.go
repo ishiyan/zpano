@@ -49,8 +49,8 @@ func TradeComponentFunc(c TradeComponent) (TradeFunc, error) {
 }
 
 // String implements the Stringer interface.
-func (c TradeComponent) String() string {
-	switch c {
+func (s TradeComponent) String() string {
+	switch s {
 	case TradePrice:
 		return tradePrice
 	case TradeVolume:
@@ -61,8 +61,8 @@ func (c TradeComponent) String() string {
 }
 
 // Mnemonic returns a short mnemonic code for the trade component.
-func (c TradeComponent) Mnemonic() string {
-	switch c {
+func (s TradeComponent) Mnemonic() string {
+	switch s {
 	case TradePrice:
 		return tradeMnemonicPrice
 	case TradeVolume:
@@ -73,39 +73,39 @@ func (c TradeComponent) Mnemonic() string {
 }
 
 // IsKnown determines if this trade component is known.
-func (c TradeComponent) IsKnown() bool {
-	return c >= TradePrice && c < tradeLast
+func (s TradeComponent) IsKnown() bool {
+	return s >= TradePrice && s < tradeLast
 }
 
 // MarshalJSON implements the Marshaler interface.
-func (c TradeComponent) MarshalJSON() ([]byte, error) {
-	s := c.String()
-	if s == unknown {
-		return nil, fmt.Errorf(marshalErrFmt, s, errUnknownTradeComponent)
+func (s TradeComponent) MarshalJSON() ([]byte, error) {
+	str := s.String()
+	if str == unknown {
+		return nil, fmt.Errorf(marshalErrFmt, str, errUnknownTradeComponent)
 	}
 
 	const extra = 2 // Two bytes for quotes.
 
-	b := make([]byte, 0, len(s)+extra)
+	b := make([]byte, 0, len(str)+extra)
 	b = append(b, dqc)
-	b = append(b, s...)
+	b = append(b, str...)
 	b = append(b, dqc)
 
 	return b, nil
 }
 
 // UnmarshalJSON implements the Unmarshaler interface.
-func (c *TradeComponent) UnmarshalJSON(data []byte) error {
+func (s *TradeComponent) UnmarshalJSON(data []byte) error {
 	d := bytes.Trim(data, dqs)
-	s := string(d)
+	str := string(d)
 
-	switch s {
+	switch str {
 	case tradePrice:
-		*c = TradePrice
+		*s = TradePrice
 	case tradeVolume:
-		*c = TradeVolume
+		*s = TradeVolume
 	default:
-		return fmt.Errorf(unmarshalErrFmt, s, errUnknownTradeComponent)
+		return fmt.Errorf(unmarshalErrFmt, str, errUnknownTradeComponent)
 	}
 
 	return nil

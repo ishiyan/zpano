@@ -9,7 +9,6 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
 )
 
 // FractalAdaptiveMovingAverage (Ehler's fractal adaptive moving average, FRAMA)
@@ -188,25 +187,15 @@ func (s *FractalAdaptiveMovingAverage) IsPrimed() bool {
 
 // Metadata describes an output data of the indicator.
 func (s *FractalAdaptiveMovingAverage) Metadata() core.Metadata {
-	return core.Metadata{
-		Type:        core.FractalAdaptiveMovingAverage,
-		Mnemonic:    s.mnemonic,
-		Description: s.description,
-		Outputs: []outputs.Metadata{
-			{
-				Kind:        int(Value),
-				Type:        outputs.ScalarType,
-				Mnemonic:    s.mnemonic,
-				Description: s.description,
-			},
-			{
-				Kind:        int(Fdim),
-				Type:        outputs.ScalarType,
-				Mnemonic:    s.mnemonicFdim,
-				Description: s.descriptionFdim,
-			},
+	return core.BuildMetadata(
+		core.FractalAdaptiveMovingAverage,
+		s.mnemonic,
+		s.description,
+		[]core.OutputText{
+			{Mnemonic: s.mnemonic, Description: s.description},
+			{Mnemonic: s.mnemonicFdim, Description: s.descriptionFdim},
 		},
-	}
+	)
 }
 
 // Update updates the value of the moving average given the next sample.

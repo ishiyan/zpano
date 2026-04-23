@@ -312,12 +312,12 @@ export class FrequencyResponse {
         for (let ii = 1; ii <= nn; ++ii) {
             const i = two * ii - 1;
             if (j > i) {
-                const tmpR = array[j - 1];
-                const tmpI = array[j];
+                const tempR = array[j - 1];
+                const tempI = array[j];
                 array[j - 1] = array[i - 1];
                 array[j] = array[i];
-                array[i - 1] = tmpR;
-                array[i] = tmpI;
+                array[i - 1] = tempR;
+                array[i] = tempI;
             }
 
             let m = nn;
@@ -343,12 +343,12 @@ export class FrequencyResponse {
                 for (let jj = 0; jj <= (n - m) / istep; ++jj) {
                     const i = m + jj * istep;
                     j = i + mMax;
-                    const tmpR = wR * array[j - 1] - wI * array[j];
-                    const tmpI = wR * array[j] + wI * array[j - 1];
-                    array[j - 1] = array[i - 1] - tmpR;
-                    array[j] = array[i] - tmpI;
-                    array[i - 1] = array[i - 1] + tmpR;
-                    array[i] = array[i] + tmpI;
+                    const tempR = wR * array[j - 1] - wI * array[j];
+                    const tempI = wR * array[j] + wI * array[j - 1];
+                    array[j - 1] = array[i - 1] - tempR;
+                    array[j] = array[i] - tempI;
+                    array[i - 1] = array[i - 1] + tempR;
+                    array[i] = array[i] + tempI;
                 }
                 const wtemp = wR;
                 wR = wR * wpR - wI * wpI + wR;
@@ -378,9 +378,9 @@ export class FrequencyResponse {
             array[i2] = h1I + wRs * h2I + wIs * h2R;
             array[i3] = h1R - wRs * h2R + wIs * h2I;
             array[i4] = -h1I + wRs * h2I + wIs * h2R;
-            const twTmp = twR;
+            const twTemp = twR;
             twR = twR * twpR - twI * twpI + twR;
-            twI = twI * twpR + twTmp * twpI + twI;
+            twI = twI * twpR + twTemp * twpI + twI;
         }
 
         twR = array[0];

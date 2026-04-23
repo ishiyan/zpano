@@ -1,10 +1,9 @@
+import { buildMetadata } from '../../core/build-metadata';
 import { componentTripleMnemonic } from '../../core/component-triple-mnemonic';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
-import { IndicatorType } from '../../core/indicator-type';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { LineIndicator } from '../../core/line-indicator';
-import { OutputType } from '../../core/outputs/output-type';
-import { MomentumOutput } from './momentum-output';
-import { MomentumParams } from './momentum-params';
+import { MomentumParams } from './params';
 
 /**
  * __Momentum__ (__MOM__) is the absolute (not normalized) difference between today's sample
@@ -49,17 +48,14 @@ export class Momentum extends LineIndicator {
 
   /** Describes the output data of the indicator. */
   public metadata(): IndicatorMetadata {
-    return {
-      type: IndicatorType.Momentum,
-      mnemonic: this.mnemonic,
-      description: this.description,
-      outputs: [{
-        kind: MomentumOutput.MomentumValue,
-        type: OutputType.Scalar,
-        mnemonic: this.mnemonic,
-        description: this.description,
-      }],
-    };
+    return buildMetadata(
+      IndicatorIdentifier.Momentum,
+      this.mnemonic,
+      this.description,
+      [
+        { mnemonic: this.mnemonic, description: this.description },
+      ],
+    );
   }
 
   /** Updates the value of the momentum given the next sample. */

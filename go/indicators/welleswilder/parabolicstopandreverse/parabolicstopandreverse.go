@@ -7,7 +7,6 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
 )
 
 const (
@@ -69,17 +68,17 @@ type ParabolicStopAndReverse struct {
 	afMaxShort      float64
 
 	// State.
-	count    int     // number of bars received
-	isLong   bool    // current direction
-	sar      float64 // current SAR value
-	ep       float64 // extreme point
-	afLong   float64 // current acceleration factor (long)
-	afShort  float64 // current acceleration factor (short)
-	prevHigh float64 // previous bar's high
-	prevLow  float64 // previous bar's low
-	newHigh  float64 // current bar's high
-	newLow   float64 // current bar's low
-	primed   bool
+	count        int     // number of bars received
+	isLong       bool    // current direction
+	sar          float64 // current SAR value
+	ep           float64 // extreme point
+	afLong       float64 // current acceleration factor (long)
+	afShort      float64 // current acceleration factor (short)
+	previousHigh float64 // previous bar's high
+	previousLow  float64 // previous bar's low
+	newHigh      float64 // current bar's high
+	newLow       float64 // current bar's low
+	primed       bool
 }
 
 // NewParabolicStopAndReverse returns an instance of the indicator created using supplied parameters.
@@ -182,19 +181,14 @@ func (s *ParabolicStopAndReverse) IsPrimed() bool {
 
 // Metadata describes the output data of the indicator.
 func (s *ParabolicStopAndReverse) Metadata() core.Metadata {
-	return core.Metadata{
-		Type:        core.ParabolicStopAndReverse,
-		Mnemonic:    s.LineIndicator.Mnemonic,
-		Description: s.LineIndicator.Description,
-		Outputs: []outputs.Metadata{
-			{
-				Kind:        int(ParabolicStopAndReverseValue),
-				Type:        outputs.ScalarType,
-				Mnemonic:    s.LineIndicator.Mnemonic,
-				Description: s.LineIndicator.Description,
-			},
+	return core.BuildMetadata(
+		core.ParabolicStopAndReverse,
+		s.LineIndicator.Mnemonic,
+		s.LineIndicator.Description,
+		[]core.OutputText{
+			{Mnemonic: s.LineIndicator.Mnemonic, Description: s.LineIndicator.Description},
 		},
-	}
+	)
 }
 
 // Update updates the indicator with the given scalar sample.
@@ -228,13 +222,13 @@ func (s *ParabolicStopAndReverse) UpdateHL(high, low float64) float64 {
 
 	// Second bar: initialize SAR, EP, and direction.
 	if s.count == 2 {
-		prevHigh := s.newHigh
-		prevLow := s.newLow
+		previousHigh := s.newHigh
+		previousLow := s.newLow
 
 		if s.startValue == 0 {
 			// Auto-detect direction using MINUS_DM logic.
-			minusDM := prevLow - low
-			plusDM := high - prevHigh
+			minusDM := previousLow - low
+			plusDM := high - previousHigh
 
 			if minusDM < 0 {
 				minusDM = 0
@@ -248,10 +242,10 @@ func (s *ParabolicStopAndReverse) UpdateHL(high, low float64) float64 {
 
 			if s.isLong {
 				s.ep = high
-				s.sar = prevLow
+				s.sar = previousLow
 			} else {
 				s.ep = low
-				s.sar = prevHigh
+				s.sar = previousHigh
 			}
 		} else if s.startValue > 0 {
 			s.isLong = true
@@ -273,21 +267,21 @@ func (s *ParabolicStopAndReverse) UpdateHL(high, low float64) float64 {
 
 	// Main SAR calculation (bars 2+).
 	if s.count >= 2 {
-		s.prevLow = s.newLow
-		s.prevHigh = s.newHigh
+		s.previousLow = s.newLow
+		s.previousHigh = s.newHigh
 		s.newLow = low
 		s.newHigh = high
 
 		if s.count == 2 {
-			// On the second call, prevLow/prevHigh are already set above,
+			// On the second call, previousLow/previousHigh are already set above,
 			// and newLow/newHigh are the current bar. But the TaLib algorithm
-			// reads from todayIdx which starts at startIdx (=1), and the first
-			// iteration reads todayIdx's values as newHigh/newLow, then increments.
-			// Since we already set prevHigh/prevLow = bar[0] values and
+			// reads from todayIndex which starts at startIndex (=1), and the first
+			// iteration reads todayIndex's values as newHigh/newLow, then increments.
+			// Since we already set previousHigh/previousLow = bar[0] values and
 			// newHigh/newLow = bar[1] values in the init above, we need to
 			// re-assign to match: the loop iteration uses the SAME bar as init.
-			s.prevLow = s.newLow
-			s.prevHigh = s.newHigh
+			s.previousLow = s.newLow
+			s.previousHigh = s.newHigh
 		}
 
 		if s.isLong {
@@ -306,8 +300,8 @@ func (s *ParabolicStopAndReverse) updateLong() float64 {
 		s.isLong = false
 		s.sar = s.ep
 
-		if s.sar < s.prevHigh {
-			s.sar = s.prevHigh
+		if s.sar < s.previousHigh {
+			s.sar = s.previousHigh
 		}
 
 		if s.sar < s.newHigh {
@@ -327,8 +321,8 @@ func (s *ParabolicStopAndReverse) updateLong() float64 {
 		// Calculate the new SAR.
 		s.sar = s.sar + s.afShort*(s.ep-s.sar)
 
-		if s.sar < s.prevHigh {
-			s.sar = s.prevHigh
+		if s.sar < s.previousHigh {
+			s.sar = s.previousHigh
 		}
 
 		if s.sar < s.newHigh {
@@ -354,8 +348,8 @@ func (s *ParabolicStopAndReverse) updateLong() float64 {
 	// Calculate the new SAR.
 	s.sar = s.sar + s.afLong*(s.ep-s.sar)
 
-	if s.sar > s.prevLow {
-		s.sar = s.prevLow
+	if s.sar > s.previousLow {
+		s.sar = s.previousLow
 	}
 
 	if s.sar > s.newLow {
@@ -371,8 +365,8 @@ func (s *ParabolicStopAndReverse) updateShort() float64 {
 		s.isLong = true
 		s.sar = s.ep
 
-		if s.sar > s.prevLow {
-			s.sar = s.prevLow
+		if s.sar > s.previousLow {
+			s.sar = s.previousLow
 		}
 
 		if s.sar > s.newLow {
@@ -392,8 +386,8 @@ func (s *ParabolicStopAndReverse) updateShort() float64 {
 		// Calculate the new SAR.
 		s.sar = s.sar + s.afLong*(s.ep-s.sar)
 
-		if s.sar > s.prevLow {
-			s.sar = s.prevLow
+		if s.sar > s.previousLow {
+			s.sar = s.previousLow
 		}
 
 		if s.sar > s.newLow {
@@ -419,8 +413,8 @@ func (s *ParabolicStopAndReverse) updateShort() float64 {
 	// Calculate the new SAR.
 	s.sar = s.sar + s.afShort*(s.ep-s.sar)
 
-	if s.sar < s.prevHigh {
-		s.sar = s.prevHigh
+	if s.sar < s.previousHigh {
+		s.sar = s.previousHigh
 	}
 
 	if s.sar < s.newHigh {

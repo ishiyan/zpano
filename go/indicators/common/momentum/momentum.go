@@ -8,7 +8,6 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
 )
 
 // Momentum is the absolute (not normalized) difference between today's sample and the sample l periods ago.
@@ -97,59 +96,54 @@ func New(p *Params) (*Momentum, error) {
 }
 
 // IsPrimed indicates whether an indicator is primed.
-func (s *Momentum) IsPrimed() bool {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
+func (m *Momentum) IsPrimed() bool {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
 
-	return s.primed
+	return m.primed
 }
 
 // Metadata describes an output data of the indicator.
 // It always has a single scalar output -- the calculated value of the momentum.
-func (s *Momentum) Metadata() core.Metadata {
-	return core.Metadata{
-		Type:        core.Momentum,
-		Mnemonic:    s.LineIndicator.Mnemonic,
-		Description: s.LineIndicator.Description,
-		Outputs: []outputs.Metadata{
-			{
-				Kind:        int(Value),
-				Type:        outputs.ScalarType,
-				Mnemonic:    s.LineIndicator.Mnemonic,
-				Description: s.LineIndicator.Description,
-			},
+func (m *Momentum) Metadata() core.Metadata {
+	return core.BuildMetadata(
+		core.Momentum,
+		m.LineIndicator.Mnemonic,
+		m.LineIndicator.Description,
+		[]core.OutputText{
+			{Mnemonic: m.LineIndicator.Mnemonic, Description: m.LineIndicator.Description},
 		},
-	}
+	)
 }
 
 // Update updates the value of the momentum given the next sample.
 //
 // The indicator is not primed during the first l updates.
-func (s *Momentum) Update(sample float64) float64 {
+func (m *Momentum) Update(sample float64) float64 {
 	if math.IsNaN(sample) {
 		return sample
 	}
 
-	s.mu.Lock()
-	defer s.mu.Unlock()
+	m.mu.Lock()
+	defer m.mu.Unlock()
 
-	if s.primed {
-		for i := 0; i < s.lastIndex; i++ {
-			s.window[i] = s.window[i+1]
+	if m.primed {
+		for i := 0; i < m.lastIndex; i++ {
+			m.window[i] = m.window[i+1]
 		}
 
-		s.window[s.lastIndex] = sample
+		m.window[m.lastIndex] = sample
 
-		return sample - s.window[0]
+		return sample - m.window[0]
 	}
 
-	s.window[s.windowCount] = sample
-	s.windowCount++
+	m.window[m.windowCount] = sample
+	m.windowCount++
 
-	if s.windowLength == s.windowCount {
-		s.primed = true
+	if m.windowLength == m.windowCount {
+		m.primed = true
 
-		return sample - s.window[0]
+		return sample - m.window[0]
 	}
 
 	return math.NaN()

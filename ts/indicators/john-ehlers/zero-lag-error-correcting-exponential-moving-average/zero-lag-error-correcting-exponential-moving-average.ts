@@ -1,10 +1,9 @@
+import { buildMetadata } from '../../core/build-metadata';
 import { componentTripleMnemonic } from '../../core/component-triple-mnemonic';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
-import { IndicatorType } from '../../core/indicator-type';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { LineIndicator } from '../../core/line-indicator';
-import { OutputType } from '../../core/outputs/output-type';
-import { ZeroLagErrorCorrectingExponentialMovingAverageOutput } from './zero-lag-error-correcting-exponential-moving-average-output';
-import { ZeroLagErrorCorrectingExponentialMovingAverageParams } from './zero-lag-error-correcting-exponential-moving-average-params';
+import { ZeroLagErrorCorrectingExponentialMovingAverageParams } from './params';
 
 /** Function to calculate mnemonic of a __ZeroLagErrorCorrectingExponentialMovingAverage__ indicator. */
 export const zeroLagErrorCorrectingExponentialMovingAverageMnemonic = (params: ZeroLagErrorCorrectingExponentialMovingAverageParams): string => {
@@ -83,17 +82,14 @@ export class ZeroLagErrorCorrectingExponentialMovingAverage extends LineIndicato
 
   /** Describes the output data of the indicator. */
   public metadata(): IndicatorMetadata {
-    return {
-      type: IndicatorType.ZeroLagErrorCorrectingExponentialMovingAverage,
-      mnemonic: this.mnemonic,
-      description: this.description,
-      outputs: [{
-        kind: ZeroLagErrorCorrectingExponentialMovingAverageOutput.ZeroLagErrorCorrectingExponentialMovingAverageValue,
-        type: OutputType.Scalar,
-        mnemonic: this.mnemonic,
-        description: this.description,
-      }],
-    };
+    return buildMetadata(
+      IndicatorIdentifier.ZeroLagErrorCorrectingExponentialMovingAverage,
+      this.mnemonic,
+      this.description,
+      [
+        { mnemonic: this.mnemonic, description: this.description },
+      ],
+    );
   }
 
   /** Updates the value of the indicator given the next sample. */

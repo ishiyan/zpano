@@ -8,7 +8,6 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
 )
 
 // SuperSmoother is Ehler's two-pole Super Smoother (SS) described in Ehler's book
@@ -35,15 +34,15 @@ import (
 type SuperSmoother struct {
 	mu sync.RWMutex
 	core.LineIndicator
-	coeff1      float64
-	coeff2      float64
-	coeff3      float64
-	count       int
-	samplePrev  float64
-	filterPrev  float64
-	filterPrev2 float64
-	value       float64
-	primed      bool
+	coeff1          float64
+	coeff2          float64
+	coeff3          float64
+	count           int
+	samplePrevious  float64
+	filterPrevious  float64
+	filterPrevious2 float64
+	value           float64
+	primed          bool
 }
 
 // NewSuperSmoother returns an instance of the indicator created using supplied parameters.
@@ -133,19 +132,14 @@ func (s *SuperSmoother) IsPrimed() bool {
 // Metadata describes an output data of the indicator.
 // It always has a single scalar output -- the calculated value of the super smoother.
 func (s *SuperSmoother) Metadata() core.Metadata {
-	return core.Metadata{
-		Type:        core.SuperSmoother,
-		Mnemonic:    s.LineIndicator.Mnemonic,
-		Description: s.LineIndicator.Description,
-		Outputs: []outputs.Metadata{
-			{
-				Kind:        int(SuperSmootherValue),
-				Type:        outputs.ScalarType,
-				Mnemonic:    s.LineIndicator.Mnemonic,
-				Description: s.LineIndicator.Description,
-			},
+	return core.BuildMetadata(
+		core.SuperSmoother,
+		s.LineIndicator.Mnemonic,
+		s.LineIndicator.Description,
+		[]core.OutputText{
+			{Mnemonic: s.LineIndicator.Mnemonic, Description: s.LineIndicator.Description},
 		},
-	}
+	)
 }
 
 // Update updates the value of the super smoother given the next sample.
@@ -160,12 +154,12 @@ func (s *SuperSmoother) Update(sample float64) float64 {
 	defer s.mu.Unlock()
 
 	if s.primed {
-		filter := s.coeff1*(sample+s.samplePrev) +
-			s.coeff2*s.filterPrev + s.coeff3*s.filterPrev2
+		filter := s.coeff1*(sample+s.samplePrevious) +
+			s.coeff2*s.filterPrevious + s.coeff3*s.filterPrevious2
 		s.value = filter
-		s.samplePrev = sample
-		s.filterPrev2 = s.filterPrev
-		s.filterPrev = filter
+		s.samplePrevious = sample
+		s.filterPrevious2 = s.filterPrevious
+		s.filterPrevious = filter
 
 		return s.value
 	}
@@ -173,22 +167,22 @@ func (s *SuperSmoother) Update(sample float64) float64 {
 	s.count++
 
 	if s.count == 1 {
-		s.samplePrev = sample
-		s.filterPrev = sample
-		s.filterPrev2 = sample
+		s.samplePrevious = sample
+		s.filterPrevious = sample
+		s.filterPrevious2 = sample
 	}
 
-	filter := s.coeff1*(sample+s.samplePrev) +
-		s.coeff2*s.filterPrev + s.coeff3*s.filterPrev2
+	filter := s.coeff1*(sample+s.samplePrevious) +
+		s.coeff2*s.filterPrevious + s.coeff3*s.filterPrevious2
 
 	if s.count == 3 { //nolint:mnd
 		s.primed = true
 		s.value = filter
 	}
 
-	s.samplePrev = sample
-	s.filterPrev2 = s.filterPrev
-	s.filterPrev = filter
+	s.samplePrevious = sample
+	s.filterPrevious2 = s.filterPrevious
+	s.filterPrevious = filter
 
 	return s.value
 }

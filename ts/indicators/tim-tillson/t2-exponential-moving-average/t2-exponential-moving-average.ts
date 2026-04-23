@@ -1,11 +1,10 @@
+import { buildMetadata } from '../../core/build-metadata';
 import { componentTripleMnemonic } from '../../core/component-triple-mnemonic';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
-import { IndicatorType } from '../../core/indicator-type';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { LineIndicator } from '../../core/line-indicator';
-import { OutputType } from '../../core/outputs/output-type';
-import { T2ExponentialMovingAverageOutput } from './t2-exponential-moving-average-output';
-import { T2ExponentialMovingAverageLengthParams } from './t2-exponential-moving-average-params';
-import { T2ExponentialMovingAverageSmoothingFactorParams } from './t2-exponential-moving-average-params';
+import { T2ExponentialMovingAverageLengthParams } from './params';
+import { T2ExponentialMovingAverageSmoothingFactorParams } from './params';
 
 const guardLength = (object: any): object is T2ExponentialMovingAverageLengthParams => 'length' in object;
 
@@ -154,17 +153,14 @@ export class T2ExponentialMovingAverage extends LineIndicator {
 
   /** Describes the output data of the indicator. */
   public metadata(): IndicatorMetadata {
-    return {
-      type: IndicatorType.T2ExponentialMovingAverage,
-      mnemonic: this.mnemonic,
-      description: this.description,
-      outputs: [{
-        kind: T2ExponentialMovingAverageOutput.T2ExponentialMovingAverageValue,
-        type: OutputType.Scalar,
-        mnemonic: this.mnemonic,
-        description: this.description,
-      }],
-    };
+    return buildMetadata(
+      IndicatorIdentifier.T2ExponentialMovingAverage,
+      this.mnemonic,
+      this.description,
+      [
+        { mnemonic: this.mnemonic, description: this.description },
+      ],
+    );
   }
 
   /** Updates the value of the indicator given the next sample. */

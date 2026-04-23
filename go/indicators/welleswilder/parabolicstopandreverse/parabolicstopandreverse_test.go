@@ -9,7 +9,7 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
+	"zpano/indicators/core/outputs/shape"
 )
 
 // Wilder's original SAR test data (38 bars).
@@ -205,10 +205,10 @@ func TestParabolicStopAndReverseWilder(t *testing.T) {
 	}
 
 	// Wilder spot checks from test_sar.c (TA_SAR, absolute values).
-	// expectedBegIdx = 1, so output[0] corresponds to results[1].
+	// expectedBegIndex = 1, so output[0] corresponds to results[1].
 	// TA_SAR always returns positive values, SAREXT returns signed.
 	spotChecks := []struct {
-		outIdx   int     // index into output array (begIdx-relative)
+		outIndex int     // index into output array (begIndex-relative)
 		expected float64 // TA_SAR absolute expected value
 	}{
 		{0, 50.00},
@@ -219,12 +219,12 @@ func TestParabolicStopAndReverseWilder(t *testing.T) {
 	}
 
 	for _, sc := range spotChecks {
-		actual := math.Abs(results[sc.outIdx+1]) // +1 because results[0] = NaN
+		actual := math.Abs(results[sc.outIndex+1]) // +1 because results[0] = NaN
 		diff := math.Abs(actual - sc.expected)
 
 		if diff > tol {
 			t.Errorf("Wilder spot check output[%d]: expected %.4f, got %.4f, diff %.6f",
-				sc.outIdx, sc.expected, actual, diff)
+				sc.outIndex, sc.expected, actual, diff)
 		}
 	}
 }
@@ -266,8 +266,8 @@ func TestParabolicStopAndReverseMetadata(t *testing.T) {
 
 	meta := sar.Metadata()
 
-	if meta.Type != core.ParabolicStopAndReverse {
-		t.Errorf("expected type ParabolicStopAndReverse, got %v", meta.Type)
+	if meta.Identifier != core.ParabolicStopAndReverse {
+		t.Errorf("expected identifier ParabolicStopAndReverse, got %v", meta.Identifier)
 	}
 
 	if meta.Mnemonic != "sar()" {
@@ -278,12 +278,12 @@ func TestParabolicStopAndReverseMetadata(t *testing.T) {
 		t.Fatalf("expected 1 output, got %d", len(meta.Outputs))
 	}
 
-	if meta.Outputs[0].Kind != int(ParabolicStopAndReverseValue) {
-		t.Errorf("expected output kind %d, got %d", ParabolicStopAndReverseValue, meta.Outputs[0].Kind)
+	if meta.Outputs[0].Kind != int(Value) {
+		t.Errorf("expected output kind %d, got %d", Value, meta.Outputs[0].Kind)
 	}
 
-	if meta.Outputs[0].Type != outputs.ScalarType {
-		t.Errorf("expected output type ScalarType, got %v", meta.Outputs[0].Type)
+	if meta.Outputs[0].Shape != shape.Scalar {
+		t.Errorf("expected output type ScalarType, got %v", meta.Outputs[0].Shape)
 	}
 }
 

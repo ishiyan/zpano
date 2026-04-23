@@ -9,7 +9,7 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
+	"zpano/indicators/core/outputs/shape"
 )
 
 //nolint:lll
@@ -410,12 +410,12 @@ func TestTriangularMovingAverageMetadata(t *testing.T) {
 		}
 	}
 
-	check("Type", core.TriangularMovingAverage, act.Type)
+	check("Identifier", core.TriangularMovingAverage, act.Identifier)
 	check("Mnemonic", "trima(5)", act.Mnemonic)
 	check("Description", "Triangular moving average trima(5)", act.Description)
 	check("len(Outputs)", 1, len(act.Outputs))
-	check("Outputs[0].Kind", int(TriangularMovingAverageValue), act.Outputs[0].Kind)
-	check("Outputs[0].Type", outputs.ScalarType, act.Outputs[0].Type)
+	check("Outputs[0].Kind", int(Value), act.Outputs[0].Kind)
+	check("Outputs[0].Shape", shape.Scalar, act.Outputs[0].Shape)
 	check("Outputs[0].Mnemonic", "trima(5)", act.Outputs[0].Mnemonic)
 	check("Outputs[0].Description", "Triangular moving average trima(5)", act.Outputs[0].Description)
 }

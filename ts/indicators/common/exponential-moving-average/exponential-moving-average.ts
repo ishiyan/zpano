@@ -1,11 +1,10 @@
+import { buildMetadata } from '../../core/build-metadata';
 import { componentTripleMnemonic } from '../../core/component-triple-mnemonic';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
-import { IndicatorType } from '../../core/indicator-type';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { LineIndicator } from '../../core/line-indicator';
-import { OutputType } from '../../core/outputs/output-type';
-import { ExponentialMovingAverageOutput } from './exponential-moving-average-output';
-import { ExponentialMovingAverageLengthParams } from './exponential-moving-average-params';
-import { ExponentialMovingAverageSmoothingFactorParams } from './exponential-moving-average-params';
+import { ExponentialMovingAverageLengthParams } from './params';
+import { ExponentialMovingAverageSmoothingFactorParams } from './params';
 
 const guardLength = (object: any): object is ExponentialMovingAverageLengthParams => 'length' in object;
 
@@ -99,17 +98,14 @@ export class ExponentialMovingAverage extends LineIndicator {
 
   /** Describes the output data of the indicator. */
   public metadata(): IndicatorMetadata {
-    return {
-      type: IndicatorType.ExponentialMovingAverage,
-      mnemonic: this.mnemonic,
-      description: this.description,
-      outputs: [{
-        kind: ExponentialMovingAverageOutput.ExponentialMovingAverageValue,
-        type: OutputType.Scalar,
-        mnemonic: this.mnemonic,
-        description: this.description,
-      }],
-    };
+    return buildMetadata(
+      IndicatorIdentifier.ExponentialMovingAverage,
+      this.mnemonic,
+      this.description,
+      [
+        { mnemonic: this.mnemonic, description: this.description },
+      ],
+    );
   }
 
   /** Updates the value of the indicator given the next sample. */

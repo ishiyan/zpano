@@ -45,6 +45,46 @@ Use the EMA indicator as the canonical reference for multi-constructor indicator
 3. [Quick Reference: Import Mapping](#quick-reference-import-mapping)
 4. [Quick Reference: Symbol Renames](#quick-reference-symbol-renames)
 5. [Advanced: Multi-Constructor Indicators](#advanced-multi-constructor-indicators)
+6. [Advanced: Helper / Shared Component Families](#advanced-helper--shared-component-families)
+7. [Naming & Style Conventions](#naming--style-conventions)
+
+---
+
+## Naming & Style Conventions
+
+All identifier, receiver, concurrency, style, and cross-language parity
+rules are defined in the **`indicator-architecture`** skill and MUST be
+followed during conversion. Summary (see that skill for the full tables
+and rationale):
+
+- **Abbreviations banned in identifiers** — always expand: `idx→index`,
+  `tmp→temp`, `res→result`, `sig→signal`, `val→value`, `prev→previous`,
+  `avg→average`, `mult→multiplier`, `buf→buffer`, `param→parameter`,
+  `hist→histogram`. Allowed: Go idioms (`err`, `len`, `cap`, `min`,
+  `max`, `num`), the Go `Params`/`params` bundle type, TS `value_`
+  ctor-param idiom.
+- **Go receivers** — compound type name (2+ CamelCase words) → `s`;
+  simple type name (single word) → first-letter of type, lowercased.
+  All methods on a type MUST use the same receiver. If a local would
+  shadow `s` (e.g. in `MarshalJSON`), rename the local to `str`.
+- **Concurrency** — stateful public indicators MUST carry `mu
+  sync.RWMutex`; writers `s.mu.Lock(); defer s.mu.Unlock()`, readers
+  `s.mu.RLock(); defer s.mu.RUnlock()`, defer on the line immediately
+  after Lock. Exceptions: pure delegating wrappers, internal engines
+  guarded by their public wrapper.
+- **Go style invariants** — no `var x T = zero`, no split
+  `var x T; x = expr`; use `any` not `interface{}`; no
+  `make([]T, 0)` (always include capacity); no `new`; grouped imports
+  (stdlib, external, `zpano/*`); every exported symbol has a doc
+  comment, even trivial passthroughs.
+- **Go ↔ TS local-variable parity** — same concept = same name in
+  both languages. Canonical: `sum`, `epsilon`, `temp`/`diff`,
+  `stddev`, `spread`, `bw`, `pctB`, `amount`, `lengthMinOne`;
+  loop counter `i`/`j`/`k`; `index` only when semantically a named
+  index. Never introduce new short forms.
+
+When porting, copy the other language's local-variable names verbatim
+where the concept is identical.
 
 ---
 
@@ -66,7 +106,7 @@ All files in this directory will use `package simplemovingaverage` (the director
 
 ### Go Step 2: Convert the params file
 
-**File:** `<indicatorname>params.go`
+**File:** `params.go`
 
 Changes:
 
@@ -90,16 +130,33 @@ Repeat the pattern for `QuoteComponent` (default: `QuoteMidPrice`) and `TradeCom
 
 ### Go Step 3: Convert the output file
 
-**File:** `<indicatorname>output.go`
+**File:** `output.go`
 
-**Only change:** `package indicators` -> `package <indicatorname>`
+Two mechanical changes:
 
-The output enum type, constants, `String()`, `IsKnown()`, `MarshalJSON()`, and `UnmarshalJSON()`
-methods are identical between old and new. No logic changes needed.
+1. `package indicators` → `package <indicatorname>`.
+2. **Rename the output type and constants to the bare Go convention.** The
+   package name provides scoping, so the indicator-name prefix would stutter
+   (`simplemovingaverage.SimpleMovingAverageOutput`). Rename:
+   - Type `<IndicatorName>Output` → `Output`.
+   - Constant `<IndicatorName>Value` → `Value`.
+   - Multi-output: strip the `<IndicatorName>` prefix and keep the descriptive
+     suffix (e.g. `DirectionalMovementIndexAverageDirectionalIndex` →
+     `AverageDirectionalIndex`). If stripping leaves a trailing `Value` with
+     more text before it, drop that too (e.g. `AverageTrueRangeValue` →
+     `AverageTrueRange`).
+
+   Update all references in the package (main file, test files, `String()`,
+   `IsKnown()`, `MarshalJSON()`, `UnmarshalJSON()`). The string forms returned
+   by `String()`/`MarshalJSON()` stay unchanged — only the Go identifiers move.
+
+> **TypeScript keeps the long form** (`SimpleMovingAverageOutput` /
+> `SimpleMovingAverageValue`) because TS imports by symbol, not by module.
+> Only the Go side strips the prefix.
 
 ### Go Step 4: Convert the output test file
 
-**File:** `<indicatorname>output_test.go`
+**File:** `output_test.go`
 
 **Only change:** `package indicators` -> `package <indicatorname>`
 
@@ -139,8 +196,11 @@ import (
 
 Keep standard library imports (`fmt`, `math`, `sync`, etc.) as-is.
 
-Remove the `"mbg/trading/indicators/indicator/output"` import entirely -- it is only needed if
-the old code references `output.Scalar` in `Metadata()`, which changes to `outputs.ScalarType`.
+Remove the `"mbg/trading/indicators/indicator/output"` import entirely -- `BuildMetadata`
+sources per-output `Kind`/`Shape` from the descriptor registry, so indicator files no
+longer need to import `"zpano/indicators/core/outputs"` or `".../outputs/shape"` just for
+`Metadata()`. Keep the `outputs` import only if the file uses `outputs.NewBand` /
+`outputs.NewEmptyBand`.
 
 #### 5b. Struct: remove boilerplate fields, embed LineIndicator
 
@@ -275,7 +335,7 @@ return sma, nil
 allows `LineIndicator` to implement `UpdateScalar/Bar/Quote/Trade` without the indicator
 having to define them. The struct must be created first so that `sma.Update` is a valid reference.
 
-#### 5e. Metadata: update return type and fields
+#### 5e. Metadata: use BuildMetadata
 
 Old:
 
@@ -295,23 +355,19 @@ func (s *SimpleMovingAverage) Metadata() indicator.Metadata {
 }
 ```
 
-New:
+New — `BuildMetadata` pulls per-output `Kind` and `Shape` from the descriptor registry
+(`go/indicators/core/descriptors.go`), so the caller supplies only mnemonic/description:
 
 ```go
 func (s *SimpleMovingAverage) Metadata() core.Metadata {
-    return core.Metadata{
-        Type:        core.SimpleMovingAverage,
-        Mnemonic:    s.LineIndicator.Mnemonic,
-        Description: s.LineIndicator.Description,
-        Outputs: []outputs.Metadata{
-            {
-                Kind:        int(SimpleMovingAverageValue),
-                Type:        outputs.ScalarType,
-                Mnemonic:    s.LineIndicator.Mnemonic,
-                Description: s.LineIndicator.Description,
-            },
+    return core.BuildMetadata(
+        core.SimpleMovingAverage,
+        s.LineIndicator.Mnemonic,
+        s.LineIndicator.Description,
+        []core.OutputText{
+            {Mnemonic: s.LineIndicator.Mnemonic, Description: s.LineIndicator.Description},
         },
-    }
+    )
 }
 ```
 
@@ -319,13 +375,21 @@ Key changes:
 
 | Old | New |
 |-----|-----|
-| `indicator.Metadata` | `core.Metadata` |
-| (no top-level Mnemonic/Description) | `Mnemonic: s.LineIndicator.Mnemonic` |
-| (no top-level Mnemonic/Description) | `Description: s.LineIndicator.Description` |
-| `[]output.Metadata` | `[]outputs.Metadata` |
-| `output.Scalar` | `outputs.ScalarType` |
-| `Name: s.name` | `Mnemonic: s.LineIndicator.Mnemonic` |
-| `Description: s.description` | `Description: s.LineIndicator.Description` |
+| `indicator.Metadata` (return type) | `core.Metadata` (return type) |
+| Inline `core.Metadata{...}` literal | `core.BuildMetadata(...)` call |
+| `Type: indicator.SimpleMovingAverage` | First argument `core.SimpleMovingAverage` (the `core.Identifier` value) |
+| `Name: s.name` | `{Mnemonic: s.LineIndicator.Mnemonic, Description: s.LineIndicator.Description}` per output |
+| `output.Scalar` | (no longer specified — sourced from the descriptor registry) |
+| `int(SimpleMovingAverageValue)` | (no longer specified — sourced from the descriptor registry) |
+| `[]output.Metadata` | `[]core.OutputText` |
+
+The caller NO LONGER imports `zpano/indicators/core/outputs` or
+`zpano/indicators/core/outputs/shape` just for `Metadata()`. Drop those imports if they
+are not referenced elsewhere in the file.
+
+**Descriptor row required.** If no descriptor is registered for the indicator's identifier,
+`BuildMetadata` panics at runtime. See Step 7 below — descriptor registration is now part
+of indicator registration.
 
 #### 5f. Delete UpdateScalar/Bar/Quote/Trade methods
 
@@ -464,10 +528,13 @@ check("Outputs[0].Name", "sma(5)", act.Outputs[0].Name)
 New:
 
 ```go
-check("Type", core.SimpleMovingAverage, act.Type)
-check("Outputs[0].Type", outputs.ScalarType, act.Outputs[0].Type)
+check("Identifier", core.SimpleMovingAverage, act.Identifier)
+check("Outputs[0].Shape", shape.Scalar, act.Outputs[0].Shape)
 check("Outputs[0].Mnemonic", "sma(5)", act.Outputs[0].Mnemonic)
 ```
+
+(`shape` is `zpano/indicators/core/outputs/shape`. The test file is one of the few places
+that still imports it, since the indicator file no longer does.)
 
 Also verify that the top-level `Mnemonic` and `Description` are checked on `act`:
 
@@ -587,17 +654,25 @@ Adapt the mnemonics and component values to your specific indicator. The pattern
 - Default component = omitted from mnemonic
 - Non-default component = shown as its mnemonic abbreviation (e.g., `hl/2`, `o`, `h`, `b`, `a`, `v`)
 
-### Go Step 7: Register the indicator type
+### Go Step 7: Register the identifier and descriptor
 
-If the indicator type constant does not already exist in `core/indicator.go` (or wherever
-indicator type constants are defined), add it. Example:
+1. **Register the identifier.** If the constant does not already exist in
+   `go/indicators/core/identifier.go`, add it:
 
-```go
-const (
-    SimpleMovingAverage IndicatorType = iota + 1
-    // ...
-)
-```
+   ```go
+   const (
+       SimpleMovingAverage Identifier = iota + 1
+       // ...
+   )
+   ```
+
+2. **Register the descriptor.** Add a row to the registry in
+   `go/indicators/core/descriptors.go`. The descriptor drives the taxonomy (role, pane,
+   volume usage, adaptivity, family) **and** supplies per-output `Kind`/`Shape` consumed by
+   `BuildMetadata`. See `.opencode/skills/indicator-architecture/SKILL.md` section
+   "Taxonomy & Descriptor Registry" for field meanings and guidance. The order of the
+   `Outputs` slice must match the order of the `[]OutputText` passed by the indicator's
+   `Metadata()` method.
 
 ### Go Step 8: Verify
 
@@ -629,14 +704,14 @@ The new folder will contain 4 files (old had 3):
 
 | Old files | New files |
 |-----------|-----------|
-| `simple-moving-average-params.interface.ts` | `simple-moving-average-params.ts` |
+| `simple-moving-average-params.interface.ts` | `params.ts` |
 | `simple-moving-average.ts` | `simple-moving-average.ts` |
 | `simple-moving-average.spec.ts` | `simple-moving-average.spec.ts` |
-| (none) | `simple-moving-average-output.ts` |
+| (none) | `output.ts` |
 
 ### TS Step 2: Convert the params file
 
-**File:** `<indicator-name>-params.ts` (renamed from `<indicator-name>-params.interface.ts`)
+**File:** `params.ts` (renamed from `<indicator-name>-params.interface.ts` — prefix dropped, `.interface` suffix dropped)
 
 Changes:
 
@@ -668,7 +743,7 @@ tradeComponent?: TradeComponent;
 
 ### TS Step 3: Create the output file
 
-**File:** `<indicator-name>-output.ts` (NEW file -- does not exist in old structure)
+**File:** `output.ts` (NEW file -- does not exist in old structure)
 
 Create a per-indicator output enum:
 
@@ -699,11 +774,15 @@ Replace old imports with new ones:
 Add new imports:
 
 ```typescript
+import { buildMetadata } from '../../core/build-metadata';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
 import { SimpleMovingAverageOutput } from './simple-moving-average-output';
 ```
+
+Note: `OutputType`/`output-type` and `IndicatorType`/`indicator-type` are gone. `buildMetadata`
+sources the per-output `Shape` and `Kind` from the descriptor registry
+(`ts/indicators/core/descriptors.ts`), so the indicator file no longer imports them.
 
 Change the mnemonic function import:
 
@@ -752,28 +831,29 @@ These call the `LineIndicator` setters which handle `undefined` -> default resol
 
 #### 4e. Add metadata() method
 
-Add a new `metadata()` method to the class:
+Add a new `metadata()` method to the class. `buildMetadata` reads the per-output `Shape` and
+`Kind` from the descriptor registry (`ts/indicators/core/descriptors.ts`), so the caller only
+supplies mnemonic/description text:
 
 ```typescript
 /** Describes the output data of the indicator. */
 metadata(): IndicatorMetadata {
-    return {
-        type: IndicatorType.SimpleMovingAverage,
-        mnemonic: this.mnemonic,
-        description: this.description,
-        outputs: [
-            {
-                kind: SimpleMovingAverageOutput.Value,
-                type: OutputType.Scalar,
-                mnemonic: this.mnemonic,
-                description: this.description,
-            },
-        ],
-    };
+    return buildMetadata(
+        IndicatorIdentifier.SimpleMovingAverage,
+        this.mnemonic,
+        this.description,
+        [{ mnemonic: this.mnemonic, description: this.description }],
+    );
 }
 ```
 
-Adapt `IndicatorType.*`, output enum, and output entries to your specific indicator.
+Adapt `IndicatorIdentifier.*` and the per-output text entries to your specific indicator. The
+number and order of the `OutputText` entries must match the descriptor row registered in
+`descriptors.ts` — `buildMetadata` throws if they disagree.
+
+**Descriptor row required.** If no descriptor is registered for the identifier, `buildMetadata`
+throws at runtime. See TS Step 7 below — descriptor registration is now part of indicator
+registration.
 
 ### TS Step 5: Convert the test file
 
@@ -800,13 +880,27 @@ The `getMnemonic()` method is replaced by accessing `metadata().mnemonic`.
 The `update()`, `isPrimed()`, and NaN tests remain **identical**. No changes needed for the core
 calculation tests.
 
-### TS Step 6: Verify
+### TS Step 6: Register the identifier and descriptor
+
+1. **Register the identifier.** If the member does not already exist in
+   `ts/indicators/core/indicator-identifier.ts`, add it.
+
+2. **Register the descriptor.** Add a row to the registry in
+   `ts/indicators/core/descriptors.ts`. The descriptor drives the taxonomy and supplies
+   per-output `kind`/`shape` consumed by `buildMetadata`. See
+   `.opencode/skills/indicator-architecture/SKILL.md` section "Taxonomy & Descriptor
+   Registry" for field meanings. The order of the `outputs` entries must match the order
+   of the `OutputText[]` passed by the indicator's `metadata()` method.
+
+### TS Step 7: Verify
 
 Run the tests for the specific indicator:
 
 ```bash
-# Adjust the path and test runner command to your project setup
-ng test --include='**/indicators/common/<indicator-name>/**/*.spec.ts'
+# zpano uses Jasmine (not Jest) via tsx. From /ts:
+npm test                                    # full suite
+node --import tsx/esm ./node_modules/.bin/jasmine --config=jasmine.json --filter=SineWave
+# --filter is a case-sensitive regex substring match against the spec describe() name.
 ```
 
 All tests must pass.
@@ -821,7 +915,7 @@ All tests must pass.
 |-----------------|-----------------|
 | `"mbg/trading/data"` | `"zpano/entities"` |
 | `"mbg/trading/indicators/indicator"` | `"zpano/indicators/core"` |
-| `"mbg/trading/indicators/indicator/output"` | `"zpano/indicators/core/outputs"` |
+| `"mbg/trading/indicators/indicator/output"` | `"zpano/indicators/core/outputs"` (only if `outputs.NewBand`/`outputs.NewEmptyBand` is used; the `Shape` enum now lives at `"zpano/indicators/core/outputs/shape"`, but indicator files rarely import it directly — `BuildMetadata` sources `Shape` from the registry) |
 
 ### TypeScript
 
@@ -833,9 +927,9 @@ All tests must pass.
 | `'../../../data/entities/bar-component.enum'` | `'../../../entities/bar-component'` |
 | `'../../../data/entities/quote-component.enum'` | `'../../../entities/quote-component'` |
 | (none) | `'../../../entities/trade-component'` |
+| (none) | `'../../core/build-metadata'` |
+| (none) | `'../../core/indicator-identifier'` |
 | (none) | `'../../core/indicator-metadata'` |
-| (none) | `'../../core/indicator-type'` |
-| (none) | `'../../core/outputs/output-type'` |
 | (none) | `'./<name>-output'` |
 
 ---
@@ -866,9 +960,11 @@ All tests must pass.
 | `data.TradeComponentFunc(...)` | `entities.TradeComponentFunc(...)` |
 | `indicator.Metadata` | `core.Metadata` |
 | `indicator.Output` | `core.Output` |
-| `indicator.SimpleMovingAverage` | `core.SimpleMovingAverage` |
+| `indicator.SimpleMovingAverage` | `core.SimpleMovingAverage` (now a `core.Identifier`, not an `IndicatorType`) |
+| `indicator.Type` / `IndicatorType` | `core.Identifier` |
 | `output.Metadata` | `outputs.Metadata` |
-| `output.Scalar` | `outputs.ScalarType` |
+| `output.Scalar` | `shape.Scalar` (package `zpano/indicators/core/outputs/shape`) — but indicator files no longer write this; sourced from the descriptor registry |
+| `outputs.ScalarType` / `outputs.Type` | `shape.Scalar` / `shape.Shape` (same note — sourced from the registry) |
 
 ### Go: Struct field / method changes
 
@@ -898,8 +994,10 @@ All tests must pass.
 | (no component setters) | `this.barComponent = params.barComponent` |
 | (no component setters) | `this.quoteComponent = params.quoteComponent` |
 | (no component setters) | `this.tradeComponent = params.tradeComponent` |
-| (no metadata method) | `metadata(): IndicatorMetadata { ... }` |
-| (no output file) | `<name>-output.ts` with output enum |
+| (no metadata method) | `metadata(): IndicatorMetadata { return buildMetadata(...); }` |
+| `IndicatorType` | `IndicatorIdentifier` (from `core/indicator-identifier`) |
+| `OutputType.Scalar` | `Shape.Scalar` (from `core/outputs/shape/shape`) — but indicator files no longer write this; sourced from the descriptor registry |
+| (no output file) | `output.ts` with output enum |
 
 ---
 
@@ -1207,3 +1305,156 @@ If frama is NaN (not primed), fdim is also set to NaN.
 
 - Go: `go/indicators/johnehlers/fractaladaptivemovingaverage/`
 - TS: `ts/indicators/john-ehlers/fractal-adaptive-moving-average/`
+
+---
+
+## Advanced: Helper / Shared Component Families
+
+A **helper family** is a group of interchangeable internal components that all
+implement the same interface (e.g., multiple cycle-estimator algorithms used
+by MESA-style indicators). They are not indicators themselves and do not
+extend `LineIndicator` — they are building blocks used *inside* indicators.
+
+Canonical reference: **Hilbert Transformer cycle estimator**
+(`go/indicators/johnehlers/hilberttransformer/`,
+`ts/indicators/john-ehlers/hilbert-transformer/`).
+
+### Folder Contents
+
+A helper family lives in a single folder at the standard indicator depth and
+contains one file per component role:
+
+| Role                    | Go filename                          | TS filename                            |
+|-------------------------|--------------------------------------|----------------------------------------|
+| Shared interface        | `cycleestimator.go`                  | `cycle-estimator.ts`                   |
+| Shared params           | `cycleestimatorparams.go`            | `cycle-estimator-params.ts`            |
+| Variant type enum       | `cycleestimatortype.go`              | `cycle-estimator-type.ts`              |
+| Common + dispatcher     | `estimator.go`                       | `common.ts`                            |
+| One file per variant    | `<variant>estimator.go`              | `<variant>.ts`                         |
+| Spec per variant + common | `<variant>estimator_test.go`       | `<variant>.spec.ts`                    |
+
+**No type suffixes.** Do not use `.interface.ts` / `.enum.ts` — plain `.ts`
+files differentiated by stem name, same as every other indicator.
+
+### Shared Interface
+
+Expose:
+
+- Primed flag and `warmUpPeriod` (read-only).
+- Construction parameters as read-only getters.
+- Intermediate state useful for tests (e.g., `smoothed`, `detrended`,
+  `inPhase`, `quadrature`, `period`).
+- A single `update(sample)` that returns the primary output.
+
+TypeScript: getters take the plain name (`period`, not `periodValue`).
+Backing private fields are prefixed with `_` (`_period`) to avoid the name
+clash with the public getter.
+
+### Dispatcher / Factory
+
+The common file exposes a single entry point that constructs a variant from a
+type enum value and optional params. Each variant case supplies its own
+**default params** when the caller omits them:
+
+```go
+// Go
+func NewCycleEstimator(typ CycleEstimatorType, params *CycleEstimatorParams) (CycleEstimator, error) {
+    switch typ {
+    case HomodyneDiscriminator: return NewHomodyneDiscriminatorEstimator(params)
+    // ... other variants
+    }
+    return nil, fmt.Errorf("invalid cycle estimator type: %s", typ)
+}
+```
+
+```ts
+// TS
+export function createEstimator(
+    estimatorType?: HilbertTransformerCycleEstimatorType,
+    estimatorParams?: HilbertTransformerCycleEstimatorParams,
+): HilbertTransformerCycleEstimator {
+    estimatorType ??= HilbertTransformerCycleEstimatorType.HomodyneDiscriminator;
+    switch (estimatorType) {
+        case HilbertTransformerCycleEstimatorType.HomodyneDiscriminator:
+            estimatorParams ??= { smoothingLength: 4, alphaEmaQuadratureInPhase: 0.2, alphaEmaPeriod: 0.2 };
+            return new HilbertTransformerHomodyneDiscriminator(estimatorParams);
+        // ... other variants with their own defaults
+        default: throw new Error('Invalid cycle estimator type: ' + estimatorType);
+    }
+}
+```
+
+Rules:
+
+- Dispatcher picks a default variant when the type argument is omitted.
+- Each `case` has its own default params literal — defaults can differ per
+  variant and must match between Go and TS.
+- Unknown types: Go returns an error, TS throws.
+
+### Warm-Up Period
+
+Every variant accepts an optional `warmUpPeriod` that, if larger than the
+variant's intrinsic minimum priming length, overrides it. Tests must cover:
+
+1. **Default priming** — `primed === false` for the first `intrinsicMinimum`
+   samples, then `true`.
+2. **Custom warm-up** — construct with `warmUpPeriod = N` (larger than
+   intrinsic); `primed === false` for the first `N` samples, then `true`.
+
+```ts
+it('should respect custom warmUpPeriod', () => {
+    const lprimed = 50;
+    const est = new HilbertTransformerHomodyneDiscriminator(
+        { smoothingLength: 4, alphaEmaQuadratureInPhase: 0.2, alphaEmaPeriod: 0.2, warmUpPeriod: lprimed }
+    );
+    expect(est.primed).toBe(false);
+    for (let i = 0; i < lprimed; i++) { est.update(input[i]); expect(est.primed).toBe(false); }
+    for (let i = lprimed; i < input.length; i++) { est.update(input[i]); expect(est.primed).toBe(true); }
+});
+```
+
+### Cross-Language Alignment Checklist
+
+- Interface getter names match (modulo language casing).
+- Dispatcher default variant matches.
+- Per-variant default params match exactly (same numeric values).
+- `Primed()` / `primed` semantics match (both return `isWarmedUp`, not some
+  other internal flag).
+- Error/throw messages use the same textual prefix where practical.
+
+### Shared Formatter / Moniker Helpers
+
+When a family defines a formatter (e.g. a per-variant mnemonic builder like
+`EstimatorMoniker(typ, params) -> "hd(4, 0.200, 0.200)"`), it **must be
+exported from both Go and TS** helper packages. Indicators that consume the
+family (MAMA, etc.) import and call this helper to build their own mnemonic
+suffix — duplicating the formatting logic per-consumer-indicator is a bug
+waiting to happen.
+
+Checklist when converting a consumer indicator:
+
+1. Does Go's helper package export a formatter used in the consumer's mnemonic?
+2. Does TS's helper export an equivalent function with the same name (camelCase)
+   and identical format string (e.g. `%.3f` ↔ `.toFixed(3)`)?
+3. If the TS equivalent is missing, **add it to the helper's common file** first,
+   then import it from the consumer. Do not inline the format in the consumer.
+
+Reference: `estimatorMoniker` in
+`ts/indicators/john-ehlers/hilbert-transformer/hilbert-transformer-common.ts`
+mirrors Go's `hilberttransformer.EstimatorMoniker`.
+
+### Numerical Tolerance for Recursive / Cascaded Indicators
+
+The default test tolerance of `1e-12` (Go) / `1e-12` (TS) works for simple
+moving averages, single-stage EMAs, etc. Indicators that stack multiple
+recursive EMAs, Hilbert-transform feedback loops, or trigonometric feedback
+(MAMA, Hilbert-based cycle estimators, multi-stage T3) accumulate enough
+floating-point drift between Go and TS that `1e-12` is too tight.
+
+**Use `1e-10`** as the tolerance for:
+
+- MAMA / FAMA and anything consuming a Hilbert Transformer
+- Any indicator whose `update` feeds its own previous output through an
+  `atan`, `cos`, or multi-stage EMA chain before producing the output
+
+Keep `1e-12` / `1e-13` for purely additive/multiplicative indicators.

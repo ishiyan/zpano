@@ -9,7 +9,7 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
+	"zpano/indicators/core/outputs/shape"
 )
 
 // Test data from TA-Lib (252 entries), used by MBST C# tests.
@@ -205,8 +205,8 @@ func TestCommodityChannelIndexMetadata(t *testing.T) {
 
 	meta := cci.Metadata()
 
-	if meta.Type != core.CommodityChannelIndex {
-		t.Errorf("expected type CommodityChannelIndex, got %v", meta.Type)
+	if meta.Identifier != core.CommodityChannelIndex {
+		t.Errorf("expected identifier CommodityChannelIndex, got %v", meta.Identifier)
 	}
 
 	exp := "cci(20)"
@@ -218,12 +218,12 @@ func TestCommodityChannelIndexMetadata(t *testing.T) {
 		t.Fatalf("expected 1 output, got %d", len(meta.Outputs))
 	}
 
-	if meta.Outputs[0].Kind != int(CommodityChannelIndexValue) {
-		t.Errorf("expected output kind %d, got %d", CommodityChannelIndexValue, meta.Outputs[0].Kind)
+	if meta.Outputs[0].Kind != int(Value) {
+		t.Errorf("expected output kind %d, got %d", Value, meta.Outputs[0].Kind)
 	}
 
-	if meta.Outputs[0].Type != outputs.ScalarType {
-		t.Errorf("expected scalar output type, got %v", meta.Outputs[0].Type)
+	if meta.Outputs[0].Shape != shape.Scalar {
+		t.Errorf("expected scalar output type, got %v", meta.Outputs[0].Shape)
 	}
 }
 

@@ -1,10 +1,10 @@
 import { } from 'jasmine';
 
 import { SuperSmoother } from './super-smoother';
-import { SuperSmootherParams } from './super-smoother-params';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
-import { SuperSmootherOutput } from './super-smoother-output';
+import { SuperSmootherParams } from './params';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
+import { SuperSmootherOutput } from './output';
 
 // Test data: first 500 rows from test_3-3_Supersmoother.csv
 // (Julia reference implementation, 10-period super smoother).
@@ -172,11 +172,11 @@ describe('SuperSmoother', () => {
     const ss = new SuperSmoother({ shortestCyclePeriod: 10 });
     const meta = ss.metadata();
 
-    expect(meta.type).toBe(IndicatorType.SuperSmoother);
+    expect(meta.identifier).toBe(IndicatorIdentifier.SuperSmoother);
     expect(meta.mnemonic).toBe('ss(10, hl/2)');
     expect(meta.description).toBe('Super Smoother ss(10, hl/2)');
     expect(meta.outputs.length).toBe(1);
     expect(meta.outputs[0].kind).toBe(SuperSmootherOutput.SuperSmootherValue);
-    expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+    expect(meta.outputs[0].shape).toBe(Shape.Scalar);
   });
 });

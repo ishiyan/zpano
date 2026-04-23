@@ -1,9 +1,9 @@
 import { } from 'jasmine';
 
 import { TripleExponentialMovingAverage } from './triple-exponential-moving-average';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
-import { TripleExponentialMovingAverageOutput } from './triple-exponential-moving-average-output';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
+import { TripleExponentialMovingAverageOutput } from './output';
 
 // ng test mb  --code-coverage --include='**/indicators/**/*.spec.ts'
 // ng test mb  --code-coverage --include='**/indicators/patrick-mulloy/triple-exponential-moving-average/*.spec.ts'
@@ -176,12 +176,12 @@ describe('TripleExponentialMovingAverage', () => {
     const tema = new TripleExponentialMovingAverage({length: 14, firstIsAverage: true});
     const meta = tema.metadata();
 
-    expect(meta.type).toBe(IndicatorType.TripleExponentialMovingAverage);
+    expect(meta.identifier).toBe(IndicatorIdentifier.TripleExponentialMovingAverage);
     expect(meta.mnemonic).toBe('tema(14)');
     expect(meta.description).toBe('Triple exponential moving average tema(14)');
     expect(meta.outputs.length).toBe(1);
     expect(meta.outputs[0].kind).toBe(TripleExponentialMovingAverageOutput.TripleExponentialMovingAverageValue);
-    expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+    expect(meta.outputs[0].shape).toBe(Shape.Scalar);
     expect(meta.outputs[0].mnemonic).toBe('tema(14)');
     expect(meta.outputs[0].description).toBe('Triple exponential moving average tema(14)');
   });

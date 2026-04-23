@@ -9,7 +9,7 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
+	"zpano/indicators/core/outputs/shape"
 )
 
 func testLinearRegressionTime() time.Time {
@@ -550,8 +550,8 @@ func TestLinearRegressionUpdate(t *testing.T) { //nolint: funlen
 		}
 
 		for i := 13; i < len(input); i++ {
-			val := linreg.Update(input[i])
-			check("Value", i, expValue[i], val)
+			value := linreg.Update(input[i])
+			check("Value", i, expValue[i], value)
 		}
 
 		checkNaN(0, linreg.Update(math.NaN()))
@@ -723,12 +723,12 @@ func TestLinearRegressionMetadata(t *testing.T) {
 	lr := testLinearRegressionCreate(14)
 	act := lr.Metadata()
 
-	check("Type", core.LinearRegression, act.Type)
+	check("Identifier", core.LinearRegression, act.Identifier)
 	check("Mnemonic", "linreg(14)", act.Mnemonic)
 	check("Description", "Linear Regression linreg(14)", act.Description)
 	check("len(Outputs)", 5, len(act.Outputs))
 	check("Outputs[0].Kind", int(Value), act.Outputs[0].Kind)
-	check("Outputs[0].Type", outputs.ScalarType, act.Outputs[0].Type)
+	check("Outputs[0].Shape", shape.Scalar, act.Outputs[0].Shape)
 	check("Outputs[1].Kind", int(Forecast), act.Outputs[1].Kind)
 	check("Outputs[2].Kind", int(Intercept), act.Outputs[2].Kind)
 	check("Outputs[3].Kind", int(SlopeRad), act.Outputs[3].Kind)

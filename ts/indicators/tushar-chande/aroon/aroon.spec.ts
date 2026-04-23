@@ -1,9 +1,9 @@
 import { } from 'jasmine';
 
 import { Aroon } from './aroon';
-import { AroonOutput } from './aroon-output';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
+import { AroonOutput } from './output';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
 
 // Standard HL test data (252 entries) from TA-Lib.
 const highs = [
@@ -356,11 +356,11 @@ describe('Aroon', () => {
     const ind = new Aroon({ length: 14 });
     const meta = ind.metadata();
 
-    expect(meta.type).toBe(IndicatorType.Aroon);
+    expect(meta.identifier).toBe(IndicatorIdentifier.Aroon);
     expect(meta.mnemonic).toBe('aroon(14)');
     expect(meta.outputs.length).toBe(3);
     expect(meta.outputs[0].kind).toBe(AroonOutput.Up);
-    expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+    expect(meta.outputs[0].shape).toBe(Shape.Scalar);
     expect(meta.outputs[1].kind).toBe(AroonOutput.Down);
     expect(meta.outputs[2].kind).toBe(AroonOutput.Osc);
   });

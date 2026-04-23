@@ -1,3 +1,4 @@
+import { buildMetadata } from '../../core/build-metadata';
 import { Bar } from '../../../entities/bar';
 import { BarComponent, barComponentValue } from '../../../entities/bar-component';
 import { Quote } from '../../../entities/quote';
@@ -8,11 +9,9 @@ import { DefaultTradeComponent, tradeComponentValue } from '../../../entities/tr
 import { Indicator } from '../../core/indicator';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
 import { IndicatorOutput } from '../../core/indicator-output';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { componentTripleMnemonic } from '../../core/component-triple-mnemonic';
-import { CenterOfGravityOscillatorParams } from './center-of-gravity-oscillator-params';
-import { CenterOfGravityOscillatorOutput } from './center-of-gravity-oscillator-output';
+import { CenterOfGravityOscillatorParams } from './params';
 
 /** __Center of Gravity Oscillator__ (Ehler's Center of Gravity oscillator, _COG_) is
  * described in Ehler's book "Cybernetic Analysis for Stocks and Futures" (2004).
@@ -100,25 +99,15 @@ export class CenterOfGravityOscillator implements Indicator {
 
   /** Describes a requested output data of an indicator. */
   public metadata(): IndicatorMetadata {
-    return {
-      type: IndicatorType.CenterOfGravityOscillator,
-      mnemonic: this.mnemonic,
-      description: this.description,
-      outputs: [
-        {
-          kind: CenterOfGravityOscillatorOutput.Value,
-          type: OutputType.Scalar,
-          mnemonic: this.mnemonic,
-          description: this.description,
-        },
-        {
-          kind: CenterOfGravityOscillatorOutput.Trigger,
-          type: OutputType.Scalar,
-          mnemonic: this.mnemonicTrig,
-          description: this.descriptionTrig,
-        },
+    return buildMetadata(
+      IndicatorIdentifier.CenterOfGravityOscillator,
+      this.mnemonic,
+      this.description,
+      [
+        { mnemonic: this.mnemonic, description: this.description },
+        { mnemonic: this.mnemonicTrig, description: this.descriptionTrig },
       ],
-    };
+    );
   }
 
   /** Updates an indicator given the next scalar sample. */

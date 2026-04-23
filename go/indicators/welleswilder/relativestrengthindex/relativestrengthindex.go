@@ -7,7 +7,6 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
 )
 
 // RelativeStrengthIndex is Welles Wilder's Relative Strength Index (RSI).
@@ -93,89 +92,84 @@ func NewRelativeStrengthIndex(p *RelativeStrengthIndexParams) (*RelativeStrength
 }
 
 // IsPrimed indicates whether an indicator is primed.
-func (r *RelativeStrengthIndex) IsPrimed() bool {
-	r.mu.RLock()
-	defer r.mu.RUnlock()
+func (s *RelativeStrengthIndex) IsPrimed() bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
-	return r.primed
+	return s.primed
 }
 
 // Metadata describes an output data of the indicator.
-func (r *RelativeStrengthIndex) Metadata() core.Metadata {
-	return core.Metadata{
-		Type:        core.RelativeStrengthIndex,
-		Mnemonic:    r.LineIndicator.Mnemonic,
-		Description: r.LineIndicator.Description,
-		Outputs: []outputs.Metadata{
-			{
-				Kind:        int(RelativeStrengthIndexValue),
-				Type:        outputs.ScalarType,
-				Mnemonic:    r.LineIndicator.Mnemonic,
-				Description: r.LineIndicator.Description,
-			},
+func (s *RelativeStrengthIndex) Metadata() core.Metadata {
+	return core.BuildMetadata(
+		core.RelativeStrengthIndex,
+		s.LineIndicator.Mnemonic,
+		s.LineIndicator.Description,
+		[]core.OutputText{
+			{Mnemonic: s.LineIndicator.Mnemonic, Description: s.LineIndicator.Description},
 		},
-	}
+	)
 }
 
 // Update updates the value of the indicator given the next sample.
-func (r *RelativeStrengthIndex) Update(sample float64) float64 {
+func (s *RelativeStrengthIndex) Update(sample float64) float64 {
 	const epsilon = 1e-8
 
 	if math.IsNaN(sample) {
 		return sample
 	}
 
-	r.mu.Lock()
-	defer r.mu.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
-	r.count++
+	s.count++
 
-	if r.count == 0 {
-		r.previousSample = sample
+	if s.count == 0 {
+		s.previousSample = sample
 
-		return r.value
+		return s.value
 	}
 
-	temp := sample - r.previousSample
-	r.previousSample = sample
+	temp := sample - s.previousSample
+	s.previousSample = sample
 
-	if !r.primed {
+	if !s.primed {
 		// Accumulation phase: count 1..length-1.
 		if temp < 0 {
-			r.previousLoss -= temp
+			s.previousLoss -= temp
 		} else {
-			r.previousGain += temp
+			s.previousGain += temp
 		}
 
-		if r.count < r.length {
-			return r.value
+		if s.count < s.length {
+			return s.value
 		}
 
 		// Priming: count == length.
-		r.previousGain /= float64(r.length)
-		r.previousLoss /= float64(r.length)
-		r.primed = true
+		s.previousGain /= float64(s.length)
+		s.previousLoss /= float64(s.length)
+		s.primed = true
 	} else {
 		// Wilder's smoothing.
-		r.previousGain *= float64(r.length - 1)
-		r.previousLoss *= float64(r.length - 1)
+		s.previousGain *= float64(s.length - 1)
+		s.previousLoss *= float64(s.length - 1)
 
 		if temp < 0 {
-			r.previousLoss -= temp
+			s.previousLoss -= temp
 		} else {
-			r.previousGain += temp
+			s.previousGain += temp
 		}
 
-		r.previousGain /= float64(r.length)
-		r.previousLoss /= float64(r.length)
+		s.previousGain /= float64(s.length)
+		s.previousLoss /= float64(s.length)
 	}
 
-	sum := r.previousGain + r.previousLoss
+	sum := s.previousGain + s.previousLoss
 	if sum > epsilon {
-		r.value = 100 * r.previousGain / sum
+		s.value = 100 * s.previousGain / sum
 	} else {
-		r.value = 0
+		s.value = 0
 	}
 
-	return r.value
+	return s.value
 }

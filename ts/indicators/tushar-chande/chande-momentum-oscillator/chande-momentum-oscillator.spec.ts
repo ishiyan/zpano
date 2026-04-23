@@ -1,9 +1,9 @@
 import { } from 'jasmine';
 
 import { ChandeMomentumOscillator } from './chande-momentum-oscillator';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
-import { ChandeMomentumOscillatorOutput } from './chande-momentum-oscillator-output';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
+import { ChandeMomentumOscillatorOutput } from './output';
 import { BarComponent } from '../../../entities/bar-component';
 import { QuoteComponent } from '../../../entities/quote-component';
 import { TradeComponent } from '../../../entities/trade-component';
@@ -86,12 +86,12 @@ describe('ChandeMomentumOscillator', () => {
     const cmo = new ChandeMomentumOscillator({length: 5});
     const meta = cmo.metadata();
 
-    expect(meta.type).toBe(IndicatorType.ChandeMomentumOscillator);
+    expect(meta.identifier).toBe(IndicatorIdentifier.ChandeMomentumOscillator);
     expect(meta.mnemonic).toBe('cmo(5)');
     expect(meta.description).toBe('Chande Momentum Oscillator cmo(5)');
     expect(meta.outputs.length).toBe(1);
     expect(meta.outputs[0].kind).toBe(ChandeMomentumOscillatorOutput.ChandeMomentumOscillatorValue);
-    expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+    expect(meta.outputs[0].shape).toBe(Shape.Scalar);
     expect(meta.outputs[0].mnemonic).toBe('cmo(5)');
     expect(meta.outputs[0].description).toBe('Chande Momentum Oscillator cmo(5)');
   });

@@ -26,6 +26,45 @@ patterns (file layout, registration, output enums, metadata, etc.) in detail.
 6. [Priming and NaN Count Calculation](#priming-and-nan-count-calculation)
 7. [Test Strategy for TaLib Indicators](#test-strategy-for-talib-indicators)
 8. [Worked Example: ADXR](#worked-example-adxr)
+9. [Naming & Style Conventions](#naming--style-conventions)
+
+---
+
+## Naming & Style Conventions
+
+All identifier, receiver, concurrency, style, and cross-language parity
+rules are defined in the **`indicator-architecture`** skill and MUST be
+followed during conversion. Summary (see that skill for the full tables
+and rationale):
+
+- **Abbreviations banned in identifiers** — always expand: `idx→index`,
+  `tmp→temp`, `res→result`, `sig→signal`, `val→value`, `prev→previous`,
+  `avg→average`, `mult→multiplier`, `buf→buffer`, `param→parameter`,
+  `hist→histogram`.
+- **TA-Lib–specific exception:** the C-source prefix conventions
+  **`beg`** and **`out`** (as in `begIdx`, `outIdx`, `outReal`,
+  `outBegIdx`, `outNbElement`) are **retained** — but the `Idx` part
+  is normalized to `Index` (`begIdx` → `begIndex`, `outIdx` →
+  `outIndex`). This keeps cross-reference with the TA-Lib C source
+  straightforward while obeying the `idx→index` rule.
+- **Go receivers** — compound type name → `s`; simple name →
+  first-letter lowercased. All methods on a type use the same
+  receiver. If a local would shadow `s`, rename the local to `str`.
+- **Concurrency** — stateful public indicators MUST carry `mu
+  sync.RWMutex`; writers `s.mu.Lock(); defer s.mu.Unlock()`, readers
+  `s.mu.RLock(); defer s.mu.RUnlock()`.
+- **Go style invariants** — no `var x T = zero`, no split var-then-
+  assign; use `any`; no bare `make([]T, 0)`; grouped imports; every
+  exported symbol has a doc comment.
+- **Go ↔ TS local-variable parity** — same concept = same name in
+  both languages. Canonical: `sum`, `epsilon`, `temp`/`diff`,
+  `stddev`, `spread`, `amount`, `lengthMinOne`; loop counter
+  `i`/`j`/`k`.
+
+When porting a TA-Lib algorithm, keep the `beg*`/`out*` variable
+**prefixes** for direct comparability with the C source, but
+normalize `Idx` → `Index` and expand any other banned abbreviations
+(`tmp`, `prev`, `sig`, `val`, etc.) encountered in the C source.
 
 ---
 
@@ -336,22 +375,28 @@ The computed values were validated against all 4 TaLib spot checks within 1e-4 t
 
 ### Files Produced
 
-**Go (5 files):**
-- `averagedirectionalmovementindexratingparams.go` — `Params` struct with `Length`
-- `averagedirectionalmovementindexratingoutput.go` — 9-value `Output` enum
-- `averagedirectionalmovementindexratingoutput_test.go` — Table-driven output enum tests
+**Go (5 files, in `averagedirectionalmovementindexrating/` package):**
+- `params.go` — `Params` struct with `Length`
+- `output.go` — 9-value `Output` enum
+- `output_test.go` — Table-driven output enum tests
 - `averagedirectionalmovementindexrating.go` — Implementation with ADX composition + circular buffer
 - `averagedirectionalmovementindexrating_test.go` — Full 252-entry tests + spot checks
 
-**TS (4 files):**
-- `average-directional-movement-index-rating-params.ts` — Params interface
-- `average-directional-movement-index-rating-output.ts` — 9-value output enum
+**TS (4 files, in `average-directional-movement-index-rating/` folder):**
+- `params.ts` — Params interface
+- `output.ts` — 9-value output enum
 - `average-directional-movement-index-rating.ts` — Implementation
 - `average-directional-movement-index-rating.spec.ts` — Full tests + spot checks
 
 ### Registration
 
-- Go: Added `AverageDirectionalMovementIndexRating` to `go/indicators/core/type.go`
+- Go: Added `AverageDirectionalMovementIndexRating` to `go/indicators/core/identifier.go`
   (enum constant, string, String(), MarshalJSON, UnmarshalJSON) and all 4 test tables
-  in `type_test.go`
-- TS: Added `AverageDirectionalMovementIndexRating` to `ts/indicators/core/indicator-type.ts`
+  in `identifier_test.go`. Registered a descriptor row in `go/indicators/core/descriptors.go`
+  (taxonomy dimensions + per-output `Kind`/`Shape`); `Metadata()` calls `core.BuildMetadata(...)`.
+- TS: Added `AverageDirectionalMovementIndexRating` to
+  `ts/indicators/core/indicator-identifier.ts`. Registered the matching descriptor row in
+  `ts/indicators/core/descriptors.ts`; `metadata()` calls `buildMetadata(...)`.
+
+See `.opencode/skills/indicator-architecture/SKILL.md` section "Taxonomy & Descriptor
+Registry" for descriptor-row guidance and field meanings.

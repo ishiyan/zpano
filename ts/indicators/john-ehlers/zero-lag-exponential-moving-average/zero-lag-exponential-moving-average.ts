@@ -1,10 +1,9 @@
+import { buildMetadata } from '../../core/build-metadata';
 import { componentTripleMnemonic } from '../../core/component-triple-mnemonic';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
-import { IndicatorType } from '../../core/indicator-type';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { LineIndicator } from '../../core/line-indicator';
-import { OutputType } from '../../core/outputs/output-type';
-import { ZeroLagExponentialMovingAverageOutput } from './zero-lag-exponential-moving-average-output';
-import { ZeroLagExponentialMovingAverageParams } from './zero-lag-exponential-moving-average-params';
+import { ZeroLagExponentialMovingAverageParams } from './params';
 
 /** Function to calculate mnemonic of a __ZeroLagExponentialMovingAverage__ indicator. */
 export const zeroLagExponentialMovingAverageMnemonic = (params: ZeroLagExponentialMovingAverageParams): string => {
@@ -24,7 +23,7 @@ export const zeroLagExponentialMovingAverageMnemonic = (params: ZeroLagExponenti
  * ZeroLagExponentialMovingAverage (Ehler's ZEMA) is described in Ehler's book
  * "Rocket Science for Traders" (2001).
  *
- * ZEMA = alpha*(Price + gainFactor*(Price - Price[momentumLength ago])) + (1 - alpha)*ZEMA[prev]
+ * ZEMA = alpha*(Price + gainFactor*(Price - Price[momentumLength ago])) + (1 - alpha)*ZEMA[previous]
  *
  * The indicator is not primed during the first VelocityMomentumLength updates.
  *
@@ -75,17 +74,14 @@ export class ZeroLagExponentialMovingAverage extends LineIndicator {
 
   /** Describes the output data of the indicator. */
   public metadata(): IndicatorMetadata {
-    return {
-      type: IndicatorType.ZeroLagExponentialMovingAverage,
-      mnemonic: this.mnemonic,
-      description: this.description,
-      outputs: [{
-        kind: ZeroLagExponentialMovingAverageOutput.ZeroLagExponentialMovingAverageValue,
-        type: OutputType.Scalar,
-        mnemonic: this.mnemonic,
-        description: this.description,
-      }],
-    };
+    return buildMetadata(
+      IndicatorIdentifier.ZeroLagExponentialMovingAverage,
+      this.mnemonic,
+      this.description,
+      [
+        { mnemonic: this.mnemonic, description: this.description },
+      ],
+    );
   }
 
   /** Updates the value of the indicator given the next sample. */

@@ -1,10 +1,9 @@
+import { buildMetadata } from '../../core/build-metadata';
 import { componentTripleMnemonic } from '../../core/component-triple-mnemonic';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
-import { IndicatorType } from '../../core/indicator-type';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { LineIndicator } from '../../core/line-indicator';
-import { OutputType } from '../../core/outputs/output-type';
-import { RateOfChangeRatioOutput } from './rate-of-change-ratio-output';
-import { RateOfChangeRatioParams } from './rate-of-change-ratio-params';
+import { RateOfChangeRatioParams } from './params';
 
 /**
  * __Rate of Change Ratio__ (__ROCR__) is the ratio of today's sample to the sample ℓ periods ago.
@@ -54,17 +53,14 @@ export class RateOfChangeRatio extends LineIndicator {
 
   /** Describes the output data of the indicator. */
   public metadata(): IndicatorMetadata {
-    return {
-      type: IndicatorType.RateOfChangeRatio,
-      mnemonic: this.mnemonic,
-      description: this.description,
-      outputs: [{
-        kind: RateOfChangeRatioOutput.RateOfChangeRatioValue,
-        type: OutputType.Scalar,
-        mnemonic: this.mnemonic,
-        description: this.description,
-      }],
-    };
+    return buildMetadata(
+      IndicatorIdentifier.RateOfChangeRatio,
+      this.mnemonic,
+      this.description,
+      [
+        { mnemonic: this.mnemonic, description: this.description },
+      ],
+    );
   }
 
   /** Updates the value of the rate of change ratio given the next sample. */

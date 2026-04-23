@@ -1,9 +1,9 @@
 import { } from 'jasmine';
 
 import { OnBalanceVolume } from './on-balance-volume';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
-import { OnBalanceVolumeOutput } from './on-balance-volume-output';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
+import { OnBalanceVolumeOutput } from './output';
 
 // C# test data: 12 entries.
 const prices = [1, 2, 8, 4, 9, 6, 7, 13, 9, 10, 3, 12];
@@ -51,12 +51,12 @@ describe('OnBalanceVolume', () => {
     const obv = new OnBalanceVolume();
     const meta = obv.metadata();
 
-    expect(meta.type).toBe(IndicatorType.OnBalanceVolume);
+    expect(meta.identifier).toBe(IndicatorIdentifier.OnBalanceVolume);
     expect(meta.mnemonic).toBe('obv');
     expect(meta.description).toBe('On-Balance Volume OBV');
     expect(meta.outputs.length).toBe(1);
     expect(meta.outputs[0].kind).toBe(OnBalanceVolumeOutput.OnBalanceVolumeValue);
-    expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+    expect(meta.outputs[0].shape).toBe(Shape.Scalar);
   });
 
   it('should not change value when prices are equal', () => {

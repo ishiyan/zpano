@@ -7,7 +7,6 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
 )
 
 // MoneyFlowIndex is Gene Quong's Money Flow Index (MFI).
@@ -89,7 +88,7 @@ func NewMoneyFlowIndex(p *MoneyFlowIndexParams) (*MoneyFlowIndex, error) {
 		return nil, fmt.Errorf(fmtw, invalid, err)
 	}
 
-	mnemonic := fmt.Sprintf("mfi(%d)", p.Length)
+	mnemonic := fmt.Sprintf("mfi(%d%s)", p.Length, core.ComponentTripleMnemonic(bc, qc, tc))
 	desc := "Money Flow Index " + mnemonic
 
 	m := &MoneyFlowIndex{
@@ -107,131 +106,126 @@ func NewMoneyFlowIndex(p *MoneyFlowIndexParams) (*MoneyFlowIndex, error) {
 }
 
 // IsPrimed indicates whether the indicator is primed.
-func (m *MoneyFlowIndex) IsPrimed() bool {
-	m.mu.RLock()
-	defer m.mu.RUnlock()
+func (s *MoneyFlowIndex) IsPrimed() bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
-	return m.primed
+	return s.primed
 }
 
 // Metadata describes the output data of the indicator.
-func (m *MoneyFlowIndex) Metadata() core.Metadata {
-	return core.Metadata{
-		Type:        core.MoneyFlowIndex,
-		Mnemonic:    m.LineIndicator.Mnemonic,
-		Description: m.LineIndicator.Description,
-		Outputs: []outputs.Metadata{
-			{
-				Kind:        int(MoneyFlowIndexValue),
-				Type:        outputs.ScalarType,
-				Mnemonic:    m.LineIndicator.Mnemonic,
-				Description: m.LineIndicator.Description,
-			},
+func (s *MoneyFlowIndex) Metadata() core.Metadata {
+	return core.BuildMetadata(
+		core.MoneyFlowIndex,
+		s.LineIndicator.Mnemonic,
+		s.LineIndicator.Description,
+		[]core.OutputText{
+			{Mnemonic: s.LineIndicator.Mnemonic, Description: s.LineIndicator.Description},
 		},
-	}
+	)
 }
 
 // Update updates the indicator with the given sample using volume = 1.
 // This satisfies the LineIndicator updateFn signature.
-func (m *MoneyFlowIndex) Update(sample float64) float64 {
-	return m.UpdateWithVolume(sample, 1)
+func (s *MoneyFlowIndex) Update(sample float64) float64 {
+	return s.UpdateWithVolume(sample, 1)
 }
 
 // UpdateWithVolume updates the indicator with the given sample and volume.
-func (m *MoneyFlowIndex) UpdateWithVolume(sample, volume float64) float64 {
+func (s *MoneyFlowIndex) UpdateWithVolume(sample, volume float64) float64 {
 	if math.IsNaN(sample) || math.IsNaN(volume) {
 		return math.NaN()
 	}
 
-	m.mu.Lock()
-	defer m.mu.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
-	lengthMinOne := m.length - 1
+	lengthMinOne := s.length - 1
 
-	if m.primed {
-		m.negativeSum -= m.negativeBuffer[m.bufferLowIndex]
-		m.positiveSum -= m.positiveBuffer[m.bufferLowIndex]
+	if s.primed {
+		s.negativeSum -= s.negativeBuffer[s.bufferLowIndex]
+		s.positiveSum -= s.positiveBuffer[s.bufferLowIndex]
 
 		amount := sample * volume
-		diff := sample - m.previousSample
+		diff := sample - s.previousSample
 
 		if diff < 0 {
-			m.negativeBuffer[m.bufferIndex] = amount
-			m.positiveBuffer[m.bufferIndex] = 0
-			m.negativeSum += amount
+			s.negativeBuffer[s.bufferIndex] = amount
+			s.positiveBuffer[s.bufferIndex] = 0
+			s.negativeSum += amount
 		} else if diff > 0 {
-			m.negativeBuffer[m.bufferIndex] = 0
-			m.positiveBuffer[m.bufferIndex] = amount
-			m.positiveSum += amount
+			s.negativeBuffer[s.bufferIndex] = 0
+			s.positiveBuffer[s.bufferIndex] = amount
+			s.positiveSum += amount
 		} else {
-			m.negativeBuffer[m.bufferIndex] = 0
-			m.positiveBuffer[m.bufferIndex] = 0
+			s.negativeBuffer[s.bufferIndex] = 0
+			s.positiveBuffer[s.bufferIndex] = 0
 		}
 
-		sum := m.positiveSum + m.negativeSum
+		sum := s.positiveSum + s.negativeSum
 		if sum < 1 {
-			m.value = 0
+			s.value = 0
 		} else {
-			m.value = 100 * m.positiveSum / sum
+			s.value = 100 * s.positiveSum / sum
 		}
 
-		m.bufferIndex++
-		if m.bufferIndex > lengthMinOne {
-			m.bufferIndex = 0
+		s.bufferIndex++
+		if s.bufferIndex > lengthMinOne {
+			s.bufferIndex = 0
 		}
 
-		m.bufferLowIndex++
-		if m.bufferLowIndex > lengthMinOne {
-			m.bufferLowIndex = 0
+		s.bufferLowIndex++
+		if s.bufferLowIndex > lengthMinOne {
+			s.bufferLowIndex = 0
 		}
-	} else if m.bufferCount == 0 {
-		m.bufferCount++
+	} else if s.bufferCount == 0 {
+		s.bufferCount++
 	} else {
 		amount := sample * volume
-		diff := sample - m.previousSample
+		diff := sample - s.previousSample
 
 		if diff < 0 {
-			m.negativeBuffer[m.bufferIndex] = amount
-			m.positiveBuffer[m.bufferIndex] = 0
-			m.negativeSum += amount
+			s.negativeBuffer[s.bufferIndex] = amount
+			s.positiveBuffer[s.bufferIndex] = 0
+			s.negativeSum += amount
 		} else if diff > 0 {
-			m.negativeBuffer[m.bufferIndex] = 0
-			m.positiveBuffer[m.bufferIndex] = amount
-			m.positiveSum += amount
+			s.negativeBuffer[s.bufferIndex] = 0
+			s.positiveBuffer[s.bufferIndex] = amount
+			s.positiveSum += amount
 		} else {
-			m.negativeBuffer[m.bufferIndex] = 0
-			m.positiveBuffer[m.bufferIndex] = 0
+			s.negativeBuffer[s.bufferIndex] = 0
+			s.positiveBuffer[s.bufferIndex] = 0
 		}
 
-		if m.length == m.bufferCount {
-			sum := m.positiveSum + m.negativeSum
+		if s.length == s.bufferCount {
+			sum := s.positiveSum + s.negativeSum
 			if sum < 1 {
-				m.value = 0
+				s.value = 0
 			} else {
-				m.value = 100 * m.positiveSum / sum
+				s.value = 100 * s.positiveSum / sum
 			}
 
-			m.primed = true
+			s.primed = true
 		}
 
-		m.bufferIndex++
-		if m.bufferIndex > lengthMinOne {
-			m.bufferIndex = 0
+		s.bufferIndex++
+		if s.bufferIndex > lengthMinOne {
+			s.bufferIndex = 0
 		}
 
-		m.bufferCount++
+		s.bufferCount++
 	}
 
-	m.previousSample = sample
+	s.previousSample = sample
 
-	return m.value
+	return s.value
 }
 
 // UpdateBar updates the indicator given the next bar sample.
 // This shadows LineIndicator.UpdateBar to use bar volume.
-func (m *MoneyFlowIndex) UpdateBar(sample *entities.Bar) core.Output {
-	price := m.barFunc(sample)
-	value := m.UpdateWithVolume(price, sample.Volume)
+func (s *MoneyFlowIndex) UpdateBar(sample *entities.Bar) core.Output {
+	price := s.barFunc(sample)
+	value := s.UpdateWithVolume(price, sample.Volume)
 
 	output := make([]any, 1)
 	output[0] = entities.Scalar{Time: sample.Time, Value: value}

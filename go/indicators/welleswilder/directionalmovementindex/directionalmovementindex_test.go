@@ -9,7 +9,7 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
+	"zpano/indicators/core/outputs/shape"
 )
 
 // TA-Lib test data (252 entries), extracted programmatically from DirectionalMovementIndexTest.cs.
@@ -336,24 +336,24 @@ func TestDirectionalMovementIndexMetadata(t *testing.T) {
 		}
 	}
 
-	check("Type", core.DirectionalMovementIndex, act.Type)
+	check("Identifier", core.DirectionalMovementIndex, act.Identifier)
 	check("Mnemonic", "dx", act.Mnemonic)
 	check("Description", "Directional Movement Index", act.Description)
 	check("len(Outputs)", 7, len(act.Outputs))
-	check("Outputs[0].Kind", int(DirectionalMovementIndexValue), act.Outputs[0].Kind)
-	check("Outputs[0].Type", outputs.ScalarType, act.Outputs[0].Type)
+	check("Outputs[0].Kind", int(Value), act.Outputs[0].Kind)
+	check("Outputs[0].Shape", shape.Scalar, act.Outputs[0].Shape)
 	check("Outputs[0].Mnemonic", "dx", act.Outputs[0].Mnemonic)
 	check("Outputs[0].Description", "Directional Movement Index", act.Outputs[0].Description)
-	check("Outputs[1].Kind", int(DirectionalIndicatorPlusValue), act.Outputs[1].Kind)
-	check("Outputs[1].Type", outputs.ScalarType, act.Outputs[1].Type)
-	check("Outputs[2].Kind", int(DirectionalIndicatorMinusValue), act.Outputs[2].Kind)
-	check("Outputs[2].Type", outputs.ScalarType, act.Outputs[2].Type)
-	check("Outputs[3].Kind", int(DirectionalMovementPlusValue), act.Outputs[3].Kind)
-	check("Outputs[3].Type", outputs.ScalarType, act.Outputs[3].Type)
-	check("Outputs[4].Kind", int(DirectionalMovementMinusValue), act.Outputs[4].Kind)
-	check("Outputs[4].Type", outputs.ScalarType, act.Outputs[4].Type)
-	check("Outputs[5].Kind", int(AverageTrueRangeValue), act.Outputs[5].Kind)
-	check("Outputs[5].Type", outputs.ScalarType, act.Outputs[5].Type)
-	check("Outputs[6].Kind", int(TrueRangeValue), act.Outputs[6].Kind)
-	check("Outputs[6].Type", outputs.ScalarType, act.Outputs[6].Type)
+	check("Outputs[1].Kind", int(DirectionalIndicatorPlus), act.Outputs[1].Kind)
+	check("Outputs[1].Shape", shape.Scalar, act.Outputs[1].Shape)
+	check("Outputs[2].Kind", int(DirectionalIndicatorMinus), act.Outputs[2].Kind)
+	check("Outputs[2].Shape", shape.Scalar, act.Outputs[2].Shape)
+	check("Outputs[3].Kind", int(DirectionalMovementPlus), act.Outputs[3].Kind)
+	check("Outputs[3].Shape", shape.Scalar, act.Outputs[3].Shape)
+	check("Outputs[4].Kind", int(DirectionalMovementMinus), act.Outputs[4].Kind)
+	check("Outputs[4].Shape", shape.Scalar, act.Outputs[4].Shape)
+	check("Outputs[5].Kind", int(AverageTrueRange), act.Outputs[5].Kind)
+	check("Outputs[5].Shape", shape.Scalar, act.Outputs[5].Shape)
+	check("Outputs[6].Kind", int(TrueRange), act.Outputs[6].Kind)
+	check("Outputs[6].Shape", shape.Scalar, act.Outputs[6].Shape)
 }

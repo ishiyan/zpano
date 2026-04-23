@@ -9,7 +9,7 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
+	"zpano/indicators/core/outputs/shape"
 )
 
 //nolint:lll
@@ -19,13 +19,13 @@ import (
 // Output data, length=14.
 // Taken from TA-Lib (http://ta-lib.org/) tests, test_mom.c.
 //
-// ROCR TEST (price/prevPrice):
+// ROCR TEST (price/previousPrice):
 // { 1, TA_ROCR_TEST, 0, 251, 14, TA_SUCCESS,      0, 0.994536,  14,  252-14 }, /* First Value */
 // { 0, TA_ROCR_TEST, 0, 251, 14, TA_SUCCESS,      1, 0.978906,  14,  252-14 },
 // { 0, TA_ROCR_TEST, 0, 251, 14, TA_SUCCESS,      2, 0.944689,  14,  252-14 },
 // { 0, TA_ROCR_TEST, 0, 251, 14, TA_SUCCESS, 252-15, 0.989633,  14,  252-14 }, /* Last Value */
 //
-// ROCR100 TEST (price/prevPrice)*100:
+// ROCR100 TEST (price/previousPrice)*100:
 // { 1, TA_ROCR100_TEST, 0, 251, 14, TA_SUCCESS,      0, 99.4536,  14,  252-14 }, /* First Value */
 // { 0, TA_ROCR100_TEST, 0, 251, 14, TA_SUCCESS,      1, 97.8906,  14,  252-14 },
 // { 0, TA_ROCR100_TEST, 0, 251, 14, TA_SUCCESS,      2, 94.4689,  14,  252-14 },
@@ -362,12 +362,12 @@ func TestRateOfChangeRatioMetadata(t *testing.T) {
 		rocr := testRateOfChangeRatioCreate(5, false)
 		act := rocr.Metadata()
 
-		check("Type", core.RateOfChangeRatio, act.Type)
+		check("Identifier", core.RateOfChangeRatio, act.Identifier)
 		check("Mnemonic", "rocr(5)", act.Mnemonic)
 		check("Description", "Rate of Change Ratio rocr(5)", act.Description)
 		check("len(Outputs)", 1, len(act.Outputs))
 		check("Outputs[0].Kind", int(Value), act.Outputs[0].Kind)
-		check("Outputs[0].Type", outputs.ScalarType, act.Outputs[0].Type)
+		check("Outputs[0].Shape", shape.Scalar, act.Outputs[0].Shape)
 		check("Outputs[0].Mnemonic", "rocr(5)", act.Outputs[0].Mnemonic)
 		check("Outputs[0].Description", "Rate of Change Ratio rocr(5)", act.Outputs[0].Description)
 	})
@@ -377,12 +377,12 @@ func TestRateOfChangeRatioMetadata(t *testing.T) {
 		rocr100 := testRateOfChangeRatioCreate(5, true)
 		act := rocr100.Metadata()
 
-		check("Type", core.RateOfChangeRatio, act.Type)
+		check("Identifier", core.RateOfChangeRatio, act.Identifier)
 		check("Mnemonic", "rocr100(5)", act.Mnemonic)
 		check("Description", "Rate of Change Ratio 100 Scale rocr100(5)", act.Description)
 		check("len(Outputs)", 1, len(act.Outputs))
 		check("Outputs[0].Kind", int(Value), act.Outputs[0].Kind)
-		check("Outputs[0].Type", outputs.ScalarType, act.Outputs[0].Type)
+		check("Outputs[0].Shape", shape.Scalar, act.Outputs[0].Shape)
 		check("Outputs[0].Mnemonic", "rocr100(5)", act.Outputs[0].Mnemonic)
 		check("Outputs[0].Description", "Rate of Change Ratio 100 Scale rocr100(5)", act.Outputs[0].Description)
 	})

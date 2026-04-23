@@ -1,9 +1,9 @@
 import { } from 'jasmine';
 
 import { ParabolicStopAndReverse } from './parabolic-stop-and-reverse';
-import { ParabolicStopAndReverseOutput } from './parabolic-stop-and-reverse-output';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
+import { ParabolicStopAndReverseOutput } from './output';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
 
 // High test data, 252 entries. Standard TA-Lib test dataset.
 const testHighs = [
@@ -166,15 +166,15 @@ describe('ParabolicStopAndReverse', () => {
 
     // Wilder spot checks (TA_SAR, absolute values). Output[0] = results[1].
     const spotChecks = [
-      { outIdx: 0, expected: 50.00 },
-      { outIdx: 1, expected: 50.047 },
-      { outIdx: 4, expected: 50.182 },
-      { outIdx: 35, expected: 52.93 },
-      { outIdx: 36, expected: 50.00 },
+      { outIndex: 0, expected: 50.00 },
+      { outIndex: 1, expected: 50.047 },
+      { outIndex: 4, expected: 50.182 },
+      { outIndex: 35, expected: 52.93 },
+      { outIndex: 36, expected: 50.00 },
     ];
 
     for (const sc of spotChecks) {
-      const actual = Math.abs(results[sc.outIdx + 1]); // +1 because results[0] = NaN
+      const actual = Math.abs(results[sc.outIndex + 1]); // +1 because results[0] = NaN
       expect(Math.abs(actual - sc.expected)).toBeLessThan(tol);
     }
   });
@@ -193,12 +193,12 @@ describe('ParabolicStopAndReverse', () => {
     const sar = new ParabolicStopAndReverse();
     const meta = sar.metadata();
 
-    expect(meta.type).toBe(IndicatorType.ParabolicStopAndReverse);
+    expect(meta.identifier).toBe(IndicatorIdentifier.ParabolicStopAndReverse);
     expect(meta.mnemonic).toBe('sar()');
     expect(meta.description).toBe('Parabolic Stop And Reverse sar()');
     expect(meta.outputs.length).toBe(1);
     expect(meta.outputs[0].kind).toBe(ParabolicStopAndReverseOutput.ParabolicStopAndReverseValue);
-    expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+    expect(meta.outputs[0].shape).toBe(Shape.Scalar);
   });
 
   it('should pass NaN through', () => {

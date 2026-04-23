@@ -1,9 +1,9 @@
 import { } from 'jasmine';
 
 import { KaufmanAdaptiveMovingAverage } from './kaufman-adaptive-moving-average';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
-import { KaufmanAdaptiveMovingAverageOutput } from './kaufman-adaptive-moving-average-output';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
+import { KaufmanAdaptiveMovingAverageOutput } from './output';
 
 /* eslint-disable max-len */
 // Input data is taken from the TA-Lib (http://ta-lib.org/) tests,
@@ -165,12 +165,12 @@ describe('KaufmanAdaptiveMovingAverage', () => {
     const kama = new KaufmanAdaptiveMovingAverage({ efficiencyRatioLength: 10, fastestLength: 2, slowestLength: 30 });
     const meta = kama.metadata();
 
-    expect(meta.type).toBe(IndicatorType.KaufmanAdaptiveMovingAverage);
+    expect(meta.identifier).toBe(IndicatorIdentifier.KaufmanAdaptiveMovingAverage);
     expect(meta.mnemonic).toBe('kama(10, 2, 30)');
     expect(meta.description).toBe('Kaufman adaptive moving average kama(10, 2, 30)');
     expect(meta.outputs.length).toBe(1);
     expect(meta.outputs[0].kind).toBe(KaufmanAdaptiveMovingAverageOutput.KaufmanAdaptiveMovingAverageValue);
-    expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+    expect(meta.outputs[0].shape).toBe(Shape.Scalar);
     expect(meta.outputs[0].mnemonic).toBe('kama(10, 2, 30)');
     expect(meta.outputs[0].description).toBe('Kaufman adaptive moving average kama(10, 2, 30)');
   });

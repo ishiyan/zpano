@@ -1,3 +1,4 @@
+import { buildMetadata } from '../../core/build-metadata';
 import { Bar } from '../../../entities/bar';
 import { Quote } from '../../../entities/quote';
 import { Scalar } from '../../../entities/scalar';
@@ -5,11 +6,8 @@ import { Trade } from '../../../entities/trade';
 import { Indicator } from '../../core/indicator';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
 import { IndicatorOutput } from '../../core/indicator-output';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputMetadata } from '../../core/outputs/output-metadata';
-import { OutputType } from '../../core/outputs/output-type';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { AverageDirectionalMovementIndex } from '../average-directional-movement-index/average-directional-movement-index';
-import { AverageDirectionalMovementIndexRatingOutput } from './average-directional-movement-index-rating-output';
 
 const adxrMnemonic = 'adxr';
 const adxrDescription = 'Average Directional Movement Index Rating';
@@ -58,69 +56,22 @@ export class AverageDirectionalMovementIndexRating implements Indicator {
 
   /** Describes the output data of the indicator. */
   public metadata(): IndicatorMetadata {
-    const outputs: OutputMetadata[] = [
-      {
-        kind: AverageDirectionalMovementIndexRatingOutput.AverageDirectionalMovementIndexRatingValue,
-        type: OutputType.Scalar,
-        mnemonic: adxrMnemonic,
-        description: adxrDescription,
-      },
-      {
-        kind: AverageDirectionalMovementIndexRatingOutput.AverageDirectionalMovementIndexValue,
-        type: OutputType.Scalar,
-        mnemonic: 'adx',
-        description: 'Average Directional Movement Index',
-      },
-      {
-        kind: AverageDirectionalMovementIndexRatingOutput.DirectionalMovementIndexValue,
-        type: OutputType.Scalar,
-        mnemonic: 'dx',
-        description: 'Directional Movement Index',
-      },
-      {
-        kind: AverageDirectionalMovementIndexRatingOutput.DirectionalIndicatorPlusValue,
-        type: OutputType.Scalar,
-        mnemonic: '+di',
-        description: 'Directional Indicator Plus',
-      },
-      {
-        kind: AverageDirectionalMovementIndexRatingOutput.DirectionalIndicatorMinusValue,
-        type: OutputType.Scalar,
-        mnemonic: '-di',
-        description: 'Directional Indicator Minus',
-      },
-      {
-        kind: AverageDirectionalMovementIndexRatingOutput.DirectionalMovementPlusValue,
-        type: OutputType.Scalar,
-        mnemonic: '+dm',
-        description: 'Directional Movement Plus',
-      },
-      {
-        kind: AverageDirectionalMovementIndexRatingOutput.DirectionalMovementMinusValue,
-        type: OutputType.Scalar,
-        mnemonic: '-dm',
-        description: 'Directional Movement Minus',
-      },
-      {
-        kind: AverageDirectionalMovementIndexRatingOutput.AverageTrueRangeValue,
-        type: OutputType.Scalar,
-        mnemonic: 'atr',
-        description: 'Average True Range',
-      },
-      {
-        kind: AverageDirectionalMovementIndexRatingOutput.TrueRangeValue,
-        type: OutputType.Scalar,
-        mnemonic: 'tr',
-        description: 'True Range',
-      },
-    ];
-
-    return {
-      type: IndicatorType.AverageDirectionalMovementIndexRating,
-      mnemonic: adxrMnemonic,
-      description: adxrDescription,
-      outputs,
-    };
+    return buildMetadata(
+      IndicatorIdentifier.AverageDirectionalMovementIndexRating,
+      adxrMnemonic,
+      adxrDescription,
+      [
+        { mnemonic: adxrMnemonic, description: adxrDescription },
+        { mnemonic: 'adx', description: 'Average Directional Movement Index' },
+        { mnemonic: 'dx', description: 'Directional Movement Index' },
+        { mnemonic: '+di', description: 'Directional Indicator Plus' },
+        { mnemonic: '-di', description: 'Directional Indicator Minus' },
+        { mnemonic: '+dm', description: 'Directional Movement Plus' },
+        { mnemonic: '-dm', description: 'Directional Movement Minus' },
+        { mnemonic: 'atr', description: 'Average True Range' },
+        { mnemonic: 'tr', description: 'True Range' },
+      ],
+    );
   }
 
   /** Updates the Average Directional Movement Index Rating given the next bar's close, high, and low values. */

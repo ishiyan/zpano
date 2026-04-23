@@ -1,10 +1,9 @@
+import { buildMetadata } from '../../core/build-metadata';
 import { componentTripleMnemonic } from '../../core/component-triple-mnemonic';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
-import { IndicatorType } from '../../core/indicator-type';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { LineIndicator } from '../../core/line-indicator';
-import { OutputType } from '../../core/outputs/output-type';
-import { RateOfChangeOutput } from './rate-of-change-output';
-import { RateOfChangeParams } from './rate-of-change-params';
+import { RateOfChangeParams } from './params';
 
 /**
  * __Rate of Change__ (__ROC__) is the difference between today's sample and the sample ℓ periods ago
@@ -49,17 +48,14 @@ export class RateOfChange extends LineIndicator {
 
   /** Describes the output data of the indicator. */
   public metadata(): IndicatorMetadata {
-    return {
-      type: IndicatorType.RateOfChange,
-      mnemonic: this.mnemonic,
-      description: this.description,
-      outputs: [{
-        kind: RateOfChangeOutput.RateOfChangeValue,
-        type: OutputType.Scalar,
-        mnemonic: this.mnemonic,
-        description: this.description,
-      }],
-    };
+    return buildMetadata(
+      IndicatorIdentifier.RateOfChange,
+      this.mnemonic,
+      this.description,
+      [
+        { mnemonic: this.mnemonic, description: this.description },
+      ],
+    );
   }
 
   /** Updates the value of the rate of change given the next sample. */

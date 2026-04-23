@@ -8,7 +8,6 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
 )
 
 // RoofingFilter is Ehler's Roofing Filter described in Ehler's book
@@ -40,16 +39,16 @@ type RoofingFilter struct {
 	hasTwoPole  bool
 	hasZeroMean bool
 
-	count       int
-	samplePrev  float64
-	samplePrev2 float64
-	hpPrev      float64
-	hpPrev2     float64
-	ssPrev      float64
-	ssPrev2     float64
-	zmPrev      float64
-	value       float64
-	primed      bool
+	count           int
+	samplePrevious  float64
+	samplePrevious2 float64
+	hpPrevious      float64
+	hpPrevious2     float64
+	ssPrevious      float64
+	ssPrevious2     float64
+	zmPrevious      float64
+	value           float64
+	primed          bool
 }
 
 // NewRoofingFilter returns an instance of the indicator created using supplied parameters.
@@ -171,126 +170,121 @@ func NewRoofingFilter(p *RoofingFilterParams) (*RoofingFilter, error) {
 }
 
 // IsPrimed indicates whether an indicator is primed.
-func (r *RoofingFilter) IsPrimed() bool {
-	r.mu.RLock()
-	defer r.mu.RUnlock()
+func (s *RoofingFilter) IsPrimed() bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
-	return r.primed
+	return s.primed
 }
 
 // Metadata describes an output data of the indicator.
-func (r *RoofingFilter) Metadata() core.Metadata {
-	return core.Metadata{
-		Type:        core.RoofingFilter,
-		Mnemonic:    r.LineIndicator.Mnemonic,
-		Description: r.LineIndicator.Description,
-		Outputs: []outputs.Metadata{
-			{
-				Kind:        int(RoofingFilterValue),
-				Type:        outputs.ScalarType,
-				Mnemonic:    r.LineIndicator.Mnemonic,
-				Description: r.LineIndicator.Description,
-			},
+func (s *RoofingFilter) Metadata() core.Metadata {
+	return core.BuildMetadata(
+		core.RoofingFilter,
+		s.LineIndicator.Mnemonic,
+		s.LineIndicator.Description,
+		[]core.OutputText{
+			{Mnemonic: s.LineIndicator.Mnemonic, Description: s.LineIndicator.Description},
 		},
-	}
+	)
 }
 
 // Update updates the value of the roofing filter given the next sample.
-func (r *RoofingFilter) Update(sample float64) float64 {
+func (s *RoofingFilter) Update(sample float64) float64 {
 	if math.IsNaN(sample) {
 		return sample
 	}
 
-	r.mu.Lock()
-	defer r.mu.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
-	if r.hasTwoPole {
-		return r.update2Pole(sample)
+	if s.hasTwoPole {
+		return s.update2Pole(sample)
 	}
 
-	return r.update1Pole(sample)
+	return s.update1Pole(sample)
 }
 
-func (r *RoofingFilter) update1Pole(sample float64) float64 {
+func (s *RoofingFilter) update1Pole(sample float64) float64 {
 	var hp, ss, zm float64
 
-	if r.primed {
-		hp = r.hpCoeff1*(sample-r.samplePrev) + r.hpCoeff2*r.hpPrev
-		ss = r.ssCoeff1*(hp+r.hpPrev) + r.ssCoeff2*r.ssPrev + r.ssCoeff3*r.ssPrev2
+	if s.primed {
+		hp = s.hpCoeff1*(sample-s.samplePrevious) + s.hpCoeff2*s.hpPrevious
+		ss = s.ssCoeff1*(hp+s.hpPrevious) + s.ssCoeff2*s.ssPrevious + s.ssCoeff3*s.ssPrevious2
 
-		if r.hasZeroMean {
-			zm = r.hpCoeff1*(ss-r.ssPrev) + r.hpCoeff2*r.zmPrev
-			r.value = zm
+		if s.hasZeroMean {
+			zm = s.hpCoeff1*(ss-s.ssPrevious) + s.hpCoeff2*s.zmPrevious
+			s.value = zm
 		} else {
-			r.value = ss
+			s.value = ss
 		}
 	} else {
-		r.count++
+		s.count++
 
-		if r.count == 1 {
+		if s.count == 1 {
 			hp = 0
 			ss = 0
 		} else {
-			hp = r.hpCoeff1*(sample-r.samplePrev) + r.hpCoeff2*r.hpPrev
-			ss = r.ssCoeff1*(hp+r.hpPrev) + r.ssCoeff2*r.ssPrev + r.ssCoeff3*r.ssPrev2
+			hp = s.hpCoeff1*(sample-s.samplePrevious) + s.hpCoeff2*s.hpPrevious
+			ss = s.ssCoeff1*(hp+s.hpPrevious) + s.ssCoeff2*s.ssPrevious + s.ssCoeff3*s.ssPrevious2
 
-			if r.hasZeroMean {
-				zm = r.hpCoeff1*(ss-r.ssPrev) + r.hpCoeff2*r.zmPrev
-				if r.count == 5 { //nolint:mnd
-					r.primed = true
-					r.value = zm
+			if s.hasZeroMean {
+				zm = s.hpCoeff1*(ss-s.ssPrevious) + s.hpCoeff2*s.zmPrevious
+				if s.count == 5 { //nolint:mnd
+					s.primed = true
+					s.value = zm
 				}
-			} else if r.count == 4 { //nolint:mnd
-				r.primed = true
-				r.value = ss
+			} else if s.count == 4 { //nolint:mnd
+				s.primed = true
+				s.value = ss
 			}
 		}
 	}
 
-	r.samplePrev = sample
-	r.hpPrev = hp
-	r.ssPrev2 = r.ssPrev
-	r.ssPrev = ss
+	s.samplePrevious = sample
+	s.hpPrevious = hp
+	s.ssPrevious2 = s.ssPrevious
+	s.ssPrevious = ss
 
-	if r.hasZeroMean {
-		r.zmPrev = zm
+	if s.hasZeroMean {
+		s.zmPrevious = zm
 	}
 
-	return r.value
+	return s.value
 }
 
-func (r *RoofingFilter) update2Pole(sample float64) float64 {
+func (s *RoofingFilter) update2Pole(sample float64) float64 {
 	var hp, ss float64
 
-	if r.primed {
-		hp = r.hpCoeff1*(sample-2*r.samplePrev+r.samplePrev2) +
-			r.hpCoeff2*r.hpPrev - r.hpCoeff3*r.hpPrev2
-		ss = r.ssCoeff1*(hp+r.hpPrev) + r.ssCoeff2*r.ssPrev + r.ssCoeff3*r.ssPrev2
-		r.value = ss
+	if s.primed {
+		hp = s.hpCoeff1*(sample-2*s.samplePrevious+s.samplePrevious2) +
+			s.hpCoeff2*s.hpPrevious - s.hpCoeff3*s.hpPrevious2
+		ss = s.ssCoeff1*(hp+s.hpPrevious) + s.ssCoeff2*s.ssPrevious + s.ssCoeff3*s.ssPrevious2
+		s.value = ss
 	} else {
-		r.count++
+		s.count++
 
-		if r.count < 4 { //nolint:mnd
+		if s.count < 4 { //nolint:mnd
 			hp = 0
 			ss = 0
 		} else {
-			hp = r.hpCoeff1*(sample-2*r.samplePrev+r.samplePrev2) +
-				r.hpCoeff2*r.hpPrev - r.hpCoeff3*r.hpPrev2
-			ss = r.ssCoeff1*(hp+r.hpPrev) + r.ssCoeff2*r.ssPrev + r.ssCoeff3*r.ssPrev2
+			hp = s.hpCoeff1*(sample-2*s.samplePrevious+s.samplePrevious2) +
+				s.hpCoeff2*s.hpPrevious - s.hpCoeff3*s.hpPrevious2
+			ss = s.ssCoeff1*(hp+s.hpPrevious) + s.ssCoeff2*s.ssPrevious + s.ssCoeff3*s.ssPrevious2
 
-			if r.count == 5 { //nolint:mnd
-				r.primed = true
-				r.value = ss
+			if s.count == 5 { //nolint:mnd
+				s.primed = true
+				s.value = ss
 			}
 		}
 	}
 
-	r.samplePrev2 = r.samplePrev
-	r.samplePrev = sample
-	r.hpPrev2 = r.hpPrev
-	r.hpPrev = hp
-	r.ssPrev2 = r.ssPrev
-	r.ssPrev = ss
+	s.samplePrevious2 = s.samplePrevious
+	s.samplePrevious = sample
+	s.hpPrevious2 = s.hpPrevious
+	s.hpPrevious = hp
+	s.ssPrevious2 = s.ssPrevious
+	s.ssPrevious = ss
 
-	return r.value
+	return s.value
 }

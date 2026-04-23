@@ -9,7 +9,7 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
+	"zpano/indicators/core/outputs/shape"
 )
 
 // TA-Lib test data (252 entries), extracted programmatically from AverageTrueRangeTest.cs.
@@ -441,12 +441,12 @@ func TestAverageTrueRangeMetadata(t *testing.T) {
 		}
 	}
 
-	check("Type", core.AverageTrueRange, act.Type)
+	check("Identifier", core.AverageTrueRange, act.Identifier)
 	check("Mnemonic", "atr", act.Mnemonic)
 	check("Description", "Average True Range", act.Description)
 	check("len(Outputs)", 1, len(act.Outputs))
-	check("Outputs[0].Kind", int(AverageTrueRangeValue), act.Outputs[0].Kind)
-	check("Outputs[0].Type", outputs.ScalarType, act.Outputs[0].Type)
+	check("Outputs[0].Kind", int(Value), act.Outputs[0].Kind)
+	check("Outputs[0].Shape", shape.Scalar, act.Outputs[0].Shape)
 	check("Outputs[0].Mnemonic", "atr", act.Outputs[0].Mnemonic)
 	check("Outputs[0].Description", "Average True Range", act.Outputs[0].Description)
 }

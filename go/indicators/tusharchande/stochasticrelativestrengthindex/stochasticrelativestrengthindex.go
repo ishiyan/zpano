@@ -9,7 +9,6 @@ import (
 	"zpano/indicators/common/exponentialmovingaverage"
 	"zpano/indicators/common/simplemovingaverage"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
 	"zpano/indicators/welleswilder/relativestrengthindex"
 )
 
@@ -22,8 +21,11 @@ type lineUpdater interface {
 // passthrough is a no-op smoother for FastD period of 1.
 type passthrough struct{}
 
+// Update returns v unchanged (no smoothing).
 func (p *passthrough) Update(v float64) float64 { return v }
-func (p *passthrough) IsPrimed() bool           { return true }
+
+// IsPrimed always reports true; a passthrough has no warmup.
+func (p *passthrough) IsPrimed() bool { return true }
 
 // StochasticRelativeStrengthIndex is Tushar Chande's Stochastic RSI.
 //
@@ -44,9 +46,9 @@ type StochasticRelativeStrengthIndex struct {
 	rsi *relativestrengthindex.RelativeStrengthIndex
 
 	// Circular buffer for RSI values (size = fastKLength).
-	rsiBuf    []float64
-	rsiBufIdx int
-	rsiCount  int
+	rsiBuf         []float64
+	rsiBufferIndex int
+	rsiCount       int
 
 	fastKLength int
 	fastDMA     lineUpdater
@@ -190,25 +192,15 @@ func (s *StochasticRelativeStrengthIndex) IsPrimed() bool {
 func (s *StochasticRelativeStrengthIndex) Metadata() core.Metadata {
 	desc := "Stochastic Relative Strength Index " + s.mnemonic
 
-	return core.Metadata{
-		Type:        core.StochasticRelativeStrengthIndex,
-		Mnemonic:    s.mnemonic,
-		Description: desc,
-		Outputs: []outputs.Metadata{
-			{
-				Kind:        int(StochasticRelativeStrengthIndexFastK),
-				Type:        outputs.ScalarType,
-				Mnemonic:    s.mnemonic + " fastK",
-				Description: desc + " Fast-K",
-			},
-			{
-				Kind:        int(StochasticRelativeStrengthIndexFastD),
-				Type:        outputs.ScalarType,
-				Mnemonic:    s.mnemonic + " fastD",
-				Description: desc + " Fast-D",
-			},
+	return core.BuildMetadata(
+		core.StochasticRelativeStrengthIndex,
+		s.mnemonic,
+		desc,
+		[]core.OutputText{
+			{Mnemonic: s.mnemonic + " fastK", Description: desc + " Fast-K"},
+			{Mnemonic: s.mnemonic + " fastD", Description: desc + " Fast-D"},
 		},
-	}
+	)
 }
 
 // Update updates the indicator given the next sample and returns both FastK and FastD values.
@@ -221,14 +213,14 @@ func (s *StochasticRelativeStrengthIndex) Update(sample float64) (float64, float
 	defer s.mu.Unlock()
 
 	// Feed to internal RSI.
-	rsiVal := s.rsi.Update(sample)
-	if math.IsNaN(rsiVal) {
+	rsiValue := s.rsi.Update(sample)
+	if math.IsNaN(rsiValue) {
 		return s.fastK, s.fastD
 	}
 
 	// Store RSI value in circular buffer.
-	s.rsiBuf[s.rsiBufIdx] = rsiVal
-	s.rsiBufIdx = (s.rsiBufIdx + 1) % s.fastKLength
+	s.rsiBuf[s.rsiBufferIndex] = rsiValue
+	s.rsiBufferIndex = (s.rsiBufferIndex + 1) % s.fastKLength
 	s.rsiCount++
 
 	// Need at least fastKLength RSI values for stochastic calculation.
@@ -253,7 +245,7 @@ func (s *StochasticRelativeStrengthIndex) Update(sample float64) (float64, float
 	// Calculate Fast-K.
 	diff := maxRSI - minRSI
 	if diff > 0 {
-		s.fastK = 100 * (rsiVal - minRSI) / diff //nolint:mnd
+		s.fastK = 100 * (rsiValue - minRSI) / diff //nolint:mnd
 	} else {
 		s.fastK = 0
 	}

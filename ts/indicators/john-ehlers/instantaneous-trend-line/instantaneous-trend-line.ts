@@ -1,3 +1,4 @@
+import { buildMetadata } from '../../core/build-metadata';
 import { Bar } from '../../../entities/bar';
 import { BarComponent, barComponentValue } from '../../../entities/bar-component';
 import { Quote } from '../../../entities/quote';
@@ -8,12 +9,10 @@ import { DefaultTradeComponent, tradeComponentValue } from '../../../entities/tr
 import { Indicator } from '../../core/indicator';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
 import { IndicatorOutput } from '../../core/indicator-output';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { componentTripleMnemonic } from '../../core/component-triple-mnemonic';
-import { InstantaneousTrendLineLengthParams } from './instantaneous-trend-line-length-params';
-import { InstantaneousTrendLineSmoothingFactorParams } from './instantaneous-trend-line-smoothing-factor-params';
-import { InstantaneousTrendLineOutput } from './instantaneous-trend-line-output';
+import { InstantaneousTrendLineLengthParams } from './length-params';
+import { InstantaneousTrendLineSmoothingFactorParams } from './smoothing-factor-params';
 
 const guardLength = (object: any): object is InstantaneousTrendLineLengthParams => 'length' in object;
 
@@ -157,25 +156,15 @@ export class InstantaneousTrendLine implements Indicator {
 
   /** Describes a requested output data of an indicator. */
   public metadata(): IndicatorMetadata {
-    return {
-      type: IndicatorType.InstantaneousTrendLine,
-      mnemonic: this.mnemonicStr,
-      description: this.descriptionStr,
-      outputs: [
-        {
-          kind: InstantaneousTrendLineOutput.Value,
-          type: OutputType.Scalar,
-          mnemonic: this.mnemonicStr,
-          description: this.descriptionStr,
-        },
-        {
-          kind: InstantaneousTrendLineOutput.Trigger,
-          type: OutputType.Scalar,
-          mnemonic: this.mnemonicTrig,
-          description: this.descriptionTrig,
-        },
+    return buildMetadata(
+      IndicatorIdentifier.InstantaneousTrendLine,
+      this.mnemonicStr,
+      this.descriptionStr,
+      [
+        { mnemonic: this.mnemonicStr, description: this.descriptionStr },
+        { mnemonic: this.mnemonicTrig, description: this.descriptionTrig },
       ],
-    };
+    );
   }
 
   /** Updates an indicator given the next scalar sample. */

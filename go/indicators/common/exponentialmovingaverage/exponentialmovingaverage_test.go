@@ -9,7 +9,7 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
+	"zpano/indicators/core/outputs/shape"
 )
 
 //nolint:lll
@@ -403,12 +403,12 @@ func TestExponentialMovingAverageMetadata(t *testing.T) {
 		ema := testExponentialMovingAverageCreateLength(10, true)
 		act := ema.Metadata()
 
-		check("Type", core.ExponentialMovingAverage, act.Type)
+		check("Identifier", core.ExponentialMovingAverage, act.Identifier)
 		check("Mnemonic", "ema(10)", act.Mnemonic)
 		check("Description", "Exponential moving average ema(10)", act.Description)
 		check("len(Outputs)", 1, len(act.Outputs))
-		check("Outputs[0].Kind", int(ExponentialMovingAverageValue), act.Outputs[0].Kind)
-		check("Outputs[0].Type", outputs.ScalarType, act.Outputs[0].Type)
+		check("Outputs[0].Kind", int(Value), act.Outputs[0].Kind)
+		check("Outputs[0].Shape", shape.Scalar, act.Outputs[0].Shape)
 		check("Outputs[0].Mnemonic", "ema(10)", act.Outputs[0].Mnemonic)
 		check("Outputs[0].Description", "Exponential moving average ema(10)", act.Outputs[0].Description)
 	})
@@ -422,12 +422,12 @@ func TestExponentialMovingAverageMetadata(t *testing.T) {
 		ema := testExponentialMovingAverageCreateAlpha(alpha, false)
 		act := ema.Metadata()
 
-		check("Type", core.ExponentialMovingAverage, act.Type)
+		check("Identifier", core.ExponentialMovingAverage, act.Identifier)
 		check("Mnemonic", "ema(10, 0.18181818)", act.Mnemonic)
 		check("Description", "Exponential moving average ema(10, 0.18181818)", act.Description)
 		check("len(Outputs)", 1, len(act.Outputs))
-		check("Outputs[0].Kind", int(ExponentialMovingAverageValue), act.Outputs[0].Kind)
-		check("Outputs[0].Type", outputs.ScalarType, act.Outputs[0].Type)
+		check("Outputs[0].Kind", int(Value), act.Outputs[0].Kind)
+		check("Outputs[0].Shape", shape.Scalar, act.Outputs[0].Shape)
 		check("Outputs[0].Mnemonic", "ema(10, 0.18181818)", act.Outputs[0].Mnemonic)
 		check("Outputs[0].Description", "Exponential moving average ema(10, 0.18181818)", act.Outputs[0].Description)
 	})

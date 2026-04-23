@@ -1,3 +1,4 @@
+import { buildMetadata } from '../../core/build-metadata';
 import { Bar } from '../../../entities/bar';
 import { BarComponent, barComponentValue } from '../../../entities/bar-component';
 import { Quote } from '../../../entities/quote';
@@ -8,11 +9,9 @@ import { DefaultTradeComponent, tradeComponentValue } from '../../../entities/tr
 import { Indicator } from '../../core/indicator';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
 import { IndicatorOutput } from '../../core/indicator-output';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { componentTripleMnemonic } from '../../core/component-triple-mnemonic';
-import { LinearRegressionParams } from './linear-regression-params';
-import { LinearRegressionOutput } from './linear-regression-output';
+import { LinearRegressionParams } from './params';
 
 const RAD_TO_DEG = 180.0 / Math.PI;
 
@@ -89,43 +88,18 @@ export class LinearRegression implements Indicator {
 
   /** Describes the output data of the indicator. */
   public metadata(): IndicatorMetadata {
-    return {
-      type: IndicatorType.LinearRegression,
-      mnemonic: this.mnemonic,
-      description: this.description,
-      outputs: [
-        {
-          kind: LinearRegressionOutput.Value,
-          type: OutputType.Scalar,
-          mnemonic: this.mnemonic,
-          description: this.description + ' value',
-        },
-        {
-          kind: LinearRegressionOutput.Forecast,
-          type: OutputType.Scalar,
-          mnemonic: this.mnemonic,
-          description: this.description + ' forecast',
-        },
-        {
-          kind: LinearRegressionOutput.Intercept,
-          type: OutputType.Scalar,
-          mnemonic: this.mnemonic,
-          description: this.description + ' intercept',
-        },
-        {
-          kind: LinearRegressionOutput.SlopeRad,
-          type: OutputType.Scalar,
-          mnemonic: this.mnemonic,
-          description: this.description + ' slope',
-        },
-        {
-          kind: LinearRegressionOutput.SlopeDeg,
-          type: OutputType.Scalar,
-          mnemonic: this.mnemonic,
-          description: this.description + ' angle',
-        },
+    return buildMetadata(
+      IndicatorIdentifier.LinearRegression,
+      this.mnemonic,
+      this.description,
+      [
+        { mnemonic: this.mnemonic, description: this.description + ' value' },
+        { mnemonic: this.mnemonic, description: this.description + ' forecast' },
+        { mnemonic: this.mnemonic, description: this.description + ' intercept' },
+        { mnemonic: this.mnemonic, description: this.description + ' slope' },
+        { mnemonic: this.mnemonic, description: this.description + ' angle' },
       ],
-    };
+    );
   }
 
   /** Updates the indicator given the next scalar sample. */
@@ -201,7 +175,7 @@ export class LinearRegression implements Indicator {
   }
 
   private updateEntity(time: Date, sample: number): IndicatorOutput {
-    const val = this.update(sample);
+    const value = this.update(sample);
 
     const sValue = new Scalar();
     sValue.time = time;
@@ -218,7 +192,7 @@ export class LinearRegression implements Indicator {
     const sSlopeDeg = new Scalar();
     sSlopeDeg.time = time;
 
-    if (Number.isNaN(val)) {
+    if (Number.isNaN(value)) {
       sValue.value = Number.NaN;
       sForecast.value = Number.NaN;
       sIntercept.value = Number.NaN;

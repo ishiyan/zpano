@@ -1,3 +1,4 @@
+import { buildMetadata } from '../../core/build-metadata';
 import { Bar } from '../../../entities/bar';
 import { Quote } from '../../../entities/quote';
 import { Scalar } from '../../../entities/scalar';
@@ -5,11 +6,8 @@ import { Trade } from '../../../entities/trade';
 import { Indicator } from '../../core/indicator';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
 import { IndicatorOutput } from '../../core/indicator-output';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputMetadata } from '../../core/outputs/output-metadata';
-import { OutputType } from '../../core/outputs/output-type';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { DirectionalMovementIndex } from '../directional-movement-index/directional-movement-index';
-import { AverageDirectionalMovementIndexOutput } from './average-directional-movement-index-output';
 
 const adxMnemonic = 'adx';
 const adxDescription = 'Average Directional Movement Index';
@@ -57,63 +55,21 @@ export class AverageDirectionalMovementIndex implements Indicator {
 
   /** Describes the output data of the indicator. */
   public metadata(): IndicatorMetadata {
-    const outputs: OutputMetadata[] = [
-      {
-        kind: AverageDirectionalMovementIndexOutput.AverageDirectionalMovementIndexValue,
-        type: OutputType.Scalar,
-        mnemonic: adxMnemonic,
-        description: adxDescription,
-      },
-      {
-        kind: AverageDirectionalMovementIndexOutput.DirectionalMovementIndexValue,
-        type: OutputType.Scalar,
-        mnemonic: 'dx',
-        description: 'Directional Movement Index',
-      },
-      {
-        kind: AverageDirectionalMovementIndexOutput.DirectionalIndicatorPlusValue,
-        type: OutputType.Scalar,
-        mnemonic: '+di',
-        description: 'Directional Indicator Plus',
-      },
-      {
-        kind: AverageDirectionalMovementIndexOutput.DirectionalIndicatorMinusValue,
-        type: OutputType.Scalar,
-        mnemonic: '-di',
-        description: 'Directional Indicator Minus',
-      },
-      {
-        kind: AverageDirectionalMovementIndexOutput.DirectionalMovementPlusValue,
-        type: OutputType.Scalar,
-        mnemonic: '+dm',
-        description: 'Directional Movement Plus',
-      },
-      {
-        kind: AverageDirectionalMovementIndexOutput.DirectionalMovementMinusValue,
-        type: OutputType.Scalar,
-        mnemonic: '-dm',
-        description: 'Directional Movement Minus',
-      },
-      {
-        kind: AverageDirectionalMovementIndexOutput.AverageTrueRangeValue,
-        type: OutputType.Scalar,
-        mnemonic: 'atr',
-        description: 'Average True Range',
-      },
-      {
-        kind: AverageDirectionalMovementIndexOutput.TrueRangeValue,
-        type: OutputType.Scalar,
-        mnemonic: 'tr',
-        description: 'True Range',
-      },
-    ];
-
-    return {
-      type: IndicatorType.AverageDirectionalMovementIndex,
-      mnemonic: adxMnemonic,
-      description: adxDescription,
-      outputs,
-    };
+    return buildMetadata(
+      IndicatorIdentifier.AverageDirectionalMovementIndex,
+      adxMnemonic,
+      adxDescription,
+      [
+        { mnemonic: adxMnemonic, description: adxDescription },
+        { mnemonic: 'dx', description: 'Directional Movement Index' },
+        { mnemonic: '+di', description: 'Directional Indicator Plus' },
+        { mnemonic: '-di', description: 'Directional Indicator Minus' },
+        { mnemonic: '+dm', description: 'Directional Movement Plus' },
+        { mnemonic: '-dm', description: 'Directional Movement Minus' },
+        { mnemonic: 'atr', description: 'Average True Range' },
+        { mnemonic: 'tr', description: 'True Range' },
+      ],
+    );
   }
 
   /** Updates the Average Directional Movement Index given the next bar's close, high, and low values. */

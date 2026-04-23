@@ -1,9 +1,9 @@
 import { } from 'jasmine';
 
 import { FractalAdaptiveMovingAverage } from './fractal-adaptive-moving-average';
-import { FractalAdaptiveMovingAverageOutput } from './fractal-adaptive-moving-average-output';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
+import { FractalAdaptiveMovingAverageOutput } from './output';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
 import { BarComponent } from '../../../entities/bar-component';
 import { QuoteComponent } from '../../../entities/quote-component';
 import { TradeComponent } from '../../../entities/trade-component';
@@ -275,18 +275,18 @@ describe('FractalAdaptiveMovingAverage', () => {
     const mnFdim = 'framaDim(16, 0.010)';
     const descr = 'Fractal adaptive moving average ';
 
-    expect(meta.type).toBe(IndicatorType.FractalAdaptiveMovingAverage);
+    expect(meta.identifier).toBe(IndicatorIdentifier.FractalAdaptiveMovingAverage);
     expect(meta.mnemonic).toBe(mn);
     expect(meta.description).toBe(descr + mn);
     expect(meta.outputs.length).toBe(2);
 
     expect(meta.outputs[0].kind).toBe(FractalAdaptiveMovingAverageOutput.Value);
-    expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+    expect(meta.outputs[0].shape).toBe(Shape.Scalar);
     expect(meta.outputs[0].mnemonic).toBe(mn);
     expect(meta.outputs[0].description).toBe(descr + mn);
 
     expect(meta.outputs[1].kind).toBe(FractalAdaptiveMovingAverageOutput.Fdim);
-    expect(meta.outputs[1].type).toBe(OutputType.Scalar);
+    expect(meta.outputs[1].shape).toBe(Shape.Scalar);
     expect(meta.outputs[1].mnemonic).toBe(mnFdim);
     expect(meta.outputs[1].description).toBe(descr + mnFdim);
   });

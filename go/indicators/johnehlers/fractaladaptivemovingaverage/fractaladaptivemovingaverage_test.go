@@ -10,7 +10,7 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
+	"zpano/indicators/core/outputs/shape"
 )
 
 func testFractalAdaptiveMovingAverageTime() time.Time {
@@ -470,18 +470,18 @@ func TestFractalAdaptiveMovingAverageMetadata(t *testing.T) {
 		mnFdim := "framaDim(16, 0.010)"
 		descr := "Fractal adaptive moving average "
 
-		check("Type", core.FractalAdaptiveMovingAverage, act.Type)
+		check("Identifier", core.FractalAdaptiveMovingAverage, act.Identifier)
 		check("Mnemonic", mn, act.Mnemonic)
 		check("Description", descr+mn, act.Description)
 		check("len(Outputs)", 2, len(act.Outputs))
 
 		check("Outputs[0].Kind", int(Value), act.Outputs[0].Kind)
-		check("Outputs[0].Type", outputs.ScalarType, act.Outputs[0].Type)
+		check("Outputs[0].Shape", shape.Scalar, act.Outputs[0].Shape)
 		check("Outputs[0].Mnemonic", mn, act.Outputs[0].Mnemonic)
 		check("Outputs[0].Description", descr+mn, act.Outputs[0].Description)
 
 		check("Outputs[1].Kind", int(Fdim), act.Outputs[1].Kind)
-		check("Outputs[1].Type", outputs.ScalarType, act.Outputs[1].Type)
+		check("Outputs[1].Shape", shape.Scalar, act.Outputs[1].Shape)
 		check("Outputs[1].Mnemonic", mnFdim, act.Outputs[1].Mnemonic)
 		check("Outputs[1].Description", descr+mnFdim, act.Outputs[1].Description)
 	})

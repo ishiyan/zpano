@@ -9,7 +9,7 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
+	"zpano/indicators/core/outputs/shape"
 )
 
 func testZecemaTime() time.Time {
@@ -76,33 +76,33 @@ func TestZecemaUpdateNaN(t *testing.T) {
 func TestZecemaUpdateConstant(t *testing.T) {
 	t.Parallel()
 
-	const val = 42.0
+	const value = 42.0
 
 	z := testZecemaCreateDefault()
 
 	// Feed constant values. First 2 should return NaN.
 	for i := 0; i < 2; i++ {
-		act := z.Update(val)
+		act := z.Update(value)
 		if !math.IsNaN(act) {
 			t.Errorf("[%d] expected NaN during priming, got %v", i, act)
 		}
 	}
 
 	// 3rd update primes.
-	act := z.Update(val)
+	act := z.Update(value)
 	if math.IsNaN(act) {
 		t.Error("expected non-NaN after priming")
 	}
 
-	if math.Abs(act-val) > 1e-6 {
-		t.Errorf("expected close to %v after priming with constant input, got %v", val, act)
+	if math.Abs(act-value) > 1e-6 {
+		t.Errorf("expected close to %v after priming with constant input, got %v", value, act)
 	}
 
-	// Further updates with same constant should stay close to val.
+	// Further updates with same constant should stay close to value.
 	for i := 0; i < 10; i++ {
-		act = z.Update(val)
-		if math.Abs(act-val) > 1e-6 {
-			t.Errorf("[%d] expected close to %v, got %v", i, val, act)
+		act = z.Update(value)
+		if math.Abs(act-value) > 1e-6 {
+			t.Errorf("[%d] expected close to %v, got %v", i, value, act)
 		}
 	}
 }
@@ -200,10 +200,10 @@ func TestZecemaMetadata(t *testing.T) {
 		}
 	}
 
-	check("Type", core.ZeroLagErrorCorrectingExponentialMovingAverage, act.Type)
+	check("Identifier", core.ZeroLagErrorCorrectingExponentialMovingAverage, act.Identifier)
 	check("len(Outputs)", 1, len(act.Outputs))
-	check("Outputs[0].Kind", int(ZeroLagErrorCorrectingExponentialMovingAverageValue), act.Outputs[0].Kind)
-	check("Outputs[0].Type", outputs.ScalarType, act.Outputs[0].Type)
+	check("Outputs[0].Kind", int(Value), act.Outputs[0].Kind)
+	check("Outputs[0].Shape", shape.Scalar, act.Outputs[0].Shape)
 	check("Outputs[0].Mnemonic", "zecema(0.095, 5, 0.1)", act.Outputs[0].Mnemonic)
 	check("Outputs[0].Description", "Zero-lag Error-Correcting Exponential Moving Average zecema(0.095, 5, 0.1)", act.Outputs[0].Description)
 }

@@ -1,9 +1,9 @@
 import { } from 'jasmine';
 
 import { UltimateOscillator } from './ultimate-oscillator';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputType } from '../../core/outputs/output-type';
-import { UltimateOscillatorOutput } from './ultimate-oscillator-output';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { Shape } from '../../core/outputs/shape/shape';
+import { UltimateOscillatorOutput } from './output';
 
 // TA-Lib test data (252 entries), same H/L/C as TrueRange and other HLC indicators.
 const inputHigh = [
@@ -222,10 +222,10 @@ describe('UltimateOscillator', () => {
     const ultosc = new UltimateOscillator();
     const meta = ultosc.metadata();
 
-    expect(meta.type).toBe(IndicatorType.UltimateOscillator);
+    expect(meta.identifier).toBe(IndicatorIdentifier.UltimateOscillator);
     expect(meta.mnemonic).toBe('ultosc(7, 14, 28)');
     expect(meta.outputs.length).toBe(1);
     expect(meta.outputs[0].kind).toBe(UltimateOscillatorOutput.UltimateOscillatorValue);
-    expect(meta.outputs[0].type).toBe(OutputType.Scalar);
+    expect(meta.outputs[0].shape).toBe(Shape.Scalar);
   });
 });

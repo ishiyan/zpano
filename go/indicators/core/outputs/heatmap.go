@@ -30,7 +30,7 @@ type Heatmap struct {
 	// A parameter corresponding to the i-th value can be calculated as:
 	//
 	// min(ParameterFirst,ParameterLast) + i / ParameterResolution
-	ParameterResolution float64 `json:"res"`
+	ParameterResolution float64 `json:"result"`
 
 	// ValueMin is a minimal value (z) of this heatmap column.
 	ValueMin float64 `json:"min"`

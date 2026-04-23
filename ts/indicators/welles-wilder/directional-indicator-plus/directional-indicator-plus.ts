@@ -1,3 +1,4 @@
+import { buildMetadata } from '../../core/build-metadata';
 import { Bar } from '../../../entities/bar';
 import { Quote } from '../../../entities/quote';
 import { Scalar } from '../../../entities/scalar';
@@ -5,12 +6,9 @@ import { Trade } from '../../../entities/trade';
 import { Indicator } from '../../core/indicator';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
 import { IndicatorOutput } from '../../core/indicator-output';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputMetadata } from '../../core/outputs/output-metadata';
-import { OutputType } from '../../core/outputs/output-type';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { AverageTrueRange } from '../average-true-range/average-true-range';
 import { DirectionalMovementPlus } from '../directional-movement-plus/directional-movement-plus';
-import { DirectionalIndicatorPlusOutput } from './directional-indicator-plus-output';
 
 const dipMnemonic = '+di';
 const dipDescription = 'Directional Indicator Plus';
@@ -58,39 +56,17 @@ export class DirectionalIndicatorPlus implements Indicator {
 
   /** Describes the output data of the indicator. */
   public metadata(): IndicatorMetadata {
-    const outputs: OutputMetadata[] = [
-      {
-        kind: DirectionalIndicatorPlusOutput.DirectionalIndicatorPlusValue,
-        type: OutputType.Scalar,
-        mnemonic: dipMnemonic,
-        description: dipDescription,
-      },
-      {
-        kind: DirectionalIndicatorPlusOutput.DirectionalMovementPlusValue,
-        type: OutputType.Scalar,
-        mnemonic: '+dm',
-        description: 'Directional Movement Plus',
-      },
-      {
-        kind: DirectionalIndicatorPlusOutput.AverageTrueRangeValue,
-        type: OutputType.Scalar,
-        mnemonic: 'atr',
-        description: 'Average True Range',
-      },
-      {
-        kind: DirectionalIndicatorPlusOutput.TrueRangeValue,
-        type: OutputType.Scalar,
-        mnemonic: 'tr',
-        description: 'True Range',
-      },
-    ];
-
-    return {
-      type: IndicatorType.DirectionalIndicatorPlus,
-      mnemonic: dipMnemonic,
-      description: dipDescription,
-      outputs,
-    };
+    return buildMetadata(
+      IndicatorIdentifier.DirectionalIndicatorPlus,
+      dipMnemonic,
+      dipDescription,
+      [
+        { mnemonic: dipMnemonic, description: dipDescription },
+        { mnemonic: '+dm', description: 'Directional Movement Plus' },
+        { mnemonic: 'atr', description: 'Average True Range' },
+        { mnemonic: 'tr', description: 'True Range' },
+      ],
+    );
   }
 
   /** Updates the Directional Indicator Plus given the next bar's close, high, and low values. */

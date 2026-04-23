@@ -8,7 +8,6 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
 )
 
 // TriangularMovingAverage computes the triangular moving average (TRIMA) like a weighted moving average.
@@ -151,88 +150,83 @@ func NewTriangularMovingAverage(p *TriangularMovingAverageParams) (*TriangularMo
 }
 
 // IsPrimed indicates whether an indicator is primed.
-func (t *TriangularMovingAverage) IsPrimed() bool {
-	t.mu.RLock()
-	defer t.mu.RUnlock()
+func (s *TriangularMovingAverage) IsPrimed() bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
-	return t.primed
+	return s.primed
 }
 
 // Metadata describes an output data of the indicator.
 // It always has a single scalar output -- the calculated value of the triangular moving average.
-func (t *TriangularMovingAverage) Metadata() core.Metadata {
-	return core.Metadata{
-		Type:        core.TriangularMovingAverage,
-		Mnemonic:    t.LineIndicator.Mnemonic,
-		Description: t.LineIndicator.Description,
-		Outputs: []outputs.Metadata{
-			{
-				Kind:        int(TriangularMovingAverageValue),
-				Type:        outputs.ScalarType,
-				Mnemonic:    t.LineIndicator.Mnemonic,
-				Description: t.LineIndicator.Description,
-			},
+func (s *TriangularMovingAverage) Metadata() core.Metadata {
+	return core.BuildMetadata(
+		core.TriangularMovingAverage,
+		s.LineIndicator.Mnemonic,
+		s.LineIndicator.Description,
+		[]core.OutputText{
+			{Mnemonic: s.LineIndicator.Mnemonic, Description: s.LineIndicator.Description},
 		},
-	}
+	)
 }
 
 // Update updates the value of the moving average given the next sample.
 //
 // The indicator is not primed during the first ℓ-1 updates.
-func (t *TriangularMovingAverage) Update(sample float64) float64 {
+func (s *TriangularMovingAverage) Update(sample float64) float64 {
 	if math.IsNaN(sample) {
 		return sample
 	}
 
 	temp := sample
 
-	t.mu.Lock()
-	defer t.mu.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
-	if t.primed {
-		t.numerator -= t.numeratorSub
-		t.numeratorSub -= t.window[0]
+	if s.primed {
+		s.numerator -= s.numeratorSub
+		s.numeratorSub -= s.window[0]
 
-		j := t.windowLength - 1
+		j := s.windowLength - 1
 		for i := 0; i < j; i++ {
-			t.window[i] = t.window[i+1]
+			s.window[i] = s.window[i+1]
 		}
 
-		t.window[j] = temp
-		temp = t.window[t.windowLengthHalf]
-		t.numeratorSub += temp
+		s.window[j] = temp
+		temp = s.window[s.windowLengthHalf]
+		s.numeratorSub += temp
 
-		if t.isOdd { // The logic for an odd length.
-			t.numerator += t.numeratorAdd
-			t.numeratorAdd -= temp
+		if s.isOdd { // The logic for an odd length.
+			s.numerator += s.numeratorAdd
+			s.numeratorAdd -= temp
 		} else { // The logic for an even length.
-			t.numeratorAdd -= temp
-			t.numerator += t.numeratorAdd
+			s.numeratorAdd -= temp
+			s.numerator += s.numeratorAdd
 		}
 
 		temp = sample
-		t.numeratorAdd += temp
-		t.numerator += temp
+		s.numeratorAdd += temp
+		s.numerator += temp
 	} else {
-		t.window[t.windowCount] = temp
-		t.windowCount++
+		s.window[s.windowCount] = temp
+		s.windowCount++
 
-		if t.windowLength > t.windowCount {
+		if s.windowLength > s.windowCount {
 			return math.NaN()
 		}
 
-		for i := t.windowLengthHalf; i >= 0; i-- {
-			t.numeratorSub += t.window[i]
-			t.numerator += t.numeratorSub
+		for i := s.windowLengthHalf; i >= 0; i-- {
+			s.numeratorSub += s.window[i]
+			s.numerator += s.numeratorSub
 		}
 
-		for i := t.windowLengthHalf + 1; i < t.windowLength; i++ {
-			t.numeratorAdd += t.window[i]
-			t.numerator += t.numeratorAdd
+		for i := s.windowLengthHalf + 1; i < s.windowLength; i++ {
+			s.numeratorAdd += s.window[i]
+			s.numerator += s.numeratorAdd
 		}
 
-		t.primed = true
+		s.primed = true
 	}
 
-	return t.numerator * t.factor
+	return s.numerator * s.factor
 }

@@ -1,4 +1,4 @@
-import { OutputType } from './output-type';
+import { Shape } from './shape/shape';
 
 /** Describes a single indicator output. */
 export interface OutputMetadata {
@@ -9,8 +9,8 @@ export interface OutputMetadata {
      */
     kind: number;
 
-    /** Identifies a data type of this indicator output. */
-    type: OutputType;
+    /** Describes the data shape of this indicator output. */
+    shape: Shape;
 
     /** A short name (mnemonic) of this indicator output. */
     mnemonic: string;

@@ -9,7 +9,6 @@ import (
 	"zpano/indicators/common/exponentialmovingaverage"
 	"zpano/indicators/common/simplemovingaverage"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
 )
 
 // lineUpdater is an interface for indicators that accept a single scalar and return a value.
@@ -151,56 +150,51 @@ func NewPercentagePriceOscillator(p *PercentagePriceOscillatorParams) (*Percenta
 }
 
 // IsPrimed indicates whether the indicator is primed.
-func (p *PercentagePriceOscillator) IsPrimed() bool {
-	p.mu.RLock()
-	defer p.mu.RUnlock()
+func (s *PercentagePriceOscillator) IsPrimed() bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
-	return p.primed
+	return s.primed
 }
 
 // Metadata describes the output data of the indicator.
-func (p *PercentagePriceOscillator) Metadata() core.Metadata {
-	return core.Metadata{
-		Type:        core.PercentagePriceOscillator,
-		Mnemonic:    p.LineIndicator.Mnemonic,
-		Description: p.LineIndicator.Description,
-		Outputs: []outputs.Metadata{
-			{
-				Kind:        int(PercentagePriceOscillatorValue),
-				Type:        outputs.ScalarType,
-				Mnemonic:    p.LineIndicator.Mnemonic,
-				Description: p.LineIndicator.Description,
-			},
+func (s *PercentagePriceOscillator) Metadata() core.Metadata {
+	return core.BuildMetadata(
+		core.PercentagePriceOscillator,
+		s.LineIndicator.Mnemonic,
+		s.LineIndicator.Description,
+		[]core.OutputText{
+			{Mnemonic: s.LineIndicator.Mnemonic, Description: s.LineIndicator.Description},
 		},
-	}
+	)
 }
 
 // Update updates the value of the indicator given the next sample.
-func (p *PercentagePriceOscillator) Update(sample float64) float64 {
+func (s *PercentagePriceOscillator) Update(sample float64) float64 {
 	const epsilon = 1e-8
 
 	if math.IsNaN(sample) {
 		return sample
 	}
 
-	p.mu.Lock()
-	defer p.mu.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
-	slow := p.slowMA.Update(sample)
-	fast := p.fastMA.Update(sample)
-	p.primed = p.slowMA.IsPrimed() && p.fastMA.IsPrimed()
+	slow := s.slowMA.Update(sample)
+	fast := s.fastMA.Update(sample)
+	s.primed = s.slowMA.IsPrimed() && s.fastMA.IsPrimed()
 
 	if math.IsNaN(fast) || math.IsNaN(slow) {
-		p.value = math.NaN()
+		s.value = math.NaN()
 
-		return p.value
+		return s.value
 	}
 
 	if math.Abs(slow) < epsilon {
-		p.value = 0
+		s.value = 0
 	} else {
-		p.value = 100 * (fast - slow) / slow
+		s.value = 100 * (fast - slow) / slow
 	}
 
-	return p.value
+	return s.value
 }

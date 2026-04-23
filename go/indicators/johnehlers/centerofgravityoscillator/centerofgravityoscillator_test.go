@@ -9,7 +9,7 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
+	"zpano/indicators/core/outputs/shape"
 )
 
 func testCenterOfGravityOscillatorTime() time.Time {
@@ -498,18 +498,18 @@ func TestCenterOfGravityOscillatorMetadata(t *testing.T) {
 		descr := "Center of Gravity oscillator "
 		descrTrig := "Center of Gravity trigger "
 
-		check("Type", core.CenterOfGravityOscillator, act.Type)
+		check("Identifier", core.CenterOfGravityOscillator, act.Identifier)
 		check("Mnemonic", mn, act.Mnemonic)
 		check("Description", descr+mn, act.Description)
 		check("len(Outputs)", 2, len(act.Outputs))
 
 		check("Outputs[0].Kind", int(Value), act.Outputs[0].Kind)
-		check("Outputs[0].Type", outputs.ScalarType, act.Outputs[0].Type)
+		check("Outputs[0].Shape", shape.Scalar, act.Outputs[0].Shape)
 		check("Outputs[0].Mnemonic", mn, act.Outputs[0].Mnemonic)
 		check("Outputs[0].Description", descr+mn, act.Outputs[0].Description)
 
 		check("Outputs[1].Kind", int(Trigger), act.Outputs[1].Kind)
-		check("Outputs[1].Type", outputs.ScalarType, act.Outputs[1].Type)
+		check("Outputs[1].Shape", shape.Scalar, act.Outputs[1].Shape)
 		check("Outputs[1].Mnemonic", mnTrig, act.Outputs[1].Mnemonic)
 		check("Outputs[1].Description", descrTrig+mnTrig, act.Outputs[1].Description)
 	})

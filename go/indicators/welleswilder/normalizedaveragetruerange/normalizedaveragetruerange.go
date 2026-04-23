@@ -7,7 +7,6 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
 	"zpano/indicators/welleswilder/averagetruerange"
 )
 
@@ -50,58 +49,53 @@ func NewNormalizedAverageTrueRange(length int) (*NormalizedAverageTrueRange, err
 }
 
 // Length returns the length parameter.
-func (n *NormalizedAverageTrueRange) Length() int {
-	return n.length
+func (s *NormalizedAverageTrueRange) Length() int {
+	return s.length
 }
 
 // IsPrimed indicates whether the indicator is primed.
-func (n *NormalizedAverageTrueRange) IsPrimed() bool {
-	n.mu.RLock()
-	defer n.mu.RUnlock()
+func (s *NormalizedAverageTrueRange) IsPrimed() bool {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
-	return n.primed
+	return s.primed
 }
 
 // Metadata describes the output data of the indicator.
-func (n *NormalizedAverageTrueRange) Metadata() core.Metadata {
-	return core.Metadata{
-		Type:        core.NormalizedAverageTrueRange,
-		Mnemonic:    natrMnemonic,
-		Description: natrDescription,
-		Outputs: []outputs.Metadata{
-			{
-				Kind:        int(NormalizedAverageTrueRangeValue),
-				Type:        outputs.ScalarType,
-				Mnemonic:    natrMnemonic,
-				Description: natrDescription,
-			},
+func (s *NormalizedAverageTrueRange) Metadata() core.Metadata {
+	return core.BuildMetadata(
+		core.NormalizedAverageTrueRange,
+		natrMnemonic,
+		natrDescription,
+		[]core.OutputText{
+			{Mnemonic: natrMnemonic, Description: natrDescription},
 		},
-	}
+	)
 }
 
 // Update updates the Normalized Average True Range given the next bar's close, high, and low values.
-func (n *NormalizedAverageTrueRange) Update(close, high, low float64) float64 {
+func (s *NormalizedAverageTrueRange) Update(close, high, low float64) float64 {
 	if math.IsNaN(close) || math.IsNaN(high) || math.IsNaN(low) {
 		return math.NaN()
 	}
 
-	n.mu.Lock()
-	defer n.mu.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
-	atrValue := n.averageTrueRange.Update(close, high, low)
+	atrValue := s.averageTrueRange.Update(close, high, low)
 
-	if n.averageTrueRange.IsPrimed() {
-		n.primed = true
+	if s.averageTrueRange.IsPrimed() {
+		s.primed = true
 
 		if close == 0 {
-			n.value = 0
+			s.value = 0
 		} else {
-			n.value = (atrValue / close) * 100 //nolint:mnd
+			s.value = (atrValue / close) * 100 //nolint:mnd
 		}
 	}
 
-	if n.primed {
-		return n.value
+	if s.primed {
+		return s.value
 	}
 
 	return math.NaN()
@@ -109,44 +103,44 @@ func (n *NormalizedAverageTrueRange) Update(close, high, low float64) float64 {
 
 // UpdateSample updates the Normalized Average True Range using a single sample value
 // as a substitute for high, low, and close.
-func (n *NormalizedAverageTrueRange) UpdateSample(sample float64) float64 {
-	return n.Update(sample, sample, sample)
+func (s *NormalizedAverageTrueRange) UpdateSample(sample float64) float64 {
+	return s.Update(sample, sample, sample)
 }
 
 // UpdateScalar updates the indicator given the next scalar sample.
-func (n *NormalizedAverageTrueRange) UpdateScalar(sample *entities.Scalar) core.Output {
+func (s *NormalizedAverageTrueRange) UpdateScalar(sample *entities.Scalar) core.Output {
 	v := sample.Value
 
 	output := make([]any, 1)
-	output[0] = entities.Scalar{Time: sample.Time, Value: n.Update(v, v, v)}
+	output[0] = entities.Scalar{Time: sample.Time, Value: s.Update(v, v, v)}
 
 	return output
 }
 
 // UpdateBar updates the indicator given the next bar sample.
-func (n *NormalizedAverageTrueRange) UpdateBar(sample *entities.Bar) core.Output {
+func (s *NormalizedAverageTrueRange) UpdateBar(sample *entities.Bar) core.Output {
 	output := make([]any, 1)
-	output[0] = entities.Scalar{Time: sample.Time, Value: n.Update(sample.Close, sample.High, sample.Low)}
+	output[0] = entities.Scalar{Time: sample.Time, Value: s.Update(sample.Close, sample.High, sample.Low)}
 
 	return output
 }
 
 // UpdateQuote updates the indicator given the next quote sample.
-func (n *NormalizedAverageTrueRange) UpdateQuote(sample *entities.Quote) core.Output {
+func (s *NormalizedAverageTrueRange) UpdateQuote(sample *entities.Quote) core.Output {
 	v := (sample.Bid + sample.Ask) / 2 //nolint:mnd
 
 	output := make([]any, 1)
-	output[0] = entities.Scalar{Time: sample.Time, Value: n.Update(v, v, v)}
+	output[0] = entities.Scalar{Time: sample.Time, Value: s.Update(v, v, v)}
 
 	return output
 }
 
 // UpdateTrade updates the indicator given the next trade sample.
-func (n *NormalizedAverageTrueRange) UpdateTrade(sample *entities.Trade) core.Output {
+func (s *NormalizedAverageTrueRange) UpdateTrade(sample *entities.Trade) core.Output {
 	v := sample.Price
 
 	output := make([]any, 1)
-	output[0] = entities.Scalar{Time: sample.Time, Value: n.Update(v, v, v)}
+	output[0] = entities.Scalar{Time: sample.Time, Value: s.Update(v, v, v)}
 
 	return output
 }

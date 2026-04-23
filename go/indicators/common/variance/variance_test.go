@@ -9,7 +9,7 @@ import (
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
+	"zpano/indicators/core/outputs/shape"
 )
 
 func testVarianceTime() time.Time {
@@ -242,12 +242,12 @@ func TestVarianceMetadata(t *testing.T) {
 		v := testVarianceCreate(7, false)
 		act := v.Metadata()
 
-		check("Type", core.Variance, act.Type)
+		check("Identifier", core.Variance, act.Identifier)
 		check("Mnemonic", "var.p(7)", act.Mnemonic)
 		check("Description", "Estimation of the population variance var.p(7)", act.Description)
 		check("len(Outputs)", 1, len(act.Outputs))
-		check("Outputs[0].Kind", int(VarianceValue), act.Outputs[0].Kind)
-		check("Outputs[0].Type", outputs.ScalarType, act.Outputs[0].Type)
+		check("Outputs[0].Kind", int(Value), act.Outputs[0].Kind)
+		check("Outputs[0].Shape", shape.Scalar, act.Outputs[0].Shape)
 		check("Outputs[0].Mnemonic", "var.p(7)", act.Outputs[0].Mnemonic)
 		check("Outputs[0].Description", "Estimation of the population variance var.p(7)", act.Outputs[0].Description)
 	})
@@ -257,12 +257,12 @@ func TestVarianceMetadata(t *testing.T) {
 		v := testVarianceCreate(7, true)
 		act := v.Metadata()
 
-		check("Type", core.Variance, act.Type)
+		check("Identifier", core.Variance, act.Identifier)
 		check("Mnemonic", "var.s(7)", act.Mnemonic)
 		check("Description", "Unbiased estimation of the sample variance var.s(7)", act.Description)
 		check("len(Outputs)", 1, len(act.Outputs))
-		check("Outputs[0].Kind", int(VarianceValue), act.Outputs[0].Kind)
-		check("Outputs[0].Type", outputs.ScalarType, act.Outputs[0].Type)
+		check("Outputs[0].Kind", int(Value), act.Outputs[0].Kind)
+		check("Outputs[0].Shape", shape.Scalar, act.Outputs[0].Shape)
 		check("Outputs[0].Mnemonic", "var.s(7)", act.Outputs[0].Mnemonic)
 		check("Outputs[0].Description", "Unbiased estimation of the sample variance var.s(7)", act.Outputs[0].Description)
 	})

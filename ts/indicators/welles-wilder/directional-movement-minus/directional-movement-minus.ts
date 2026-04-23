@@ -1,3 +1,4 @@
+import { buildMetadata } from '../../core/build-metadata';
 import { Bar } from '../../../entities/bar';
 import { Quote } from '../../../entities/quote';
 import { Scalar } from '../../../entities/scalar';
@@ -5,10 +6,7 @@ import { Trade } from '../../../entities/trade';
 import { Indicator } from '../../core/indicator';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
 import { IndicatorOutput } from '../../core/indicator-output';
-import { IndicatorType } from '../../core/indicator-type';
-import { OutputMetadata } from '../../core/outputs/output-metadata';
-import { OutputType } from '../../core/outputs/output-type';
-import { DirectionalMovementMinusOutput } from './directional-movement-minus-output';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 
 const dmmMnemonic = '-dm';
 const dmmDescription = 'Directional Movement Minus';
@@ -60,19 +58,14 @@ export class DirectionalMovementMinus implements Indicator {
 
   /** Describes the output data of the indicator. */
   public metadata(): IndicatorMetadata {
-    const outputMeta: OutputMetadata = {
-      kind: DirectionalMovementMinusOutput.DirectionalMovementMinusValue,
-      type: OutputType.Scalar,
-      mnemonic: dmmMnemonic,
-      description: dmmDescription,
-    };
-
-    return {
-      type: IndicatorType.DirectionalMovementMinus,
-      mnemonic: dmmMnemonic,
-      description: dmmDescription,
-      outputs: [outputMeta],
-    };
+    return buildMetadata(
+      IndicatorIdentifier.DirectionalMovementMinus,
+      dmmMnemonic,
+      dmmDescription,
+      [
+        { mnemonic: dmmMnemonic, description: dmmDescription },
+      ],
+    );
   }
 
   /** Updates the Directional Movement Minus given the next bar's high and low values. */
