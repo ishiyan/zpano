@@ -32,3 +32,9 @@ export interface TriangularMovingAverageParams {
      */
     tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): TriangularMovingAverageParams {
+    return {
+        length: 20,
+    };
+}

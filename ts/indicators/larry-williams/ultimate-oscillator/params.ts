@@ -7,3 +7,7 @@ export interface UltimateOscillatorParams {
   /** Third time period (default 28). Minimum 2. */
   length3?: number;
 }
+
+export function defaultParams(): UltimateOscillatorParams {
+    return { length1: 7, length2: 14, length3: 28 };
+}

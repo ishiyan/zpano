@@ -33,3 +33,7 @@ export interface TripleExponentialMovingAverageOscillatorParams {
      */
     tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): TripleExponentialMovingAverageOscillatorParams {
+    return { length: 30 };
+}

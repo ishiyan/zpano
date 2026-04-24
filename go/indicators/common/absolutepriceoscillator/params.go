@@ -51,3 +51,11 @@ type AbsolutePriceOscillatorParams struct {
 	// If zero, the default (TradePrice) is used and the component is not shown in the indicator mnemonic.
 	TradeComponent entities.TradeComponent
 }
+
+// DefaultParams returns a AbsolutePriceOscillatorParams value populated with conventional defaults.
+func DefaultParams() *AbsolutePriceOscillatorParams {
+	return &AbsolutePriceOscillatorParams{
+		FastLength: 12,
+		SlowLength: 26,
+	}
+}

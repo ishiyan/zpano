@@ -32,3 +32,9 @@ export interface RateOfChangeParams {
      */
     tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): RateOfChangeParams {
+    return {
+        length: 10,
+    };
+}

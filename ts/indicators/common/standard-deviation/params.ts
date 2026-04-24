@@ -40,3 +40,10 @@ export interface StandardDeviationParams {
      */
     tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): StandardDeviationParams {
+    return {
+        length: 20,
+        unbiased: true,
+    };
+}

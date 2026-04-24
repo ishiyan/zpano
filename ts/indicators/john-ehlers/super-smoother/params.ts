@@ -34,3 +34,7 @@ export interface SuperSmootherParams {
      */
     tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): SuperSmootherParams {
+    return { shortestCyclePeriod: 10 };
+}

@@ -35,3 +35,12 @@ type ZeroLagExponentialMovingAverageParams struct {
 	// If zero, the default (TradePrice) is used and the component is not shown in the indicator mnemonic.
 	TradeComponent entities.TradeComponent
 }
+
+// DefaultParams returns a [ZeroLagExponentialMovingAverageParams] value populated with Ehlers defaults.
+func DefaultParams() *ZeroLagExponentialMovingAverageParams {
+	return &ZeroLagExponentialMovingAverageParams{
+		SmoothingFactor:        0.25,
+		VelocityGainFactor:     0.5,
+		VelocityMomentumLength: 3,
+	}
+}

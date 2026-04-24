@@ -26,3 +26,7 @@ export interface OnBalanceVolumeParams {
      */
     tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): OnBalanceVolumeParams {
+    return {};
+}

@@ -3,3 +3,9 @@ export interface DirectionalIndicatorMinusParams {
   /** The smoothing length (the number of time periods). Must be >= 1. The default value is 14. */
   length: number;
 }
+
+export function defaultParams(): DirectionalIndicatorMinusParams {
+    return {
+        length: 14,
+    };
+}

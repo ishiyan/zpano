@@ -51,3 +51,17 @@ type ParabolicStopAndReverseParams struct {
 	// Default is 0.20.
 	AccelerationMaxShort float64
 }
+
+// DefaultParams returns a [ParabolicStopAndReverseParams] value populated with conventional defaults.
+func DefaultParams() *ParabolicStopAndReverseParams {
+	return &ParabolicStopAndReverseParams{
+		StartValue:            0,
+		OffsetOnReverse:       0,
+		AccelerationInitLong:  0.02,
+		AccelerationLong:      0.02,
+		AccelerationMaxLong:   0.20,
+		AccelerationInitShort: 0.02,
+		AccelerationShort:     0.02,
+		AccelerationMaxShort:  0.20,
+	}
+}

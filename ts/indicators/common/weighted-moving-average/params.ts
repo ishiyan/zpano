@@ -32,3 +32,9 @@ export interface WeightedMovingAverageParams {
      */
     tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): WeightedMovingAverageParams {
+    return {
+        length: 20,
+    };
+}

@@ -39,3 +39,7 @@ export interface SineWaveParams {
    */
   tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): SineWaveParams {
+    return { alphaEmaPeriodAdditional: 0.33 };
+}

@@ -46,3 +46,7 @@ export interface AutoCorrelationIndicatorParams {
    * If _undefined_, a default value is used and the component is not shown in the mnemonic. */
   tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): AutoCorrelationIndicatorParams {
+    return { minLag: 3, maxLag: 48, smoothingPeriod: 10, averagingLength: 0 };
+}

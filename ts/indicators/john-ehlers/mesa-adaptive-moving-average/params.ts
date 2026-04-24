@@ -54,6 +54,10 @@ export interface MesaAdaptiveMovingAverageLengthParams {
   tradeComponent?: TradeComponent;
 }
 
+export function defaultLengthParams(): MesaAdaptiveMovingAverageLengthParams {
+    return { fastLimitLength: 3, slowLimitLength: 39 };
+}
+
 /** Describes parameters to create an instance of the indicator based on smoothing factor. */
 export interface MesaAdaptiveMovingAverageSmoothingFactorParams {
   /** The type of cycle estimator to use.
@@ -100,4 +104,8 @@ export interface MesaAdaptiveMovingAverageSmoothingFactorParams {
    * If _undefined_, a default value is used and the component is not shown in the indicator mnemonic.
    */
   tradeComponent?: TradeComponent;
+}
+
+export function defaultSmoothingFactorParams(): MesaAdaptiveMovingAverageSmoothingFactorParams {
+    return { fastLimitSmoothingFactor: 0.5, slowLimitSmoothingFactor: 0.05 };
 }

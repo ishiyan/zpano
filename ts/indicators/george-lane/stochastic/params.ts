@@ -52,3 +52,7 @@ export interface StochasticParams {
      */
     firstIsAverage?: boolean;
 }
+
+export function defaultParams(): StochasticParams {
+    return { fastKLength: 5, slowKLength: 3, slowDLength: 3 };
+}

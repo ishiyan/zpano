@@ -53,3 +53,7 @@ export interface RoofingFilterParams {
      */
     tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): RoofingFilterParams {
+    return { shortestCyclePeriod: 10, longestCyclePeriod: 48 };
+}

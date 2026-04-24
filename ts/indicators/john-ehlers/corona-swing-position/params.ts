@@ -37,3 +37,7 @@ export interface CoronaSwingPositionParams {
   /** A component of a trade to use when updating the indicator with a trade sample. */
   tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): CoronaSwingPositionParams {
+    return { rasterLength: 50, maxRasterValue: 20, minParameterValue: -5, maxParameterValue: 5, highPassFilterCutoff: 30, minimalPeriod: 6, maximalPeriod: 30 };
+}

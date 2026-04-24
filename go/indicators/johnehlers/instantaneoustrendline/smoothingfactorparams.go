@@ -28,3 +28,10 @@ type SmoothingFactorParams struct {
 	// If zero, the default (TradePrice) is used and the component is not shown in the indicator mnemonic.
 	TradeComponent entities.TradeComponent
 }
+
+// DefaultSmoothingFactorParams returns a [SmoothingFactorParams] value populated with Ehlers defaults.
+func DefaultSmoothingFactorParams() *SmoothingFactorParams {
+	return &SmoothingFactorParams{
+		SmoothingFactor: 0.07,
+	}
+}

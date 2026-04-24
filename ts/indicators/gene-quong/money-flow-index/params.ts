@@ -32,3 +32,7 @@ export interface MoneyFlowIndexParams {
      */
     tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): MoneyFlowIndexParams {
+    return { length: 14 };
+}

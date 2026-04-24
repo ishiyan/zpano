@@ -58,3 +58,7 @@ export interface MaximumEntropySpectrumParams {
    * If _undefined_, a default value is used and the component is not shown in the mnemonic. */
   tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): MaximumEntropySpectrumParams {
+    return { length: 60, degree: 30, minPeriod: 2, maxPeriod: 59, spectrumResolution: 1, automaticGainControlDecayFactor: 0.995 };
+}

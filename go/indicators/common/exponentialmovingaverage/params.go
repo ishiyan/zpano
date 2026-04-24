@@ -60,3 +60,17 @@ type ExponentialMovingAverageSmoothingFactorParams struct {
 	// If zero, the default (TradePrice) is used and the component is not shown in the indicator mnemonic.
 	TradeComponent entities.TradeComponent
 }
+
+// DefaultLengthParams returns a ExponentialMovingAverageLengthParams value populated with conventional defaults.
+func DefaultLengthParams() *ExponentialMovingAverageLengthParams {
+	return &ExponentialMovingAverageLengthParams{
+		Length: 20,
+	}
+}
+
+// DefaultSmoothingFactorParams returns a ExponentialMovingAverageSmoothingFactorParams value populated with conventional defaults.
+func DefaultSmoothingFactorParams() *ExponentialMovingAverageSmoothingFactorParams {
+	return &ExponentialMovingAverageSmoothingFactorParams{
+		SmoothingFactor: 0.0952,
+	}
+}

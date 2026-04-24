@@ -24,3 +24,10 @@ type RelativeStrengthIndexParams struct {
 	// If zero, the default (TradePrice) is used and the component is not shown in the indicator mnemonic.
 	TradeComponent entities.TradeComponent
 }
+
+// DefaultParams returns a [RelativeStrengthIndexParams] value populated with conventional defaults.
+func DefaultParams() *RelativeStrengthIndexParams {
+	return &RelativeStrengthIndexParams{
+		Length: 14,
+	}
+}

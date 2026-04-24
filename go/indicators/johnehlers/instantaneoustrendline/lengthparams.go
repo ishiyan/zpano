@@ -28,3 +28,10 @@ type LengthParams struct {
 	// If zero, the default (TradePrice) is used and the component is not shown in the indicator mnemonic.
 	TradeComponent entities.TradeComponent
 }
+
+// DefaultLengthParams returns a [LengthParams] value populated with Ehlers defaults.
+func DefaultLengthParams() *LengthParams {
+	return &LengthParams{
+		Length: 28,
+	}
+}

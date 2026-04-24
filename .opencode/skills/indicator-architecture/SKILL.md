@@ -151,6 +151,21 @@ context). All other languages use fully-qualified symbol names.
 | Indicator identity| `core.Identifier`   | --                          | `IndicatorIdentifier`            |
 | Output shape      | --                  | `shape.Shape`               | `Shape`                          |
 
+### Identifier Registry Asymmetry
+
+Go and TypeScript do not always have the same number of registered identifiers.
+As of writing, Go has **72** `core.Identifier` constants (iota 1–72) while TS
+has **65** `IndicatorIdentifier` enum values (0-based). The gap exists because
+some indicators have been converted in Go but not yet in TS (or vice versa).
+When adding a new indicator, register the identifier in **both** languages even
+if only one implementation exists yet — this keeps the registries aligned.
+
+**KAMA identifier quirk:** The Go JSON string for KAMA is
+`"kaufmanAdaptiveMovingAverageMovingAverage"` (with "MovingAverage" duplicated)
+because `core/identifier.go` defines it that way. The TS enum is just
+`KaufmanAdaptiveMovingAverage` (no duplicate). Any tooling that maps between
+the two (e.g., the TS `icalc` CLI) must handle this mismatch explicitly.
+
 ### File Naming
 
 | Language   | Style                     | Test files                  | Example                          |
@@ -314,6 +329,34 @@ and new code MUST respect them:
   has a leading `// Name ...` doc comment. Trivial stubs (e.g.
   `passthrough.Update`) still get a one-line comment.
 
+### Go Params: No JSON Tags
+
+Go indicator params structs do **not** carry `json:"..."` struct tags. Go's
+`encoding/json` unmarshaler performs **case-insensitive** key matching by
+default, so JSON `"smoothingFactor"` matches Go field `SmoothingFactor`
+without explicit tags. Do not add JSON tags to params structs — they are
+unnecessary and would diverge from the established pattern.
+
+### TypeScript Import Conventions
+
+1. **No barrel files.** The TS indicators codebase does not use `index.ts`
+   barrel re-exports. All imports use **direct file paths** to the specific
+   module (e.g., `import { Foo } from '../common/simple-moving-average/simple-moving-average.js'`).
+
+2. **`.js` extensions in import paths.** TypeScript source files use `.js`
+   extensions in import specifiers (not `.ts`). This is required by the ESM
+   module resolution used in the project (`"type": "module"` in
+   `package.json`, `tsx` loader for tests/CLI).
+
+3. **Renamed imports for disambiguation.** When multiple indicators export
+   the same symbol name (e.g., every params file exports `defaultParams`),
+   use renamed imports:
+   ```typescript
+   import { defaultParams as defaultSmaParams } from '../common/simple-moving-average/params.js';
+   import { defaultParams as defaultEmaLengthParams } from '../common/exponential-moving-average/length-params.js';
+   ```
+   This pattern is used extensively in the factory.
+
 ### Go ↔ TypeScript Local-Variable Parity
 
 The same indicator MUST use the **same local/field names** in both
@@ -347,7 +390,8 @@ banned per the Abbreviation Convention).
 2. **Create the indicator subfolder** at `indicators/<group>/<indicator-name>/`
    using full descriptive names and language-appropriate casing.
 3. **Create the required files:**
-   - **Parameters** -- define a params struct. Where the indicator can be
+   - **Parameters** -- define a params struct with a `DefaultParams()` /
+     `defaultParams()` function (see the DefaultParams section below). Where the indicator can be
      driven by different price components, include optional `BarComponent`,
      `QuoteComponent`, `TradeComponent` fields (zero = default in Go,
      `undefined` = default in TS). Document the defaults in field comments.
@@ -1133,3 +1177,189 @@ When adding a new indicator you MUST add its descriptor in **both** Go and TS:
   HilbertTransformerInstantaneousTrendLine, TrendCycleMode, all Corona
   indicators, AutoCorrelationPeriodogram).
 - `Static` — everything else.
+
+## Indicator Factory
+
+The **factory** maps an indicator identifier string + JSON parameters to a fully
+constructed `Indicator` instance at runtime. This enables data-driven indicator
+creation from configuration files, user input, or serialized settings.
+
+### Location & Rationale
+
+| Language   | Path                                  |
+|------------|---------------------------------------|
+| Go         | `go/indicators/factory/factory.go`    |
+| TypeScript | `ts/indicators/factory/factory.ts`    |
+
+The factory **cannot live in `core/`** in Go due to circular imports: indicator
+packages import `core`, so `core` cannot import them back. The `factory/`
+package sits at `indicators/factory/` — a sibling of `core/` and the
+author/group folders — and imports both `core` and every indicator package.
+
+TypeScript has no circular-import issue but uses the same location for
+consistency.
+
+### Go API
+
+```go
+package factory
+
+// New creates an indicator from its identifier and JSON-encoded parameters.
+func New(identifier core.Identifier, paramsJSON []byte) (core.Indicator, error)
+```
+
+- `identifier` is a `core.Identifier` value (the same enum used in descriptors
+  and metadata).
+- `paramsJSON` is the raw JSON for the indicator's params struct. For
+  no-params indicators, pass `nil` or `[]byte("{}}")`.
+- Returns the constructed indicator or an error if the identifier is unknown or
+  params are invalid.
+
+### TypeScript API
+
+```ts
+export function createIndicator(
+    identifier: IndicatorIdentifier,
+    params?: Record<string, unknown>,
+): Indicator
+```
+
+- `identifier` is an `IndicatorIdentifier` enum value.
+- `params` is the plain object (already parsed from JSON). For no-params
+  indicators, omit or pass `undefined` / `{}`.
+- Throws on unknown identifier or invalid params.
+
+### Constructor Pattern Categories
+
+The factory handles five categories of indicator constructors:
+
+| Category | Count (Go/TS) | JSON detection | Example |
+|----------|---------------|----------------|---------|
+| **Standard `*Params` struct** | ~35 | Unmarshal into the params struct directly | SMA, WMA, RSI, BB, MACD, CCI |
+| **Length vs SmoothingFactor variants** | 9 | If JSON contains `"smoothingFactor"` key → SF constructor; else → Length constructor | EMA, DEMA, TEMA, T2, T3, KAMA, CyberCycle, ITL |
+| **Default vs Params variants** | ~15 | If JSON is `{}` or empty → Default constructor; else → Params constructor | Ehlers spectra, Corona family, DominantCycle, SineWave, ATCF |
+| **Bare `int` length** | 10 | Parse `{"length": N}` | ATR, NATR, DM±, DI±, DMI, ADX, ADXR, WilliamsPercentR |
+| **No params** | 3 | Ignore JSON entirely | TrueRange, BalanceOfPower, AdvanceDecline |
+
+**Special case — MAMA:** uses `"fastLimitSmoothingFactor"` /
+`"slowLimitSmoothingFactor"` keys for the SmoothingFactor variant, and
+`"fastestSmoothingFactor"` / `"slowestSmoothingFactor"` for KAMA.
+
+### Auto-Detection Logic
+
+The factory uses helper functions to detect which constructor variant to call:
+
+- **Go:** `hasKey(json, "smoothingFactor")` checks for a specific key;
+  `isEmptyObject(json)` checks if JSON is `{}`.
+- **TS:** `"smoothingFactor" in params` checks for a key;
+  `Object.keys(params).length === 0` checks for empty params.
+
+No JSON tags exist on Go params structs — Go's default case-insensitive JSON
+unmarshaling handles key matching (e.g., JSON `"smoothingFactor"` matches Go
+field `SmoothingFactor`).
+
+### Adding a New Indicator to the Factory
+
+When adding a new indicator, add a `case` to the factory's switch statement in
+**both** Go and TS:
+
+1. **Go** — add a `case core.<Identifier>:` block in `factory.New()` that
+   unmarshals `paramsJSON` into the indicator's params struct and calls its
+   constructor.
+2. **TS** — add a `case IndicatorIdentifier.<Name>:` block in
+   `createIndicator()` that spreads defaults onto `params` and calls the
+   constructor.
+
+The case block should follow the pattern of existing entries in the same
+constructor category. TS uses a `{ defaultField: value, ...p }` spread pattern
+to fill in required defaults.
+
+### `icalc` CLI Tool
+
+The `icalc` ("indicator calculator") CLI is a reference consumer of the factory
+in both languages. It reads a JSON settings file, creates indicators via the
+factory, and runs them against embedded test bar data.
+
+| Language | Path | Run command |
+|----------|------|-------------|
+| Go | `go/cmd/icalc/main.go` | `cd go && go run ./cmd/icalc settings.json` |
+| TS | `ts/cmd/icalc/main.ts` | `cd ts && npx tsx cmd/icalc/main.ts cmd/icalc/settings.json` |
+
+Settings file format (`settings.json`):
+
+```json
+[
+    { "identifier": "simpleMovingAverage", "params": { "length": 14 } },
+    { "identifier": "exponentialMovingAverage", "params": { "smoothingFactor": 0.1 } },
+    { "identifier": "trueRange", "params": {} }
+]
+```
+
+- `identifier` is the camelCase JSON string of the `core.Identifier` /
+  `IndicatorIdentifier` enum.
+- `params` is the JSON object passed to the factory.
+- Both CLIs embed 252-entry H/L/C/V test bar data (from TA-Lib `test_data.c`)
+  and print metadata + per-bar outputs for each configured indicator.
+
+## DefaultParams / defaultParams
+
+Every indicator params file exports a **`DefaultParams()`** (Go) /
+**`defaultParams()`** (TS) function that returns a fully-populated params
+struct/object with sensible default values. This provides programmatic access to
+defaults for UIs, factories, and documentation generators.
+
+### Convention
+
+- **Go:** `func DefaultParams() *Params` (or `*StructName` if the struct name
+  differs from `Params`). Returns a pointer to a new struct.
+- **TS:** `export function defaultParams(): SomeParamsInterface`. Returns a
+  plain object satisfying the interface.
+- **Dual-variant indicators** (Length/SmoothingFactor) export two functions:
+  `DefaultLengthParams()` / `defaultLengthParams()` and
+  `DefaultSmoothingFactorParams()` / `defaultSmoothingFactorParams()`.
+- **No-params indicators** (empty struct/interface) still export
+  `DefaultParams()` / `defaultParams()` returning an empty struct/object for
+  consistency.
+- **Component fields** (`BarComponent`, `QuoteComponent`, `TradeComponent`)
+  are omitted from `DefaultParams` — their zero/undefined values already mean
+  "use default".
+
+### Placement
+
+The function is added at the **end** of the params file, after the struct/
+interface definition and any validation logic.
+
+### Doc Comment
+
+Go:
+```go
+// DefaultParams returns a Params value populated with conventional defaults.
+func DefaultParams() *Params {
+    return &Params{
+        Length: 20,
+    }
+}
+```
+
+TypeScript:
+```typescript
+export function defaultParams(): SimpleMovingAverageParams {
+    return {
+        length: 20,
+    };
+}
+```
+
+### Default Value Sources
+
+Default values come from (in priority order):
+1. Values documented in the params struct/interface field comments.
+2. The original paper or reference implementation (Ehlers, TA-Lib, etc.).
+3. Conventional industry defaults (e.g., length=14 for RSI/ATR, length=20
+   for SMA/EMA).
+
+### When Adding a New Indicator
+
+Add `DefaultParams()` / `defaultParams()` to the params file as part of the
+standard indicator creation checklist. The function should be present from day
+one, not added retroactively.

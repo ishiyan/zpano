@@ -33,3 +33,9 @@ export interface MomentumParams {
      */
     tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): MomentumParams {
+    return {
+        length: 10,
+    };
+}

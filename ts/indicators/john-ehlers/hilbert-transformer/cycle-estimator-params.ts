@@ -37,3 +37,7 @@ export interface HilbertTransformerCycleEstimatorParams {
    */
   warmUpPeriod?: number; // integer
 }
+
+export function defaultParams(): HilbertTransformerCycleEstimatorParams {
+    return { smoothingLength: 4, alphaEmaQuadratureInPhase: 0.2, alphaEmaPeriod: 0.2 };
+}

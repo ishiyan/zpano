@@ -48,3 +48,7 @@ export interface ZeroLagExponentialMovingAverageParams {
      */
     tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): ZeroLagExponentialMovingAverageParams {
+    return { smoothingFactor: 0.25, velocityGainFactor: 0.5, velocityMomentumLength: 3 };
+}

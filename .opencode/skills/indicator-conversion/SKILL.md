@@ -47,6 +47,7 @@ Use the EMA indicator as the canonical reference for multi-constructor indicator
 5. [Advanced: Multi-Constructor Indicators](#advanced-multi-constructor-indicators)
 6. [Advanced: Helper / Shared Component Families](#advanced-helper--shared-component-families)
 7. [Naming & Style Conventions](#naming--style-conventions)
+8. [Registering in the Factory](#registering-in-the-factory)
 
 ---
 
@@ -127,6 +128,24 @@ BarComponent entities.BarComponent
 
 Repeat the pattern for `QuoteComponent` (default: `QuoteMidPrice`) and `TradeComponent`
 (default: `TradePrice`).
+
+5. **Add `DefaultParams()`** at the end of the file. Every params file must export a
+   `DefaultParams()` function that returns a pointer to a fully-populated struct with
+   sensible defaults. Component fields are omitted (zero = use default). For dual-variant
+   indicators, export `DefaultLengthParams()` and `DefaultSmoothingFactorParams()` instead.
+   For no-params indicators (empty struct), still export `DefaultParams()` returning `&Params{}`.
+
+```go
+// DefaultParams returns a Params value populated with conventional defaults.
+func DefaultParams() *Params {
+    return &Params{
+        Length: 14,
+    }
+}
+```
+
+See the `indicator-architecture` skill's DefaultParams section for default value
+sources and naming conventions.
 
 ### Go Step 3: Convert the output file
 
@@ -740,6 +759,23 @@ And add the field to the interface:
  */
 tradeComponent?: TradeComponent;
 ```
+
+4. **Add `defaultParams()`** at the end of the file. Every params file must export a
+   `defaultParams()` function that returns a plain object with sensible defaults.
+   Component fields are omitted (`undefined` = use default). For dual-variant indicators,
+   export `defaultLengthParams()` and `defaultSmoothingFactorParams()` instead. For
+   no-params indicators (empty interface), still export `defaultParams()` returning `{}`.
+
+```typescript
+export function defaultParams(): SimpleMovingAverageParams {
+    return {
+        length: 14,
+    };
+}
+```
+
+See the `indicator-architecture` skill's DefaultParams section for default value
+sources and naming conventions.
 
 ### TS Step 3: Create the output file
 
@@ -1458,3 +1494,105 @@ floating-point drift between Go and TS that `1e-12` is too tight.
   `atan`, `cos`, or multi-stage EMA chain before producing the output
 
 Keep `1e-12` / `1e-13` for purely additive/multiplicative indicators.
+
+---
+
+## Registering in the Factory
+
+After converting an indicator and registering its identifier and descriptor,
+add it to the **factory** so it can be created from a JSON identifier string
+and parameters at runtime. The factory lives at `indicators/factory/` in both
+languages (see the `indicator-architecture` skill for full details).
+
+### Go
+
+Add a `case` to the switch in `go/indicators/factory/factory.go` inside
+`func New(identifier core.Identifier, paramsJSON []byte)`:
+
+```go
+case core.MyIndicator:
+    var p myindicator.Params
+    if err := unmarshal(paramsJSON, &p); err != nil {
+        return nil, err
+    }
+    return myindicator.NewMyIndicator(&p)
+```
+
+For **multi-constructor** indicators (Length vs SmoothingFactor), use
+`hasKey()` to detect which constructor to call:
+
+```go
+case core.MyIndicator:
+    if hasKey(paramsJSON, "smoothingFactor") {
+        var p myindicator.SmoothingFactorParams
+        if err := unmarshal(paramsJSON, &p); err != nil {
+            return nil, err
+        }
+        return myindicator.NewMyIndicatorSmoothingFactor(&p)
+    }
+    var p myindicator.LengthParams
+    if err := unmarshal(paramsJSON, &p); err != nil {
+        return nil, err
+    }
+    return myindicator.NewMyIndicatorLength(&p)
+```
+
+For **Default vs Params** indicators, use `isEmptyObject()`:
+
+```go
+case core.MyIndicator:
+    if isEmptyObject(paramsJSON) {
+        return myindicator.NewDefaultMyIndicator()
+    }
+    var p myindicator.Params
+    if err := unmarshal(paramsJSON, &p); err != nil {
+        return nil, err
+    }
+    return myindicator.NewMyIndicator(&p)
+```
+
+### TypeScript
+
+Add a `case` to the switch in `ts/indicators/factory/factory.ts` inside
+`createIndicator()`:
+
+```ts
+case IndicatorIdentifier.MyIndicator:
+    return new MyIndicator(p as MyIndicatorParams);
+```
+
+For multi-constructor indicators, check for the discriminating key:
+
+```ts
+case IndicatorIdentifier.MyIndicator:
+    if ('smoothingFactor' in p)
+        return MyIndicator.fromSmoothingFactor(p as MyIndicatorSmoothingFactorParams);
+    return MyIndicator.fromLength({ length: 14, ...p } as MyIndicatorLengthParams);
+```
+
+For Default vs Params indicators:
+
+```ts
+case IndicatorIdentifier.MyIndicator:
+    if (Object.keys(p).length === 0) return MyIndicator.default();
+    return MyIndicator.fromParams(p as MyIndicatorParams);
+```
+
+### Settings File
+
+Add an entry to `cmd/icalc/settings.json` (shared between Go and TS) so the
+new indicator is exercised by the CLI tool:
+
+```json
+{ "identifier": "myIndicator", "params": { "length": 14 } }
+```
+
+### Verification
+
+Run `icalc` in both languages to confirm the new indicator loads and processes
+bars without error:
+
+```bash
+cd go && go run ./cmd/icalc settings.json
+cd ts && npx tsx cmd/icalc/main.ts cmd/icalc/settings.json
+```

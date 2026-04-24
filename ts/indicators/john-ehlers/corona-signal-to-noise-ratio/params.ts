@@ -38,3 +38,7 @@ export interface CoronaSignalToNoiseRatioParams {
   /** A component of a trade to use when updating the indicator with a trade sample. */
   tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): CoronaSignalToNoiseRatioParams {
+    return { rasterLength: 50, maxRasterValue: 20, minParameterValue: 1, maxParameterValue: 11, highPassFilterCutoff: 30, minimalPeriod: 6, maximalPeriod: 30 };
+}

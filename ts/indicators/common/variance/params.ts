@@ -39,3 +39,10 @@ export interface VarianceParams {
      */
     tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): VarianceParams {
+    return {
+        length: 20,
+        unbiased: true,
+    };
+}

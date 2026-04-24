@@ -60,3 +60,16 @@ export interface ParabolicStopAndReverseParams {
    */
   accelerationMaxShort?: number;
 }
+
+export function defaultParams(): ParabolicStopAndReverseParams {
+    return {
+        startValue: 0,
+        offsetOnReverse: 0,
+        accelerationInitLong: 0.02,
+        accelerationLong: 0.02,
+        accelerationMaxLong: 0.20,
+        accelerationInitShort: 0.02,
+        accelerationShort: 0.02,
+        accelerationMaxShort: 0.20,
+    };
+}

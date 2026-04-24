@@ -39,3 +39,7 @@ export interface InstantaneousTrendLineSmoothingFactorParams {
    */
   tradeComponent?: TradeComponent;
 }
+
+export function defaultSmoothingFactorParams(): InstantaneousTrendLineSmoothingFactorParams {
+    return { smoothingFactor: 0.07 };
+}

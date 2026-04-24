@@ -43,3 +43,16 @@ type Params struct {
 	// If zero, the default (TradePrice) is used and the component is not shown in the indicator mnemonic.
 	TradeComponent entities.TradeComponent
 }
+
+// DefaultParams returns a [Params] value populated with Ehlers defaults.
+func DefaultParams() *Params {
+	return &Params{
+		RasterLength:         50,
+		MaxRasterValue:       20,
+		MinParameterValue:    -5,
+		MaxParameterValue:    5,
+		HighPassFilterCutoff: 30,
+		MinimalPeriod:        6,
+		MaximalPeriod:        30,
+	}
+}

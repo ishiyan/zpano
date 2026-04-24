@@ -86,3 +86,7 @@ export interface BollingerBandsTrendParams {
      */
     tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): BollingerBandsTrendParams {
+    return { fastLength: 20, slowLength: 50, upperMultiplier: 2.0, lowerMultiplier: 2.0 };
+}

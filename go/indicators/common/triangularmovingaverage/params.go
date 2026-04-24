@@ -24,3 +24,10 @@ type TriangularMovingAverageParams struct {
 	// If zero, the default (TradePrice) is used and the component is not shown in the indicator mnemonic.
 	TradeComponent entities.TradeComponent
 }
+
+// DefaultParams returns a TriangularMovingAverageParams value populated with conventional defaults.
+func DefaultParams() *TriangularMovingAverageParams {
+	return &TriangularMovingAverageParams{
+		Length: 20,
+	}
+}

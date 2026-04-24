@@ -44,3 +44,7 @@ export interface CyberCycleLengthParams {
    */
   tradeComponent?: TradeComponent;
 }
+
+export function defaultLengthParams(): CyberCycleLengthParams {
+    return { length: 28, signalLag: 9 };
+}

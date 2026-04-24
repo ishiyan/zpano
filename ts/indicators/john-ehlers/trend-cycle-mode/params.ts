@@ -60,3 +60,7 @@ export interface TrendCycleModeParams {
    */
   tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): TrendCycleModeParams {
+    return { alphaEmaPeriodAdditional: 0.33, trendLineSmoothingLength: 4, cyclePartMultiplier: 1.0, separationPercentage: 1.5 };
+}

@@ -85,3 +85,21 @@ type KaufmanAdaptiveMovingAverageSmoothingFactorParams struct {
 	// If zero, the default (TradePrice) is used and the component is not shown in the indicator mnemonic.
 	TradeComponent entities.TradeComponent
 }
+
+// DefaultLengthParams returns a [KaufmanAdaptiveMovingAverageLengthParams] value populated with conventional defaults.
+func DefaultLengthParams() *KaufmanAdaptiveMovingAverageLengthParams {
+	return &KaufmanAdaptiveMovingAverageLengthParams{
+		EfficiencyRatioLength: 10,
+		FastestLength:         2,
+		SlowestLength:         30,
+	}
+}
+
+// DefaultSmoothingFactorParams returns a [KaufmanAdaptiveMovingAverageSmoothingFactorParams] value populated with conventional defaults.
+func DefaultSmoothingFactorParams() *KaufmanAdaptiveMovingAverageSmoothingFactorParams {
+	return &KaufmanAdaptiveMovingAverageSmoothingFactorParams{
+		EfficiencyRatioLength:  10,
+		FastestSmoothingFactor: 2.0 / 3.0,
+		SlowestSmoothingFactor: 2.0 / 31.0,
+	}
+}

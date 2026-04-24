@@ -5,3 +5,10 @@ type AverageTrueRangeParams struct {
 	// Length is the number of time periods. Must be >= 1. The default value is 14.
 	Length int
 }
+
+// DefaultParams returns a [AverageTrueRangeParams] value populated with conventional defaults.
+func DefaultParams() *AverageTrueRangeParams {
+	return &AverageTrueRangeParams{
+		Length: 14,
+	}
+}

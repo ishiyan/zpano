@@ -40,6 +40,14 @@ export interface TripleExponentialMovingAverageLengthParams {
     tradeComponent?: TradeComponent;
 }
 
+export function defaultLengthParams(): TripleExponentialMovingAverageLengthParams {
+    return { length: 10, firstIsAverage: true };
+}
+
+export function defaultSmoothingFactorParams(): TripleExponentialMovingAverageSmoothingFactorParams {
+    return { smoothingFactor: 0.0952 };
+}
+
 /** Describes parameters to create an instance of the indicator based on smoothing factor. */
 export interface TripleExponentialMovingAverageSmoothingFactorParams {
     /**

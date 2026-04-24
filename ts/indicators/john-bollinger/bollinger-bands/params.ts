@@ -79,3 +79,7 @@ export interface BollingerBandsParams {
      */
     tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): BollingerBandsParams {
+    return { length: 5, upperMultiplier: 2.0, lowerMultiplier: 2.0 };
+}

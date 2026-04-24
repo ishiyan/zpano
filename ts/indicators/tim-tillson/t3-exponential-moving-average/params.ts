@@ -48,6 +48,14 @@ export interface T3ExponentialMovingAverageLengthParams {
     tradeComponent?: TradeComponent;
 }
 
+export function defaultLengthParams(): T3ExponentialMovingAverageLengthParams {
+    return { length: 10, volumeFactor: 0.7, firstIsAverage: true };
+}
+
+export function defaultSmoothingFactorParams(): T3ExponentialMovingAverageSmoothingFactorParams {
+    return { smoothingFactor: 0.3333, volumeFactor: 0.7, firstIsAverage: false };
+}
+
 /** Describes parameters to create an instance of the indicator based on smoothing factor. */
 export interface T3ExponentialMovingAverageSmoothingFactorParams {
     /**

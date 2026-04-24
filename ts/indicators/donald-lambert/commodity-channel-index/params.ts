@@ -45,3 +45,7 @@ export interface CommodityChannelIndexParams {
      */
     tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): CommodityChannelIndexParams {
+    return { length: 20, inverseScalingFactor: 0.015 };
+}

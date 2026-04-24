@@ -40,6 +40,14 @@ export interface DoubleExponentialMovingAverageLengthParams {
     tradeComponent?: TradeComponent;
 }
 
+export function defaultLengthParams(): DoubleExponentialMovingAverageLengthParams {
+    return { length: 10, firstIsAverage: true };
+}
+
+export function defaultSmoothingFactorParams(): DoubleExponentialMovingAverageSmoothingFactorParams {
+    return { smoothingFactor: 0.0952 };
+}
+
 /** Describes parameters to create an instance of the indicator based on smoothing factor. */
 export interface DoubleExponentialMovingAverageSmoothingFactorParams {
     /**

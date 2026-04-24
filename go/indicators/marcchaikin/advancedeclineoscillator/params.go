@@ -35,3 +35,11 @@ type AdvanceDeclineOscillatorParams struct {
 	// Only relevant when MovingAverageType is EMA.
 	FirstIsAverage bool
 }
+
+// DefaultParams returns a [AdvanceDeclineOscillatorParams] value populated with conventional defaults.
+func DefaultParams() *AdvanceDeclineOscillatorParams {
+	return &AdvanceDeclineOscillatorParams{
+		FastLength: 3,
+		SlowLength: 10,
+	}
+}

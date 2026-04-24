@@ -12,3 +12,12 @@ type UltimateOscillatorParams struct {
 	Length2 int
 	Length3 int
 }
+
+// DefaultParams returns a [UltimateOscillatorParams] value populated with conventional defaults.
+func DefaultParams() *UltimateOscillatorParams {
+	return &UltimateOscillatorParams{
+		Length1: 7,
+		Length2: 14,
+		Length3: 28,
+	}
+}

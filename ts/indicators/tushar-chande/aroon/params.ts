@@ -7,3 +7,7 @@ export interface AroonParams {
      */
     length: number;
 }
+
+export function defaultParams(): AroonParams {
+    return { length: 14 };
+}

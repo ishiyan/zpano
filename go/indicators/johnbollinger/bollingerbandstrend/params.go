@@ -67,3 +67,13 @@ type BollingerBandsTrendParams struct {
 	// If zero, the default (TradePrice) is used and the component is not shown in the indicator mnemonic.
 	TradeComponent entities.TradeComponent
 }
+
+// DefaultParams returns a [BollingerBandsTrendParams] value populated with conventional defaults.
+func DefaultParams() *BollingerBandsTrendParams {
+	return &BollingerBandsTrendParams{
+		FastLength:      20,
+		SlowLength:      50,
+		UpperMultiplier: 2.0,
+		LowerMultiplier: 2.0,
+	}
+}

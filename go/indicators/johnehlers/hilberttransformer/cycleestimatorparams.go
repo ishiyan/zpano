@@ -35,3 +35,12 @@ type CycleEstimatorParams struct {
 	// by the implementation-specific primed length.
 	WarmUpPeriod int
 }
+
+// DefaultParams returns a [CycleEstimatorParams] value populated with Ehlers defaults.
+func DefaultParams() *CycleEstimatorParams {
+	return &CycleEstimatorParams{
+		SmoothingLength:           4,
+		AlphaEmaQuadratureInPhase: 0.2,
+		AlphaEmaPeriod:            0.2,
+	}
+}

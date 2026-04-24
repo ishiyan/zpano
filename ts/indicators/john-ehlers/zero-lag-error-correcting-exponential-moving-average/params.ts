@@ -48,3 +48,7 @@ export interface ZeroLagErrorCorrectingExponentialMovingAverageParams {
      */
     tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): ZeroLagErrorCorrectingExponentialMovingAverageParams {
+    return { smoothingFactor: 0.095, gainLimit: 5, gainStep: 0.1 };
+}

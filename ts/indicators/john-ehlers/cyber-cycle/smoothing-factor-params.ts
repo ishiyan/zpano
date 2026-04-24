@@ -48,3 +48,7 @@ export interface CyberCycleSmoothingFactorParams {
    */
   tradeComponent?: TradeComponent;
 }
+
+export function defaultSmoothingFactorParams(): CyberCycleSmoothingFactorParams {
+    return { smoothingFactor: 0.07, signalLag: 9 };
+}

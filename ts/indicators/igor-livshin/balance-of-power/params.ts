@@ -2,3 +2,7 @@
 export interface BalanceOfPowerParams {
   // Balance of Power requires OHLC bar data and has no configurable parameters.
 }
+
+export function defaultParams(): BalanceOfPowerParams {
+    return {};
+}

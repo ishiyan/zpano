@@ -38,3 +38,7 @@ export interface AdvanceDeclineOscillatorParams {
      */
     firstIsAverage?: boolean;
 }
+
+export function defaultParams(): AdvanceDeclineOscillatorParams {
+    return { fastLength: 3, slowLength: 10 };
+}

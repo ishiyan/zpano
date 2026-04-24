@@ -24,3 +24,10 @@ type TripleExponentialMovingAverageOscillatorParams struct {
 	// If zero, the default (TradePrice) is used and the component is not shown in the indicator mnemonic.
 	TradeComponent entities.TradeComponent
 }
+
+// DefaultParams returns a [TripleExponentialMovingAverageOscillatorParams] value populated with conventional defaults.
+func DefaultParams() *TripleExponentialMovingAverageOscillatorParams {
+	return &TripleExponentialMovingAverageOscillatorParams{
+		Length: 30,
+	}
+}

@@ -3,3 +3,7 @@ export interface WilliamsPercentRParams {
   /** The number of time periods. The typical values are 5, 9 or 14. The default is 14. Must be >= 2. */
   length: number;
 }
+
+export function defaultParams(): WilliamsPercentRParams {
+    return { length: 14 };
+}

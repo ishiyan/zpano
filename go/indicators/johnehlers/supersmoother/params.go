@@ -25,3 +25,10 @@ type SuperSmootherParams struct {
 	// If zero, the default (TradePrice) is used and the component is not shown in the indicator mnemonic.
 	TradeComponent entities.TradeComponent
 }
+
+// DefaultParams returns a [SuperSmootherParams] value populated with Ehlers defaults.
+func DefaultParams() *SuperSmootherParams {
+	return &SuperSmootherParams{
+		ShortestCyclePeriod: 10,
+	}
+}

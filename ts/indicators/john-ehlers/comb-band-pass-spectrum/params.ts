@@ -61,3 +61,7 @@ export interface CombBandPassSpectrumParams {
    * If _undefined_, a default value is used and the component is not shown in the mnemonic. */
   tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): CombBandPassSpectrumParams {
+    return { minPeriod: 10, maxPeriod: 48, bandwidth: 0.3, automaticGainControlDecayFactor: 0.995 };
+}

@@ -44,3 +44,11 @@ type JurikMovingAverageParams struct {
 	// If zero, the default (TradePrice) is used and the component is not shown in the indicator mnemonic.
 	TradeComponent entities.TradeComponent
 }
+
+// DefaultParams returns a [JurikMovingAverageParams] value populated with conventional defaults.
+func DefaultParams() *JurikMovingAverageParams {
+	return &JurikMovingAverageParams{
+		Length: 14,
+		Phase:  0,
+	}
+}

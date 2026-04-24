@@ -35,3 +35,7 @@ export interface InstantaneousTrendLineLengthParams {
    */
   tradeComponent?: TradeComponent;
 }
+
+export function defaultLengthParams(): InstantaneousTrendLineLengthParams {
+    return { length: 28 };
+}

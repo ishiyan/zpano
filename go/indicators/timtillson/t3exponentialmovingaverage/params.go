@@ -72,3 +72,19 @@ type T3ExponentialMovingAverageSmoothingFactorParams struct {
 	// If zero, the default (TradePrice) is used and the component is not shown in the indicator mnemonic.
 	TradeComponent entities.TradeComponent
 }
+
+// DefaultLengthParams returns a [T3ExponentialMovingAverageLengthParams] value populated with conventional defaults.
+func DefaultLengthParams() *T3ExponentialMovingAverageLengthParams {
+	return &T3ExponentialMovingAverageLengthParams{
+		Length:       5,
+		VolumeFactor: 0.7,
+	}
+}
+
+// DefaultSmoothingFactorParams returns a [T3ExponentialMovingAverageSmoothingFactorParams] value populated with conventional defaults.
+func DefaultSmoothingFactorParams() *T3ExponentialMovingAverageSmoothingFactorParams {
+	return &T3ExponentialMovingAverageSmoothingFactorParams{
+		SmoothingFactor: 0.3333,
+		VolumeFactor:    0.7,
+	}
+}

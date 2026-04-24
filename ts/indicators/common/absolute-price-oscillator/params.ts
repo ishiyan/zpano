@@ -64,3 +64,10 @@ export interface AbsolutePriceOscillatorParams {
      */
     tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): AbsolutePriceOscillatorParams {
+    return {
+        fastLength: 12,
+        slowLength: 26,
+    };
+}

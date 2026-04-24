@@ -56,3 +56,7 @@ export interface JurikMovingAverageParams {
      */
     tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): JurikMovingAverageParams {
+    return { length: 14, phase: 0 };
+}

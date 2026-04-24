@@ -32,3 +32,9 @@ export interface SimpleMovingAverageParams {
      */
     tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): SimpleMovingAverageParams {
+    return {
+        length: 20,
+    };
+}

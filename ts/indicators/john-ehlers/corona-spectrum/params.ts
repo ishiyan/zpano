@@ -59,3 +59,7 @@ export interface CoronaSpectrumParams {
    */
   tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): CoronaSpectrumParams {
+    return { minRasterValue: 6, maxRasterValue: 20, minParameterValue: 6, maxParameterValue: 30, highPassFilterCutoff: 30 };
+}

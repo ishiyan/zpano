@@ -52,3 +52,7 @@ export interface HilbertTransformerInstantaneousTrendLineParams {
    */
   tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): HilbertTransformerInstantaneousTrendLineParams {
+    return { alphaEmaPeriodAdditional: 0.33, trendLineSmoothingLength: 4, cyclePartMultiplier: 1.0 };
+}

@@ -33,3 +33,9 @@ export interface RelativeStrengthIndexParams {
      */
     tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): RelativeStrengthIndexParams {
+    return {
+        length: 14,
+    };
+}

@@ -51,6 +51,14 @@ type LengthParams struct {
 	TradeComponent entities.TradeComponent
 }
 
+// DefaultLengthParams returns a [LengthParams] value populated with Ehlers defaults.
+func DefaultLengthParams() *LengthParams {
+	return &LengthParams{
+		FastLimitLength: 3,
+		SlowLimitLength: 39,
+	}
+}
+
 // SmoothingFactorParams describes parameters to create an instance of the indicator
 // based on smoothing factors.
 type SmoothingFactorParams struct {
@@ -92,4 +100,12 @@ type SmoothingFactorParams struct {
 	//
 	// If zero, the default (TradePrice) is used and the component is not shown in the indicator mnemonic.
 	TradeComponent entities.TradeComponent
+}
+
+// DefaultSmoothingFactorParams returns a [SmoothingFactorParams] value populated with Ehlers defaults.
+func DefaultSmoothingFactorParams() *SmoothingFactorParams {
+	return &SmoothingFactorParams{
+		FastLimitSmoothingFactor: 0.5,
+		SlowLimitSmoothingFactor: 0.05,
+	}
 }

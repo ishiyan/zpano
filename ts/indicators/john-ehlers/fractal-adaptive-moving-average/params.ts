@@ -41,3 +41,7 @@ export interface FractalAdaptiveMovingAverageParams {
    */
   tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): FractalAdaptiveMovingAverageParams {
+    return { length: 16, slowestSmoothingFactor: 0.01 };
+}

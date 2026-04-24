@@ -56,6 +56,14 @@ export interface KaufmanAdaptiveMovingAverageLengthParams {
     tradeComponent?: TradeComponent;
 }
 
+export function defaultLengthParams(): KaufmanAdaptiveMovingAverageLengthParams {
+    return { efficiencyRatioLength: 10, fastestLength: 2, slowestLength: 30 };
+}
+
+export function defaultSmoothingFactorParams(): KaufmanAdaptiveMovingAverageSmoothingFactorParams {
+    return { efficiencyRatioLength: 10, fastestSmoothingFactor: 2 / 3, slowestSmoothingFactor: 2 / 31 };
+}
+
 /** Describes parameters to create an instance of the indicator based on smoothing factor. */
 export interface KaufmanAdaptiveMovingAverageSmoothingFactorParams {
     /**

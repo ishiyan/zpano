@@ -32,3 +32,9 @@ export interface PearsonsCorrelationCoefficientParams {
      */
     tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): PearsonsCorrelationCoefficientParams {
+    return {
+        length: 20,
+    };
+}

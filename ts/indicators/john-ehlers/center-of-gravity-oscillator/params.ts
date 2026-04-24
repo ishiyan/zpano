@@ -34,3 +34,7 @@ export interface CenterOfGravityOscillatorParams {
    */
   tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): CenterOfGravityOscillatorParams {
+    return { length: 10 };
+}

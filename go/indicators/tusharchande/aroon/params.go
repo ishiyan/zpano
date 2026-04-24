@@ -7,3 +7,10 @@ type AroonParams struct {
 	// The value should be greater than 1. The default value is 14.
 	Length int
 }
+
+// DefaultParams returns a [AroonParams] value populated with conventional defaults.
+func DefaultParams() *AroonParams {
+	return &AroonParams{
+		Length: 14,
+	}
+}

@@ -64,3 +64,7 @@ export interface PercentagePriceOscillatorParams {
      */
     tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): PercentagePriceOscillatorParams {
+    return { fastLength: 12, slowLength: 26 };
+}

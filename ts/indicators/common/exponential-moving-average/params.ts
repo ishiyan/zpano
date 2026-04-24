@@ -83,3 +83,15 @@ export interface ExponentialMovingAverageSmoothingFactorParams {
      */
     tradeComponent?: TradeComponent;
 }
+
+export function defaultLengthParams(): ExponentialMovingAverageLengthParams {
+    return {
+        length: 20,
+    };
+}
+
+export function defaultSmoothingFactorParams(): ExponentialMovingAverageSmoothingFactorParams {
+    return {
+        smoothingFactor: 0.0952,
+    };
+}

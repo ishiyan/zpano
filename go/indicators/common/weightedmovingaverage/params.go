@@ -24,3 +24,10 @@ type WeightedMovingAverageParams struct {
 	// If zero, the default (TradePrice) is used and the component is not shown in the indicator mnemonic.
 	TradeComponent entities.TradeComponent
 }
+
+// DefaultParams returns a WeightedMovingAverageParams value populated with conventional defaults.
+func DefaultParams() *WeightedMovingAverageParams {
+	return &WeightedMovingAverageParams{
+		Length: 20,
+	}
+}

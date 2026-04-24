@@ -56,3 +56,12 @@ type StochasticRelativeStrengthIndexParams struct {
 	// If zero, the default (TradePrice) is used and the component is not shown in the indicator mnemonic.
 	TradeComponent entities.TradeComponent
 }
+
+// DefaultParams returns a [StochasticRelativeStrengthIndexParams] value populated with conventional defaults.
+func DefaultParams() *StochasticRelativeStrengthIndexParams {
+	return &StochasticRelativeStrengthIndexParams{
+		Length:      14,
+		FastKLength: 5,
+		FastDLength: 3,
+	}
+}

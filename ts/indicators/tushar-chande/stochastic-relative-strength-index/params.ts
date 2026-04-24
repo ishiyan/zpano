@@ -71,3 +71,7 @@ export interface StochasticRelativeStrengthIndexParams {
      */
     tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): StochasticRelativeStrengthIndexParams {
+    return { length: 14, fastKLength: 5, fastDLength: 3 };
+}

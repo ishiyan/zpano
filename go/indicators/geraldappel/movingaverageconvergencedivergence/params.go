@@ -61,3 +61,12 @@ type MovingAverageConvergenceDivergenceParams struct {
 	// If zero, the default (TradePrice) is used and the component is not shown in the indicator mnemonic.
 	TradeComponent entities.TradeComponent
 }
+
+// DefaultParams returns a [MovingAverageConvergenceDivergenceParams] value populated with conventional defaults.
+func DefaultParams() *MovingAverageConvergenceDivergenceParams {
+	return &MovingAverageConvergenceDivergenceParams{
+		FastLength:   12,
+		SlowLength:   26,
+		SignalLength: 9,
+	}
+}

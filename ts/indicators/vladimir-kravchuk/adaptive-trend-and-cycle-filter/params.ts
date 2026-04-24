@@ -30,3 +30,7 @@ export interface AdaptiveTrendAndCycleFilterParams {
    */
   tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): AdaptiveTrendAndCycleFilterParams {
+    return {};
+}

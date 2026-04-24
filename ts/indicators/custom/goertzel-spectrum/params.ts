@@ -63,3 +63,7 @@ export interface GoertzelSpectrumParams {
    * If _undefined_, a default value is used and the component is not shown in the mnemonic. */
   tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): GoertzelSpectrumParams {
+    return { length: 64, minPeriod: 2, maxPeriod: 64, spectrumResolution: 1, automaticGainControlDecayFactor: 0.991 };
+}

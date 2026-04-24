@@ -59,3 +59,7 @@ export interface DiscreteFourierTransformSpectrumParams {
    * If _undefined_, a default value is used and the component is not shown in the mnemonic. */
   tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): DiscreteFourierTransformSpectrumParams {
+    return { length: 48, minPeriod: 10, maxPeriod: 48, spectrumResolution: 1, automaticGainControlDecayFactor: 0.995 };
+}

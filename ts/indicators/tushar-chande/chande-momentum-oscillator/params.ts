@@ -32,3 +32,7 @@ export interface ChandeMomentumOscillatorParams {
      */
     tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): ChandeMomentumOscillatorParams {
+    return { length: 14 };
+}

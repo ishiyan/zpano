@@ -60,3 +60,17 @@ type TripleExponentialMovingAverageSmoothingFactorParams struct {
 	// If zero, the default (TradePrice) is used and the component is not shown in the indicator mnemonic.
 	TradeComponent entities.TradeComponent
 }
+
+// DefaultLengthParams returns a [TripleExponentialMovingAverageLengthParams] value populated with conventional defaults.
+func DefaultLengthParams() *TripleExponentialMovingAverageLengthParams {
+	return &TripleExponentialMovingAverageLengthParams{
+		Length: 20,
+	}
+}
+
+// DefaultSmoothingFactorParams returns a [TripleExponentialMovingAverageSmoothingFactorParams] value populated with conventional defaults.
+func DefaultSmoothingFactorParams() *TripleExponentialMovingAverageSmoothingFactorParams {
+	return &TripleExponentialMovingAverageSmoothingFactorParams{
+		SmoothingFactor: 0.0952,
+	}
+}

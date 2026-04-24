@@ -32,3 +32,9 @@ export interface LinearRegressionParams {
    */
   tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): LinearRegressionParams {
+    return {
+        length: 20,
+    };
+}

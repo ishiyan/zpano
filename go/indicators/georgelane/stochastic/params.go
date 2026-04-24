@@ -44,3 +44,12 @@ type StochasticParams struct {
 	// Only relevant when an MA type is EMA.
 	FirstIsAverage bool
 }
+
+// DefaultParams returns a [StochasticParams] value populated with conventional defaults.
+func DefaultParams() *StochasticParams {
+	return &StochasticParams{
+		FastKLength: 5,
+		SlowKLength: 3,
+		SlowDLength: 3,
+	}
+}

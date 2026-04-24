@@ -39,3 +39,7 @@ export interface DominantCycleParams {
    */
   tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): DominantCycleParams {
+    return { alphaEmaPeriodAdditional: 0.33 };
+}

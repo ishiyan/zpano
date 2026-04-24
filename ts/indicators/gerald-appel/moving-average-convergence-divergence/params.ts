@@ -78,3 +78,7 @@ export interface MovingAverageConvergenceDivergenceParams {
      */
     tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): MovingAverageConvergenceDivergenceParams {
+    return { fastLength: 12, slowLength: 26, signalLength: 9 };
+}

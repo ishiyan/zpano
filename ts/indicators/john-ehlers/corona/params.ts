@@ -45,3 +45,7 @@ export const DefaultCoronaParams: Required<CoronaParams> = {
   decibelsLowerThreshold: 6,
   decibelsUpperThreshold: 20,
 };
+
+export function defaultParams(): CoronaParams {
+    return { ...DefaultCoronaParams };
+}

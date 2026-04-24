@@ -34,3 +34,7 @@ export interface CoronaTrendVigorParams {
   /** A component of a trade to use. */
   tradeComponent?: TradeComponent;
 }
+
+export function defaultParams(): CoronaTrendVigorParams {
+    return { rasterLength: 50, maxRasterValue: 20, minParameterValue: -10, maxParameterValue: 10, highPassFilterCutoff: 30, minimalPeriod: 6, maximalPeriod: 30 };
+}

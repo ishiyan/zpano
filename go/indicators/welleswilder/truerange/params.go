@@ -5,3 +5,8 @@ package truerange
 // The True Range indicator has no configurable parameters.
 // This struct exists for consistency with other indicators.
 type TrueRangeParams struct{}
+
+// DefaultParams returns a [TrueRangeParams] value populated with conventional defaults.
+func DefaultParams() *TrueRangeParams {
+	return &TrueRangeParams{}
+}
