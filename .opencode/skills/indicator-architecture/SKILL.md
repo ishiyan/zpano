@@ -37,9 +37,11 @@ indicators/
 │   └── ...
 ├── core/                   # Shared types, interfaces, enums, base classes
 │   ├── outputs/            # Indicator output data types (band, heatmap, ...)
+│   │   └── shape/          # Output shape enum (shape.Shape in Go, Shape in TS)
 │   └── frequency-response/ # Frequency response calculation utilities
 ├── custom/                 # Your own experimental/custom indicators
 │   └── my-indicator/
+├── factory/                # Identifier + JSON params → indicator instance
 ├── <author-name>/          # Author-attributed indicators
 │   └── <indicator-name>/
 │       ├── implementation
@@ -48,15 +50,16 @@ indicators/
 └── ...
 ```
 
-### The Three Special Folders
+### The Four Special Folders
 
 | Folder     | Purpose |
 |------------|---------|
 | `core/`    | Shared foundations: types, interfaces, enums, base abstractions, utilities. |
 | `common/`  | Indicators whose author is unknown or not attributed to a single person (SMA, EMA, RSI, ...). |
 | `custom/`  | Indicators you develop yourself. |
+| `factory/` | Maps an indicator identifier + JSON parameters to a fully constructed indicator instance. Sits at `indicators/factory/` as a sibling of `core/` (not inside `core/`) because Go's circular-import rule prevents `core` from importing indicator packages. |
 
-These three names are **reserved** and must never be used as author names.
+These four names are **reserved** and must never be used as author names.
 
 ### Author Folders
 
@@ -124,10 +127,129 @@ core/
   types; the taxonomy enum lives in the `outputs/shape/` sub-package as
   `shape.Shape` (Go) / `Shape` (TS).
 - **`frequency-response/`** contains utilities for computing the frequency
-  response of a filter/indicator.
+  response of a filter/indicator. See the **Frequency Response API** section
+  below for the full API reference.
 
 Other shared types (indicator interface, metadata, specification, line indicator
 base class, indicator type enum) live directly in `core/`.
+
+### Frequency Response API
+
+The frequency response module computes the spectral characteristics of a
+filter/indicator by feeding it an impulse signal, applying a real FFT, and
+extracting power, amplitude, and phase spectra. The Go and TS implementations
+are kept **feature-compatible** — both produce the same set of output
+components with the same semantics.
+
+#### Data Types
+
+Both languages use a **component** type that bundles a data array with its
+min/max bounds:
+
+```go
+// Go — frequencyresponse.Component
+type Component struct {
+    Data []float64
+    Min  float64
+    Max  float64
+}
+```
+
+```typescript
+// TS — FrequencyResponseComponent
+interface FrequencyResponseComponent {
+    data: number[];
+    min: number;
+    max: number;
+}
+```
+
+The result struct/interface contains:
+
+| Field                   | Go type      | TS type                       | Description |
+|-------------------------|--------------|-------------------------------|-------------|
+| `Label`                 | `string`     | `label: string`               | Filter mnemonic. |
+| `NormalizedFrequency`   | `[]float64`  | `frequencies: number[]`       | Normalized frequencies in (0, 1], 1 = Nyquist. |
+| `PowerPercent`          | `Component`  | `FrequencyResponseComponent`  | Spectrum power in percentages from max. |
+| `PowerDecibel`          | `Component`  | `FrequencyResponseComponent`  | Spectrum power in decibels. |
+| `AmplitudePercent`      | `Component`  | `FrequencyResponseComponent`  | Spectrum amplitude in percentages from max. |
+| `AmplitudeDecibel`      | `Component`  | `FrequencyResponseComponent`  | Spectrum amplitude in decibels. |
+| `PhaseDegrees`          | `Component`  | `FrequencyResponseComponent`  | Phase in degrees, range [-180, 180]. |
+| `PhaseDegreesUnwrapped` | `Component`  | `FrequencyResponseComponent`  | Phase in degrees, unwrapped. |
+
+#### Filter Interface
+
+Both languages require the filter to expose metadata and an update function:
+
+```go
+// Go
+type Updater interface {
+    Metadata() core.Metadata
+    Update(sample float64) float64
+}
+```
+
+```typescript
+// TS
+interface FrequencyResponseFilter {
+    metadata(): { mnemonic: string };
+    update(sample: number): number;
+}
+```
+
+#### Calculate Signature
+
+```go
+// Go
+func Calculate(signalLength int, filter Updater, warmup int,
+    phaseDegreesUnwrappingLimit float64) (*FrequencyResponse, error)
+```
+
+```typescript
+// TS
+static calculate(signalLength: number, filter: FrequencyResponseFilter,
+    warmup: number, phaseDegreesUnwrappingLimit = 179,
+    filteredSignal: number[] = []): FrequencyResponseResult
+```
+
+| Parameter                      | Description |
+|--------------------------------|-------------|
+| `signalLength`                 | Must be a power of 2 and ≥ 4 (realistic: 512–4096). |
+| `filter`                       | The filter/indicator to analyze. |
+| `warmup`                       | Number of zero-value updates before the impulse. |
+| `phaseDegreesUnwrappingLimit`  | Threshold for phase unwrapping (use 179 as default). |
+| `filteredSignal` (TS only)     | Optional pre-computed filtered signal; if provided and length matches, skips internal filtering. |
+
+**Error handling:** Go returns `(*FrequencyResponse, error)`; TS throws on
+invalid signal length.
+
+#### Processing Pipeline
+
+Both implementations follow the same pipeline:
+
+1. Validate signal length (power of 2, ≥ 4).
+2. Compute `spectrumLength = signalLength/2 - 1`.
+3. Prepare frequency domain (normalized frequencies).
+4. Prepare filtered signal (warmup with zeros, then impulse of 1000).
+5. Apply direct real FFT.
+6. Parse spectrum → extract power, amplitude, phase (with min/max tracking).
+7. Unwrap phase degrees using the unwrapping limit.
+8. Convert power/amplitude to decibels (with base normalization, min/max clamping).
+9. Convert power/amplitude to percentages (with base normalization, max clamping).
+
+#### Decibel Conversion
+
+Decibels are computed relative to a base value (first element, or max if first
+is near zero): `db = 20 * log10(value / base)`. The min is snapped to the
+nearest [-100, -90), [-90, -80), ..., [-10, 0) interval boundary. Values below
+-100 dB are clamped. The max is snapped to [0, 5) or [5, 10) interval
+boundaries and clamped at 10 dB.
+
+#### Percentage Conversion
+
+Percentages are computed as `100 * value / base`. The max is snapped to
+[100, 110), [110, 120), ..., [190, 200) interval boundaries and clamped at
+200%. Min is always 0.
 
 ## Naming Conventions per Language
 
@@ -151,20 +273,13 @@ context). All other languages use fully-qualified symbol names.
 | Indicator identity| `core.Identifier`   | --                          | `IndicatorIdentifier`            |
 | Output shape      | --                  | `shape.Shape`               | `Shape`                          |
 
-### Identifier Registry Asymmetry
+### Identifier Registry Parity
 
-Go and TypeScript do not always have the same number of registered identifiers.
-As of writing, Go has **72** `core.Identifier` constants (iota 1–72) while TS
-has **65** `IndicatorIdentifier` enum values (0-based). The gap exists because
-some indicators have been converted in Go but not yet in TS (or vice versa).
-When adding a new indicator, register the identifier in **both** languages even
-if only one implementation exists yet — this keeps the registries aligned.
-
-**KAMA identifier quirk:** The Go JSON string for KAMA is
-`"kaufmanAdaptiveMovingAverageMovingAverage"` (with "MovingAverage" duplicated)
-because `core/identifier.go` defines it that way. The TS enum is just
-`KaufmanAdaptiveMovingAverage` (no duplicate). Any tooling that maps between
-the two (e.g., the TS `icalc` CLI) must handle this mismatch explicitly.
+Go and TypeScript MUST have the same set of registered identifiers. Both
+currently have **72** identifiers (Go: `core.Identifier` iota 1–72; TS:
+`IndicatorIdentifier` enum 0–71) with identical PascalCase names. When
+adding a new indicator, register the identifier in **both** languages even
+if only one implementation exists yet.
 
 ### File Naming
 

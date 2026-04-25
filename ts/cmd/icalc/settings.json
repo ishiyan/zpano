@@ -7,7 +7,7 @@
   { "identifier": "tripleExponentialMovingAverage", "params": { "length": 10 } },
   { "identifier": "t2ExponentialMovingAverage", "params": { "length": 10, "volumeFactor": 0.7 } },
   { "identifier": "t3ExponentialMovingAverage", "params": { "length": 10, "volumeFactor": 0.7 } },
-  { "identifier": "kaufmanAdaptiveMovingAverageMovingAverage", "params": { "efficiencyRatioLength": 10, "fastestLength": 2, "slowestLength": 30 } },
+  { "identifier": "kaufmanAdaptiveMovingAverage", "params": { "efficiencyRatioLength": 10, "fastestLength": 2, "slowestLength": 30 } },
   { "identifier": "jurikMovingAverage", "params": { "length": 14, "phase": 0 } },
   { "identifier": "mesaAdaptiveMovingAverage", "params": {} },
   { "identifier": "fractalAdaptiveMovingAverage", "params": { "length": 16 } },

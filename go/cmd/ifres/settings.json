@@ -1,0 +1,14 @@
+[
+  { "identifier": "simpleMovingAverage", "params": { "length": 14 } },
+  { "identifier": "exponentialMovingAverage", "params": { "length": 14 } },
+  { "identifier": "doubleExponentialMovingAverage", "params": { "length": 14 } },
+  { "identifier": "tripleExponentialMovingAverage", "params": { "length": 14 } },
+  { "identifier": "t3ExponentialMovingAverage", "params": { "length": 10, "volumeFactor": 0.7 } },
+  { "identifier": "kaufmanAdaptiveMovingAverage", "params": { "efficiencyRatioLength": 10, "fastestLength": 2, "slowestLength": 30 } },
+  { "identifier": "superSmoother", "params": { "shortestCyclePeriod": 10 } },
+  { "identifier": "roofingFilter", "params": { "shortestCyclePeriod": 10, "longestCyclePeriod": 48 } },
+  { "identifier": "relativeStrengthIndex", "params": { "length": 14 } },
+  { "identifier": "chandeMomentumOscillator", "params": { "length": 14 } },
+  { "identifier": "momentum", "params": { "length": 10 } },
+  { "identifier": "absolutePriceOscillator", "params": { "fastLength": 12, "slowLength": 26 } }
+]

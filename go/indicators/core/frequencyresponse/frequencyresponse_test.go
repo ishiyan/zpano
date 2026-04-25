@@ -104,42 +104,6 @@ func TestFrequencyResponse(t *testing.T) {
 		}
 	})
 
-	t.Run("normalize array", func(t *testing.T) {
-		t.Parallel()
-
-		t.Run("zero max", func(t *testing.T) {
-			t.Parallel()
-
-			expected := []float64{1, 2, 3, 4, 5}
-			actual := []float64{1, 2, 3, 4, 5}
-
-			normalize(len(actual), actual, 0)
-
-			for i := 0; i < len(expected); i++ {
-				exp := expected[i]
-				act := actual[i]
-				check(i, exp, act)
-			}
-		})
-
-		t.Run("positive max", func(t *testing.T) {
-			t.Parallel()
-
-			const max = float64(6)
-
-			expected := []float64{2 / max, 3 / max, 4 / max, 5 / max, 6 / max}
-			actual := []float64{2, 3, 4, 5, 6}
-
-			normalize(len(actual), actual, max)
-
-			for i := 0; i < len(expected); i++ {
-				exp := expected[i]
-				act := actual[i]
-				check(i, exp, act)
-			}
-		})
-	})
-
 	t.Run("calculate", func(t *testing.T) {
 		t.Parallel()
 
@@ -148,7 +112,7 @@ func TestFrequencyResponse(t *testing.T) {
 
 		filter := testFrequencyResponseIdentytyFilter(0)
 
-		actual, _ := Calculate(length, filter, warmup)
+		actual, _ := Calculate(length, filter, warmup, 179)
 
 		t.Log(actual != nil)
 	})

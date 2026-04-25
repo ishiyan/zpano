@@ -34,13 +34,8 @@ function resolveIdentifier(name: string): IndicatorIdentifier {
     // The enum members are PascalCase; the JSON uses camelCase.
     // TS numeric enums have a reverse mapping: IndicatorIdentifier["SimpleMovingAverage"] === 0.
     // Convert first char to upper to get PascalCase.
-    let pascal = name.charAt(0).toUpperCase() + name.slice(1);
+    const pascal = name.charAt(0).toUpperCase() + name.slice(1);
 
-    // Handle quirky Go JSON identifier: "kaufmanAdaptiveMovingAverageMovingAverage"
-    // maps to TS enum "KaufmanAdaptiveMovingAverage".
-    if (pascal === 'KaufmanAdaptiveMovingAverageMovingAverage') {
-        pascal = 'KaufmanAdaptiveMovingAverage';
-    }
     const value = (IndicatorIdentifier as unknown as Record<string, number>)[pascal];
     if (value === undefined) {
         throw new Error(`Unknown indicator identifier: "${name}" (tried "${pascal}")`);

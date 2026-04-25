@@ -255,7 +255,7 @@ const (
 	tripleExponentialMovingAverage                 = "tripleExponentialMovingAverage"
 	t2ExponentialMovingAverage                     = "t2ExponentialMovingAverage"
 	t3ExponentialMovingAverage                     = "t3ExponentialMovingAverage"
-	kaufmanAdaptiveMovingAverage                   = "kaufmanAdaptiveMovingAverageMovingAverage"
+	kaufmanAdaptiveMovingAverage                   = "kaufmanAdaptiveMovingAverage"
 	jurikMovingAverage                             = "jurikMovingAverage"
 	mesaAdaptiveMovingAverage                      = "mesaAdaptiveMovingAverage"
 	fractalAdaptiveMovingAverage                   = "fractalAdaptiveMovingAverage"
