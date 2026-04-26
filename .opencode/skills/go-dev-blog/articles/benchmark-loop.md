@@ -1,8 +1,3 @@
----
-description: 'Guidance on writing Go benchmarks with testing.B.Loop (Go 1.24+)'
-applyTo: '**/*_test.go'
----
-
 # `testing.B.Loop` — Preferred Benchmark Loop (Go 1.24+)
 
 `b.Loop()` is the preferred way to write Go benchmarks. It replaces the `for range b.N` pattern with fewer pitfalls and more accurate results.

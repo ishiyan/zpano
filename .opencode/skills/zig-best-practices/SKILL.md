@@ -3,6 +3,9 @@ name: zig-best-practices
 description: Provides Zig patterns for type-first development with tagged unions, explicit error sets, comptime validation, and memory management. Must use when reading or writing Zig files.
 ---
 
+<!-- Upstream: https://www.skillsdirectory.com/skills/aiskillstore-zig-best-practices -->
+<!-- To update: fetch the upstream content and diff against this file, merge relevant changes. -->
+
 # Zig Best Practices
 
 ## Type-First Development

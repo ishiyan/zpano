@@ -1,8 +1,3 @@
----
-description: 'Instructions for running go fix command'
-applyTo: '**/*.go'
----
-
 # `go fix` — Modernize Go Code
 
 Use `go fix` (Go 1.26+) to automatically modernize Go code by applying safe, mechanical transformations that use newer language and library features.

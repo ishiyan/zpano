@@ -1,8 +1,3 @@
----
-description: 'Guidance on runtime.AddCleanup and weak.Pointer in Go 1.24+'
-applyTo: '**/*.go'
----
-
 # `runtime.AddCleanup` and `weak.Pointer` (Go 1.24+)
 
 Go 1.24 introduces two low-level GC primitives that replace `runtime.SetFinalizer`. Prefer these in all new code.

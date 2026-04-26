@@ -3,6 +3,9 @@ name: zig
 description: Up-to-date Zig programming language patterns for version 0.15.x. Use when writing, reviewing, or debugging Zig code, working with build.zig and build.zig.zon files, or using comptime metaprogramming. Critical for avoiding outdated patterns from training data - especially build system APIs (root_module instead of root_source_file), I/O APIs (buffered writer pattern), container initialization (.empty/.init), allocator selection (DebugAllocator), and removed language features (async/await, usingnamespace).
 ---
 
+<!-- Upstream: https://github.com/rudedogg/zig-skills -->
+<!-- To update: fetch the upstream content and diff against this file, merge relevant changes. -->
+
 # Zig Language Reference (v0.15.2)
 
 Zig evolves rapidly. Training data contains outdated patterns that cause compilation errors. This skill documents breaking changes and correct modern patterns.

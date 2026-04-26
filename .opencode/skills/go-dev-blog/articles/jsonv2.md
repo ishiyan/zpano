@@ -1,8 +1,3 @@
----
-description: 'Guidance on encoding/json/v2 and encoding/json/jsontext (experimental, Go 1.25)'
-applyTo: '**/*.go'
----
-
 # `encoding/json/v2` — Experimental JSON API (Go 1.25)
 
 Go 1.25 adds experimental `encoding/json/v2` and `encoding/json/jsontext` packages that fix longstanding `encoding/json` problems: stricter syntax, better defaults, streaming support, and options-first design.

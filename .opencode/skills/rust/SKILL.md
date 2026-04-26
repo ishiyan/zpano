@@ -15,6 +15,9 @@ metadata:
     - ripgrep, tokio, serde, polars codebases
 ---
 
+<!-- Upstream: https://github.com/leonardomso/rust-skills -->
+<!-- To update: fetch the upstream content and diff against this file, merge relevant changes. -->
+
 # Rust Best Practices
 
 Comprehensive guide for writing high-quality, idiomatic, and highly optimized Rust code. Contains 179 rules across 14 categories, prioritized by impact to guide LLMs in code generation and refactoring.

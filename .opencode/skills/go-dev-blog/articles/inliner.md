@@ -1,8 +1,3 @@
----
-description: 'Instructions for using //go:fix inline directive and source-level inliner'
-applyTo: '**/*.go'
----
-
 # `//go:fix inline` — Source-Level Inliner
 
 Use the `//go:fix inline` directive (Go 1.26+) to mark functions, type aliases, and constants for automatic inlining. When users run `go fix`, every call/reference is replaced by the function body / underlying definition. `gopls` also shows diagnostics at call sites in real time.

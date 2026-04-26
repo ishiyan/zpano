@@ -1,8 +1,3 @@
----
-description: 'Guidance on testing/synctest for concurrent Go tests (GA in Go 1.25)'
-applyTo: '**/*_test.go'
----
-
 # `testing/synctest` — Testing Concurrent Code (Go 1.25+)
 
 `testing/synctest` eliminates flaky, slow concurrent tests that rely on `time.Sleep` or polling. It provides deterministic synchronization and a fake clock for goroutines under test.

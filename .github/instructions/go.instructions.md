@@ -3,6 +3,8 @@ description: 'Instructions for writing Go code following idiomatic Go practices 
 applyTo: '**/*.go,**/go.mod,**/go.sum'
 ---
 
+<!-- Upstream: https://github.com/github/awesome-copilot/blob/main/instructions/go.instructions.md -->
+<!-- To update: fetch the upstream file, diff against this copy, merge relevant changes. -->
 # Go Development Instructions
 
 Follow idiomatic Go practices and community standards when writing Go code. These instructions are based on [Effective Go](https://go.dev/doc/effective_go), [Go Code Review Comments](https://go.dev/wiki/CodeReviewComments), and [Google's Go Style Guide](https://google.github.io/styleguide/go/).
@@ -371,3 +373,8 @@ Follow idiomatic Go practices and community standards when writing Go code. Thes
 - Overusing unconstrained types (e.g., `any`); prefer specific types or generic type parameters with constraints. If an unconstrained type is required, use `any` rather than `interface{}`
 - Not considering the zero value of types
 - **Creating duplicate `package` declarations** - this is a compile error; always check existing files before adding package declarations
+
+## Related Skills
+
+- **`go-dev-blog`** — Modern Go features reference (Go 1.21–1.26+) distilled from 20 official blog articles. Load when using newer APIs like `log/slog`, range-over-func iterators, `unique.Handle`, `os.Root`, `testing/synctest`, ServeMux routing patterns, or PGO.
+- **`use-modern-go`** — Modern Go syntax guidelines keyed to the project's Go version. Load when writing new code or modernizing existing code to use current idioms.

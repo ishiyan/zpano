@@ -1,8 +1,3 @@
----
-description: 'Guidance on stack vs heap allocation patterns for slices in Go 1.25+'
-applyTo: '**/*.go'
----
-
 # Stack Allocation of Slices in Go 1.25+
 
 The Go compiler progressively improved slice allocation to favor the stack over the heap. Stack allocations are cheaper (often free), produce no GC pressure, and are cache-friendly. Write natural code and let the compiler optimize — avoid unnecessary hand-tuning.

@@ -1,8 +1,3 @@
----
-description: 'Patterns for generic interfaces in Go (self-referential constraints, pointer receivers)'
-applyTo: '**/*.go'
----
-
 # Generic Interface Patterns in Go
 
 Interfaces can have type parameters, enabling powerful constraint patterns for generic code. These patterns are non-obvious but commonly needed.

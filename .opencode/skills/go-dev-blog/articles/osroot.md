@@ -1,8 +1,3 @@
----
-description: 'Guidance on os.Root for traversal-resistant file access in Go 1.24+'
-applyTo: '**/*.go'
----
-
 # `os.Root` — Traversal-Resistant File Access (Go 1.24+)
 
 Use `os.Root` or `os.OpenInRoot` when opening files in a directory where the filename is untrusted. This prevents path traversal attacks (`../`, symlinks, Windows device names) at the OS level, without TOCTOU races.

@@ -3,21 +3,21 @@ description: 'Rust programming language coding conventions and best practices'
 applyTo: '**/*.rs'
 ---
 
+<!-- Upstream: https://github.com/github/awesome-copilot/blob/main/instructions/rust.instructions.md -->
+<!-- Locally trimmed to remove external-crate assumptions (serde, tokio, rayon, async-std) for this zero-deps project. -->
+<!-- To update: fetch upstream, diff, merge relevant changes, then re-apply project-specific trimming. -->
+
 # Rust Coding Conventions and Best Practices
 
-Follow idiomatic Rust practices and community standards when writing Rust code. 
+Follow idiomatic Rust practices and community standards when writing Rust code.
 
-These instructions are based on [The Rust Book](https://doc.rust-lang.org/book/), [Rust API Guidelines](https://rust-lang.github.io/api-guidelines/), [RFC 430 naming conventions](https://github.com/rust-lang/rfcs/blob/master/text/0430-finalizing-naming-conventions.md), and the broader Rust community at [users.rust-lang.org](https://users.rust-lang.org).
+Based on [The Rust Book](https://doc.rust-lang.org/book/), [Rust API Guidelines](https://rust-lang.github.io/api-guidelines/), and [RFC 430 naming conventions](https://github.com/rust-lang/rfcs/blob/master/text/0430-finalizing-naming-conventions.md).
 
 ## General Instructions
 
-- Always prioritize readability, safety, and maintainability.
+- Prioritize readability, safety, and maintainability.
 - Use strong typing and leverage Rust's ownership system for memory safety.
-- Break down complex functions into smaller, more manageable functions.
-- For algorithm-related code, include explanations of the approach used.
-- Write code with good maintainability practices, including comments on why certain design decisions were made.
 - Handle errors gracefully using `Result<T, E>` and provide meaningful error messages.
-- For external dependencies, mention their usage and purpose in documentation.
 - Use consistent naming conventions following [RFC 430](https://github.com/rust-lang/rfcs/blob/master/text/0430-finalizing-naming-conventions.md).
 - Write idiomatic, safe, and efficient Rust code that follows the borrow checker's rules.
 - Ensure code compiles without warnings.
@@ -26,13 +26,7 @@ These instructions are based on [The Rust Book](https://doc.rust-lang.org/book/)
 
 - Use modules (`mod`) and public interfaces (`pub`) to encapsulate logic.
 - Handle errors properly using `?`, `match`, or `if let`.
-- Use `serde` for serialization and `thiserror` or `anyhow` for custom errors.
-- Implement traits to abstract services or external dependencies.
-- Structure async code using `async/await` and `tokio` or `async-std`.
 - Prefer enums over flags and states for type safety.
-- Use builders for complex object creation.
-- Split binary and library code (`main.rs` vs `lib.rs`) for testability and reuse.
-- Use `rayon` for data parallelism and CPU-bound tasks.
 - Use iterators instead of index-based loops as they're often faster and safer.
 - Use `&str` instead of `String` for function parameters when you don't need ownership.
 - Prefer borrowing and zero-copy operations to avoid unnecessary allocations.
@@ -42,8 +36,8 @@ These instructions are based on [The Rust Book](https://doc.rust-lang.org/book/)
 - Prefer borrowing (`&T`) over cloning unless ownership transfer is necessary.
 - Use `&mut T` when you need to modify borrowed data.
 - Explicitly annotate lifetimes when the compiler cannot infer them.
-- Use `Rc<T>` for single-threaded reference counting and `Arc<T>` for thread-safe reference counting.
-- Use `RefCell<T>` for interior mutability in single-threaded contexts and `Mutex<T>` or `RwLock<T>` for multi-threaded contexts.
+- Use `Rc<T>` / `Arc<T>` for shared ownership (single-threaded / thread-safe).
+- Use `RefCell<T>` / `Mutex<T>` / `RwLock<T>` for interior mutability.
 
 ## Patterns to Avoid
 
@@ -51,85 +45,48 @@ These instructions are based on [The Rust Book](https://doc.rust-lang.org/book/)
 - Avoid panics in library code—return `Result` instead.
 - Don't rely on global mutable state—use dependency injection or thread-safe containers.
 - Avoid deeply nested logic—refactor with functions or combinators.
-- Don't ignore warnings—treat them as errors during CI.
 - Avoid `unsafe` unless required and fully documented.
-- Don't overuse `clone()`, use borrowing instead of cloning unless ownership transfer is needed.
-- Avoid premature `collect()`, keep iterators lazy until you actually need the collection.
-- Avoid unnecessary allocations—prefer borrowing and zero-copy operations.
+- Don't overuse `clone()`; prefer borrowing.
+- Avoid premature `collect()`; keep iterators lazy until you need the collection.
 
 ## Code Style and Formatting
 
-- Follow the Rust Style Guide and use `rustfmt` for automatic formatting.
+- Use `rustfmt` for formatting. Use `cargo clippy` for linting.
 - Keep lines under 100 characters when possible.
-- Place function and struct documentation immediately before the item using `///`.
-- Use `cargo clippy` to catch common mistakes and enforce best practices.
+- Place documentation immediately before the item using `///`.
 
 ## Error Handling
 
 - Use `Result<T, E>` for recoverable errors and `panic!` only for unrecoverable errors.
-- Prefer `?` operator over `unwrap()` or `expect()` for error propagation.
-- Create custom error types using `thiserror` or implement `std::error::Error`.
+- Prefer `?` operator for error propagation.
+- Implement `std::error::Error` for custom error types (or use `thiserror` if available).
 - Use `Option<T>` for values that may or may not exist.
-- Provide meaningful error messages and context.
-- Error types should be meaningful and well-behaved (implement standard traits).
 - Validate function arguments and return appropriate errors for invalid input.
 
-## API Design Guidelines
+## API Design
 
-### Common Traits Implementation
-Eagerly implement common traits where appropriate:
-- `Copy`, `Clone`, `Eq`, `PartialEq`, `Ord`, `PartialOrd`, `Hash`, `Debug`, `Display`, `Default`
-- Use standard conversion traits: `From`, `AsRef`, `AsMut`
-- Collections should implement `FromIterator` and `Extend`
-- Note: `Send` and `Sync` are auto-implemented by the compiler when safe; avoid manual implementation unless using `unsafe` code
+- Eagerly implement common traits: `Debug`, `Clone`, `PartialEq`, `Default`, and others as appropriate.
+- Use standard conversion traits: `From`, `AsRef`, `AsMut`.
+- Use newtypes for static distinctions; prefer specific types over `bool` parameters.
+- Functions with a clear receiver should be methods.
+- Structs should have private fields; all public types must implement `Debug`.
 
-### Type Safety and Predictability
-- Use newtypes to provide static distinctions
-- Arguments should convey meaning through types; prefer specific types over generic `bool` parameters
-- Use `Option<T>` appropriately for truly optional values
-- Functions with a clear receiver should be methods
-- Only smart pointers should implement `Deref` and `DerefMut`
+## Testing
 
-### Future Proofing
-- Use sealed traits to protect against downstream implementations
-- Structs should have private fields
-- Functions should validate their arguments
-- All public types must implement `Debug`
-
-## Testing and Documentation
-
-- Write comprehensive unit tests using `#[cfg(test)]` modules and `#[test]` annotations.
-- Use test modules alongside the code they test (`mod tests { ... }`).
-- Write integration tests in `tests/` directory with descriptive filenames.
-- Write clear and concise comments for each function, struct, enum, and complex logic.
-- Ensure functions have descriptive names and include comprehensive documentation.
-- Document all public APIs with rustdoc (`///` comments) following the [API Guidelines](https://rust-lang.github.io/api-guidelines/).
-- Use `#[doc(hidden)]` to hide implementation details from public documentation.
-- Document error conditions, panic scenarios, and safety considerations.
-- Examples should use `?` operator, not `unwrap()` or deprecated `try!` macro.
-
-## Project Organization
-
-- Use semantic versioning in `Cargo.toml`.
-- Include comprehensive metadata: `description`, `license`, `repository`, `keywords`, `categories`.
-- Use feature flags for optional functionality.
-- Organize code into modules using `mod.rs` or named files.
-- Keep `main.rs` or `lib.rs` minimal - move logic to modules.
+- Write unit tests in `#[cfg(test)] mod tests { ... }` at the bottom of source files.
+- Use `#[test]` annotations; name tests descriptively.
+- Test both success and error cases.
+- Document all public APIs with rustdoc (`///` comments).
 
 ## Quality Checklist
 
-Before publishing or reviewing Rust code, ensure:
+- [ ] Naming follows RFC 430 conventions
+- [ ] Common traits implemented (`Debug`, `Clone`, `PartialEq`) where appropriate
+- [ ] Error handling uses `Result<T, E>` with meaningful error types
+- [ ] No unnecessary `unsafe` code
+- [ ] Efficient use of iterators, minimal allocations
+- [ ] Code passes `cargo fmt`, `cargo clippy`, and `cargo test`
 
-### Core Requirements
-- [ ] **Naming**: Follows RFC 430 naming conventions
-- [ ] **Traits**: Implements `Debug`, `Clone`, `PartialEq` where appropriate
-- [ ] **Error Handling**: Uses `Result<T, E>` and provides meaningful error types
-- [ ] **Documentation**: All public items have rustdoc comments with examples
-- [ ] **Testing**: Comprehensive test coverage including edge cases
+## Related Skills
 
-### Safety and Quality
-- [ ] **Safety**: No unnecessary `unsafe` code, proper error handling
-- [ ] **Performance**: Efficient use of iterators, minimal allocations
-- [ ] **API Design**: Functions are predictable, flexible, and type-safe
-- [ ] **Future Proofing**: Private fields in structs, sealed traits where appropriate
-- [ ] **Tooling**: Code passes `cargo fmt`, `cargo clippy`, and `cargo test`
+- **`rust-skills`** — Comprehensive Rust coding guidelines with 179 rules across 14 categories covering ownership, error handling, async patterns, API design, memory optimization, performance, testing, and common anti-patterns. Load for in-depth guidance when writing or reviewing Rust code.

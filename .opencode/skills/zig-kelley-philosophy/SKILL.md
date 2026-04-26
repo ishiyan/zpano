@@ -3,6 +3,9 @@ name: kelley-zig-philosophy
 description: Write Zig code in the style of Andrew Kelley, creator of Zig. Emphasizes simplicity, explicit behavior, compile-time metaprogramming, and being a better C. Use when writing systems code that prioritizes clarity and safety.
 ---
 
+<!-- Upstream: https://www.skillsdirectory.com/skills/majiayu000-kelley -->
+<!-- To update: fetch the upstream content and diff against this file, merge relevant changes. -->
+
 # Andrew Kelley Style Guide
 
 ## Overview
