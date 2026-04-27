@@ -109,12 +109,12 @@ pub const AbsolutePriceOscillator = struct {
         switch (params.moving_average_type) {
             .ema => {
                 ma_label = "EMA";
-                var fast_ema = ema_mod.ExponentialMovingAverage.initLength(.{
+                var fast_ema = try ema_mod.ExponentialMovingAverage.initLength(.{
                     .length = params.fast_length,
                     .first_is_average = params.first_is_average,
                 });
                 fast_ema.fixSlices();
-                var slow_ema = ema_mod.ExponentialMovingAverage.initLength(.{
+                var slow_ema = try ema_mod.ExponentialMovingAverage.initLength(.{
                     .length = params.slow_length,
                     .first_is_average = params.first_is_average,
                 });

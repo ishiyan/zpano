@@ -66,6 +66,9 @@ pub const rate_of_change_percent = @import("common/rate_of_change_percent/rate_o
 pub const rate_of_change_ratio = @import("common/rate_of_change_ratio/rate_of_change_ratio.zig");
 pub const variance = @import("common/variance/variance.zig");
 pub const standard_deviation = @import("common/standard_deviation/standard_deviation.zig");
+pub const absolute_price_oscillator = @import("common/absolute_price_oscillator/absolute_price_oscillator.zig");
+pub const linear_regression = @import("common/linear_regression/linear_regression.zig");
+pub const pearsons_correlation_coefficient = @import("common/pearsons_correlation_coefficient/pearsons_correlation_coefficient.zig");
 
 // Force-include tests from sub-modules.
 comptime {
@@ -80,4 +83,7 @@ comptime {
     _ = rate_of_change_ratio;
     _ = variance;
     _ = standard_deviation;
+    _ = absolute_price_oscillator;
+    _ = linear_regression;
+    _ = pearsons_correlation_coefficient;
 }

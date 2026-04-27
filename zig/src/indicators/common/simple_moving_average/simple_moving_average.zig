@@ -113,7 +113,7 @@ pub const SimpleMovingAverage = struct {
 
     /// After init, fix up the line's mnemonic/description slices to point into
     /// `self`'s own buffers (not the stack-local ones from `init`).
-    fn fixSlices(self: *SimpleMovingAverage) void {
+    pub fn fixSlices(self: *SimpleMovingAverage) void {
         self.line.mnemonic = self.mnemonic_buf[0..self.mnemonic_len];
         self.line.description = self.description_buf[0..self.description_len];
     }

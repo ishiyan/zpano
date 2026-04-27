@@ -141,7 +141,7 @@ pub const ExponentialMovingAverage = struct {
         };
     }
 
-    fn fixSlices(self: *ExponentialMovingAverage) void {
+    pub fn fixSlices(self: *ExponentialMovingAverage) void {
         self.line.mnemonic = self.mnemonic_buf[0..self.mnemonic_len];
         self.line.description = self.description_buf[0..self.description_len];
     }
