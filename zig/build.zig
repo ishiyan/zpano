@@ -122,13 +122,13 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
-    _ = b.addModule("scalar", .{
+    const scalar_mod = b.addModule("scalar", .{
         .root_source_file = b.path("src/entities/scalar.zig"),
         .target = target,
         .optimize = optimize,
     });
 
-    _ = b.addModule("bar_component", .{
+    const bar_component_mod = b.addModule("bar_component", .{
         .root_source_file = b.path("src/entities/bar_component.zig"),
         .target = target,
         .optimize = optimize,
@@ -137,7 +137,7 @@ pub fn build(b: *std.Build) void {
         },
     });
 
-    _ = b.addModule("quote_component", .{
+    const quote_component_mod = b.addModule("quote_component", .{
         .root_source_file = b.path("src/entities/quote_component.zig"),
         .target = target,
         .optimize = optimize,
@@ -146,12 +146,28 @@ pub fn build(b: *std.Build) void {
         },
     });
 
-    _ = b.addModule("trade_component", .{
+    const trade_component_mod = b.addModule("trade_component", .{
         .root_source_file = b.path("src/entities/trade_component.zig"),
         .target = target,
         .optimize = optimize,
         .imports = &.{
             .{ .name = "trade", .module = trade_mod },
+        },
+    });
+
+    // --- Indicators library module ---
+    _ = b.addModule("indicators", .{
+        .root_source_file = b.path("src/indicators/indicators.zig"),
+        .target = target,
+        .optimize = optimize,
+        .imports = &.{
+            .{ .name = "bar", .module = bar_mod },
+            .{ .name = "quote", .module = quote_mod },
+            .{ .name = "trade", .module = trade_mod },
+            .{ .name = "scalar", .module = scalar_mod },
+            .{ .name = "bar_component", .module = bar_component_mod },
+            .{ .name = "quote_component", .module = quote_component_mod },
+            .{ .name = "trade_component", .module = trade_component_mod },
         },
     });
 
@@ -338,6 +354,21 @@ pub fn build(b: *std.Build) void {
         },
     });
 
+    const indicators_test_mod = b.createModule(.{
+        .root_source_file = b.path("src/indicators/indicators.zig"),
+        .target = target,
+        .optimize = optimize,
+        .imports = &.{
+            .{ .name = "bar", .module = bar_mod },
+            .{ .name = "quote", .module = quote_mod },
+            .{ .name = "trade", .module = trade_mod },
+            .{ .name = "scalar", .module = scalar_mod },
+            .{ .name = "bar_component", .module = bar_component_mod },
+            .{ .name = "quote_component", .module = quote_component_mod },
+            .{ .name = "trade_component", .module = trade_component_mod },
+        },
+    });
+
     // --- Tests ---
     const conventions_tests = b.addTest(.{ .root_module = conventions_test_mod, .filters = filters });
     const daycounting_tests = b.addTest(.{ .root_module = daycounting_test_mod, .filters = filters });
@@ -360,6 +391,7 @@ pub fn build(b: *std.Build) void {
     const bar_component_tests = b.addTest(.{ .root_module = bar_component_test_mod, .filters = filters });
     const quote_component_tests = b.addTest(.{ .root_module = quote_component_test_mod, .filters = filters });
     const trade_component_tests = b.addTest(.{ .root_module = trade_component_test_mod, .filters = filters });
+    const indicators_tests = b.addTest(.{ .root_module = indicators_test_mod, .filters = filters });
 
     const run_conventions_tests = b.addRunArtifact(conventions_tests);
     const run_daycounting_tests = b.addRunArtifact(daycounting_tests);
@@ -382,6 +414,7 @@ pub fn build(b: *std.Build) void {
     const run_bar_component_tests = b.addRunArtifact(bar_component_tests);
     const run_quote_component_tests = b.addRunArtifact(quote_component_tests);
     const run_trade_component_tests = b.addRunArtifact(trade_component_tests);
+    const run_indicators_tests = b.addRunArtifact(indicators_tests);
 
     const test_step = b.step("test", "Run all tests");
     test_step.dependOn(&run_conventions_tests.step);
@@ -405,4 +438,5 @@ pub fn build(b: *std.Build) void {
     test_step.dependOn(&run_bar_component_tests.step);
     test_step.dependOn(&run_quote_component_tests.step);
     test_step.dependOn(&run_trade_component_tests.step);
+    test_step.dependOn(&run_indicators_tests.step);
 }

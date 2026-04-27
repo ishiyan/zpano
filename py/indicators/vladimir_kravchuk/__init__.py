@@ -1,0 +1,1 @@
+"""Vladimir Kravchuk indicators."""

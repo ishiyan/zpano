@@ -1,21 +1,21 @@
 ---
 name: indicator-conversion
-description: Step-by-step guide for converting old-structure indicators to the new architecture in both Go and TypeScript. Load when migrating an existing indicator.
+description: Step-by-step guide for converting old-structure indicators to the new architecture in Go and TypeScript, and for porting indicators from Go/TS to Python. Load when migrating an existing indicator or porting to a new language.
 ---
 
 # Converting an Old-Structure Indicator to New Structure
 
 This guide provides step-by-step instructions for converting an indicator from the old
-architecture to the new architecture. It covers both **Go** and **TypeScript** implementations.
+architecture to the new architecture. It covers **Go**, **TypeScript**, and **Python** implementations.
 
 The new architecture introduces:
 
-- **Per-indicator packages** (Go) / **per-indicator folders** (TS) instead of a flat shared package
-- **`LineIndicator` embedding/inheritance** that eliminates `UpdateScalar/Bar/Quote/Trade` boilerplate
+- **Per-indicator packages** (Go) / **per-indicator folders** (TS/Python) instead of a flat shared package
+- **`LineIndicator` embedding/inheritance/composition** that eliminates `UpdateScalar/Bar/Quote/Trade` boilerplate
 - **`ComponentTripleMnemonic`** (bar + quote + trade) replacing `componentPairMnemonic` (bar + quote only)
-- **Zero-value default resolution** for components: zero/undefined = use default, don't show in mnemonic
+- **Zero-value default resolution** for components: zero/undefined/None = use default, don't show in mnemonic
 - **Top-level `Mnemonic` and `Description`** on metadata
-- **Per-indicator output enum** (TS) in a dedicated file
+- **Per-indicator output enum** (TS/Python) in a dedicated file
 - **Renamed imports** from `data`/`indicator`/`output` to `entities`/`core`/`outputs`
 
 Use the SMA indicator as the canonical reference for single-constructor indicators.
@@ -48,6 +48,7 @@ Use the EMA indicator as the canonical reference for multi-constructor indicator
 6. [Advanced: Helper / Shared Component Families](#advanced-helper--shared-component-families)
 7. [Naming & Style Conventions](#naming--style-conventions)
 8. [Registering in the Factory](#registering-in-the-factory)
+9. [Python Porting Guide](#python-porting-guide)
 
 ---
 
@@ -1596,3 +1597,517 @@ bars without error:
 cd go && go run ./cmd/icalc settings.json
 cd ts && npx tsx cmd/icalc/main.ts cmd/icalc/settings.json
 ```
+
+---
+
+## Python Porting Guide
+
+This section describes how to port an indicator from Go/TS to Python. The Python
+indicators port is **complete** (63 indicators, factory, frequency_response,
+icalc/ifres/iconf — 803 tests passing). Use this guide as reference for future
+indicators or for porting to Rust/Zig.
+
+### Step 1: Create the folder structure
+
+Create `py/indicators/<group>/<indicator_name>/` with:
+- `__init__.py` — re-exports class, output enum, params, default_params
+- `params.py` — `@dataclass` with `default_params()` function
+- `output.py` — `IntEnum` class starting at 0
+- `<indicator_name>.py` — main implementation
+- `test_<indicator_name>.py` — unit tests
+
+Also ensure `py/indicators/<group>/__init__.py` exists (empty).
+
+### Step 2: Convert the params file
+
+Map Go/TS params to a Python `@dataclass`. Key mappings:
+
+| Go / TS | Python |
+|---------|--------|
+| `Length int` / `length: number` | `length: int = 20` |
+| `BarComponent entities.BarComponent` (zero = not set) | `bar_component: Optional[BarComponent] = None` |
+| `QuoteComponent` / `TradeComponent` | Same pattern with `Optional` + `None` |
+| `SmoothingFactor float64` | `smoothing_factor: float = 0.0952` |
+| `FirstIsAverage bool` | `first_is_average: bool = False` |
+| Custom enum fields (e.g., `MovingAverageType`) | Python `IntEnum` in params.py |
+
+Always include `default_params()` returning a default instance.
+
+For multi-constructor indicators (EMA), create separate dataclass per variant:
+`ExponentialMovingAverageLengthParams` and `ExponentialMovingAverageSmoothingFactorParams`.
+
+### Step 3: Convert the output enum
+
+```python
+from enum import IntEnum
+
+class SimpleMovingAverageOutput(IntEnum):
+    VALUE = 0
+```
+
+Use `UPPER_SNAKE_CASE` members starting at 0 (matching TS, unlike Go's `iota`).
+
+### Step 4: Convert the main indicator file
+
+#### Single-output (line) indicators
+
+1. Class extends `Indicator` (ABC), uses `LineIndicator` via composition:
+
+```python
+class SimpleMovingAverage(Indicator):
+    def __init__(self, params: SimpleMovingAverageParams) -> None:
+        # Resolve components: None → default
+        bc = params.bar_component if params.bar_component is not None else DEFAULT_BAR_COMPONENT
+        qc = params.quote_component if params.quote_component is not None else DEFAULT_QUOTE_COMPONENT
+        tc = params.trade_component if params.trade_component is not None else DEFAULT_TRADE_COMPONENT
+
+        bar_func = bar_component_value(bc)
+        quote_func = quote_component_value(qc)
+        trade_func = trade_component_value(tc)
+
+        mnemonic = f"sma({length}{component_triple_mnemonic(bc, qc, tc)})"
+        description = f"Simple moving average {mnemonic}"
+
+        self._line = LineIndicator(mnemonic, description, bar_func, quote_func, trade_func, self.update)
+        # ... indicator-specific state ...
+```
+
+2. Implement `update(self, sample: float) -> float` with the core logic.
+3. Implement `is_primed(self) -> bool`.
+4. Implement `metadata(self) -> Metadata` using `build_metadata()`.
+5. Delegate `update_scalar/bar/quote/trade` to `self._line.*`.
+
+#### Multi-output indicators (MACD, Bollinger Bands, etc.)
+
+Do NOT use `LineIndicator`. Instead:
+- Store component functions directly: `self._bar_func`, `self._quote_func`, `self._trade_func`
+- Implement `update(self, sample: float)` returning a tuple of values
+- Implement `update_scalar()` building a list of `Scalar`/`Band`/`Heatmap` objects
+- Delegate `update_bar/quote/trade` through component extraction → `update_scalar`
+
+#### Heatmap-output indicators
+
+```python
+from ...core.outputs.heatmap import Heatmap
+
+# In update:
+heatmap = Heatmap(time, param_first, param_last, param_resolution, value_min, value_max, values)
+# or empty:
+heatmap = Heatmap.empty(time, param_first, param_last, param_resolution)
+```
+
+#### Multi-constructor indicators (EMA pattern)
+
+Use `@staticmethod` factory methods:
+
+```python
+class ExponentialMovingAverage(Indicator):
+    @staticmethod
+    def from_length(params: ExponentialMovingAverageLengthParams) -> 'ExponentialMovingAverage':
+        ...
+
+    @staticmethod
+    def from_smoothing_factor(params: ExponentialMovingAverageSmoothingFactorParams) -> 'ExponentialMovingAverage':
+        ...
+```
+
+#### Ehlers indicators with `create()` pattern
+
+```python
+class SuperSmoother(Indicator):
+    @staticmethod
+    def create(params: SuperSmootherParams) -> 'SuperSmoother':
+        # Pre-compute coefficients from params
+        ...
+        return SuperSmoother(...)
+
+    @staticmethod
+    def create_default() -> 'SuperSmoother':
+        return SuperSmoother.create(default_params())
+```
+
+### Step 5: Convert the test file
+
+Key differences from Go/TS tests:
+- Use `unittest.TestCase` (not Jasmine or `testing.T`)
+- Use `assertAlmostEqual(result, expected, delta=1e-N)` — always use `delta=`, NOT `places=`
+- Use `math.isnan()` for NaN checks, `self.assertTrue(math.isnan(result))`
+- Test imports are absolute: `from py.indicators.common.simple_moving_average.simple_moving_average import SimpleMovingAverage`
+- Test data arrays at module level: `INPUT = [...]`, `EXPECTED_3 = [...]`
+- Call `is_primed()` with parentheses: `self.assertTrue(sma.is_primed())`
+
+Tolerance mapping from Go to Python:
+```
+Go: epsilon = 1e-10  →  Python: delta=1e-10
+Go: epsilon = 1e-12  →  Python: delta=1e-12
+Go: math.Abs(exp-act) > 1e-N  →  Python: assertAlmostEqual(act, exp, delta=1e-N)
+```
+
+### Step 6: Register in the factory
+
+Add to `py/indicators/factory/factory.py`:
+
+```python
+if identifier == Identifier.SIMPLE_MOVING_AVERAGE:
+    from ..common.simple_moving_average.params import default_params
+    from ..common.simple_moving_average.simple_moving_average import SimpleMovingAverage
+    return SimpleMovingAverage(_apply(default_params(), params))
+```
+
+The factory uses lazy imports (inside the `if` block) to avoid circular dependencies.
+
+Four construction patterns:
+1. **Direct**: `Indicator(_apply(default_params(), params))` — most indicators
+2. **`create()`**: `Indicator.create(_apply(default_params(), params))` — Ehlers
+3. **Dual variant**: detect `_has_key(params, 'smoothing_factor')` — EMA family
+4. **Raw constructor**: `WilliamsPercentR(params['length'])` — special cases
+
+### Step 7: Register identifier and descriptor
+
+If adding a new indicator (not just porting):
+- Add to `py/indicators/core/identifier.py` — new `Identifier` IntEnum member
+- Add to `py/indicators/core/descriptors.py` — new `_descriptors` entry
+
+### Step 8: Verify
+
+```bash
+# Run all indicator tests:
+cd /home/dev/repos/chi/zpano && PYTHONPATH=. python3 -m unittest discover -s py/indicators -p "test_*.py" -t .
+
+# Run a single indicator's tests:
+cd /home/dev/repos/chi/zpano && PYTHONPATH=. python3 -m unittest py.indicators.common.simple_moving_average.test_simple_moving_average
+
+# Run icalc to verify factory integration:
+cd /home/dev/repos/chi/zpano && PYTHONPATH=. python3 -m py.cmd.icalc py/cmd/icalc/settings.json
+```
+
+### Python Import Path Reference
+
+From an indicator at `py/indicators/<group>/<indicator>/`:
+
+```python
+# Core framework
+from ...core.indicator import Indicator
+from ...core.line_indicator import LineIndicator
+from ...core.metadata import Metadata
+from ...core.build_metadata import build_metadata, OutputText
+from ...core.identifier import Identifier
+from ...core.component_triple_mnemonic import component_triple_mnemonic
+from ...core.output import Output
+
+# Entities (one more level up)
+from ....entities.bar import Bar
+from ....entities.quote import Quote
+from ....entities.trade import Trade
+from ....entities.scalar import Scalar
+from ....entities.bar_component import BarComponent, DEFAULT_BAR_COMPONENT, bar_component_value
+from ....entities.quote_component import QuoteComponent, DEFAULT_QUOTE_COMPONENT, quote_component_value
+from ....entities.trade_component import TradeComponent, DEFAULT_TRADE_COMPONENT, trade_component_value
+
+# Output types (when needed)
+from ...core.outputs.band import Band
+from ...core.outputs.heatmap import Heatmap
+from ...core.outputs.polyline import Polyline, Point
+
+# Sibling indicators
+from ...common.exponential_moving_average.exponential_moving_average import ExponentialMovingAverage
+from ...common.exponential_moving_average.params import ExponentialMovingAverageLengthParams
+```
+
+### Python ↔ Go/TS Name Mapping
+
+| Go | TypeScript | Python |
+|----|-----------|--------|
+| `Update(sample float64) float64` | `update(sample: number): number` | `update(self, sample: float) -> float` |
+| `IsPrimed() bool` | `isPrimed(): boolean` | `is_primed(self) -> bool` |
+| `Metadata() Metadata` | `metadata(): IndicatorMetadata` | `metadata(self) -> Metadata` |
+| `UpdateBar(*Bar) Output` | `updateBar(bar: Bar): Output` | `update_bar(self, sample: Bar) -> Output` |
+| `core.LineIndicator` (embedded) | `LineIndicator` (extended) | `LineIndicator` (composed via `self._line`) |
+| `core.BuildMetadata(...)` | `buildMetadata(...)` | `build_metadata(...)` |
+| `core.ComponentTripleMnemonic(...)` | `componentTripleMnemonic(...)` | `component_triple_mnemonic(...)` |
+| `core.OutputText{...}` | `{ mnemonic, description }` | `OutputText(mnemonic, description)` |
+| `entities.DefaultBarComponent` | `DefaultBarComponent` | `DEFAULT_BAR_COMPONENT` |
+| `entities.BarFunc` | `(bar: Bar) => number` | `Callable[[Bar], float]` |
+| `math.NaN()` | `NaN` | `math.nan` |
+| `math.IsNaN(x)` | `isNaN(x)` | `math.isnan(x)` |
+| `Params` struct | `params` interface | `@dataclass` class |
+| `DefaultParams()` | `defaultParams()` | `default_params()` |
+
+---
+
+## Rust Porting Guide
+
+This section describes how to port an indicator from Go/TS to Rust. The Rust
+indicators port is **complete** (67 indicators, factory, frequency_response,
+icalc/ifres/iconf — 985 tests passing). Use this guide as reference for future
+indicators or for porting to Zig.
+
+### Step 1: Create the folder structure
+
+Create `rust/src/indicators/<group>/<indicator_name>/` with:
+- `mod.rs` — re-exports: `mod <indicator_name>; pub use <indicator_name>::*;`
+- `<indicator_name>.rs` — params, output enum, indicator struct, impl, and `#[cfg(test)] mod tests`
+
+Register the module in the group's `mod.rs` (e.g., `rust/src/indicators/common/mod.rs`):
+```rust
+pub mod simple_moving_average;
+```
+
+### Step 2: Convert the params struct
+
+Map Go/TS params to a Rust struct with `impl Default`:
+
+| Go / TS | Rust |
+|---------|------|
+| `Length int` / `length: number` | `pub length: usize` (default `20`) |
+| `BarComponent entities.BarComponent` (zero = not set) | `pub bar_component: Option<BarComponent>` (default `None`) |
+| `QuoteComponent` / `TradeComponent` | Same `Option` pattern |
+| `SmoothingFactor float64` | `pub smoothing_factor: f64` (default `0.0952...`) |
+| `FirstIsAverage bool` | `pub first_is_average: bool` (default `false`) |
+| Custom enum fields (e.g., `MovingAverageType`) | Rust `enum` with `#[repr(u8)]` in same file |
+
+```rust
+pub struct SimpleMovingAverageParams {
+    pub length: usize,
+    pub bar_component: Option<BarComponent>,
+    pub quote_component: Option<QuoteComponent>,
+    pub trade_component: Option<TradeComponent>,
+}
+
+impl Default for SimpleMovingAverageParams {
+    fn default() -> Self {
+        Self { length: 20, bar_component: None, quote_component: None, trade_component: None }
+    }
+}
+```
+
+For multi-constructor indicators (EMA), create separate structs:
+`ExponentialMovingAverageLengthParams` and `ExponentialMovingAverageSmoothingFactorParams`.
+
+MESA params do **not** implement `Default` — factory constructs them explicitly.
+
+### Step 3: Convert the output enum
+
+```rust
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u8)]
+pub enum SimpleMovingAverageOutput {
+    Value = 1,
+}
+```
+
+Output enums are **1-based** (matching Go's `iota+1` and the descriptor registry).
+This differs from Python/TS which use 0-based.
+
+### Step 4: Convert the main indicator file
+
+#### Single-output (line) indicators
+
+```rust
+pub struct SimpleMovingAverage {
+    // LineIndicator fields inlined (Rust uses composition)
+    bar_func: fn(&Bar) -> f64,
+    quote_func: fn(&Quote) -> f64,
+    trade_func: fn(&Trade) -> f64,
+    meta: Metadata,
+
+    // Indicator-specific state
+    primed: bool,
+    window: Vec<f64>,
+    index: usize,
+    sum: f64,
+    length: usize,
+}
+```
+
+Key patterns:
+
+1. **Component resolution** — `None` → default:
+   ```rust
+   let bc = params.bar_component.unwrap_or(DEFAULT_BAR_COMPONENT);
+   let bar_func = bar_component_value(bc);
+   ```
+
+2. **Borrow checker constraint** — Cannot pass `|v| self.update(v)` closure to
+   `self.line` because both borrow `self`. Extract the sample first:
+   ```rust
+   fn update_bar(&mut self, bar: &Bar) -> Output {
+       let sample = (self.bar_func)(bar);
+       let value = self.update(sample);
+       vec![Box::new(Scalar::new(bar.time, value))]
+   }
+   ```
+
+3. **NaN handling** — Use `f64::NAN` and `f64::is_nan()`:
+   ```rust
+   if !self.primed { return f64::NAN; }
+   ```
+
+4. **Metadata construction**:
+   ```rust
+   let meta = build_metadata(
+       Identifier::SimpleMovingAverage,
+       &format!("sma({length}{ctm})"),
+       &format!("Simple moving average sma({length}{ctm})"),
+       &[OutputText { mnemonic: "val", description: "Value" }],
+   );
+   ```
+
+#### Multi-output indicators
+
+Return `Vec<Box<dyn Any>>` with multiple `Scalar`/`Band`/`Heatmap` outputs:
+
+```rust
+fn update_bar(&mut self, bar: &Bar) -> Output {
+    let sample = (self.bar_func)(bar);
+    let (signal, histogram) = self.update_internal(sample);
+    vec![
+        Box::new(Scalar::new(bar.time, signal)),
+        Box::new(Scalar::new(bar.time, histogram)),
+    ]
+}
+```
+
+#### Ehlers indicators with `create()` pattern
+
+Ehlers indicators use an associated function for construction:
+
+```rust
+impl MesaAdaptiveMovingAverage {
+    pub fn create(params: MesaAdaptiveMovingAverageLengthParams) -> Self { ... }
+    pub fn from_smoothing_factor(params: MesaAdaptiveMovingAverageSmoothingFactorParams) -> Self { ... }
+}
+```
+
+### Step 5: Convert the tests
+
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::entities::bar_component::BarComponent;
+
+    const INPUT: [f64; 50] = [ /* ... */ ];
+    const EXPECTED_20: [f64; 50] = [ /* ... */ ];
+
+    #[test]
+    fn test_simple_moving_average_20() {
+        let params = SimpleMovingAverageParams { length: 20, ..Default::default() };
+        let mut sma = SimpleMovingAverage::new(params);
+        for i in 0..INPUT.len() {
+            let result = sma.update(INPUT[i]);
+            if EXPECTED_20[i].is_nan() {
+                assert!(result.is_nan(), "bar {i}: expected NaN, got {result}");
+            } else {
+                assert!(
+                    (result - EXPECTED_20[i]).abs() < 1e-8,
+                    "bar {i}: expected {}, got {result}", EXPECTED_20[i]
+                );
+            }
+        }
+        assert!(sma.is_primed());
+    }
+}
+```
+
+Key test conventions:
+- `#[cfg(test)] mod tests` at bottom of the indicator `.rs` file
+- `use super::*;` to import everything from the parent module
+- Test data as `const` arrays (not `static`)
+- Tolerance typically `1e-8` (matching Go test tolerances)
+- NaN checks with `.is_nan()` + descriptive assertion messages with bar index
+
+### Step 6: Register in factory
+
+Edit `rust/src/indicators/factory/factory.rs`:
+
+1. Add import at top (match visibility pattern A or B):
+   ```rust
+   // Pattern A (pub use * re-export):
+   use crate::indicators::common::simple_moving_average::{SimpleMovingAverage, SimpleMovingAverageParams};
+   // Pattern B (pub mod):
+   use crate::indicators::custom::goertzel_spectrum::goertzel_spectrum::{GoertzelSpectrum, GoertzelSpectrumParams};
+   ```
+
+2. Add match arm in `create_indicator()`:
+   ```rust
+   Identifier::SimpleMovingAverage => {
+       let mut p = SimpleMovingAverageParams::default();
+       if !is_empty_object(json) {
+           if let Some(v) = get_usize(json, "length") { p.length = v; }
+           if let Some(v) = get_i32(json, "bar_component") { p.bar_component = Some(BarComponent::from_i32(v)); }
+           // ... other fields
+       }
+       Box::new(SimpleMovingAverage::new(p))
+   }
+   ```
+
+### Step 7: Register in identifier enum
+
+Add to `rust/src/indicators/core/identifier.rs` and `rust/src/indicators/core/descriptors.rs`.
+
+### Step 8: Verify
+
+```bash
+# Run all indicator tests:
+cd rust && cargo test --lib indicators
+
+# Run a single indicator's tests:
+cd rust && cargo test --lib simple_moving_average
+
+# Run factory tests:
+cd rust && cargo test --lib factory
+
+# Run icalc to verify factory integration:
+cd rust && cargo run --bin icalc -- path/to/settings.json
+```
+
+### Rust Import Path Reference
+
+From an indicator at `rust/src/indicators/<group>/<indicator>/`:
+
+```rust
+// Core framework
+use crate::indicators::core::indicator::{Indicator, Output};
+use crate::indicators::core::line_indicator::LineIndicator;  // if used
+use crate::indicators::core::metadata::Metadata;
+use crate::indicators::core::build_metadata::{build_metadata, OutputText};
+use crate::indicators::core::identifier::Identifier;
+use crate::indicators::core::component_triple_mnemonic::component_triple_mnemonic;
+
+// Entities
+use crate::entities::bar::Bar;
+use crate::entities::quote::Quote;
+use crate::entities::trade::Trade;
+use crate::entities::scalar::Scalar;
+use crate::entities::bar_component::{component_value as bar_component_value, BarComponent, DEFAULT_BAR_COMPONENT};
+use crate::entities::quote_component::{component_value as quote_component_value, QuoteComponent, DEFAULT_QUOTE_COMPONENT};
+use crate::entities::trade_component::{component_value as trade_component_value, TradeComponent, DEFAULT_TRADE_COMPONENT};
+
+// Output types (when needed)
+use crate::indicators::core::outputs::band::Band;
+use crate::indicators::core::outputs::heatmap::Heatmap;
+use crate::indicators::core::outputs::polyline::{Polyline, Point};
+
+// Sibling indicators
+use crate::indicators::common::exponential_moving_average::{ExponentialMovingAverage, ExponentialMovingAverageLengthParams};
+```
+
+### Rust ↔ Go/TS Name Mapping
+
+| Go | TypeScript | Python | Rust |
+|----|-----------|--------|------|
+| `Update(sample float64) float64` | `update(sample: number): number` | `update(self, sample: float) -> float` | `fn update(&mut self, sample: f64) -> f64` |
+| `IsPrimed() bool` | `isPrimed(): boolean` | `is_primed(self) -> bool` | `fn is_primed(&self) -> bool` |
+| `Metadata() Metadata` | `metadata(): IndicatorMetadata` | `metadata(self) -> Metadata` | `fn metadata(&self) -> Metadata` |
+| `UpdateBar(*Bar) Output` | `updateBar(bar: Bar): Output` | `update_bar(self, sample: Bar) -> Output` | `fn update_bar(&mut self, bar: &Bar) -> Output` |
+| `core.LineIndicator` (embedded) | `LineIndicator` (extended) | `LineIndicator` (composed via `self._line`) | Fields inlined (composition) |
+| `core.BuildMetadata(...)` | `buildMetadata(...)` | `build_metadata(...)` | `build_metadata(...)` |
+| `core.ComponentTripleMnemonic(...)` | `componentTripleMnemonic(...)` | `component_triple_mnemonic(...)` | `component_triple_mnemonic(...)` |
+| `core.OutputText{...}` | `{ mnemonic, description }` | `OutputText(mnemonic, description)` | `OutputText { mnemonic: "...", description: "..." }` |
+| `entities.DefaultBarComponent` | `DefaultBarComponent` | `DEFAULT_BAR_COMPONENT` | `DEFAULT_BAR_COMPONENT` |
+| `entities.BarFunc` | `(bar: Bar) => number` | `Callable[[Bar], float]` | `fn(&Bar) -> f64` |
+| `math.NaN()` | `NaN` | `math.nan` | `f64::NAN` |
+| `math.IsNaN(x)` | `isNaN(x)` | `math.isnan(x)` | `x.is_nan()` |
+| `Params` struct | `params` interface | `@dataclass` class | `struct` + `impl Default` |
+| `DefaultParams()` | `defaultParams()` | `default_params()` | `Default::default()` |

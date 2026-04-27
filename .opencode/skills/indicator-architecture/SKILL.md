@@ -12,7 +12,7 @@ human developers and AI agents creating new indicators.
 ## Scope
 
 The rules in this document apply **only to the `indicators/` folder** within each
-language directory (e.g., `ts/indicators/`, `go/indicators/`). Other folders at the
+language directory (e.g., `ts/indicators/`, `go/indicators/`, `py/indicators/`). Other folders at the
 same level as `indicators/` (such as `entities/`) have their own conventions and are
 not governed by this guide.
 
@@ -275,10 +275,11 @@ context). All other languages use fully-qualified symbol names.
 
 ### Identifier Registry Parity
 
-Go and TypeScript MUST have the same set of registered identifiers. Both
-currently have **72** identifiers (Go: `core.Identifier` iota 1–72; TS:
-`IndicatorIdentifier` enum 0–71) with identical PascalCase names. When
-adding a new indicator, register the identifier in **both** languages even
+Go, TypeScript, and Python MUST have the same set of registered identifiers. All
+three currently have **72** identifiers (Go: `core.Identifier` iota 1–72; TS:
+`IndicatorIdentifier` enum 0–71; Python: `Identifier` IntEnum 0–71) with
+identical names (PascalCase in Go/TS, UPPER_SNAKE_CASE in Python). When
+adding a new indicator, register the identifier in **all** languages even
 if only one implementation exists yet.
 
 ### File Naming
@@ -574,11 +575,11 @@ indicator's core `Update(sample) → value` function.
 
 Each concrete indicator is responsible for:
 
-1. **`Update(sample float64) float64`** (Go) / **`update(sample: number): number`** (TS) --
-   the core calculation logic.
+1. **`Update(sample float64) float64`** (Go) / **`update(sample: number): number`** (TS) /
+   **`update(self, sample: float) -> float`** (Python) -- the core calculation logic.
 2. **`Metadata()`** / **`metadata()`** -- returns indicator-level metadata with
    an explicit per-indicator output enum (not a hardcoded `kind: 0`).
-3. **`IsPrimed()`** / **`isPrimed()`** -- whether the indicator has received
+3. **`IsPrimed()`** / **`isPrimed()`** / **`is_primed()`** -- whether the indicator has received
    enough data to produce meaningful output.
 
 ### What LineIndicator Provides (Eliminating Boilerplate)
@@ -655,6 +656,51 @@ Each entity file also exports a `Default*` constant (`DefaultBarComponent`,
 `DefaultQuoteComponent`, `DefaultTradeComponent`) for use in
 `componentTripleMnemonic` and anywhere else defaults need to be checked.
 
+### Python Implementation
+
+In Python, `LineIndicator` is a **helper class used via composition**. The concrete
+indicator creates a `LineIndicator` instance in `__init__` and delegates
+`update_scalar/bar/quote/trade` calls to it. Unlike Go (embedding) and TS
+(inheritance), the concrete indicator must explicitly define all four `update_*`
+methods as one-line delegations:
+
+```python
+class SimpleMovingAverage(Indicator):
+    def __init__(self, params: SimpleMovingAverageParams) -> None:
+        bc = params.bar_component if params.bar_component is not None else DEFAULT_BAR_COMPONENT
+        qc = params.quote_component if params.quote_component is not None else DEFAULT_QUOTE_COMPONENT
+        tc = params.trade_component if params.trade_component is not None else DEFAULT_TRADE_COMPONENT
+
+        bar_func = bar_component_value(bc)
+        quote_func = quote_component_value(qc)
+        trade_func = trade_component_value(tc)
+
+        mnemonic = f"sma({length}{component_triple_mnemonic(bc, qc, tc)})"
+        description = f"Simple moving average {mnemonic}"
+
+        self._line = LineIndicator(mnemonic, description, bar_func, quote_func, trade_func, self.update)
+
+    def update_scalar(self, sample: Scalar) -> Output:
+        return self._line.update_scalar(sample)
+
+    def update_bar(self, sample: Bar) -> Output:
+        return self._line.update_bar(sample)
+
+    def update_quote(self, sample: Quote) -> Output:
+        return self._line.update_quote(sample)
+
+    def update_trade(self, sample: Trade) -> Output:
+        return self._line.update_trade(sample)
+```
+
+Component resolution uses `is not None` (not truthiness), so explicitly passing
+a zero-valued enum like `BarComponent.OPEN` (value 0) works correctly.
+
+Python entity modules export standalone functions `bar_component_value()`,
+`quote_component_value()`, `trade_component_value()` that return
+`Callable[[Bar], float]` (etc.), and constants `DEFAULT_BAR_COMPONENT`,
+`DEFAULT_QUOTE_COMPONENT`, `DEFAULT_TRADE_COMPONENT`.
+
 ### Per-Indicator Output Enums
 
 Each indicator defines its own output enum describing what it produces. The
@@ -668,6 +714,8 @@ symbols differently:
   `<IndicatorName>Value`. TS imports by symbol rather than by module, so the
   indicator name must be baked into the identifier to stay unambiguous at
   call sites.
+- **Python**: use long-form `<IndicatorName>Output` (same as TS). `IntEnum`
+  starting at 0 with `UPPER_SNAKE_CASE` members.
 
 ```go
 // Go — file: simplemovingaverage/output.go
@@ -680,10 +728,16 @@ const (
 ```
 
 ```typescript
-// TypeScript — file: simple-moving-average/output.ts
+// TypeScript — simple-moving-average/output.ts
 export enum SimpleMovingAverageOutput {
     SimpleMovingAverageValue = 0,
 }
+```
+
+```python
+# Python — simple_moving_average/output.py
+class SimpleMovingAverageOutput(IntEnum):
+    VALUE = 0
 ```
 
 For multi-output indicators, strip the indicator-name prefix on the Go side
@@ -1478,3 +1532,429 @@ Default values come from (in priority order):
 Add `DefaultParams()` / `defaultParams()` to the params file as part of the
 standard indicator creation checklist. The function should be present from day
 one, not added retroactively.
+
+## Python / Zig / Rust Porting Conventions
+
+This section documents decisions for porting the indicators module from Go/TS
+to Python, Zig, and Rust. It is updated incrementally as porting progresses.
+
+### Component Sentinel Pattern
+
+Go uses `iota+1` (1-based enums) so `0` means "not set". TS uses `undefined`.
+Python, Zig, and Rust keep **0-based enums** and use their idiomatic optional
+types for the "not set" sentinel:
+
+| Language | Params field type | "Not set" value | Resolution pattern |
+|----------|------------------|-----------------|-------------------|
+| **Go** | `entities.BarComponent` (int) | `0` | `if bc == 0 { bc = DefaultBarComponent }` |
+| **TypeScript** | `BarComponent \| undefined` | `undefined` | `=== undefined` in setter |
+| **Python** | `Optional[BarComponent]` | `None` | `if bc is None: bc = DEFAULT_BAR_COMPONENT` |
+| **Zig** | `?BarComponent` | `null` | `bc orelse default_bar_component` |
+| **Rust** | `Option<BarComponent>` | `None` | `bc.unwrap_or(DEFAULT_BAR_COMPONENT)` |
+
+### Folder Naming (repeated from above for completeness)
+
+| Language | Author folder | Indicator folder | File naming |
+|----------|--------------|-----------------|-------------|
+| **Python** | `mark_jurik/` | `jurik_moving_average/` | `snake_case.py`, tests: `test_snake_case.py` |
+| **Zig** | `mark_jurik/` | `jurik_moving_average/` | `snake_case.zig`, tests at bottom of source |
+| **Rust** | `mark_jurik/` | `jurik_moving_average/` | `snake_case.rs`, tests in `#[cfg(test)]` at bottom |
+
+### Python-Specific Conventions
+
+Python indicators live under `py/indicators/`. The Python port is **complete** (63 indicators,
+factory, frequency_response, icalc/ifres/iconf cmd tools — 803 tests passing).
+
+#### Directory structure
+
+```
+py/indicators/
+├── __init__.py              # empty
+├── core/
+│   ├── __init__.py          # empty
+│   ├── indicator.py         # Indicator ABC
+│   ├── line_indicator.py    # LineIndicator helper (composition, not inheritance)
+│   ├── identifier.py        # Identifier IntEnum (0-based, 72 values)
+│   ├── metadata.py          # Metadata class
+│   ├── build_metadata.py    # build_metadata() + OutputText
+│   ├── output.py            # Output = list[Any]
+│   ├── descriptor.py        # Descriptor class
+│   ├── descriptors.py       # static registry, descriptor_of(), descriptors()
+│   ├── output_descriptor.py # OutputDescriptor class
+│   ├── specification.py     # Specification class
+│   ├── component_triple_mnemonic.py
+│   ├── adaptivity.py        # Adaptivity IntEnum
+│   ├── input_requirement.py # InputRequirement IntEnum
+│   ├── volume_usage.py      # VolumeUsage IntEnum
+│   ├── role.py              # Role IntEnum
+│   ├── pane.py              # Pane IntEnum
+│   ├── frequency_response.py
+│   ├── test_frequency_response.py
+│   └── outputs/
+│       ├── __init__.py
+│       ├── metadata.py      # OutputMetadata class
+│       ├── shape.py         # Shape IntEnum
+│       ├── band.py          # Band class
+│       ├── heatmap.py       # Heatmap class
+│       └── polyline.py      # Polyline class (Point + Polyline)
+├── common/
+│   ├── __init__.py          # empty
+│   └── simple_moving_average/
+│       ├── __init__.py      # re-exports class, output, params, default_params
+│       ├── simple_moving_average.py
+│       ├── params.py
+│       ├── output.py
+│       └── test_simple_moving_average.py
+├── <author_name>/           # e.g., john_ehlers/, mark_jurik/
+│   ├── __init__.py          # empty
+│   └── <indicator_name>/
+│       └── ...
+├── factory/
+│   ├── __init__.py
+│   └── factory.py           # create_indicator(identifier, params)
+└── custom/
+    ├── __init__.py
+    └── ...
+```
+
+Every directory needs an `__init__.py` file. Author-level `__init__.py` files are empty.
+Indicator-level `__init__.py` files re-export the main class, output enum, and params.
+
+#### LineIndicator pattern — composition, not inheritance
+
+Unlike Go (embedding) and TS (abstract class inheritance), Python uses **composition**.
+The concrete indicator creates a `LineIndicator` instance and delegates `update_*` calls:
+
+```python
+class SimpleMovingAverage(Indicator):
+    def __init__(self, params: SimpleMovingAverageParams) -> None:
+        # ... resolve components, build mnemonic ...
+        self._line = LineIndicator(mnemonic, description, bar_func, quote_func, trade_func, self.update)
+
+    def update(self, sample: float) -> float:
+        # core calculation logic
+        ...
+
+    def update_scalar(self, sample: Scalar) -> Output:
+        return self._line.update_scalar(sample)
+
+    def update_bar(self, sample: Bar) -> Output:
+        return self._line.update_bar(sample)
+
+    def update_quote(self, sample: Quote) -> Output:
+        return self._line.update_quote(sample)
+
+    def update_trade(self, sample: Trade) -> Output:
+        return self._line.update_trade(sample)
+```
+
+Multi-output indicators (MACD, Bollinger Bands, etc.) do NOT use `LineIndicator`.
+They implement `Indicator` directly, store component functions, and build output
+lists manually in `update_scalar()`.
+
+#### Params pattern
+
+Parameters are `@dataclass` classes with defaults. Component fields use `Optional[BarComponent]`
+with `None` meaning "use default". Every params file exports a `default_params()` function:
+
+```python
+@dataclass
+class SimpleMovingAverageParams:
+    length: int = 20
+    bar_component: Optional[BarComponent] = None
+    quote_component: Optional[QuoteComponent] = None
+    trade_component: Optional[TradeComponent] = None
+
+def default_params() -> SimpleMovingAverageParams:
+    return SimpleMovingAverageParams()
+```
+
+Multi-constructor indicators (EMA) have multiple params classes and use `@staticmethod`
+factory methods: `ExponentialMovingAverage.from_length(params)` and
+`ExponentialMovingAverage.from_smoothing_factor(params)`.
+
+Ehlers indicators with coefficient pre-computation use a `create(params)` static method
+(e.g., `SuperSmoother.create(params)`) and a `create_default()` for parameterless defaults.
+
+#### Output enum pattern
+
+Per-indicator output enums are `IntEnum` starting at 0. Naming uses the long-form
+`<IndicatorName>Output` (same as TypeScript):
+
+```python
+class SimpleMovingAverageOutput(IntEnum):
+    VALUE = 0
+```
+
+#### Import conventions
+
+- Relative imports within the indicators package (e.g., `from ...core.metadata import Metadata`)
+- Tests use absolute imports (e.g., `from py.indicators.common.simple_moving_average...`)
+- Entity imports: `from ....entities.bar_component import BarComponent, DEFAULT_BAR_COMPONENT, bar_component_value`
+
+Key import paths from an indicator file at `py/indicators/<group>/<indicator>/`:
+```python
+from ...core.indicator import Indicator
+from ...core.line_indicator import LineIndicator
+from ...core.metadata import Metadata
+from ...core.build_metadata import build_metadata, OutputText
+from ...core.identifier import Identifier
+from ...core.component_triple_mnemonic import component_triple_mnemonic
+from ...core.output import Output
+from ....entities.bar import Bar
+from ....entities.bar_component import BarComponent, DEFAULT_BAR_COMPONENT, bar_component_value
+from ....entities.quote_component import QuoteComponent, DEFAULT_QUOTE_COMPONENT, quote_component_value
+from ....entities.trade_component import TradeComponent, DEFAULT_TRADE_COMPONENT, trade_component_value
+```
+
+For heatmap-producing indicators, also:
+```python
+from ...core.outputs.heatmap import Heatmap
+```
+
+#### Naming conventions
+
+| Concept | Python |
+|---------|--------|
+| Identifier enum | `Identifier.SIMPLE_MOVING_AVERAGE` (UPPER_SNAKE_CASE, 0-based) |
+| Output enum | `SimpleMovingAverageOutput.VALUE` (UPPER_SNAKE_CASE, 0-based) |
+| Params class | `SimpleMovingAverageParams` (PascalCase `@dataclass`) |
+| Indicator class | `SimpleMovingAverage` (PascalCase) |
+| File naming | `simple_moving_average.py`, `test_simple_moving_average.py` |
+| Folder naming | `simple_moving_average/`, `john_ehlers/` |
+| Methods | `update()`, `is_primed()`, `metadata()`, `update_bar()` (snake_case) |
+| Private fields | `self._primed`, `self._window`, `self._line` |
+| Constants | `DEFAULT_BAR_COMPONENT`, `_EPSILON` |
+
+#### Testing conventions
+
+- `unittest.TestCase` with `assertAlmostEqual(result, expected, delta=1e-N)`
+  (using `delta=`, NOT `places=`, to match Go's `math.Abs(exp-act) > 1e-N` semantics)
+- `math.isnan()` checks for NaN expected values
+- `self.assertTrue(sma.is_primed())` — always call `is_primed()` with parentheses
+- Tests use absolute imports: `from py.indicators.common.simple_moving_average.simple_moving_average import SimpleMovingAverage`
+- Test data arrays are module-level constants (INPUT, EXPECTED_3, EXPECTED_5, etc.)
+
+#### Factory pattern
+
+`py/indicators/factory/factory.py` exports `create_indicator(identifier, params)`.
+It uses four construction patterns:
+
+1. **Direct construction**: `Indicator(_apply(default_params(), params))` — 51 indicators
+2. **`create()` static factory**: `Indicator.create(_apply(default_params(), params))` — Ehlers indicators (9)
+3. **Dual `from_length()` / `from_smoothing_factor()`**: detected by `_has_key(params, 'smoothing_factor')` — EMA family (9)
+4. **Raw constructor**: `WilliamsPercentR(length)` — 1 indicator
+
+The `_apply()` helper overlays dict values onto a default dataclass instance.
+
+#### Descriptor registry
+
+`py/indicators/core/descriptors.py` uses 0-based `Kind` values (matching Python/TS output enums),
+unlike Go which uses `iota` (0-based but starting from the `Output` const block which itself is 0).
+Output kinds are integers directly matching the per-indicator `IntEnum` values.
+
+#### Cmd tools
+
+Three CLI tools at `py/cmd/{icalc,ifres,iconf}/`:
+- Each has `__init__.py`, `__main__.py`, `main.py`, `settings.json`, `run-me.sh`
+- Run via: `PYTHONPATH=. python3 -m py.cmd.icalc py/cmd/icalc/settings.json`
+- `icalc/main.py` contains shared data: `_IDENTIFIER_MAP`, `_convert_params()`, 252-bar test arrays
+- `ifres` and `iconf` import from `icalc/main.py` for shared functionality
+
+#### No concurrency
+
+Python indicators have no mutex/lock equivalent (unlike Go's `sync.RWMutex`).
+The indicators are not thread-safe by design.
+
+### Zig-Specific Conventions
+
+*(To be filled as porting progresses.)*
+
+### Rust-Specific Conventions
+
+The Rust port is **complete**: 67 indicators, factory, frequency_response, icalc/ifres/iconf — 985 tests passing.
+
+#### File layout
+
+Rust uses a single-file pattern per indicator. Each indicator lives in
+`rust/src/indicators/<group>/<indicator_name>/`:
+
+- `mod.rs` — re-exports: `mod <indicator_name>; pub use <indicator_name>::*;`
+- `<indicator_name>.rs` — contains params struct, output enum, indicator struct, impl, and `#[cfg(test)] mod tests`
+
+No separate `params.rs`, `output.rs`, or test files. Everything is in one `.rs` file,
+re-exported through `mod.rs`.
+
+Group directories also have a `mod.rs` that lists all indicator submodules.
+
+#### Module visibility patterns
+
+Two patterns are used for re-exports in `mod.rs` files:
+
+- **Pattern A** (preferred) — Private mod + wildcard re-export:
+  ```rust
+  mod simple_moving_average;
+  pub use simple_moving_average::*;
+  ```
+  Types accessible as `crate::indicators::common::simple_moving_average::TypeName`.
+  Used by `common/*`.
+
+- **Pattern B** — Public module:
+  ```rust
+  pub mod goertzel_spectrum;
+  ```
+  Types accessible as `crate::indicators::custom::goertzel_spectrum::goertzel_spectrum::TypeName`.
+  Used by `custom/*`, `gerald_appel/*`, `tim_tillson/*`.
+
+The factory imports must match the visibility pattern of each indicator.
+
+#### Params
+
+Params are plain structs (not `#[derive(Clone)]` unless needed) with `impl Default`:
+
+```rust
+pub struct SimpleMovingAverageParams {
+    pub length: usize,
+    pub bar_component: Option<BarComponent>,
+    pub quote_component: Option<QuoteComponent>,
+    pub trade_component: Option<TradeComponent>,
+}
+
+impl Default for SimpleMovingAverageParams {
+    fn default() -> Self {
+        Self { length: 20, bar_component: None, quote_component: None, trade_component: None }
+    }
+}
+```
+
+Component fields use `Option<BarComponent>` (`None` = use default). This matches
+the sentinel pattern: Go uses zero-value, TS uses `undefined`, Python uses `Optional[...] = None`,
+Rust uses `Option<...>`.
+
+Multi-constructor indicators (EMA family) have separate params structs:
+`ExponentialMovingAverageLengthParams` and `ExponentialMovingAverageSmoothingFactorParams`.
+
+MESA params do **not** implement `Default` due to complex nested types; the factory
+constructs them explicitly.
+
+#### Output enums
+
+Output enums are **1-based** (matching Go's `iota+1` and the descriptor registry):
+
+```rust
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u8)]
+pub enum SimpleMovingAverageOutput {
+    Value = 1,
+}
+```
+
+#### Indicator trait and LineIndicator
+
+The `Indicator` trait is the core interface:
+
+```rust
+pub trait Indicator {
+    fn update(&mut self, sample: f64) -> f64;
+    fn is_primed(&self) -> bool;
+    fn metadata(&self) -> Metadata;
+    fn update_bar(&mut self, bar: &Bar) -> Vec<Box<dyn std::any::Any>>;
+    fn update_quote(&mut self, quote: &Quote) -> Vec<Box<dyn std::any::Any>>;
+    fn update_trade(&mut self, trade: &Trade) -> Vec<Box<dyn std::any::Any>>;
+}
+```
+
+`Output` is `Vec<Box<dyn std::any::Any>>`, downcast by callers.
+
+`LineIndicator` is used via composition (like Python), stored as a field. Due to
+borrow-checker constraints, the update pattern extracts the component value first:
+
+```rust
+fn update_bar(&mut self, bar: &Bar) -> Vec<Box<dyn std::any::Any>> {
+    let sample = (self.bar_func)(bar);
+    let value = self.update(sample);
+    vec![Box::new(Scalar::new(bar.time, value))]
+}
+```
+
+You **cannot** use `self.line.update_bar(bar, |v| self.update(v))` because the closure
+borrows `self` while `self.line` is already borrowed.
+
+#### Import conventions
+
+All imports use absolute `crate::` paths:
+
+```rust
+use crate::entities::bar::Bar;
+use crate::entities::bar_component::{component_value as bar_component_value, BarComponent, DEFAULT_BAR_COMPONENT};
+use crate::indicators::core::build_metadata::{build_metadata, OutputText};
+use crate::indicators::core::identifier::Identifier;
+use crate::indicators::core::indicator::{Indicator, Output};
+use crate::indicators::core::metadata::Metadata;
+```
+
+Note: `component_value` is imported with an alias (`as bar_component_value`) to avoid
+name collisions when multiple component modules are imported.
+
+#### Naming conventions
+
+| Concept | Rust |
+|---------|------|
+| Identifier enum | `Identifier::SimpleMovingAverage` (PascalCase, 0-based) |
+| Output enum | `SimpleMovingAverageOutput::Value` (PascalCase, **1-based**) |
+| Params struct | `SimpleMovingAverageParams` (PascalCase, `impl Default`) |
+| Indicator struct | `SimpleMovingAverage` (PascalCase) |
+| File naming | `simple_moving_average.rs` (snake_case) |
+| Folder naming | `simple_moving_average/`, `john_ehlers/` (snake_case) |
+| Methods | `update()`, `is_primed()`, `metadata()`, `update_bar()` (snake_case) |
+| Private fields | `primed`, `window`, `line` (no prefix, struct fields are private by default) |
+| Constants | `DEFAULT_BAR_COMPONENT`, `EPSILON` (UPPER_SNAKE_CASE) |
+
+Module renames from Go/TS: `cybercycle→cyber_cycle`, `sinewave→sine_wave`,
+`supersmoother→super_smoother`, `stochastic_rsi→stochastic_relative_strength_index`.
+
+#### Testing conventions
+
+- Inline `#[cfg(test)] mod tests { use super::*; ... }` at bottom of indicator file
+- `assert!((result - expected).abs() < 1e-8)` or custom `almost_equal()` helper
+- `f64::is_nan()` checks for NaN expected values
+- Test data arrays as module-level constants (`INPUT`, `EXPECTED_3`, etc.)
+
+#### Factory pattern
+
+`rust/src/indicators/factory/factory.rs` exports `create_indicator(id: Identifier, params: &str) -> Box<dyn Indicator>`.
+
+Custom JSON parser in `factory/json.rs` (~250 lines, zero dependencies — no serde).
+Provides `JsonValue` enum and helpers: `has_key()`, `get_f64()`, `get_usize()`, `get_bool()`, etc.
+
+Factory uses a large `match` on `Identifier` enum (~152 arms). Construction patterns:
+1. **Default**: `SomeIndicator(SomeIndicatorParams { ..overrides, ..Default::default() })`
+2. **EMA-style dual**: detect `has_key("smoothing_factor")` → length vs smoothing_factor variant
+3. **`create()` associated function**: Ehlers indicators with `MesaParams`
+4. **Explicit construction**: MESA params built field-by-field (no `Default`)
+
+#### Frequency response
+
+`rust/src/indicators/core/frequency_response.rs` — standalone module, not tied to any indicator.
+Uses `Updater` trait. The `ifres` cmd tool wraps indicators in an `IndicatorUpdater` adapter struct.
+
+#### Cmd tools
+
+Three binaries in `rust/src/bin/`:
+- `icalc.rs` — indicator calculator (reads JSON settings, feeds 252-bar test data)
+- `ifres.rs` — frequency response calculator (`IndicatorUpdater` adapter implements `Updater`)
+- `iconf.rs` — chart config generator (custom `JVal` enum for JSON building, `PaneData` struct, color cycling, generates `.json` + `.ts`)
+
+All share: JSON settings parsing, 252-bar embedded test data, `json_value_to_string()` helper.
+
+Run via: `cd rust && cargo run --bin icalc -- settings.json`
+
+#### No concurrency
+
+Rust indicators have no `Mutex`/`RwLock` (like Python, unlike Go's `sync.RWMutex`).
+The indicators are not `Send`/`Sync` by default due to internal mutability via `&mut self`.
+
+#### Precision fix
+
+`std::f64::consts::FRAC_PI_3` must be used instead of `(2.0 * PI) / 6.0` in
+`shared.rs` `calculate_differential_phase()` to match Go's compile-time constant precision.

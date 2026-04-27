@@ -1,0 +1,1 @@
+"""Goertzel Spectrum indicator."""

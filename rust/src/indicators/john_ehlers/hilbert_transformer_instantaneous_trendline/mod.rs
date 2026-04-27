@@ -1,0 +1,2 @@
+mod hilbert_transformer_instantaneous_trendline;
+pub use hilbert_transformer_instantaneous_trendline::*;

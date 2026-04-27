@@ -1,0 +1,13 @@
+pub mod simple_moving_average;
+pub mod exponential_moving_average;
+pub mod weighted_moving_average;
+pub mod variance;
+pub mod standard_deviation;
+pub mod momentum;
+pub mod triangular_moving_average;
+pub mod rate_of_change;
+pub mod rate_of_change_percent;
+pub mod rate_of_change_ratio;
+pub mod linear_regression;
+pub mod absolute_price_oscillator;
+pub mod pearsons_correlation_coefficient;

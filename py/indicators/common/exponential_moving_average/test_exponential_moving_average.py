@@ -1,0 +1,176 @@
+import math
+import unittest
+from datetime import datetime
+
+from py.indicators.common.exponential_moving_average.exponential_moving_average import ExponentialMovingAverage
+from py.indicators.common.exponential_moving_average.params import ExponentialMovingAverageLengthParams, ExponentialMovingAverageSmoothingFactorParams
+from py.indicators.core.identifier import Identifier
+from py.entities.bar import Bar
+from py.entities.quote import Quote
+from py.entities.trade import Trade
+from py.entities.scalar import Scalar
+
+INPUT = [
+    91.500000, 94.815000, 94.375000, 95.095000, 93.780000, 94.625000, 92.530000, 92.750000, 90.315000, 92.470000,
+    96.125000, 97.250000, 98.500000, 89.875000, 91.000000, 92.815000, 89.155000, 89.345000, 91.625000, 89.875000,
+    88.375000, 87.625000, 84.780000, 83.000000, 83.500000, 81.375000, 84.440000, 89.250000, 86.375000, 86.250000,
+    85.250000, 87.125000, 85.815000, 88.970000, 88.470000, 86.875000, 86.815000, 84.875000, 84.190000, 83.875000,
+    83.375000, 85.500000, 89.190000, 89.440000, 91.095000, 90.750000, 91.440000, 89.000000, 91.000000, 90.500000,
+    89.030000, 88.815000, 84.280000, 83.500000, 82.690000, 84.750000, 85.655000, 86.190000, 88.940000, 89.280000,
+    88.625000, 88.500000, 91.970000, 91.500000, 93.250000, 93.500000, 93.155000, 91.720000, 90.000000, 89.690000,
+    88.875000, 85.190000, 83.375000, 84.875000, 85.940000, 97.250000, 99.875000, 104.940000, 106.000000, 102.500000,
+    102.405000, 104.595000, 106.125000, 106.000000, 106.065000, 104.625000, 108.625000, 109.315000, 110.500000,
+    112.750000, 123.000000, 119.625000, 118.750000, 119.250000, 117.940000, 116.440000, 115.190000, 111.875000,
+    110.595000, 118.125000, 116.000000, 116.000000, 112.000000, 113.750000, 112.940000, 116.000000, 120.500000,
+    116.620000, 117.000000, 115.250000, 114.310000, 115.500000, 115.870000, 120.690000, 120.190000, 120.750000,
+    124.750000, 123.370000, 122.940000, 122.560000, 123.120000, 122.560000, 124.620000, 129.250000, 131.000000,
+    132.250000, 131.000000, 132.810000, 134.000000, 137.380000, 137.810000, 137.880000, 137.250000, 136.310000,
+    136.250000, 134.630000, 128.250000, 129.000000, 123.870000, 124.810000, 123.000000, 126.250000, 128.380000,
+    125.370000, 125.690000, 122.250000, 119.370000, 118.500000, 123.190000, 123.500000, 122.190000, 119.310000,
+    123.310000, 121.120000, 123.370000, 127.370000, 128.500000, 123.870000, 122.940000, 121.750000, 124.440000,
+    122.000000, 122.370000, 122.940000, 124.000000, 123.190000, 124.560000, 127.250000, 125.870000, 128.860000,
+    132.000000, 130.750000, 134.750000, 135.000000, 132.380000, 133.310000, 131.940000, 130.000000, 125.370000,
+    130.130000, 127.120000, 125.190000, 122.000000, 125.000000, 123.000000, 123.500000, 120.060000, 121.000000,
+    117.750000, 119.870000, 122.000000, 119.190000, 116.370000, 113.500000, 114.250000, 110.000000, 105.060000,
+    107.000000, 107.870000, 107.000000, 107.120000, 107.000000, 91.000000, 93.940000, 93.870000, 95.500000, 93.000000,
+    94.940000, 98.250000, 96.750000, 94.810000, 94.370000, 91.560000, 90.250000, 93.940000, 93.620000, 97.000000,
+    95.000000, 95.870000, 94.060000, 94.620000, 93.750000, 98.000000, 103.940000, 107.870000, 106.060000, 104.500000,
+    105.000000, 104.190000, 103.060000, 103.420000, 105.270000, 111.870000, 116.000000, 116.620000, 118.280000,
+    113.370000, 109.000000, 109.700000, 109.250000, 107.000000, 109.190000, 110.000000, 109.200000, 110.120000,
+    108.000000, 108.620000, 109.750000, 109.810000, 109.000000, 108.750000, 107.870000,
+]
+
+
+class TestExponentialMovingAverage(unittest.TestCase):
+
+    def test_update_length_2_first_is_average_true(self):
+        ema = ExponentialMovingAverage.from_length(ExponentialMovingAverageLengthParams(length=2, first_is_average=True))
+        results = [ema.update(v) for v in INPUT]
+        self.assertTrue(math.isnan(results[0]))
+        self.assertAlmostEqual(results[1], 93.15, delta=1e-2)
+        self.assertAlmostEqual(results[2], 93.96, delta=1e-2)
+        self.assertAlmostEqual(results[3], 94.71, delta=1e-2)
+        self.assertAlmostEqual(results[251], 108.21, delta=1e-2)
+
+    def test_update_length_10_first_is_average_true(self):
+        ema = ExponentialMovingAverage.from_length(ExponentialMovingAverageLengthParams(length=10, first_is_average=True))
+        results = [ema.update(v) for v in INPUT]
+        for i in range(9):
+            self.assertTrue(math.isnan(results[i]))
+        self.assertAlmostEqual(results[9], 93.22, delta=1e-2)
+        self.assertAlmostEqual(results[10], 93.75, delta=1e-2)
+        self.assertAlmostEqual(results[29], 86.46, delta=1e-2)
+        self.assertAlmostEqual(results[251], 108.97, delta=1e-2)
+
+    def test_update_length_2_first_is_average_false(self):
+        ema = ExponentialMovingAverage.from_length(ExponentialMovingAverageLengthParams(length=2, first_is_average=False))
+        results = [ema.update(v) for v in INPUT]
+        self.assertTrue(math.isnan(results[0]))
+        self.assertAlmostEqual(results[1], 93.71, delta=1e-2)
+        self.assertAlmostEqual(results[2], 94.15, delta=1e-2)
+        self.assertAlmostEqual(results[3], 94.78, delta=1e-2)
+        self.assertAlmostEqual(results[251], 108.21, delta=1e-2)
+
+    def test_update_length_10_first_is_average_false(self):
+        ema = ExponentialMovingAverage.from_length(ExponentialMovingAverageLengthParams(length=10, first_is_average=False))
+        results = [ema.update(v) for v in INPUT]
+        for i in range(9):
+            self.assertTrue(math.isnan(results[i]))
+        self.assertAlmostEqual(results[9], 92.60, delta=1e-2)
+        self.assertAlmostEqual(results[10], 93.24, delta=1e-2)
+        self.assertAlmostEqual(results[11], 93.97, delta=1e-2)
+        self.assertAlmostEqual(results[30], 86.23, delta=1e-2)
+        self.assertAlmostEqual(results[251], 108.97, delta=1e-2)
+
+    def test_is_primed_length_10_first_is_average_true(self):
+        ema = ExponentialMovingAverage.from_length(ExponentialMovingAverageLengthParams(length=10, first_is_average=True))
+        for i in range(9):
+            ema.update(INPUT[i])
+            self.assertFalse(ema.is_primed())
+        ema.update(INPUT[9])
+        self.assertTrue(ema.is_primed())
+
+    def test_is_primed_length_10_first_is_average_false(self):
+        ema = ExponentialMovingAverage.from_length(ExponentialMovingAverageLengthParams(length=10, first_is_average=False))
+        for i in range(9):
+            ema.update(INPUT[i])
+            self.assertFalse(ema.is_primed())
+        ema.update(INPUT[9])
+        self.assertTrue(ema.is_primed())
+
+    def test_metadata_length(self):
+        ema = ExponentialMovingAverage.from_length(ExponentialMovingAverageLengthParams(length=10, first_is_average=True))
+        meta = ema.metadata()
+        self.assertEqual(meta.identifier, Identifier.EXPONENTIAL_MOVING_AVERAGE)
+        self.assertEqual(meta.mnemonic, "ema(10)")
+        self.assertEqual(meta.description, "Exponential moving average ema(10)")
+        self.assertEqual(len(meta.outputs), 1)
+        self.assertEqual(meta.outputs[0].mnemonic, "ema(10)")
+
+    def test_metadata_alpha(self):
+        ema = ExponentialMovingAverage.from_smoothing_factor(ExponentialMovingAverageSmoothingFactorParams(smoothing_factor=2/11, first_is_average=False))
+        meta = ema.metadata()
+        self.assertEqual(meta.identifier, Identifier.EXPONENTIAL_MOVING_AVERAGE)
+        self.assertEqual(meta.mnemonic, "ema(10, 0.18181818)")
+        self.assertEqual(meta.description, "Exponential moving average ema(10, 0.18181818)")
+
+    def test_construction_errors(self):
+        with self.assertRaises(ValueError) as ctx:
+            ExponentialMovingAverage.from_length(ExponentialMovingAverageLengthParams(length=0, first_is_average=True))
+        self.assertIn("length should be positive", str(ctx.exception))
+        with self.assertRaises(ValueError) as ctx:
+            ExponentialMovingAverage.from_length(ExponentialMovingAverageLengthParams(length=-1, first_is_average=True))
+        self.assertIn("length should be positive", str(ctx.exception))
+        with self.assertRaises(ValueError) as ctx:
+            ExponentialMovingAverage.from_smoothing_factor(ExponentialMovingAverageSmoothingFactorParams(smoothing_factor=-1, first_is_average=True))
+        self.assertIn("smoothing factor should be in range [0, 1]", str(ctx.exception))
+        with self.assertRaises(ValueError) as ctx:
+            ExponentialMovingAverage.from_smoothing_factor(ExponentialMovingAverageSmoothingFactorParams(smoothing_factor=2, first_is_average=True))
+        self.assertIn("smoothing factor should be in range [0, 1]", str(ctx.exception))
+
+    def test_update_entity(self):
+        t = datetime(2021, 4, 1)
+
+        # update_bar
+        ema = ExponentialMovingAverage.from_length(ExponentialMovingAverageLengthParams(length=2, first_is_average=False))
+        ema.update(0.0)
+        ema.update(0.0)
+        output = ema.update_bar(Bar(t, 3.0, 3.0, 3.0, 3.0, 1.0))
+        self.assertEqual(len(output), 1)
+        self.assertIsInstance(output[0], Scalar)
+        self.assertEqual(output[0].time, t)
+        self.assertAlmostEqual(output[0].value, 2.0, delta=1e-2)
+
+        # update_scalar
+        ema = ExponentialMovingAverage.from_length(ExponentialMovingAverageLengthParams(length=2, first_is_average=False))
+        ema.update(0.0)
+        ema.update(0.0)
+        output = ema.update_scalar(Scalar(t, 3.0))
+        self.assertEqual(len(output), 1)
+        self.assertIsInstance(output[0], Scalar)
+        self.assertEqual(output[0].time, t)
+        self.assertAlmostEqual(output[0].value, 2.0, delta=1e-2)
+
+        # update_quote
+        ema = ExponentialMovingAverage.from_length(ExponentialMovingAverageLengthParams(length=2, first_is_average=False))
+        ema.update(0.0)
+        ema.update(0.0)
+        output = ema.update_quote(Quote(t, 3.0, 3.0, 1.0, 1.0))
+        self.assertEqual(len(output), 1)
+        self.assertIsInstance(output[0], Scalar)
+        self.assertEqual(output[0].time, t)
+        self.assertAlmostEqual(output[0].value, 2.0, delta=1e-2)
+
+        # update_trade
+        ema = ExponentialMovingAverage.from_length(ExponentialMovingAverageLengthParams(length=2, first_is_average=False))
+        ema.update(0.0)
+        ema.update(0.0)
+        output = ema.update_trade(Trade(t, 3.0, 1.0))
+        self.assertEqual(len(output), 1)
+        self.assertIsInstance(output[0], Scalar)
+        self.assertEqual(output[0].time, t)
+        self.assertAlmostEqual(output[0].value, 2.0, delta=1e-2)
+
+
+if __name__ == "__main__":
+    unittest.main()

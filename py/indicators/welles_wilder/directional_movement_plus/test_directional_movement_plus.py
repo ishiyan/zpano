@@ -1,0 +1,336 @@
+"""Tests for Welles Wilder's Directional Movement Plus indicator."""
+
+import math
+import unittest
+from datetime import datetime
+
+from .directional_movement_plus import DirectionalMovementPlus
+from .params import DirectionalMovementPlusParams
+from .output import DirectionalMovementPlusOutput
+from ...core.identifier import Identifier
+from ....entities.bar import Bar
+from ....entities.quote import Quote
+from ....entities.trade import Trade
+from ....entities.scalar import Scalar
+
+
+# fmt: off
+_HIGH = [
+    93.25, 94.94, 96.375, 96.19, 96.0, 94.72, 95.0, 93.72, 92.47, 92.75,
+    96.25, 99.625, 99.125, 92.75, 91.315, 93.25, 93.405, 90.655, 91.97, 92.25,
+    90.345, 88.5, 88.25, 85.5, 84.44, 84.75, 84.44, 89.405, 88.125, 89.125,
+    87.155, 87.25, 87.375, 88.97, 90.0, 89.845, 86.97, 85.94, 84.75, 85.47,
+    84.47, 88.5, 89.47, 90.0, 92.44, 91.44, 92.97, 91.72, 91.155, 91.75,
+    90.0, 88.875, 89.0, 85.25, 83.815, 85.25, 86.625, 87.94, 89.375, 90.625,
+    90.75, 88.845, 91.97, 93.375, 93.815, 94.03, 94.03, 91.815, 92.0, 91.94,
+    89.75, 88.75, 86.155, 84.875, 85.94, 99.375, 103.28, 105.375, 107.625, 105.25,
+    104.5, 105.5, 106.125, 107.94, 106.25, 107.0, 108.75, 110.94, 110.94, 114.22,
+    123.0, 121.75, 119.815, 120.315, 119.375, 118.19, 116.69, 115.345, 113.0, 118.315,
+    116.87, 116.75, 113.87, 114.62, 115.31, 116.0, 121.69, 119.87, 120.87, 116.75,
+    116.5, 116.0, 118.31, 121.5, 122.0, 121.44, 125.75, 127.75, 124.19, 124.44,
+    125.75, 124.69, 125.31, 132.0, 131.31, 132.25, 133.88, 133.5, 135.5, 137.44,
+    138.69, 139.19, 138.5, 138.13, 137.5, 138.88, 132.13, 129.75, 128.5, 125.44,
+    125.12, 126.5, 128.69, 126.62, 126.69, 126.0, 123.12, 121.87, 124.0, 127.0,
+    124.44, 122.5, 123.75, 123.81, 124.5, 127.87, 128.56, 129.63, 124.87, 124.37,
+    124.87, 123.62, 124.06, 125.87, 125.19, 125.62, 126.0, 128.5, 126.75, 129.75,
+    132.69, 133.94, 136.5, 137.69, 135.56, 133.56, 135.0, 132.38, 131.44, 130.88,
+    129.63, 127.25, 127.81, 125.0, 126.81, 124.75, 122.81, 122.25, 121.06, 120.0,
+    123.25, 122.75, 119.19, 115.06, 116.69, 114.87, 110.87, 107.25, 108.87, 109.0,
+    108.5, 113.06, 93.0, 94.62, 95.12, 96.0, 95.56, 95.31, 99.0, 98.81,
+    96.81, 95.94, 94.44, 92.94, 93.94, 95.5, 97.06, 97.5, 96.25, 96.37,
+    95.0, 94.87, 98.25, 105.12, 108.44, 109.87, 105.0, 106.0, 104.94, 104.5,
+    104.44, 106.31, 112.87, 116.5, 119.19, 121.0, 122.12, 111.94, 112.75, 110.19,
+    107.94, 109.69, 111.06, 110.44, 110.12, 110.31, 110.44, 110.0, 110.75, 110.5,
+    110.5, 109.5,
+]
+
+_LOW = [
+    90.75, 91.405, 94.25, 93.5, 92.815, 93.5, 92.0, 89.75, 89.44, 90.625,
+    92.75, 96.315, 96.03, 88.815, 86.75, 90.94, 88.905, 88.78, 89.25, 89.75,
+    87.5, 86.53, 84.625, 82.28, 81.565, 80.875, 81.25, 84.065, 85.595, 85.97,
+    84.405, 85.095, 85.5, 85.53, 87.875, 86.565, 84.655, 83.25, 82.565, 83.44,
+    82.53, 85.065, 86.875, 88.53, 89.28, 90.125, 90.75, 89.0, 88.565, 90.095,
+    89.0, 86.47, 84.0, 83.315, 82.0, 83.25, 84.75, 85.28, 87.19, 88.44,
+    88.25, 87.345, 89.28, 91.095, 89.53, 91.155, 92.0, 90.53, 89.97, 88.815,
+    86.75, 85.065, 82.03, 81.5, 82.565, 96.345, 96.47, 101.155, 104.25, 101.75,
+    101.72, 101.72, 103.155, 105.69, 103.655, 104.0, 105.53, 108.53, 108.75, 107.75,
+    117.0, 118.0, 116.0, 118.5, 116.53, 116.25, 114.595, 110.875, 110.5, 110.72,
+    112.62, 114.19, 111.19, 109.44, 111.56, 112.44, 117.5, 116.06, 116.56, 113.31,
+    112.56, 114.0, 114.75, 118.87, 119.0, 119.75, 122.62, 123.0, 121.75, 121.56,
+    123.12, 122.19, 122.75, 124.37, 128.0, 129.5, 130.81, 130.63, 132.13, 133.88,
+    135.38, 135.75, 136.19, 134.5, 135.38, 133.69, 126.06, 126.87, 123.5, 122.62,
+    122.75, 123.56, 125.81, 124.62, 124.37, 121.81, 118.19, 118.06, 117.56, 121.0,
+    121.12, 118.94, 119.81, 121.0, 122.0, 124.5, 126.56, 123.5, 121.25, 121.06,
+    122.31, 121.0, 120.87, 122.06, 122.75, 122.69, 122.87, 125.5, 124.25, 128.0,
+    128.38, 130.69, 131.63, 134.38, 132.0, 131.94, 131.94, 129.56, 123.75, 126.0,
+    126.25, 124.37, 121.44, 120.44, 121.37, 121.69, 120.0, 119.62, 115.5, 116.75,
+    119.06, 119.06, 115.06, 111.06, 113.12, 110.0, 105.0, 104.69, 103.87, 104.69,
+    105.44, 107.0, 89.0, 92.5, 92.12, 94.62, 92.81, 94.25, 96.25, 96.37,
+    93.69, 93.5, 90.0, 90.19, 90.5, 92.12, 94.12, 94.87, 93.0, 93.87,
+    93.0, 92.62, 93.56, 98.37, 104.44, 106.0, 101.81, 104.12, 103.37, 102.12,
+    102.25, 103.37, 107.94, 112.5, 115.44, 115.5, 112.25, 107.56, 106.56, 106.87,
+    104.5, 105.75, 108.62, 107.75, 108.06, 108.0, 108.19, 108.12, 109.06, 108.75,
+    108.56, 106.62,
+]
+
+_EXPECTED_DMP1 = [
+    None,
+    1.69, 1.435, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.28, 3.5,
+    3.375, 0.0, 0.0, 0.0, 1.935, 0.0, 0.0, 1.315, 0.28, 0.0,
+    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 4.965, 0.0, 1.0, 0.0,
+    0.095, 0.125, 1.595, 1.03, 0.0, 0.0, 0.0, 0.0, 0.72, 0.0,
+    4.03, 0.97, 0.53, 2.44, 0.0, 1.53, 0.0, 0.0, 0.595, 0.0,
+    0.0, 0.0, 0.0, 0.0, 1.435, 1.375, 1.315, 1.435, 1.25, 0.0,
+    0.0, 3.125, 1.405, 0.0, 0.215, 0.0, 0.0, 0.0, 0.0, 0.0,
+    0.0, 0.0, 0.0, 1.065, 13.435, 3.905, 2.095, 2.25, 0.0, 0.0,
+    1.0, 0.625, 1.815, 0.0, 0.75, 1.75, 2.19, 0.0, 3.28, 8.78,
+    0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 5.315, 0.0,
+    0.0, 0.0, 0.0, 0.69, 0.69, 5.69, 0.0, 1.0, 0.0, 0.0,
+    0.0, 2.31, 3.19, 0.5, 0.0, 4.31, 2.0, 0.0, 0.25, 1.31,
+    0.0, 0.62, 6.69, 0.0, 0.94, 1.63, 0.0, 2.0, 1.94, 1.25,
+    0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+    1.38, 2.19, 0.0, 0.0, 0.0, 0.0, 0.0, 2.13, 3.0, 0.0,
+    0.0, 1.25, 0.06, 0.69, 3.37, 0.69, 0.0, 0.0, 0.0, 0.5,
+    0.0, 0.44, 1.81, 0.0, 0.43, 0.38, 2.5, 0.0, 3.0, 2.94,
+    1.25, 2.56, 1.19, 0.0, 0.0, 1.44, 0.0, 0.0, 0.0, 0.0,
+    0.0, 0.0, 0.0, 1.81, 0.0, 0.0, 0.0, 0.0, 0.0, 3.25,
+    0.0, 0.0, 0.0, 1.63, 0.0, 0.0, 0.0, 1.62, 0.13, 0.0,
+    4.56, 0.0, 1.62, 0.5, 0.88, 0.0, 0.0, 3.69, 0.0, 0.0,
+    0.0, 0.0, 0.0, 1.0, 1.56, 1.56, 0.44, 0.0, 0.12, 0.0,
+    0.0, 3.38, 6.87, 3.32, 1.43, 0.0, 1.0, 0.0, 0.0, 0.0,
+    1.87, 6.56, 3.63, 2.69, 1.81, 0.0, 0.0, 0.0, 0.0, 0.0,
+    1.75, 1.37, 0.0, 0.0, 0.19, 0.13, 0.0, 0.75, 0.0, 0.0,
+    0.0,
+]
+
+_EXPECTED_DMP14 = [
+    None, None, None, None, None, None, None, None, None, None,
+    None, None, None, None,
+    9.54571428571429, 10.7988775510204, 10.027529154519, 9.31127707205331, 9.96118585262093, 9.52967257743372,
+    8.8489816790456, 8.21691155911377, 7.62998930489136, 7.08499006882769, 6.57891934962571, 6.10899653893816,
+    5.67263964329972, 10.2324510973497, 9.50156173325333, 9.82287875230667, 9.12124455571333, 8.56472708744809,
+    8.07796086691609, 9.09596366213636, 9.47625197198377, 8.79937683112778, 8.17084991461866, 7.58721777786018,
+    7.04527365087017, 7.26203981866515, 6.7433226887605, 10.2916567824205, 10.526538440819, 10.3046428379034,
+    12.0085969209103, 11.1508399979881, 11.8843514267032, 11.0354691819387, 10.2472213832288, 10.1102769987125,
+    9.38811435594729, 8.71753475909391, 8.09485370487292, 7.51664986881057, 6.97974630675267, 7.91619299912748,
+    8.72575064204695, 9.41748273904359, 10.1798054005405, 10.702676443359, 9.93819955454766, 9.22832815779425,
+    11.6941618608089, 12.2638645850369, 11.3878742575342, 10.7894546677104, 10.0187793343025, 9.30315223899517,
+    8.63864136478123, 8.02159555301114, 7.44862444208178, 6.91657983907594, 6.42253842199908, 5.96378567757058,
+    6.60280098631553, 19.5661723444359, 22.0735886055476, 22.5919037051513, 23.2281962976405, 21.5690394192376,
+    20.0283937464349, 19.5977941931182, 18.8229517507526, 19.2934551971274, 17.9153512544754, 17.3856833077272,
+    17.8938487857467, 18.8057167296219, 17.4624512489346, 19.4951333025822, 26.8826237809691, 24.9624363680428,
+    23.1794051988969, 22.0237333989757, 20.4506095847631, 18.989851757280, 17.6334337746172, 16.373902790716,
+    15.2043383056648, 19.4333141409745, 18.045220273762, 16.7562759684933, 15.5593991136009, 14.4480134626294,
+    14.106012501013, 13.7884401795121, 18.4935515952612, 17.1725836241711, 16.9459705081589, 15.7355440432904,
+    14.6115766116268, 13.5678925679392, 14.908757384515, 17.0338461427639, 16.3171428468522, 15.1516326435056,
+    18.3793731689695, 19.0665607997574, 17.7046635997747, 16.6900447712194, 16.8078987161323, 15.6073345221228,
+    15.1125249133998, 20.7230588481569, 19.2428403590029, 18.8083517619312, 19.0948980646504, 17.7309767743183,
+    18.4644784332955, 19.0855871166316, 18.972330894015, 18.1171644015854, 16.8230812300436, 15.6214325707547,
+    14.505615958558, 13.4695005329467, 12.5073933520219, 11.6140081125918, 10.7844361045495, 10.0141192399388,
+    9.29882500851463, 10.0146232221922, 11.4892929920356, 10.6686292068902, 9.90658426354087, 9.19897110185938,
+    8.54190173744085, 7.93176589905222, 9.49521119197706, 11.8169818211216, 10.9729116910414, 10.1891322845385,
+    10.7113371213572, 10.0062416126888, 9.98151006892531, 12.6385450640021, 12.4257918451448, 11.5382352847773,
+    10.7140756215789, 9.94878450575186, 9.7381570410553, 9.04257439526563, 8.83667622417523, 10.0154850653056,
+    9.3000932749266, 9.06580089814613, 8.79824369113569, 10.6697977131974, 9.90766930511190, 12.199978640461,
+    14.2685515947138, 14.4993693379486, 16.0237000995237, 16.0691500924148, 14.9213536572423, 13.855542681725,
+    14.3058610616018, 13.284013842916, 12.3351557112791, 11.4540731604735, 10.6359250775825, 9.87621614346946,
+    9.17077213322164, 8.51571698084867, 9.71745148221662, 9.02334780491544, 8.37882296170719, 7.78033560729954,
+    7.22459734963528, 6.70855468180419, 9.47937220453246, 8.802274189923, 8.17354031921422, 7.58971601069892,
+    8.67759343850613, 8.0577653357557, 7.482210668916, 6.94776704970772, 8.0714979747286, 7.62496240510512,
+    7.0803222333119, 11.1345849309325, 10.3392574358659, 11.2207390475897, 10.9192576870476, 11.0193107094014,
+    10.2322170873013, 9.50134443820831, 12.5126769783363, 11.6189143370266, 10.7889918843818, 10.018349606926,
+    9.30275320643125, 8.6382708345433, 9.02125148921878, 9.93687638284601, 10.787099498357, 10.4565923913315,
+    9.70969293480783, 9.13614343946442, 8.48356176521696, 7.87759306770146, 10.6949078485799, 16.8009858593956,
+    18.9209154408674, 18.9994214808054, 17.6423199464622, 17.3821542360006, 16.140571790572, 14.9876738055311,
+    13.9171256765646, 14.7930452710957, 20.2963991803032, 22.4766563817101, 23.5611809258736, 23.6882394311684,
+    21.9962223289421, 20.4250635911605, 18.9661304775062, 17.611406871970, 16.3534492382579, 16.9353457212395,
+    17.0956781697224, 15.8745583004565, 14.7406612789953, 13.8777569019242, 13.0164885517868, 12.0867393695163,
+    11.9734008431223, 11.1181579257564, 10.3240037882024, 9.5865749461879,
+]
+# fmt: on
+
+
+class TestDirectionalMovementPlus(unittest.TestCase):
+    """Tests for the DirectionalMovementPlus indicator."""
+
+    def test_constructor_invalid(self) -> None:
+        """Length 0 and negative should raise ValueError."""
+        with self.assertRaises(ValueError):
+            DirectionalMovementPlus(DirectionalMovementPlusParams(length=0))
+
+        with self.assertRaises(ValueError):
+            DirectionalMovementPlus(DirectionalMovementPlusParams(length=-8))
+
+    def test_is_primed_length1(self) -> None:
+        """Length=1 requires 2 updates to prime."""
+        dmp = DirectionalMovementPlus(DirectionalMovementPlusParams(length=1))
+        self.assertFalse(dmp.is_primed())
+
+        dmp.update(_HIGH[0], _LOW[0])
+        self.assertFalse(dmp.is_primed(), "[0] should not be primed yet")
+
+        dmp.update(_HIGH[1], _LOW[1])
+        self.assertTrue(dmp.is_primed(), "[1] should be primed")
+
+    def test_is_primed_length14(self) -> None:
+        """Length=14 requires 15 updates to prime."""
+        dmp = DirectionalMovementPlus(DirectionalMovementPlusParams(length=14))
+
+        for i in range(14):
+            dmp.update(_HIGH[i], _LOW[i])
+            self.assertFalse(dmp.is_primed(), f"[{i}] should not be primed yet")
+
+        dmp.update(_HIGH[14], _LOW[14])
+        self.assertTrue(dmp.is_primed(), "[14] should be primed")
+
+    def test_values_length1(self) -> None:
+        """Feed all 252 high/low pairs, check DMP1 output."""
+        dmp = DirectionalMovementPlus(DirectionalMovementPlusParams(length=1))
+
+        for i in range(len(_HIGH)):
+            act = dmp.update(_HIGH[i], _LOW[i])
+            exp = _EXPECTED_DMP1[i]
+
+            if exp is None:
+                self.assertTrue(math.isnan(act), f"[{i}] expected NaN, got {act}")
+            else:
+                self.assertFalse(math.isnan(act), f"[{i}] expected {exp}, got NaN")
+                self.assertAlmostEqual(act, exp, delta=1e-8,
+                                       msg=f"[{i}] expected {exp}, got {act}")
+
+    def test_values_length14(self) -> None:
+        """Feed all 252 high/low pairs, check DMP14 output."""
+        dmp = DirectionalMovementPlus(DirectionalMovementPlusParams(length=14))
+
+        for i in range(len(_HIGH)):
+            act = dmp.update(_HIGH[i], _LOW[i])
+            exp = _EXPECTED_DMP14[i]
+
+            if exp is None:
+                self.assertTrue(math.isnan(act), f"[{i}] expected NaN, got {act}")
+            else:
+                self.assertFalse(math.isnan(act), f"[{i}] expected {exp}, got NaN")
+                self.assertAlmostEqual(act, exp, delta=1e-8,
+                                       msg=f"[{i}] expected {exp}, got {act}")
+
+    def test_nan_high(self) -> None:
+        """NaN high produces NaN output."""
+        dmp = DirectionalMovementPlus(DirectionalMovementPlusParams(length=14))
+        self.assertTrue(math.isnan(dmp.update(math.nan, 1)),
+                        "expected NaN passthrough for NaN high")
+
+    def test_nan_low(self) -> None:
+        """NaN low produces NaN output."""
+        dmp = DirectionalMovementPlus(DirectionalMovementPlusParams(length=14))
+        self.assertTrue(math.isnan(dmp.update(1, math.nan)),
+                        "expected NaN passthrough for NaN low")
+
+    def test_nan_both(self) -> None:
+        """NaN high and low produces NaN output."""
+        dmp = DirectionalMovementPlus(DirectionalMovementPlusParams(length=14))
+        self.assertTrue(math.isnan(dmp.update(math.nan, math.nan)),
+                        "expected NaN passthrough for NaN high and low")
+
+    def test_nan_sample(self) -> None:
+        """NaN sample produces NaN output."""
+        dmp = DirectionalMovementPlus(DirectionalMovementPlusParams(length=14))
+        self.assertTrue(math.isnan(dmp.update_sample(math.nan)),
+                        "expected NaN passthrough for NaN sample")
+
+    def test_high_low_swap(self) -> None:
+        """When high < low, they should be swapped internally."""
+        dmp1 = DirectionalMovementPlus(DirectionalMovementPlusParams(length=1))
+        dmp2 = DirectionalMovementPlus(DirectionalMovementPlusParams(length=1))
+
+        # Prime both.
+        dmp1.update(10, 5)
+        dmp2.update(5, 10)  # Swapped.
+
+        # Update both with same effective values.
+        v1 = dmp1.update(12, 6)
+        v2 = dmp2.update(6, 12)  # Swapped.
+
+        self.assertEqual(v1, v2, f"high/low swap should produce same result: {v1} vs {v2}")
+
+    def test_zero_inputs(self) -> None:
+        """20 updates of (0,0) with length=10."""
+        dmp = DirectionalMovementPlus(DirectionalMovementPlusParams(length=10))
+
+        for _ in range(20):
+            dmp.update_sample(0)
+
+        self.assertTrue(dmp.is_primed(), "should be primed after 20 updates with length 10")
+
+    def test_entity_bar(self) -> None:
+        """update_bar with Bar."""
+        dmp = DirectionalMovementPlus(DirectionalMovementPlusParams(length=14))
+        for i in range(14):
+            dmp.update(_HIGH[i], _LOW[i])
+
+        tm = datetime(2021, 4, 1)
+        b = Bar(time=tm, open=0, high=_HIGH[14], low=_LOW[14], close=0, volume=0)
+        result = dmp.update_bar(b)
+
+        self.assertEqual(len(result), 1)
+        self.assertIsInstance(result[0], Scalar)
+        self.assertEqual(result[0].time, tm)
+
+    def test_entity_scalar(self) -> None:
+        """update_scalar with Scalar."""
+        dmp = DirectionalMovementPlus(DirectionalMovementPlusParams(length=14))
+        for i in range(14):
+            dmp.update(_HIGH[i], _LOW[i])
+
+        tm = datetime(2021, 4, 1)
+        s = Scalar(time=tm, value=_HIGH[14])
+        result = dmp.update_scalar(s)
+
+        self.assertEqual(len(result), 1)
+        self.assertIsInstance(result[0], Scalar)
+        self.assertEqual(result[0].time, tm)
+
+    def test_entity_quote(self) -> None:
+        """update_quote with Quote."""
+        dmp = DirectionalMovementPlus(DirectionalMovementPlusParams(length=14))
+        for i in range(14):
+            dmp.update(_HIGH[i], _LOW[i])
+
+        tm = datetime(2021, 4, 1)
+        q = Quote(time=tm, bid_price=_HIGH[14] - 0.5, ask_price=_HIGH[14] + 0.5,
+                  bid_size=0, ask_size=0)
+        result = dmp.update_quote(q)
+
+        self.assertEqual(len(result), 1)
+        self.assertIsInstance(result[0], Scalar)
+        self.assertEqual(result[0].time, tm)
+
+    def test_entity_trade(self) -> None:
+        """update_trade with Trade."""
+        dmp = DirectionalMovementPlus(DirectionalMovementPlusParams(length=14))
+        for i in range(14):
+            dmp.update(_HIGH[i], _LOW[i])
+
+        tm = datetime(2021, 4, 1)
+        t = Trade(time=tm, price=_HIGH[14], volume=0)
+        result = dmp.update_trade(t)
+
+        self.assertEqual(len(result), 1)
+        self.assertIsInstance(result[0], Scalar)
+        self.assertEqual(result[0].time, tm)
+
+    def test_metadata(self) -> None:
+        """Metadata fields are correct."""
+        dmp = DirectionalMovementPlus(DirectionalMovementPlusParams(length=14))
+        md = dmp.metadata()
+
+        self.assertEqual(md.identifier, Identifier.DIRECTIONAL_MOVEMENT_PLUS)
+        self.assertEqual(md.mnemonic, "+dm")
+        self.assertEqual(md.description, "Directional Movement Plus")
+        self.assertEqual(len(md.outputs), 1)
+        self.assertEqual(md.outputs[0].kind, int(DirectionalMovementPlusOutput.VALUE))
+        self.assertEqual(md.outputs[0].mnemonic, "+dm")
+        self.assertEqual(md.outputs[0].description, "Directional Movement Plus")
+
+
+if __name__ == '__main__':
+    unittest.main()
