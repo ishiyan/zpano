@@ -156,7 +156,7 @@ pub fn build(b: *std.Build) void {
     });
 
     // --- Indicators library module ---
-    _ = b.addModule("indicators", .{
+    const indicators_mod = b.addModule("indicators", .{
         .root_source_file = b.path("src/indicators/indicators.zig"),
         .target = target,
         .optimize = optimize,
@@ -170,6 +170,75 @@ pub fn build(b: *std.Build) void {
             .{ .name = "trade_component", .module = trade_component_mod },
         },
     });
+
+    // --- CLI executables ---
+    const icalc_exe = b.addExecutable(.{
+        .name = "icalc",
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/cmd/icalc/main.zig"),
+            .target = target,
+            .optimize = optimize,
+            .imports = &.{
+                .{ .name = "indicators", .module = indicators_mod },
+                .{ .name = "bar", .module = bar_mod },
+                .{ .name = "scalar", .module = scalar_mod },
+            },
+        }),
+    });
+    b.installArtifact(icalc_exe);
+
+    const run_icalc = b.addRunArtifact(icalc_exe);
+    run_icalc.step.dependOn(b.getInstallStep());
+    if (b.args) |args| {
+        run_icalc.addArgs(args);
+    }
+    const run_icalc_step = b.step("icalc", "Run the icalc indicator calculator");
+    run_icalc_step.dependOn(&run_icalc.step);
+
+    const ifres_exe = b.addExecutable(.{
+        .name = "ifres",
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/cmd/ifres/main.zig"),
+            .target = target,
+            .optimize = optimize,
+            .imports = &.{
+                .{ .name = "indicators", .module = indicators_mod },
+                .{ .name = "scalar", .module = scalar_mod },
+            },
+        }),
+    });
+    b.installArtifact(ifres_exe);
+
+    const run_ifres = b.addRunArtifact(ifres_exe);
+    run_ifres.step.dependOn(b.getInstallStep());
+    if (b.args) |args| {
+        run_ifres.addArgs(args);
+    }
+    const run_ifres_step = b.step("ifres", "Run the ifres frequency response calculator");
+    run_ifres_step.dependOn(&run_ifres.step);
+
+    const iconf_exe = b.addExecutable(.{
+        .name = "iconf",
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/cmd/iconf/main.zig"),
+            .target = target,
+            .optimize = optimize,
+            .imports = &.{
+                .{ .name = "indicators", .module = indicators_mod },
+                .{ .name = "bar", .module = bar_mod },
+                .{ .name = "scalar", .module = scalar_mod },
+            },
+        }),
+    });
+    b.installArtifact(iconf_exe);
+
+    const run_iconf = b.addRunArtifact(iconf_exe);
+    run_iconf.step.dependOn(b.getInstallStep());
+    if (b.args) |args| {
+        run_iconf.addArgs(args);
+    }
+    const run_iconf_step = b.step("iconf", "Run the iconf chart configuration generator");
+    run_iconf_step.dependOn(&run_iconf.step);
 
     // --- Symbology library modules (no dependencies) ---
     _ = b.addModule("isin", .{

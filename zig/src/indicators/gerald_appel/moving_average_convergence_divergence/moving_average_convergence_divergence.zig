@@ -319,17 +319,17 @@ pub const MovingAverageConvergenceDivergence = struct {
     }
 
     pub fn updateBar(self: *MovingAverageConvergenceDivergence, sample: *const Bar) OutputArray {
-        const v = self.bar_func(sample);
+        const v = self.bar_func(sample.*);
         return self.updateScalar(&Scalar{ .time = sample.time, .value = v });
     }
 
     pub fn updateQuote(self: *MovingAverageConvergenceDivergence, sample: *const Quote) OutputArray {
-        const v = self.quote_func(sample);
+        const v = self.quote_func(sample.*);
         return self.updateScalar(&Scalar{ .time = sample.time, .value = v });
     }
 
     pub fn updateTrade(self: *MovingAverageConvergenceDivergence, sample: *const Trade) OutputArray {
-        const v = self.trade_func(sample);
+        const v = self.trade_func(sample.*);
         return self.updateScalar(&Scalar{ .time = sample.time, .value = v });
     }
 

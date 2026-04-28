@@ -35,11 +35,17 @@ pub fn buildMetadata(
     out.description = description;
     out.outputs_len = d.outputs.len;
     for (d.outputs, 0..) |od, i| {
-        out.outputs_buf[i] = .{
-            .kind = od.kind,
-            .shape = od.shape,
-            .mnemonic = texts[i].mnemonic,
-            .description = texts[i].description,
-        };
+        const mn = texts[i].mnemonic;
+        const desc = texts[i].description;
+        const mn_len = @min(mn.len, output_metadata_mod.max_mnemonic_len);
+        const desc_len = @min(desc.len, output_metadata_mod.max_description_len);
+        // Copy strings into owned storage within the output metadata struct.
+        @memcpy(out.outputs_buf[i].mnemonic_storage[0..mn_len], mn[0..mn_len]);
+        @memcpy(out.outputs_buf[i].description_storage[0..desc_len], desc[0..desc_len]);
+        out.outputs_buf[i].kind = od.kind;
+        out.outputs_buf[i].shape = od.shape;
+        // Point slices to the owned storage (which is now at its final location in `out`).
+        out.outputs_buf[i].mnemonic = out.outputs_buf[i].mnemonic_storage[0..mn_len];
+        out.outputs_buf[i].description = out.outputs_buf[i].description_storage[0..desc_len];
     }
 }

@@ -275,12 +275,13 @@ context). All other languages use fully-qualified symbol names.
 
 ### Identifier Registry Parity
 
-Go, TypeScript, and Python MUST have the same set of registered identifiers. All
-three currently have **72** identifiers (Go: `core.Identifier` iota 1–72; TS:
-`IndicatorIdentifier` enum 0–71; Python: `Identifier` IntEnum 0–71) with
-identical names (PascalCase in Go/TS, UPPER_SNAKE_CASE in Python). When
-adding a new indicator, register the identifier in **all** languages even
-if only one implementation exists yet.
+Go, TypeScript, Python, Zig, and Rust MUST have the same set of registered
+identifiers. All five currently have **72** identifiers (Go: `core.Identifier`
+iota 1–72; TS: `IndicatorIdentifier` enum 0–71; Python: `Identifier` IntEnum
+0–71; Zig: `Identifier` enum(u8) 0–71; Rust: `Identifier` enum 0–71) with
+identical names (PascalCase in Go/TS/Rust, UPPER_SNAKE_CASE in Python,
+snake_case in Zig). When adding a new indicator, register the identifier in
+**all** languages even if only one implementation exists yet.
 
 ### File Naming
 
@@ -290,7 +291,7 @@ if only one implementation exists yet.
 | Go         | `lowercase.go`            | `lowercase_test.go`         | `simplemovingaverage.go`         |
 | Python     | `snake_case.py`           | `test_snake_case.py`        | `simple_moving_average.py`       |
 | Rust       | `snake_case.rs`           | `snake_case_test.rs` or inline `#[cfg(test)]` | `simple_moving_average.rs` |
-| Zig        | `snake_case.zig`          | `snake_case_test.zig`       | `simple_moving_average.zig`      |
+| Zig        | `snake_case.zig`          | inline `test` blocks at bottom  | `simple_moving_average.zig`      |
 
 No type-suffix convention is used (no `.enum.ts`, `.interface.ts`, etc.).
 This is consistent across all languages.
@@ -304,16 +305,16 @@ so prefixing would stutter.
 
 For a `simple-moving-average/` folder:
 
-| Role                         | Go                              | TypeScript                              |
-|------------------------------|---------------------------------|-----------------------------------------|
-| Main implementation          | `simplemovingaverage.go`        | `simple-moving-average.ts`              |
-| Main test                    | `simplemovingaverage_test.go`   | `simple-moving-average.spec.ts`         |
-| Data-driven test (if split)  | `data_test.go`                  | `data.spec.ts`                          |
-| Parameters                   | `params.go`                     | `params.ts`                             |
-| Output enum                  | `output.go`                     | `output.ts`                             |
-| Output test                  | `output_test.go`                | `output.spec.ts`                        |
-| Coefficients / helpers       | `coefficients.go`, `estimator.go` | `coefficients.ts`, `estimator.ts`     |
-| Package docs (Go only)       | `doc.go`                        | —                                       |
+| Role                         | Go                              | TypeScript                              | Zig                                      |
+|------------------------------|---------------------------------|-----------------------------------------|------------------------------------------|
+| Main implementation          | `simplemovingaverage.go`        | `simple-moving-average.ts`              | `simple_moving_average.zig` (single file)|
+| Main test                    | `simplemovingaverage_test.go`   | `simple-moving-average.spec.ts`         | inline `test` blocks at bottom           |
+| Data-driven test (if split)  | `data_test.go`                  | `data.spec.ts`                          | —                                        |
+| Parameters                   | `params.go`                     | `params.ts`                             | inline struct in main file               |
+| Output enum                  | `output.go`                     | `output.ts`                             | inline enum in main file                 |
+| Output test                  | `output_test.go`                | `output.spec.ts`                        | —                                        |
+| Coefficients / helpers       | `coefficients.go`, `estimator.go` | `coefficients.ts`, `estimator.ts`     | `coefficients.zig`, `estimator.zig`      |
+| Package docs (Go only)       | `doc.go`                        | —                                       | —                                        |
 
 **Exception:** when an auxiliary file holds a *concept* that would be
 meaningless outside the folder name (e.g., `hilberttransformer/` contains
@@ -1768,7 +1769,326 @@ The indicators are not thread-safe by design.
 
 ### Zig-Specific Conventions
 
-*(To be filled as porting progresses.)*
+The Zig port is **complete**: 63 indicators, factory, frequency_response,
+icalc/ifres/iconf CLI tools — 1014 tests passing.
+
+#### Directory structure
+
+```
+zig/src/indicators/
+├── indicators.zig           # barrel: re-exports all types + comptime test inclusion
+├── core/
+│   ├── indicator.zig        # Indicator interface (vtable-based), OutputValue, OutputArray
+│   ├── line_indicator.zig   # LineIndicator composition helper
+│   ├── identifier.zig       # Identifier enum(u8), 72 values (0-based)
+│   ├── metadata.zig         # Metadata struct (fixed-capacity OutputMetadata buffer)
+│   ├── build_metadata.zig   # buildMetadata() + OutputText
+│   ├── descriptor.zig       # Descriptor struct
+│   ├── descriptors.zig      # static registry, descriptorOf(), allDescriptors()
+│   ├── output_descriptor.zig
+│   ├── specification.zig
+│   ├── component_triple_mnemonic.zig
+│   ├── adaptivity.zig       # Adaptivity enum
+│   ├── input_requirement.zig
+│   ├── volume_usage.zig
+│   ├── role.zig
+│   ├── pane.zig
+│   ├── frequency_response.zig  # FFT spectral analysis (582 lines)
+│   └── outputs/
+│       ├── shape.zig        # Shape enum
+│       ├── band.zig         # Band struct
+│       ├── heatmap.zig      # Heatmap struct (max 256 values)
+│       ├── polyline.zig     # Point + Polyline
+│       └── output_metadata.zig
+├── common/
+│   └── simple_moving_average/
+│       └── simple_moving_average.zig   # params + output + impl + tests (single file)
+├── <author_name>/           # e.g., john_ehlers/, mark_jurik/
+│   └── <indicator_name>/
+│       └── <indicator_name>.zig
+├── factory/
+│   └── factory.zig          # create(allocator, Identifier, params_json)
+└── (20 author family directories, ~68 indicator subdirectories)
+```
+
+Every indicator is a single `.zig` file: params struct, output enum, indicator struct,
+impl, and `test` blocks — all in one file. No separate params/output/test files.
+
+#### Indicator interface — vtable-based type erasure
+
+Unlike Go (interface), TS (class inheritance), Python (ABC), or Rust (trait object),
+Zig uses a manually-constructed **vtable** for type erasure:
+
+```zig
+pub const Indicator = struct {
+    ptr: *anyopaque,
+    vtable: *const VTable,
+
+    const VTable = struct {
+        isPrimed: *const fn (*anyopaque) bool,
+        metadata: *const fn (*anyopaque, *Metadata) void,
+        updateScalar: *const fn (*anyopaque, Scalar) OutputArray,
+        updateBar: *const fn (*anyopaque, Bar) OutputArray,
+        updateQuote: *const fn (*anyopaque, Quote) OutputArray,
+        updateTrade: *const fn (*anyopaque, Trade) OutputArray,
+    };
+
+    pub fn GenVTable(comptime T: type) VTable { ... }
+};
+```
+
+Each concrete indicator exposes an `indicator()` method returning this interface:
+```zig
+const vtable = Indicator.GenVTable(SimpleMovingAverage);
+pub fn indicator(self: *SimpleMovingAverage) Indicator {
+    return .{ .ptr = self, .vtable = &vtable };
+}
+```
+
+#### OutputValue — tagged union (not `Box<dyn Any>`)
+
+Zig avoids heap allocation for outputs. `OutputValue` is a tagged union:
+```zig
+pub const OutputValue = union(enum) {
+    scalar: Scalar,
+    band: Band,
+    heatmap: Heatmap,
+    polyline: Polyline,
+};
+```
+
+`OutputArray` is a fixed-capacity array (max 9 outputs) with stack storage:
+```zig
+pub const OutputArray = struct {
+    buf: [max_output_count]OutputValue = undefined,
+    len: usize = 0,
+    pub fn fromScalar(s: Scalar) OutputArray { ... }
+    pub fn append(self: *OutputArray, val: OutputValue) void { ... }
+    pub fn slice(self: *const OutputArray) []const OutputValue { ... }
+};
+```
+
+#### LineIndicator — composition pattern
+
+Like Python and Rust, Zig uses **composition** (stored as a field):
+
+```zig
+pub const LineIndicator = struct {
+    mnemonic: []const u8,
+    description: []const u8,
+    bar_func: BarFunc,
+    quote_func: QuoteFunc,
+    trade_func: TradeFunc,
+
+    pub fn new(mnemonic, description, bc, qc, tc) LineIndicator { ... }
+    pub fn extractBar(self: *const LineIndicator, bar: Bar) f64 { ... }
+    pub fn wrapScalar(self: *const LineIndicator, time: i64, value: f64) OutputArray { ... }
+};
+```
+
+Single-output indicators store `line: LineIndicator` and delegate entity extraction:
+```zig
+pub fn updateBar(self: *SuperSmoother, bar: Bar) OutputArray {
+    const sample = self.line.extractBar(bar);
+    const value = self.update(sample);
+    return self.line.wrapScalar(bar.time, value);
+}
+```
+
+#### Params pattern
+
+Parameters are plain structs with optional component fields. No `Default` trait —
+defaults are set in `init()`:
+
+```zig
+pub const SimpleMovingAverageParams = struct {
+    length: u32 = 20,
+    bar_component: ?BarComponent = null,
+    quote_component: ?QuoteComponent = null,
+    trade_component: ?TradeComponent = null,
+};
+```
+
+Component sentinel pattern: `?BarComponent` with `null` meaning "use default",
+resolved via `orelse default_bar_component`.
+
+#### Output enum pattern
+
+Per-indicator output enums are `enum(u8)` **1-based** (matching Go's `iota+1`):
+
+```zig
+pub const SimpleMovingAverageOutput = enum(u8) {
+    value = 1,
+};
+```
+
+#### Constructor: `init()` and `deinit()`
+
+Indicators that need heap allocation (ring buffers, arrays) take an `allocator`
+parameter in `init()` and must implement `deinit()`:
+
+```zig
+pub fn init(allocator: std.mem.Allocator, params: SimpleMovingAverageParams) !SimpleMovingAverage { ... }
+pub fn deinit(self: *SimpleMovingAverage) void {
+    self.allocator.free(self.window);
+}
+```
+
+Simple indicators (e.g., SuperSmoother) that need no allocation take no allocator
+and have no deinit.
+
+#### The `fixSlices()` pattern — critical for heap allocation
+
+When the factory copies an indicator from stack to heap (`heapAlloc`), any slices
+pointing into the struct's owned `[N]u8` buffers become dangling. Every indicator
+that stores mnemonic/description as slices into owned buffers must implement:
+
+```zig
+pub fn fixSlices(self: *SimpleMovingAverage) void {
+    self.line.mnemonic = self.mnemonic_buf[0..self.mnemonic_len];
+    self.line.description = self.description_buf[0..self.description_len];
+}
+```
+
+This is called automatically by the factory's `heapAlloc` after copying.
+
+#### Owned string buffer pattern
+
+Indicators store mnemonics/descriptions in fixed-size owned buffers to avoid
+heap-allocating strings:
+
+```zig
+mnemonic_buf: [64]u8 = undefined,
+mnemonic_len: usize = 0,
+description_buf: [128]u8 = undefined,
+description_len: usize = 0,
+```
+
+Built via `std.fmt.bufPrint(&self.mnemonic_buf, "sma({d}{s})", .{length, ctm})`.
+
+#### Factory pattern
+
+`zig/src/indicators/factory/factory.zig` exports:
+
+```zig
+pub fn create(allocator: Allocator, id: Identifier, params_json: []const u8) FactoryError!FactoryResult
+```
+
+`FactoryResult` bundles the type-erased indicator with a cleanup function:
+```zig
+pub const FactoryResult = struct {
+    indicator: Indicator,         // vtable-based interface
+    deinit_fn: *const fn(*anyopaque, Allocator) void,
+    ptr: *anyopaque,
+    pub fn deinit(self: FactoryResult, allocator: Allocator) void { ... }
+};
+```
+
+Two internal creation paths:
+1. **`createWithParams`** — for indicators that need no allocator (most Ehlers)
+2. **`createWithAllocParams`** — for indicators requiring heap allocation (SMA, BB, etc.)
+
+Both use `heapAlloc` to copy the stack-initialized indicator to the heap and call
+`fixSlices()` automatically.
+
+JSON parsing uses `std.json` from the standard library — no custom parser needed
+(unlike Rust which has its own `json.rs`).
+
+#### Import conventions
+
+All imports use `@import` with build.zig module names (not file paths):
+
+From the barrel file `indicators.zig`, indicators import core types:
+```zig
+const indicators = @import("indicators");
+const Identifier = indicators.Identifier;
+const Metadata = indicators.Metadata;
+const Indicator = indicators.Indicator;
+const OutputArray = indicators.OutputArray;
+const LineIndicator = indicators.LineIndicator;
+```
+
+Entity imports:
+```zig
+const bar_mod = @import("bar");
+const Bar = bar_mod.Bar;
+const BarComponent = bar_mod.BarComponent;
+const default_bar_component = bar_mod.default_bar_component;
+const barComponentValue = bar_mod.componentValue;
+```
+
+#### Naming conventions
+
+| Concept | Zig |
+|---------|-----|
+| Identifier enum | `Identifier.simple_moving_average` (snake_case, 0-based) |
+| Output enum | `SimpleMovingAverageOutput.value` (snake_case, **1-based**) |
+| Params struct | `SimpleMovingAverageParams` (PascalCase) |
+| Indicator struct | `SimpleMovingAverage` (PascalCase) |
+| File naming | `simple_moving_average.zig` (snake_case) |
+| Folder naming | `simple_moving_average/`, `john_ehlers/` (snake_case) |
+| Methods | `update()`, `isPrimed()`, `getMetadata()`, `updateBar()` (camelCase) |
+| Struct fields | `window_sum`, `last_index`, `mnemonic_buf` (snake_case) |
+| Constants | `default_bar_component`, `max_output_count` (snake_case) |
+
+Note: Zig uses `camelCase` for methods/functions and `snake_case` for struct fields
+and module-level constants — this is standard Zig convention.
+
+#### Testing conventions
+
+- Inline `test "descriptive name" { ... }` blocks at bottom of indicator files
+- `std.testing.expect(almostEqual(result, expected, 1e-8))` for float comparisons
+- `std.math.isNan(result)` checks for NaN expected values
+- `testing.allocator` with `defer indicator.deinit()` for leak detection
+- Test data as module-level `const` arrays
+- The barrel file `indicators.zig` has a `comptime` block that force-references all
+  indicator modules so their tests are included in `zig build test`
+
+#### No concurrency
+
+Zig indicators have no mutex/lock equivalent (like Python and Rust, unlike Go's
+`sync.RWMutex`). The vtable uses `*anyopaque` (mutable pointer), so thread safety
+is the caller's responsibility.
+
+#### Metadata — fixed-capacity buffer
+
+Unlike Go (slice), TS (array), Python (list), Rust (`Vec`), Zig uses a
+fixed-capacity buffer (max 9 outputs) to avoid heap allocation:
+
+```zig
+pub const Metadata = struct {
+    identifier: Identifier,
+    mnemonic: []const u8,
+    description: []const u8,
+    outputs_buf: [9]OutputMetadata,
+    outputs_len: usize,
+};
+```
+
+`buildMetadata` takes an `*Metadata` out-pointer (not return value) to avoid
+large struct copies.
+
+#### Cmd tools
+
+Three CLI tools at `zig/src/cmd/{icalc,ifres,iconf}/`:
+- Each has `main.zig`, `settings.json`, `run-me.sh`, and output files
+- Build via: `cd zig && zig build icalc` (or `ifres`, `iconf`)
+- Run via: `cd zig && zig build icalc -- src/cmd/icalc/settings.json`
+- `icalc` — indicator calculator, outputs metadata + per-bar values to stdout
+- `ifres` — frequency response calculator, wraps indicators in updater adapter
+- `iconf` — chart config generator, writes `.json` and `.ts` files directly
+
+All use Zig 0.16 I/O patterns (`Io.Writer.Allocating`, `Io.Dir.cwd()`,
+`File.writePositionalAll(io, data, 0)`).
+
+#### Frequency response
+
+`zig/src/indicators/core/frequency_response.zig` — 582 lines, standalone module.
+Computes spectral characteristics (power, amplitude, phase) using FFT. Returns
+a `FrequencyResponse` struct with 7 allocated `[]f64` components.
+
+Used by the `ifres` CLI tool. The tool wraps indicators in an updater that
+implements the `Updater` interface expected by `frequency_response.calculate()`.
 
 ### Rust-Specific Conventions
 

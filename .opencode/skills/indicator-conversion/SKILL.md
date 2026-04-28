@@ -1835,6 +1835,343 @@ from ...common.exponential_moving_average.params import ExponentialMovingAverage
 
 ---
 
+## Zig Porting Guide
+
+This section describes how to port an indicator from Go/TS to Zig. The Zig
+indicators port is **complete** (63 indicators, factory, frequency_response,
+icalc/ifres/iconf — 1014 tests passing). Use this guide as reference for future
+indicators.
+
+### Step 1: Create the folder structure
+
+Create `zig/src/indicators/<group>/<indicator_name>/` with a single file:
+- `<indicator_name>.zig` — params struct, output enum, indicator struct, impl, and `test` blocks
+
+Zig uses a single-file-per-indicator pattern. No separate params/output/test files.
+
+Register the module in the barrel file `zig/src/indicators/indicators.zig`:
+```zig
+// In the pub const exports section:
+pub const simple_moving_average = @import("common/simple_moving_average/simple_moving_average.zig");
+
+// In the comptime test-inclusion block:
+comptime { _ = simple_moving_average; }
+```
+
+Also register in `build.zig` if the indicator needs its own test target (usually
+not needed — the barrel file's comptime block includes tests automatically).
+
+### Step 2: Convert the params struct
+
+Map Go/TS params to a Zig struct with defaults:
+
+| Go / TS | Zig |
+|---------|-----|
+| `Length int` / `length: number` | `length: u32 = 20` |
+| `BarComponent entities.BarComponent` (zero = not set) | `bar_component: ?BarComponent = null` |
+| `QuoteComponent` / `TradeComponent` | Same `?T = null` pattern |
+| `SmoothingFactor float64` | `smoothing_factor: f64 = 0.0952...` |
+| `FirstIsAverage bool` | `first_is_average: bool = false` |
+| Custom enum fields (e.g., `MovingAverageType`) | Zig `enum(u8)` in same file |
+
+```zig
+pub const SimpleMovingAverageParams = struct {
+    length: u32 = 20,
+    bar_component: ?BarComponent = null,
+    quote_component: ?QuoteComponent = null,
+    trade_component: ?TradeComponent = null,
+};
+```
+
+Component sentinel: `?BarComponent` with `null` meaning "use default", resolved
+via `params.bar_component orelse default_bar_component`.
+
+For multi-constructor indicators (EMA), create separate structs:
+`ExponentialMovingAverageLengthParams` and `ExponentialMovingAverageSmoothingFactorParams`.
+
+### Step 3: Convert the output enum
+
+```zig
+pub const SimpleMovingAverageOutput = enum(u8) {
+    value = 1,
+};
+```
+
+Output enums are **1-based** (matching Go's `iota+1` and the descriptor registry).
+This differs from Python/TS which use 0-based.
+
+### Step 4: Convert the main indicator file
+
+#### Single-output (line) indicators
+
+```zig
+pub const SimpleMovingAverage = struct {
+    // LineIndicator for entity routing
+    line: LineIndicator,
+
+    // Owned string buffers (for mnemonic/description after heap move)
+    mnemonic_buf: [64]u8 = undefined,
+    mnemonic_len: usize = 0,
+    description_buf: [128]u8 = undefined,
+    description_len: usize = 0,
+
+    // Indicator-specific state
+    primed: bool = false,
+    window: []f64,
+    window_sum: f64 = 0,
+    length: u32,
+    allocator: std.mem.Allocator,
+
+    const vtable = Indicator.GenVTable(SimpleMovingAverage);
+};
+```
+
+Key patterns:
+
+1. **Component resolution** — `null` → default:
+   ```zig
+   const bc = params.bar_component orelse default_bar_component;
+   const bar_func = barComponentValue(bc);
+   ```
+
+2. **LineIndicator composition** — extract sample then call core update:
+   ```zig
+   pub fn updateBar(self: *SimpleMovingAverage, bar: Bar) OutputArray {
+       const sample = self.line.extractBar(bar);
+       const value = self.update(sample);
+       return self.line.wrapScalar(bar.time, value);
+   }
+   ```
+
+3. **NaN handling** — Use `std.math.nan(f64)` and `std.math.isNan()`:
+   ```zig
+   if (!self.primed) return std.math.nan(f64);
+   ```
+
+4. **Metadata construction** — out-pointer pattern:
+   ```zig
+   pub fn getMetadata(self: *SimpleMovingAverage, out: *Metadata) void {
+       buildMetadata(out, .simple_moving_average,
+           self.line.mnemonic, self.line.description,
+           &.{ .{ .mnemonic = "val", .description = "Value" } });
+   }
+   ```
+
+5. **vtable exposure**:
+   ```zig
+   const vtable = Indicator.GenVTable(SimpleMovingAverage);
+   pub fn indicator(self: *SimpleMovingAverage) Indicator {
+       return .{ .ptr = self, .vtable = &vtable };
+   }
+   ```
+
+6. **fixSlices()** — critical for heap-allocated indicators:
+   ```zig
+   pub fn fixSlices(self: *SimpleMovingAverage) void {
+       self.line.mnemonic = self.mnemonic_buf[0..self.mnemonic_len];
+       self.line.description = self.description_buf[0..self.description_len];
+   }
+   ```
+
+#### Multi-output indicators
+
+Do NOT use `LineIndicator`. Store component functions directly and build
+`OutputArray` with multiple entries:
+
+```zig
+pub fn updateBar(self: *BollingerBands, bar: Bar) OutputArray {
+    const sample = self.bar_func(bar);
+    const result = self.update(sample);
+    var out = OutputArray{};
+    out.append(.{ .scalar = Scalar.init(bar.time, result.lower) });
+    out.append(.{ .scalar = Scalar.init(bar.time, result.middle) });
+    out.append(.{ .scalar = Scalar.init(bar.time, result.upper) });
+    out.append(.{ .band = Band.init(bar.time, result.upper, result.lower) });
+    out.append(.{ .scalar = Scalar.init(bar.time, result.bandwidth) });
+    out.append(.{ .scalar = Scalar.init(bar.time, result.percent_band) });
+    return out;
+}
+```
+
+#### Ehlers indicators with precomputed coefficients
+
+Use `init()` with coefficient computation at construction time:
+
+```zig
+pub fn init(params: SuperSmootherParams) !SuperSmoother {
+    if (params.length < 2) return error.InvalidLength;
+    const angle = 2.0 * std.math.pi / @as(f64, @floatFromInt(params.length));
+    const a1 = @exp(-std.math.sqrt(2.0) * std.math.pi / @as(f64, @floatFromInt(params.length)));
+    // ... compute coefficients
+}
+```
+
+### Step 5: Constructor pattern — `init()` and `deinit()`
+
+Two categories:
+
+1. **No allocation needed** (most Ehlers, simple filters):
+   ```zig
+   pub fn init(params: SuperSmootherParams) !SuperSmoother { ... }
+   // No deinit needed
+   ```
+
+2. **Allocation needed** (SMA, BB, anything with ring buffers):
+   ```zig
+   pub fn init(allocator: std.mem.Allocator, params: SimpleMovingAverageParams) !SimpleMovingAverage {
+       const window = try allocator.alloc(f64, length);
+       // ...
+   }
+   pub fn deinit(self: *SimpleMovingAverage) void {
+       self.allocator.free(self.window);
+   }
+   ```
+
+### Step 6: Convert the tests
+
+```zig
+test "simple moving average length 20" {
+    const allocator = std.testing.allocator;
+    var sma = try SimpleMovingAverage.init(allocator, .{ .length = 20 });
+    defer sma.deinit();
+
+    for (INPUT, 0..) |input, i| {
+        const result = sma.update(input);
+        if (std.math.isNan(EXPECTED_20[i])) {
+            try std.testing.expect(std.math.isNan(result));
+        } else {
+            try std.testing.expect(@abs(result - EXPECTED_20[i]) < 1e-8);
+        }
+    }
+    try std.testing.expect(sma.isPrimed());
+}
+```
+
+Key test conventions:
+- `test "descriptive name" { ... }` blocks at bottom of the indicator file
+- `std.testing.allocator` for leak detection (with `defer indicator.deinit()`)
+- `@abs(result - expected) < tolerance` for float comparisons
+- `std.math.isNan()` for NaN checks
+- Test data as module-level `const` arrays
+
+### Step 7: Register in factory
+
+Edit `zig/src/indicators/factory/factory.zig`:
+
+1. Add import at top:
+   ```zig
+   const sma_mod = @import("../common/simple_moving_average/simple_moving_average.zig");
+   ```
+
+2. Add match arm in `create()` function. Two patterns based on allocator need:
+   ```zig
+   // Pattern A — needs allocator:
+   .simple_moving_average => return createWithAllocParams(
+       sma_mod.SimpleMovingAverage, sma_mod.SimpleMovingAverageParams,
+       allocator, params_json),
+
+   // Pattern B — no allocator:
+   .super_smoother => return createWithParams(
+       ss_mod.SuperSmoother, ss_mod.SuperSmootherParams,
+       allocator, params_json),
+   ```
+
+### Step 8: Verify
+
+```bash
+# Build all (includes indicators):
+cd zig && zig build
+
+# Run all tests (includes indicator tests via barrel comptime block):
+cd zig && zig build test --summary all
+
+# Run icalc to verify factory integration:
+cd zig && zig build icalc -- src/cmd/icalc/settings.json
+```
+
+### Zig Import Path Reference
+
+From an indicator at `zig/src/indicators/<group>/<indicator>/`:
+
+```zig
+// Core framework (via barrel)
+const indicators = @import("indicators");
+const Indicator = indicators.Indicator;
+const OutputArray = indicators.OutputArray;
+const OutputValue = indicators.OutputValue;
+const LineIndicator = indicators.LineIndicator;
+const Metadata = indicators.Metadata;
+const Identifier = indicators.Identifier;
+const buildMetadata = indicators.buildMetadata;
+const componentTripleMnemonic = indicators.componentTripleMnemonic;
+
+// Entities
+const bar_mod = @import("bar");
+const Bar = bar_mod.Bar;
+const BarComponent = bar_mod.BarComponent;
+const default_bar_component = bar_mod.default_bar_component;
+const barComponentValue = bar_mod.componentValue;
+
+const quote_mod = @import("quote");
+const Quote = quote_mod.Quote;
+// ... similar pattern
+
+const scalar_mod = @import("scalar");
+const Scalar = scalar_mod.Scalar;
+
+// Output types (when needed)
+const Band = indicators.Band;
+const Heatmap = indicators.Heatmap;
+const Polyline = indicators.Polyline;
+
+// Sibling indicators
+const ema_mod = @import("../common/exponential_moving_average/exponential_moving_average.zig");
+```
+
+### Zig ↔ Go/TS/Python/Rust Name Mapping
+
+| Go | TypeScript | Python | Zig | Rust |
+|----|-----------|--------|-----|------|
+| `Update(sample float64) float64` | `update(sample: number): number` | `update(self, sample: float) -> float` | `fn update(self: *Self, sample: f64) f64` | `fn update(&mut self, sample: f64) -> f64` |
+| `IsPrimed() bool` | `isPrimed(): boolean` | `is_primed(self) -> bool` | `fn isPrimed(self: *Self) bool` | `fn is_primed(&self) -> bool` |
+| `Metadata() Metadata` | `metadata(): IndicatorMetadata` | `metadata(self) -> Metadata` | `fn getMetadata(self: *Self, out: *Metadata) void` | `fn metadata(&self) -> Metadata` |
+| `UpdateBar(*Bar) Output` | `updateBar(bar: Bar): Output` | `update_bar(self, sample: Bar) -> Output` | `fn updateBar(self: *Self, bar: Bar) OutputArray` | `fn update_bar(&mut self, bar: &Bar) -> Output` |
+| `core.LineIndicator` (embedded) | `LineIndicator` (extended) | `LineIndicator` (composed via `self._line`) | `LineIndicator` (composed via `self.line`) | Fields inlined (composition) |
+| `core.BuildMetadata(...)` | `buildMetadata(...)` | `build_metadata(...)` | `buildMetadata(out, ...)` (out-pointer) | `build_metadata(...)` |
+| `core.ComponentTripleMnemonic(...)` | `componentTripleMnemonic(...)` | `component_triple_mnemonic(...)` | `componentTripleMnemonic(...)` | `component_triple_mnemonic(...)` |
+| `core.OutputText{...}` | `{ mnemonic, description }` | `OutputText(mnemonic, description)` | `.{ .mnemonic = "...", .description = "..." }` | `OutputText { mnemonic: "...", description: "..." }` |
+| `entities.DefaultBarComponent` | `DefaultBarComponent` | `DEFAULT_BAR_COMPONENT` | `default_bar_component` | `DEFAULT_BAR_COMPONENT` |
+| `entities.BarFunc` | `(bar: Bar) => number` | `Callable[[Bar], float]` | `BarFunc` (`*const fn(Bar) f64`) | `fn(&Bar) -> f64` |
+| `math.NaN()` | `NaN` | `math.nan` | `std.math.nan(f64)` | `f64::NAN` |
+| `math.IsNaN(x)` | `isNaN(x)` | `math.isnan(x)` | `std.math.isNan(x)` | `x.is_nan()` |
+| `Params` struct | `params` interface | `@dataclass` class | `Params` struct with defaults | `struct` + `impl Default` |
+| `DefaultParams()` | `defaultParams()` | `default_params()` | `.{}` (struct literal with defaults) | `Default::default()` |
+
+### Zig-Specific Pitfalls
+
+1. **fixSlices()** — Any indicator storing mnemonic/description slices pointing into
+   owned `[N]u8` buffers MUST implement `fixSlices()`. The factory calls it after
+   copying the indicator from stack to heap. Without it, slices become dangling pointers.
+
+2. **Owned string buffers** — Use `[64]u8` + `usize` length for mnemonic, `[128]u8`
+   for description. Build via `std.fmt.bufPrint`. Do NOT allocate strings on the heap.
+
+3. **OutputArray is stack-based** — Max 9 outputs, no heap allocation. Use
+   `OutputArray.fromScalar()` for single-output, or manual `append()` for multi-output.
+
+4. **Metadata out-pointer** — `getMetadata` takes `*Metadata` instead of returning it
+   (avoids large struct copy). This differs from all other languages.
+
+5. **Allocator propagation** — Indicators needing heap allocation store the allocator
+   as a field and pass it to `ArrayList`/`alloc` operations. Use `std.testing.allocator`
+   in tests for automatic leak detection.
+
+6. **Build.zig module wiring** — Indicators import by build.zig module name
+   (`@import("bar")`), not file path (`@import("bar.zig")`). The barrel file
+   re-exports everything; new indicators must be added to it.
+
+---
+
 ## Rust Porting Guide
 
 This section describes how to port an indicator from Go/TS to Rust. The Rust

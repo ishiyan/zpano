@@ -78,4 +78,52 @@ pub const Indicator = struct {
     pub fn updateTrade(self: Indicator, sample: *const Trade) OutputArray {
         return self.vtable.updateTrade(self.ptr, sample);
     }
+
+    /// Generates a VTable for any concrete indicator type T that implements:
+    ///   isPrimed(*const T) bool
+    ///   getMetadata(*const T, *Metadata) void
+    ///   updateScalar(*T, *const Scalar) OutputArray
+    ///   updateBar(*T, *const Bar) OutputArray
+    ///   updateQuote(*T, *const Quote) OutputArray
+    ///   updateTrade(*T, *const Trade) OutputArray
+    pub fn GenVTable(comptime T: type) VTable {
+        return .{
+            .isPrimed = struct {
+                fn f(ptr: *anyopaque) bool {
+                    const self: *const T = @ptrCast(@alignCast(ptr));
+                    return self.isPrimed();
+                }
+            }.f,
+            .metadata = struct {
+                fn f(ptr: *anyopaque, out: *metadata_mod.Metadata) void {
+                    const self: *const T = @ptrCast(@alignCast(ptr));
+                    self.getMetadata(out);
+                }
+            }.f,
+            .updateScalar = struct {
+                fn f(ptr: *anyopaque, sample: *const Scalar) OutputArray {
+                    const self: *T = @ptrCast(@alignCast(ptr));
+                    return self.updateScalar(sample);
+                }
+            }.f,
+            .updateBar = struct {
+                fn f(ptr: *anyopaque, sample: *const Bar) OutputArray {
+                    const self: *T = @ptrCast(@alignCast(ptr));
+                    return self.updateBar(sample);
+                }
+            }.f,
+            .updateQuote = struct {
+                fn f(ptr: *anyopaque, sample: *const Quote) OutputArray {
+                    const self: *T = @ptrCast(@alignCast(ptr));
+                    return self.updateQuote(sample);
+                }
+            }.f,
+            .updateTrade = struct {
+                fn f(ptr: *anyopaque, sample: *const Trade) OutputArray {
+                    const self: *T = @ptrCast(@alignCast(ptr));
+                    return self.updateTrade(sample);
+                }
+            }.f,
+        };
+    }
 };

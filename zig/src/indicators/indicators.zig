@@ -28,6 +28,12 @@ pub const band = @import("core/outputs/band.zig");
 pub const heatmap = @import("core/outputs/heatmap.zig");
 pub const polyline = @import("core/outputs/polyline.zig");
 
+// --- Factory ---
+pub const factory = @import("factory/factory.zig");
+
+// --- Frequency Response ---
+pub const frequency_response = @import("core/frequency_response.zig");
+
 // --- Convenience type aliases ---
 pub const Identifier = identifier.Identifier;
 pub const Shape = shape.Shape;
@@ -92,9 +98,53 @@ pub const advance_decline = @import("marc_chaikin/advance_decline/advance_declin
 pub const advance_decline_oscillator = @import("marc_chaikin/advance_decline_oscillator/advance_decline_oscillator.zig");
 pub const aroon = @import("tushar_chande/aroon/aroon.zig");
 pub const chande_momentum_oscillator = @import("tushar_chande/chande_momentum_oscillator/chande_momentum_oscillator.zig");
+pub const stochastic_relative_strength_index = @import("tushar_chande/stochastic_relative_strength_index/stochastic_relative_strength_index.zig");
 pub const true_range = @import("welles_wilder/true_range/true_range.zig");
 pub const directional_movement_plus = @import("welles_wilder/directional_movement_plus/directional_movement_plus.zig");
 pub const directional_movement_minus = @import("welles_wilder/directional_movement_minus/directional_movement_minus.zig");
+pub const relative_strength_index = @import("welles_wilder/relative_strength_index/relative_strength_index.zig");
+pub const parabolic_stop_and_reverse = @import("welles_wilder/parabolic_stop_and_reverse/parabolic_stop_and_reverse.zig");
+pub const average_true_range = @import("welles_wilder/average_true_range/average_true_range.zig");
+pub const normalized_average_true_range = @import("welles_wilder/normalized_average_true_range/normalized_average_true_range.zig");
+pub const directional_indicator_plus = @import("welles_wilder/directional_indicator_plus/directional_indicator_plus.zig");
+pub const directional_indicator_minus = @import("welles_wilder/directional_indicator_minus/directional_indicator_minus.zig");
+pub const directional_movement_index = @import("welles_wilder/directional_movement_index/directional_movement_index.zig");
+pub const average_directional_movement_index = @import("welles_wilder/average_directional_movement_index/average_directional_movement_index.zig");
+pub const average_directional_movement_index_rating = @import("welles_wilder/average_directional_movement_index_rating/average_directional_movement_index_rating.zig");
+
+pub const super_smoother = @import("john_ehlers/super_smoother/super_smoother.zig");
+pub const roofing_filter = @import("john_ehlers/roofing_filter/roofing_filter.zig");
+pub const instantaneous_trend_line = @import("john_ehlers/instantaneous_trend_line/instantaneous_trend_line.zig");
+pub const cyber_cycle = @import("john_ehlers/cyber_cycle/cyber_cycle.zig");
+pub const zero_lag_error_correcting_exponential_moving_average = @import("john_ehlers/zero_lag_error_correcting_exponential_moving_average/zero_lag_error_correcting_exponential_moving_average.zig");
+pub const zero_lag_exponential_moving_average = @import("john_ehlers/zero_lag_exponential_moving_average/zero_lag_exponential_moving_average.zig");
+pub const center_of_gravity_oscillator = @import("john_ehlers/center_of_gravity_oscillator/center_of_gravity_oscillator.zig");
+pub const fractal_adaptive_moving_average = @import("john_ehlers/fractal_adaptive_moving_average/fractal_adaptive_moving_average.zig");
+pub const discrete_fourier_transform_spectrum = @import("john_ehlers/discrete_fourier_transform_spectrum/discrete_fourier_transform_spectrum.zig");
+pub const autocorrelation_indicator = @import("john_ehlers/autocorrelation_indicator/autocorrelation_indicator.zig");
+pub const autocorrelation_periodogram = @import("john_ehlers/autocorrelation_periodogram/autocorrelation_periodogram.zig");
+pub const comb_band_pass_spectrum = @import("john_ehlers/comb_band_pass_spectrum/comb_band_pass_spectrum.zig");
+
+// --- Hilbert transformer (helper, not a registered indicator) ---
+pub const dominant_cycle = @import("john_ehlers/dominant_cycle/dominant_cycle.zig");
+pub const sine_wave = @import("john_ehlers/sinewave/sinewave.zig");
+pub const trend_cycle_mode = @import("john_ehlers/trend_cycle_mode/trend_cycle_mode.zig");
+pub const hilbert_transformer_instantaneous_trend_line = @import("john_ehlers/hilbert_transformer_instantaneous_trend_line/hilbert_transformer_instantaneous_trend_line.zig");
+pub const mesa_adaptive_moving_average = @import("john_ehlers/mesa_adaptive_moving_average/mesa_adaptive_moving_average.zig");
+
+pub const corona = @import("john_ehlers/corona/corona.zig");
+pub const corona_spectrum = @import("john_ehlers/corona_spectrum/corona_spectrum.zig");
+pub const corona_swing_position = @import("john_ehlers/corona_swing_position/corona_swing_position.zig");
+pub const corona_trend_vigor = @import("john_ehlers/corona_trend_vigor/corona_trend_vigor.zig");
+
+pub const goertzel_spectrum = @import("custom/goertzel_spectrum/goertzel_spectrum.zig");
+pub const maximum_entropy_spectrum = @import("custom/maximum_entropy_spectrum/maximum_entropy_spectrum.zig");
+
+pub const hilbert_transformer = @import("john_ehlers/hilbert_transformer/hilbert_transformer.zig");
+pub const homodyne_discriminator = @import("john_ehlers/hilbert_transformer/homodyne_discriminator.zig");
+pub const homodyne_discriminator_unrolled = @import("john_ehlers/hilbert_transformer/homodyne_discriminator_unrolled.zig");
+pub const phase_accumulator = @import("john_ehlers/hilbert_transformer/phase_accumulator.zig");
+pub const dual_differentiator = @import("john_ehlers/hilbert_transformer/dual_differentiator.zig");
 
 // Force-include tests from sub-modules.
 comptime {
@@ -135,7 +185,47 @@ comptime {
     _ = advance_decline_oscillator;
     _ = aroon;
     _ = chande_momentum_oscillator;
+    _ = stochastic_relative_strength_index;
     _ = true_range;
     _ = directional_movement_plus;
     _ = directional_movement_minus;
+    _ = relative_strength_index;
+    _ = parabolic_stop_and_reverse;
+    _ = average_true_range;
+    _ = normalized_average_true_range;
+    _ = directional_indicator_plus;
+    _ = directional_indicator_minus;
+    _ = directional_movement_index;
+    _ = average_directional_movement_index;
+    _ = average_directional_movement_index_rating;
+    _ = super_smoother;
+    _ = roofing_filter;
+    _ = instantaneous_trend_line;
+    _ = cyber_cycle;
+    _ = zero_lag_error_correcting_exponential_moving_average;
+    _ = zero_lag_exponential_moving_average;
+    _ = center_of_gravity_oscillator;
+    _ = fractal_adaptive_moving_average;
+    _ = discrete_fourier_transform_spectrum;
+    _ = autocorrelation_indicator;
+    _ = autocorrelation_periodogram;
+    _ = comb_band_pass_spectrum;
+    _ = hilbert_transformer;
+    _ = homodyne_discriminator;
+    _ = homodyne_discriminator_unrolled;
+    _ = phase_accumulator;
+    _ = dual_differentiator;
+    _ = dominant_cycle;
+    _ = sine_wave;
+    _ = trend_cycle_mode;
+    _ = hilbert_transformer_instantaneous_trend_line;
+    _ = mesa_adaptive_moving_average;
+    _ = corona;
+    _ = corona_spectrum;
+    _ = corona_swing_position;
+    _ = corona_trend_vigor;
+    _ = goertzel_spectrum;
+    _ = maximum_entropy_spectrum;
+    _ = frequency_response;
+    _ = factory;
 }

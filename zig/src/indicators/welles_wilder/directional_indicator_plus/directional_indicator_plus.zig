@@ -1,0 +1,395 @@
+const std = @import("std");
+const math = std.math;
+
+const Bar = @import("bar").Bar;
+const Quote = @import("quote").Quote;
+const Trade = @import("trade").Trade;
+const Scalar = @import("scalar").Scalar;
+
+const indicator_mod = @import("../../core/indicator.zig");
+const build_metadata_mod = @import("../../core/build_metadata.zig");
+const identifier_mod = @import("../../core/identifier.zig");
+const metadata_mod = @import("../../core/metadata.zig");
+
+const atr_mod = @import("../average_true_range/average_true_range.zig");
+const AverageTrueRange = atr_mod.AverageTrueRange;
+const dmp_mod = @import("../directional_movement_plus/directional_movement_plus.zig");
+const DirectionalMovementPlus = dmp_mod.DirectionalMovementPlus;
+
+const OutputArray = indicator_mod.OutputArray;
+const Identifier = identifier_mod.Identifier;
+const Metadata = metadata_mod.Metadata;
+
+const epsilon = 1e-8;
+
+/// Enumerates the outputs of the Directional Indicator Plus indicator.
+pub const DirectionalIndicatorPlusOutput = enum(u8) {
+    /// The scalar value of the directional indicator plus (+DI).
+    value = 1,
+    /// The scalar value of the directional movement plus (+DM).
+    directional_movement_plus = 2,
+    /// The scalar value of the average true range (ATR).
+    average_true_range = 3,
+    /// The scalar value of the true range (TR).
+    true_range = 4,
+};
+
+/// Welles Wilder's Directional Indicator Plus (+DI).
+///
+/// The directional indicator plus measures the percentage of the average true range
+/// that is attributable to upward movement. It is calculated as:
+///   +DI = 100 * +DM(n) / (ATR * length)
+///
+/// where +DM(n) is the Wilder-smoothed directional movement plus and ATR is the
+/// average true range over the same length.
+pub const DirectionalIndicatorPlus = struct {
+    length: i32,
+    value: f64,
+    average_true_range: AverageTrueRange,
+    directional_movement_plus: DirectionalMovementPlus,
+
+    const mnemonic_str = "+di";
+    const description_str = "Directional Indicator Plus";
+
+    pub const Error = error{
+        InvalidLength,
+        OutOfMemory,
+    };
+
+    pub fn init(allocator: std.mem.Allocator, params: struct { length: i32 = 14 }) Error!DirectionalIndicatorPlus {
+        if (params.length < 1) return Error.InvalidLength;
+
+        const atr = atr_mod.AverageTrueRange.init(allocator, .{ .length = params.length }) catch |e| switch (e) {
+            error.InvalidLength => return Error.InvalidLength,
+            error.OutOfMemory => return Error.OutOfMemory,
+        };
+
+        const dmp = DirectionalMovementPlus.init(.{ .length = @intCast(params.length) }) catch return Error.InvalidLength;
+
+        return .{
+            .length = params.length,
+            .value = math.nan(f64),
+            .average_true_range = atr,
+            .directional_movement_plus = dmp,
+        };
+    }
+
+    pub fn deinit(self: *DirectionalIndicatorPlus) void {
+        self.average_true_range.deinit();
+    }
+
+    pub fn fixSlices(_: *DirectionalIndicatorPlus) void {}
+
+    /// Update given close, high, low values.
+    pub fn update(self: *DirectionalIndicatorPlus, close: f64, high: f64, low: f64) f64 {
+        if (math.isNan(close) or math.isNan(high) or math.isNan(low)) return math.nan(f64);
+
+        const atr_value = self.average_true_range.update(close, high, low);
+        const dmp_value = self.directional_movement_plus.update(high, low);
+
+        if (self.average_true_range.isPrimed() and self.directional_movement_plus.isPrimed()) {
+            const atr_scaled = atr_value * @as(f64, @floatFromInt(self.length));
+
+            if (@abs(atr_scaled) < epsilon) {
+                self.value = 0;
+            } else {
+                self.value = 100.0 * dmp_value / atr_scaled;
+            }
+
+            return self.value;
+        }
+
+        return math.nan(f64);
+    }
+
+    /// Update using a single sample value as substitute for high, low, close.
+    pub fn updateSample(self: *DirectionalIndicatorPlus, sample: f64) f64 {
+        return self.update(sample, sample, sample);
+    }
+
+    pub fn isPrimed(self: *const DirectionalIndicatorPlus) bool {
+        return self.average_true_range.isPrimed() and self.directional_movement_plus.isPrimed();
+    }
+
+    pub fn getMetadata(_: *const DirectionalIndicatorPlus, out: *Metadata) void {
+        build_metadata_mod.buildMetadata(out, Identifier.directional_indicator_plus, mnemonic_str, description_str, &.{
+            .{ .mnemonic = mnemonic_str, .description = description_str },
+            .{ .mnemonic = "+dm", .description = "Directional Movement Plus" },
+            .{ .mnemonic = "atr", .description = "Average True Range" },
+            .{ .mnemonic = "tr", .description = "True Range" },
+        });
+    }
+
+    fn makeOutput(self: *const DirectionalIndicatorPlus, time: i64) OutputArray {
+        var out = OutputArray{};
+        out.append(.{ .scalar = Scalar{ .time = time, .value = self.value } });
+        return out;
+    }
+
+    pub fn updateScalar(self: *DirectionalIndicatorPlus, sample: *const Scalar) OutputArray {
+        _ = self.update(sample.value, sample.value, sample.value);
+        return self.makeOutput(sample.time);
+    }
+
+    pub fn updateBar(self: *DirectionalIndicatorPlus, sample: *const Bar) OutputArray {
+        _ = self.update(sample.close, sample.high, sample.low);
+        return self.makeOutput(sample.time);
+    }
+
+    pub fn updateQuote(self: *DirectionalIndicatorPlus, sample: *const Quote) OutputArray {
+        const mid = (sample.bid_price + sample.ask_price) / 2.0;
+        _ = self.update(mid, mid, mid);
+        return self.makeOutput(sample.time);
+    }
+
+    pub fn updateTrade(self: *DirectionalIndicatorPlus, sample: *const Trade) OutputArray {
+        _ = self.update(sample.price, sample.price, sample.price);
+        return self.makeOutput(sample.time);
+    }
+
+    // --- Indicator interface ---
+
+    pub fn indicator(self: *DirectionalIndicatorPlus) indicator_mod.Indicator {
+        return indicator_mod.Indicator{
+            .ptr = @ptrCast(self),
+            .vtable = &.{
+                .isPrimed = vtableIsPrimed,
+                .metadata = vtableMetadata,
+                .updateScalar = vtableUpdateScalar,
+                .updateBar = vtableUpdateBar,
+                .updateQuote = vtableUpdateQuote,
+                .updateTrade = vtableUpdateTrade,
+            },
+        };
+    }
+
+    fn vtableIsPrimed(ptr: *const anyopaque) bool {
+        const self: *const DirectionalIndicatorPlus = @ptrCast(@alignCast(ptr));
+        return self.isPrimed();
+    }
+
+    fn vtableMetadata(ptr: *const anyopaque, out: *Metadata) void {
+        const self: *const DirectionalIndicatorPlus = @ptrCast(@alignCast(ptr));
+        self.getMetadata(out);
+    }
+
+    fn vtableUpdateScalar(ptr: *anyopaque, sample: *const Scalar) OutputArray {
+        const self: *DirectionalIndicatorPlus = @ptrCast(@alignCast(ptr));
+        return self.updateScalar(sample);
+    }
+
+    fn vtableUpdateBar(ptr: *anyopaque, sample: *const Bar) OutputArray {
+        const self: *DirectionalIndicatorPlus = @ptrCast(@alignCast(ptr));
+        return self.updateBar(sample);
+    }
+
+    fn vtableUpdateQuote(ptr: *anyopaque, sample: *const Quote) OutputArray {
+        const self: *DirectionalIndicatorPlus = @ptrCast(@alignCast(ptr));
+        return self.updateQuote(sample);
+    }
+
+    fn vtableUpdateTrade(ptr: *anyopaque, sample: *const Trade) OutputArray {
+        const self: *DirectionalIndicatorPlus = @ptrCast(@alignCast(ptr));
+        return self.updateTrade(sample);
+    }
+};
+
+// ============================================================================
+// Tests
+// ============================================================================
+
+const testing = std.testing;
+
+fn almostEqual(a: f64, b: f64, tolerance: f64) bool {
+    return @abs(a - b) <= tolerance;
+}
+
+// TA-Lib test data (252 entries).
+const test_input_high = [_]f64{
+    93.250000,  94.940000,  96.375000,  96.190000,  96.000000,  94.720000,  95.000000,  93.720000,  92.470000,  92.750000,  96.250000,
+    99.625000,  99.125000,  92.750000,  91.315000,  93.250000,  93.405000,  90.655000,  91.970000,  92.250000,  90.345000,  88.500000,
+    88.250000,  85.500000,  84.440000,  84.750000,  84.440000,  89.405000,  88.125000,  89.125000,  87.155000,  87.250000,  87.375000,
+    88.970000,  90.000000,  89.845000,  86.970000,  85.940000,  84.750000,  85.470000,  84.470000,  88.500000,  89.470000,  90.000000,
+    92.440000,  91.440000,  92.970000,  91.720000,  91.155000,  91.750000,  90.000000,  88.875000,  89.000000,  85.250000,  83.815000,
+    85.250000,  86.625000,  87.940000,  89.375000,  90.625000,  90.750000,  88.845000,  91.970000,  93.375000,  93.815000,  94.030000,
+    94.030000,  91.815000,  92.000000,  91.940000,  89.750000,  88.750000,  86.155000,  84.875000,  85.940000,  99.375000,  103.280000,
+    105.375000, 107.625000, 105.250000, 104.500000, 105.500000, 106.125000, 107.940000, 106.250000, 107.000000, 108.750000, 110.940000,
+    110.940000, 114.220000, 123.000000, 121.750000, 119.815000, 120.315000, 119.375000, 118.190000, 116.690000, 115.345000, 113.000000,
+    118.315000, 116.870000, 116.750000, 113.870000, 114.620000, 115.310000, 116.000000, 121.690000, 119.870000, 120.870000, 116.750000,
+    116.500000, 116.000000, 118.310000, 121.500000, 122.000000, 121.440000, 125.750000, 127.750000, 124.190000, 124.440000, 125.750000,
+    124.690000, 125.310000, 132.000000, 131.310000, 132.250000, 133.880000, 133.500000, 135.500000, 137.440000, 138.690000, 139.190000,
+    138.500000, 138.130000, 137.500000, 138.880000, 132.130000, 129.750000, 128.500000, 125.440000, 125.120000, 126.500000, 128.690000,
+    126.620000, 126.690000, 126.000000, 123.120000, 121.870000, 124.000000, 127.000000, 124.440000, 122.500000, 123.750000, 123.810000,
+    124.500000, 127.870000, 128.560000, 129.630000, 124.870000, 124.370000, 124.870000, 123.620000, 124.060000, 125.870000, 125.190000,
+    125.620000, 126.000000, 128.500000, 126.750000, 129.750000, 132.690000, 133.940000, 136.500000, 137.690000, 135.560000, 133.560000,
+    135.000000, 132.380000, 131.440000, 130.880000, 129.630000, 127.250000, 127.810000, 125.000000, 126.810000, 124.750000, 122.810000,
+    122.250000, 121.060000, 120.000000, 123.250000, 122.750000, 119.190000, 115.060000, 116.690000, 114.870000, 110.870000, 107.250000,
+    108.870000, 109.000000, 108.500000, 113.060000, 93.000000,  94.620000,  95.120000,  96.000000,  95.560000,  95.310000,  99.000000,
+    98.810000,  96.810000,  95.940000,  94.440000,  92.940000,  93.940000,  95.500000,  97.060000,  97.500000,  96.250000,  96.370000,
+    95.000000,  94.870000,  98.250000,  105.120000, 108.440000, 109.870000, 105.000000, 106.000000, 104.940000, 104.500000, 104.440000,
+    106.310000, 112.870000, 116.500000, 119.190000, 121.000000, 122.120000, 111.940000, 112.750000, 110.190000, 107.940000, 109.690000,
+    111.060000, 110.440000, 110.120000, 110.310000, 110.440000, 110.000000, 110.750000, 110.500000, 110.500000, 109.500000,
+};
+
+const test_input_low = [_]f64{
+    90.750000,  91.405000,  94.250000,  93.500000,  92.815000,  93.500000,  92.000000,  89.750000,  89.440000,  90.625000,  92.750000,
+    96.315000,  96.030000,  88.815000,  86.750000,  90.940000,  88.905000,  88.780000,  89.250000,  89.750000,  87.500000,  86.530000,
+    84.625000,  82.280000,  81.565000,  80.875000,  81.250000,  84.065000,  85.595000,  85.970000,  84.405000,  85.095000,  85.500000,
+    85.530000,  87.875000,  86.565000,  84.655000,  83.250000,  82.565000,  83.440000,  82.530000,  85.065000,  86.875000,  88.530000,
+    89.280000,  90.125000,  90.750000,  89.000000,  88.565000,  90.095000,  89.000000,  86.470000,  84.000000,  83.315000,  82.000000,
+    83.250000,  84.750000,  85.280000,  87.190000,  88.440000,  88.250000,  87.345000,  89.280000,  91.095000,  89.530000,  91.155000,
+    92.000000,  90.530000,  89.970000,  88.815000,  86.750000,  85.065000,  82.030000,  81.500000,  82.565000,  96.345000,  96.470000,
+    101.155000, 104.250000, 101.750000, 101.720000, 101.720000, 103.155000, 105.690000, 103.655000, 104.000000, 105.530000, 108.530000,
+    108.750000, 107.750000, 117.000000, 118.000000, 116.000000, 118.500000, 116.530000, 116.250000, 114.595000, 110.875000, 110.500000,
+    110.720000, 112.620000, 114.190000, 111.190000, 109.440000, 111.560000, 112.440000, 117.500000, 116.060000, 116.560000, 113.310000,
+    112.560000, 114.000000, 114.750000, 118.870000, 119.000000, 119.750000, 122.620000, 123.000000, 121.750000, 121.560000, 123.120000,
+    122.190000, 122.750000, 124.370000, 128.000000, 129.500000, 130.810000, 130.630000, 132.130000, 133.880000, 135.380000, 135.750000,
+    136.190000, 134.500000, 135.380000, 133.690000, 126.060000, 126.870000, 123.500000, 122.620000, 122.750000, 123.560000, 125.810000,
+    124.620000, 124.370000, 121.810000, 118.190000, 118.060000, 117.560000, 121.000000, 121.120000, 118.940000, 119.810000, 121.000000,
+    122.000000, 124.500000, 126.560000, 123.500000, 121.250000, 121.060000, 122.310000, 121.000000, 120.870000, 122.060000, 122.750000,
+    122.690000, 122.870000, 125.500000, 124.250000, 128.000000, 128.380000, 130.690000, 131.630000, 134.380000, 132.000000, 131.940000,
+    131.940000, 129.560000, 123.750000, 126.000000, 126.250000, 124.370000, 121.440000, 120.440000, 121.370000, 121.690000, 120.000000,
+    119.620000, 115.500000, 116.750000, 119.060000, 119.060000, 115.060000, 111.060000, 113.120000, 110.000000, 105.000000, 104.690000,
+    103.870000, 104.690000, 105.440000, 107.000000, 89.000000,  92.500000,  92.120000,  94.620000,  92.810000,  94.250000,  96.250000,
+    96.370000,  93.690000,  93.500000,  90.000000,  90.190000,  90.500000,  92.120000,  94.120000,  94.870000,  93.000000,  93.870000,
+    93.000000,  92.620000,  93.560000,  98.370000,  104.440000, 106.000000, 101.810000, 104.120000, 103.370000, 102.120000, 102.250000,
+    103.370000, 107.940000, 112.500000, 115.440000, 115.500000, 112.250000, 107.560000, 106.560000, 106.870000, 104.500000, 105.750000,
+    108.620000, 107.750000, 108.060000, 108.000000, 108.190000, 108.120000, 109.060000, 108.750000, 108.560000, 106.620000,
+};
+
+const test_input_close = [_]f64{
+    91.500000,  94.815000,  94.375000,  95.095000,  93.780000,  94.625000,  92.530000,  92.750000,  90.315000,  92.470000,  96.125000,
+    97.250000,  98.500000,  89.875000,  91.000000,  92.815000,  89.155000,  89.345000,  91.625000,  89.875000,  88.375000,  87.625000,
+    84.780000,  83.000000,  83.500000,  81.375000,  84.440000,  89.250000,  86.375000,  86.250000,  85.250000,  87.125000,  85.815000,
+    88.970000,  88.470000,  86.875000,  86.815000,  84.875000,  84.190000,  83.875000,  83.375000,  85.500000,  89.190000,  89.440000,
+    91.095000,  90.750000,  91.440000,  89.000000,  91.000000,  90.500000,  89.030000,  88.815000,  84.280000,  83.500000,  82.690000,
+    84.750000,  85.655000,  86.190000,  88.940000,  89.280000,  88.625000,  88.500000,  91.970000,  91.500000,  93.250000,  93.500000,
+    93.155000,  91.720000,  90.000000,  89.690000,  88.875000,  85.190000,  83.375000,  84.875000,  85.940000,  97.250000,  99.875000,
+    104.940000, 106.000000, 102.500000, 102.405000, 104.595000, 106.125000, 106.000000, 106.065000, 104.625000, 108.625000, 109.315000,
+    110.500000, 112.750000, 123.000000, 119.625000, 118.750000, 119.250000, 117.940000, 116.440000, 115.190000, 111.875000, 110.595000,
+    118.125000, 116.000000, 116.000000, 112.000000, 113.750000, 112.940000, 116.000000, 120.500000, 116.620000, 117.000000, 115.250000,
+    114.310000, 115.500000, 115.870000, 120.690000, 120.190000, 120.750000, 124.750000, 123.370000, 122.940000, 122.560000, 123.120000,
+    122.560000, 124.620000, 129.250000, 131.000000, 132.250000, 131.000000, 132.810000, 134.000000, 137.380000, 137.810000, 137.880000,
+    137.250000, 136.310000, 136.250000, 134.630000, 128.250000, 129.000000, 123.870000, 124.810000, 123.000000, 126.250000, 128.380000,
+    125.370000, 125.690000, 122.250000, 119.370000, 118.500000, 123.190000, 123.500000, 122.190000, 119.310000, 123.310000, 121.120000,
+    123.370000, 127.370000, 128.500000, 123.870000, 122.940000, 121.750000, 124.440000, 122.000000, 122.370000, 122.940000, 124.000000,
+    123.190000, 124.560000, 127.250000, 125.870000, 128.860000, 132.000000, 130.750000, 134.750000, 135.000000, 132.380000, 133.310000,
+    131.940000, 130.000000, 125.370000, 130.130000, 127.120000, 125.190000, 122.000000, 125.000000, 123.000000, 123.500000, 120.060000,
+    121.000000, 117.750000, 119.870000, 122.000000, 119.190000, 116.370000, 113.500000, 114.250000, 110.000000, 105.060000, 107.000000,
+    107.870000, 107.000000, 107.120000, 107.000000, 91.000000,  93.940000,  93.870000,  95.500000,  93.000000,  94.940000,  98.250000,
+    96.750000,  94.810000,  94.370000,  91.560000,  90.250000,  93.940000,  93.620000,  97.000000,  95.000000,  95.870000,  94.060000,
+    94.620000,  93.750000,  98.000000,  103.940000, 107.870000, 106.060000, 104.500000, 105.000000, 104.190000, 103.060000, 103.420000,
+    105.270000, 111.870000, 116.000000, 116.620000, 118.280000, 113.370000, 109.000000, 109.700000, 109.250000, 107.000000, 109.190000,
+    110.000000, 109.200000, 110.120000, 108.000000, 108.620000, 109.750000, 109.810000, 109.000000, 108.750000, 107.870000,
+};
+
+// Expected +DI14 (length=14), 252 entries.
+const test_expected_di14 = [_]f64{
+    math.nan(f64),     math.nan(f64),     math.nan(f64),     math.nan(f64),     math.nan(f64),     math.nan(f64),     math.nan(f64),     math.nan(f64),     math.nan(f64),     math.nan(f64),
+    math.nan(f64),     math.nan(f64),     math.nan(f64),     math.nan(f64),     19.05522364650020, 22.11670785419090, 20.11978035758620, 19.33636844671700, 20.99981719094980, 20.47347100363450,
+    19.20906464662860, 18.36336509461560, 16.88982642648080, 15.68576790165920, 14.67952880689320, 13.42909504582180, 12.48616130538830, 21.53007552812920, 19.88332801106740, 20.66745325231280,
+    19.45517924306970, 18.74547860719180, 18.23425400342490, 20.40521430446810, 21.77566896811640, 20.14084456889050, 19.05357338735990, 17.48793337655480, 16.53956577930640, 17.46359409234340,
+    16.62817205812690, 24.05609132860710, 24.09035797093930, 24.50865285383940, 28.45523845491510, 27.53137394678220, 29.83822836599620, 27.79411935200460, 25.96974385988290, 26.40113531112920,
+    25.33253772451870, 23.57849165810060, 20.58108730132500, 19.54553389595490, 18.60016496429710, 21.16356699392530, 23.83561133641820, 25.69349297603400, 27.35029209577470, 29.12568778656980,
+    27.13741076295150, 25.99095102191110, 32.09173817075960, 33.95598312219940, 30.10899589269230, 28.39660304764620, 26.85163886743150, 24.96050065698340, 23.57756240740020, 21.59410293602210,
+    19.86628855863870, 17.90669600129270, 16.05968407324500, 14.72171195562030, 16.10771014717990, 37.99360972454650, 40.40553056823370, 40.17912333551700, 41.78734053360190, 38.60838472712570,
+    36.64461538699690, 35.93829978691120, 35.11308969031360, 37.08311209653530, 35.19276482006510, 34.58448582826890, 35.22102444031580, 37.92579013803350, 36.20381119260810, 38.03299845932430,
+    46.47181965796660, 42.51442784979620, 39.73412414738380, 39.33905983382840, 37.29786722103520, 35.92885437430480, 34.45796460812880, 31.49524889534370, 29.94452337573990, 35.41815090444110,
+    31.96442465577000, 30.47612919020430, 27.85209257229330, 25.32337123164460, 24.86570859089050, 24.51857024603690, 31.93509105934530, 29.49936648183770, 29.03432526058680, 27.18351477819400,
+    25.32703946333510, 24.41551583506920, 27.02749927102350, 29.96208606556600, 29.24715718736490, 28.32319711029190, 33.61606011270490, 34.34236397715080, 32.79040883109250, 31.48070237899800,
+    32.06400367675980, 30.49763091099920, 30.06261176080620, 38.15737892262070, 35.80716553572750, 35.72227344405440, 36.74867490853040, 34.68548730366480, 36.32028888833950, 37.59474342651780,
+    37.60587116210990, 36.02764139161160, 34.32936624038000, 31.79315631546060, 30.38145785610720, 27.19759089329120, 22.92531109110230, 21.69212746918880, 19.53139651980610, 18.51315659474360,
+    17.67898009181570, 19.13335241673110, 22.31687799265660, 20.68958955771950, 19.73345492324700, 18.10602941796520, 16.39296718938940, 15.19635840853670, 17.29327792704440, 20.73699559641250,
+    19.51271826260920, 18.26732764471760, 19.04787405984010, 18.18421683356720, 18.32257627643170, 22.94355558139810, 23.37841126503840, 20.79552138030930, 19.43029970160000, 18.25048991000120,
+    18.12131798856590, 16.95264350274280, 16.76146564229790, 18.98149812152310, 18.08105403084440, 17.88422678339420, 17.52611217758870, 21.10532506192850, 19.83758394717680, 24.27542064998030,
+    27.99030852624950, 28.66305974549740, 30.39263899916450, 30.74468841227070, 28.64362189299360, 27.71542326588360, 28.91164889611440, 27.23980166190380, 23.28548898440100, 20.93990146481540,
+    19.45384109039080, 18.40948431413370, 16.32231829467620, 15.01036959936500, 16.71965585498820, 15.82252292812300, 14.84158601569850, 14.13256559912150, 12.74624287047500, 12.00493855584780,
+    16.90327871702080, 15.78476684663180, 14.61879120659790, 13.26235008798910, 15.30173835246020, 14.00640431900310, 12.61970002672870, 12.05896981464090, 13.79753194141390, 13.00499329305030,
+    12.31293885436390, 18.72751858390610, 14.12295105212690, 15.67149001196900, 15.71445628444950, 16.53255710610160, 15.82922160536570, 15.24261629001660, 20.20075035610160, 19.37866732228830,
+    18.35031673698770, 17.56527601255580, 16.20659291590220, 15.41145712343060, 16.18529622753460, 18.02245406516310, 19.74292528992190, 19.59444072066950, 18.38841900328940, 17.72919202364710,
+    17.01790197744330, 16.22906286508620, 21.49173327726360, 31.50476328246680, 35.02626060131780, 35.16411500458720, 32.41799752369260, 33.16310503272140, 32.08844153003670, 30.53263484511610,
+    29.13290986056760, 31.27564878516600, 39.39485655885770, 42.83683182797080, 44.90194886917620, 43.68551077162930, 36.52565212501750, 33.08786171608180, 29.86298019755390, 28.27141398984170,
+    26.12602927654530, 27.28715489439020, 28.45943643184480, 27.15010832084870, 26.15763179760630, 25.39947530272000, 24.47846947433050, 23.58065059204600, 24.29381129585600, 23.39906607444560,
+    22.41355209873950, 20.99955110084610,
+};
+
+test "DirectionalIndicatorPlus update length=14" {
+    const tolerance = 1e-8;
+    var dip = try DirectionalIndicatorPlus.init(testing.allocator, .{ .length = 14 });
+    defer dip.deinit();
+
+    for (0..test_input_close.len) |i| {
+        const act = dip.update(test_input_close[i], test_input_high[i], test_input_low[i]);
+        const exp = test_expected_di14[i];
+
+        if (math.isNan(exp)) {
+            try testing.expect(math.isNan(act));
+        } else {
+            try testing.expect(!math.isNan(act));
+            try testing.expect(almostEqual(act, exp, tolerance));
+        }
+    }
+}
+
+test "DirectionalIndicatorPlus isPrimed length=14" {
+    var dip = try DirectionalIndicatorPlus.init(testing.allocator, .{ .length = 14 });
+    defer dip.deinit();
+
+    for (0..14) |i| {
+        _ = dip.update(test_input_close[i], test_input_high[i], test_input_low[i]);
+        try testing.expect(!dip.isPrimed());
+    }
+
+    _ = dip.update(test_input_close[14], test_input_high[14], test_input_low[14]);
+    try testing.expect(dip.isPrimed());
+}
+
+test "DirectionalIndicatorPlus constructor validation" {
+    try testing.expectError(error.InvalidLength, DirectionalIndicatorPlus.init(testing.allocator, .{ .length = 0 }));
+    try testing.expectError(error.InvalidLength, DirectionalIndicatorPlus.init(testing.allocator, .{ .length = -8 }));
+
+    var dip = try DirectionalIndicatorPlus.init(testing.allocator, .{ .length = 14 });
+    defer dip.deinit();
+    try testing.expect(!dip.isPrimed());
+}
+
+test "DirectionalIndicatorPlus NaN passthrough" {
+    var dip = try DirectionalIndicatorPlus.init(testing.allocator, .{ .length = 14 });
+    defer dip.deinit();
+
+    try testing.expect(math.isNan(dip.update(math.nan(f64), 1, 1)));
+    try testing.expect(math.isNan(dip.update(1, math.nan(f64), 1)));
+    try testing.expect(math.isNan(dip.update(1, 1, math.nan(f64))));
+    try testing.expect(math.isNan(dip.updateSample(math.nan(f64))));
+}
+
+test "DirectionalIndicatorPlus metadata" {
+    var dip = try DirectionalIndicatorPlus.init(testing.allocator, .{ .length = 14 });
+    defer dip.deinit();
+    var meta: Metadata = undefined;
+    dip.getMetadata(&meta);
+
+    try testing.expectEqual(Identifier.directional_indicator_plus, meta.identifier);
+    try testing.expectEqualStrings("+di", meta.mnemonic);
+    try testing.expectEqual(@as(usize, 4), meta.outputs_len);
+}
+
+test "DirectionalIndicatorPlus updateBar" {
+    var dip = try DirectionalIndicatorPlus.init(testing.allocator, .{ .length = 14 });
+    defer dip.deinit();
+
+    for (0..14) |i| {
+        _ = dip.update(test_input_close[i], test_input_high[i], test_input_low[i]);
+    }
+
+    const bar = Bar{
+        .time = 1000,
+        .open = 91,
+        .high = test_input_high[14],
+        .low = test_input_low[14],
+        .close = test_input_close[14],
+        .volume = 1000,
+    };
+    const out = dip.updateBar(&bar);
+    try testing.expect(!math.isNan(out.slice()[0].scalar.value));
+}

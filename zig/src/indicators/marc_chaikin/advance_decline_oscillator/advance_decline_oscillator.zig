@@ -38,7 +38,7 @@ pub const MovingAverageType = enum {
 pub const AdvanceDeclineOscillatorParams = struct {
     fast_length: u32 = 3,
     slow_length: u32 = 10,
-    moving_average_type: MovingAverageType = .ema,
+    moving_average_type: MovingAverageType = .sma,
     first_is_average: bool = false,
 };
 

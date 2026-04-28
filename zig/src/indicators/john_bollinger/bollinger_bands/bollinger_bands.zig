@@ -346,17 +346,17 @@ pub const BollingerBands = struct {
     }
 
     pub fn updateBar(self: *BollingerBands, sample: *const Bar) OutputArray {
-        const v = self.bar_func(sample);
+        const v = self.bar_func(sample.*);
         return self.updateScalar(&.{ .time = sample.time, .value = v });
     }
 
     pub fn updateQuote(self: *BollingerBands, sample: *const Quote) OutputArray {
-        const v = self.quote_func(sample);
+        const v = self.quote_func(sample.*);
         return self.updateScalar(&.{ .time = sample.time, .value = v });
     }
 
     pub fn updateTrade(self: *BollingerBands, sample: *const Trade) OutputArray {
-        const v = self.trade_func(sample);
+        const v = self.trade_func(sample.*);
         return self.updateScalar(&.{ .time = sample.time, .value = v });
     }
 

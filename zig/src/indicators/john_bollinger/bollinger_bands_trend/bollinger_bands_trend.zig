@@ -123,7 +123,7 @@ const BbLine = struct {
         self.ma.deinit();
     }
 
-    fn fixSlices(self: *BbLine) void {
+    pub fn fixSlices(self: *BbLine) void {
         self.variance.fixSlices();
         switch (self.ma) {
             .sma => |*s| s.fixSlices(),
@@ -323,17 +323,17 @@ pub const BollingerBandsTrend = struct {
     }
 
     pub fn updateBar(self: *BollingerBandsTrend, sample: *const Bar) OutputArray {
-        const v = self.bar_func(sample);
+        const v = self.bar_func(sample.*);
         return self.updateScalar(&.{ .time = sample.time, .value = v });
     }
 
     pub fn updateQuote(self: *BollingerBandsTrend, sample: *const Quote) OutputArray {
-        const v = self.quote_func(sample);
+        const v = self.quote_func(sample.*);
         return self.updateScalar(&.{ .time = sample.time, .value = v });
     }
 
     pub fn updateTrade(self: *BollingerBandsTrend, sample: *const Trade) OutputArray {
-        const v = self.trade_func(sample);
+        const v = self.trade_func(sample.*);
         return self.updateScalar(&.{ .time = sample.time, .value = v });
     }
 
