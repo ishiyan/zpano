@@ -156,8 +156,9 @@ pub const RateOfChangeRatio = struct {
         return self.primed;
     }
 
-    pub fn getMetadata(self: *const RateOfChangeRatio) Metadata {
-        return build_metadata_mod.buildMetadata(
+    pub fn getMetadata(self: *const RateOfChangeRatio, out: *Metadata) void {
+        build_metadata_mod.buildMetadata(
+            out,
             .rate_of_change_ratio,
             self.line.mnemonic,
             self.line.description,
@@ -204,9 +205,9 @@ pub const RateOfChangeRatio = struct {
         const self: *RateOfChangeRatio = @ptrCast(@alignCast(ptr));
         return self.isPrimed();
     }
-    fn vtableMetadata(ptr: *anyopaque) Metadata {
+    fn vtableMetadata(ptr: *anyopaque, out: *Metadata) void {
         const self: *const RateOfChangeRatio = @ptrCast(@alignCast(ptr));
-        return self.getMetadata();
+        self.getMetadata(out);
     }
     fn vtableUpdateScalar(ptr: *anyopaque, sample: *const Scalar) OutputArray {
         const self: *RateOfChangeRatio = @ptrCast(@alignCast(ptr));
@@ -331,18 +332,20 @@ test "rocr is primed" {
 test "rocr metadata" {
     var rocr = try createRocr(testing.allocator, 5, false);
     defer rocr.deinit();
-    const m = rocr.getMetadata();
+    var m: Metadata = undefined;
+    rocr.getMetadata(&m);
     try testing.expectEqual(Identifier.rate_of_change_ratio, m.identifier);
-    try testing.expectEqualStrings("rocr(5)", m.outputs[0].mnemonic);
-    try testing.expectEqualStrings("Rate of Change Ratio rocr(5)", m.outputs[0].description);
+    try testing.expectEqualStrings("rocr(5)", m.outputs_buf[0].mnemonic);
+    try testing.expectEqualStrings("Rate of Change Ratio rocr(5)", m.outputs_buf[0].description);
 }
 
 test "rocr100 metadata" {
     var rocr = try createRocr(testing.allocator, 5, true);
     defer rocr.deinit();
-    const m = rocr.getMetadata();
-    try testing.expectEqualStrings("rocr100(5)", m.outputs[0].mnemonic);
-    try testing.expectEqualStrings("Rate of Change Ratio 100 Scale rocr100(5)", m.outputs[0].description);
+    var m: Metadata = undefined;
+    rocr.getMetadata(&m);
+    try testing.expectEqualStrings("rocr100(5)", m.outputs_buf[0].mnemonic);
+    try testing.expectEqualStrings("Rate of Change Ratio 100 Scale rocr100(5)", m.outputs_buf[0].description);
 }
 
 test "rocr init invalid length" {

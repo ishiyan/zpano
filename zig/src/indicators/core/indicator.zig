@@ -48,7 +48,7 @@ pub const Indicator = struct {
 
     pub const VTable = struct {
         isPrimed: *const fn (ptr: *anyopaque) bool,
-        metadata: *const fn (ptr: *anyopaque) metadata_mod.Metadata,
+        metadata: *const fn (ptr: *anyopaque, out: *metadata_mod.Metadata) void,
         updateScalar: *const fn (ptr: *anyopaque, sample: *const Scalar) OutputArray,
         updateBar: *const fn (ptr: *anyopaque, sample: *const Bar) OutputArray,
         updateQuote: *const fn (ptr: *anyopaque, sample: *const Quote) OutputArray,
@@ -59,8 +59,8 @@ pub const Indicator = struct {
         return self.vtable.isPrimed(self.ptr);
     }
 
-    pub fn metadata(self: Indicator) metadata_mod.Metadata {
-        return self.vtable.metadata(self.ptr);
+    pub fn metadata(self: Indicator, out: *metadata_mod.Metadata) void {
+        self.vtable.metadata(self.ptr, out);
     }
 
     pub fn updateScalar(self: Indicator, sample: *const Scalar) OutputArray {

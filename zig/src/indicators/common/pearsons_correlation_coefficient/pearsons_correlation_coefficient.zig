@@ -206,8 +206,9 @@ pub const PearsonsCorrelationCoefficient = struct {
         return self.primed;
     }
 
-    pub fn getMetadata(self: *const PearsonsCorrelationCoefficient) Metadata {
-        return build_metadata_mod.buildMetadata(
+    pub fn getMetadata(self: *const PearsonsCorrelationCoefficient, out: *Metadata) void {
+        build_metadata_mod.buildMetadata(
+            out,
             .pearsons_correlation_coefficient,
             self.line.mnemonic,
             self.line.description,
@@ -261,9 +262,9 @@ pub const PearsonsCorrelationCoefficient = struct {
         return self.isPrimed();
     }
 
-    fn vtableMetadata(ptr: *anyopaque) Metadata {
+    fn vtableMetadata(ptr: *anyopaque, out: *Metadata) void {
         const self: *const PearsonsCorrelationCoefficient = @ptrCast(@alignCast(ptr));
-        return self.getMetadata();
+        self.getMetadata(out);
     }
 
     fn vtableUpdateScalar(ptr: *anyopaque, sample: *const Scalar) OutputArray {
@@ -538,13 +539,14 @@ test "pearsons correlation coefficient is primed length=20" {
 test "pearsons correlation coefficient metadata" {
     var c = try createCorrel(testing.allocator, 20);
     defer c.deinit();
-    const m = c.getMetadata();
+    var m: Metadata = undefined;
+    c.getMetadata(&m);
 
     try testing.expectEqual(Identifier.pearsons_correlation_coefficient, m.identifier);
     try testing.expectEqualStrings("correl(20)", m.mnemonic);
     try testing.expectEqualStrings("Pearsons Correlation Coefficient correl(20)", m.description);
-    try testing.expectEqual(@as(usize, 1), m.outputs.len);
-    try testing.expectEqualStrings("correl(20)", m.outputs[0].mnemonic);
+    try testing.expectEqual(@as(usize, 1), m.outputs_len);
+    try testing.expectEqualStrings("correl(20)", m.outputs_buf[0].mnemonic);
 }
 
 test "pearsons correlation coefficient init invalid length" {

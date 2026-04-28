@@ -198,8 +198,9 @@ pub const TriangularMovingAverage = struct {
         return self.primed;
     }
 
-    pub fn getMetadata(self: *const TriangularMovingAverage) Metadata {
-        return build_metadata_mod.buildMetadata(
+    pub fn getMetadata(self: *const TriangularMovingAverage, out: *Metadata) void {
+        build_metadata_mod.buildMetadata(
+            out,
             .triangular_moving_average,
             self.line.mnemonic,
             self.line.description,
@@ -250,9 +251,9 @@ pub const TriangularMovingAverage = struct {
         return self.isPrimed();
     }
 
-    fn vtableMetadata(ptr: *anyopaque) Metadata {
+    fn vtableMetadata(ptr: *anyopaque, out: *Metadata) void {
         const self: *const TriangularMovingAverage = @ptrCast(@alignCast(ptr));
-        return self.getMetadata();
+        self.getMetadata(out);
     }
 
     fn vtableUpdateScalar(ptr: *anyopaque, sample: *const Scalar) OutputArray {
@@ -408,13 +409,14 @@ test "trima is primed length 12" {
 test "trima metadata" {
     var trima = try createTrima(testing.allocator, 5);
     defer trima.deinit();
-    const m = trima.getMetadata();
+    var m: Metadata = undefined;
+    trima.getMetadata(&m);
 
     try testing.expectEqual(Identifier.triangular_moving_average, m.identifier);
-    try testing.expectEqual(@as(usize, 1), m.outputs.len);
-    try testing.expectEqual(@as(i32, 1), m.outputs[0].kind);
-    try testing.expectEqualStrings("trima(5)", m.outputs[0].mnemonic);
-    try testing.expectEqualStrings("Triangular moving average trima(5)", m.outputs[0].description);
+    try testing.expectEqual(@as(usize, 1), m.outputs_len);
+    try testing.expectEqual(@as(i32, 1), m.outputs_buf[0].kind);
+    try testing.expectEqualStrings("trima(5)", m.outputs_buf[0].mnemonic);
+    try testing.expectEqualStrings("Triangular moving average trima(5)", m.outputs_buf[0].description);
 }
 
 test "trima init invalid length" {

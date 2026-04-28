@@ -146,8 +146,9 @@ pub const RateOfChangePercent = struct {
         return self.primed;
     }
 
-    pub fn getMetadata(self: *const RateOfChangePercent) Metadata {
-        return build_metadata_mod.buildMetadata(
+    pub fn getMetadata(self: *const RateOfChangePercent, out: *Metadata) void {
+        build_metadata_mod.buildMetadata(
+            out,
             .rate_of_change_percent,
             self.line.mnemonic,
             self.line.description,
@@ -194,9 +195,9 @@ pub const RateOfChangePercent = struct {
         const self: *RateOfChangePercent = @ptrCast(@alignCast(ptr));
         return self.isPrimed();
     }
-    fn vtableMetadata(ptr: *anyopaque) Metadata {
+    fn vtableMetadata(ptr: *anyopaque, out: *Metadata) void {
         const self: *const RateOfChangePercent = @ptrCast(@alignCast(ptr));
-        return self.getMetadata();
+        self.getMetadata(out);
     }
     fn vtableUpdateScalar(ptr: *anyopaque, sample: *const Scalar) OutputArray {
         const self: *RateOfChangePercent = @ptrCast(@alignCast(ptr));
@@ -301,10 +302,11 @@ test "rocp is primed" {
 test "rocp metadata" {
     var rocp = try createRocp(testing.allocator, 5);
     defer rocp.deinit();
-    const m = rocp.getMetadata();
+    var m: Metadata = undefined;
+    rocp.getMetadata(&m);
     try testing.expectEqual(Identifier.rate_of_change_percent, m.identifier);
-    try testing.expectEqualStrings("rocp(5)", m.outputs[0].mnemonic);
-    try testing.expectEqualStrings("Rate of Change Percent rocp(5)", m.outputs[0].description);
+    try testing.expectEqualStrings("rocp(5)", m.outputs_buf[0].mnemonic);
+    try testing.expectEqualStrings("Rate of Change Percent rocp(5)", m.outputs_buf[0].description);
 }
 
 test "rocp init invalid length" {

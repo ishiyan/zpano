@@ -183,8 +183,9 @@ pub const ExponentialMovingAverage = struct {
         return self.primed;
     }
 
-    pub fn getMetadata(self: *const ExponentialMovingAverage) Metadata {
-        return build_metadata_mod.buildMetadata(
+    pub fn getMetadata(self: *const ExponentialMovingAverage, out: *Metadata) void {
+        build_metadata_mod.buildMetadata(
+            out,
             .exponential_moving_average,
             self.line.mnemonic,
             self.line.description,
@@ -235,9 +236,9 @@ pub const ExponentialMovingAverage = struct {
         return self.isPrimed();
     }
 
-    fn vtableMetadata(ptr: *anyopaque) Metadata {
+    fn vtableMetadata(ptr: *anyopaque, out: *Metadata) void {
         const self: *const ExponentialMovingAverage = @ptrCast(@alignCast(ptr));
-        return self.getMetadata();
+        self.getMetadata(out);
     }
 
     fn vtableUpdateScalar(ptr: *anyopaque, sample: *const Scalar) OutputArray {
@@ -415,7 +416,8 @@ test "ema is primed length 10" {
 
 test "ema metadata length" {
     var ema = try createEmaLength(10, true);
-    const m = ema.getMetadata();
+    var m: Metadata = undefined;
+    ema.getMetadata(&m);
 
     try testing.expectEqual(Identifier.exponential_moving_average, m.identifier);
     try testing.expectEqualStrings("ema(10)", m.mnemonic);
@@ -425,7 +427,8 @@ test "ema metadata length" {
 test "ema metadata alpha" {
     const alpha: f64 = 2.0 / 11.0;
     var ema = try createEmaAlpha(alpha, false);
-    const m = ema.getMetadata();
+    var m: Metadata = undefined;
+    ema.getMetadata(&m);
 
     try testing.expectEqual(Identifier.exponential_moving_average, m.identifier);
     try testing.expectEqualStrings("ema(10, 0.18181818)", m.mnemonic);

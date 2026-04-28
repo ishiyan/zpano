@@ -125,8 +125,9 @@ pub const StandardDeviation = struct {
         return self.variance.isPrimed();
     }
 
-    pub fn getMetadata(self: *const StandardDeviation) Metadata {
-        return build_metadata_mod.buildMetadata(
+    pub fn getMetadata(self: *const StandardDeviation, out: *Metadata) void {
+        build_metadata_mod.buildMetadata(
+            out,
             .standard_deviation,
             self.line.mnemonic,
             self.line.description,
@@ -177,9 +178,9 @@ pub const StandardDeviation = struct {
         return self.isPrimed();
     }
 
-    fn vtableMetadata(ptr: *anyopaque) Metadata {
+    fn vtableMetadata(ptr: *anyopaque, out: *Metadata) void {
         const self: *const StandardDeviation = @ptrCast(@alignCast(ptr));
-        return self.getMetadata();
+        self.getMetadata(out);
     }
 
     fn vtableUpdateScalar(ptr: *anyopaque, sample: *const Scalar) OutputArray {
@@ -441,21 +442,23 @@ test "stdev is primed" {
 test "stdev metadata population" {
     var sd = try createStdDev(testing.allocator, 7, false);
     defer sd.deinit();
-    const m = sd.getMetadata();
+    var m: Metadata = undefined;
+    sd.getMetadata(&m);
 
     try testing.expectEqual(Identifier.standard_deviation, m.identifier);
-    try testing.expectEqualStrings("stdev.p(7)", m.outputs[0].mnemonic);
-    try testing.expectEqualStrings("Standard deviation based on estimation of the population variance stdev.p(7)", m.outputs[0].description);
+    try testing.expectEqualStrings("stdev.p(7)", m.outputs_buf[0].mnemonic);
+    try testing.expectEqualStrings("Standard deviation based on estimation of the population variance stdev.p(7)", m.outputs_buf[0].description);
 }
 
 test "stdev metadata sample" {
     var sd = try createStdDev(testing.allocator, 7, true);
     defer sd.deinit();
-    const m = sd.getMetadata();
+    var m: Metadata = undefined;
+    sd.getMetadata(&m);
 
     try testing.expectEqual(Identifier.standard_deviation, m.identifier);
-    try testing.expectEqualStrings("stdev.s(7)", m.outputs[0].mnemonic);
-    try testing.expectEqualStrings("Standard deviation based on unbiased estimation of the sample variance stdev.s(7)", m.outputs[0].description);
+    try testing.expectEqualStrings("stdev.s(7)", m.outputs_buf[0].mnemonic);
+    try testing.expectEqualStrings("Standard deviation based on unbiased estimation of the sample variance stdev.s(7)", m.outputs_buf[0].description);
 }
 
 test "stdev update entity" {

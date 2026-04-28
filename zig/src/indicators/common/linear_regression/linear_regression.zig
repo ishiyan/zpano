@@ -196,8 +196,9 @@ pub const LinearRegression = struct {
         return self.primed;
     }
 
-    pub fn getMetadata(self: *const LinearRegression) Metadata {
-        return build_metadata_mod.buildMetadata(
+    pub fn getMetadata(self: *const LinearRegression, out: *Metadata) void {
+        build_metadata_mod.buildMetadata(
+            out,
             .linear_regression,
             self.line.mnemonic,
             self.line.description,
@@ -271,9 +272,9 @@ pub const LinearRegression = struct {
         return self.isPrimed();
     }
 
-    fn vtableMetadata(ptr: *anyopaque) Metadata {
+    fn vtableMetadata(ptr: *anyopaque, out: *Metadata) void {
         const self: *const LinearRegression = @ptrCast(@alignCast(ptr));
-        return self.getMetadata();
+        self.getMetadata(out);
     }
 
     fn vtableUpdateScalar(ptr: *anyopaque, sample: *const Scalar) OutputArray {
@@ -881,12 +882,13 @@ test "linear regression is primed length 2" {
 test "linear regression metadata" {
     var lr = try createLinreg(testing.allocator, 14);
     defer lr.deinit();
-    const m = lr.getMetadata();
+    var m: Metadata = undefined;
+    lr.getMetadata(&m);
 
     try testing.expectEqual(Identifier.linear_regression, m.identifier);
     try testing.expectEqualStrings("linreg(14)", m.mnemonic);
     try testing.expectEqualStrings("Linear Regression linreg(14)", m.description);
-    try testing.expectEqual(@as(usize, 5), m.outputs.len);
+    try testing.expectEqual(@as(usize, 5), m.outputs_len);
 }
 
 test "linear regression init invalid length" {

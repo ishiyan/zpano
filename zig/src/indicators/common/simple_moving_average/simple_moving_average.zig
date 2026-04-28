@@ -154,8 +154,9 @@ pub const SimpleMovingAverage = struct {
     }
 
     /// Returns metadata for this indicator.
-    pub fn getMetadata(self: *const SimpleMovingAverage) Metadata {
-        return build_metadata_mod.buildMetadata(
+    pub fn getMetadata(self: *const SimpleMovingAverage, out: *Metadata) void {
+        build_metadata_mod.buildMetadata(
+            out,
             .simple_moving_average,
             self.line.mnemonic,
             self.line.description,
@@ -207,9 +208,9 @@ pub const SimpleMovingAverage = struct {
         return self.isPrimed();
     }
 
-    fn vtableMetadata(ptr: *anyopaque) Metadata {
+    fn vtableMetadata(ptr: *anyopaque, out: *Metadata) void {
         const self: *const SimpleMovingAverage = @ptrCast(@alignCast(ptr));
-        return self.getMetadata();
+        self.getMetadata(out);
     }
 
     fn vtableUpdateScalar(ptr: *anyopaque, sample: *const Scalar) OutputArray {
@@ -351,13 +352,14 @@ test "sma is primed" {
 test "sma metadata" {
     var sma = try createSma(testing.allocator, 5);
     defer sma.deinit();
-    const m = sma.getMetadata();
+    var m: Metadata = undefined;
+    sma.getMetadata(&m);
 
     try testing.expectEqual(Identifier.simple_moving_average, m.identifier);
-    try testing.expectEqual(@as(usize, 1), m.outputs.len);
-    try testing.expectEqual(@as(i32, 1), m.outputs[0].kind);
-    try testing.expectEqualStrings("sma(5)", m.outputs[0].mnemonic);
-    try testing.expectEqualStrings("Simple moving average sma(5)", m.outputs[0].description);
+    try testing.expectEqual(@as(usize, 1), m.outputs_len);
+    try testing.expectEqual(@as(i32, 1), m.outputs_buf[0].kind);
+    try testing.expectEqualStrings("sma(5)", m.outputs_buf[0].mnemonic);
+    try testing.expectEqualStrings("Simple moving average sma(5)", m.outputs_buf[0].description);
 }
 
 test "sma update entity" {

@@ -1,0 +1,604 @@
+const std = @import("std");
+const math = std.math;
+
+const Bar = @import("bar").Bar;
+const Quote = @import("quote").Quote;
+const Trade = @import("trade").Trade;
+const Scalar = @import("scalar").Scalar;
+const bar_component = @import("bar_component");
+const quote_component = @import("quote_component");
+const trade_component = @import("trade_component");
+
+const indicator_mod = @import("../../core/indicator.zig");
+const line_indicator_mod = @import("../../core/line_indicator.zig");
+const build_metadata_mod = @import("../../core/build_metadata.zig");
+const component_triple_mnemonic_mod = @import("../../core/component_triple_mnemonic.zig");
+const metadata_mod = @import("../../core/metadata.zig");
+
+const OutputArray = indicator_mod.OutputArray;
+const LineIndicator = line_indicator_mod.LineIndicator;
+const Metadata = metadata_mod.Metadata;
+
+/// Enumerates the outputs of the Money Flow Index indicator.
+pub const MoneyFlowIndexOutput = enum(u8) {
+    /// The scalar value of the money flow index.
+    value = 1,
+};
+
+/// Parameters to create an instance of the Money Flow Index indicator.
+pub const MoneyFlowIndexParams = struct {
+    /// The number of time periods. Must be >= 1.
+    length: u32 = 14,
+    /// Bar component to extract. `null` means use default (Typical).
+    bar_component: ?bar_component.BarComponent = null,
+    /// Quote component to extract. `null` means use default (Mid).
+    quote_component: ?quote_component.QuoteComponent = null,
+    /// Trade component to extract. `null` means use default (Price).
+    trade_component: ?trade_component.TradeComponent = null,
+};
+
+/// Gene Quong's Money Flow Index (MFI).
+///
+/// MFI is a volume-weighted oscillator calculated over ℓ periods, showing money flow
+/// on up days as a percentage of the total of up and down days.
+///
+///   TypicalPrice = (High + Low + Close) / 3
+///   MoneyFlow = TypicalPrice × Volume
+///   MFI = 100 × PositiveMoneyFlow / (PositiveMoneyFlow + NegativeMoneyFlow)
+pub const MoneyFlowIndex = struct {
+    line: LineIndicator,
+    bar_func: *const fn (Bar) f64,
+    length: u32,
+    negative_buffer: []f64,
+    positive_buffer: []f64,
+    negative_sum: f64,
+    positive_sum: f64,
+    previous_sample: f64,
+    buffer_index: u32,
+    buffer_low_index: u32,
+    buffer_count: u32,
+    value: f64,
+    primed: bool,
+    allocator: std.mem.Allocator,
+    mnemonic_buf: [128]u8,
+    mnemonic_len: usize,
+
+    pub fn init(allocator: std.mem.Allocator, params: MoneyFlowIndexParams) !MoneyFlowIndex {
+        if (params.length < 1) {
+            return error.InvalidLength;
+        }
+
+        const bc = params.bar_component orelse .typical;
+        const qc = params.quote_component orelse quote_component.default_quote_component;
+        const tc = params.trade_component orelse trade_component.default_trade_component;
+
+        var triple_buf: [64]u8 = undefined;
+        const triple = component_triple_mnemonic_mod.componentTripleMnemonic(&triple_buf, bc, qc, tc);
+
+        var mnemonic_buf: [128]u8 = undefined;
+        const mnemonic = std.fmt.bufPrint(&mnemonic_buf, "mfi({d}{s})", .{ params.length, triple }) catch unreachable;
+        const mnemonic_len = mnemonic.len;
+
+        const desc = "Money Flow Index " ++ "mfi";
+
+        const neg_buf = try allocator.alloc(f64, params.length);
+        @memset(neg_buf, 0);
+        const pos_buf = try allocator.alloc(f64, params.length);
+        @memset(pos_buf, 0);
+
+        return .{
+            .line = LineIndicator.new(
+                mnemonic_buf[0..mnemonic_len],
+                desc,
+                params.bar_component,
+                params.quote_component,
+                params.trade_component,
+            ),
+            .bar_func = bar_component.componentValue(bc),
+            .length = params.length,
+            .negative_buffer = neg_buf,
+            .positive_buffer = pos_buf,
+            .negative_sum = 0,
+            .positive_sum = 0,
+            .previous_sample = 0,
+            .buffer_index = 0,
+            .buffer_low_index = 0,
+            .buffer_count = 0,
+            .value = math.nan(f64),
+            .primed = false,
+            .allocator = allocator,
+            .mnemonic_buf = mnemonic_buf,
+            .mnemonic_len = mnemonic_len,
+        };
+    }
+
+    pub fn deinit(self: *MoneyFlowIndex) void {
+        self.allocator.free(self.negative_buffer);
+        self.allocator.free(self.positive_buffer);
+    }
+
+    pub fn fixSlices(self: *MoneyFlowIndex) void {
+        self.line.mnemonic = self.mnemonic_buf[0..self.mnemonic_len];
+    }
+
+    /// Update with volume = 1 (scalar path).
+    pub fn update(self: *MoneyFlowIndex, sample: f64) f64 {
+        return self.updateWithVolume(sample, 1);
+    }
+
+    /// Update with the given sample and volume.
+    pub fn updateWithVolume(self: *MoneyFlowIndex, sample: f64, volume: f64) f64 {
+        if (math.isNan(sample) or math.isNan(volume)) {
+            return math.nan(f64);
+        }
+
+        const length_min_one = self.length - 1;
+
+        if (self.primed) {
+            self.negative_sum -= self.negative_buffer[self.buffer_low_index];
+            self.positive_sum -= self.positive_buffer[self.buffer_low_index];
+
+            const amount = sample * volume;
+            const diff = sample - self.previous_sample;
+
+            if (diff < 0) {
+                self.negative_buffer[self.buffer_index] = amount;
+                self.positive_buffer[self.buffer_index] = 0;
+                self.negative_sum += amount;
+            } else if (diff > 0) {
+                self.negative_buffer[self.buffer_index] = 0;
+                self.positive_buffer[self.buffer_index] = amount;
+                self.positive_sum += amount;
+            } else {
+                self.negative_buffer[self.buffer_index] = 0;
+                self.positive_buffer[self.buffer_index] = 0;
+            }
+
+            const sum = self.positive_sum + self.negative_sum;
+            if (sum < 1) {
+                self.value = 0;
+            } else {
+                self.value = 100 * self.positive_sum / sum;
+            }
+
+            self.buffer_index += 1;
+            if (self.buffer_index > length_min_one) {
+                self.buffer_index = 0;
+            }
+
+            self.buffer_low_index += 1;
+            if (self.buffer_low_index > length_min_one) {
+                self.buffer_low_index = 0;
+            }
+        } else if (self.buffer_count == 0) {
+            self.buffer_count += 1;
+        } else {
+            const amount = sample * volume;
+            const diff = sample - self.previous_sample;
+
+            if (diff < 0) {
+                self.negative_buffer[self.buffer_index] = amount;
+                self.positive_buffer[self.buffer_index] = 0;
+                self.negative_sum += amount;
+            } else if (diff > 0) {
+                self.negative_buffer[self.buffer_index] = 0;
+                self.positive_buffer[self.buffer_index] = amount;
+                self.positive_sum += amount;
+            } else {
+                self.negative_buffer[self.buffer_index] = 0;
+                self.positive_buffer[self.buffer_index] = 0;
+            }
+
+            if (self.length == self.buffer_count) {
+                const sum = self.positive_sum + self.negative_sum;
+                if (sum < 1) {
+                    self.value = 0;
+                } else {
+                    self.value = 100 * self.positive_sum / sum;
+                }
+
+                self.primed = true;
+            }
+
+            self.buffer_index += 1;
+            if (self.buffer_index > length_min_one) {
+                self.buffer_index = 0;
+            }
+
+            self.buffer_count += 1;
+        }
+
+        self.previous_sample = sample;
+
+        return self.value;
+    }
+
+    pub fn isPrimed(self: *const MoneyFlowIndex) bool {
+        return self.primed;
+    }
+
+    pub fn getMetadata(self: *const MoneyFlowIndex, out: *Metadata) void {
+        build_metadata_mod.buildMetadata(
+            out,
+            .money_flow_index,
+            self.line.mnemonic,
+            self.line.description,
+            &[_]build_metadata_mod.OutputText{
+                .{ .mnemonic = self.line.mnemonic, .description = self.line.description },
+            },
+        );
+    }
+
+    pub fn updateScalar(self: *MoneyFlowIndex, sample: *const Scalar) OutputArray {
+        const value = self.update(sample.value);
+        return LineIndicator.wrapScalar(sample.time, value);
+    }
+
+    /// Shadows LineIndicator.updateBar to use bar volume.
+    pub fn updateBar(self: *MoneyFlowIndex, sample: *const Bar) OutputArray {
+        const price = self.bar_func(sample.*);
+        const value = self.updateWithVolume(price, sample.volume);
+        return LineIndicator.wrapScalar(sample.time, value);
+    }
+
+    pub fn updateQuote(self: *MoneyFlowIndex, sample: *const Quote) OutputArray {
+        const value = self.update(self.line.extractQuote(sample));
+        return LineIndicator.wrapScalar(sample.time, value);
+    }
+
+    pub fn updateTrade(self: *MoneyFlowIndex, sample: *const Trade) OutputArray {
+        const value = self.update(self.line.extractTrade(sample));
+        return LineIndicator.wrapScalar(sample.time, value);
+    }
+
+    pub fn indicator(self: *MoneyFlowIndex) indicator_mod.Indicator {
+        return .{
+            .ptr = @ptrCast(self),
+            .vtable = &vtable,
+        };
+    }
+
+    const vtable = indicator_mod.Indicator.VTable{
+        .isPrimed = vtableIsPrimed,
+        .metadata = vtableMetadata,
+        .updateScalar = vtableUpdateScalar,
+        .updateBar = vtableUpdateBar,
+        .updateQuote = vtableUpdateQuote,
+        .updateTrade = vtableUpdateTrade,
+    };
+
+    fn vtableIsPrimed(ptr: *anyopaque) bool {
+        const self: *MoneyFlowIndex = @ptrCast(@alignCast(ptr));
+        return self.isPrimed();
+    }
+
+    fn vtableMetadata(ptr: *anyopaque, out: *Metadata) void {
+        const self: *const MoneyFlowIndex = @ptrCast(@alignCast(ptr));
+        self.getMetadata(out);
+    }
+
+    fn vtableUpdateScalar(ptr: *anyopaque, sample: *const Scalar) OutputArray {
+        const self: *MoneyFlowIndex = @ptrCast(@alignCast(ptr));
+        return self.updateScalar(sample);
+    }
+
+    fn vtableUpdateBar(ptr: *anyopaque, sample: *const Bar) OutputArray {
+        const self: *MoneyFlowIndex = @ptrCast(@alignCast(ptr));
+        return self.updateBar(sample);
+    }
+
+    fn vtableUpdateQuote(ptr: *anyopaque, sample: *const Quote) OutputArray {
+        const self: *MoneyFlowIndex = @ptrCast(@alignCast(ptr));
+        return self.updateQuote(sample);
+    }
+
+    fn vtableUpdateTrade(ptr: *anyopaque, sample: *const Trade) OutputArray {
+        const self: *MoneyFlowIndex = @ptrCast(@alignCast(ptr));
+        return self.updateTrade(sample);
+    }
+
+    pub const Error = error{InvalidLength} || std.mem.Allocator.Error;
+};
+
+// ---------------------------------------------------------------------------
+// Tests
+// ---------------------------------------------------------------------------
+
+const testing = std.testing;
+
+fn roundTo(v: f64, comptime digits: comptime_int) f64 {
+    const p = comptime blk: {
+        var result: f64 = 1.0;
+        for (0..digits) |_| {
+            result *= 10.0;
+        }
+        break :blk result;
+    };
+    return @round(v * p) / p;
+}
+
+// Typical price test data: (high + low + close) / 3, 252 entries.
+fn testTypicalPrices() [252]f64 {
+    return .{
+        91.83333333333330,  93.72000000000000,  95.00000000000000,  94.92833333333330,  94.19833333333330,  94.28166666666670,  93.17666666666670,  92.07333333333330,  90.74166666666670,  91.94833333333330,
+        95.04166666666670,  97.73000000000000,  97.88500000000000,  90.48000000000000,  89.68833333333330,  92.33500000000000,  90.48833333333330,  89.59333333333330,  90.94833333333330,  90.62500000000000,
+        88.74000000000000,  87.55166666666670,  85.88500000000000,  83.59333333333330,  83.16833333333330,  82.33333333333330,  83.37666666666670,  87.57333333333330,  86.69833333333330,  87.11500000000000,
+        85.60333333333330,  86.49000000000000,  86.23000000000000,  87.82333333333330,  88.78166666666670,  87.76166666666670,  86.14666666666670,  84.68833333333330,  83.83500000000000,  84.26166666666670,
+        83.45833333333330,  86.35500000000000,  88.51166666666670,  89.32333333333330,  90.93833333333330,  90.77166666666670,  91.72000000000000,  89.90666666666670,  90.24000000000000,  90.78166666666670,
+        89.34333333333330,  88.05333333333330,  85.76000000000000,  84.02166666666670,  82.83500000000000,  84.41666666666670,  85.67666666666670,  86.47000000000000,  88.50166666666670,  89.44833333333330,
+        89.20833333333330,  88.23000000000000,  91.07333333333330,  91.99000000000000,  92.19833333333330,  92.89500000000000,  93.06166666666670,  91.35500000000000,  90.65666666666670,  90.14833333333330,
+        88.45833333333330,  86.33500000000000,  83.85333333333330,  83.75000000000000,  84.81500000000000,  97.65666666666670,  99.87500000000000,  103.82333333333300, 105.95833333333300, 103.16666666666700,
+        102.87500000000000, 103.93833333333300, 105.13500000000000, 106.54333333333300, 105.32333333333300, 105.20833333333300, 107.63500000000000, 109.59500000000000, 110.06333333333300, 111.57333333333300,
+        121.00000000000000, 119.79166666666700, 118.18833333333300, 119.35500000000000, 117.94833333333300, 116.96000000000000, 115.49166666666700, 112.69833333333300, 111.36500000000000, 115.72000000000000,
+        115.16333333333300, 115.64666666666700, 112.35333333333300, 112.60333333333300, 113.27000000000000, 114.81333333333300, 119.89666666666700, 117.51666666666700, 118.14333333333300, 115.10333333333300,
+        114.45666666666700, 115.16666666666700, 116.31000000000000, 120.35333333333300, 120.39666666666700, 120.64666666666700, 124.37333333333300, 124.70666666666700, 122.96000000000000, 122.85333333333300,
+        123.99666666666700, 123.14666666666700, 124.22666666666700, 128.54000000000000, 130.10333333333300, 131.33333333333300, 131.89666666666700, 132.31333333333300, 133.87666666666700, 136.23333333333300,
+        137.29333333333300, 137.60666666666700, 137.31333333333300, 136.31333333333300, 136.37666666666700, 135.73333333333300, 128.81333333333300, 128.54000000000000, 125.29000000000000, 124.29000000000000,
+        123.62333333333300, 125.43666666666700, 127.62666666666700, 125.53666666666700, 125.58333333333300, 123.35333333333300, 120.22666666666700, 119.47666666666700, 121.58333333333300, 123.83333333333300,
+        122.58333333333300, 120.25000000000000, 122.29000000000000, 121.97666666666700, 123.29000000000000, 126.58000000000000, 127.87333333333300, 125.66666666666700, 123.02000000000000, 122.39333333333300,
+        123.87333333333300, 122.20666666666700, 122.43333333333300, 123.62333333333300, 123.98000000000000, 123.83333333333300, 124.47666666666700, 127.08333333333300, 125.62333333333300, 128.87000000000000,
+        131.02333333333300, 131.79333333333300, 134.29333333333300, 135.69000000000000, 133.31333333333300, 132.93666666666700, 132.96000000000000, 130.64666666666700, 126.85333333333300, 129.00333333333300,
+        127.66666666666700, 125.60333333333300, 123.75000000000000, 123.48000000000000, 123.72666666666700, 123.31333333333300, 120.95666666666700, 120.95666666666700, 118.10333333333300, 118.87333333333300,
+        121.43666666666700, 120.33333333333300, 116.87333333333300, 113.20666666666700, 114.68666666666700, 111.62333333333300, 106.97666666666700, 106.31333333333300, 106.87000000000000, 106.89666666666700,
+        107.02000000000000, 109.02000000000000, 91.00000000000000,  93.68666666666670,  93.70333333333330,  95.37333333333330,  93.79000000000000,  94.83333333333330,  97.83333333333330,  97.31000000000000,
+        95.10333333333330,  94.60333333333330,  92.00000000000000,  91.12666666666670,  92.79333333333330,  93.74666666666670,  96.06000000000000,  95.79000000000000,  95.04000000000000,  94.76666666666670,
+        94.20666666666670,  93.74666666666670,  96.60333333333330,  102.47666666666700, 106.91666666666700, 107.31000000000000, 103.77000000000000, 105.04000000000000, 104.16666666666700, 103.22666666666700,
+        103.37000000000000, 104.98333333333300, 110.89333333333300, 115.00000000000000, 117.08333333333300, 118.26000000000000, 115.91333333333300, 109.50000000000000, 109.67000000000000, 108.77000000000000,
+        106.48000000000000, 108.21000000000000, 109.89333333333300, 109.13000000000000, 109.43333333333300, 108.77000000000000, 109.08333333333300, 109.29000000000000, 109.87333333333300, 109.41666666666700,
+        109.27000000000000, 107.99666666666700,
+    };
+}
+
+fn testVolumes() [252]f64 {
+    return .{
+        4077500,  4955900,  4775300,  4155300,  4593100,  3631300,  3382800,  4954200,  4500000,  3397500,
+        4204500,  6321400,  10203600, 19043900, 11692000, 9553300,  8920300,  5970900,  5062300,  3705600,
+        5865600,  5603000,  5811900,  8483800,  5995200,  5408800,  5430500,  6283800,  5834800,  4515500,
+        4493300,  4346100,  3700300,  4600200,  4557200,  4323600,  5237500,  7404100,  4798400,  4372800,
+        3872300,  10750800, 5804800,  3785500,  5014800,  3507700,  4298800,  4842500,  3952200,  3304700,
+        3462000,  7253900,  9753100,  5953000,  5011700,  5910800,  4916900,  4135000,  4054200,  3735300,
+        2921900,  2658400,  4624400,  4372200,  5831600,  4268600,  3059200,  4495500,  3425000,  3630800,
+        4168100,  5966900,  7692800,  7362500,  6581300,  19587700, 10378600, 9334700,  10467200, 5671400,
+        5645000,  4518600,  4519500,  5569700,  4239700,  4175300,  4995300,  4776600,  4190000,  6035300,
+        12168900, 9040800,  5780300,  4320800,  3899100,  3221400,  3455500,  4304200,  4703900,  8316300,
+        10553900, 6384800,  7163300,  7007800,  5114100,  5263800,  6666100,  7398400,  5575000,  4852300,
+        4298100,  4900500,  4887700,  6964800,  4679200,  9165000,  6469800,  6792000,  4423800,  5231900,
+        4565600,  6235200,  5225900,  8261400,  5912500,  3545600,  5714500,  6653900,  6094500,  4799200,
+        5050800,  5648900,  4726300,  5585600,  5124800,  7630200,  14311600, 8793600,  8874200,  6966600,
+        5525500,  6515500,  5291900,  5711700,  4327700,  4568000,  6859200,  5757500,  7367000,  6144100,
+        4052700,  5849700,  5544700,  5032200,  4400600,  4894100,  5140000,  6610900,  7585200,  5963100,
+        6045500,  8443300,  6464700,  6248300,  4357200,  4774700,  6216900,  6266900,  5584800,  5284500,
+        7554500,  7209500,  8424800,  5094500,  4443600,  4591100,  5658400,  6094100,  14862200, 7544700,
+        6985600,  8093000,  7590000,  7451300,  7078000,  7105300,  8778800,  6643900,  10563900, 7043100,
+        6438900,  8057700,  14240000, 17872300, 7831100,  8277700,  15017800, 14183300, 13921100, 9683000,
+        9187300,  11380500, 69447300, 26673600, 13768400, 11371600, 9872200,  9450500,  11083300, 9552800,
+        11108400, 10374200, 16701900, 13741900, 8523600,  9551900,  8680500,  7151700,  9673100,  6264700,
+        8541600,  8358000,  18720800, 19683100, 13682500, 10668100, 9710600,  3113100,  5682000,  5763600,
+        5340000,  6220800,  14680500, 9933000,  11329500, 8145300,  16644700, 12593800, 7138100,  7442300,
+        9442300,  7123600,  7680600,  4839800,  4775500,  4008800,  4533600,  3741100,  4084800,  2685200,
+        3438000,  2870500,
+    };
+}
+
+fn testExpectedMfi() [252]f64 {
+    return .{
+        math.nan(f64),      math.nan(f64),      math.nan(f64),      math.nan(f64),      math.nan(f64),      math.nan(f64),      math.nan(f64),      math.nan(f64),      math.nan(f64),      math.nan(f64),
+        math.nan(f64),      math.nan(f64),      math.nan(f64),      math.nan(f64),      42.892339191984400, 45.607156851091500, 38.878793951593400, 38.290129948202000, 43.122883231836800, 39.472063174605500,
+        38.619504683535500, 38.480240953756300, 38.117382822517500, 33.493804027688200, 29.220342754571200, 23.520352146535000, 19.081931442350100, 28.481290408467600, 30.490812178544800, 25.775155811166700,
+        27.381160459828800, 33.714897815218800, 27.346236954569300, 33.230236653265300, 40.118024000754600, 40.823048765546300, 41.135108269566700, 41.680829047530400, 42.339545647269900, 49.001919128375700,
+        42.392172404098500, 45.867453946118200, 53.997002568739900, 53.588498226773500, 60.228835056232500, 54.754579072612200, 60.351233895099000, 53.680943493294200, 53.327997144285700, 58.838359573789600,
+        60.213410800320400, 60.097703903620900, 56.094189206003500, 49.441225266874700, 48.766676072630400, 45.280879088501500, 44.466732201976600, 44.639607885232800, 43.763066748750100, 49.078132475724300,
+        43.620818288478700, 45.125370367976700, 45.726730247415200, 46.652805486780400, 53.587014163017200, 62.395368203121500, 73.992133516387600, 75.233585066283000, 76.739092816158000, 69.478067069803000,
+        61.791039405717700, 52.979119553844600, 43.611085952147000, 35.632094488668100, 43.132069849049600, 58.558612786918400, 61.622886855899200, 64.070474573453800, 66.240508852609600, 60.836814969402700,
+        56.163526421896500, 60.526841459144100, 64.219258150120700, 68.268188287812500, 67.762758475020000, 68.255367180145800, 74.169912621879500, 79.958351174098000, 79.766574398741300, 76.948814878544800,
+        78.024986385746000, 66.829423996542400, 57.693477934536300, 63.899566273645300, 64.773628555603800, 60.088928403603700, 55.132852436560800, 48.895793014737500, 48.457969622396200, 56.199374948151300,
+        46.859474107550700, 47.995759390064600, 41.971670804312500, 42.610662519661100, 37.280126307767600, 45.847228642327700, 53.909440152338700, 46.556511995229400, 52.329762223590400, 51.377532200329000,
+        50.904222971411900, 56.061920872684300, 61.387710037561000, 60.912248924847500, 71.100278345574400, 72.184058056313500, 80.399963566853100, 80.515149594892200, 74.904684087431900, 68.481225516631800,
+        67.717679698804500, 68.440193555062700, 68.408830319584900, 75.573128494188300, 81.010664199402400, 80.826774345443100, 81.168947637919100, 81.245132900086000, 81.688875940994300, 80.879355218425200,
+        80.669011621145200, 80.534864532093900, 79.701177080956400, 78.780045284268800, 79.051033840647100, 77.065944806840600, 63.831290718231500, 54.562696176753600, 46.770498008688100, 41.618305153003300,
+        35.869938038196300, 35.547087430032400, 34.816485828319300, 29.392596702896100, 28.532501849189100, 22.610761929506100, 22.287085626136000, 22.421382137723100, 23.653109915982100, 30.466816048698600,
+        34.275225748947100, 35.689403537495200, 44.091275513979800, 45.241681051659700, 51.608309269494300, 50.581636957184600, 50.485404665744000, 49.875703386910600, 42.352927398873300, 41.646500766605900,
+        49.530926863595900, 47.867674833431800, 47.331811032466300, 47.391959326311600, 52.489788275380300, 53.073778093167800, 53.515508782535700, 60.260033160276800, 54.190880840068300, 54.457242157662000,
+        55.845104249410000, 63.853565749535800, 72.800838543904700, 79.228436235412000, 73.565658287475200, 76.487189107132600, 76.400128755798000, 68.940655109333700, 56.653167948395200, 62.793860016393300,
+        55.979475215441400, 48.717429670408200, 47.819892167528300, 41.767172161477900, 41.257187492959700, 34.156880635363700, 25.558893314722900, 21.337922958584500, 20.249577219401300, 26.302212477127900,
+        26.468571764037900, 26.122801624778700, 26.565090844618700, 17.687510587310800, 24.044011125948200, 24.202696170228300, 23.103025879725400, 22.213969197816800, 25.210640416611600, 31.412015035001700,
+        37.724747125035200, 42.215013664095700, 32.604406046786600, 37.282270695486000, 38.585983766176300, 42.820594099402800, 44.147604863667400, 50.287951685924600, 50.692411629161800, 50.680013446112800,
+        51.927950477513600, 53.181132635422700, 46.257450161681700, 41.114616150641800, 40.597286990830600, 39.645289911455000, 58.383535609990900, 48.273526416074600, 40.263533215303500, 33.635443700142000,
+        33.942981201094800, 27.417051677325700, 31.206368431967500, 42.421829079077100, 50.820450787400300, 57.657991643241500, 59.691077910231700, 65.938534386077600, 61.184231419957100, 55.942197744715000,
+        55.008036152423900, 60.065503010643300, 68.672164665302100, 73.945187872402500, 80.199366102364600, 85.581304822458100, 73.118251304665500, 62.572280531032600, 60.757153390120200, 53.881595106361000,
+        53.890465195840400, 55.338949333747200, 60.237735832562900, 60.518802776206900, 60.437554224385300, 56.727638360871000, 52.935722699624500, 50.106574450994700, 46.239260209445200, 40.103335987977600,
+        46.950189199635600, 53.199678850628700,
+    };
+}
+
+fn testExpectedMfiVolume1() [252]f64 {
+    return .{
+        math.nan(f64),     math.nan(f64),     math.nan(f64),     math.nan(f64),     math.nan(f64),     math.nan(f64),     math.nan(f64),     math.nan(f64),     math.nan(f64),     math.nan(f64),
+        math.nan(f64),     math.nan(f64),     math.nan(f64),     math.nan(f64),     50.77504399035770, 50.72298127159680, 43.61862993264350, 43.79768067843300, 50.92286786476000, 43.77382669827870,
+        43.92457350732410, 44.07928046757150, 44.24666781344970, 37.30092831254890, 30.10207527008440, 22.61440852345010, 21.70072862017890, 28.89577725208690, 28.96642707421910, 28.66191997415870,
+        28.77736596842310, 36.00088727110400, 28.59417142699070, 35.96613933834180, 43.34968267127290, 43.34211182879160, 43.33268201830060, 43.29326543666250, 43.26930261777790, 50.18478070157260,
+        43.27056970768640, 43.21322438390980, 50.48112703438240, 50.57155694482350, 57.83649828545080, 50.53751237468070, 57.80206526858570, 50.54316216319050, 50.60189942056410, 57.85274918998110,
+        57.70289852136650, 57.54599326599330, 57.45661630729300, 50.66797935740020, 50.69347912968940, 50.61619409844550, 50.50271994250770, 50.38798420171120, 50.28958118244630, 57.63277446167010,
+        50.26156848548850, 50.33047512101520, 50.36429649240360, 50.41325574782620, 57.80475886688480, 65.11346812955040, 72.23487129309050, 71.81019646827430, 71.36271110821940, 64.34343888292610,
+        57.42195176314960, 50.58472358521430, 43.74148570127370, 36.80285878435170, 43.72394206797880, 51.15769562936780, 51.49698314586790, 51.94577554086970, 52.45730642031500, 44.91396204403470,
+        37.48901776962960, 44.97564091923150, 52.33674971046420, 59.56016271153110, 58.82859185583420, 58.03092367506310, 64.65902696186350, 71.10236794002740, 71.59979001861200, 71.86671289063380,
+        72.26243836720110, 64.66183659754650, 57.21976161791330, 64.33981686580760, 63.71865722865270, 56.58951166217800, 49.58519403537630, 42.69601120587870, 42.53447361719360, 49.45558572878720,
+        42.55997225857320, 42.77441729669260, 35.93366415011810, 35.97429022616100, 35.66813377831250, 42.90260262724080, 50.28900659213960, 42.93967739132950, 50.26510235422470, 50.32307627001950,
+        50.35545195545190, 57.42610922790310, 64.44707527498250, 64.54870958520400, 71.74529375226780, 71.83190989742680, 78.87607396812840, 79.03054299098170, 71.76691300282510, 64.55879569206860,
+        64.64544469732360, 64.42914196963450, 64.55728184852620, 71.59936550211500, 78.52111446168890, 78.72137551327990, 78.91094768128640, 79.05413588470390, 79.21320883694030, 79.39415601822890,
+        79.54177479095970, 79.68706988625730, 79.06230654382580, 78.48526365637730, 78.62872819459510, 78.09925314044810, 71.27822331015930, 64.41817107969060, 57.62270814011560, 50.78692439761030,
+        43.89796523912710, 43.68905927923440, 43.49783662684030, 36.30683246559720, 35.89659439886330, 28.55165582861650, 28.82469595521090, 29.09889787032090, 28.50129336377140, 35.79959614810960,
+        35.92799777391840, 36.10029154968690, 43.24947653889840, 43.30753132410340, 50.47125827507090, 50.50410144280310, 50.51118142929770, 50.50737383304020, 43.28969552904470, 43.31384257223820,
+        50.40461377600230, 50.32495474947220, 50.34938599485810, 50.34335227557690, 57.47142166036730, 57.35259043838190, 57.40633308232550, 64.54012641256460, 57.37892119357310, 57.43485511579080,
+        57.51155535894070, 64.82356965055960, 72.01615400300580, 79.10599073159670, 71.76130019590920, 71.33327898134490, 71.50004605323750, 64.41811005271980, 57.50202906091580, 64.40944881889760,
+        57.48668221699830, 50.57466648901320, 50.62659755426890, 43.69200152463610, 43.46522175100960, 36.36091398614710, 29.12900162020220, 23.31566125219890, 23.53203172666260, 31.05126148506300,
+        30.55881526535870, 30.75541139043100, 30.94807672993870, 23.07939399446740, 30.60219090864540, 30.87813824286350, 31.21586169271670, 31.56924077928990, 30.80000889145750, 38.34833518749510,
+        45.99627011280410, 49.72669862926900, 50.59558730302000, 49.78013600330290, 48.85051717271500, 56.15181854177270, 57.04562693943220, 64.40105415586050, 63.97703553978730, 64.63083191333400,
+        65.18340190002540, 65.73770372755150, 58.60977066061100, 51.35682472562700, 50.83735140234150, 50.26716716742050, 57.34122731593660, 50.17446251447560, 43.05406404591310, 35.87468768792190,
+        35.86340815566800, 28.73088677316870, 28.66462233129820, 36.26935462415200, 43.92916760995410, 51.45018791202020, 51.00633755674240, 58.11260520460480, 50.95948111261430, 43.91379343206210,
+        44.20530468396340, 51.33427677324710, 58.51253833454030, 65.61870713388580, 72.54077978913870, 79.24332377204100, 71.87342900358490, 64.82463999300750, 64.88801542568970, 57.81073624845820,
+        57.70849693391660, 57.79580513092140, 64.71118743187360, 64.46427532656680, 64.60299678517320, 57.70324254659580, 57.65401589080910, 57.49796706866360, 57.29927401698360, 49.91761406864770,
+        50.13481443638830, 50.18422766430790,
+    };
+}
+
+fn createMfi(allocator: std.mem.Allocator) !MoneyFlowIndex {
+    var mfi = try MoneyFlowIndex.init(allocator, .{ .length = 14 });
+    mfi.fixSlices();
+    return mfi;
+}
+
+test "money flow index with volume" {
+    const tp = testTypicalPrices();
+    const vol = testVolumes();
+    const expected = testExpectedMfi();
+    const digits = 9;
+
+    var mfi = try createMfi(testing.allocator);
+    defer mfi.deinit();
+
+    for (0..14) |i| {
+        const v = mfi.updateWithVolume(tp[i], vol[i]);
+        try testing.expect(math.isNan(v));
+        try testing.expect(!mfi.isPrimed());
+    }
+
+    for (14..252) |i| {
+        const v = mfi.updateWithVolume(tp[i], vol[i]);
+        try testing.expect(!math.isNan(v));
+        try testing.expect(mfi.isPrimed());
+
+        const got = roundTo(v, digits);
+        const exp = roundTo(expected[i], digits);
+        try testing.expectEqual(exp, got);
+    }
+}
+
+test "money flow index volume 1" {
+    const tp = testTypicalPrices();
+    const expected = testExpectedMfiVolume1();
+    const digits = 9;
+
+    var mfi = try createMfi(testing.allocator);
+    defer mfi.deinit();
+
+    for (0..14) |i| {
+        const v = mfi.update(tp[i]);
+        try testing.expect(math.isNan(v));
+    }
+
+    for (14..252) |i| {
+        const v = mfi.update(tp[i]);
+        try testing.expect(!math.isNan(v));
+
+        const got = roundTo(v, digits);
+        const exp = roundTo(expected[i], digits);
+        try testing.expectEqual(exp, got);
+    }
+}
+
+test "money flow index is primed" {
+    var mfi = try MoneyFlowIndex.init(testing.allocator, .{ .length = 5 });
+    defer mfi.deinit();
+    mfi.fixSlices();
+
+    try testing.expect(!mfi.isPrimed());
+
+    // Feed 6 samples (5+1): first stores previousSample, next 5 fill buffer.
+    for (1..6) |i| {
+        _ = mfi.update(@floatFromInt(i));
+        try testing.expect(!mfi.isPrimed());
+    }
+
+    _ = mfi.update(5);
+    try testing.expect(mfi.isPrimed());
+
+    _ = mfi.update(6);
+    try testing.expect(mfi.isPrimed());
+}
+
+test "money flow index NaN" {
+    var mfi = try MoneyFlowIndex.init(testing.allocator, .{ .length = 5 });
+    defer mfi.deinit();
+    mfi.fixSlices();
+
+    try testing.expect(math.isNan(mfi.update(math.nan(f64))));
+    try testing.expect(math.isNan(mfi.updateWithVolume(1.0, math.nan(f64))));
+    try testing.expect(math.isNan(mfi.updateWithVolume(math.nan(f64), math.nan(f64))));
+}
+
+test "money flow index metadata" {
+    var mfi = try createMfi(testing.allocator);
+    defer mfi.deinit();
+
+    var m: Metadata = undefined;
+    mfi.getMetadata(&m);
+
+    try testing.expectEqual(@import("../../core/identifier.zig").Identifier.money_flow_index, m.identifier);
+    try testing.expectEqual(@as(usize, 1), m.outputs_len);
+    try testing.expectEqual(@as(i32, 1), m.outputs_buf[0].kind);
+    try testing.expectEqualStrings("mfi(14, hlc/3)", m.mnemonic);
+}
+
+test "money flow index update bar" {
+    const digits = 9;
+    const input_high = [_]f64{
+        93.250000, 94.940000, 96.375000, 96.190000, 96.000000, 94.720000, 95.000000, 93.720000, 92.470000, 92.750000, 96.250000,
+        99.625000, 99.125000, 92.750000, 91.315000,
+    };
+    const input_low = [_]f64{
+        90.750000, 91.405000, 94.250000, 93.500000, 92.815000, 93.500000, 92.000000, 89.750000, 89.440000, 90.625000, 92.750000,
+        96.315000, 96.030000, 88.815000, 86.750000,
+    };
+    const input_close = [_]f64{
+        91.500000, 94.815000, 94.375000, 95.095000, 93.780000, 94.625000, 92.530000, 92.750000, 90.315000, 92.470000, 96.125000,
+        97.250000, 98.500000, 89.875000, 91.000000,
+    };
+    const input_volume = [_]f64{
+        4077500, 4955900, 4775300,  4155300,  4593100,  3631300, 3382800, 4954200, 4500000, 3397500,
+        4204500, 6321400, 10203600, 19043900, 11692000,
+    };
+
+    var mfi = try createMfi(testing.allocator);
+    defer mfi.deinit();
+
+    const time: i64 = 1617235200;
+
+    for (0..14) |i| {
+        const bar = Bar{ .time = time, .open = 0, .high = input_high[i], .low = input_low[i], .close = input_close[i], .volume = input_volume[i] };
+        const out = mfi.updateBar(&bar);
+        const s = out.slice()[0].scalar;
+        try testing.expect(math.isNan(s.value));
+    }
+
+    // Index 14: first value with real volume via UpdateBar.
+    const bar = Bar{ .time = time, .open = 0, .high = input_high[14], .low = input_low[14], .close = input_close[14], .volume = input_volume[14] };
+    const out = mfi.updateBar(&bar);
+    const s = out.slice()[0].scalar;
+    try testing.expect(!math.isNan(s.value));
+
+    const expected = testExpectedMfi();
+    const got = roundTo(s.value, digits);
+    const exp = roundTo(expected[14], digits);
+    try testing.expectEqual(exp, got);
+}
+
+test "money flow index invalid params" {
+    const result = MoneyFlowIndex.init(testing.allocator, .{ .length = 0 });
+    try testing.expectError(error.InvalidLength, result);
+}
+
+test "money flow index small sum" {
+    var mfi = try MoneyFlowIndex.init(testing.allocator, .{ .length = 2 });
+    defer mfi.deinit();
+    mfi.fixSlices();
+
+    for (0..10) |_| {
+        _ = mfi.updateWithVolume(0.001, 0.5);
+    }
+
+    try testing.expect(mfi.isPrimed());
+
+    const v = mfi.updateWithVolume(0.001, 0.5);
+    try testing.expectEqual(@as(f64, 0), v);
+}

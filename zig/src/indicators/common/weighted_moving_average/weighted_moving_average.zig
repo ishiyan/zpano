@@ -161,8 +161,9 @@ pub const WeightedMovingAverage = struct {
         return self.primed;
     }
 
-    pub fn getMetadata(self: *const WeightedMovingAverage) Metadata {
-        return build_metadata_mod.buildMetadata(
+    pub fn getMetadata(self: *const WeightedMovingAverage, out: *Metadata) void {
+        build_metadata_mod.buildMetadata(
+            out,
             .weighted_moving_average,
             self.line.mnemonic,
             self.line.description,
@@ -213,9 +214,9 @@ pub const WeightedMovingAverage = struct {
         return self.isPrimed();
     }
 
-    fn vtableMetadata(ptr: *anyopaque) Metadata {
+    fn vtableMetadata(ptr: *anyopaque, out: *Metadata) void {
         const self: *const WeightedMovingAverage = @ptrCast(@alignCast(ptr));
-        return self.getMetadata();
+        self.getMetadata(out);
     }
 
     fn vtableUpdateScalar(ptr: *anyopaque, sample: *const Scalar) OutputArray {
@@ -375,13 +376,14 @@ test "wma is primed length 30" {
 test "wma metadata" {
     var wma = try createWma(testing.allocator, 5);
     defer wma.deinit();
-    const m = wma.getMetadata();
+    var m: Metadata = undefined;
+    wma.getMetadata(&m);
 
     try testing.expectEqual(Identifier.weighted_moving_average, m.identifier);
-    try testing.expectEqual(@as(usize, 1), m.outputs.len);
-    try testing.expectEqual(@as(i32, 1), m.outputs[0].kind);
-    try testing.expectEqualStrings("wma(5)", m.outputs[0].mnemonic);
-    try testing.expectEqualStrings("Weighted moving average wma(5)", m.outputs[0].description);
+    try testing.expectEqual(@as(usize, 1), m.outputs_len);
+    try testing.expectEqual(@as(i32, 1), m.outputs_buf[0].kind);
+    try testing.expectEqualStrings("wma(5)", m.outputs_buf[0].mnemonic);
+    try testing.expectEqualStrings("Weighted moving average wma(5)", m.outputs_buf[0].description);
 }
 
 test "wma update entity" {

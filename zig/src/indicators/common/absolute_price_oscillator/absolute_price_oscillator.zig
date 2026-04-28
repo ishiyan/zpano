@@ -200,8 +200,9 @@ pub const AbsolutePriceOscillator = struct {
         return self.primed;
     }
 
-    pub fn getMetadata(self: *const AbsolutePriceOscillator) Metadata {
-        return build_metadata_mod.buildMetadata(
+    pub fn getMetadata(self: *const AbsolutePriceOscillator, out: *Metadata) void {
+        build_metadata_mod.buildMetadata(
+            out,
             .absolute_price_oscillator,
             self.line.mnemonic,
             self.line.description,
@@ -252,9 +253,9 @@ pub const AbsolutePriceOscillator = struct {
         return self.isPrimed();
     }
 
-    fn vtableMetadata(ptr: *anyopaque) Metadata {
+    fn vtableMetadata(ptr: *anyopaque, out: *Metadata) void {
         const self: *const AbsolutePriceOscillator = @ptrCast(@alignCast(ptr));
-        return self.getMetadata();
+        self.getMetadata(out);
     }
 
     fn vtableUpdateScalar(ptr: *anyopaque, sample: *const Scalar) OutputArray {
@@ -413,17 +414,19 @@ test "apo nan passthrough" {
 test "apo metadata sma" {
     var apo = try createApo(testing.allocator, 12, 26, .sma, false);
     defer apo.deinit();
-    const m = apo.getMetadata();
+    var m: Metadata = undefined;
+    apo.getMetadata(&m);
 
     try testing.expectEqual(Identifier.absolute_price_oscillator, m.identifier);
-    try testing.expectEqualStrings("apo(SMA12/SMA26)", m.outputs[0].mnemonic);
+    try testing.expectEqualStrings("apo(SMA12/SMA26)", m.outputs_buf[0].mnemonic);
 }
 
 test "apo metadata ema" {
     var apo = try createApo(testing.allocator, 12, 26, .ema, false);
     defer apo.deinit();
-    const m = apo.getMetadata();
-    try testing.expectEqualStrings("apo(EMA12/EMA26)", m.outputs[0].mnemonic);
+    var m: Metadata = undefined;
+    apo.getMetadata(&m);
+    try testing.expectEqualStrings("apo(EMA12/EMA26)", m.outputs_buf[0].mnemonic);
 }
 
 test "apo update entity" {

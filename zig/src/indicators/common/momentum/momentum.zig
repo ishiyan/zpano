@@ -148,8 +148,9 @@ pub const Momentum = struct {
         return self.primed;
     }
 
-    pub fn getMetadata(self: *const Momentum) Metadata {
-        return build_metadata_mod.buildMetadata(
+    pub fn getMetadata(self: *const Momentum, out: *Metadata) void {
+        build_metadata_mod.buildMetadata(
+            out,
             .momentum,
             self.line.mnemonic,
             self.line.description,
@@ -200,9 +201,9 @@ pub const Momentum = struct {
         return self.isPrimed();
     }
 
-    fn vtableMetadata(ptr: *anyopaque) Metadata {
+    fn vtableMetadata(ptr: *anyopaque, out: *Metadata) void {
         const self: *const Momentum = @ptrCast(@alignCast(ptr));
-        return self.getMetadata();
+        self.getMetadata(out);
     }
 
     fn vtableUpdateScalar(ptr: *anyopaque, sample: *const Scalar) OutputArray {
@@ -324,13 +325,14 @@ test "momentum is primed" {
 test "momentum metadata" {
     var mom = try createMomentum(testing.allocator, 5);
     defer mom.deinit();
-    const m = mom.getMetadata();
+    var m: Metadata = undefined;
+    mom.getMetadata(&m);
 
     try testing.expectEqual(Identifier.momentum, m.identifier);
-    try testing.expectEqual(@as(usize, 1), m.outputs.len);
-    try testing.expectEqual(@as(i32, 1), m.outputs[0].kind);
-    try testing.expectEqualStrings("mom(5)", m.outputs[0].mnemonic);
-    try testing.expectEqualStrings("Momentum mom(5)", m.outputs[0].description);
+    try testing.expectEqual(@as(usize, 1), m.outputs_len);
+    try testing.expectEqual(@as(i32, 1), m.outputs_buf[0].kind);
+    try testing.expectEqualStrings("mom(5)", m.outputs_buf[0].mnemonic);
+    try testing.expectEqualStrings("Momentum mom(5)", m.outputs_buf[0].description);
 }
 
 test "momentum update entity" {

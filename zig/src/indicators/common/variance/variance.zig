@@ -199,8 +199,9 @@ pub const Variance = struct {
         return self.primed;
     }
 
-    pub fn getMetadata(self: *const Variance) Metadata {
-        return build_metadata_mod.buildMetadata(
+    pub fn getMetadata(self: *const Variance, out: *Metadata) void {
+        build_metadata_mod.buildMetadata(
+            out,
             .variance,
             self.line.mnemonic,
             self.line.description,
@@ -251,9 +252,9 @@ pub const Variance = struct {
         return self.isPrimed();
     }
 
-    fn vtableMetadata(ptr: *anyopaque) Metadata {
+    fn vtableMetadata(ptr: *anyopaque, out: *Metadata) void {
         const self: *const Variance = @ptrCast(@alignCast(ptr));
-        return self.getMetadata();
+        self.getMetadata(out);
     }
 
     fn vtableUpdateScalar(ptr: *anyopaque, sample: *const Scalar) OutputArray {
@@ -388,21 +389,23 @@ test "variance is primed" {
 test "variance metadata population" {
     var v = try createVariance(testing.allocator, 7, false);
     defer v.deinit();
-    const m = v.getMetadata();
+    var m: Metadata = undefined;
+    v.getMetadata(&m);
 
     try testing.expectEqual(Identifier.variance, m.identifier);
-    try testing.expectEqualStrings("var.p(7)", m.outputs[0].mnemonic);
-    try testing.expectEqualStrings("Estimation of the population variance var.p(7)", m.outputs[0].description);
+    try testing.expectEqualStrings("var.p(7)", m.outputs_buf[0].mnemonic);
+    try testing.expectEqualStrings("Estimation of the population variance var.p(7)", m.outputs_buf[0].description);
 }
 
 test "variance metadata sample" {
     var v = try createVariance(testing.allocator, 7, true);
     defer v.deinit();
-    const m = v.getMetadata();
+    var m: Metadata = undefined;
+    v.getMetadata(&m);
 
     try testing.expectEqual(Identifier.variance, m.identifier);
-    try testing.expectEqualStrings("var.s(7)", m.outputs[0].mnemonic);
-    try testing.expectEqualStrings("Unbiased estimation of the sample variance var.s(7)", m.outputs[0].description);
+    try testing.expectEqualStrings("var.s(7)", m.outputs_buf[0].mnemonic);
+    try testing.expectEqualStrings("Unbiased estimation of the sample variance var.s(7)", m.outputs_buf[0].description);
 }
 
 test "variance update entity" {
