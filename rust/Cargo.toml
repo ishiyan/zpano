@@ -4,3 +4,15 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+
+[[bin]]
+name = "icalc"
+path = "src/cmd/icalc/main.rs"
+
+[[bin]]
+name = "iconf"
+path = "src/cmd/iconf/main.rs"
+
+[[bin]]
+name = "ifres"
+path = "src/cmd/ifres/main.rs"

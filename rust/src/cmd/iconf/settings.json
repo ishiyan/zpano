@@ -1,0 +1,10 @@
+[
+  { "identifier": "bollingerBands", "params": { "length": 20, "multiplier": 2 } },
+  { "identifier": "simpleMovingAverage", "params": { "length": 14 } },
+  { "identifier": "exponentialMovingAverage", "params": { "length": 10 } },
+  { "identifier": "relativeStrengthIndex", "params": { "length": 14 } },
+  { "identifier": "movingAverageConvergenceDivergence", "params": { "fastLength": 12, "slowLength": 26, "signalLength": 9 } },
+  { "identifier": "averageTrueRange", "params": { "length": 14 } },
+  { "identifier": "stochastic", "params": { "fastKLength": 14, "slowKLength": 3, "slowDLength": 3 } },
+  { "identifier": "goertzelSpectrum", "params": { "length": 64, "range": [2, 28], "resolution": 10 } }
+]
