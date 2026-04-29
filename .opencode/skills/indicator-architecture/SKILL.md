@@ -2433,3 +2433,10 @@ The indicators are not `Send`/`Sync` by default due to internal mutability via `
 
 `std::f64::consts::FRAC_PI_3` must be used instead of `(2.0 * PI) / 6.0` in
 `shared.rs` `calculate_differential_phase()` to match Go's compile-time constant precision.
+
+## Related Skills
+
+- **`indicator-checklist`** — Compact (~80 lines) mechanically-verifiable rules for imports, naming, and structure. Use for quick verification or as a checklist during conversion.
+- **`indicator-conversion`** — Full step-by-step conversion workflow for porting indicators between languages.
+- **`mbst-indicator-conversion`** — Converting from MBST C# source indicators.
+- **`talib-indicator-conversion`** — Converting from TA-Lib C source indicators.
