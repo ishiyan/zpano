@@ -1,12 +1,13 @@
 ---
 name: indicator-conversion
-description: Step-by-step guide for converting old-structure indicators to the new architecture in Go and TypeScript, and for porting indicators from Go/TS to Python. Load when migrating an existing indicator or porting to a new language.
+description: Step-by-step guide for converting old-structure indicators to the new architecture in all five languages (Go, TypeScript, Python, Zig, Rust). Load when migrating an existing indicator or implementing one in any language.
 ---
 
 # Converting an Old-Structure Indicator to New Structure
 
 This guide provides step-by-step instructions for converting an indicator from the old
-architecture to the new architecture. It covers **Go**, **TypeScript**, and **Python** implementations.
+architecture to the new architecture. It covers all five languages: **Go**, **TypeScript**,
+**Python**, **Zig**, and **Rust**.
 
 The new architecture introduces:
 
@@ -26,29 +27,19 @@ Use the EMA indicator as the canonical reference for multi-constructor indicator
 
 ## Table of Contents
 
-1. [Go Conversion](#go-conversion)
-   1. [Create the new package directory](#go-step-1-create-the-new-package-directory)
-   2. [Convert the params file](#go-step-2-convert-the-params-file)
-   3. [Convert the output file](#go-step-3-convert-the-output-file)
-   4. [Convert the output test file](#go-step-4-convert-the-output-test-file)
-   5. [Convert the main indicator file](#go-step-5-convert-the-main-indicator-file)
-   6. [Convert the test file](#go-step-6-convert-the-test-file)
-   7. [Register the indicator type](#go-step-7-register-the-indicator-type)
-   8. [Verify](#go-step-8-verify)
-2. [TypeScript Conversion](#typescript-conversion)
-   1. [Create the new folder](#ts-step-1-create-the-new-folder)
-   2. [Convert the params file](#ts-step-2-convert-the-params-file)
-   3. [Create the output file](#ts-step-3-create-the-output-file)
-   4. [Convert the main indicator file](#ts-step-4-convert-the-main-indicator-file)
-   5. [Convert the test file](#ts-step-5-convert-the-test-file)
-   6. [Verify](#ts-step-6-verify)
-3. [Quick Reference: Import Mapping](#quick-reference-import-mapping)
-4. [Quick Reference: Symbol Renames](#quick-reference-symbol-renames)
-5. [Advanced: Multi-Constructor Indicators](#advanced-multi-constructor-indicators)
-6. [Advanced: Helper / Shared Component Families](#advanced-helper--shared-component-families)
-7. [Naming & Style Conventions](#naming--style-conventions)
-8. [Registering in the Factory](#registering-in-the-factory)
-9. [Python Porting Guide](#python-porting-guide)
+1. [Naming & Style Conventions](#naming--style-conventions)
+2. [Go Conversion](#go-conversion)
+3. [TypeScript Conversion](#typescript-conversion)
+4. [Python Implementation Guide](#python-porting-guide)
+5. [Zig Implementation Guide](#zig-porting-guide)
+6. [Rust Implementation Guide](#rust-porting-guide)
+7. [Quick Reference: Import Mapping](#quick-reference-import-mapping)
+8. [Quick Reference: Symbol Renames](#quick-reference-symbol-renames)
+9. [Advanced: Multi-Constructor Indicators](#advanced-multi-constructor-indicators)
+10. [Advanced: Wrapper Indicators](#advanced-wrapper-indicators)
+11. [Indicators That Do Not Use LineIndicator](#indicators-that-do-not-use-lineindicator)
+12. [Advanced: Helper / Shared Component Families](#advanced-helper--shared-component-families)
+13. [Registering in the Factory](#registering-in-the-factory)
 
 ---
 
@@ -79,14 +70,17 @@ and rationale):
   `make([]T, 0)` (always include capacity); no `new`; grouped imports
   (stdlib, external, `zpano/*`); every exported symbol has a doc
   comment, even trivial passthroughs.
-- **Go ↔ TS local-variable parity** — same concept = same name in
-  both languages. Canonical: `sum`, `epsilon`, `temp`/`diff`,
-  `stddev`, `spread`, `bw`, `pctB`, `amount`, `lengthMinOne`;
-  loop counter `i`/`j`/`k`; `index` only when semantically a named
-  index. Never introduce new short forms.
+- **Cross-language local-variable parity** — same concept = same name
+  across all five languages (modulo casing convention). Canonical:
+  `sum`, `epsilon`, `temp`/`diff`, `stddev`, `spread`, `bw`, `pctB`
+  (Go/TS) / `pct_b` (Python/Zig/Rust), `amount`, `lengthMinOne`
+  (Go/TS) / `length_min_one` (Python/Zig/Rust); loop counter
+  `i`/`j`/`k`; `index` only when semantically a named index. Never
+  introduce new short forms.
 
-When porting, copy the other language's local-variable names verbatim
-where the concept is identical.
+When implementing in any language, copy the reference language's
+local-variable names verbatim (adjusted to that language's casing
+convention) where the concept is identical.
 
 ---
 
@@ -1049,7 +1043,7 @@ additional considerations for multi-constructor indicators.
 
 ### Multiple Param Structs / Interfaces
 
-Each constructor path gets its own param struct (Go) or interface (TS).
+Each constructor path gets its own param struct (Go/Zig/Rust), interface (TS), or dataclass (Python).
 
 **Go:**
 
@@ -1079,6 +1073,54 @@ export interface ExponentialMovingAverageLengthParams {
 export interface ExponentialMovingAverageSmoothingFactorParams {
     smoothingFactor: number;
     barComponent?: BarComponent;
+    // ...
+}
+```
+
+**Python:**
+
+```python
+@dataclass
+class ExponentialMovingAverageLengthParams:
+    length: int = 10
+    bar_component: Optional[BarComponent] = None
+    # ...
+
+@dataclass
+class ExponentialMovingAverageSmoothingFactorParams:
+    smoothing_factor: float = 0.18181818
+    bar_component: Optional[BarComponent] = None
+    # ...
+```
+
+**Zig:**
+
+```zig
+pub const ExponentialMovingAverageLengthParams = struct {
+    length: u32 = 10,
+    bar_component: ?BarComponent = null,
+    // ...
+};
+
+pub const ExponentialMovingAverageSmoothingFactorParams = struct {
+    smoothing_factor: f64 = 0.18181818,
+    bar_component: ?BarComponent = null,
+    // ...
+};
+```
+
+**Rust:**
+
+```rust
+pub struct ExponentialMovingAverageLengthParams {
+    pub length: usize,
+    pub bar_component: Option<BarComponent>,
+    // ...
+}
+
+pub struct ExponentialMovingAverageSmoothingFactorParams {
+    pub smoothing_factor: f64,
+    pub bar_component: Option<BarComponent>,
     // ...
 }
 ```
@@ -1121,6 +1163,33 @@ export class ExponentialMovingAverage extends LineIndicator {
 
 Both static methods delegate to the private constructor with resolved parameters.
 
+### Python: Static Factory Methods
+
+```python
+class ExponentialMovingAverage(Indicator):
+    @staticmethod
+    def from_length(params: ExponentialMovingAverageLengthParams) -> 'ExponentialMovingAverage': ...
+
+    @staticmethod
+    def from_smoothing_factor(params: ExponentialMovingAverageSmoothingFactorParams) -> 'ExponentialMovingAverage': ...
+```
+
+### Zig: Separate `init` Functions
+
+```zig
+pub fn initFromLength(allocator: Allocator, params: ExponentialMovingAverageLengthParams) !ExponentialMovingAverage { ... }
+pub fn initFromSmoothingFactor(allocator: Allocator, params: ExponentialMovingAverageSmoothingFactorParams) !ExponentialMovingAverage { ... }
+```
+
+### Rust: Associated Functions
+
+```rust
+impl ExponentialMovingAverage {
+    pub fn from_length(params: ExponentialMovingAverageLengthParams) -> Self { ... }
+    pub fn from_smoothing_factor(params: ExponentialMovingAverageSmoothingFactorParams) -> Self { ... }
+}
+```
+
 ### Constructor-Specific Mnemonic Formats
 
 Different constructor paths may produce different mnemonic formats. Define the format
@@ -1136,14 +1205,15 @@ mnemonic := fmt.Sprintf("ema(%d, %.8f%s)", length, smoothingFactor, core.Compone
 // => "ema(10, 0.18181818)" or "ema(10, 0.18181818, hl/2)"
 ```
 
-The mnemonics must match between Go and TS. This may require changing the TS format
-from the old style to match Go (e.g., old TS alpha path used `ema(0.123)` with 3 decimal
-places; new uses `ema(10, 0.18181818)` with 8 decimal places to match Go).
+The mnemonics must match across all five languages. This may require changing
+a language's format from the old style to match the reference (e.g., old TS
+alpha path used `ema(0.123)` with 3 decimal places; new uses
+`ema(10, 0.18181818)` with 8 decimal places to match Go).
 
 ### Cross-Language Behavior Alignment
 
-When converting multi-constructor indicators, check for behavioral differences between
-Go and TS and decide whether to align them:
+When converting multi-constructor indicators, check for behavioral differences
+across languages and decide whether to align them:
 
 - **Priming behavior:** If one language primes differently for a given constructor path,
   consider aligning. Example: old TS smoothing-factor EMA primed immediately (length=0),
@@ -1165,6 +1235,23 @@ t.Run("from smoothing factor", func(t *testing.T) { ... })
 ```ts
 describe('from length', () => { ... });
 describe('from smoothing factor', () => { ... });
+```
+
+```python
+def test_from_length(self): ...
+def test_from_smoothing_factor(self): ...
+```
+
+```zig
+test "ema from length" { ... }
+test "ema from smoothing factor" { ... }
+```
+
+```rust
+#[test]
+fn test_from_length() { ... }
+#[test]
+fn test_from_smoothing_factor() { ... }
 ```
 
 Mnemonic tests should cover both paths, including with non-default components, to verify
@@ -1322,6 +1409,26 @@ Some indicators cannot use `LineIndicator` because they:
 - Has a private `updateEntity` helper that calls `update` and builds the `IndicatorOutput` array
 - Uses `componentTripleMnemonic` for mnemonic construction
 
+**Python**: The class extends `Indicator` (ABC) without using `LineIndicator`. It:
+- Stores `self._bar_func`, `self._quote_func`, `self._trade_func` directly
+- Resolves defaults with `if x is None: x = DEFAULT_*`
+- Implements `update_scalar`, `update_bar`, `update_quote`, `update_trade` directly
+- Uses `component_triple_mnemonic` for mnemonic construction
+
+**Zig**: The struct does NOT use `LineIndicator`. It:
+- Stores `bar_func`, `quote_func`, `trade_func` function pointers directly
+- Resolves defaults with `orelse default_*_component`
+- Implements `updateBar`, `updateQuote`, `updateTrade`, `updateScalar` directly
+- Builds `OutputArray` manually with multiple entries
+- Uses `componentTripleMnemonic` for mnemonic construction
+
+**Rust**: The struct does NOT use `LineIndicator`. It:
+- Stores `bar_func: fn(&Bar) -> f64`, `quote_func`, `trade_func` directly
+- Resolves defaults with `.unwrap_or(DEFAULT_*)`
+- Implements `update_bar`, `update_quote`, `update_trade`, `update_scalar` directly
+- Returns `Vec<Box<dyn Any>>` with multiple output entries
+- Uses `component_triple_mnemonic` for mnemonic construction
+
 ### Example: FRAMA (Fractal Adaptive Moving Average)
 
 FRAMA has two outputs (`Value` and `Fdim`), and its core `Update` takes three parameters
@@ -1361,14 +1468,14 @@ Canonical reference: **Hilbert Transformer cycle estimator**
 A helper family lives in a single folder at the standard indicator depth and
 contains one file per component role:
 
-| Role                    | Go filename                          | TS filename                            |
-|-------------------------|--------------------------------------|----------------------------------------|
-| Shared interface        | `cycleestimator.go`                  | `cycle-estimator.ts`                   |
-| Shared params           | `cycleestimatorparams.go`            | `cycle-estimator-params.ts`            |
-| Variant type enum       | `cycleestimatortype.go`              | `cycle-estimator-type.ts`              |
-| Common + dispatcher     | `estimator.go`                       | `common.ts`                            |
-| One file per variant    | `<variant>estimator.go`              | `<variant>.ts`                         |
-| Spec per variant + common | `<variant>estimator_test.go`       | `<variant>.spec.ts`                    |
+| Role                    | Go filename                          | TS filename                            | Python filename                        | Zig filename                           | Rust filename                          |
+|-------------------------|--------------------------------------|----------------------------------------|----------------------------------------|----------------------------------------|----------------------------------------|
+| Shared interface        | `cycleestimator.go`                  | `cycle-estimator.ts`                   | `cycle_estimator.py`                   | `cycle_estimator.zig`                  | `cycle_estimator.rs`                   |
+| Shared params           | `cycleestimatorparams.go`            | `cycle-estimator-params.ts`            | `cycle_estimator_params.py`            | *(in same file)*                        | *(in same file)*                        |
+| Variant type enum       | `cycleestimatortype.go`              | `cycle-estimator-type.ts`              | `cycle_estimator_type.py`              | *(in same file)*                        | *(in same file)*                        |
+| Common + dispatcher     | `estimator.go`                       | `common.ts`                            | `common.py`                            | `estimator.zig`                         | `estimator.rs`                         |
+| One file per variant    | `<variant>estimator.go`              | `<variant>.ts`                         | `<variant>_estimator.py`               | `<variant>_estimator.zig`              | `<variant>_estimator.rs`               |
+| Spec per variant + common | `<variant>estimator_test.go`       | `<variant>.spec.ts`                    | `test_<variant>_estimator.py`          | *(tests in same file)*                  | *(tests in same file)*                  |
 
 **No type suffixes.** Do not use `.interface.ts` / `.enum.ts` — plain `.ts`
 files differentiated by stem name, same as every other indicator.
@@ -1452,28 +1559,28 @@ it('should respect custom warmUpPeriod', () => {
 
 ### Cross-Language Alignment Checklist
 
-- Interface getter names match (modulo language casing).
+- Interface getter names match across all five languages (modulo casing).
 - Dispatcher default variant matches.
 - Per-variant default params match exactly (same numeric values).
-- `Primed()` / `primed` semantics match (both return `isWarmedUp`, not some
-  other internal flag).
-- Error/throw messages use the same textual prefix where practical.
+- `Primed()` / `isPrimed()` / `is_primed()` semantics match (all return
+  `isWarmedUp`, not some other internal flag).
+- Error/throw/panic messages use the same textual prefix where practical.
 
 ### Shared Formatter / Moniker Helpers
 
 When a family defines a formatter (e.g. a per-variant mnemonic builder like
 `EstimatorMoniker(typ, params) -> "hd(4, 0.200, 0.200)"`), it **must be
-exported from both Go and TS** helper packages. Indicators that consume the
-family (MAMA, etc.) import and call this helper to build their own mnemonic
-suffix — duplicating the formatting logic per-consumer-indicator is a bug
-waiting to happen.
+exported from all languages** that implement the indicator family. Indicators
+that consume the family (MAMA, etc.) import and call this helper to build
+their own mnemonic suffix — duplicating the formatting logic per-consumer
+is a bug waiting to happen.
 
 Checklist when converting a consumer indicator:
 
-1. Does Go's helper package export a formatter used in the consumer's mnemonic?
-2. Does TS's helper export an equivalent function with the same name (camelCase)
-   and identical format string (e.g. `%.3f` ↔ `.toFixed(3)`)?
-3. If the TS equivalent is missing, **add it to the helper's common file** first,
+1. Does the reference language's helper package export a formatter used in the consumer's mnemonic?
+2. Does the target language export an equivalent function with the same name
+   (adjusted for casing) and identical format string?
+3. If the target equivalent is missing, **add it to the helper's common file** first,
    then import it from the consumer. Do not inline the format in the consumer.
 
 Reference: `estimatorMoniker` in
@@ -1482,11 +1589,11 @@ mirrors Go's `hilberttransformer.EstimatorMoniker`.
 
 ### Numerical Tolerance for Recursive / Cascaded Indicators
 
-The default test tolerance of `1e-12` (Go) / `1e-12` (TS) works for simple
-moving averages, single-stage EMAs, etc. Indicators that stack multiple
-recursive EMAs, Hilbert-transform feedback loops, or trigonometric feedback
-(MAMA, Hilbert-based cycle estimators, multi-stage T3) accumulate enough
-floating-point drift between Go and TS that `1e-12` is too tight.
+The default test tolerance of `1e-12` works for simple moving averages,
+single-stage EMAs, etc. Indicators that stack multiple recursive EMAs,
+Hilbert-transform feedback loops, or trigonometric feedback (MAMA,
+Hilbert-based cycle estimators, multi-stage T3) accumulate enough
+floating-point drift across languages that `1e-12` is too tight.
 
 **Use `1e-10`** as the tolerance for:
 
@@ -1502,8 +1609,17 @@ Keep `1e-12` / `1e-13` for purely additive/multiplicative indicators.
 
 After converting an indicator and registering its identifier and descriptor,
 add it to the **factory** so it can be created from a JSON identifier string
-and parameters at runtime. The factory lives at `indicators/factory/` in both
+and parameters at runtime. The factory lives at `indicators/factory/` in all
 languages (see the `indicator-architecture` skill for full details).
+
+Each language's implementation guide above includes factory registration steps:
+- Go: [Step 7](#go-step-7-register-the-indicator-type)
+- TypeScript: built into the conversion steps
+- Python: [Step 6](#step-6-register-in-the-factory)
+- Zig: [Step 7](#step-7-register-in-factory)
+- Rust: [Step 6](#step-6-register-in-factory-1)
+
+Below are the Go and TypeScript factory patterns (as the reference implementations):
 
 ### Go
 
@@ -1600,12 +1716,12 @@ cd ts && npx tsx cmd/icalc/main.ts cmd/icalc/settings.json
 
 ---
 
-## Python Porting Guide
+## Python Implementation Guide
 
-This section describes how to port an indicator from Go/TS to Python. The Python
-indicators port is **complete** (63 indicators, factory, frequency_response,
+This section describes how to implement an indicator in Python. The Python
+indicators module is **complete** (63 indicators, factory, frequency_response,
 icalc/ifres/iconf — 803 tests passing). Use this guide as reference for future
-indicators or for porting to Rust/Zig.
+indicators.
 
 ### Step 1: Create the folder structure
 
@@ -1816,29 +1932,15 @@ from ...common.exponential_moving_average.params import ExponentialMovingAverage
 
 ### Python ↔ Go/TS Name Mapping
 
-| Go | TypeScript | Python |
-|----|-----------|--------|
-| `Update(sample float64) float64` | `update(sample: number): number` | `update(self, sample: float) -> float` |
-| `IsPrimed() bool` | `isPrimed(): boolean` | `is_primed(self) -> bool` |
-| `Metadata() Metadata` | `metadata(): IndicatorMetadata` | `metadata(self) -> Metadata` |
-| `UpdateBar(*Bar) Output` | `updateBar(bar: Bar): Output` | `update_bar(self, sample: Bar) -> Output` |
-| `core.LineIndicator` (embedded) | `LineIndicator` (extended) | `LineIndicator` (composed via `self._line`) |
-| `core.BuildMetadata(...)` | `buildMetadata(...)` | `build_metadata(...)` |
-| `core.ComponentTripleMnemonic(...)` | `componentTripleMnemonic(...)` | `component_triple_mnemonic(...)` |
-| `core.OutputText{...}` | `{ mnemonic, description }` | `OutputText(mnemonic, description)` |
-| `entities.DefaultBarComponent` | `DefaultBarComponent` | `DEFAULT_BAR_COMPONENT` |
-| `entities.BarFunc` | `(bar: Bar) => number` | `Callable[[Bar], float]` |
-| `math.NaN()` | `NaN` | `math.nan` |
-| `math.IsNaN(x)` | `isNaN(x)` | `math.isnan(x)` |
-| `Params` struct | `params` interface | `@dataclass` class |
-| `DefaultParams()` | `defaultParams()` | `default_params()` |
+See the consolidated [Cross-Language Name Mapping](#cross-language-name-mapping)
+table in the Zig section below for the full 5-language comparison.
 
 ---
 
-## Zig Porting Guide
+## Zig Implementation Guide
 
-This section describes how to port an indicator from Go/TS to Zig. The Zig
-indicators port is **complete** (63 indicators, factory, frequency_response,
+This section describes how to implement an indicator in Zig. The Zig
+indicators module is **complete** (63 indicators, factory, frequency_response,
 icalc/ifres/iconf — 1014 tests passing). Use this guide as reference for future
 indicators.
 
@@ -2105,19 +2207,21 @@ const Identifier = indicators.Identifier;
 const buildMetadata = indicators.buildMetadata;
 const componentTripleMnemonic = indicators.componentTripleMnemonic;
 
-// Entities
-const bar_mod = @import("bar");
-const Bar = bar_mod.Bar;
-const BarComponent = bar_mod.BarComponent;
-const default_bar_component = bar_mod.default_bar_component;
-const barComponentValue = bar_mod.componentValue;
-
-const quote_mod = @import("quote");
-const Quote = quote_mod.Quote;
-// ... similar pattern
-
-const scalar_mod = @import("scalar");
-const Scalar = scalar_mod.Scalar;
+// Entities (via barrel)
+const entities = @import("entities");
+const Bar = entities.Bar;
+const BarComponent = entities.BarComponent;
+const default_bar_component = entities.default_bar_component;
+const barComponentValue = entities.barComponentValue;
+const Quote = entities.Quote;
+const QuoteComponent = entities.QuoteComponent;
+const default_quote_component = entities.default_quote_component;
+const quoteComponentValue = entities.quoteComponentValue;
+const Trade = entities.Trade;
+const TradeComponent = entities.TradeComponent;
+const default_trade_component = entities.default_trade_component;
+const tradeComponentValue = entities.tradeComponentValue;
+const Scalar = entities.Scalar;
 
 // Output types (when needed)
 const Band = indicators.Band;
@@ -2129,6 +2233,8 @@ const ema_mod = @import("../common/exponential_moving_average/exponential_moving
 ```
 
 ### Zig ↔ Go/TS/Python/Rust Name Mapping
+
+This is the consolidated **cross-language name mapping** table for all five languages:
 
 | Go | TypeScript | Python | Zig | Rust |
 |----|-----------|--------|-----|------|
@@ -2166,18 +2272,18 @@ const ema_mod = @import("../common/exponential_moving_average/exponential_moving
    as a field and pass it to `ArrayList`/`alloc` operations. Use `std.testing.allocator`
    in tests for automatic leak detection.
 
-6. **Build.zig module wiring** — Indicators import by build.zig module name
-   (`@import("bar")`), not file path (`@import("bar.zig")`). The barrel file
+6. **Build.zig module wiring** — Indicators import the `entities` barrel module
+   (`@import("entities")`), not individual entity modules. The barrel file
    re-exports everything; new indicators must be added to it.
 
 ---
 
-## Rust Porting Guide
+## Rust Implementation Guide
 
-This section describes how to port an indicator from Go/TS to Rust. The Rust
-indicators port is **complete** (67 indicators, factory, frequency_response,
+This section describes how to implement an indicator in Rust. The Rust
+indicators module is **complete** (67 indicators, factory, frequency_response,
 icalc/ifres/iconf — 985 tests passing). Use this guide as reference for future
-indicators or for porting to Zig.
+indicators.
 
 ### Step 1: Create the folder structure
 
@@ -2387,16 +2493,16 @@ Add to `rs/src/indicators/core/identifier.rs` and `rs/src/indicators/core/descri
 
 ```bash
 # Run all indicator tests:
-cd rust && cargo test --lib indicators
+cd rs && cargo test --lib indicators
 
 # Run a single indicator's tests:
-cd rust && cargo test --lib simple_moving_average
+cd rs && cargo test --lib simple_moving_average
 
 # Run factory tests:
-cd rust && cargo test --lib factory
+cd rs && cargo test --lib factory
 
 # Run icalc to verify factory integration:
-cd rust && cargo run --bin icalc -- path/to/settings.json
+cd rs && cargo run --bin icalc -- path/to/settings.json
 ```
 
 ### Rust Import Path Reference
@@ -2430,21 +2536,7 @@ use crate::indicators::core::outputs::polyline::{Polyline, Point};
 use crate::indicators::common::exponential_moving_average::{ExponentialMovingAverage, ExponentialMovingAverageLengthParams};
 ```
 
-### Rust ↔ Go/TS Name Mapping
+### Rust Name Mapping
 
-| Go | TypeScript | Python | Rust |
-|----|-----------|--------|------|
-| `Update(sample float64) float64` | `update(sample: number): number` | `update(self, sample: float) -> float` | `fn update(&mut self, sample: f64) -> f64` |
-| `IsPrimed() bool` | `isPrimed(): boolean` | `is_primed(self) -> bool` | `fn is_primed(&self) -> bool` |
-| `Metadata() Metadata` | `metadata(): IndicatorMetadata` | `metadata(self) -> Metadata` | `fn metadata(&self) -> Metadata` |
-| `UpdateBar(*Bar) Output` | `updateBar(bar: Bar): Output` | `update_bar(self, sample: Bar) -> Output` | `fn update_bar(&mut self, bar: &Bar) -> Output` |
-| `core.LineIndicator` (embedded) | `LineIndicator` (extended) | `LineIndicator` (composed via `self._line`) | Fields inlined (composition) |
-| `core.BuildMetadata(...)` | `buildMetadata(...)` | `build_metadata(...)` | `build_metadata(...)` |
-| `core.ComponentTripleMnemonic(...)` | `componentTripleMnemonic(...)` | `component_triple_mnemonic(...)` | `component_triple_mnemonic(...)` |
-| `core.OutputText{...}` | `{ mnemonic, description }` | `OutputText(mnemonic, description)` | `OutputText { mnemonic: "...", description: "..." }` |
-| `entities.DefaultBarComponent` | `DefaultBarComponent` | `DEFAULT_BAR_COMPONENT` | `DEFAULT_BAR_COMPONENT` |
-| `entities.BarFunc` | `(bar: Bar) => number` | `Callable[[Bar], float]` | `fn(&Bar) -> f64` |
-| `math.NaN()` | `NaN` | `math.nan` | `f64::NAN` |
-| `math.IsNaN(x)` | `isNaN(x)` | `math.isnan(x)` | `x.is_nan()` |
-| `Params` struct | `params` interface | `@dataclass` class | `struct` + `impl Default` |
-| `DefaultParams()` | `defaultParams()` | `default_params()` | `Default::default()` |
+See the consolidated [Cross-Language Name Mapping](#zig--gotstpythonrust-name-mapping)
+table in the Zig section above for the full 5-language comparison.

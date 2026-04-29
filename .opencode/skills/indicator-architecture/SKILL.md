@@ -75,22 +75,26 @@ indicators/
     └── composite-fractal-behavior/
 ```
 
-**Go: every author folder MUST contain a `doc.go`** that declares the
-parent package with a one-line godoc comment identifying the author:
+**Author-folder boilerplate by language:**
 
-```go
-// Package markjurik implements indicators developed by Mark Jurik.
-package markjurik
-```
+- **Go:** every author folder MUST contain a `doc.go` that declares the
+  parent package with a one-line godoc comment identifying the author:
+  ```go
+  // Package markjurik implements indicators developed by Mark Jurik.
+  package markjurik
+  ```
+  This is the only file at the author-folder level; all actual indicator
+  code lives in subpackages. The same rule applies to the special
+  folders `common` and `custom`. The `core` folder already contains
+  real framework code and needs no `doc.go`.
 
-This is the only file at the author-folder level; all actual indicator
-code lives in subpackages. The same rule applies to the special
-folders `common` (shared utilities across authors) and `custom`
-(zpano-specific indicators without a single author). The `core`
-folder already contains real framework code and needs no `doc.go`.
+- **Python:** every directory (author, indicator, core, outputs) MUST
+  contain an `__init__.py` file. Author-level `__init__.py` files are
+  empty. Indicator-level `__init__.py` files re-export the main class,
+  output enum, and params.
 
-TypeScript has no equivalent requirement (no package-level doc
-construct).
+- **TypeScript, Zig, Rust:** no equivalent requirement (no package-level
+  doc or init construct).
 
 ### Indicator Folders
 
@@ -305,16 +309,16 @@ so prefixing would stutter.
 
 For a `simple-moving-average/` folder:
 
-| Role                         | Go                              | TypeScript                              | Zig                                      |
-|------------------------------|---------------------------------|-----------------------------------------|------------------------------------------|
-| Main implementation          | `simplemovingaverage.go`        | `simple-moving-average.ts`              | `simple_moving_average.zig` (single file)|
-| Main test                    | `simplemovingaverage_test.go`   | `simple-moving-average.spec.ts`         | inline `test` blocks at bottom           |
-| Data-driven test (if split)  | `data_test.go`                  | `data.spec.ts`                          | —                                        |
-| Parameters                   | `params.go`                     | `params.ts`                             | inline struct in main file               |
-| Output enum                  | `output.go`                     | `output.ts`                             | inline enum in main file                 |
-| Output test                  | `output_test.go`                | `output.spec.ts`                        | —                                        |
-| Coefficients / helpers       | `coefficients.go`, `estimator.go` | `coefficients.ts`, `estimator.ts`     | `coefficients.zig`, `estimator.zig`      |
-| Package docs (Go only)       | `doc.go`                        | —                                       | —                                        |
+| Role                         | Go                              | TypeScript                              | Python                                   | Zig                                      | Rust                                     |
+|------------------------------|---------------------------------|-----------------------------------------|------------------------------------------|------------------------------------------|------------------------------------------|
+| Main implementation          | `simplemovingaverage.go`        | `simple-moving-average.ts`              | `simple_moving_average.py`               | `simple_moving_average.zig` (single file)| `simple_moving_average.rs` (single file) |
+| Main test                    | `simplemovingaverage_test.go`   | `simple-moving-average.spec.ts`         | `test_simple_moving_average.py`          | inline `test` blocks at bottom           | inline `#[cfg(test)]` at bottom          |
+| Data-driven test (if split)  | `data_test.go`                  | `data.spec.ts`                          | —                                        | —                                        | —                                        |
+| Parameters                   | `params.go`                     | `params.ts`                             | `params.py`                              | inline struct in main file               | inline in main file                      |
+| Output enum                  | `output.go`                     | `output.ts`                             | `output.py`                              | inline enum in main file                 | inline in main file                      |
+| Output test                  | `output_test.go`                | `output.spec.ts`                        | —                                        | —                                        | —                                        |
+| Coefficients / helpers       | `coefficients.go`, `estimator.go` | `coefficients.ts`, `estimator.ts`     | `coefficients.py`                        | `coefficients.zig`, `estimator.zig`      | inline in main file                      |
+| Package docs (Go only)       | `doc.go`                        | —                                       | `__init__.py` (re-exports)               | —                                        | `mod.rs` (re-exports)                    |
 
 **Exception:** when an auxiliary file holds a *concept* that would be
 meaningless outside the folder name (e.g., `hilberttransformer/` contains
@@ -363,122 +367,28 @@ long form:
   are kept, matching TA-Lib's C-source variable names for easier
   cross-reference.
 
-**Go↔TS parity:** the same identifier stem MUST be used in both languages.
-When porting, do not introduce new short forms; use the canonical long form
-from the table above.
+**Cross-language parity:** the same identifier stem MUST be used in all five
+languages. When porting, do not introduce new short forms; use the canonical
+long form from the table above.
 
-### Go Receiver Naming Convention
+### Go-Specific Conventions
 
-Method receivers follow a **type-shape rule**, not a one-letter-for-all rule:
+See the **Go Reference** section under Language-Specific Reference below for:
+Go Receiver Naming Convention, Concurrency / Lock Convention, Go Style
+Invariants, and Go Params: No JSON Tags.
 
-- **Compound type name** (2+ CamelCase words, e.g. `SimpleMovingAverage`,
-  `BarComponent`, `CycleEstimatorType`) → receiver is **`s`**
-  ("self"/"struct"). Short, consistent across all large types.
-- **Simple type name** (single word, e.g. `Momentum`, `Trade`, `Quote`) →
-  receiver is the **first letter of the type name, lowercased** (`m`, `t`,
-  `q`). Short types deserve short mnemonic receivers.
+### TypeScript-Specific Conventions
 
-All methods on a given type MUST use the same receiver name (enforced by
-`go vet`/consistency). When adding a method, match the receiver already in
-use on that type.
+See the **TypeScript Reference** section under Language-Specific Reference
+below for: TypeScript Import Conventions.
 
-**Local-variable collision:** if a method body needs a local variable that
-would shadow the receiver `s` (typical case: `s := someValue.String()` in
-`MarshalJSON`), rename the **local** to `str` (not the receiver). Example:
+### Cross-Language Local-Variable Parity
 
-```go
-func (s BarComponent) MarshalJSON() ([]byte, error) {
-    str := s.String()           // local renamed s → str
-    if str == unknown { ... }
-}
-```
-
-This keeps the receiver convention uniform; local names are flexible.
-
-### Concurrency / Lock Convention
-
-Stateful indicators (those exposing `Update(...)` that mutates internal
-fields) MUST guard reads and writes with a `sync.RWMutex`:
-
-- **Field:** `mu sync.RWMutex` (always named `mu`, always `RWMutex` —
-  never plain `sync.Mutex`).
-- **Writer methods** (`Update`, any mutator): acquire with
-  `s.mu.Lock(); defer s.mu.Unlock()` on the two lines immediately
-  following the function-signature brace (before any other logic).
-- **Reader methods** (`IsPrimed`, accessors that read mutable state):
-  use `s.mu.RLock(); defer s.mu.RUnlock()`.
-- **Never** unlock manually (non-deferred). Always pair Lock with
-  `defer Unlock` on the very next line.
-
-**Exceptions — indicators without a mutex:**
-
-1. **Pure delegating wrappers** that own no mutable state of their own
-   and forward all `Update`/read calls to an embedded indicator which
-   itself carries a mutex (e.g. `standarddeviation` wrapping
-   `variance`). The embedded indicator provides the lock.
-2. **Internal engines** that are not part of the public indicator
-   surface and are only consumed by higher-level wrappers which hold
-   the mutex (e.g. `corona` engine used by `coronaswingposition`,
-   `coronaspectrum`, `coronasignaltonoiseratio`, `coronatrendvigor`).
-
-Any new stateful public indicator MUST either carry its own `mu
-sync.RWMutex` following the pattern above or fall under one of the two
-exceptions.
-
-### Go Style Invariants (enforced across the codebase)
-
-The following idioms are invariants — audits return **zero** deviations
-and new code MUST respect them:
-
-- **Variable declarations.** No `var x T = zero-literal`, no split
-  `var x T` followed immediately by `x = expr`. Use either `var x T`
-  (zero value) or `x := expr`.
-- **Empty / nil tests.** Slice/map emptiness is not tested by
-  `len(x) == 0`; prefer direct ranging or `== nil` where the value is
-  nil-able. Error checks always use `err != nil`.
-- **Any.** Use `any`, never `interface{}`.
-- **Slice construction.** Use `[]T{}` or `make([]T, n)` /
-  `make([]T, 0, n)` — never `make([]T, 0)` (no capacity hint).
-- **`new`.** Not used; use composite literals (`&T{...}`).
-- **Imports.** Grouped by class with blank lines: stdlib, external,
-  `zpano/*`. Each group contains only one class.
-- **Doc comments.** Every exported `func`/`type`/`var`/`const`/method
-  has a leading `// Name ...` doc comment. Trivial stubs (e.g.
-  `passthrough.Update`) still get a one-line comment.
-
-### Go Params: No JSON Tags
-
-Go indicator params structs do **not** carry `json:"..."` struct tags. Go's
-`encoding/json` unmarshaler performs **case-insensitive** key matching by
-default, so JSON `"smoothingFactor"` matches Go field `SmoothingFactor`
-without explicit tags. Do not add JSON tags to params structs — they are
-unnecessary and would diverge from the established pattern.
-
-### TypeScript Import Conventions
-
-1. **No barrel files.** The TS indicators codebase does not use `index.ts`
-   barrel re-exports. All imports use **direct file paths** to the specific
-   module (e.g., `import { Foo } from '../common/simple-moving-average/simple-moving-average.js'`).
-
-2. **`.js` extensions in import paths.** TypeScript source files use `.js`
-   extensions in import specifiers (not `.ts`). This is required by the ESM
-   module resolution used in the project (`"type": "module"` in
-   `package.json`, `tsx` loader for tests/CLI).
-
-3. **Renamed imports for disambiguation.** When multiple indicators export
-   the same symbol name (e.g., every params file exports `defaultParams`),
-   use renamed imports:
-   ```typescript
-   import { defaultParams as defaultSmaParams } from '../common/simple-moving-average/params.js';
-   import { defaultParams as defaultEmaLengthParams } from '../common/exponential-moving-average/length-params.js';
-   ```
-   This pattern is used extensively in the factory.
-
-### Go ↔ TypeScript Local-Variable Parity
-
-The same indicator MUST use the **same local/field names** in both
-languages. When porting, copy the other language's names verbatim
-where semantically identical. Observed canonical vocabulary:
+The same indicator MUST use the **same local/field names** across all five
+languages (adapted to each language's casing convention: camelCase in Go/TS,
+snake_case in Python/Zig struct fields/Rust). When porting, copy the other
+language's names verbatim where semantically identical. Observed canonical
+vocabulary:
 
 | Concept                    | Canonical local name |
 |----------------------------|----------------------|
@@ -577,10 +487,11 @@ indicator's core `Update(sample) → value` function.
 Each concrete indicator is responsible for:
 
 1. **`Update(sample float64) float64`** (Go) / **`update(sample: number): number`** (TS) /
-   **`update(self, sample: float) -> float`** (Python) -- the core calculation logic.
+   **`update(self, sample: float) -> float`** (Python) / **`update(self: *T, sample: f64) f64`** (Zig) /
+   **`update(&mut self, sample: f64) -> f64`** (Rust) -- the core calculation logic.
 2. **`Metadata()`** / **`metadata()`** -- returns indicator-level metadata with
    an explicit per-indicator output enum (not a hardcoded `kind: 0`).
-3. **`IsPrimed()`** / **`isPrimed()`** / **`is_primed()`** -- whether the indicator has received
+3. **`IsPrimed()`** / **`isPrimed()`** / **`is_primed()`** / **`isPrimed()`** (Zig) / **`is_primed()`** (Rust) -- whether the indicator has received
    enough data to produce meaningful output.
 
 ### What LineIndicator Provides (Eliminating Boilerplate)
@@ -702,10 +613,96 @@ Python entity modules export standalone functions `bar_component_value()`,
 `Callable[[Bar], float]` (etc.), and constants `DEFAULT_BAR_COMPONENT`,
 `DEFAULT_QUOTE_COMPONENT`, `DEFAULT_TRADE_COMPONENT`.
 
+### Zig Implementation
+
+In Zig, `LineIndicator` is used via **composition** (stored as a field). The concrete
+indicator stores a `line: LineIndicator` field and delegates entity extraction:
+
+```zig
+pub const LineIndicator = struct {
+    mnemonic: []const u8,
+    description: []const u8,
+    bar_func: BarFunc,
+    quote_func: QuoteFunc,
+    trade_func: TradeFunc,
+
+    pub fn new(mnemonic, description, bc, qc, tc) LineIndicator { ... }
+    pub fn extractBar(self: *const LineIndicator, bar: Bar) f64 { ... }
+    pub fn wrapScalar(self: *const LineIndicator, time: i64, value: f64) OutputArray { ... }
+};
+```
+
+Single-output indicators store `line: LineIndicator` and delegate entity extraction:
+```zig
+pub fn updateBar(self: *SuperSmoother, bar: Bar) OutputArray {
+    const sample = self.line.extractBar(bar);
+    const value = self.update(sample);
+    return self.line.wrapScalar(bar.time, value);
+}
+```
+
+The Zig `Indicator` interface uses a manually-constructed **vtable** for type erasure:
+
+```zig
+pub const Indicator = struct {
+    ptr: *anyopaque,
+    vtable: *const VTable,
+
+    const VTable = struct {
+        isPrimed: *const fn (*anyopaque) bool,
+        metadata: *const fn (*anyopaque, *Metadata) void,
+        updateScalar: *const fn (*anyopaque, Scalar) OutputArray,
+        updateBar: *const fn (*anyopaque, Bar) OutputArray,
+        updateQuote: *const fn (*anyopaque, Quote) OutputArray,
+        updateTrade: *const fn (*anyopaque, Trade) OutputArray,
+    };
+
+    pub fn GenVTable(comptime T: type) VTable { ... }
+};
+```
+
+Each concrete indicator exposes an `indicator()` method returning this interface:
+```zig
+const vtable = Indicator.GenVTable(SimpleMovingAverage);
+pub fn indicator(self: *SimpleMovingAverage) Indicator {
+    return .{ .ptr = self, .vtable = &vtable };
+}
+```
+
+### Rust Implementation
+
+In Rust, `LineIndicator` is used via **composition** (stored as a field), similar to
+Python. Due to borrow-checker constraints, the update pattern extracts the component
+value first, then calls `self.update()`:
+
+```rust
+pub trait Indicator {
+    fn update(&mut self, sample: f64) -> f64;
+    fn is_primed(&self) -> bool;
+    fn metadata(&self) -> Metadata;
+    fn update_bar(&mut self, bar: &Bar) -> Vec<Box<dyn std::any::Any>>;
+    fn update_quote(&mut self, quote: &Quote) -> Vec<Box<dyn std::any::Any>>;
+    fn update_trade(&mut self, trade: &Trade) -> Vec<Box<dyn std::any::Any>>;
+}
+```
+
+`Output` is `Vec<Box<dyn std::any::Any>>`, downcast by callers.
+
+The update pattern cannot use a closure delegation because the closure would borrow
+`self` while `self.line` is already borrowed:
+
+```rust
+fn update_bar(&mut self, bar: &Bar) -> Vec<Box<dyn std::any::Any>> {
+    let sample = (self.bar_func)(bar);
+    let value = self.update(sample);
+    vec![Box::new(Scalar::new(bar.time, value))]
+}
+```
+
 ### Per-Indicator Output Enums
 
 Each indicator defines its own output enum describing what it produces. The
-naming convention is **language-asymmetric** because the two languages scope
+naming convention is **language-asymmetric** because the languages scope
 symbols differently:
 
 - **Go**: use bare `Output` / `Value`. The package name
@@ -717,6 +714,10 @@ symbols differently:
   call sites.
 - **Python**: use long-form `<IndicatorName>Output` (same as TS). `IntEnum`
   starting at 0 with `UPPER_SNAKE_CASE` members.
+- **Zig**: use long-form `<IndicatorName>Output`. `enum(u8)` **1-based** with
+  `snake_case` members.
+- **Rust**: use long-form `<IndicatorName>Output`. `#[repr(u8)]` **1-based**
+  with `PascalCase` members.
 
 ```go
 // Go — file: simplemovingaverage/output.go
@@ -740,6 +741,32 @@ export enum SimpleMovingAverageOutput {
 class SimpleMovingAverageOutput(IntEnum):
     VALUE = 0
 ```
+
+```zig
+// Zig — simple_moving_average/simple_moving_average.zig
+pub const SimpleMovingAverageOutput = enum(u8) {
+    value = 1,
+};
+```
+
+```rust
+// Rust — simple_moving_average/simple_moving_average.rs
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u8)]
+pub enum SimpleMovingAverageOutput {
+    Value = 1,
+}
+```
+
+**Cross-language output enum summary:**
+
+| Language | Enum start | Naming style | Example |
+|----------|-----------|--------------|---------|
+| Go | 0 (`iota`) | Bare `Output` / bare concept names (pkg scoped) | `simplemovingaverage.Value` |
+| TypeScript | 0 | `<IndicatorName>Output`, PascalCase members | `SimpleMovingAverageOutput.SimpleMovingAverageValue` |
+| Python | 0 | `<IndicatorName>Output`, UPPER_SNAKE_CASE members | `SimpleMovingAverageOutput.VALUE` |
+| Zig | 1 | `<IndicatorName>Output` enum(u8), snake_case members | `SimpleMovingAverageOutput.value` |
+| Rust | 1 | `<IndicatorName>Output` #[repr(u8)], PascalCase members | `SimpleMovingAverageOutput::Value` |
 
 For multi-output indicators, strip the indicator-name prefix on the Go side
 and keep the descriptive suffix:
@@ -796,6 +823,10 @@ In practice, **indicators never construct `Metadata` object literals directly**.
 They call `core.BuildMetadata` (Go) / `buildMetadata` (TS), which pulls `kind`
 and `shape` from the descriptor registry. See the Taxonomy section below.
 
+This pattern is the same across all five languages. The helper function name
+varies: `core.BuildMetadata` (Go), `buildMetadata` (TS), `build_metadata`
+(Python), `buildMetadata` (Zig), `build_metadata` (Rust).
+
 ### Mnemonic Prefix Convention
 
 Every indicator is identified by a short lowercase **mnemonic prefix** (e.g.
@@ -809,8 +840,8 @@ TypeScript, because downstream tooling keys off them.
    `+dm`, `-dm`).
 2. **Kept short** — typically 2-7 chars. The mnemonic is a compact label, not a
    full name; the full name goes in `description`.
-3. **Go ↔ TS parity.** The same prefix must appear on both sides. When adding
-   an indicator, add its prefix to both languages in the same PR.
+3. **Cross-language parity.** The same prefix must appear in all five languages.
+   When adding an indicator, add its prefix to all languages simultaneously.
 4. **Format.** `<prefix>(<param1>, <param2>, ...<componentSuffix>)` where the
    component suffix comes from `ComponentTripleMnemonic` (empty when all
    components are at their default).
@@ -961,6 +992,16 @@ mnemonic := fmt.Sprintf("sma(%d%s)", length,
 This means that `sma(14)` is the mnemonic whether the user left `BarComponent`
 as zero or explicitly set it to `BarClosePrice` — both produce the same
 indicator with the same mnemonic.
+
+**Cross-language sentinel patterns:**
+
+| Language | "Not set" representation | Resolution |
+|----------|------------------------|------------|
+| Go | `0` (zero value of int-based enum) | `if bc == 0 { bc = DefaultBarComponent }` |
+| TypeScript | `undefined` (optional field) | `=== undefined` check in LineIndicator setter |
+| Python | `None` (`Optional[BarComponent]`) | `if bc is None: bc = DEFAULT_BAR_COMPONENT` |
+| Zig | `null` (`?BarComponent`) | `bc orelse default_bar_component` |
+| Rust | `None` (`Option<BarComponent>`) | `bc.unwrap_or(DEFAULT_BAR_COMPONENT)` |
 
 #### ComponentTripleMnemonic Function
 
@@ -1127,6 +1168,9 @@ export function createEstimator(
 
 The dispatcher must have a default variant (when `type` is omitted) and throw
 on unknown types.
+
+Python, Zig, and Rust follow the same dispatcher pattern with language-idiomatic
+syntax. See the per-language reference sections below for specifics.
 
 ### Shared Interface Design
 
@@ -1534,10 +1578,10 @@ Add `DefaultParams()` / `defaultParams()` to the params file as part of the
 standard indicator creation checklist. The function should be present from day
 one, not added retroactively.
 
-## Python / Zig / Rust Porting Conventions
+## Language-Specific Reference
 
-This section documents decisions for porting the indicators module from Go/TS
-to Python, Zig, and Rust. It is updated incrementally as porting progresses.
+This section documents language-specific conventions for each implementation.
+All five ports are complete and produce identical results.
 
 ### Component Sentinel Pattern
 
@@ -1553,6 +1597,117 @@ types for the "not set" sentinel:
 | **Zig** | `?BarComponent` | `null` | `bc orelse default_bar_component` |
 | **Rust** | `Option<BarComponent>` | `None` | `bc.unwrap_or(DEFAULT_BAR_COMPONENT)` |
 
+### Go Reference
+
+#### Receiver Naming Convention
+
+Method receivers follow a **type-shape rule**, not a one-letter-for-all rule:
+
+- **Compound type name** (2+ CamelCase words, e.g. `SimpleMovingAverage`,
+  `BarComponent`, `CycleEstimatorType`) → receiver is **`s`**
+  ("self"/"struct"). Short, consistent across all large types.
+- **Simple type name** (single word, e.g. `Momentum`, `Trade`, `Quote`) →
+  receiver is the **first letter of the type name, lowercased** (`m`, `t`,
+  `q`). Short types deserve short mnemonic receivers.
+
+All methods on a given type MUST use the same receiver name (enforced by
+`go vet`/consistency). When adding a method, match the receiver already in
+use on that type.
+
+**Local-variable collision:** if a method body needs a local variable that
+would shadow the receiver `s` (typical case: `s := someValue.String()` in
+`MarshalJSON`), rename the **local** to `str` (not the receiver). Example:
+
+```go
+func (s BarComponent) MarshalJSON() ([]byte, error) {
+    str := s.String()           // local renamed s → str
+    if str == unknown { ... }
+}
+```
+
+This keeps the receiver convention uniform; local names are flexible.
+
+#### Concurrency / Lock Convention
+
+Stateful indicators (those exposing `Update(...)` that mutates internal
+fields) MUST guard reads and writes with a `sync.RWMutex`:
+
+- **Field:** `mu sync.RWMutex` (always named `mu`, always `RWMutex` —
+  never plain `sync.Mutex`).
+- **Writer methods** (`Update`, any mutator): acquire with
+  `s.mu.Lock(); defer s.mu.Unlock()` on the two lines immediately
+  following the function-signature brace (before any other logic).
+- **Reader methods** (`IsPrimed`, accessors that read mutable state):
+  use `s.mu.RLock(); defer s.mu.RUnlock()`.
+- **Never** unlock manually (non-deferred). Always pair Lock with
+  `defer Unlock` on the very next line.
+
+**Exceptions — indicators without a mutex:**
+
+1. **Pure delegating wrappers** that own no mutable state of their own
+   and forward all `Update`/read calls to an embedded indicator which
+   itself carries a mutex (e.g. `standarddeviation` wrapping
+   `variance`). The embedded indicator provides the lock.
+2. **Internal engines** that are not part of the public indicator
+   surface and are only consumed by higher-level wrappers which hold
+   the mutex (e.g. `corona` engine used by `coronaswingposition`,
+   `coronaspectrum`, `coronasignaltonoiseratio`, `coronatrendvigor`).
+
+Any new stateful public indicator MUST either carry its own `mu
+sync.RWMutex` following the pattern above or fall under one of the two
+exceptions.
+
+#### Style Invariants (enforced across the codebase)
+
+The following idioms are invariants — audits return **zero** deviations
+and new code MUST respect them:
+
+- **Variable declarations.** No `var x T = zero-literal`, no split
+  `var x T` followed immediately by `x = expr`. Use either `var x T`
+  (zero value) or `x := expr`.
+- **Empty / nil tests.** Slice/map emptiness is not tested by
+  `len(x) == 0`; prefer direct ranging or `== nil` where the value is
+  nil-able. Error checks always use `err != nil`.
+- **Any.** Use `any`, never `interface{}`.
+- **Slice construction.** Use `[]T{}` or `make([]T, n)` /
+  `make([]T, 0, n)` — never `make([]T, 0)` (no capacity hint).
+- **`new`.** Not used; use composite literals (`&T{...}`).
+- **Imports.** Grouped by class with blank lines: stdlib, external,
+  `zpano/*`. Each group contains only one class.
+- **Doc comments.** Every exported `func`/`type`/`var`/`const`/method
+  has a leading `// Name ...` doc comment. Trivial stubs (e.g.
+  `passthrough.Update`) still get a one-line comment.
+
+#### Params: No JSON Tags
+
+Go indicator params structs do **not** carry `json:"..."` struct tags. Go's
+`encoding/json` unmarshaler performs **case-insensitive** key matching by
+default, so JSON `"smoothingFactor"` matches Go field `SmoothingFactor`
+without explicit tags. Do not add JSON tags to params structs — they are
+unnecessary and would diverge from the established pattern.
+
+### TypeScript Reference
+
+#### Import Conventions
+
+1. **No barrel files.** The TS indicators codebase does not use `index.ts`
+   barrel re-exports. All imports use **direct file paths** to the specific
+   module (e.g., `import { Foo } from '../common/simple-moving-average/simple-moving-average.js'`).
+
+2. **`.js` extensions in import paths.** TypeScript source files use `.js`
+   extensions in import specifiers (not `.ts`). This is required by the ESM
+   module resolution used in the project (`"type": "module"` in
+   `package.json`, `tsx` loader for tests/CLI).
+
+3. **Renamed imports for disambiguation.** When multiple indicators export
+   the same symbol name (e.g., every params file exports `defaultParams`),
+   use renamed imports:
+   ```typescript
+   import { defaultParams as defaultSmaParams } from '../common/simple-moving-average/params.js';
+   import { defaultParams as defaultEmaLengthParams } from '../common/exponential-moving-average/length-params.js';
+   ```
+   This pattern is used extensively in the factory.
+
 ### Folder Naming (repeated from above for completeness)
 
 | Language | Author folder | Indicator folder | File naming |
@@ -1561,7 +1716,7 @@ types for the "not set" sentinel:
 | **Zig** | `mark_jurik/` | `jurik_moving_average/` | `snake_case.zig`, tests at bottom of source |
 | **Rust** | `mark_jurik/` | `jurik_moving_average/` | `snake_case.rs`, tests in `#[cfg(test)]` at bottom |
 
-### Python-Specific Conventions
+### Python Reference
 
 Python indicators live under `py/indicators/`. The Python port is **complete** (63 indicators,
 factory, frequency_response, icalc/ifres/iconf cmd tools — 803 tests passing).
@@ -1767,7 +1922,7 @@ Three CLI tools at `py/cmd/{icalc,ifres,iconf}/`:
 Python indicators have no mutex/lock equivalent (unlike Go's `sync.RWMutex`).
 The indicators are not thread-safe by design.
 
-### Zig-Specific Conventions
+### Zig Reference
 
 The Zig port is **complete**: 63 indicators, factory, frequency_response,
 icalc/ifres/iconf CLI tools — 1014 tests passing.
@@ -2090,7 +2245,7 @@ a `FrequencyResponse` struct with 7 allocated `[]f64` components.
 Used by the `ifres` CLI tool. The tool wraps indicators in an updater that
 implements the `Updater` interface expected by `frequency_response.calculate()`.
 
-### Rust-Specific Conventions
+### Rust Reference
 
 The Rust port is **complete**: 67 indicators, factory, frequency_response, icalc/ifres/iconf — 985 tests passing.
 

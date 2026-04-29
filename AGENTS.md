@@ -8,10 +8,10 @@ Multi-language financial library (Python, Go, TypeScript, Zig, Rust) implementin
 3. **Performance Metrics** — Portfolio performance ratios (Sharpe, Sortino, Omega, Kappa, Calmar, Sterling, Burke, Pain, Ulcer, Martin, etc.).
 4. **Roundtrips** — Trading round-trip tracking with execution matching, PnL computation (gross/net, long/short), and 100+ incremental performance statistics (ROI, Sharpe, Sortino, Calmar, drawdowns, MAE/MFE, efficiency, consecutive streaks, duration analytics).
 5. **Symbology** — Financial security identifier validation (ISIN, CUSIP, SEDOL) with check digit calculation and validation, country code verification, and SEC 13F workaround support.
-6. **Indicators** — 63 technical analysis indicators (SMA, EMA, RSI, MACD, Bollinger Bands, etc.) organized by author, with a shared `core/` framework providing the `Indicator` interface, `LineIndicator` base, metadata, descriptor registry, output types, and frequency response utilities. Currently implemented in Go and TypeScript only; Python, Zig, and Rust ports are planned. See the `indicator-architecture` skill for the full design reference.
-7. **Cmd** — Three CLI tools (`icalc`, `iconf`, `ifres`) that exercise the indicators module: indicator calculation against 252-bar reference data, chart configuration generation, and frequency response analysis. Currently implemented in Go and TypeScript only.
+6. **Indicators** — 63 technical analysis indicators (SMA, EMA, RSI, MACD, Bollinger Bands, etc.) organized by author, with a shared `core/` framework providing the `Indicator` interface, `LineIndicator` base, metadata, descriptor registry, output types, and frequency response utilities. Implemented in all five languages (Go, TypeScript, Python, Zig, Rust). See the `indicator-architecture` skill for the full design reference.
+7. **Cmd** — Three CLI tools (`icalc`, `iconf`, `ifres`) that exercise the indicators module: indicator calculation against 252-bar reference data, chart configuration generation, and frequency response analysis. Implemented in all five languages.
 
-Go and TypeScript are the reference implementations for modules 6 and 7. Python is the reference for modules 1–5. All ports must match reference output to 13+ decimal places. The `laptop/` directory is an older working copy; prefer editing files under `py/`, `go/`, `ts/`, `zig/`, and `rs/`. The `performatce/` directory name is an intentional typo — do not rename it.
+Go and TypeScript are the reference implementations for modules 6 and 7; Python, Zig, and Rust implementations are complete and must match reference output to 13+ decimal places. Python is the reference for modules 1–5. All ports must match reference output to 13+ decimal places. The `laptop/` directory is an older working copy; prefer editing files under `py/`, `go/`, `ts/`, `zig/`, and `rs/`. The `performatce/` directory name is an intentional typo — do not rename it.
 
 ## Build / Lint / Test Commands
 
@@ -84,6 +84,12 @@ py/performatce/          — periodicity.py, ratios.py, tests (typo is intention
 py/roundtrips/           — execution.py, side.py, matching.py, grouping.py, roundtrip.py, performance.py, tests
 py/symbology/            — isin.py, cusip.py, sedol.py, tests
 py/entities/             — bar.py, quote.py, trade.py, scalar.py, bar_component.py, quote_component.py, trade_component.py, tests
+py/indicators/           — 63 indicators organized by author (common/, john_ehlers/, welles_wilder/, etc.)
+py/indicators/core/      — shared types: indicator.py, line_indicator.py, identifier.py, metadata.py, descriptor.py, outputs/, frequency_response/
+py/indicators/factory/   — identifier + JSON params → indicator instance
+py/cmd/icalc/            — CLI indicator calculator
+py/cmd/iconf/            — CLI chart configuration generator
+py/cmd/ifres/            — CLI frequency response calculator
 go/daycounting/          — daycounting.go, fractional.go, conventions/ subpackage
 go/performance/          — periodicity.go, ratios.go
 go/roundtrips/           — execution.go, side.go, matching.go, grouping.go, roundtrip.go, performance.go, tests
@@ -110,13 +116,25 @@ zig/src/daycounting/     — conventions.zig, daycounting.zig, fractional.zig
 zig/src/performance/     — periodicity.zig, ratios.zig
 zig/src/roundtrips/      — execution.zig, side.zig, matching.zig, grouping.zig, roundtrip.zig, performance.zig
 zig/src/symbology/       — isin.zig, cusip.zig, sedol.zig
-zig/src/entities/        — bar.zig, quote.zig, trade.zig, scalar.zig, bar_component.zig, quote_component.zig, trade_component.zig
-zig/build.zig            — build config: 21 modules, 21 test targets
+zig/src/entities/        — bar.zig, quote.zig, trade.zig, scalar.zig, bar_component.zig, quote_component.zig, trade_component.zig, entities.zig (barrel)
+zig/src/indicators/      — 63 indicators organized by author (common/, john_ehlers/, welles_wilder/, etc.)
+zig/src/indicators/core/ — shared types: indicator.zig, line_indicator.zig, identifier.zig, metadata.zig, descriptor.zig, outputs/, frequency_response/
+zig/src/indicators/factory/ — identifier + JSON params → indicator instance
+zig/src/cmd/icalc/       — CLI indicator calculator
+zig/src/cmd/iconf/       — CLI chart configuration generator
+zig/src/cmd/ifres/       — CLI frequency response calculator
+zig/build.zig            — build config
 rs/src/daycounting/      — conventions.rs, daycounting.rs, fractional.rs
 rs/src/performance/      — periodicity.rs, ratios.rs
 rs/src/roundtrips/       — mod.rs, execution.rs, side.rs, matching.rs, grouping.rs, roundtrip.rs, performance.rs
 rs/src/symbology/        — mod.rs, isin.rs, cusip.rs, sedol.rs
 rs/src/entities/         — mod.rs, bar.rs, quote.rs, trade.rs, scalar.rs, bar_component.rs, quote_component.rs, trade_component.rs
+rs/src/indicators/       — 67 indicators organized by author (common/, john_ehlers/, welles_wilder/, etc.)
+rs/src/indicators/core/  — shared types: indicator.rs, line_indicator.rs, identifier.rs, metadata.rs, descriptor.rs, outputs/, frequency_response/
+rs/src/indicators/factory/ — identifier + JSON params → indicator instance
+rs/src/cmd/icalc/        — CLI indicator calculator
+rs/src/cmd/iconf/        — CLI chart configuration generator
+rs/src/cmd/ifres/        — CLI frequency response calculator
 rs/Cargo.toml            — minimal config, zero external deps
 laptop/                  — older working copy, do not prefer
 readme/performance/      — R validation scripts, reference PDFs, CSV data, SVG charts
@@ -154,7 +172,7 @@ readme/performance/      — R validation scripts, reference PDFs, CSV data, SVG
 - `ArrayList(f64)` uses the Zig 0.16 unmanaged API: init with `.empty`, pass allocator to `.append(self.allocator, item)`, `.deinit(self.allocator)`, `.appendSlice(self.allocator, items)`. `.clearRetainingCapacity()` takes no allocator.
 - The `Ratios` struct stores `allocator: std.mem.Allocator` and passes it to all ArrayList operations.
 - Tests live at the bottom of source files. Use `test "descriptive name" { ... }` blocks. Assertions: `try std.testing.expect(almostEqual(...))`, `try std.testing.expectEqual(expected, actual)`. Use `testing.allocator` with `defer obj.deinit()`.
-- Build.zig defines 21 modules with a dependency graph: `conventions` (no deps) -> `daycounting` -> `fractional`; `periodicity` (no deps); `ratios` (depends on all four); `execution` (depends on `fractional`); `side`, `matching`, `grouping` (no deps); `roundtrip` (depends on `execution`, `side`, `fractional`); `performance` (depends on `roundtrip`, `execution`, `side`, `fractional`); `isin`, `cusip`, `sedol` (no deps, standalone symbology modules); `bar`, `quote`, `trade`, `scalar`, `bar_component` (depends on `bar`), `quote_component` (depends on `quote`), `trade_component` (depends on `trade`) (standalone entities modules).
+- Build.zig defines 21+ modules with a dependency graph: `conventions` (no deps) -> `daycounting` -> `fractional`; `periodicity` (no deps); `ratios` (depends on all four); `execution` (depends on `fractional`); `side`, `matching`, `grouping` (no deps); `roundtrip` (depends on `execution`, `side`, `fractional`); `performance` (depends on `roundtrip`, `execution`, `side`, `fractional`); `isin`, `cusip`, `sedol` (no deps, standalone symbology modules); `bar`, `quote`, `trade`, `scalar`, `bar_component` (depends on `bar`), `quote_component` (depends on `quote`), `trade_component` (depends on `trade`) (standalone entities modules); `entities` (barrel, depends on all entity modules); `indicators` (depends on `entities`).
 - Modules are registered with `b.addModule()` and tests with `b.createModule()` + `b.addTest(.{ .root_module = mod })`.
 
 ### Rust
@@ -164,7 +182,7 @@ readme/performance/      — R validation scripts, reference PDFs, CSV data, SVG
 - `DateTime` struct with fields `year: i32, month: i32, day: i32, hour: i32, minute: i32, second: i32`.
 - Tests live in `#[cfg(test)] mod tests { ... }` at the bottom of source files. Helper `almost_equal(a, b, epsilon)` with `epsilon = 1e-14` (daycounting) or `1e-13` (ratios).
 - Zero external dependencies. All math uses `f64` methods (`.ln()`, `.sqrt()`, `.powf()`, `.abs()`, `.cbrt()`).
-- Module structure: `daycounting`, `performance`, `roundtrips`, `symbology`, and `entities` as submodules of the `portf` crate, each with `mod.rs` re-exporting contents.
+- Module structure: `daycounting`, `performance`, `roundtrips`, `symbology`, `entities`, and `indicators` as submodules of the `zpano` crate, each with `mod.rs` re-exporting contents.
 
 ## Cross-Language Rules
 
@@ -243,7 +261,7 @@ Key behavioral details:
 - **Test data volume**: ISIN ~815 cases (validate ~260, check digit ~274, country ~280), CUSIP ~4475 cases, SEDOL ~3249 cases — all ported identically across all five languages.
 
 ### Indicators Module
-63 technical analysis indicators organized by author, with a shared `core/` framework. Currently implemented in **Go and TypeScript only**; Python, Zig, and Rust ports are planned.
+63 technical analysis indicators organized by author, with a shared `core/` framework. Implemented in all five languages (Go, TypeScript, Python, Zig, Rust).
 
 See the `indicator-architecture` skill for the full design reference including:
 - Folder layout and naming conventions per language
@@ -253,15 +271,15 @@ See the `indicator-architecture` skill for the full design reference including:
 - Concurrency/lock conventions (Go)
 - 72 registered identifiers, 63 concrete implementations across 19 author-based families
 
-Key points for porting:
+Key design points:
 - **LineIndicator** is the base for most indicators. It routes `updateBar/Quote/Trade` to a core `update(sample)` method via stored component functions from the entities module.
 - **Descriptor registry** classifies each indicator by role, pane, shape, adaptivity, input requirement, and volume usage. `BuildMetadata` pulls kind/shape from this registry.
 - **Factory** maps `Identifier` + JSON params → indicator instance. Depends on all individual indicators.
 - **Frequency response** computes spectral characteristics of filters. Used by spectrum indicators and the `ifres` CLI tool.
-- **Component sentinel pattern**: Go uses zero-value (`if bc == 0`), TS uses `undefined`. For py/zig/rust ports, use `Optional`/`Option`/`?T` with `None`/`null` as the sentinel. See the `entities-architecture` skill for the cross-language mapping.
+- **Component sentinel pattern**: Go uses zero-value (`if bc == 0`), TS uses `undefined`, Python uses `Optional[T]` with `None`, Zig uses `?T` with `null`, Rust uses `Option<T>` with `None`. See the `entities-architecture` skill for the cross-language mapping.
 
 ### Cmd Module
-Three CLI tools exercising the indicators module. Currently implemented in **Go and TypeScript only**.
+Three CLI tools exercising the indicators module. Implemented in all five languages.
 
 1. **icalc** — Indicator calculator. Reads JSON settings, creates indicators via factory, feeds embedded 252-bar test data, prints metadata + per-bar output values.
 2. **iconf** — Chart configuration generator. Same input as icalc but outputs JSON + TypeScript chart configuration with lines/bands/heatmaps for an OHLCV chart component.
@@ -283,8 +301,8 @@ All commands run from the project root (`~/repos/zpano/`).
 | **Python** | Python 3.10+, `numpy`, `scipy`, symlink `ln -sf py accounts`, `touch py/__init__.py` | `PYTHONPATH=. python3 -m unittest discover -s py -p "test_*.py" -t .` | 339 tests |
 | **Go** | Go 1.26+ | `cd go && go test ./...&& cd ..`| 84 packages OK |
 | **TypeScript** | Node.js 20+, TypeScript 5.3+, Jasmine 5.1+ | `cd ts && npm install && npm test && cd ..` | 8935 specs |
-| **Zig** | Zig 0.16.0-dev | `cd zig && zig build test --summary all && cd ..` | 367 tests |
-| **Rust** | Rust 1.75.0+ (apt) | `cd rs && cargo test && cd ..` | 342 tests |
+| **Zig** | Zig 0.16.0-dev | `cd zig && zig build test --summary all && cd ..` | 1014 tests |
+| **Rust** | Rust 1.75.0+ (apt) | `cd rs && cargo test && cd ..` | 985 tests |
 
 ```bash
 python3 -m unittest discover -s py -p "test_*.py" -t .
