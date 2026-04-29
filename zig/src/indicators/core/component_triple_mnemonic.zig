@@ -1,8 +1,10 @@
-const bar_component = @import("bar_component");
-const quote_component = @import("quote_component");
-const trade_component = @import("trade_component");
 
 /// Builds a mnemonic suffix from bar, quote and trade components.
+
+const entities = @import("entities");
+const bar_component = entities.bar_component;
+const quote_component = entities.quote_component;
+const trade_component = entities.trade_component;
 ///
 /// A component equal to its default is omitted. For example, if the bar
 /// component is Median (non-default), the result is ", hl/2". If the bar

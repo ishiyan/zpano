@@ -6,8 +6,9 @@
 /// outputs on each iteration.
 const std = @import("std");
 const indicators = @import("indicators");
-const Bar = @import("bar").Bar;
-const Scalar = @import("scalar").Scalar;
+const entities = @import("entities");
+const Bar = entities.Bar;
+const Scalar = entities.Scalar;
 
 const Io = std.Io;
 const Identifier = indicators.identifier.Identifier;

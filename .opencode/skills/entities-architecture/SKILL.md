@@ -18,6 +18,22 @@ architecture skill.
 The entities module defines four data types for financial trading data, three
 component enums for field extraction, and supporting utilities.
 
+### Module Root / Barrel Files
+
+Each language provides a root file that re-exports all entity types:
+
+| Language | Root file | Pattern |
+|----------|-----------|---------|
+| **Go** | *(implicit — package-level exports)* | `entities.Bar`, `entities.Quote`, etc. |
+| **TypeScript** | *(no barrel — import from individual files)* | `import { Bar } from './bar'` |
+| **Python** | `__init__.py` | Re-exports all 4 types + 3 component modules |
+| **Zig** | `entities.zig` | `pub const bar = @import("bar")` + convenience aliases (`Bar`, `Scalar`, etc.) |
+| **Rust** | `mod.rs` | `pub mod bar; pub mod quote;` etc. (no type aliases) |
+
+The Zig `entities.zig` barrel mirrors the `indicators/indicators.zig` pattern:
+CLIs import `const entities = @import("entities")` and use `entities.Bar`,
+`entities.Scalar`, etc.
+
 ### Entity Types
 
 | Type | Fields | Computed Methods |
@@ -61,45 +77,53 @@ Each component has two display representations:
 | **Full name** (JSON, debug) | `String()` / `str()` | `"close"` | Go: `"unknown"`, others: N/A (exhaustive) |
 | **Short code** (chart labels) | `Mnemonic()` / mnemonic function | `"c"` | Go: `"unknown"`, Py: `"??"` |
 
-### TS-Only Types
+### Language-Specific Types (Do Not Port)
 
-TypeScript defines two additional types not present in other languages:
+The following types exist only in Go or TypeScript. They are either dead code
+or indicators-module infrastructure that will be handled separately when/if
+those modules are ported. **Do not port these to py/zig/rs as part of entities.**
 
-- **`TemporalEntityKind`** — string enum (`'bar'`, `'quote'`, `'trade'`,
-  `'scalar'`) used for runtime type discrimination.
-- **`TemporalEntity`** — union type `Bar | Scalar | Quote | Trade`.
+**Dead code** (unused anywhere — not by indicators, cmd, or tests of other modules):
 
-### Go-Only Types
+- **`Temporal`** interface (Go) — `DateTime() time.Time`, never implemented by
+  any entity struct, never referenced outside its definition file.
+- **`TemporalEntityKind`** (TS) — string enum (`'bar'`, `'quote'`, `'trade'`,
+  `'scalar'`), never imported by indicators or cmd.
+- **`TemporalEntity`** (TS) — union type `Bar | Scalar | Quote | Trade`,
+  never imported by indicators or cmd.
 
-Go defines additional types not needed in other languages:
+**Indicators infrastructure** (used by Go indicators/cmd, port with indicators):
 
-- **`Temporal`** interface (`DateTime() time.Time`) — currently unimplemented
-  by any entity struct; treat as reserved for future use.
-- **JSON marshal/unmarshal** on component enums — Go-specific serialization
-  concern; not ported to other languages.
-- **`IsKnown()`** on component enums — unnecessary in languages with
-  exhaustive pattern matching (Zig, Rust).
+- **JSON marshal/unmarshal** on component enums — supports the JSON-based
+  factory and `iconf` CLI tool. Every indicator `Output` enum, `Identifier`,
+  and core enums also implement this pattern.
+- **`IsKnown()`** on component enums — used by indicators for iteration and
+  validation (`for id := ...; id.IsKnown(); id++`). Unnecessary in languages
+  with exhaustive pattern matching (Zig, Rust).
 
 ## Cross-Language Conventions
 
 ### File Layout
 
-| Language | Entity files | Component files | Test files |
-|----------|-------------|-----------------|------------|
-| **Go** | `bar.go`, `quote.go`, `trade.go`, `scalar.go` | `barcomponent.go`, `quotecomponent.go`, `tradecomponent.go` | `*_test.go` |
-| **TypeScript** | `bar.ts`, `quote.ts`, `trade.ts`, `scalar.ts` | `bar-component.ts`, `quote-component.ts`, `trade-component.ts` | `*.spec.ts` |
-| **Python** | `bar.py`, `quote.py`, `trade.py`, `scalar.py` | `bar_component.py`, `quote_component.py`, `trade_component.py` | `test_entities.py` |
-| **Zig** | `bar.zig`, `quote.zig`, `trade.zig`, `scalar.zig` | `bar_component.zig`, `quote_component.zig`, `trade_component.zig` | Tests at bottom of source |
-| **Rust** | `bar.rs`, `quote.rs`, `trade.rs`, `scalar.rs` | `bar_component.rs`, `quote_component.rs`, `trade_component.rs` | `#[cfg(test)]` at bottom |
+| Language | Entity files | Component files | Barrel / Root | Test files |
+|----------|-------------|-----------------|---------------|------------|
+| **Go** | `bar.go`, `quote.go`, `trade.go`, `scalar.go` | `barcomponent.go`, `quotecomponent.go`, `tradecomponent.go` | *(package-level)* | `*_test.go` |
+| **TypeScript** | `bar.ts`, `quote.ts`, `trade.ts`, `scalar.ts` | `bar-component.ts`, `quote-component.ts`, `trade-component.ts` | *(none)* | `*.spec.ts` |
+| **Python** | `bar.py`, `quote.py`, `trade.py`, `scalar.py` | `bar_component.py`, `quote_component.py`, `trade_component.py` | `__init__.py` | `test_entities.py` |
+| **Zig** | `bar.zig`, `quote.zig`, `trade.zig`, `scalar.zig` | `bar_component.zig`, `quote_component.zig`, `trade_component.zig` | `entities.zig` | Tests at bottom of source |
+| **Rust** | `bar.rs`, `quote.rs`, `trade.rs`, `scalar.rs` | `bar_component.rs`, `quote_component.rs`, `trade_component.rs` | `mod.rs` | `#[cfg(test)]` at bottom |
 
 ### Field Naming
 
 | Field | Go | TypeScript | Python | Zig | Rust |
 |-------|-----|-----------|--------|-----|------|
-| Time | `Time time.Time` | `time: Date` | `time: datetime` | `time: i64` | `time: i64` |
+| Time | `Time time.Time` | `time: Date` | `time: datetime` | `time: i64` (epoch) | `time: i64` (epoch) |
 | Bid price | `Bid float64` | `bidPrice: number` | `bid_price: float` | `bid_price: f64` | `bid_price: f64` |
 | Ask price | `Ask float64` | `askPrice: number` | `ask_price: float` | `ask_price: f64` | `ask_price: f64` |
 
+Go uses `time.Time`, TypeScript uses `Date`, Python uses `datetime.datetime`.
+Zig and Rust use a raw `i64` epoch timestamp (not the `DateTime` struct from
+the daycounting module, which is used only there).
 Go uses short field names (`Bid`, `Ask`) because the type provides context.
 All other languages use descriptive names (`bid_price`, `ask_price`).
 
@@ -125,7 +149,7 @@ optional type for component fields.
 | **Go** | `BarComponentFunc(c BarComponent) (BarFunc, error)` | Returns error |
 | **TypeScript** | `barComponentValue(c: BarComponent): (b: Bar) => number` | Returns close (default fallback) |
 | **Python** | `bar_component_value(c: BarComponent) -> Callable[[Bar], float]` | Returns close (default fallback) |
-| **Zig** | `componentValue(c: BarComponent) fn(*const Bar) f64` | Exhaustive switch, no unknown case |
+| **Zig** | `componentValue(c: BarComponent) *const fn(Bar) f64` | Exhaustive switch, no unknown case |
 | **Rust** | `component_value(c: BarComponent) -> fn(&Bar) -> f64` | Exhaustive match, no unknown case |
 
 ### Default Constants
@@ -181,8 +205,8 @@ optional type for component fields.
 | Keep 0-based enums in py/zig/rust, use Optional for "not set" | Avoids breaking changes to existing code and tests. Each language has a natural "absent" type (`None`, `null`, `None`) that is cleaner than Go's zero-sentinel. |
 | Go uses 1-based enums (iota+1) with zero = "not set" | Idiomatic Go pattern for optional enum fields in structs where zero value serves as sentinel. |
 | TS uses `undefined` for "not set" (not `null`) | TS convention: `undefined` means "not provided", `null` means "intentionally empty". Component params are optional object properties. |
-| No Temporal interface in py/zig/rust | Dead code in Go (no entity implements it). Skip unless future need arises. |
-| No JSON marshal in py/zig/rust | Go-specific serialization for the factory/cmd tools. Other languages will handle serialization differently if needed. |
+| No Temporal interface in py/zig/rust | Dead code in Go — never implemented or referenced. No reason to port. |
+| No JSON marshal in py/zig/rust | Go indicators infrastructure. Port alongside the indicators module, not entities. |
 | `String()` vs `Mnemonic()` separation | `String()` returns full words for serialization/debug. `Mnemonic()` returns short codes for chart labels. Different audiences, different needs. |
 | Unknown component: Go returns `"unknown"`, Py returns `"??"` | Documented convention per AGENTS.md. Zig/Rust use exhaustive switches so unknown is impossible. |
 | Quote fields: Go `Bid`/`Ask` vs others `bid_price`/`ask_price` | Go relies on type context for clarity. Other languages use descriptive names per their conventions. Both are correct. |

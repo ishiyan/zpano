@@ -104,6 +104,11 @@ pub fn build(b: *std.Build) void {
     });
 
     // --- Entities library modules ---
+    // Individual entity modules are registered because:
+    // 1. Component modules depend on their parent (bar_component → bar, etc.)
+    // 2. The entities barrel (entities_mod) re-exports them via @import("bar") etc.
+    // 3. Entity test targets reference them directly.
+    // External consumers (indicators, CLIs) use the aggregate entities_mod barrel.
     const bar_mod = b.addModule("bar", .{
         .root_source_file = b.path("src/entities/bar.zig"),
         .target = target,
@@ -155,9 +160,9 @@ pub fn build(b: *std.Build) void {
         },
     });
 
-    // --- Indicators library module ---
-    const indicators_mod = b.addModule("indicators", .{
-        .root_source_file = b.path("src/indicators/indicators.zig"),
+    // --- Entities aggregate module (barrel for CLIs) ---
+    const entities_mod = b.addModule("entities", .{
+        .root_source_file = b.path("src/entities/entities.zig"),
         .target = target,
         .optimize = optimize,
         .imports = &.{
@@ -171,6 +176,16 @@ pub fn build(b: *std.Build) void {
         },
     });
 
+    // --- Indicators library module ---
+    const indicators_mod = b.addModule("indicators", .{
+        .root_source_file = b.path("src/indicators/indicators.zig"),
+        .target = target,
+        .optimize = optimize,
+        .imports = &.{
+            .{ .name = "entities", .module = entities_mod },
+        },
+    });
+
     // --- CLI executables ---
     const icalc_exe = b.addExecutable(.{
         .name = "icalc",
@@ -180,8 +195,7 @@ pub fn build(b: *std.Build) void {
             .optimize = optimize,
             .imports = &.{
                 .{ .name = "indicators", .module = indicators_mod },
-                .{ .name = "bar", .module = bar_mod },
-                .{ .name = "scalar", .module = scalar_mod },
+                .{ .name = "entities", .module = entities_mod },
             },
         }),
     });
@@ -203,7 +217,7 @@ pub fn build(b: *std.Build) void {
             .optimize = optimize,
             .imports = &.{
                 .{ .name = "indicators", .module = indicators_mod },
-                .{ .name = "scalar", .module = scalar_mod },
+                .{ .name = "entities", .module = entities_mod },
             },
         }),
     });
@@ -225,8 +239,7 @@ pub fn build(b: *std.Build) void {
             .optimize = optimize,
             .imports = &.{
                 .{ .name = "indicators", .module = indicators_mod },
-                .{ .name = "bar", .module = bar_mod },
-                .{ .name = "scalar", .module = scalar_mod },
+                .{ .name = "entities", .module = entities_mod },
             },
         }),
     });
@@ -428,13 +441,7 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
         .imports = &.{
-            .{ .name = "bar", .module = bar_mod },
-            .{ .name = "quote", .module = quote_mod },
-            .{ .name = "trade", .module = trade_mod },
-            .{ .name = "scalar", .module = scalar_mod },
-            .{ .name = "bar_component", .module = bar_component_mod },
-            .{ .name = "quote_component", .module = quote_component_mod },
-            .{ .name = "trade_component", .module = trade_component_mod },
+            .{ .name = "entities", .module = entities_mod },
         },
     });
 

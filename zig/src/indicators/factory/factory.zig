@@ -1,6 +1,11 @@
 /// Factory creates indicator instances from an Identifier and a JSON parameter string.
 /// This avoids the need for callers to import individual indicator modules directly.
 const std = @import("std");
+
+const entities = @import("entities");
+const bar_component = entities.bar_component;
+const quote_component = entities.quote_component;
+const trade_component = entities.trade_component;
 const json = std.json;
 
 // -- Core types --
@@ -10,9 +15,6 @@ const identifier_mod = @import("../core/identifier.zig");
 const Identifier = identifier_mod.Identifier;
 
 // -- Entity component types --
-const bar_component = @import("bar_component");
-const quote_component = @import("quote_component");
-const trade_component = @import("trade_component");
 
 // -- Indicator imports (alphabetical by author/family) --
 

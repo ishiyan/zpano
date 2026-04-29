@@ -1,12 +1,14 @@
-const Bar = @import("bar").Bar;
-const Quote = @import("quote").Quote;
-const Trade = @import("trade").Trade;
-const Scalar = @import("scalar").Scalar;
-const bar_component = @import("bar_component");
-const quote_component = @import("quote_component");
-const trade_component = @import("trade_component");
 const indicator_mod = @import("indicator.zig");
 
+
+const entities = @import("entities");
+const Bar = entities.Bar;
+const Quote = entities.Quote;
+const Trade = entities.Trade;
+const Scalar = entities.Scalar;
+const bar_component = entities.bar_component;
+const quote_component = entities.quote_component;
+const trade_component = entities.trade_component;
 const OutputArray = indicator_mod.OutputArray;
 
 /// Type aliases for component extraction functions.

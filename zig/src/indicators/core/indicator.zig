@@ -1,8 +1,10 @@
-const Bar = @import("bar").Bar;
-const Quote = @import("quote").Quote;
-const Trade = @import("trade").Trade;
-const Scalar = @import("scalar").Scalar;
 const metadata_mod = @import("metadata.zig");
+
+const entities = @import("entities");
+const Bar = entities.Bar;
+const Quote = entities.Quote;
+const Trade = entities.Trade;
+const Scalar = entities.Scalar;
 const band_mod = @import("outputs/band.zig");
 const heatmap_mod = @import("outputs/heatmap.zig");
 const polyline_mod = @import("outputs/polyline.zig");

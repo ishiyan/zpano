@@ -5,7 +5,8 @@
 /// and calculates the frequency response with signal length 1024.
 const std = @import("std");
 const indicators = @import("indicators");
-const Scalar = @import("scalar").Scalar;
+const entities = @import("entities");
+const Scalar = entities.Scalar;
 
 const Io = std.Io;
 const Identifier = indicators.identifier.Identifier;

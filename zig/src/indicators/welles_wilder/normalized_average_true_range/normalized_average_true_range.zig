@@ -1,11 +1,12 @@
 const std = @import("std");
 const math = std.math;
 
-const Bar = @import("bar").Bar;
-const Quote = @import("quote").Quote;
-const Trade = @import("trade").Trade;
-const Scalar = @import("scalar").Scalar;
 
+const entities = @import("entities");
+const Bar = entities.Bar;
+const Quote = entities.Quote;
+const Trade = entities.Trade;
+const Scalar = entities.Scalar;
 const indicator_mod = @import("../../core/indicator.zig");
 const build_metadata_mod = @import("../../core/build_metadata.zig");
 const identifier_mod = @import("../../core/identifier.zig");

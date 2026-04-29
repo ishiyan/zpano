@@ -1,9 +1,11 @@
 const std = @import("std");
 const math = std.math;
+
+const entities = @import("entities");
+const Scalar = entities.Scalar;
 const Indicator = @import("indicator.zig").Indicator;
 const OutputArray = @import("indicator.zig").OutputArray;
 const Metadata = @import("metadata.zig").Metadata;
-const Scalar = @import("scalar").Scalar;
 
 /// A single calculated filter frequency response component data.
 pub const Component = struct {
@@ -472,15 +474,15 @@ const TestIdentityFilter = struct {
         return OutputArray.fromScalar(.{ .time = sample.time, .value = sample.value });
     }
 
-    fn updateBarFn(_: *anyopaque, _: *const @import("bar").Bar) OutputArray {
+    fn updateBarFn(_: *anyopaque, _: *const @import("entities").Bar) OutputArray {
         return .{};
     }
 
-    fn updateQuoteFn(_: *anyopaque, _: *const @import("quote").Quote) OutputArray {
+    fn updateQuoteFn(_: *anyopaque, _: *const @import("entities").Quote) OutputArray {
         return .{};
     }
 
-    fn updateTradeFn(_: *anyopaque, _: *const @import("trade").Trade) OutputArray {
+    fn updateTradeFn(_: *anyopaque, _: *const @import("entities").Trade) OutputArray {
         return .{};
     }
 

@@ -5,13 +5,12 @@
 /// and calculates the frequency response with signal length 1024.
 ///
 /// Usage: ifres <settings.json>
-
-use portf::entities::scalar::Scalar;
-use portf::indicators::core::frequency_response::{self, Component, FrequencyResponse, Updater};
-use portf::indicators::core::identifier::Identifier;
-use portf::indicators::core::indicator::Indicator;
-use portf::indicators::core::metadata::Metadata;
-use portf::indicators::factory::{create_indicator, JsonValue};
+use zpano::entities::scalar::Scalar;
+use zpano::indicators::core::frequency_response::{self, Component, FrequencyResponse, Updater};
+use zpano::indicators::core::identifier::Identifier;
+use zpano::indicators::core::indicator::Indicator;
+use zpano::indicators::core::metadata::Metadata;
+use zpano::indicators::factory::{create_indicator, JsonValue};
 
 use std::env;
 use std::fs;
@@ -69,8 +68,12 @@ fn print_component(name: &str, c: &Component) {
     } else {
         print!(
             "  data=[{:.4} {:.4} {:.4} ... {:.4} {:.4} {:.4}]",
-            c.data[0], c.data[1], c.data[2],
-            c.data[n - 3], c.data[n - 2], c.data[n - 1]
+            c.data[0],
+            c.data[1],
+            c.data[2],
+            c.data[n - 3],
+            c.data[n - 2],
+            c.data[n - 1]
         );
     }
 
@@ -114,7 +117,8 @@ fn main() {
     });
 
     for entry in entries {
-        let id_str = entry.get("identifier")
+        let id_str = entry
+            .get("identifier")
             .and_then(|v| v.as_str_val())
             .unwrap_or_else(|| {
                 eprintln!("error: entry missing 'identifier' string");
@@ -153,7 +157,8 @@ fn main() {
             &mut updater,
             warmup,
             PHASE_DEGREES_UNWRAPPING_LIMIT,
-        ).unwrap_or_else(|e| {
+        )
+        .unwrap_or_else(|e| {
             eprintln!("error calculating frequency response for {}: {}", id_str, e);
             process::exit(1);
         });
@@ -183,7 +188,8 @@ fn json_value_to_string(val: &JsonValue) -> String {
             format!("[{}]", items.join(","))
         }
         JsonValue::Object(pairs) => {
-            let items: Vec<String> = pairs.iter()
+            let items: Vec<String> = pairs
+                .iter()
                 .map(|(k, v)| format!("{:?}:{}", k, json_value_to_string(v)))
                 .collect();
             format!("{{{}}}", items.join(","))

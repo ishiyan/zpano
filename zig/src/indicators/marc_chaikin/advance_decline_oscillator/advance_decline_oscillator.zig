@@ -1,13 +1,14 @@
 const std = @import("std");
 const math = std.math;
 
-const Bar = @import("bar").Bar;
-const Quote = @import("quote").Quote;
-const Trade = @import("trade").Trade;
-const Scalar = @import("scalar").Scalar;
-const quote_component = @import("quote_component");
-const trade_component = @import("trade_component");
 
+const entities = @import("entities");
+const Bar = entities.Bar;
+const Quote = entities.Quote;
+const Trade = entities.Trade;
+const Scalar = entities.Scalar;
+const quote_component = entities.quote_component;
+const trade_component = entities.trade_component;
 const indicator_mod = @import("../../core/indicator.zig");
 const line_indicator_mod = @import("../../core/line_indicator.zig");
 const build_metadata_mod = @import("../../core/build_metadata.zig");
