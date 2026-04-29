@@ -20,7 +20,7 @@ not governed by this guide.
 
 1. **Multi-language library.** The same set of indicators is implemented in
    TypeScript, Go, Python, Rust, and Zig. Each language lives in its own
-   top-level folder (`ts/`, `go/`, `python/`, `rust/`, `zig/`).
+   top-level folder (`ts/`, `go/`, `python/`, `rs/`, `zig/`).
 2. **Shared ideology, language-idiomatic scaffolding.** The organizational
    structure and design rules are the same across all languages. File and folder
    naming adapts to each language's conventions.
@@ -2097,7 +2097,7 @@ The Rust port is **complete**: 67 indicators, factory, frequency_response, icalc
 #### File layout
 
 Rust uses a single-file pattern per indicator. Each indicator lives in
-`rust/src/indicators/<group>/<indicator_name>/`:
+`rs/src/indicators/<group>/<indicator_name>/`:
 
 - `mod.rs` — re-exports: `mod <indicator_name>; pub use <indicator_name>::*;`
 - `<indicator_name>.rs` — contains params struct, output enum, indicator struct, impl, and `#[cfg(test)] mod tests`
@@ -2242,7 +2242,7 @@ Module renames from Go/TS: `cybercycle→cyber_cycle`, `sinewave→sine_wave`,
 
 #### Factory pattern
 
-`rust/src/indicators/factory/factory.rs` exports `create_indicator(id: Identifier, params: &str) -> Box<dyn Indicator>`.
+`rs/src/indicators/factory/factory.rs` exports `create_indicator(id: Identifier, params: &str) -> Box<dyn Indicator>`.
 
 Custom JSON parser in `factory/json.rs` (~250 lines, zero dependencies — no serde).
 Provides `JsonValue` enum and helpers: `has_key()`, `get_f64()`, `get_usize()`, `get_bool()`, etc.
@@ -2255,12 +2255,12 @@ Factory uses a large `match` on `Identifier` enum (~152 arms). Construction patt
 
 #### Frequency response
 
-`rust/src/indicators/core/frequency_response.rs` — standalone module, not tied to any indicator.
+`rs/src/indicators/core/frequency_response.rs` — standalone module, not tied to any indicator.
 Uses `Updater` trait. The `ifres` cmd tool wraps indicators in an `IndicatorUpdater` adapter struct.
 
 #### Cmd tools
 
-Three binaries in `rust/src/bin/`:
+Three binaries in `rs/src/bin/`:
 - `icalc.rs` — indicator calculator (reads JSON settings, feeds 252-bar test data)
 - `ifres.rs` — frequency response calculator (`IndicatorUpdater` adapter implements `Updater`)
 - `iconf.rs` — chart config generator (custom `JVal` enum for JSON building, `PaneData` struct, color cycling, generates `.json` + `.ts`)

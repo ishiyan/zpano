@@ -10,7 +10,7 @@ entity code and for indicator authors who consume entity types.
 
 The rules in this document apply **only to the `entities/` folder** within each
 language directory (`go/entities/`, `ts/entities/`, `py/entities/`,
-`zig/src/entities/`, `rust/src/entities/`). The `indicators/` folder has its own
+`zig/src/entities/`, `rs/src/entities/`). The `indicators/` folder has its own
 architecture skill.
 
 ## Module Contents

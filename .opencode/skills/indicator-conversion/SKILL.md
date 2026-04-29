@@ -2181,11 +2181,11 @@ indicators or for porting to Zig.
 
 ### Step 1: Create the folder structure
 
-Create `rust/src/indicators/<group>/<indicator_name>/` with:
+Create `rs/src/indicators/<group>/<indicator_name>/` with:
 - `mod.rs` — re-exports: `mod <indicator_name>; pub use <indicator_name>::*;`
 - `<indicator_name>.rs` — params, output enum, indicator struct, impl, and `#[cfg(test)] mod tests`
 
-Register the module in the group's `mod.rs` (e.g., `rust/src/indicators/common/mod.rs`):
+Register the module in the group's `mod.rs` (e.g., `rs/src/indicators/common/mod.rs`):
 ```rust
 pub mod simple_moving_average;
 ```
@@ -2356,7 +2356,7 @@ Key test conventions:
 
 ### Step 6: Register in factory
 
-Edit `rust/src/indicators/factory/factory.rs`:
+Edit `rs/src/indicators/factory/factory.rs`:
 
 1. Add import at top (match visibility pattern A or B):
    ```rust
@@ -2381,7 +2381,7 @@ Edit `rust/src/indicators/factory/factory.rs`:
 
 ### Step 7: Register in identifier enum
 
-Add to `rust/src/indicators/core/identifier.rs` and `rust/src/indicators/core/descriptors.rs`.
+Add to `rs/src/indicators/core/identifier.rs` and `rs/src/indicators/core/descriptors.rs`.
 
 ### Step 8: Verify
 
@@ -2401,7 +2401,7 @@ cd rust && cargo run --bin icalc -- path/to/settings.json
 
 ### Rust Import Path Reference
 
-From an indicator at `rust/src/indicators/<group>/<indicator>/`:
+From an indicator at `rs/src/indicators/<group>/<indicator>/`:
 
 ```rust
 // Core framework

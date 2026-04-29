@@ -11,7 +11,7 @@ Multi-language financial library (Python, Go, TypeScript, Zig, Rust) implementin
 6. **Indicators** — 63 technical analysis indicators (SMA, EMA, RSI, MACD, Bollinger Bands, etc.) organized by author, with a shared `core/` framework providing the `Indicator` interface, `LineIndicator` base, metadata, descriptor registry, output types, and frequency response utilities. Currently implemented in Go and TypeScript only; Python, Zig, and Rust ports are planned. See the `indicator-architecture` skill for the full design reference.
 7. **Cmd** — Three CLI tools (`icalc`, `iconf`, `ifres`) that exercise the indicators module: indicator calculation against 252-bar reference data, chart configuration generation, and frequency response analysis. Currently implemented in Go and TypeScript only.
 
-Go and TypeScript are the reference implementations for modules 6 and 7. Python is the reference for modules 1–5. All ports must match reference output to 13+ decimal places. The `laptop/` directory is an older working copy; prefer editing files under `py/`, `go/`, `ts/`, `zig/`, and `rust/`. The `performatce/` directory name is an intentional typo — do not rename it.
+Go and TypeScript are the reference implementations for modules 6 and 7. Python is the reference for modules 1–5. All ports must match reference output to 13+ decimal places. The `laptop/` directory is an older working copy; prefer editing files under `py/`, `go/`, `ts/`, `zig/`, and `rs/`. The `performatce/` directory name is an intentional typo — do not rename it.
 
 ## Build / Lint / Test Commands
 
@@ -66,14 +66,14 @@ cd zig && zig test src/daycounting/daycounting.zig --test-filter "act365Fixed" \
 ### Rust
 Dependencies: Rust 1.75.0+ (installed via apt at `/usr/bin/rustc`, `/usr/bin/cargo`), zero external deps.
 ```bash
-cd rust && cargo test                                                       # all tests (342 tests)
-cd rust && cargo test --lib daycounting                                     # daycounting tests only
-cd rust && cargo test --lib performance                                     # performance tests only
-cd rust && cargo test --lib roundtrips                                      # roundtrips tests only
-cd rust && cargo test --lib symbology                                       # symbology tests only
-cd rust && cargo test --lib entities                                        # entities tests only
-cd rust && cargo test --lib test_sharpe_rf0                                 # single test by name
-cd rust && cargo test --lib test_sharpe -- --nocapture                      # with stdout output
+cd rs && cargo test                                                       # all tests (342 tests)
+cd rs && cargo test --lib daycounting                                     # daycounting tests only
+cd rs && cargo test --lib performance                                     # performance tests only
+cd rs && cargo test --lib roundtrips                                      # roundtrips tests only
+cd rs && cargo test --lib symbology                                       # symbology tests only
+cd rs && cargo test --lib entities                                        # entities tests only
+cd rs && cargo test --lib test_sharpe_rf0                                 # single test by name
+cd rs && cargo test --lib test_sharpe -- --nocapture                      # with stdout output
 ```
 
 ## Project Structure
@@ -112,12 +112,12 @@ zig/src/roundtrips/      — execution.zig, side.zig, matching.zig, grouping.zig
 zig/src/symbology/       — isin.zig, cusip.zig, sedol.zig
 zig/src/entities/        — bar.zig, quote.zig, trade.zig, scalar.zig, bar_component.zig, quote_component.zig, trade_component.zig
 zig/build.zig            — build config: 21 modules, 21 test targets
-rust/src/daycounting/    — conventions.rs, daycounting.rs, fractional.rs
-rust/src/performance/    — periodicity.rs, ratios.rs
-rust/src/roundtrips/     — mod.rs, execution.rs, side.rs, matching.rs, grouping.rs, roundtrip.rs, performance.rs
-rust/src/symbology/      — mod.rs, isin.rs, cusip.rs, sedol.rs
-rust/src/entities/       — mod.rs, bar.rs, quote.rs, trade.rs, scalar.rs, bar_component.rs, quote_component.rs, trade_component.rs
-rust/Cargo.toml          — minimal config, zero external deps
+rs/src/daycounting/      — conventions.rs, daycounting.rs, fractional.rs
+rs/src/performance/      — periodicity.rs, ratios.rs
+rs/src/roundtrips/       — mod.rs, execution.rs, side.rs, matching.rs, grouping.rs, roundtrip.rs, performance.rs
+rs/src/symbology/        — mod.rs, isin.rs, cusip.rs, sedol.rs
+rs/src/entities/         — mod.rs, bar.rs, quote.rs, trade.rs, scalar.rs, bar_component.rs, quote_component.rs, trade_component.rs
+rs/Cargo.toml            — minimal config, zero external deps
 laptop/                  — older working copy, do not prefer
 readme/performance/      — R validation scripts, reference PDFs, CSV data, SVG charts
 ```
@@ -284,14 +284,14 @@ All commands run from the project root (`~/repos/zpano/`).
 | **Go** | Go 1.26+ | `cd go && go test ./...&& cd ..`| 84 packages OK |
 | **TypeScript** | Node.js 20+, TypeScript 5.3+, Jasmine 5.1+ | `cd ts && npm install && npm test && cd ..` | 8935 specs |
 | **Zig** | Zig 0.16.0-dev | `cd zig && zig build test --summary all && cd ..` | 367 tests |
-| **Rust** | Rust 1.75.0+ (apt) | `cd rust && cargo test && cd ..` | 342 tests |
+| **Rust** | Rust 1.75.0+ (apt) | `cd rs && cargo test && cd ..` | 342 tests |
 
 ```bash
 python3 -m unittest discover -s py -p "test_*.py" -t .
 cd go && go test ./...&& cd ..
 cd ts && npm install && npm test && cd ..
 cd zig && zig build test --summary all && cd ..
-cd rust && cargo test && cd ..
+cd rs && cargo test && cd ..
 ```
 
 ### Build Only (no tests)
@@ -302,11 +302,11 @@ cd rust && cargo test && cd ..
 | **Go** | `cd go && go build ./...` | Compiles all packages |
 | **TypeScript** | `cd ts && npm run build` | Single tsc build for all modules |
 | **Zig** | `cd zig && zig build` | Build without running tests |
-| **Rust** | `cd rust && cargo build` | Debug build; add `--release` for optimized |
+| **Rust** | `cd rs && cargo build` | Debug build; add `--release` for optimized |
 
 ```bash
 cd go && go build ./... && cd ..
 cd ts && npm run build && cd ..
 cd zig && zig build && cd ..
-cd rust && cargo build && cd ..
+cd rs && cargo build && cd ..
 ```
