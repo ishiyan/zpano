@@ -230,4 +230,16 @@ export enum IndicatorIdentifier {
    * transform of the autocorrelation function over a configurable cycle-period range, following
    * EasyLanguage listing 8-3. */
   AutoCorrelationPeriodogram,
+
+  /** Identifies the Jurik __Relative Trend Strength Index__ (RSX) indicator. */
+  JurikRelativeTrendStrengthIndex,
+
+  /** Identifies the Jurik __Composite Fractal Behavior Index__ (CFB) indicator. */
+  JurikCompositeFractalBehaviorIndex,
+
+  /** Identifies the Jurik __Zero Lag Velocity__ (VEL) indicator. */
+  JurikZeroLagVelocity,
+
+  /** Identifies the Jurik __Directional Movement Index__ (DMX) indicator. */
+  JurikDirectionalMovementIndex,
 }

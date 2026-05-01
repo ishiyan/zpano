@@ -117,7 +117,7 @@ export class DirectionalIndicatorMinus implements Indicator {
 
   /** Updates the indicator given the next quote sample. */
   public updateQuote(sample: Quote): IndicatorOutput {
-    const v = (sample.bid + sample.ask) / 2;
+    const v = (sample.bidPrice + sample.askPrice) / 2;
     const scalar = new Scalar();
     scalar.time = sample.time;
     scalar.value = this.update(v, v, v);

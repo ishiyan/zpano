@@ -50,6 +50,14 @@ import { defaultParams as defaultApoParams } from '../common/absolute-price-osci
 // ── mark-jurik ──────────────────────────────────────────────────────────────
 import { JurikMovingAverage } from '../mark-jurik/jurik-moving-average/jurik-moving-average.js';
 import { defaultParams as defaultJmaParams } from '../mark-jurik/jurik-moving-average/params.js';
+import { JurikCompositeFractalBehaviorIndex } from '../mark-jurik/jurik-composite-fractal-behavior-index/jurik-composite-fractal-behavior-index.js';
+import { defaultParams as defaultCfbParams } from '../mark-jurik/jurik-composite-fractal-behavior-index/params.js';
+import { JurikZeroLagVelocity } from '../mark-jurik/jurik-zero-lag-velocity/jurik-zero-lag-velocity.js';
+import { defaultParams as defaultVelParams } from '../mark-jurik/jurik-zero-lag-velocity/params.js';
+import { JurikRelativeTrendStrengthIndex } from '../mark-jurik/jurik-relative-trend-strength-index/jurik-relative-trend-strength-index.js';
+import { defaultParams as defaultRsxParams } from '../mark-jurik/jurik-relative-trend-strength-index/params.js';
+import { JurikDirectionalMovementIndex } from '../mark-jurik/jurik-directional-movement-index/jurik-directional-movement-index.js';
+import { defaultParams as defaultDmxParams } from '../mark-jurik/jurik-directional-movement-index/params.js';
 
 // ── patrick-mulloy ──────────────────────────────────────────────────────────
 import { DoubleExponentialMovingAverage } from '../patrick-mulloy/double-exponential-moving-average/double-exponential-moving-average.js';
@@ -256,6 +264,18 @@ export function createIndicator(identifier: IndicatorIdentifier, params?: Record
 
         case IndicatorIdentifier.JurikMovingAverage:
             return new JurikMovingAverage({ ...defaultJmaParams(), ...p });
+
+        case IndicatorIdentifier.JurikCompositeFractalBehaviorIndex:
+            return new JurikCompositeFractalBehaviorIndex({ ...defaultCfbParams(), ...p });
+
+        case IndicatorIdentifier.JurikZeroLagVelocity:
+            return new JurikZeroLagVelocity({ ...defaultVelParams(), ...p });
+
+        case IndicatorIdentifier.JurikRelativeTrendStrengthIndex:
+            return new JurikRelativeTrendStrengthIndex({ ...defaultRsxParams(), ...p });
+
+        case IndicatorIdentifier.JurikDirectionalMovementIndex:
+            return new JurikDirectionalMovementIndex({ ...defaultDmxParams(), ...p });
 
         // ── patrick-mulloy ──────────────────────────────────────────────
 

@@ -1,11 +1,12 @@
 {
   "name": "@zpano/ts",
   "version": "1.0.0",
+  "type": "module",
   "private": true,
   "description": "Multi-module financial library — TypeScript implementation",
   "scripts": {
     "build": "tsc",
-    "test": "npm run build && jasmine --config=jasmine.json",
+    "test": "npm run build && node --loader ./loader.js node_modules/.bin/jasmine --config=jasmine.json",
     "clean": "rimraf dist"
   },
   "devDependencies": {

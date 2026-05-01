@@ -231,6 +231,14 @@ const descriptors: Map<IndicatorIdentifier, Descriptor> = new Map<IndicatorIdent
   [IndicatorIdentifier.CombBandPassSpectrum, desc(IndicatorIdentifier.CombBandPassSpectrum, 'John Ehlers', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Heatmap, R.Spectrum, P.Own)])],
   [IndicatorIdentifier.AutoCorrelationIndicator, desc(IndicatorIdentifier.AutoCorrelationIndicator, 'John Ehlers', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Heatmap, R.Correlation, P.Own)])],
   [IndicatorIdentifier.AutoCorrelationPeriodogram, desc(IndicatorIdentifier.AutoCorrelationPeriodogram, 'John Ehlers', A.Adaptive, I.ScalarInput, V.NoVolume, [out(0, S.Heatmap, R.Spectrum, P.Own)])],
+  [IndicatorIdentifier.JurikRelativeTrendStrengthIndex, desc(IndicatorIdentifier.JurikRelativeTrendStrengthIndex, 'Mark Jurik', A.Static, I.ScalarInput, V.NoVolume, [out(1, S.Scalar, R.Oscillator, P.Own)])],
+  [IndicatorIdentifier.JurikCompositeFractalBehaviorIndex, desc(IndicatorIdentifier.JurikCompositeFractalBehaviorIndex, 'Mark Jurik', A.Static, I.ScalarInput, V.NoVolume, [out(1, S.Scalar, R.Oscillator, P.Own)])],
+  [IndicatorIdentifier.JurikZeroLagVelocity, desc(IndicatorIdentifier.JurikZeroLagVelocity, 'Mark Jurik', A.Adaptive, I.ScalarInput, V.NoVolume, [out(1, S.Scalar, R.Oscillator, P.Own)])],
+  [IndicatorIdentifier.JurikDirectionalMovementIndex, desc(IndicatorIdentifier.JurikDirectionalMovementIndex, 'Mark Jurik', A.Adaptive, I.BarInput, V.NoVolume, [
+    out(1, S.Scalar, R.Oscillator, P.Own),
+    out(2, S.Scalar, R.Oscillator, P.Own),
+    out(3, S.Scalar, R.Oscillator, P.Own),
+  ])],
 ]);
 
 /**
