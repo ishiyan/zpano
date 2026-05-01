@@ -496,4 +496,28 @@ var descriptors = map[Identifier]Descriptor{
 		Adaptivity: Adaptive, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
 		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Heatmap, Role: Spectrum, Pane: Own}},
 	},
+	JurikRelativeTrendStrengthIndex: {
+		Identifier: JurikRelativeTrendStrengthIndex, Family: "Mark Jurik",
+		Adaptivity: Static, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Oscillator, Pane: Own}},
+	},
+	JurikCompositeFractalBehaviorIndex: {
+		Identifier: JurikCompositeFractalBehaviorIndex, Family: "Mark Jurik",
+		Adaptivity: Static, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Oscillator, Pane: Own}},
+	},
+	JurikZeroLagVelocity: {
+		Identifier: JurikZeroLagVelocity, Family: "Mark Jurik",
+		Adaptivity: Adaptive, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Oscillator, Pane: Own}},
+	},
+	JurikDirectionalMovementIndex: {
+		Identifier: JurikDirectionalMovementIndex, Family: "Mark Jurik",
+		Adaptivity: Adaptive, InputRequirement: BarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{
+			{Kind: 1 /* Bipolar */, Shape: shape.Scalar, Role: Oscillator, Pane: Own},
+			{Kind: 2 /* Plus */, Shape: shape.Scalar, Role: Oscillator, Pane: Own},
+			{Kind: 3 /* Minus */, Shape: shape.Scalar, Role: Oscillator, Pane: Own},
+		},
+	},
 }

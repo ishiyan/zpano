@@ -242,6 +242,18 @@ const (
 	// heat-map of cyclic activity estimated via a discrete Fourier transform of the
 	// autocorrelation function, following Ehlers' EasyLanguage listing 8-3.
 	AutoCorrelationPeriodogram
+
+	// JurikRelativeTrendStrengthIndex identifies the Jurik Relative Trend Strength Index (RSX) indicator.
+	JurikRelativeTrendStrengthIndex
+
+	// JurikCompositeFractalBehaviorIndex identifies the Jurik Composite Fractal Behavior Index (CFB) indicator.
+	JurikCompositeFractalBehaviorIndex
+
+	// JurikZeroLagVelocity identifies the Jurik Zero Lag Velocity (VEL) indicator.
+	JurikZeroLagVelocity
+
+	// JurikDirectionalMovementIndex identifies the Jurik Directional Movement Index (DMX) indicator.
+	JurikDirectionalMovementIndex
 	last
 )
 
@@ -319,6 +331,10 @@ const (
 	combBandPassSpectrum                           = "combBandPassSpectrum"
 	autoCorrelationIndicator                       = "autoCorrelationIndicator"
 	autoCorrelationPeriodogram                     = "autoCorrelationPeriodogram"
+	jurikRelativeTrendStrengthIndex                = "jurikRelativeTrendStrengthIndex"
+	jurikCompositeFractalBehaviorIndex             = "jurikCompositeFractalBehaviorIndex"
+	jurikZeroLagVelocity                           = "jurikZeroLagVelocity"
+	jurikDirectionalMovementIndex                  = "jurikDirectionalMovementIndex"
 )
 
 // String implements the Stringer interface.
@@ -470,6 +486,14 @@ func (i Identifier) String() string {
 		return autoCorrelationIndicator
 	case AutoCorrelationPeriodogram:
 		return autoCorrelationPeriodogram
+	case JurikRelativeTrendStrengthIndex:
+		return jurikRelativeTrendStrengthIndex
+	case JurikCompositeFractalBehaviorIndex:
+		return jurikCompositeFractalBehaviorIndex
+	case JurikZeroLagVelocity:
+		return jurikZeroLagVelocity
+	case JurikDirectionalMovementIndex:
+		return jurikDirectionalMovementIndex
 	default:
 		return unknown
 	}
@@ -658,6 +682,14 @@ func (i *Identifier) UnmarshalJSON(data []byte) error {
 		*i = AutoCorrelationIndicator
 	case autoCorrelationPeriodogram:
 		*i = AutoCorrelationPeriodogram
+	case jurikRelativeTrendStrengthIndex:
+		*i = JurikRelativeTrendStrengthIndex
+	case jurikCompositeFractalBehaviorIndex:
+		*i = JurikCompositeFractalBehaviorIndex
+	case jurikZeroLagVelocity:
+		*i = JurikZeroLagVelocity
+	case jurikDirectionalMovementIndex:
+		*i = JurikDirectionalMovementIndex
 	default:
 		return fmt.Errorf(errFmt, s)
 	}

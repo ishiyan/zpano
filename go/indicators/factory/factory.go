@@ -58,7 +58,11 @@ import (
 	"zpano/indicators/larrywilliams/williamspercentr"
 	"zpano/indicators/marcchaikin/advancedecline"
 	"zpano/indicators/marcchaikin/advancedeclineoscillator"
+	"zpano/indicators/markjurik/jurikcompositefractalbehaviorindex"
+	"zpano/indicators/markjurik/jurikdirectionalmovementindex"
 	"zpano/indicators/markjurik/jurikmovingaverage"
+	"zpano/indicators/markjurik/jurikrelativetrendstrengthindex"
+	"zpano/indicators/markjurik/jurikzerolagvelocity"
 	"zpano/indicators/patrickmulloy/doubleexponentialmovingaverage"
 	"zpano/indicators/patrickmulloy/tripleexponentialmovingaverage"
 	"zpano/indicators/perrykaufman/kaufmanadaptivemovingaverage"
@@ -644,6 +648,38 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 		}
 
 		return jurikmovingaverage.NewJurikMovingAverage(p)
+
+	case core.JurikRelativeTrendStrengthIndex:
+		p := jurikrelativetrendstrengthindex.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return jurikrelativetrendstrengthindex.NewJurikRelativeTrendStrengthIndex(p)
+
+	case core.JurikCompositeFractalBehaviorIndex:
+		p := jurikcompositefractalbehaviorindex.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return jurikcompositefractalbehaviorindex.NewJurikCompositeFractalBehaviorIndex(p)
+
+	case core.JurikZeroLagVelocity:
+		p := jurikzerolagvelocity.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return jurikzerolagvelocity.NewJurikZeroLagVelocity(p)
+
+	case core.JurikDirectionalMovementIndex:
+		p := jurikdirectionalmovementindex.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return jurikdirectionalmovementindex.NewJurikDirectionalMovementIndex(p)
 
 	// ── patrickmulloy ────────────────────────────────────────────────────
 
