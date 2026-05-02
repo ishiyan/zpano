@@ -75,6 +75,10 @@ pub enum Identifier {
     CombBandPassSpectrum = 69,
     AutoCorrelationIndicator = 70,
     AutoCorrelationPeriodogram = 71,
+    JurikRelativeTrendStrengthIndex = 72,
+    JurikCompositeFractalBehaviorIndex = 73,
+    JurikZeroLagVelocity = 74,
+    JurikDirectionalMovementIndex = 75,
 }
 
 impl Identifier {
@@ -108,7 +112,9 @@ impl Identifier {
             Self::InstantaneousTrendLine => "instantaneousTrendLine",
             Self::SuperSmoother => "superSmoother",
             Self::ZeroLagExponentialMovingAverage => "zeroLagExponentialMovingAverage",
-            Self::ZeroLagErrorCorrectingExponentialMovingAverage => "zeroLagErrorCorrectingExponentialMovingAverage",
+            Self::ZeroLagErrorCorrectingExponentialMovingAverage => {
+                "zeroLagErrorCorrectingExponentialMovingAverage"
+            }
             Self::RoofingFilter => "roofingFilter",
             Self::TrueRange => "trueRange",
             Self::AverageTrueRange => "averageTrueRange",
@@ -137,11 +143,15 @@ impl Identifier {
             Self::AdvanceDecline => "advanceDecline",
             Self::AdvanceDeclineOscillator => "advanceDeclineOscillator",
             Self::ParabolicStopAndReverse => "parabolicStopAndReverse",
-            Self::TripleExponentialMovingAverageOscillator => "tripleExponentialMovingAverageOscillator",
+            Self::TripleExponentialMovingAverageOscillator => {
+                "tripleExponentialMovingAverageOscillator"
+            }
             Self::BollingerBandsTrend => "bollingerBandsTrend",
             Self::MovingAverageConvergenceDivergence => "movingAverageConvergenceDivergence",
             Self::SineWave => "sineWave",
-            Self::HilbertTransformerInstantaneousTrendLine => "hilbertTransformerInstantaneousTrendLine",
+            Self::HilbertTransformerInstantaneousTrendLine => {
+                "hilbertTransformerInstantaneousTrendLine"
+            }
             Self::TrendCycleMode => "trendCycleMode",
             Self::CoronaSpectrum => "coronaSpectrum",
             Self::CoronaSignalToNoiseRatio => "coronaSignalToNoiseRatio",
@@ -153,6 +163,10 @@ impl Identifier {
             Self::CombBandPassSpectrum => "combBandPassSpectrum",
             Self::AutoCorrelationIndicator => "autoCorrelationIndicator",
             Self::AutoCorrelationPeriodogram => "autoCorrelationPeriodogram",
+            Self::JurikRelativeTrendStrengthIndex => "jurikRelativeTrendStrengthIndex",
+            Self::JurikCompositeFractalBehaviorIndex => "jurikCompositeFractalBehaviorIndex",
+            Self::JurikZeroLagVelocity => "jurikZeroLagVelocity",
+            Self::JurikDirectionalMovementIndex => "jurikDirectionalMovementIndex",
         }
     }
 
@@ -186,7 +200,9 @@ impl Identifier {
             "instantaneousTrendLine" => Some(Self::InstantaneousTrendLine),
             "superSmoother" => Some(Self::SuperSmoother),
             "zeroLagExponentialMovingAverage" => Some(Self::ZeroLagExponentialMovingAverage),
-            "zeroLagErrorCorrectingExponentialMovingAverage" => Some(Self::ZeroLagErrorCorrectingExponentialMovingAverage),
+            "zeroLagErrorCorrectingExponentialMovingAverage" => {
+                Some(Self::ZeroLagErrorCorrectingExponentialMovingAverage)
+            }
             "roofingFilter" => Some(Self::RoofingFilter),
             "trueRange" => Some(Self::TrueRange),
             "averageTrueRange" => Some(Self::AverageTrueRange),
@@ -197,7 +213,9 @@ impl Identifier {
             "directionalIndicatorPlus" => Some(Self::DirectionalIndicatorPlus),
             "directionalMovementIndex" => Some(Self::DirectionalMovementIndex),
             "averageDirectionalMovementIndex" => Some(Self::AverageDirectionalMovementIndex),
-            "averageDirectionalMovementIndexRating" => Some(Self::AverageDirectionalMovementIndexRating),
+            "averageDirectionalMovementIndexRating" => {
+                Some(Self::AverageDirectionalMovementIndexRating)
+            }
             "williamsPercentR" => Some(Self::WilliamsPercentR),
             "percentagePriceOscillator" => Some(Self::PercentagePriceOscillator),
             "absolutePriceOscillator" => Some(Self::AbsolutePriceOscillator),
@@ -215,11 +233,15 @@ impl Identifier {
             "advanceDecline" => Some(Self::AdvanceDecline),
             "advanceDeclineOscillator" => Some(Self::AdvanceDeclineOscillator),
             "parabolicStopAndReverse" => Some(Self::ParabolicStopAndReverse),
-            "tripleExponentialMovingAverageOscillator" => Some(Self::TripleExponentialMovingAverageOscillator),
+            "tripleExponentialMovingAverageOscillator" => {
+                Some(Self::TripleExponentialMovingAverageOscillator)
+            }
             "bollingerBandsTrend" => Some(Self::BollingerBandsTrend),
             "movingAverageConvergenceDivergence" => Some(Self::MovingAverageConvergenceDivergence),
             "sineWave" => Some(Self::SineWave),
-            "hilbertTransformerInstantaneousTrendLine" => Some(Self::HilbertTransformerInstantaneousTrendLine),
+            "hilbertTransformerInstantaneousTrendLine" => {
+                Some(Self::HilbertTransformerInstantaneousTrendLine)
+            }
             "trendCycleMode" => Some(Self::TrendCycleMode),
             "coronaSpectrum" => Some(Self::CoronaSpectrum),
             "coronaSignalToNoiseRatio" => Some(Self::CoronaSignalToNoiseRatio),
@@ -231,6 +253,10 @@ impl Identifier {
             "combBandPassSpectrum" => Some(Self::CombBandPassSpectrum),
             "autoCorrelationIndicator" => Some(Self::AutoCorrelationIndicator),
             "autoCorrelationPeriodogram" => Some(Self::AutoCorrelationPeriodogram),
+            "jurikRelativeTrendStrengthIndex" => Some(Self::JurikRelativeTrendStrengthIndex),
+            "jurikCompositeFractalBehaviorIndex" => Some(Self::JurikCompositeFractalBehaviorIndex),
+            "jurikZeroLagVelocity" => Some(Self::JurikZeroLagVelocity),
+            "jurikDirectionalMovementIndex" => Some(Self::JurikDirectionalMovementIndex),
             _ => None,
         }
     }
