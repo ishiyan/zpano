@@ -507,4 +507,24 @@ def create_indicator(
         from ..welles_wilder.parabolic_stop_and_reverse.parabolic_stop_and_reverse import ParabolicStopAndReverse
         return ParabolicStopAndReverse(_apply(default_params(), params))
 
+    if identifier == Identifier.JURIK_RELATIVE_TREND_STRENGTH_INDEX:
+        from ..mark_jurik.jurik_relative_trend_strength_index.params import default_params
+        from ..mark_jurik.jurik_relative_trend_strength_index.jurik_relative_trend_strength_index import JurikRelativeTrendStrengthIndex
+        return JurikRelativeTrendStrengthIndex(_apply(default_params(), params))
+
+    if identifier == Identifier.JURIK_COMPOSITE_FRACTAL_BEHAVIOR_INDEX:
+        from ..mark_jurik.jurik_composite_fractal_behavior_index.params import default_params
+        from ..mark_jurik.jurik_composite_fractal_behavior_index.jurik_composite_fractal_behavior_index import JurikCompositeFractalBehaviorIndex
+        return JurikCompositeFractalBehaviorIndex(_apply(default_params(), params))
+
+    if identifier == Identifier.JURIK_ZERO_LAG_VELOCITY:
+        from ..mark_jurik.jurik_zero_lag_velocity.params import default_params
+        from ..mark_jurik.jurik_zero_lag_velocity.jurik_zero_lag_velocity import JurikZeroLagVelocity
+        return JurikZeroLagVelocity(_apply(default_params(), params))
+
+    if identifier == Identifier.JURIK_DIRECTIONAL_MOVEMENT_INDEX:
+        from ..mark_jurik.jurik_directional_movement_index.params import default_params
+        from ..mark_jurik.jurik_directional_movement_index.jurik_directional_movement_index import JurikDirectionalMovementIndex
+        return JurikDirectionalMovementIndex(_apply(default_params(), params))
+
     raise ValueError(f"unsupported indicator: {identifier}")
