@@ -96,6 +96,10 @@ const ado_mod = @import("../marc_chaikin/advance_decline_oscillator/advance_decl
 
 // mark_jurik
 const jma_mod = @import("../mark_jurik/jurik_moving_average/jurik_moving_average.zig");
+const jrsx_mod = @import("../mark_jurik/jurik_relative_trend_strength_index/jurik_relative_trend_strength_index.zig");
+const jcfb_mod = @import("../mark_jurik/jurik_composite_fractal_behavior_index/jurik_composite_fractal_behavior_index.zig");
+const jvel_mod = @import("../mark_jurik/jurik_zero_lag_velocity/jurik_zero_lag_velocity.zig");
+const jdmx_mod = @import("../mark_jurik/jurik_directional_movement_index/jurik_directional_movement_index.zig");
 
 // patrick_mulloy
 const dema_mod = @import("../patrick_mulloy/double_exponential_moving_average/double_exponential_moving_average.zig");
@@ -896,6 +900,32 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
             .bar_component = getBarComponent(obj),
             .quote_component = getQuoteComponent(obj),
             .trade_component = getTradeComponent(obj),
+        })),
+
+        .jurik_relative_trend_strength_index => createWithParams(jrsx_mod.JurikRelativeTrendStrengthIndex, allocator, jrsx_mod.JurikRelativeTrendStrengthIndex.init(.{
+            .length = @as(u32, @intCast(getUsize(obj, "length", 14))),
+            .bar_component = getBarComponent(obj),
+            .quote_component = getQuoteComponent(obj),
+            .trade_component = getTradeComponent(obj),
+        })),
+
+        .jurik_composite_fractal_behavior_index => createWithParams(jcfb_mod.JurikCompositeFractalBehaviorIndex, allocator, jcfb_mod.JurikCompositeFractalBehaviorIndex.init(.{
+            .fractal_type = @as(u32, @intCast(getUsize(obj, "fractalType", 1))),
+            .smooth = @as(u32, @intCast(getUsize(obj, "smooth", 10))),
+            .bar_component = getBarComponent(obj),
+            .quote_component = getQuoteComponent(obj),
+            .trade_component = getTradeComponent(obj),
+        })),
+
+        .jurik_zero_lag_velocity => createWithParams(jvel_mod.JurikZeroLagVelocity, allocator, jvel_mod.JurikZeroLagVelocity.init(.{
+            .depth = @as(u32, @intCast(getUsize(obj, "depth", 10))),
+            .bar_component = getBarComponent(obj),
+            .quote_component = getQuoteComponent(obj),
+            .trade_component = getTradeComponent(obj),
+        })),
+
+        .jurik_directional_movement_index => createWithParams(jdmx_mod.JurikDirectionalMovementIndex, allocator, jdmx_mod.JurikDirectionalMovementIndex.init(.{
+            .length = @as(u32, @intCast(getUsize(obj, "length", 14))),
         })),
 
         // ── patrick_mulloy ──────────────────────────────────────────────

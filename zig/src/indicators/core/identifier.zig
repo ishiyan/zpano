@@ -73,6 +73,10 @@ pub const Identifier = enum(u8) {
     comb_band_pass_spectrum = 69,
     auto_correlation_indicator = 70,
     auto_correlation_periodogram = 71,
+    jurik_relative_trend_strength_index = 72,
+    jurik_composite_fractal_behavior_index = 73,
+    jurik_zero_lag_velocity = 74,
+    jurik_directional_movement_index = 75,
 
     /// Returns the camelCase string representation matching Go's String().
     pub fn asStr(self: Identifier) []const u8 {
@@ -149,6 +153,10 @@ pub const Identifier = enum(u8) {
             .comb_band_pass_spectrum => "combBandPassSpectrum",
             .auto_correlation_indicator => "autoCorrelationIndicator",
             .auto_correlation_periodogram => "autoCorrelationPeriodogram",
+            .jurik_relative_trend_strength_index => "jurikRelativeTrendStrengthIndex",
+            .jurik_composite_fractal_behavior_index => "jurikCompositeFractalBehaviorIndex",
+            .jurik_zero_lag_velocity => "jurikZeroLagVelocity",
+            .jurik_directional_movement_index => "jurikDirectionalMovementIndex",
         };
     }
 
@@ -227,6 +235,10 @@ pub const Identifier = enum(u8) {
             .{ "combBandPassSpectrum", Identifier.comb_band_pass_spectrum },
             .{ "autoCorrelationIndicator", Identifier.auto_correlation_indicator },
             .{ "autoCorrelationPeriodogram", Identifier.auto_correlation_periodogram },
+            .{ "jurikRelativeTrendStrengthIndex", Identifier.jurik_relative_trend_strength_index },
+            .{ "jurikCompositeFractalBehaviorIndex", Identifier.jurik_composite_fractal_behavior_index },
+            .{ "jurikZeroLagVelocity", Identifier.jurik_zero_lag_velocity },
+            .{ "jurikDirectionalMovementIndex", Identifier.jurik_directional_movement_index },
         };
 
         inline for (map) |entry| {

@@ -218,4 +218,12 @@ pub const descriptors = [_]Descriptor{
     .{ .identifier = .comb_band_pass_spectrum, .family = "John Ehlers", .adaptivity = .static_, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .heatmap, .role = .spectrum, .pane = .own }} },
     .{ .identifier = .auto_correlation_indicator, .family = "John Ehlers", .adaptivity = .static_, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .heatmap, .role = .correlation, .pane = .own }} },
     .{ .identifier = .auto_correlation_periodogram, .family = "John Ehlers", .adaptivity = .adaptive, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .heatmap, .role = .spectrum, .pane = .own }} },
+    .{ .identifier = .jurik_relative_trend_strength_index, .family = "Mark Jurik", .adaptivity = .static_, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .oscillator, .pane = .own }} },
+    .{ .identifier = .jurik_composite_fractal_behavior_index, .family = "Mark Jurik", .adaptivity = .static_, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .oscillator, .pane = .own }} },
+    .{ .identifier = .jurik_zero_lag_velocity, .family = "Mark Jurik", .adaptivity = .adaptive, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .oscillator, .pane = .own }} },
+    .{ .identifier = .jurik_directional_movement_index, .family = "Mark Jurik", .adaptivity = .adaptive, .input_requirement = .bar_input, .volume_usage = .no_volume, .outputs = &[_]OD{
+        .{ .kind = 1, .shape = .scalar, .role = .oscillator, .pane = .own },
+        .{ .kind = 2, .shape = .scalar, .role = .oscillator, .pane = .own },
+        .{ .kind = 3, .shape = .scalar, .role = .oscillator, .pane = .own },
+    } },
 };
