@@ -197,7 +197,11 @@ def _to_decibels(length: int, src: Component, tgt: Component) -> None:
         base = src.max
 
     for i in range(length):
-        db = 20.0 * math.log10(src.data[i] / base)
+        val = src.data[i] / base
+        if val <= 0.0:
+            db = float('-inf')
+        else:
+            db = 20.0 * math.log10(val)
         dbmin = min(dbmin, db)
         dbmax = max(dbmax, db)
         tgt.data[i] = db

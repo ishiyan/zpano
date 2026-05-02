@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-#
-# Run with: PYTHONPATH=. python -m py.cmd.ifres py/cmd/ifres/settings.json from the project root.
-
-PYTHONPATH=. python3 -m py.cmd.ifres py/cmd/ifres/settings.json >output.txt
+set -euo pipefail
+cd "$(dirname "$0")/../../.."
+PYTHONPATH=. python3 -m py.cmd.ifres py/cmd/ifres/settings.json >py/cmd/ifres/output.txt

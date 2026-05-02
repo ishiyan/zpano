@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-#
-# Run with: PYTHONPATH=. python -m py.cmd.icalc py/cmd/icalc/settings.json from the project root.
-
-PYTHONPATH=. python3 -m py.cmd.icalc py/cmd/icalc/settings.json >output.txt
+set -euo pipefail
+cd "$(dirname "$0")/../../.."
+PYTHONPATH=. python3 -m py.cmd.icalc py/cmd/icalc/settings.json >py/cmd/icalc/output.txt
