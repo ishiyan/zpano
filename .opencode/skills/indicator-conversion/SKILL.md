@@ -831,6 +831,10 @@ func TestOutputUnmarshalJSON(t *testing.T) {
    `Outputs` slice must match the order of the `[]OutputText` passed by the indicator's
    `Metadata()` method.
 
+   **Grouping:** Descriptor entries follow the same author-grouping as identifiers —
+   grouped by author with `// ── groupname ──...──` dividers (common first, authors
+   alphabetical, custom last). Append the new entry at the end of its author group.
+
 ### Go Step 8: Add to icalc settings
 
 Add the new indicator to `go/cmd/icalc/settings.json` so it is exercised by the CLI tool:
@@ -1084,6 +1088,10 @@ calculation tests.
    `.opencode/skills/indicator-architecture/SKILL.md` section "Taxonomy & Descriptor
    Registry" for field meanings. The order of the `outputs` entries must match the order
    of the `OutputText[]` passed by the indicator's `metadata()` method.
+
+   **Grouping:** Descriptor entries follow the same author-grouping as identifiers —
+   grouped by author with `// ── groupname ──...──` dividers (common first, authors
+   alphabetical, custom last). Append the new entry at the end of its author group.
 
 ### TS Step 7: Verify
 
@@ -2077,7 +2085,9 @@ If adding a new indicator (not just porting):
   member at the end of its author group. Identifiers are grouped by author with
   `# ── groupname ──...──` dividers (common first, authors alphabetical, custom
   last). Append after the last member — do not re-sort.
-- Add to `py/indicators/core/descriptors.py` — new `_descriptors` entry
+- Add to `py/indicators/core/descriptors.py` — new `_descriptors` entry.
+  Descriptor entries follow the same author-grouping as identifiers (grouped by
+  author with `# ── groupname ──...──` dividers, append at end of author group).
 
 ### Step 8: Verify
 
@@ -2363,7 +2373,9 @@ Key test conventions:
    alphabetical, custom last). Append after the last member — do not re-sort.
    Also update the `asStr` and `fromStr` match tables in the same group position.
 
-2. **Register the descriptor** in `zig/src/indicators/core/descriptor.zig`.
+2. **Register the descriptor** in `zig/src/indicators/core/descriptors.zig`.
+   Descriptor entries follow the same author-grouping as identifiers (grouped by
+   author with `// ── groupname ──...──` dividers, append at end of author group).
 
 3. **Register in the factory.** Edit `zig/src/indicators/factory/factory.zig`:
 
@@ -2700,7 +2712,9 @@ end of its author group. Identifiers are grouped by author with
 last). Append after the last member — do not re-sort. Also update the `as_str`
 and `from_str` match arms in the same group position.
 
-Add to `rs/src/indicators/core/descriptors.rs`.
+Add to `rs/src/indicators/core/descriptors.rs`. Descriptor entries follow the same
+author-grouping as identifiers (grouped by author with `// ── groupname ──...──`
+dividers, append at end of author group).
 
 ### Step 8: Verify
 

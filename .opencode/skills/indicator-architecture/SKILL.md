@@ -1298,10 +1298,13 @@ indicator `Metadata()` implementations consume the registry via
 
 | Location                                              | Content |
 |-------------------------------------------------------|---------|
-| `go/indicators/core/descriptors.go`                   | Go descriptor map keyed by `Identifier`. |
+| `go/indicators/core/descriptors.go`                   | Go descriptor map keyed by `Identifier`. Grouped by author with `// ──` dividers. |
 | `go/indicators/core/descriptors_test.go`              | Coverage test: every `Identifier` has a descriptor row. |
 | `go/indicators/core/metadata_descriptor_test.go`      | Invariants: outputs are non-empty, Kinds are strictly ascending starting at 1, shapes are known. |
-| `ts/indicators/core/descriptors.ts`                   | TS descriptor `Map` keyed by `IndicatorIdentifier`. Uses `out()`/`desc()` helpers and `S`/`R`/`P`/`A`/`I`/`V` aliases for terse one-line entries. |
+| `ts/indicators/core/descriptors.ts`                   | TS descriptor `Map` keyed by `IndicatorIdentifier`. Grouped by author with `// ──` dividers. Uses `out()`/`desc()` helpers and `S`/`R`/`P`/`A`/`I`/`V` aliases for terse one-line entries. |
+| `py/indicators/core/descriptors.py`                   | Python descriptor dict keyed by `Identifier`. Grouped by author with `# ──` dividers. Uses `_o()`/`_d()` helpers. |
+| `zig/src/indicators/core/descriptors.zig`             | Zig descriptor array. Grouped by author with `// ──` dividers. |
+| `rs/src/indicators/core/descriptors.rs`               | Rust descriptor slice. Grouped by author with `// ──` dividers. |
 
 **Kind-numbering asymmetry:** Go per-indicator output enums are 1-based
 (`iota + 1`), TS enums are 0-based. The descriptor tables mirror that — Go
@@ -1366,7 +1369,16 @@ public metadata(): IndicatorMetadata {
 
 ### Adding a Descriptor Row
 
-When adding a new indicator you MUST add its descriptor in **both** Go and TS:
+When adding a new indicator you MUST add its descriptor in **all 5 languages**
+(`go/indicators/core/descriptors.go`, `ts/indicators/core/descriptors.ts`,
+`py/indicators/core/descriptors.py`, `zig/src/indicators/core/descriptors.zig`,
+`rs/src/indicators/core/descriptors.rs`).
+
+**Grouping rules (same as identifiers):**
+- Descriptor entries are grouped by author with `// ──` / `# ──` comment dividers.
+- "common" first, author groups alphabetical, "custom" last.
+- **Append** new entry at end of its author group — do not re-sort alphabetically within a group.
+- If a new author group is needed, insert a new divider in alphabetical order between existing groups.
 
 1. **Go** — `go/indicators/core/descriptors.go`:
 

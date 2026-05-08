@@ -148,6 +148,12 @@ Register in `core/identifier` in all 5 languages simultaneously.
 Register in `core/descriptors.{go,ts,py,zig,rs}`. Missing descriptor causes `BuildMetadata` to panic at runtime.
 Outputs order must match the `OutputText[]` passed by `metadata()`.
 
+**Grouping rules (same as identifiers):**
+- Descriptor entries are grouped by author with `// ──` / `# ──` comment dividers.
+- "common" first, author groups alphabetical, "custom" last.
+- **Append** new entry at end of its author group — do not re-sort alphabetically within a group.
+- If a new author group is needed, insert a new divider in alphabetical order between existing groups.
+
 ### 8c. Factory (all 5 languages)
 
 Register in `factory/factory.{go,ts,py,zig,rs}`.
