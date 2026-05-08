@@ -1591,4 +1591,17 @@ pub static DESCRIPTORS: &[Descriptor] = &[
             pane: Own,
         }],
     },
+    Descriptor {
+        identifier: ArnaudLegouxMovingAverage,
+        family: "Arnaud Legoux",
+        adaptivity: Static,
+        input_requirement: ScalarInput,
+        volume_usage: NoVolume,
+        outputs: &[OutputDescriptor {
+            kind: 1,
+            shape: Scalar,
+            role: Smoother,
+            pane: Price,
+        }],
+    },
 ];

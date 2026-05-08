@@ -223,6 +223,9 @@ use crate::indicators::welles_wilder::relative_strength_index::{
     RelativeStrengthIndex, RelativeStrengthIndexParams,
 };
 use crate::indicators::welles_wilder::true_range::{TrueRange, TrueRangeParams};
+use crate::indicators::arnaud_legoux::arnaud_legoux_moving_average::{
+    ArnaudLegouxMovingAverage, ArnaudLegouxMovingAverageParams,
+};
 
 /// Create an indicator from its identifier and a JSON-encoded parameter string.
 ///
@@ -1376,6 +1379,20 @@ pub fn create_indicator(
         Identifier::ParabolicStopAndReverse => {
             let p = ParabolicStopAndReverseParams::default();
             Ok(Box::new(ParabolicStopAndReverse::new(&p)?))
+        }
+
+        Identifier::ArnaudLegouxMovingAverage => {
+            let mut p = ArnaudLegouxMovingAverageParams::default();
+            if let Some(v) = get_usize(&params, "window") {
+                p.window = v;
+            }
+            if let Some(v) = get_f64(&params, "sigma") {
+                p.sigma = v;
+            }
+            if let Some(v) = get_f64(&params, "offset") {
+                p.offset = v;
+            }
+            Ok(Box::new(ArnaudLegouxMovingAverage::new(&p)?))
         }
 
         _ => Err(format!("unsupported indicator: {:?}", identifier)),

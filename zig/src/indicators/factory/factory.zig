@@ -106,6 +106,7 @@ const javel_mod = @import("../mark_jurik/jurik_adaptive_zero_lag_velocity/jurik_
 const jccx_mod = @import("../mark_jurik/jurik_commodity_channel_index/jurik_commodity_channel_index.zig");
 const jvelcfb_mod = @import("../mark_jurik/jurik_fractal_adaptive_zero_lag_velocity/jurik_fractal_adaptive_zero_lag_velocity.zig");
 const wav_mod = @import("../mark_jurik/jurik_wavelet_sampler/jurik_wavelet_sampler.zig");
+const alma_mod = @import("../arnaud_legoux/arnaud_legoux_moving_average/arnaud_legoux_moving_average.zig");
 
 // patrick_mulloy
 const dema_mod = @import("../patrick_mulloy/double_exponential_moving_average/double_exponential_moving_average.zig");
@@ -982,6 +983,17 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
             .quote_component = getQuoteComponent(obj),
             .trade_component = getTradeComponent(obj),
         })),
+
+        // ── arnaud_legoux ───────────────────────────────────────────────
+
+        .arnaud_legoux_moving_average => createWithAllocParams(alma_mod.ArnaudLegouxMovingAverage, alma_mod.ArnaudLegouxMovingAverageParams, allocator, obj, .{
+            .window = getUsize(obj, "window", 9),
+            .sigma = getF64(obj, "sigma", 6.0),
+            .offset = getF64(obj, "offset", 0.85),
+            .bar_component = getBarComponent(obj),
+            .quote_component = getQuoteComponent(obj),
+            .trade_component = getTradeComponent(obj),
+        }),
 
         // ── patrick_mulloy ──────────────────────────────────────────────
 

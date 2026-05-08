@@ -550,4 +550,9 @@ var descriptors = map[Identifier]Descriptor{
 		Adaptivity: Static, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
 		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Oscillator, Pane: Own}},
 	},
+	ArnaudLegouxMovingAverage: {
+		Identifier: ArnaudLegouxMovingAverage, Family: "Arnaud Legoux",
+		Adaptivity: Static, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Smoother, Pane: Price}},
+	},
 }

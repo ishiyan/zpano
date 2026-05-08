@@ -20,3 +20,4 @@ pub mod tushar_chande;
 pub mod vladimir_kravchuk;
 pub mod welles_wilder;
 pub mod john_ehlers;
+pub mod arnaud_legoux;

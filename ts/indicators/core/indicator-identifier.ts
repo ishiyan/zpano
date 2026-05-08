@@ -260,4 +260,7 @@ export enum IndicatorIdentifier {
 
   /** Identifies the Jurik __Wavelet Sampler__ (WAV) indicator. */
   JurikWaveletSampler,
+
+  /** Identifies the Arnaud Legoux __Moving Average__ (ALMA) indicator. */
+  ArnaudLegouxMovingAverage,
 }

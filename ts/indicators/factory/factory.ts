@@ -193,6 +193,10 @@ import { AdaptiveTrendAndCycleFilter } from '../vladimir-kravchuk/adaptive-trend
 import { GoertzelSpectrum } from '../custom/goertzel-spectrum/goertzel-spectrum.js';
 import { MaximumEntropySpectrum } from '../custom/maximum-entropy-spectrum/maximum-entropy-spectrum.js';
 
+// ── arnaud-legoux ───────────────────────────────────────────────────────────
+import { ArnaudLegouxMovingAverage } from '../arnaud-legoux/arnaud-legoux-moving-average/arnaud-legoux-moving-average.js';
+import { defaultParams as defaultAlmaParams } from '../arnaud-legoux/arnaud-legoux-moving-average/params.js';
+
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -570,6 +574,11 @@ export function createIndicator(identifier: IndicatorIdentifier, params?: Record
         case IndicatorIdentifier.MaximumEntropySpectrum:
             if (isEmpty(p)) return MaximumEntropySpectrum.default();
             return MaximumEntropySpectrum.fromParams(p as any);
+
+        // ── arnaud-legoux ───────────────────────────────────────────
+
+        case IndicatorIdentifier.ArnaudLegouxMovingAverage:
+            return new ArnaudLegouxMovingAverage({ ...defaultAlmaParams(), ...p });
 
         default:
             throw new Error(`Unsupported indicator: ${IndicatorIdentifier[identifier] ?? identifier}`);

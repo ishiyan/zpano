@@ -80,5 +80,6 @@
   { "identifier": "discreteFourierTransformSpectrum", "params": {} },
   { "identifier": "combBandPassSpectrum", "params": {} },
   { "identifier": "autoCorrelationIndicator", "params": {} },
-  { "identifier": "autoCorrelationPeriodogram", "params": {} }
+  { "identifier": "autoCorrelationPeriodogram", "params": {} },
+  { "identifier": "arnaudLegouxMovingAverage", "params": { "window": 9, "sigma": 6, "offset": 0.85 } }
 ]

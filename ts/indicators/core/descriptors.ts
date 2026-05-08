@@ -245,6 +245,7 @@ const descriptors: Map<IndicatorIdentifier, Descriptor> = new Map<IndicatorIdent
   [IndicatorIdentifier.JurikFractalAdaptiveZeroLagVelocity, desc(IndicatorIdentifier.JurikFractalAdaptiveZeroLagVelocity, 'Mark Jurik', A.Adaptive, I.ScalarInput, V.NoVolume, [out(1, S.Scalar, R.Oscillator, P.Own)])],
   [IndicatorIdentifier.JurikTurningPointOscillator, desc(IndicatorIdentifier.JurikTurningPointOscillator, 'Mark Jurik', A.Static, I.ScalarInput, V.NoVolume, [out(1, S.Scalar, R.Oscillator, P.Own)])],
   [IndicatorIdentifier.JurikWaveletSampler, desc(IndicatorIdentifier.JurikWaveletSampler, 'Mark Jurik', A.Static, I.ScalarInput, V.NoVolume, [out(1, S.Scalar, R.Smoother, P.Price)])],
+  [IndicatorIdentifier.ArnaudLegouxMovingAverage, desc(IndicatorIdentifier.ArnaudLegouxMovingAverage, 'Arnaud Legoux', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Smoother, P.Price)])],
 ]);
 
 /**

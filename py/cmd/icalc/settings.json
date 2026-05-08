@@ -80,5 +80,6 @@
   { "identifier": "jurikCommodityChannelIndex", "params": { "length": 20 } },
   { "identifier": "jurikFractalAdaptiveZeroLagVelocity", "params": { "loDepth": 5, "hiDepth": 30, "fractalType": 1, "smooth": 10 } },
   { "identifier": "jurikTurningPointOscillator", "params": { "length": 14 } },
-  { "identifier": "jurikWaveletSampler", "params": { "index": 12 } }
+  { "identifier": "jurikWaveletSampler", "params": { "index": 12 } },
+  { "identifier": "arnaudLegouxMovingAverage", "params": { "window": 9, "sigma": 6, "offset": 0.85 } }
 ]

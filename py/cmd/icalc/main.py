@@ -112,6 +112,7 @@ _IDENTIFIER_MAP: dict[str, Identifier] = {
     'jurikFractalAdaptiveZeroLagVelocity': Identifier.JURIK_FRACTAL_ADAPTIVE_ZERO_LAG_VELOCITY,
     'jurikTurningPointOscillator': Identifier.JURIK_TURNING_POINT_OSCILLATOR,
     'jurikWaveletSampler': Identifier.JURIK_WAVELET_SAMPLER,
+    'arnaudLegouxMovingAverage': Identifier.ARNAUD_LEGOUX_MOVING_AVERAGE,
 }
 
 

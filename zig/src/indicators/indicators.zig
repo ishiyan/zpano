@@ -155,6 +155,7 @@ pub const homodyne_discriminator = @import("john_ehlers/hilbert_transformer/homo
 pub const homodyne_discriminator_unrolled = @import("john_ehlers/hilbert_transformer/homodyne_discriminator_unrolled.zig");
 pub const phase_accumulator = @import("john_ehlers/hilbert_transformer/phase_accumulator.zig");
 pub const dual_differentiator = @import("john_ehlers/hilbert_transformer/dual_differentiator.zig");
+pub const arnaud_legoux_moving_average = @import("arnaud_legoux/arnaud_legoux_moving_average/arnaud_legoux_moving_average.zig");
 
 // Force-include tests from sub-modules.
 comptime {
@@ -248,4 +249,5 @@ comptime {
     _ = maximum_entropy_spectrum;
     _ = frequency_response;
     _ = factory;
+    _ = arnaud_legoux_moving_average;
 }

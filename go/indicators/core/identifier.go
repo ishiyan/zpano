@@ -273,6 +273,9 @@ const (
 	// JurikTurningPointOscillator identifies the Jurik Turning Point Oscillator (JTPO) indicator.
 	JurikTurningPointOscillator
 
+	// ArnaudLegouxMovingAverage identifies the Arnaud Legoux Moving Average (ALMA) indicator.
+	ArnaudLegouxMovingAverage
+
 	last
 )
 
@@ -360,6 +363,7 @@ const (
 	jurikFractalAdaptiveZeroLagVelocity            = "jurikFractalAdaptiveZeroLagVelocity"
 	jurikAdaptiveRelativeTrendStrengthIndex         = "jurikAdaptiveRelativeTrendStrengthIndex"
 	jurikTurningPointOscillator                    = "jurikTurningPointOscillator"
+	arnaudLegouxMovingAverage                      = "arnaudLegouxMovingAverage"
 )
 
 // String implements the Stringer interface.
@@ -531,6 +535,8 @@ func (i Identifier) String() string {
 		return jurikAdaptiveRelativeTrendStrengthIndex
 	case JurikTurningPointOscillator:
 		return jurikTurningPointOscillator
+	case ArnaudLegouxMovingAverage:
+		return arnaudLegouxMovingAverage
 	default:
 		return unknown
 	}
@@ -739,6 +745,8 @@ func (i *Identifier) UnmarshalJSON(data []byte) error {
 		*i = JurikAdaptiveRelativeTrendStrengthIndex
 	case jurikTurningPointOscillator:
 		*i = JurikTurningPointOscillator
+	case arnaudLegouxMovingAverage:
+		*i = ArnaudLegouxMovingAverage
 	default:
 		return fmt.Errorf(errFmt, s)
 	}

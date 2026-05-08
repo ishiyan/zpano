@@ -85,6 +85,7 @@ pub enum Identifier {
     JurikFractalAdaptiveZeroLagVelocity = 79,
     JurikAdaptiveRelativeTrendStrengthIndex = 80,
     JurikTurningPointOscillator = 81,
+    ArnaudLegouxMovingAverage = 82,
 }
 
 impl Identifier {
@@ -179,6 +180,7 @@ impl Identifier {
             Self::JurikAdaptiveZeroLagVelocity => "jurikAdaptiveZeroLagVelocity",
             Self::JurikFractalAdaptiveZeroLagVelocity => "jurikFractalAdaptiveZeroLagVelocity",
             Self::JurikAdaptiveRelativeTrendStrengthIndex => "jurikAdaptiveRelativeTrendStrengthIndex",
+            Self::ArnaudLegouxMovingAverage => "arnaudLegouxMovingAverage",
         }
     }
 
@@ -275,6 +277,7 @@ impl Identifier {
             "jurikAdaptiveZeroLagVelocity" => Some(Self::JurikAdaptiveZeroLagVelocity),
             "jurikFractalAdaptiveZeroLagVelocity" => Some(Self::JurikFractalAdaptiveZeroLagVelocity),
             "jurikAdaptiveRelativeTrendStrengthIndex" => Some(Self::JurikAdaptiveRelativeTrendStrengthIndex),
+            "arnaudLegouxMovingAverage" => Some(Self::ArnaudLegouxMovingAverage),
             _ => None,
         }
     }

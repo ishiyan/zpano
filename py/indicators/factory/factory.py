@@ -557,4 +557,9 @@ def create_indicator(
         from ..mark_jurik.jurik_wavelet_sampler.jurik_wavelet_sampler import JurikWaveletSampler
         return JurikWaveletSampler(_apply(default_params(), params))
 
+    if identifier == Identifier.ARNAUD_LEGOUX_MOVING_AVERAGE:
+        from ..arnaud_legoux.arnaud_legoux_moving_average.params import default_params
+        from ..arnaud_legoux.arnaud_legoux_moving_average.arnaud_legoux_moving_average import ArnaudLegouxMovingAverage
+        return ArnaudLegouxMovingAverage(_apply(default_params(), params))
+
     raise ValueError(f"unsupported indicator: {identifier}")

@@ -569,6 +569,12 @@
   Outputs (1):
     [0] kind=1 shape=heatmap mnemonic="acp(10, 48, hl/2)" description="Autocorrelation periodogram acp(10, 48, hl/2)"
 
+[82] alma(9, 6, 0.85)
+  Identifier:  arnaudLegouxMovingAverage
+  Description: Arnaud Legoux moving average alma(9, 6, 0.85)
+  Outputs (1):
+    [0] kind=1 shape=scalar mnemonic="alma(9, 6, 0.85)" description="Arnaud Legoux moving average alma(9, 6, 0.85)"
+
 
 === Bar Data & Indicator Outputs ===
 
@@ -655,6 +661,7 @@ Bar[  0] 2020-01-02  O=91.5000 H=93.2500 L=90.7500 C=91.5000 V=4077500
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=false alma(9, 6, 0.85)=NaN 
 
 Bar[  1] 2020-01-03  O=91.5000 H=94.9400 L=91.4050 C=94.8150 V=4955900
   sma(14)                                       primed=false sma(14)=NaN 
@@ -739,6 +746,7 @@ Bar[  1] 2020-01-03  O=91.5000 H=94.9400 L=91.4050 C=94.8150 V=4955900
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=false alma(9, 6, 0.85)=NaN 
 
 Bar[  2] 2020-01-04  O=94.8150 H=96.3750 L=94.2500 C=94.3750 V=4775300
   sma(14)                                       primed=false sma(14)=NaN 
@@ -823,6 +831,7 @@ Bar[  2] 2020-01-04  O=94.8150 H=96.3750 L=94.2500 C=94.3750 V=4775300
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=false alma(9, 6, 0.85)=NaN 
 
 Bar[  3] 2020-01-05  O=94.3750 H=96.1900 L=93.5000 C=95.0950 V=4155300
   sma(14)                                       primed=false sma(14)=NaN 
@@ -907,6 +916,7 @@ Bar[  3] 2020-01-05  O=94.3750 H=96.1900 L=93.5000 C=95.0950 V=4155300
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=false alma(9, 6, 0.85)=NaN 
 
 Bar[  4] 2020-01-06  O=95.0950 H=96.0000 L=92.8150 C=93.7800 V=4593100
   sma(14)                                       primed=false sma(14)=NaN 
@@ -991,6 +1001,7 @@ Bar[  4] 2020-01-06  O=95.0950 H=96.0000 L=92.8150 C=93.7800 V=4593100
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=false alma(9, 6, 0.85)=NaN 
 
 Bar[  5] 2020-01-07  O=93.7800 H=94.7200 L=93.5000 C=94.6250 V=3631300
   sma(14)                                       primed=false sma(14)=NaN 
@@ -1075,6 +1086,7 @@ Bar[  5] 2020-01-07  O=93.7800 H=94.7200 L=93.5000 C=94.6250 V=3631300
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=false alma(9, 6, 0.85)=NaN 
 
 Bar[  6] 2020-01-08  O=94.6250 H=95.0000 L=92.0000 C=92.5300 V=3382800
   sma(14)                                       primed=false sma(14)=NaN 
@@ -1159,6 +1171,7 @@ Bar[  6] 2020-01-08  O=94.6250 H=95.0000 L=92.0000 C=92.5300 V=3382800
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=false alma(9, 6, 0.85)=NaN 
 
 Bar[  7] 2020-01-09  O=92.5300 H=93.7200 L=89.7500 C=92.7500 V=4954200
   sma(14)                                       primed=false sma(14)=NaN 
@@ -1243,6 +1256,7 @@ Bar[  7] 2020-01-09  O=92.5300 H=93.7200 L=89.7500 C=92.7500 V=4954200
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=false alma(9, 6, 0.85)=NaN 
 
 Bar[  8] 2020-01-10  O=92.7500 H=92.4700 L=89.4400 C=90.3150 V=4500000
   sma(14)                                       primed=false sma(14)=NaN 
@@ -1327,6 +1341,7 @@ Bar[  8] 2020-01-10  O=92.7500 H=92.4700 L=89.4400 C=90.3150 V=4500000
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=92.5191 
 
 Bar[  9] 2020-01-11  O=90.3150 H=92.7500 L=90.6250 C=92.4700 V=3397500
   sma(14)                                       primed=false sma(14)=NaN 
@@ -1411,6 +1426,7 @@ Bar[  9] 2020-01-11  O=90.3150 H=92.7500 L=90.6250 C=92.4700 V=3397500
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=92.0399 
 
 Bar[ 10] 2020-01-12  O=92.4700 H=96.2500 L=92.7500 C=96.1250 V=4204500
   sma(14)                                       primed=false sma(14)=NaN 
@@ -1495,6 +1511,7 @@ Bar[ 10] 2020-01-12  O=92.4700 H=96.2500 L=92.7500 C=96.1250 V=4204500
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=92.7821 
 
 Bar[ 11] 2020-01-13  O=96.1250 H=99.6250 L=96.3150 C=97.2500 V=6321400
   sma(14)                                       primed=false sma(14)=NaN 
@@ -1579,6 +1596,7 @@ Bar[ 11] 2020-01-13  O=96.1250 H=99.6250 L=96.3150 C=97.2500 V=6321400
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=94.3251 
 
 Bar[ 12] 2020-01-14  O=97.2500 H=99.1250 L=96.0300 C=98.5000 V=10203600
   sma(14)                                       primed=false sma(14)=NaN 
@@ -1663,6 +1681,7 @@ Bar[ 12] 2020-01-14  O=97.2500 H=99.1250 L=96.0300 C=98.5000 V=10203600
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=96.0899 
 
 Bar[ 13] 2020-01-15  O=98.5000 H=92.7500 L=88.8150 C=89.8750 V=19043900
   sma(14)                                       primed=true  sma(14)=93.8575 
@@ -1747,6 +1766,7 @@ Bar[ 13] 2020-01-15  O=98.5000 H=92.7500 L=88.8150 C=89.8750 V=19043900
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=95.4857 
 
 Bar[ 14] 2020-01-16  O=89.8750 H=91.3150 L=86.7500 C=91.0000 V=11692000
   sma(14)                                       primed=true  sma(14)=93.8218 
@@ -1831,6 +1851,7 @@ Bar[ 14] 2020-01-16  O=89.8750 H=91.3150 L=86.7500 C=91.0000 V=11692000
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=93.8500 
 
 Bar[ 15] 2020-01-17  O=91.0000 H=93.2500 L=90.9400 C=92.8150 V=9553300
   sma(14)                                       primed=true  sma(14)=93.6789 
@@ -1915,6 +1936,7 @@ Bar[ 15] 2020-01-17  O=91.0000 H=93.2500 L=90.9400 C=92.8150 V=9553300
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=92.6100 
 
 Bar[ 16] 2020-01-18  O=92.8150 H=93.4050 L=88.9050 C=89.1550 V=8920300
   sma(14)                                       primed=true  sma(14)=93.3061 
@@ -1999,6 +2021,7 @@ Bar[ 16] 2020-01-18  O=92.8150 H=93.4050 L=88.9050 C=89.1550 V=8920300
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=91.4582 
 
 Bar[ 17] 2020-01-19  O=89.1550 H=90.6550 L=88.7800 C=89.3450 V=5970900
   sma(14)                                       primed=true  sma(14)=92.8954 
@@ -2083,6 +2106,7 @@ Bar[ 17] 2020-01-19  O=89.1550 H=90.6550 L=88.7800 C=89.3450 V=5970900
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=90.6023 
 
 Bar[ 18] 2020-01-20  O=89.3450 H=91.9700 L=89.2500 C=91.6250 V=5062300
   sma(14)                                       primed=true  sma(14)=92.7414 
@@ -2167,6 +2191,7 @@ Bar[ 18] 2020-01-20  O=89.3450 H=91.9700 L=89.2500 C=91.6250 V=5062300
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=90.4230 
 
 Bar[ 19] 2020-01-21  O=91.6250 H=92.2500 L=89.7500 C=89.8750 V=3705600
   sma(14)                                       primed=true  sma(14)=92.4021 
@@ -2251,6 +2276,7 @@ Bar[ 19] 2020-01-21  O=91.6250 H=92.2500 L=89.7500 C=89.8750 V=3705600
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=90.3273 
 
 Bar[ 20] 2020-01-22  O=89.8750 H=90.3450 L=87.5000 C=88.3750 V=5865600
   sma(14)                                       primed=true  sma(14)=92.1054 
@@ -2335,6 +2361,7 @@ Bar[ 20] 2020-01-22  O=89.8750 H=90.3450 L=87.5000 C=88.3750 V=5865600
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=89.9268 
 
 Bar[ 21] 2020-01-23  O=88.3750 H=88.5000 L=86.5300 C=87.6250 V=5603000
   sma(14)                                       primed=true  sma(14)=91.7393 
@@ -2419,6 +2446,7 @@ Bar[ 21] 2020-01-23  O=88.3750 H=88.5000 L=86.5300 C=87.6250 V=5603000
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=89.1547 
 
 Bar[ 22] 2020-01-24  O=87.6250 H=88.2500 L=84.6250 C=84.7800 V=5811900
   sma(14)                                       primed=true  sma(14)=91.3439 
@@ -2503,6 +2531,7 @@ Bar[ 22] 2020-01-24  O=87.6250 H=88.2500 L=84.6250 C=84.7800 V=5811900
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=87.7653 
 
 Bar[ 23] 2020-01-25  O=84.7800 H=85.5000 L=82.2800 C=83.0000 V=8483800
   sma(14)                                       primed=true  sma(14)=90.6675 
@@ -2587,6 +2616,7 @@ Bar[ 23] 2020-01-25  O=84.7800 H=85.5000 L=82.2800 C=83.0000 V=8483800
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=86.0321 
 
 Bar[ 24] 2020-01-26  O=83.0000 H=84.4400 L=81.5650 C=83.5000 V=5995200
   sma(14)                                       primed=true  sma(14)=89.7657 
@@ -2671,6 +2701,7 @@ Bar[ 24] 2020-01-26  O=83.0000 H=84.4400 L=81.5650 C=83.5000 V=5995200
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=84.6495 
 
 Bar[ 25] 2020-01-27  O=83.5000 H=84.7500 L=80.8750 C=81.3750 V=5408800
   sma(14)                                       primed=true  sma(14)=88.6318 
@@ -2755,6 +2786,7 @@ Bar[ 25] 2020-01-27  O=83.5000 H=84.7500 L=80.8750 C=81.3750 V=5408800
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=83.3811 
 
 Bar[ 26] 2020-01-28  O=81.3750 H=84.4400 L=81.2500 C=84.4400 V=5430500
   sma(14)                                       primed=true  sma(14)=87.6275 
@@ -2839,6 +2871,7 @@ Bar[ 26] 2020-01-28  O=81.3750 H=84.4400 L=81.2500 C=84.4400 V=5430500
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=83.1226 
 
 Bar[ 27] 2020-01-29  O=84.4400 H=89.4050 L=84.0650 C=89.2500 V=6283800
   sma(14)                                       primed=true  sma(14)=87.5829 
@@ -2923,6 +2956,7 @@ Bar[ 27] 2020-01-29  O=84.4400 H=89.4050 L=84.0650 C=89.2500 V=6283800
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=84.4884 
 
 Bar[ 28] 2020-01-30  O=89.2500 H=88.1250 L=85.5950 C=86.3750 V=5834800
   sma(14)                                       primed=true  sma(14)=87.2525 
@@ -3007,6 +3041,7 @@ Bar[ 28] 2020-01-30  O=89.2500 H=88.1250 L=85.5950 C=86.3750 V=5834800
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=85.7947 
 
 Bar[ 29] 2020-01-31  O=86.3750 H=89.1250 L=85.9700 C=86.2500 V=4515500
   sma(14)                                       primed=true  sma(14)=86.7836 
@@ -3091,6 +3126,7 @@ Bar[ 29] 2020-01-31  O=86.3750 H=89.1250 L=85.9700 C=86.2500 V=4515500
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=86.5111 
 
 Bar[ 30] 2020-02-01  O=86.2500 H=87.1550 L=84.4050 C=85.2500 V=4493300
   sma(14)                                       primed=true  sma(14)=86.5046 
@@ -3175,6 +3211,7 @@ Bar[ 30] 2020-02-01  O=86.2500 H=87.1550 L=84.4050 C=85.2500 V=4493300
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=86.3442 
 
 Bar[ 31] 2020-02-02  O=85.2500 H=87.2500 L=85.0950 C=87.1250 V=4346100
   sma(14)                                       primed=true  sma(14)=86.3461 
@@ -3259,6 +3296,7 @@ Bar[ 31] 2020-02-02  O=85.2500 H=87.2500 L=85.0950 C=87.1250 V=4346100
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=86.2884 
 
 Bar[ 32] 2020-02-03  O=87.1250 H=87.3750 L=85.5000 C=85.8150 V=3700300
   sma(14)                                       primed=true  sma(14)=85.9311 
@@ -3343,6 +3381,7 @@ Bar[ 32] 2020-02-03  O=87.1250 H=87.3750 L=85.5000 C=85.8150 V=3700300
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=86.1933 
 
 Bar[ 33] 2020-02-04  O=85.8150 H=88.9700 L=85.5300 C=88.9700 V=4600200
   sma(14)                                       primed=true  sma(14)=85.8664 
@@ -3427,6 +3466,7 @@ Bar[ 33] 2020-02-04  O=85.8150 H=88.9700 L=85.5300 C=88.9700 V=4600200
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=86.8081 
 
 Bar[ 34] 2020-02-05  O=88.9700 H=90.0000 L=87.8750 C=88.4700 V=4557200
   sma(14)                                       primed=true  sma(14)=85.8732 
@@ -3511,6 +3551,7 @@ Bar[ 34] 2020-02-05  O=88.9700 H=90.0000 L=87.8750 C=88.4700 V=4557200
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=87.5203 
 
 Bar[ 35] 2020-02-06  O=88.4700 H=89.8450 L=86.5650 C=86.8750 V=4323600
   sma(14)                                       primed=true  sma(14)=85.8196 
@@ -3595,6 +3636,7 @@ Bar[ 35] 2020-02-06  O=88.4700 H=89.8450 L=86.5650 C=86.8750 V=4323600
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=87.7423 
 
 Bar[ 36] 2020-02-07  O=86.8750 H=86.9700 L=84.6550 C=86.8150 V=5237500
   sma(14)                                       primed=true  sma(14)=85.9650 
@@ -3679,6 +3721,7 @@ Bar[ 36] 2020-02-07  O=86.8750 H=86.9700 L=84.6550 C=86.8150 V=5237500
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=87.5351 
 
 Bar[ 37] 2020-02-08  O=86.8150 H=85.9400 L=83.2500 C=84.8750 V=7404100
   sma(14)                                       primed=true  sma(14)=86.0989 
@@ -3763,6 +3806,7 @@ Bar[ 37] 2020-02-08  O=86.8150 H=85.9400 L=83.2500 C=84.8750 V=7404100
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=86.7503 
 
 Bar[ 38] 2020-02-09  O=84.8750 H=84.7500 L=82.5650 C=84.1900 V=4798400
   sma(14)                                       primed=true  sma(14)=86.1482 
@@ -3847,6 +3891,7 @@ Bar[ 38] 2020-02-09  O=84.8750 H=84.7500 L=82.5650 C=84.1900 V=4798400
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=85.7740 
 
 Bar[ 39] 2020-02-10  O=84.1900 H=85.4700 L=83.4400 C=83.8750 V=4372800
   sma(14)                                       primed=true  sma(14)=86.3268 
@@ -3931,6 +3976,7 @@ Bar[ 39] 2020-02-10  O=84.1900 H=85.4700 L=83.4400 C=83.8750 V=4372800
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=84.8932 
 
 Bar[ 40] 2020-02-11  O=83.8750 H=84.4700 L=82.5300 C=83.3750 V=3872300
   sma(14)                                       primed=true  sma(14)=86.2507 
@@ -4015,6 +4061,7 @@ Bar[ 40] 2020-02-11  O=83.8750 H=84.4700 L=82.5300 C=83.3750 V=3872300
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=84.1979 
 
 Bar[ 41] 2020-02-12  O=83.3750 H=88.5000 L=85.0650 C=85.5000 V=10750800
   sma(14)                                       primed=true  sma(14)=85.9829 
@@ -4099,6 +4146,7 @@ Bar[ 41] 2020-02-12  O=83.3750 H=88.5000 L=85.0650 C=85.5000 V=10750800
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=84.2249 
 
 Bar[ 42] 2020-02-13  O=85.5000 H=89.4700 L=86.8750 C=89.1900 V=5804800
   sma(14)                                       primed=true  sma(14)=86.1839 
@@ -4183,6 +4231,7 @@ Bar[ 42] 2020-02-13  O=85.5000 H=89.4700 L=86.8750 C=89.1900 V=5804800
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=85.4391 
 
 Bar[ 43] 2020-02-14  O=89.1900 H=90.0000 L=88.5300 C=89.4400 V=3785500
   sma(14)                                       primed=true  sma(14)=86.4118 
@@ -4267,6 +4316,7 @@ Bar[ 43] 2020-02-14  O=89.1900 H=90.0000 L=88.5300 C=89.4400 V=3785500
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=87.0617 
 
 Bar[ 44] 2020-02-15  O=89.4400 H=92.4400 L=89.2800 C=91.0950 V=5014800
   sma(14)                                       primed=true  sma(14)=86.8293 
@@ -4351,6 +4401,7 @@ Bar[ 44] 2020-02-15  O=89.4400 H=92.4400 L=89.2800 C=91.0950 V=5014800
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=88.7557 
 
 Bar[ 45] 2020-02-16  O=91.0950 H=91.4400 L=90.1250 C=90.7500 V=3507700
   sma(14)                                       primed=true  sma(14)=87.0882 
@@ -4435,6 +4486,7 @@ Bar[ 45] 2020-02-16  O=91.0950 H=91.4400 L=90.1250 C=90.7500 V=3507700
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=89.8950 
 
 Bar[ 46] 2020-02-17  O=90.7500 H=92.9700 L=90.7500 C=91.4400 V=4298800
   sma(14)                                       primed=true  sma(14)=87.4900 
@@ -4519,6 +4571,7 @@ Bar[ 46] 2020-02-17  O=90.7500 H=92.9700 L=90.7500 C=91.4400 V=4298800
   cbps(10, 48, hl/2)                            primed=false cbps(10, 48, hl/2)=Heatmap(empty) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=90.6374 
 
 Bar[ 47] 2020-02-18  O=91.4400 H=91.7200 L=89.0000 C=89.0000 V=4842500
   sma(14)                                       primed=true  sma(14)=87.4921 
@@ -4603,6 +4656,7 @@ Bar[ 47] 2020-02-18  O=91.4400 H=91.7200 L=89.0000 C=89.0000 V=4842500
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=90.5231 
 
 Bar[ 48] 2020-02-19  O=89.0000 H=91.1550 L=88.5650 C=91.0000 V=3952200
   sma(14)                                       primed=true  sma(14)=87.6729 
@@ -4687,6 +4741,7 @@ Bar[ 48] 2020-02-19  O=89.0000 H=91.1550 L=88.5650 C=91.0000 V=3952200
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=90.4587 
 
 Bar[ 49] 2020-02-20  O=91.0000 H=91.7500 L=90.0950 C=90.5000 V=3304700
   sma(14)                                       primed=true  sma(14)=87.9318 
@@ -4771,6 +4826,7 @@ Bar[ 49] 2020-02-20  O=91.0000 H=91.7500 L=90.0950 C=90.5000 V=3304700
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=false acp(10, 48, hl/2)=Heatmap(empty) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=90.4127 
 
 Bar[ 50] 2020-02-21  O=90.5000 H=90.0000 L=89.0000 C=89.0300 V=3462000
   sma(14)                                       primed=true  sma(14)=88.0900 
@@ -4855,6 +4911,7 @@ Bar[ 50] 2020-02-21  O=90.5000 H=90.0000 L=89.0000 C=89.0300 V=3462000
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=90.1398 
 
 Bar[ 51] 2020-02-22  O=89.0300 H=88.8750 L=86.4700 C=88.8150 V=7253900
   sma(14)                                       primed=true  sma(14)=88.3714 
@@ -4939,6 +4996,7 @@ Bar[ 51] 2020-02-22  O=89.0300 H=88.8750 L=86.4700 C=88.8150 V=7253900
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=89.6923 
 
 Bar[ 52] 2020-02-23  O=88.8150 H=89.0000 L=84.0000 C=84.2800 V=9753100
   sma(14)                                       primed=true  sma(14)=88.3779 
@@ -5023,6 +5081,7 @@ Bar[ 52] 2020-02-23  O=88.8150 H=89.0000 L=84.0000 C=84.2800 V=9753100
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=88.2444 
 
 Bar[ 53] 2020-02-24  O=84.2800 H=85.2500 L=83.3150 C=83.5000 V=5953000
   sma(14)                                       primed=true  sma(14)=88.3511 
@@ -5107,6 +5166,7 @@ Bar[ 53] 2020-02-24  O=84.2800 H=85.2500 L=83.3150 C=83.5000 V=5953000
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=86.4274 
 
 Bar[ 54] 2020-02-25  O=83.5000 H=83.8150 L=82.0000 C=82.6900 V=5011700
   sma(14)                                       primed=true  sma(14)=88.3021 
@@ -5191,6 +5251,7 @@ Bar[ 54] 2020-02-25  O=83.5000 H=83.8150 L=82.0000 C=82.6900 V=5011700
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=84.7069 
 
 Bar[ 55] 2020-02-26  O=82.6900 H=85.2500 L=83.2500 C=84.7500 V=5910800
   sma(14)                                       primed=true  sma(14)=88.2486 
@@ -5275,6 +5336,7 @@ Bar[ 55] 2020-02-26  O=82.6900 H=85.2500 L=83.2500 C=84.7500 V=5910800
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=84.0116 
 
 Bar[ 56] 2020-02-27  O=84.7500 H=86.6250 L=84.7500 C=85.6550 V=4916900
   sma(14)                                       primed=true  sma(14)=87.9961 
@@ -5359,6 +5421,7 @@ Bar[ 56] 2020-02-27  O=84.7500 H=86.6250 L=84.7500 C=85.6550 V=4916900
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=84.2559 
 
 Bar[ 57] 2020-02-28  O=85.6550 H=87.9400 L=85.2800 C=86.1900 V=4135000
   sma(14)                                       primed=true  sma(14)=87.7639 
@@ -5443,6 +5506,7 @@ Bar[ 57] 2020-02-28  O=85.6550 H=87.9400 L=85.2800 C=86.1900 V=4135000
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=84.9713 
 
 Bar[ 58] 2020-02-29  O=86.1900 H=89.3750 L=87.1900 C=88.9400 V=4054200
   sma(14)                                       primed=true  sma(14)=87.6100 
@@ -5527,6 +5591,7 @@ Bar[ 58] 2020-02-29  O=86.1900 H=89.3750 L=87.1900 C=88.9400 V=4054200
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=86.2205 
 
 Bar[ 59] 2020-03-01  O=88.9400 H=90.6250 L=88.4400 C=89.2800 V=3735300
   sma(14)                                       primed=true  sma(14)=87.5050 
@@ -5611,6 +5676,7 @@ Bar[ 59] 2020-03-01  O=88.9400 H=90.6250 L=88.4400 C=89.2800 V=3735300
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=87.4951 
 
 Bar[ 60] 2020-03-02  O=89.2800 H=90.7500 L=88.2500 C=88.6250 V=2921900
   sma(14)                                       primed=true  sma(14)=87.3039 
@@ -5695,6 +5761,7 @@ Bar[ 60] 2020-03-02  O=89.2800 H=90.7500 L=88.2500 C=88.6250 V=2921900
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=88.3281 
 
 Bar[ 61] 2020-03-03  O=88.6250 H=88.8450 L=87.3450 C=88.5000 V=2658400
   sma(14)                                       primed=true  sma(14)=87.2682 
@@ -5779,6 +5846,7 @@ Bar[ 61] 2020-03-03  O=88.6250 H=88.8450 L=87.3450 C=88.5000 V=2658400
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=88.6425 
 
 Bar[ 62] 2020-03-04  O=88.5000 H=91.9700 L=89.2800 C=91.9700 V=4624400
   sma(14)                                       primed=true  sma(14)=87.3375 
@@ -5863,6 +5931,7 @@ Bar[ 62] 2020-03-04  O=88.5000 H=91.9700 L=89.2800 C=91.9700 V=4624400
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=89.4024 
 
 Bar[ 63] 2020-03-05  O=91.9700 H=93.3750 L=91.0950 C=91.5000 V=4372200
   sma(14)                                       primed=true  sma(14)=87.4089 
@@ -5947,6 +6016,7 @@ Bar[ 63] 2020-03-05  O=91.9700 H=93.3750 L=91.0950 C=91.5000 V=4372200
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=90.2663 
 
 Bar[ 64] 2020-03-06  O=91.5000 H=93.8150 L=89.5300 C=93.2500 V=5831600
   sma(14)                                       primed=true  sma(14)=87.7104 
@@ -6031,6 +6101,7 @@ Bar[ 64] 2020-03-06  O=91.5000 H=93.8150 L=89.5300 C=93.2500 V=5831600
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=91.3805 
 
 Bar[ 65] 2020-03-07  O=93.2500 H=94.0300 L=91.1550 C=93.5000 V=4268600
   sma(14)                                       primed=true  sma(14)=88.0450 
@@ -6115,6 +6186,7 @@ Bar[ 65] 2020-03-07  O=93.2500 H=94.0300 L=91.1550 C=93.5000 V=4268600
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=92.3377 
 
 Bar[ 66] 2020-03-08  O=93.5000 H=94.0300 L=92.0000 C=93.1550 V=3059200
   sma(14)                                       primed=true  sma(14)=88.6789 
@@ -6199,6 +6271,7 @@ Bar[ 66] 2020-03-08  O=93.5000 H=94.0300 L=92.0000 C=93.1550 V=3059200
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=92.9102 
 
 Bar[ 67] 2020-03-09  O=93.1550 H=91.8150 L=90.5300 C=91.7200 V=4495500
   sma(14)                                       primed=true  sma(14)=89.2661 
@@ -6283,6 +6356,7 @@ Bar[ 67] 2020-03-09  O=93.1550 H=91.8150 L=90.5300 C=91.7200 V=4495500
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=92.8317 
 
 Bar[ 68] 2020-03-10  O=91.7200 H=92.0000 L=89.9700 C=90.0000 V=3425000
   sma(14)                                       primed=true  sma(14)=89.7882 
@@ -6367,6 +6441,7 @@ Bar[ 68] 2020-03-10  O=91.7200 H=92.0000 L=89.9700 C=90.0000 V=3425000
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=92.0603 
 
 Bar[ 69] 2020-03-11  O=90.0000 H=91.9400 L=88.8150 C=89.6900 V=3630800
   sma(14)                                       primed=true  sma(14)=90.1411 
@@ -6451,6 +6526,7 @@ Bar[ 69] 2020-03-11  O=90.0000 H=91.9400 L=88.8150 C=89.6900 V=3630800
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=91.0799 
 
 Bar[ 70] 2020-03-12  O=89.6900 H=89.7500 L=86.7500 C=88.8750 V=4168100
   sma(14)                                       primed=true  sma(14)=90.3711 
@@ -6535,6 +6611,7 @@ Bar[ 70] 2020-03-12  O=89.6900 H=89.7500 L=86.7500 C=88.8750 V=4168100
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=90.1297 
 
 Bar[ 71] 2020-03-13  O=88.8750 H=88.7500 L=85.0650 C=85.1900 V=5966900
   sma(14)                                       primed=true  sma(14)=90.2996 
@@ -6619,6 +6696,7 @@ Bar[ 71] 2020-03-13  O=88.8750 H=88.7500 L=85.0650 C=85.1900 V=5966900
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=88.6564 
 
 Bar[ 72] 2020-03-14  O=85.1900 H=86.1550 L=82.0300 C=83.3750 V=7692800
   sma(14)                                       primed=true  sma(14)=89.9021 
@@ -6703,6 +6781,7 @@ Bar[ 72] 2020-03-14  O=85.1900 H=86.1550 L=82.0300 C=83.3750 V=7692800
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=86.7772 
 
 Bar[ 73] 2020-03-15  O=83.3750 H=84.8750 L=81.5000 C=84.8750 V=7362500
   sma(14)                                       primed=true  sma(14)=89.5875 
@@ -6787,6 +6866,7 @@ Bar[ 73] 2020-03-15  O=83.3750 H=84.8750 L=81.5000 C=84.8750 V=7362500
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=85.4305 
 
 Bar[ 74] 2020-03-16  O=84.8750 H=85.9400 L=82.5650 C=85.9400 V=6581300
   sma(14)                                       primed=true  sma(14)=89.3957 
@@ -6871,6 +6951,7 @@ Bar[ 74] 2020-03-16  O=84.8750 H=85.9400 L=82.5650 C=85.9400 V=6581300
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=85.0436 
 
 Bar[ 75] 2020-03-17  O=85.9400 H=99.3750 L=96.3450 C=97.2500 V=19587700
   sma(14)                                       primed=true  sma(14)=90.0207 
@@ -6955,6 +7036,7 @@ Bar[ 75] 2020-03-17  O=85.9400 H=99.3750 L=96.3450 C=97.2500 V=19587700
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=87.7777 
 
 Bar[ 76] 2020-03-18  O=97.2500 H=103.2800 L=96.4700 C=99.8750 V=10378600
   sma(14)                                       primed=true  sma(14)=90.5854 
@@ -7039,6 +7121,7 @@ Bar[ 76] 2020-03-18  O=97.2500 H=103.2800 L=96.4700 C=99.8750 V=10378600
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=92.1189 
 
 Bar[ 77] 2020-03-19  O=99.8750 H=105.3750 L=101.1550 C=104.9400 V=9334700
   sma(14)                                       primed=true  sma(14)=91.5454 
@@ -7123,6 +7206,7 @@ Bar[ 77] 2020-03-19  O=99.8750 H=105.3750 L=101.1550 C=104.9400 V=9334700
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=97.2123 
 
 Bar[ 78] 2020-03-20  O=104.9400 H=107.6250 L=104.2500 C=106.0000 V=10467200
   sma(14)                                       primed=true  sma(14)=92.4561 
@@ -7207,6 +7291,7 @@ Bar[ 78] 2020-03-20  O=104.9400 H=107.6250 L=104.2500 C=106.0000 V=10467200
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=101.4041 
 
 Bar[ 79] 2020-03-21  O=106.0000 H=105.2500 L=101.7500 C=102.5000 V=5671400
   sma(14)                                       primed=true  sma(14)=93.0989 
@@ -7291,6 +7376,7 @@ Bar[ 79] 2020-03-21  O=106.0000 H=105.2500 L=101.7500 C=102.5000 V=5671400
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=103.2902 
 
 Bar[ 80] 2020-03-22  O=102.5000 H=104.5000 L=101.7200 C=102.4050 V=5645000
   sma(14)                                       primed=true  sma(14)=93.7596 
@@ -7375,6 +7461,7 @@ Bar[ 80] 2020-03-22  O=102.5000 H=104.5000 L=101.7200 C=102.4050 V=5645000
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=103.5242 
 
 Bar[ 81] 2020-03-23  O=102.4050 H=105.5000 L=101.7200 C=104.5950 V=4518600
   sma(14)                                       primed=true  sma(14)=94.6793 
@@ -7459,6 +7546,7 @@ Bar[ 81] 2020-03-23  O=102.4050 H=105.5000 L=101.7200 C=104.5950 V=4518600
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=103.5355 
 
 Bar[ 82] 2020-03-24  O=104.5950 H=106.1250 L=103.1550 C=106.1250 V=4519500
   sma(14)                                       primed=true  sma(14)=95.8311 
@@ -7543,6 +7631,7 @@ Bar[ 82] 2020-03-24  O=104.5950 H=106.1250 L=103.1550 C=106.1250 V=4519500
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=104.1148 
 
 Bar[ 83] 2020-03-25  O=106.1250 H=107.9400 L=105.6900 C=106.0000 V=5569700
   sma(14)                                       primed=true  sma(14)=96.9961 
@@ -7627,6 +7716,7 @@ Bar[ 83] 2020-03-25  O=106.1250 H=107.9400 L=105.6900 C=106.0000 V=5569700
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=104.9471 
 
 Bar[ 84] 2020-03-26  O=106.0000 H=106.2500 L=103.6550 C=106.0650 V=4239700
   sma(14)                                       primed=true  sma(14)=98.2239 
@@ -7711,6 +7801,7 @@ Bar[ 84] 2020-03-26  O=106.0000 H=106.2500 L=103.6550 C=106.0650 V=4239700
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=105.6053 
 
 Bar[ 85] 2020-03-27  O=106.0650 H=107.0000 L=104.0000 C=104.6250 V=4175300
   sma(14)                                       primed=true  sma(14)=99.6121 
@@ -7795,6 +7886,7 @@ Bar[ 85] 2020-03-27  O=106.0650 H=107.0000 L=104.0000 C=104.6250 V=4175300
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=105.6097 
 
 Bar[ 86] 2020-03-28  O=104.6250 H=108.7500 L=105.5300 C=108.6250 V=4995300
   sma(14)                                       primed=true  sma(14)=101.4157 
@@ -7879,6 +7971,7 @@ Bar[ 86] 2020-03-28  O=104.6250 H=108.7500 L=105.5300 C=108.6250 V=4995300
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=106.1644 
 
 Bar[ 87] 2020-03-29  O=108.6250 H=110.9400 L=108.5300 C=109.3150 V=4776600
   sma(14)                                       primed=true  sma(14)=103.1614 
@@ -7963,6 +8056,7 @@ Bar[ 87] 2020-03-29  O=108.6250 H=110.9400 L=108.5300 C=109.3150 V=4776600
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=107.1666 
 
 Bar[ 88] 2020-03-30  O=109.3150 H=110.9400 L=108.7500 C=110.5000 V=4190000
   sma(14)                                       primed=true  sma(14)=104.9157 
@@ -8047,6 +8141,7 @@ Bar[ 88] 2020-03-30  O=109.3150 H=110.9400 L=108.7500 C=110.5000 V=4190000
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=108.4813 
 
 Bar[ 89] 2020-03-31  O=110.5000 H=114.2200 L=107.7500 C=112.7500 V=6035300
   sma(14)                                       primed=true  sma(14)=106.0229 
@@ -8131,6 +8226,7 @@ Bar[ 89] 2020-03-31  O=110.5000 H=114.2200 L=107.7500 C=112.7500 V=6035300
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=110.0311 
 
 Bar[ 90] 2020-04-01  O=112.7500 H=123.0000 L=117.0000 C=123.0000 V=12168900
   sma(14)                                       primed=true  sma(14)=107.6746 
@@ -8215,6 +8311,7 @@ Bar[ 90] 2020-04-01  O=112.7500 H=123.0000 L=117.0000 C=123.0000 V=12168900
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=113.5773 
 
 Bar[ 91] 2020-04-02  O=123.0000 H=121.7500 L=118.0000 C=119.6250 V=9040800
   sma(14)                                       primed=true  sma(14)=108.7236 
@@ -8299,6 +8396,7 @@ Bar[ 91] 2020-04-02  O=123.0000 H=121.7500 L=118.0000 C=119.6250 V=9040800
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=116.7686 
 
 Bar[ 92] 2020-04-03  O=119.6250 H=119.8150 L=116.0000 C=118.7500 V=5780300
   sma(14)                                       primed=true  sma(14)=109.6343 
@@ -8383,6 +8481,7 @@ Bar[ 92] 2020-04-03  O=119.6250 H=119.8150 L=116.0000 C=118.7500 V=5780300
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=118.6706 
 
 Bar[ 93] 2020-04-04  O=118.7500 H=120.3150 L=118.5000 C=119.2500 V=4320800
   sma(14)                                       primed=true  sma(14)=110.8307 
@@ -8467,6 +8566,7 @@ Bar[ 93] 2020-04-04  O=118.7500 H=120.3150 L=118.5000 C=119.2500 V=4320800
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=119.2795 
 
 Bar[ 94] 2020-04-05  O=119.2500 H=119.3750 L=116.5300 C=117.9400 V=3899100
   sma(14)                                       primed=true  sma(14)=111.9404 
@@ -8551,6 +8651,7 @@ Bar[ 94] 2020-04-05  O=119.2500 H=119.3750 L=116.5300 C=117.9400 V=3899100
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=false aci(3, 48, 10, hl/2)=Heatmap(empty) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=118.9869 
 
 Bar[ 95] 2020-04-06  O=117.9400 H=118.1900 L=116.2500 C=116.4400 V=3221400
   sma(14)                                       primed=true  sma(14)=112.7864 
@@ -8635,6 +8736,7 @@ Bar[ 95] 2020-04-06  O=117.9400 H=118.1900 L=116.2500 C=116.4400 V=3221400
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=118.2149 
 
 Bar[ 96] 2020-04-07  O=116.4400 H=116.6900 L=114.5950 C=115.1900 V=3455500
   sma(14)                                       primed=true  sma(14)=113.4339 
@@ -8719,6 +8821,7 @@ Bar[ 96] 2020-04-07  O=116.4400 H=116.6900 L=114.5950 C=115.1900 V=3455500
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=117.1479 
 
 Bar[ 97] 2020-04-08  O=115.1900 H=115.3450 L=110.8750 C=111.8750 V=4304200
   sma(14)                                       primed=true  sma(14)=113.8536 
@@ -8803,6 +8906,7 @@ Bar[ 97] 2020-04-08  O=115.1900 H=115.3450 L=110.8750 C=111.8750 V=4304200
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=115.4637 
 
 Bar[ 98] 2020-04-09  O=111.8750 H=113.0000 L=110.5000 C=110.5950 V=4703900
   sma(14)                                       primed=true  sma(14)=114.1771 
@@ -8887,6 +8991,7 @@ Bar[ 98] 2020-04-09  O=111.8750 H=113.0000 L=110.5000 C=110.5950 V=4703900
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=113.5674 
 
 Bar[ 99] 2020-04-10  O=110.5950 H=118.3150 L=110.7200 C=118.1250 V=8316300
   sma(14)                                       primed=true  sma(14)=115.1414 
@@ -8971,6 +9076,7 @@ Bar[ 99] 2020-04-10  O=110.5950 H=118.3150 L=110.7200 C=118.1250 V=8316300
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=113.6895 
 
 Bar[100] 2020-04-11  O=118.1250 H=116.8700 L=112.6200 C=116.0000 V=10553900
   sma(14)                                       primed=true  sma(14)=115.6682 
@@ -9055,6 +9161,7 @@ Bar[100] 2020-04-11  O=118.1250 H=116.8700 L=112.6200 C=116.0000 V=10553900
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=114.5728 
 
 Bar[101] 2020-04-12  O=116.0000 H=116.7500 L=114.1900 C=116.0000 V=6384800
   sma(14)                                       primed=true  sma(14)=116.1457 
@@ -9139,6 +9246,7 @@ Bar[101] 2020-04-12  O=116.0000 H=116.7500 L=114.1900 C=116.0000 V=6384800
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=115.5328 
 
 Bar[102] 2020-04-13  O=116.0000 H=113.8700 L=111.1900 C=112.0000 V=7163300
   sma(14)                                       primed=true  sma(14)=116.2529 
@@ -9223,6 +9331,7 @@ Bar[102] 2020-04-13  O=116.0000 H=113.8700 L=111.1900 C=112.0000 V=7163300
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=115.0928 
 
 Bar[103] 2020-04-14  O=112.0000 H=114.6200 L=109.4400 C=113.7500 V=7007800
   sma(14)                                       primed=true  sma(14)=116.3243 
@@ -9307,6 +9416,7 @@ Bar[103] 2020-04-14  O=112.0000 H=114.6200 L=109.4400 C=113.7500 V=7007800
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=114.3393 
 
 Bar[104] 2020-04-15  O=113.7500 H=115.3100 L=111.5600 C=112.9400 V=5114100
   sma(14)                                       primed=true  sma(14)=115.6057 
@@ -9391,6 +9501,7 @@ Bar[104] 2020-04-15  O=113.7500 H=115.3100 L=111.5600 C=112.9400 V=5114100
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=113.6103 
 
 Bar[105] 2020-04-16  O=112.9400 H=116.0000 L=112.4400 C=116.0000 V=5263800
   sma(14)                                       primed=true  sma(14)=115.3468 
@@ -9475,6 +9586,7 @@ Bar[105] 2020-04-16  O=112.9400 H=116.0000 L=112.4400 C=116.0000 V=5263800
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=113.8983 
 
 Bar[106] 2020-04-17  O=116.0000 H=121.6900 L=117.5000 C=120.5000 V=6666100
   sma(14)                                       primed=true  sma(14)=115.4718 
@@ -9559,6 +9671,7 @@ Bar[106] 2020-04-17  O=116.0000 H=121.6900 L=117.5000 C=120.5000 V=6666100
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=115.6413 
 
 Bar[107] 2020-04-18  O=120.5000 H=119.8700 L=116.0600 C=116.6200 V=7398400
   sma(14)                                       primed=true  sma(14)=115.2839 
@@ -9643,6 +9756,7 @@ Bar[107] 2020-04-18  O=120.5000 H=119.8700 L=116.0600 C=116.6200 V=7398400
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=116.8700 
 
 Bar[108] 2020-04-19  O=116.6200 H=120.8700 L=116.5600 C=117.0000 V=5575000
   sma(14)                                       primed=true  sma(14)=115.2168 
@@ -9727,6 +9841,7 @@ Bar[108] 2020-04-19  O=116.6200 H=120.8700 L=116.5600 C=117.0000 V=5575000
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=117.3946 
 
 Bar[109] 2020-04-20  O=117.0000 H=116.7500 L=113.3100 C=115.2500 V=4852300
   sma(14)                                       primed=true  sma(14)=115.1318 
@@ -9811,6 +9926,7 @@ Bar[109] 2020-04-20  O=117.0000 H=116.7500 L=113.3100 C=115.2500 V=4852300
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=116.9216 
 
 Bar[110] 2020-04-21  O=115.2500 H=116.5000 L=112.5600 C=114.3100 V=4298100
   sma(14)                                       primed=true  sma(14)=115.0689 
@@ -9895,6 +10011,7 @@ Bar[110] 2020-04-21  O=115.2500 H=116.5000 L=112.5600 C=114.3100 V=4298100
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=115.9900 
 
 Bar[111] 2020-04-22  O=114.3100 H=116.0000 L=114.0000 C=115.5000 V=4900500
   sma(14)                                       primed=true  sma(14)=115.3279 
@@ -9979,6 +10096,7 @@ Bar[111] 2020-04-22  O=114.3100 H=116.0000 L=114.0000 C=115.5000 V=4900500
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=115.4191 
 
 Bar[112] 2020-04-23  O=115.5000 H=118.3100 L=114.7500 C=115.8700 V=4887700
   sma(14)                                       primed=true  sma(14)=115.7046 
@@ -10063,6 +10181,7 @@ Bar[112] 2020-04-23  O=115.5000 H=118.3100 L=114.7500 C=115.8700 V=4887700
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=115.3338 
 
 Bar[113] 2020-04-24  O=115.8700 H=121.5000 L=118.8700 C=120.6900 V=6964800
   sma(14)                                       primed=true  sma(14)=115.8879 
@@ -10147,6 +10266,7 @@ Bar[113] 2020-04-24  O=115.8700 H=121.5000 L=118.8700 C=120.6900 V=6964800
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=116.5877 
 
 Bar[114] 2020-04-25  O=120.6900 H=122.0000 L=119.0000 C=120.1900 V=4679200
   sma(14)                                       primed=true  sma(14)=116.1871 
@@ -10231,6 +10351,7 @@ Bar[114] 2020-04-25  O=120.6900 H=122.0000 L=119.0000 C=120.1900 V=4679200
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=118.1299 
 
 Bar[115] 2020-04-26  O=120.1900 H=121.4400 L=119.7500 C=120.7500 V=9165000
   sma(14)                                       primed=true  sma(14)=116.5264 
@@ -10315,6 +10436,7 @@ Bar[115] 2020-04-26  O=120.1900 H=121.4400 L=119.7500 C=120.7500 V=9165000
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=119.4756 
 
 Bar[116] 2020-04-27  O=120.7500 H=125.7500 L=122.6200 C=124.7500 V=6469800
   sma(14)                                       primed=true  sma(14)=117.4371 
@@ -10399,6 +10521,7 @@ Bar[116] 2020-04-27  O=120.7500 H=125.7500 L=122.6200 C=124.7500 V=6469800
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=121.1390 
 
 Bar[117] 2020-04-28  O=124.7500 H=127.7500 L=123.0000 C=123.3700 V=6792000
   sma(14)                                       primed=true  sma(14)=118.1243 
@@ -10483,6 +10606,7 @@ Bar[117] 2020-04-28  O=124.7500 H=127.7500 L=123.0000 C=123.3700 V=6792000
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=122.3749 
 
 Bar[118] 2020-04-29  O=123.3700 H=124.1900 L=121.7500 C=122.9400 V=4423800
   sma(14)                                       primed=true  sma(14)=118.8386 
@@ -10567,6 +10691,7 @@ Bar[118] 2020-04-29  O=123.3700 H=124.1900 L=121.7500 C=122.9400 V=4423800
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=123.0344 
 
 Bar[119] 2020-04-30  O=122.9400 H=124.4400 L=121.5600 C=122.5600 V=5231900
   sma(14)                                       primed=true  sma(14)=119.3071 
@@ -10651,6 +10776,7 @@ Bar[119] 2020-04-30  O=122.9400 H=124.4400 L=121.5600 C=122.5600 V=5231900
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=123.0814 
 
 Bar[120] 2020-05-01  O=122.5600 H=125.7500 L=123.1200 C=123.1200 V=4565600
   sma(14)                                       primed=true  sma(14)=119.4943 
@@ -10735,6 +10861,7 @@ Bar[120] 2020-05-01  O=122.5600 H=125.7500 L=123.1200 C=123.1200 V=4565600
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=122.9928 
 
 Bar[121] 2020-05-02  O=123.1200 H=124.6900 L=122.1900 C=122.5600 V=6235200
   sma(14)                                       primed=true  sma(14)=119.9186 
@@ -10819,6 +10946,7 @@ Bar[121] 2020-05-02  O=123.1200 H=124.6900 L=122.1900 C=122.5600 V=6235200
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=122.8509 
 
 Bar[122] 2020-05-03  O=122.5600 H=125.3100 L=122.7500 C=124.6200 V=5225900
   sma(14)                                       primed=true  sma(14)=120.4629 
@@ -10903,6 +11031,7 @@ Bar[122] 2020-05-03  O=122.5600 H=125.3100 L=122.7500 C=124.6200 V=5225900
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=123.1954 
 
 Bar[123] 2020-05-04  O=124.6200 H=132.0000 L=124.3700 C=129.2500 V=8261400
   sma(14)                                       primed=true  sma(14)=121.4629 
@@ -10987,6 +11116,7 @@ Bar[123] 2020-05-04  O=124.6200 H=132.0000 L=124.3700 C=129.2500 V=8261400
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=124.7441 
 
 Bar[124] 2020-05-05  O=129.2500 H=131.3100 L=128.0000 C=131.0000 V=5912500
   sma(14)                                       primed=true  sma(14)=122.6550 
@@ -11071,6 +11201,7 @@ Bar[124] 2020-05-05  O=129.2500 H=131.3100 L=128.0000 C=131.0000 V=5912500
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=127.0072 
 
 Bar[125] 2020-05-06  O=131.0000 H=132.2500 L=129.5000 C=132.2500 V=3545600
   sma(14)                                       primed=true  sma(14)=123.8514 
@@ -11155,6 +11286,7 @@ Bar[125] 2020-05-06  O=131.0000 H=132.2500 L=129.5000 C=132.2500 V=3545600
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=129.3096 
 
 Bar[126] 2020-05-07  O=132.2500 H=133.8800 L=130.8100 C=131.0000 V=5714500
   sma(14)                                       primed=true  sma(14)=124.9321 
@@ -11239,6 +11371,7 @@ Bar[126] 2020-05-07  O=132.2500 H=133.8800 L=130.8100 C=131.0000 V=5714500
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=130.6589 
 
 Bar[127] 2020-05-08  O=131.0000 H=133.5000 L=130.6300 C=132.8100 V=6653900
   sma(14)                                       primed=true  sma(14)=125.7979 
@@ -11323,6 +11456,7 @@ Bar[127] 2020-05-08  O=131.0000 H=133.5000 L=130.6300 C=132.8100 V=6653900
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=131.5402 
 
 Bar[128] 2020-05-09  O=132.8100 H=135.5000 L=132.1300 C=134.0000 V=6094500
   sma(14)                                       primed=true  sma(14)=126.7843 
@@ -11407,6 +11541,7 @@ Bar[128] 2020-05-09  O=132.8100 H=135.5000 L=132.1300 C=134.0000 V=6094500
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=132.3563 
 
 Bar[129] 2020-05-10  O=134.0000 H=137.4400 L=133.8800 C=137.3800 V=4799200
   sma(14)                                       primed=true  sma(14)=127.9721 
@@ -11491,6 +11626,7 @@ Bar[129] 2020-05-10  O=134.0000 H=137.4400 L=133.8800 C=137.3800 V=4799200
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=133.8482 
 
 Bar[130] 2020-05-11  O=137.3800 H=138.6900 L=135.3800 C=137.8100 V=5050800
   sma(14)                                       primed=true  sma(14)=128.9050 
@@ -11575,6 +11711,7 @@ Bar[130] 2020-05-11  O=137.3800 H=138.6900 L=135.3800 C=137.8100 V=5050800
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=135.4939 
 
 Bar[131] 2020-05-12  O=137.8100 H=139.1900 L=135.7500 C=137.8800 V=5648900
   sma(14)                                       primed=true  sma(14)=129.9414 
@@ -11659,6 +11796,7 @@ Bar[131] 2020-05-12  O=137.8100 H=139.1900 L=135.7500 C=137.8800 V=5648900
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=136.7884 
 
 Bar[132] 2020-05-13  O=137.8800 H=138.5000 L=136.1900 C=137.2500 V=4726300
   sma(14)                                       primed=true  sma(14)=130.9636 
@@ -11743,6 +11881,7 @@ Bar[132] 2020-05-13  O=137.8800 H=138.5000 L=136.1900 C=137.2500 V=4726300
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=137.3667 
 
 Bar[133] 2020-05-14  O=137.2500 H=138.1300 L=134.5000 C=136.3100 V=5585600
   sma(14)                                       primed=true  sma(14)=131.9457 
@@ -11827,6 +11966,7 @@ Bar[133] 2020-05-14  O=137.2500 H=138.1300 L=134.5000 C=136.3100 V=5585600
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=137.2493 
 
 Bar[134] 2020-05-15  O=136.3100 H=137.5000 L=135.3800 C=136.2500 V=5124800
   sma(14)                                       primed=true  sma(14)=132.8836 
@@ -11911,6 +12051,7 @@ Bar[134] 2020-05-15  O=136.3100 H=137.5000 L=135.3800 C=136.2500 V=5124800
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=136.8644 
 
 Bar[135] 2020-05-16  O=136.2500 H=138.8800 L=133.6900 C=134.6300 V=7630200
   sma(14)                                       primed=true  sma(14)=133.7457 
@@ -11995,6 +12136,7 @@ Bar[135] 2020-05-16  O=136.2500 H=138.8800 L=133.6900 C=134.6300 V=7630200
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=136.1639 
 
 Bar[136] 2020-05-17  O=134.6300 H=132.1300 L=126.0600 C=128.2500 V=14311600
   sma(14)                                       primed=true  sma(14)=134.0050 
@@ -12079,6 +12221,7 @@ Bar[136] 2020-05-17  O=134.6300 H=132.1300 L=126.0600 C=128.2500 V=14311600
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=134.0837 
 
 Bar[137] 2020-05-18  O=128.2500 H=129.7500 L=126.8700 C=129.0000 V=8793600
   sma(14)                                       primed=true  sma(14)=133.9871 
@@ -12163,6 +12306,7 @@ Bar[137] 2020-05-18  O=128.2500 H=129.7500 L=126.8700 C=129.0000 V=8793600
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=131.8361 
 
 Bar[138] 2020-05-19  O=129.0000 H=128.5000 L=123.5000 C=123.8700 V=8874200
   sma(14)                                       primed=true  sma(14)=133.4779 
@@ -12247,6 +12391,7 @@ Bar[138] 2020-05-19  O=129.0000 H=128.5000 L=123.5000 C=123.8700 V=8874200
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=128.9953 
 
 Bar[139] 2020-05-20  O=123.8700 H=125.4400 L=122.6200 C=124.8100 V=6966600
   sma(14)                                       primed=true  sma(14)=132.9464 
@@ -12331,6 +12476,7 @@ Bar[139] 2020-05-20  O=123.8700 H=125.4400 L=122.6200 C=124.8100 V=6966600
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=126.8247 
 
 Bar[140] 2020-05-21  O=124.8100 H=125.1200 L=122.7500 C=123.0000 V=5525500
   sma(14)                                       primed=true  sma(14)=132.3750 
@@ -12415,6 +12561,7 @@ Bar[140] 2020-05-21  O=124.8100 H=125.1200 L=122.7500 C=123.0000 V=5525500
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=125.1088 
 
 Bar[141] 2020-05-22  O=123.0000 H=126.5000 L=123.5600 C=126.2500 V=6515500
   sma(14)                                       primed=true  sma(14)=131.9064 
@@ -12499,6 +12646,7 @@ Bar[141] 2020-05-22  O=123.0000 H=126.5000 L=123.5600 C=126.2500 V=6515500
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=124.7288 
 
 Bar[142] 2020-05-23  O=126.2500 H=128.6900 L=125.8100 C=128.3800 V=5291900
   sma(14)                                       primed=true  sma(14)=131.5050 
@@ -12583,6 +12731,7 @@ Bar[142] 2020-05-23  O=126.2500 H=128.6900 L=125.8100 C=128.3800 V=5291900
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=125.5632 
 
 Bar[143] 2020-05-24  O=128.3800 H=126.6200 L=124.6200 C=125.3700 V=5711700
   sma(14)                                       primed=true  sma(14)=130.6471 
@@ -12667,6 +12816,7 @@ Bar[143] 2020-05-24  O=128.3800 H=126.6200 L=124.6200 C=125.3700 V=5711700
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=126.1163 
 
 Bar[144] 2020-05-25  O=125.3700 H=126.6900 L=124.3700 C=125.6900 V=4327700
   sma(14)                                       primed=true  sma(14)=129.7814 
@@ -12751,6 +12901,7 @@ Bar[144] 2020-05-25  O=125.3700 H=126.6900 L=124.3700 C=125.6900 V=4327700
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=126.2284 
 
 Bar[145] 2020-05-26  O=125.6900 H=126.0000 L=121.8100 C=122.2500 V=4568000
   sma(14)                                       primed=true  sma(14)=128.6650 
@@ -12835,6 +12986,7 @@ Bar[145] 2020-05-26  O=125.6900 H=126.0000 L=121.8100 C=122.2500 V=4568000
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=125.2397 
 
 Bar[146] 2020-05-27  O=122.2500 H=123.1200 L=118.1900 C=119.3700 V=6859200
   sma(14)                                       primed=true  sma(14)=127.3879 
@@ -12919,6 +13071,7 @@ Bar[146] 2020-05-27  O=122.2500 H=123.1200 L=118.1900 C=119.3700 V=6859200
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=123.3590 
 
 Bar[147] 2020-05-28  O=119.3700 H=121.8700 L=118.0600 C=118.5000 V=5757500
   sma(14)                                       primed=true  sma(14)=126.1157 
@@ -13003,6 +13156,7 @@ Bar[147] 2020-05-28  O=119.3700 H=121.8700 L=118.0600 C=118.5000 V=5757500
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=121.3134 
 
 Bar[148] 2020-05-29  O=118.5000 H=124.0000 L=117.5600 C=123.1900 V=7367000
   sma(14)                                       primed=true  sma(14)=125.1829 
@@ -13087,6 +13241,7 @@ Bar[148] 2020-05-29  O=118.5000 H=124.0000 L=117.5600 C=123.1900 V=7367000
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=120.8033 
 
 Bar[149] 2020-05-30  O=123.1900 H=127.0000 L=121.0000 C=123.5000 V=6144100
   sma(14)                                       primed=true  sma(14)=124.3879 
@@ -13171,6 +13326,7 @@ Bar[149] 2020-05-30  O=123.1900 H=127.0000 L=121.0000 C=123.5000 V=6144100
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=121.4442 
 
 Bar[150] 2020-05-31  O=123.5000 H=124.4400 L=121.1200 C=122.1900 V=4052700
   sma(14)                                       primed=true  sma(14)=123.9550 
@@ -13255,6 +13411,7 @@ Bar[150] 2020-05-31  O=123.5000 H=124.4400 L=121.1200 C=122.1900 V=4052700
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=122.1600 
 
 Bar[151] 2020-06-01  O=122.1900 H=122.5000 L=118.9400 C=119.3100 V=5849700
   sma(14)                                       primed=true  sma(14)=123.2629 
@@ -13339,6 +13496,7 @@ Bar[151] 2020-06-01  O=122.1900 H=122.5000 L=118.9400 C=119.3100 V=5849700
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=121.8178 
 
 Bar[152] 2020-06-02  O=119.3100 H=123.7500 L=119.8100 C=123.3100 V=5544700
   sma(14)                                       primed=true  sma(14)=123.2229 
@@ -13423,6 +13581,7 @@ Bar[152] 2020-06-02  O=119.3100 H=123.7500 L=119.8100 C=123.3100 V=5544700
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=121.7667 
 
 Bar[153] 2020-06-03  O=123.3100 H=123.8100 L=121.0000 C=121.1200 V=5032200
   sma(14)                                       primed=true  sma(14)=122.9593 
@@ -13507,6 +13666,7 @@ Bar[153] 2020-06-03  O=123.3100 H=123.8100 L=121.0000 C=121.1200 V=5032200
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=121.6074 
 
 Bar[154] 2020-06-04  O=121.1200 H=124.5000 L=122.0000 C=123.3700 V=4400600
   sma(14)                                       primed=true  sma(14)=122.9857 
@@ -13591,6 +13751,7 @@ Bar[154] 2020-06-04  O=121.1200 H=124.5000 L=122.0000 C=123.3700 V=4400600
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=122.0147 
 
 Bar[155] 2020-06-05  O=123.3700 H=127.8700 L=124.5000 C=127.3700 V=4894100
   sma(14)                                       primed=true  sma(14)=123.0657 
@@ -13675,6 +13836,7 @@ Bar[155] 2020-06-05  O=123.3700 H=127.8700 L=124.5000 C=127.3700 V=4894100
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=123.4202 
 
 Bar[156] 2020-06-06  O=127.3700 H=128.5600 L=126.5600 C=128.5000 V=5140000
   sma(14)                                       primed=true  sma(14)=123.0743 
@@ -13759,6 +13921,7 @@ Bar[156] 2020-06-06  O=127.3700 H=128.5600 L=126.5600 C=128.5000 V=5140000
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=125.3171 
 
 Bar[157] 2020-06-07  O=128.5000 H=129.6300 L=123.5000 C=123.8700 V=6610900
   sma(14)                                       primed=true  sma(14)=122.9671 
@@ -13843,6 +14006,7 @@ Bar[157] 2020-06-07  O=128.5000 H=129.6300 L=123.5000 C=123.8700 V=6610900
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=125.9496 
 
 Bar[158] 2020-06-08  O=123.8700 H=124.8700 L=121.2500 C=122.9400 V=7585200
   sma(14)                                       primed=true  sma(14)=122.7707 
@@ -13927,6 +14091,7 @@ Bar[158] 2020-06-08  O=123.8700 H=124.8700 L=121.2500 C=122.9400 V=7585200
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=125.3395 
 
 Bar[159] 2020-06-09  O=122.9400 H=124.3700 L=121.0600 C=121.7500 V=5963100
   sma(14)                                       primed=true  sma(14)=122.7350 
@@ -14011,6 +14176,7 @@ Bar[159] 2020-06-09  O=122.9400 H=124.3700 L=121.0600 C=121.7500 V=5963100
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=123.9818 
 
 Bar[160] 2020-06-10  O=121.7500 H=124.8700 L=122.3100 C=124.4400 V=6045500
   sma(14)                                       primed=true  sma(14)=123.0971 
@@ -14095,6 +14261,7 @@ Bar[160] 2020-06-10  O=121.7500 H=124.8700 L=122.3100 C=124.4400 V=6045500
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=123.4005 
 
 Bar[161] 2020-06-11  O=124.4400 H=123.6200 L=121.0000 C=122.0000 V=8443300
   sma(14)                                       primed=true  sma(14)=123.3471 
@@ -14179,6 +14346,7 @@ Bar[161] 2020-06-11  O=124.4400 H=123.6200 L=121.0000 C=122.0000 V=8443300
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=122.9965 
 
 Bar[162] 2020-06-12  O=122.0000 H=124.0600 L=120.8700 C=122.3700 V=6464700
   sma(14)                                       primed=true  sma(14)=123.2886 
@@ -14263,6 +14431,7 @@ Bar[162] 2020-06-12  O=122.0000 H=124.0600 L=120.8700 C=122.3700 V=6464700
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=122.7729 
 
 Bar[163] 2020-06-13  O=122.3700 H=125.8700 L=122.0600 C=122.9400 V=6248300
   sma(14)                                       primed=true  sma(14)=123.2486 
@@ -14347,6 +14516,7 @@ Bar[163] 2020-06-13  O=122.3700 H=125.8700 L=122.0600 C=122.9400 V=6248300
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=122.6820 
 
 Bar[164] 2020-06-14  O=122.9400 H=125.1900 L=122.7500 C=124.0000 V=4357200
   sma(14)                                       primed=true  sma(14)=123.3779 
@@ -14431,6 +14601,7 @@ Bar[164] 2020-06-14  O=122.9400 H=125.1900 L=122.7500 C=124.0000 V=4357200
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=122.9500 
 
 Bar[165] 2020-06-15  O=124.0000 H=125.6200 L=122.6900 C=123.1900 V=4774700
   sma(14)                                       primed=true  sma(14)=123.6550 
@@ -14515,6 +14686,7 @@ Bar[165] 2020-06-15  O=124.0000 H=125.6200 L=122.6900 C=123.1900 V=4774700
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=123.1961 
 
 Bar[166] 2020-06-16  O=123.1900 H=126.0000 L=122.8700 C=124.5600 V=6216900
   sma(14)                                       primed=true  sma(14)=123.7443 
@@ -14599,6 +14771,7 @@ Bar[166] 2020-06-16  O=123.1900 H=126.0000 L=122.8700 C=124.5600 V=6216900
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=123.6122 
 
 Bar[167] 2020-06-17  O=124.5600 H=128.5000 L=125.5000 C=127.2500 V=6266900
   sma(14)                                       primed=true  sma(14)=124.1821 
@@ -14683,6 +14856,7 @@ Bar[167] 2020-06-17  O=124.5600 H=128.5000 L=125.5000 C=127.2500 V=6266900
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=124.5918 
 
 Bar[168] 2020-06-18  O=127.2500 H=126.7500 L=124.2500 C=125.8700 V=5584800
   sma(14)                                       primed=true  sma(14)=124.3607 
@@ -14767,6 +14941,7 @@ Bar[168] 2020-06-18  O=127.2500 H=126.7500 L=124.2500 C=125.8700 V=5584800
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=125.4018 
 
 Bar[169] 2020-06-19  O=125.8700 H=129.7500 L=128.0000 C=128.8600 V=5284500
   sma(14)                                       primed=true  sma(14)=124.4671 
@@ -14851,6 +15026,7 @@ Bar[169] 2020-06-19  O=125.8700 H=129.7500 L=128.0000 C=128.8600 V=5284500
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=126.5277 
 
 Bar[170] 2020-06-20  O=128.8600 H=132.6900 L=128.3800 C=132.0000 V=7554500
   sma(14)                                       primed=true  sma(14)=124.7171 
@@ -14935,6 +15111,7 @@ Bar[170] 2020-06-20  O=128.8600 H=132.6900 L=128.3800 C=132.0000 V=7554500
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=128.2188 
 
 Bar[171] 2020-06-21  O=132.0000 H=133.9400 L=130.6900 C=130.7500 V=7209500
   sma(14)                                       primed=true  sma(14)=125.2086 
@@ -15019,6 +15196,7 @@ Bar[171] 2020-06-21  O=132.0000 H=133.9400 L=130.6900 C=130.7500 V=7209500
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=129.6302 
 
 Bar[172] 2020-06-22  O=130.7500 H=136.5000 L=131.6300 C=134.7500 V=8424800
   sma(14)                                       primed=true  sma(14)=126.0521 
@@ -15103,6 +15281,7 @@ Bar[172] 2020-06-22  O=130.7500 H=136.5000 L=131.6300 C=134.7500 V=8424800
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=131.3668 
 
 Bar[173] 2020-06-23  O=134.7500 H=137.6900 L=134.3800 C=135.0000 V=5094500
   sma(14)                                       primed=true  sma(14)=126.9986 
@@ -15187,6 +15366,7 @@ Bar[173] 2020-06-23  O=134.7500 H=137.6900 L=134.3800 C=135.0000 V=5094500
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=132.9076 
 
 Bar[174] 2020-06-24  O=135.0000 H=135.5600 L=132.0000 C=132.3800 V=4443600
   sma(14)                                       primed=true  sma(14)=127.5657 
@@ -15271,6 +15451,7 @@ Bar[174] 2020-06-24  O=135.0000 H=135.5600 L=132.0000 C=132.3800 V=4443600
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=133.4756 
 
 Bar[175] 2020-06-25  O=132.3800 H=133.5600 L=131.9400 C=133.3100 V=4591100
   sma(14)                                       primed=true  sma(14)=128.3736 
@@ -15355,6 +15536,7 @@ Bar[175] 2020-06-25  O=132.3800 H=133.5600 L=131.9400 C=133.3100 V=4591100
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=133.5264 
 
 Bar[176] 2020-06-26  O=133.3100 H=135.0000 L=131.9400 C=131.9400 V=5658400
   sma(14)                                       primed=true  sma(14)=129.0571 
@@ -15439,6 +15621,7 @@ Bar[176] 2020-06-26  O=133.3100 H=135.0000 L=131.9400 C=131.9400 V=5658400
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=133.0547 
 
 Bar[177] 2020-06-27  O=131.9400 H=132.3800 L=129.5600 C=130.0000 V=6094100
   sma(14)                                       primed=true  sma(14)=129.5614 
@@ -15523,6 +15706,7 @@ Bar[177] 2020-06-27  O=131.9400 H=132.3800 L=129.5600 C=130.0000 V=6094100
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=132.1331 
 
 Bar[178] 2020-06-28  O=130.0000 H=131.4400 L=123.7500 C=125.3700 V=14862200
   sma(14)                                       primed=true  sma(14)=129.6593 
@@ -15607,6 +15791,7 @@ Bar[178] 2020-06-28  O=130.0000 H=131.4400 L=123.7500 C=125.3700 V=14862200
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=130.1760 
 
 Bar[179] 2020-06-29  O=125.3700 H=130.8800 L=126.0000 C=130.1300 V=7544700
   sma(14)                                       primed=true  sma(14)=130.1550 
@@ -15691,6 +15876,7 @@ Bar[179] 2020-06-29  O=125.3700 H=130.8800 L=126.0000 C=130.1300 V=7544700
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=129.1371 
 
 Bar[180] 2020-06-30  O=130.1300 H=129.6300 L=126.2500 C=127.1200 V=6985600
   sma(14)                                       primed=true  sma(14)=130.3379 
@@ -15775,6 +15961,7 @@ Bar[180] 2020-06-30  O=130.1300 H=129.6300 L=126.2500 C=127.1200 V=6985600
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=128.3337 
 
 Bar[181] 2020-07-01  O=127.1200 H=127.2500 L=124.3700 C=125.1900 V=8093000
   sma(14)                                       primed=true  sma(14)=130.1907 
@@ -15859,6 +16046,7 @@ Bar[181] 2020-07-01  O=127.1200 H=127.2500 L=124.3700 C=125.1900 V=8093000
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=127.4531 
 
 Bar[182] 2020-07-02  O=125.1900 H=127.8100 L=121.4400 C=122.0000 V=7590000
   sma(14)                                       primed=true  sma(14)=129.9143 
@@ -15943,6 +16131,7 @@ Bar[182] 2020-07-02  O=125.1900 H=127.8100 L=121.4400 C=122.0000 V=7590000
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=125.8074 
 
 Bar[183] 2020-07-03  O=122.0000 H=125.0000 L=120.4400 C=125.0000 V=7451300
   sma(14)                                       primed=true  sma(14)=129.6386 
@@ -16027,6 +16216,7 @@ Bar[183] 2020-07-03  O=122.0000 H=125.0000 L=120.4400 C=125.0000 V=7451300
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=124.7482 
 
 Bar[184] 2020-07-04  O=125.0000 H=126.8100 L=121.3700 C=123.0000 V=7078000
   sma(14)                                       primed=true  sma(14)=128.9957 
@@ -16111,6 +16301,7 @@ Bar[184] 2020-07-04  O=125.0000 H=126.8100 L=121.3700 C=123.0000 V=7078000
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=123.9743 
 
 Bar[185] 2020-07-05  O=123.0000 H=124.7500 L=121.6900 C=123.5000 V=7105300
   sma(14)                                       primed=true  sma(14)=128.4779 
@@ -16195,6 +16386,7 @@ Bar[185] 2020-07-05  O=123.0000 H=124.7500 L=121.6900 C=123.5000 V=7105300
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=123.6696 
 
 Bar[186] 2020-07-06  O=123.5000 H=122.8100 L=120.0000 C=120.0600 V=8778800
   sma(14)                                       primed=true  sma(14)=127.4286 
@@ -16279,6 +16471,7 @@ Bar[186] 2020-07-06  O=123.5000 H=122.8100 L=120.0000 C=120.0600 V=8778800
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=122.7803 
 
 Bar[187] 2020-07-07  O=120.0600 H=122.2500 L=119.6200 C=121.0000 V=6643900
   sma(14)                                       primed=true  sma(14)=126.4286 
@@ -16363,6 +16556,7 @@ Bar[187] 2020-07-07  O=120.0600 H=122.2500 L=119.6200 C=121.0000 V=6643900
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=121.9048 
 
 Bar[188] 2020-07-08  O=121.0000 H=121.0600 L=115.5000 C=117.7500 V=10563900
   sma(14)                                       primed=true  sma(14)=125.3836 
@@ -16447,6 +16641,7 @@ Bar[188] 2020-07-08  O=121.0000 H=121.0600 L=115.5000 C=117.7500 V=10563900
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=120.5634 
 
 Bar[189] 2020-07-09  O=117.7500 H=120.0000 L=116.7500 C=119.8700 V=7043100
   sma(14)                                       primed=true  sma(14)=124.4236 
@@ -16531,6 +16726,7 @@ Bar[189] 2020-07-09  O=117.7500 H=120.0000 L=116.7500 C=119.8700 V=7043100
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=119.7989 
 
 Bar[190] 2020-07-10  O=119.8700 H=123.2500 L=119.0600 C=122.0000 V=6438900
   sma(14)                                       primed=true  sma(14)=123.7136 
@@ -16615,6 +16811,7 @@ Bar[190] 2020-07-10  O=119.8700 H=123.2500 L=119.0600 C=122.0000 V=6438900
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=120.0095 
 
 Bar[191] 2020-07-11  O=122.0000 H=122.7500 L=119.0600 C=119.1900 V=8057700
   sma(14)                                       primed=true  sma(14)=122.9414 
@@ -16699,6 +16896,7 @@ Bar[191] 2020-07-11  O=122.0000 H=122.7500 L=119.0600 C=119.1900 V=8057700
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=120.1174 
 
 Bar[192] 2020-07-12  O=119.1900 H=119.1900 L=115.0600 C=116.3700 V=14240000
   sma(14)                                       primed=true  sma(14)=122.2986 
@@ -16783,6 +16981,7 @@ Bar[192] 2020-07-12  O=119.1900 H=119.1900 L=115.0600 C=116.3700 V=14240000
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=119.3568 
 
 Bar[193] 2020-07-13  O=116.3700 H=115.0600 L=111.0600 C=113.5000 V=17872300
   sma(14)                                       primed=true  sma(14)=121.1107 
@@ -16867,6 +17066,7 @@ Bar[193] 2020-07-13  O=116.3700 H=115.0600 L=111.0600 C=113.5000 V=17872300
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=117.5241 
 
 Bar[194] 2020-07-14  O=113.5000 H=116.6900 L=113.1200 C=114.2500 V=7831100
   sma(14)                                       primed=true  sma(14)=120.1914 
@@ -16951,6 +17151,7 @@ Bar[194] 2020-07-14  O=113.5000 H=116.6900 L=113.1200 C=114.2500 V=7831100
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=115.8013 
 
 Bar[195] 2020-07-15  O=114.2500 H=114.8700 L=110.0000 C=110.0000 V=8277700
   sma(14)                                       primed=true  sma(14)=119.1064 
@@ -17035,6 +17236,7 @@ Bar[195] 2020-07-15  O=114.2500 H=114.8700 L=110.0000 C=110.0000 V=8277700
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=113.7974 
 
 Bar[196] 2020-07-16  O=110.0000 H=110.8700 L=105.0000 C=105.0600 V=15017800
   sma(14)                                       primed=true  sma(14)=117.8964 
@@ -17119,6 +17321,7 @@ Bar[196] 2020-07-16  O=110.0000 H=110.8700 L=105.0000 C=105.0600 V=15017800
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=111.0224 
 
 Bar[197] 2020-07-17  O=105.0600 H=107.2500 L=104.6900 C=107.0000 V=14183300
   sma(14)                                       primed=true  sma(14)=116.6107 
@@ -17203,6 +17406,7 @@ Bar[197] 2020-07-17  O=105.0600 H=107.2500 L=104.6900 C=107.0000 V=14183300
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=108.7632 
 
 Bar[198] 2020-07-18  O=107.0000 H=108.8700 L=103.8700 C=107.8700 V=13921100
   sma(14)                                       primed=true  sma(14)=115.5300 
@@ -17287,6 +17491,7 @@ Bar[198] 2020-07-18  O=107.0000 H=108.8700 L=103.8700 C=107.8700 V=13921100
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=107.6087 
 
 Bar[199] 2020-07-19  O=107.8700 H=109.0000 L=104.6900 C=107.0000 V=9683000
   sma(14)                                       primed=true  sma(14)=114.3514 
@@ -17371,6 +17576,7 @@ Bar[199] 2020-07-19  O=107.8700 H=109.0000 L=104.6900 C=107.0000 V=9683000
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=107.2371 
 
 Bar[200] 2020-07-20  O=107.0000 H=108.5000 L=105.4400 C=107.1200 V=9187300
   sma(14)                                       primed=true  sma(14)=113.4271 
@@ -17455,6 +17661,7 @@ Bar[200] 2020-07-20  O=107.0000 H=108.5000 L=105.4400 C=107.1200 V=9187300
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=107.2036 
 
 Bar[201] 2020-07-21  O=107.1200 H=113.0600 L=107.0000 C=107.0000 V=11380500
   sma(14)                                       primed=true  sma(14)=112.4271 
@@ -17539,6 +17746,7 @@ Bar[201] 2020-07-21  O=107.1200 H=113.0600 L=107.0000 C=107.0000 V=11380500
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=107.1476 
 
 Bar[202] 2020-07-22  O=107.0000 H=93.0000 L=89.0000 C=91.0000 V=69447300
   sma(14)                                       primed=true  sma(14)=110.5164 
@@ -17623,6 +17831,7 @@ Bar[202] 2020-07-22  O=107.0000 H=93.0000 L=89.0000 C=91.0000 V=69447300
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=103.5474 
 
 Bar[203] 2020-07-23  O=91.0000 H=94.6200 L=92.5000 C=93.9400 V=26673600
   sma(14)                                       primed=true  sma(14)=108.6643 
@@ -17707,6 +17916,7 @@ Bar[203] 2020-07-23  O=91.0000 H=94.6200 L=92.5000 C=93.9400 V=26673600
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=99.3338 
 
 Bar[204] 2020-07-24  O=93.9400 H=95.1200 L=92.1200 C=93.8700 V=13768400
   sma(14)                                       primed=true  sma(14)=106.6550 
@@ -17791,6 +18001,7 @@ Bar[204] 2020-07-24  O=93.9400 H=95.1200 L=92.1200 C=93.8700 V=13768400
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=95.9690 
 
 Bar[205] 2020-07-25  O=93.8700 H=96.0000 L=94.6200 C=95.5000 V=11371600
   sma(14)                                       primed=true  sma(14)=104.9629 
@@ -17875,6 +18086,7 @@ Bar[205] 2020-07-25  O=93.8700 H=96.0000 L=94.6200 C=95.5000 V=11371600
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=94.7107 
 
 Bar[206] 2020-07-26  O=95.5000 H=95.5600 L=92.8100 C=93.0000 V=9872200
   sma(14)                                       primed=true  sma(14)=103.2936 
@@ -17959,6 +18171,7 @@ Bar[206] 2020-07-26  O=95.5000 H=95.5600 L=92.8100 C=93.0000 V=9872200
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=94.2140 
 
 Bar[207] 2020-07-27  O=93.0000 H=95.3100 L=94.2500 C=94.9400 V=9450500
   sma(14)                                       primed=true  sma(14)=101.9679 
@@ -18043,6 +18256,7 @@ Bar[207] 2020-07-27  O=93.0000 H=95.3100 L=94.2500 C=94.9400 V=9450500
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=94.2681 
 
 Bar[208] 2020-07-28  O=94.9400 H=99.0000 L=96.2500 C=98.2500 V=11083300
   sma(14)                                       primed=true  sma(14)=100.8250 
@@ -18127,6 +18341,7 @@ Bar[208] 2020-07-28  O=94.9400 H=99.0000 L=96.2500 C=98.2500 V=11083300
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=95.1675 
 
 Bar[209] 2020-07-29  O=98.2500 H=98.8100 L=96.3700 C=96.7500 V=9552800
   sma(14)                                       primed=true  sma(14)=99.8786 
@@ -18211,6 +18426,7 @@ Bar[209] 2020-07-29  O=98.2500 H=98.8100 L=96.3700 C=96.7500 V=9552800
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=96.0627 
 
 Bar[210] 2020-07-30  O=96.7500 H=96.8100 L=93.6900 C=94.8100 V=11108400
   sma(14)                                       primed=true  sma(14)=99.1464 
@@ -18295,6 +18511,7 @@ Bar[210] 2020-07-30  O=96.7500 H=96.8100 L=93.6900 C=94.8100 V=11108400
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=96.2293 
 
 Bar[211] 2020-07-31  O=94.8100 H=95.9400 L=93.5000 C=94.3700 V=10374200
   sma(14)                                       primed=true  sma(14)=98.2443 
@@ -18379,6 +18596,7 @@ Bar[211] 2020-07-31  O=94.8100 H=95.9400 L=93.5000 C=94.3700 V=10374200
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=95.7181 
 
 Bar[212] 2020-08-01  O=94.3700 H=94.4400 L=90.0000 C=91.5600 V=16701900
   sma(14)                                       primed=true  sma(14)=97.0793 
@@ -18463,6 +18681,7 @@ Bar[212] 2020-08-01  O=94.3700 H=94.4400 L=90.0000 C=91.5600 V=16701900
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=94.4291 
 
 Bar[213] 2020-08-02  O=91.5600 H=92.9400 L=90.1900 C=90.2500 V=13741900
   sma(14)                                       primed=true  sma(14)=95.8829 
@@ -18547,6 +18766,7 @@ Bar[213] 2020-08-02  O=91.5600 H=92.9400 L=90.1900 C=90.2500 V=13741900
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=92.8560 
 
 Bar[214] 2020-08-03  O=90.2500 H=93.9400 L=90.5000 C=93.9400 V=8523600
   sma(14)                                       primed=true  sma(14)=94.9414 
@@ -18631,6 +18851,7 @@ Bar[214] 2020-08-03  O=90.2500 H=93.9400 L=90.5000 C=93.9400 V=8523600
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=92.3550 
 
 Bar[215] 2020-08-04  O=93.9400 H=95.5000 L=92.1200 C=93.6200 V=9551900
   sma(14)                                       primed=true  sma(14)=93.9857 
@@ -18715,6 +18936,7 @@ Bar[215] 2020-08-04  O=93.9400 H=95.5000 L=92.1200 C=93.6200 V=9551900
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=92.5853 
 
 Bar[216] 2020-08-05  O=93.6200 H=97.0600 L=94.1200 C=97.0000 V=8680500
   sma(14)                                       primed=true  sma(14)=94.4143 
@@ -18799,6 +19021,7 @@ Bar[216] 2020-08-05  O=93.6200 H=97.0600 L=94.1200 C=97.0000 V=8680500
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=93.8538 
 
 Bar[217] 2020-08-06  O=97.0000 H=97.5000 L=94.8700 C=95.0000 V=7151700
   sma(14)                                       primed=true  sma(14)=94.4900 
@@ -18883,6 +19106,7 @@ Bar[217] 2020-08-06  O=97.0000 H=97.5000 L=94.8700 C=95.0000 V=7151700
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=94.7858 
 
 Bar[218] 2020-08-07  O=95.0000 H=96.2500 L=93.0000 C=95.8700 V=9673100
   sma(14)                                       primed=true  sma(14)=94.6329 
@@ -18967,6 +19191,7 @@ Bar[218] 2020-08-07  O=95.0000 H=96.2500 L=93.0000 C=95.8700 V=9673100
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=95.3936 
 
 Bar[219] 2020-08-08  O=95.8700 H=96.3700 L=93.8700 C=94.0600 V=6264700
   sma(14)                                       primed=true  sma(14)=94.5300 
@@ -19051,6 +19276,7 @@ Bar[219] 2020-08-08  O=95.8700 H=96.3700 L=93.8700 C=94.0600 V=6264700
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=95.2545 
 
 Bar[220] 2020-08-09  O=94.0600 H=95.0000 L=93.0000 C=94.6200 V=8541600
   sma(14)                                       primed=true  sma(14)=94.6457 
@@ -19135,6 +19361,7 @@ Bar[220] 2020-08-09  O=94.0600 H=95.0000 L=93.0000 C=94.6200 V=8541600
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=94.9491 
 
 Bar[221] 2020-08-10  O=94.6200 H=94.8700 L=92.6200 C=93.7500 V=8358000
   sma(14)                                       primed=true  sma(14)=94.5607 
@@ -19219,6 +19446,7 @@ Bar[221] 2020-08-10  O=94.6200 H=94.8700 L=92.6200 C=93.7500 V=8358000
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=94.5129 
 
 Bar[222] 2020-08-11  O=93.7500 H=98.2500 L=93.5600 C=98.0000 V=18720800
   sma(14)                                       primed=true  sma(14)=94.5429 
@@ -19303,6 +19531,7 @@ Bar[222] 2020-08-11  O=93.7500 H=98.2500 L=93.5600 C=98.0000 V=18720800
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=95.0959 
 
 Bar[223] 2020-08-12  O=98.0000 H=105.1200 L=98.3700 C=103.9400 V=19683100
   sma(14)                                       primed=true  sma(14)=95.0564 
@@ -19387,6 +19616,7 @@ Bar[223] 2020-08-12  O=98.0000 H=105.1200 L=98.3700 C=103.9400 V=19683100
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=97.4495 
 
 Bar[224] 2020-08-13  O=103.9400 H=108.4400 L=104.4400 C=107.8700 V=13682500
   sma(14)                                       primed=true  sma(14)=95.9893 
@@ -19471,6 +19701,7 @@ Bar[224] 2020-08-13  O=103.9400 H=108.4400 L=104.4400 C=107.8700 V=13682500
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=101.1031 
 
 Bar[225] 2020-08-14  O=107.8700 H=109.8700 L=106.0000 C=106.0600 V=10668100
   sma(14)                                       primed=true  sma(14)=96.8243 
@@ -19555,6 +19786,7 @@ Bar[225] 2020-08-14  O=107.8700 H=109.8700 L=106.0000 C=106.0600 V=10668100
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=104.0366 
 
 Bar[226] 2020-08-15  O=106.0600 H=105.0000 L=101.8100 C=104.5000 V=9710600
   sma(14)                                       primed=true  sma(14)=97.7486 
@@ -19639,6 +19871,7 @@ Bar[226] 2020-08-15  O=106.0600 H=105.0000 L=101.8100 C=104.5000 V=9710600
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=105.2769 
 
 Bar[227] 2020-08-16  O=104.5000 H=106.0000 L=104.1200 C=105.0000 V=3113100
   sma(14)                                       primed=true  sma(14)=98.8021 
@@ -19723,6 +19956,7 @@ Bar[227] 2020-08-16  O=104.5000 H=106.0000 L=104.1200 C=105.0000 V=3113100
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=105.3883 
 
 Bar[228] 2020-08-17  O=105.0000 H=104.9400 L=103.3700 C=104.1900 V=5682000
   sma(14)                                       primed=true  sma(14)=99.5343 
@@ -19807,6 +20041,7 @@ Bar[228] 2020-08-17  O=105.0000 H=104.9400 L=103.3700 C=104.1900 V=5682000
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=104.9712 
 
 Bar[229] 2020-08-18  O=104.1900 H=104.5000 L=102.1200 C=103.0600 V=5763600
   sma(14)                                       primed=true  sma(14)=100.2086 
@@ -19891,6 +20126,7 @@ Bar[229] 2020-08-18  O=104.1900 H=104.5000 L=102.1200 C=103.0600 V=5763600
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=104.3430 
 
 Bar[230] 2020-08-19  O=103.0600 H=104.4400 L=102.2500 C=103.4200 V=5340000
   sma(14)                                       primed=true  sma(14)=100.6671 
@@ -19975,6 +20211,7 @@ Bar[230] 2020-08-19  O=103.0600 H=104.4400 L=102.2500 C=103.4200 V=5340000
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=103.8459 
 
 Bar[231] 2020-08-20  O=103.4200 H=106.3100 L=103.3700 C=105.2700 V=6220800
   sma(14)                                       primed=true  sma(14)=101.4007 
@@ -20059,6 +20296,7 @@ Bar[231] 2020-08-20  O=103.4200 H=106.3100 L=103.3700 C=105.2700 V=6220800
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=103.9497 
 
 Bar[232] 2020-08-21  O=105.2700 H=112.8700 L=107.9400 C=111.8700 V=14680500
   sma(14)                                       primed=true  sma(14)=102.5436 
@@ -20143,6 +20381,7 @@ Bar[232] 2020-08-21  O=105.2700 H=112.8700 L=107.9400 C=111.8700 V=14680500
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=105.8493 
 
 Bar[233] 2020-08-22  O=111.8700 H=116.5000 L=112.5000 C=116.0000 V=9933000
   sma(14)                                       primed=true  sma(14)=104.1107 
@@ -20227,6 +20466,7 @@ Bar[233] 2020-08-22  O=111.8700 H=116.5000 L=112.5000 C=116.0000 V=9933000
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=109.2171 
 
 Bar[234] 2020-08-23  O=116.0000 H=119.1900 L=115.4400 C=116.6200 V=11329500
   sma(14)                                       primed=true  sma(14)=105.6821 
@@ -20311,6 +20551,7 @@ Bar[234] 2020-08-23  O=116.0000 H=119.1900 L=115.4400 C=116.6200 V=11329500
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=112.6121 
 
 Bar[235] 2020-08-24  O=116.6200 H=121.0000 L=115.5000 C=118.2800 V=8145300
   sma(14)                                       primed=true  sma(14)=107.4343 
@@ -20395,6 +20636,7 @@ Bar[235] 2020-08-24  O=116.6200 H=121.0000 L=115.5000 C=118.2800 V=8145300
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=115.3284 
 
 Bar[236] 2020-08-25  O=118.2800 H=122.1200 L=112.2500 C=113.3700 V=16644700
   sma(14)                                       primed=true  sma(14)=108.5321 
@@ -20479,6 +20721,7 @@ Bar[236] 2020-08-25  O=118.2800 H=122.1200 L=112.2500 C=113.3700 V=16644700
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=115.8932 
 
 Bar[237] 2020-08-26  O=113.3700 H=111.9400 L=107.5600 C=109.0000 V=12593800
   sma(14)                                       primed=true  sma(14)=108.8936 
@@ -20563,6 +20806,7 @@ Bar[237] 2020-08-26  O=113.3700 H=111.9400 L=107.5600 C=109.0000 V=12593800
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=114.2849 
 
 Bar[238] 2020-08-27  O=109.0000 H=112.7500 L=106.5600 C=109.7000 V=7138100
   sma(14)                                       primed=true  sma(14)=109.0243 
@@ -20647,6 +20891,7 @@ Bar[238] 2020-08-27  O=109.0000 H=112.7500 L=106.5600 C=109.7000 V=7138100
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=112.1723 
 
 Bar[239] 2020-08-28  O=109.7000 H=110.1900 L=106.8700 C=109.2500 V=7442300
   sma(14)                                       primed=true  sma(14)=109.2521 
@@ -20731,6 +20976,7 @@ Bar[239] 2020-08-28  O=109.7000 H=110.1900 L=106.8700 C=109.2500 V=7442300
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=110.5117 
 
 Bar[240] 2020-08-29  O=109.2500 H=107.9400 L=104.5000 C=107.0000 V=9442300
   sma(14)                                       primed=true  sma(14)=109.4307 
@@ -20815,6 +21061,7 @@ Bar[240] 2020-08-29  O=109.2500 H=107.9400 L=104.5000 C=107.0000 V=9442300
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=109.1799 
 
 Bar[241] 2020-08-30  O=107.0000 H=109.6900 L=105.7500 C=109.1900 V=7123600
   sma(14)                                       primed=true  sma(14)=109.7300 
@@ -20899,6 +21146,7 @@ Bar[241] 2020-08-30  O=107.0000 H=109.6900 L=105.7500 C=109.1900 V=7123600
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=108.6811 
 
 Bar[242] 2020-08-31  O=109.1900 H=111.0600 L=108.6200 C=110.0000 V=7680600
   sma(14)                                       primed=true  sma(14)=110.1450 
@@ -20983,6 +21231,7 @@ Bar[242] 2020-08-31  O=109.1900 H=111.0600 L=108.6200 C=110.0000 V=7680600
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=108.8347 
 
 Bar[243] 2020-09-01  O=110.0000 H=110.4400 L=107.7500 C=109.2000 V=4839800
   sma(14)                                       primed=true  sma(14)=110.5836 
@@ -21067,6 +21316,7 @@ Bar[243] 2020-09-01  O=110.0000 H=110.4400 L=107.7500 C=109.2000 V=4839800
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=109.1222 
 
 Bar[244] 2020-09-02  O=109.2000 H=110.1200 L=108.0600 C=110.1200 V=4775500
   sma(14)                                       primed=true  sma(14)=111.0621 
@@ -21151,6 +21401,7 @@ Bar[244] 2020-09-02  O=109.2000 H=110.1200 L=108.0600 C=110.1200 V=4775500
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=109.4966 
 
 Bar[245] 2020-09-03  O=110.1200 H=110.3100 L=108.0000 C=108.0000 V=4008800
   sma(14)                                       primed=true  sma(14)=111.2571 
@@ -21235,6 +21486,7 @@ Bar[245] 2020-09-03  O=110.1200 H=110.3100 L=108.0000 C=108.0000 V=4008800
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=109.3032 
 
 Bar[246] 2020-09-04  O=108.0000 H=110.4400 L=108.1900 C=108.6200 V=4533600
   sma(14)                                       primed=true  sma(14)=111.0250 
@@ -21319,6 +21571,7 @@ Bar[246] 2020-09-04  O=108.0000 H=110.4400 L=108.1900 C=108.6200 V=4533600
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=108.9917 
 
 Bar[247] 2020-09-05  O=108.6200 H=110.0000 L=108.1200 C=109.7500 V=3741100
   sma(14)                                       primed=true  sma(14)=110.5786 
@@ -21403,6 +21656,7 @@ Bar[247] 2020-09-05  O=108.6200 H=110.0000 L=108.1200 C=109.7500 V=3741100
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=108.9761 
 
 Bar[248] 2020-09-06  O=109.7500 H=110.7500 L=109.0600 C=109.8100 V=4084800
   sma(14)                                       primed=true  sma(14)=110.0921 
@@ -21487,6 +21741,7 @@ Bar[248] 2020-09-06  O=109.7500 H=110.7500 L=109.0600 C=109.8100 V=4084800
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=109.2202 
 
 Bar[249] 2020-09-07  O=109.8100 H=110.5000 L=108.7500 C=109.0000 V=2685200
   sma(14)                                       primed=true  sma(14)=109.4293 
@@ -21571,6 +21826,7 @@ Bar[249] 2020-09-07  O=109.8100 H=110.5000 L=108.7500 C=109.0000 V=2685200
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=109.3462 
 
 Bar[250] 2020-09-08  O=109.0000 H=110.5000 L=108.5600 C=108.7500 V=3438000
   sma(14)                                       primed=true  sma(14)=109.0993 
@@ -21655,6 +21911,7 @@ Bar[250] 2020-09-08  O=109.0000 H=110.5000 L=108.5600 C=108.7500 V=3438000
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=109.2387 
 
 Bar[251] 2020-09-09  O=108.7500 H=109.5000 L=106.6200 C=107.8700 V=2870500
   sma(14)                                       primed=true  sma(14)=109.0186 
@@ -21739,4 +21996,5 @@ Bar[251] 2020-09-09  O=108.7500 H=109.5000 L=106.6200 C=107.8700 V=2870500
   cbps(10, 48, hl/2)                            primed=true  cbps(10, 48, hl/2)=Heatmap(39 values) 
   aci(3, 48, 10, hl/2)                          primed=true  aci(3, 48, 10, hl/2)=Heatmap(46 values) 
   acp(10, 48, hl/2)                             primed=true  acp(10, 48, hl/2)=Heatmap(39 values) 
+  alma(9, 6, 0.85)                              primed=true  alma(9, 6, 0.85)=108.8289 
 

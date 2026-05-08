@@ -90,6 +90,8 @@ import (
 	"zpano/indicators/welleswilder/parabolicstopandreverse"
 	"zpano/indicators/welleswilder/relativestrengthindex"
 	"zpano/indicators/welleswilder/truerange"
+
+	"zpano/indicators/arnaudlegoux/arnaudlegouxmovingaverage"
 )
 
 // lengthParam is a helper struct for indicators that take a bare int length.
@@ -958,6 +960,14 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 		}
 
 		return parabolicstopandreverse.NewParabolicStopAndReverse(p)
+
+	case core.ArnaudLegouxMovingAverage:
+		p := arnaudlegouxmovingaverage.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return arnaudlegouxmovingaverage.NewArnaudLegouxMovingAverage(p)
 
 	default:
 		return nil, fmt.Errorf("unsupported indicator: %s", identifier)
