@@ -1793,6 +1793,10 @@ Below are the Go and TypeScript factory patterns (as the reference implementatio
 
 ### Go
 
+**Grouping:** Factory cases are grouped by author with `// ── groupname ──...──`
+dividers (common first, authors alphabetical, custom last). Append the new case
+at the end of its author group — do not re-sort alphabetically within the group.
+
 Add a `case` to the switch in `go/indicators/factory/factory.go` inside
 `func New(identifier core.Identifier, paramsJSON []byte)`:
 
@@ -1839,6 +1843,8 @@ case core.MyIndicator:
 ```
 
 ### TypeScript
+
+**Grouping:** Same author-grouping rules as Go (see above).
 
 Add a `case` to the switch in `ts/indicators/factory/factory.ts` inside
 `createIndicator()`:
@@ -2061,7 +2067,9 @@ Go: math.Abs(exp-act) > 1e-N  →  Python: assertAlmostEqual(act, exp, delta=1e-
 
 ### Step 6: Register in the factory
 
-Add to `py/indicators/factory/factory.py`:
+Add to `py/indicators/factory/factory.py`. Factory cases are grouped by author
+with `# ── groupname ──...──` dividers (common first, authors alphabetical,
+custom last). Append the new case at the end of its author group.
 
 ```python
 if identifier == Identifier.SIMPLE_MOVING_AVERAGE:
@@ -2377,7 +2385,10 @@ Key test conventions:
    Descriptor entries follow the same author-grouping as identifiers (grouped by
    author with `// ── groupname ──...──` dividers, append at end of author group).
 
-3. **Register in the factory.** Edit `zig/src/indicators/factory/factory.zig`:
+3. **Register in the factory.** Edit `zig/src/indicators/factory/factory.zig`.
+   Factory cases follow the same author-grouping as identifiers and descriptors
+   (grouped by author with `// ── groupname ──...──` dividers, append at end of
+   author group).
 
 1. Add import at top:
    ```zig
@@ -2681,7 +2692,9 @@ Key test conventions:
 
 ### Step 6: Register in factory
 
-Edit `rs/src/indicators/factory/factory.rs`:
+Edit `rs/src/indicators/factory/factory.rs`. Factory cases are grouped by author
+with `// ── groupname ──...──` dividers (common first, authors alphabetical,
+custom last). Append the new case at the end of its author group.
 
 1. Add import at top (match visibility pattern A or B):
    ```rust

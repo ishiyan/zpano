@@ -499,7 +499,7 @@ banned per the Abbreviation Convention).
    **Go:** also add the new identifier to all four test tables in
    `go/indicators/core/identifier_test.go` (String, IsKnown, MarshalJSON,
    UnmarshalJSON).
-5. **Register the descriptor** in `core/descriptors.{go,ts}` — see the Taxonomy section below. A missing descriptor row causes
+5. **Register the descriptor** in `core/descriptors.{go,ts,py,zig,rs}` — see the Taxonomy section below. A missing descriptor row causes
    `BuildMetadata` to panic at runtime.
 6. **Register in the factory** — add a factory case mapping `Identifier` + JSON params → indicator instance.
 7. **Add to `icalc/settings.json`** — add an entry with default params (camelCase identifier string).
@@ -1402,13 +1402,41 @@ When adding a new indicator you MUST add its descriptor in **all 5 languages**
    ])],
    ```
 
-3. Confirm the output order matches the per-indicator output enum order
-   (`iota + 1` in Go, `0, 1, 2, ...` in TS).
+3. **Python** — `py/indicators/core/descriptors.py` (using `_d()`/`_o()` helpers):
 
-4. Run the suites:
+   ```python
+   Id.MY_INDICATOR: _d(
+       Id.MY_INDICATOR, "<family>", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
+       [_o(0, S.SCALAR, R.SMOOTHER, P.PRICE),
+        _o(1, S.SCALAR, R.SIGNAL,   P.PRICE)]),
+   ```
+
+4. **Zig** — `zig/src/indicators/core/descriptors.zig` (single-line struct literals):
+
+   ```zig
+   .{ .identifier = .my_indicator, .family = "<family>", .adaptivity = .static_, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .smoother, .pane = .price }, .{ .kind = 2, .shape = .scalar, .role = .signal, .pane = .price }} },
+   ```
+
+5. **Rust** — `rs/src/indicators/core/descriptors.rs`:
+
+   ```rust
+   Descriptor {
+       identifier: MyIndicator, family: "<family>",
+       adaptivity: Static, input_requirement: ScalarInput, volume_usage: NoVolume,
+       outputs: &[OutputDescriptor { kind: 1, shape: Scalar, role: Smoother, pane: Price },
+                  OutputDescriptor { kind: 2, shape: Scalar, role: Signal,   pane: Price }],
+   },
+   ```
+
+6. Confirm the output order matches the per-indicator output enum order
+   (`iota + 1` in Go, `1, 2, ...` in Zig/Rust, `0, 1, 2, ...` in TS/Python).
+
+7. Run the suites:
    ```
    cd go && go test ./indicators/core/...
    cd ts && npm test
+   cd zig && zig build test --summary all
+   cd rs && cargo test --lib descriptors
    ```
    `TestDescriptorCoverage` and `TestDescriptorOutputsWellFormed` will catch
    missing or malformed rows on the Go side; the TS `buildMetadata` contract
@@ -1469,10 +1497,13 @@ creation from configuration files, user input, or serialized settings.
 
 ### Location & Rationale
 
-| Language   | Path                                  |
-|------------|---------------------------------------|
-| Go         | `go/indicators/factory/factory.go`    |
-| TypeScript | `ts/indicators/factory/factory.ts`    |
+| Language   | Path                                           |
+|------------|------------------------------------------------|
+| Go         | `go/indicators/factory/factory.go`             |
+| TypeScript | `ts/indicators/factory/factory.ts`             |
+| Python     | `py/indicators/factory/factory.py`             |
+| Zig        | `zig/src/indicators/factory/factory.zig`       |
+| Rust       | `rs/src/indicators/factory/factory.rs`         |
 
 The factory **cannot live in `core/`** in Go due to circular imports: indicator
 packages import `core`, so `core` cannot import them back. The `factory/`
@@ -1480,7 +1511,15 @@ package sits at `indicators/factory/` — a sibling of `core/` and the
 author/group folders — and imports both `core` and every indicator package.
 
 TypeScript has no circular-import issue but uses the same location for
-consistency.
+consistency. The same layout is used in Python, Zig, and Rust.
+
+### Factory Grouping
+
+Factory switch/match cases are grouped by author with the same `// ──` / `# ──`
+comment dividers used in identifiers and descriptors. The **common** group comes
+first, author groups are arranged alphabetically, and the **custom** group comes
+last. When adding a new indicator, **append** the new case at the end of its
+author group — do not re-sort alphabetically within the group.
 
 ### Go API
 

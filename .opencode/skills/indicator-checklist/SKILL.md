@@ -158,6 +158,12 @@ Outputs order must match the `OutputText[]` passed by `metadata()`.
 
 Register in `factory/factory.{go,ts,py,zig,rs}`.
 
+**Grouping rules (same as identifiers and descriptors):**
+- Factory cases are grouped by author with `// ──` / `# ──` comment dividers.
+- "common" first, author groups alphabetical, "custom" last.
+- **Append** new case at end of its author group — do not re-sort alphabetically within a group.
+- If a new author group is needed, insert a new divider in alphabetical order between existing groups.
+
 ### 8d. icalc settings.json
 
 - Add entry with default params using **camelCase** identifier string.
