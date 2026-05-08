@@ -296,12 +296,36 @@ context). All other languages use fully-qualified symbol names.
 ### Identifier Registry Parity
 
 Go, TypeScript, Python, Zig, and Rust MUST have the same set of registered
-identifiers. All five currently have **72** identifiers (Go: `core.Identifier`
-iota 1–72; TS: `IndicatorIdentifier` enum 0–71; Python: `Identifier` IntEnum
-0–71; Zig: `Identifier` enum(u8) 0–71; Rust: `Identifier` enum 0–71) with
+identifiers. All five currently have **84** identifiers (Go: `core.Identifier`
+iota 1–84; TS: `IndicatorIdentifier` enum 0–83; Python: `Identifier` IntEnum
+0–83; Zig: `Identifier` enum(u8) 0–83; Rust: `Identifier` enum 0–83) with
 identical names (PascalCase in Go/TS/Rust, UPPER_SNAKE_CASE in Python,
 snake_case in Zig). When adding a new indicator, register the identifier in
 **all** languages even if only one implementation exists yet.
+
+#### Identifier Grouping by Author
+
+Identifiers are grouped by author with comment dividers matching the style used
+in `factory.go`. The **common** group comes first, author groups are arranged
+alphabetically, and the **custom** group comes last.
+
+Divider format per language:
+
+| Language   | Divider style |
+|------------|---------------|
+| Go         | `// ── groupname ──────...──` (tab-indented) |
+| TypeScript | `// ── groupname ──────...──` (4-space indent) |
+| Python     | `# ── groupname ──────...──` (4-space indent) |
+| Zig        | `// ── groupname ──────...──` (4-space indent) |
+| Rust       | `// ── groupname ──────...──` (4-space indent) |
+
+When adding a new indicator, **append** the new enum member at the end of its
+author group (after the last existing member in that group), assigning the next
+sequential number. Do **not** re-sort alphabetically within the group — this
+avoids renumbering all subsequent members across 5 languages. If the author
+group does not yet exist, insert a new group in alphabetical order among the
+existing author groups (between "common" and "custom"), and assign sequential
+numbers continuing from the previous group's last value.
 
 ### File Naming
 
@@ -466,7 +490,15 @@ banned per the Abbreviation Convention).
      Descriptor Registry** section below for details and the mandatory descriptor-row step.
    - **Test file** -- include mnemonic sub-tests covering: all components zero,
      each component set individually, and combinations of two components.
-4. **Register the indicator** in `core/identifier` (add a new enum variant in both Go `core.Identifier` and TS `IndicatorIdentifier`).
+4. **Register the indicator** in `core/identifier` across all five languages.
+   Append the new enum member at the end of its author group (do not re-sort
+   alphabetically — just append after the last member). Assign the next
+   sequential number. If the author group does not exist, insert a new group
+   divider in alphabetical order among existing author groups. See the
+   "Identifier Grouping by Author" section above for divider format.
+   **Go:** also add the new identifier to all four test tables in
+   `go/indicators/core/identifier_test.go` (String, IsKnown, MarshalJSON,
+   UnmarshalJSON).
 5. **Register the descriptor** in `core/descriptors.{go,ts}` — see the Taxonomy section below. A missing descriptor row causes
    `BuildMetadata` to panic at runtime.
 6. **Register in the factory** — add a factory case mapping `Identifier` + JSON params → indicator instance.

@@ -798,14 +798,30 @@ func TestOutputUnmarshalJSON(t *testing.T) {
 ### Go Step 7: Register the identifier and descriptor
 
 1. **Register the identifier.** If the constant does not already exist in
-   `go/indicators/core/identifier.go`, add it:
+   `go/indicators/core/identifier.go`, append it at the end of its author
+   group. Identifiers are grouped by author with `// ── groupname ──...──`
+   dividers (common first, authors alphabetical, custom last). Append after
+   the last member in the group — do not re-sort alphabetically. If the
+   author group does not exist, insert a new divider in alphabetical order.
 
    ```go
    const (
-       SimpleMovingAverage Identifier = iota + 1
+       // ── common ──────────────────────────────────────────────────────────
+       AbsolutePriceOscillator Identifier = iota + 1
+       // ...
+
+       // ── johnehlers ───────────────────────────────────────────────────────
+       AutoCorrelationIndicator
        // ...
    )
    ```
+
+   Also add the corresponding entries in the private string-constant block,
+   `String()` switch, and `UnmarshalJSON()` switch — all in the same group
+   position. Finally, add the new identifier to all four test tables in
+   `go/indicators/core/identifier_test.go` (TestIdentifierString,
+   TestIdentifierIsKnown, TestIdentifierMarshalJSON,
+   TestIdentifierUnmarshalJSON).
 
 2. **Register the descriptor.** Add a row to the registry in
    `go/indicators/core/descriptors.go`. The descriptor drives the taxonomy (role, pane,
@@ -1057,7 +1073,10 @@ calculation tests.
 ### TS Step 6: Register the identifier and descriptor
 
 1. **Register the identifier.** If the member does not already exist in
-   `ts/indicators/core/indicator-identifier.ts`, add it.
+   `ts/indicators/core/indicator-identifier.ts`, append it at the end of its
+   author group. Identifiers are grouped by author with
+   `// ── groupname ──...──` dividers (common first, authors alphabetical,
+   custom last). Append after the last member in the group — do not re-sort.
 
 2. **Register the descriptor.** Add a row to the registry in
    `ts/indicators/core/descriptors.ts`. The descriptor drives the taxonomy and supplies
@@ -2054,7 +2073,10 @@ Four construction patterns:
 ### Step 7: Register identifier and descriptor
 
 If adding a new indicator (not just porting):
-- Add to `py/indicators/core/identifier.py` — new `Identifier` IntEnum member
+- Add to `py/indicators/core/identifier.py` — append new `Identifier` IntEnum
+  member at the end of its author group. Identifiers are grouped by author with
+  `# ── groupname ──...──` dividers (common first, authors alphabetical, custom
+  last). Append after the last member — do not re-sort.
 - Add to `py/indicators/core/descriptors.py` — new `_descriptors` entry
 
 ### Step 8: Verify
@@ -2333,9 +2355,17 @@ Key test conventions:
 - `std.math.isNan()` for NaN checks
 - Test data as module-level `const` arrays
 
-### Step 7: Register in factory
+### Step 7: Register in identifier, descriptor, and factory
 
-Edit `zig/src/indicators/factory/factory.zig`:
+1. **Register the identifier.** Append the new variant at the end of its author
+   group in `zig/src/indicators/core/identifier.zig`. Identifiers are grouped
+   by author with `// ── groupname ──...──` dividers (common first, authors
+   alphabetical, custom last). Append after the last member — do not re-sort.
+   Also update the `asStr` and `fromStr` match tables in the same group position.
+
+2. **Register the descriptor** in `zig/src/indicators/core/descriptor.zig`.
+
+3. **Register in the factory.** Edit `zig/src/indicators/factory/factory.zig`:
 
 1. Add import at top:
    ```zig
@@ -2664,7 +2694,13 @@ Edit `rs/src/indicators/factory/factory.rs`:
 
 ### Step 7: Register in identifier enum
 
-Add to `rs/src/indicators/core/identifier.rs` and `rs/src/indicators/core/descriptors.rs`.
+Add to `rs/src/indicators/core/identifier.rs` — append the new variant at the
+end of its author group. Identifiers are grouped by author with
+`// ── groupname ──...──` dividers (common first, authors alphabetical, custom
+last). Append after the last member — do not re-sort. Also update the `as_str`
+and `from_str` match arms in the same group position.
+
+Add to `rs/src/indicators/core/descriptors.rs`.
 
 ### Step 8: Verify
 
