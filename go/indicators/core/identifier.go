@@ -276,6 +276,9 @@ const (
 	// ArnaudLegouxMovingAverage identifies the Arnaud Legoux Moving Average (ALMA) indicator.
 	ArnaudLegouxMovingAverage
 
+	// NewMovingAverage identifies the New Moving Average (NMA) indicator by Dürschner.
+	NewMovingAverage
+
 	last
 )
 
@@ -364,6 +367,7 @@ const (
 	jurikAdaptiveRelativeTrendStrengthIndex         = "jurikAdaptiveRelativeTrendStrengthIndex"
 	jurikTurningPointOscillator                    = "jurikTurningPointOscillator"
 	arnaudLegouxMovingAverage                      = "arnaudLegouxMovingAverage"
+	newMovingAverage                               = "newMovingAverage"
 )
 
 // String implements the Stringer interface.
@@ -537,6 +541,8 @@ func (i Identifier) String() string {
 		return jurikTurningPointOscillator
 	case ArnaudLegouxMovingAverage:
 		return arnaudLegouxMovingAverage
+	case NewMovingAverage:
+		return newMovingAverage
 	default:
 		return unknown
 	}
@@ -747,6 +753,8 @@ func (i *Identifier) UnmarshalJSON(data []byte) error {
 		*i = JurikTurningPointOscillator
 	case arnaudLegouxMovingAverage:
 		*i = ArnaudLegouxMovingAverage
+	case newMovingAverage:
+		*i = NewMovingAverage
 	default:
 		return fmt.Errorf(errFmt, s)
 	}

@@ -353,6 +353,9 @@ _descriptors: dict[Id, Descriptor] = {
     Id.ARNAUD_LEGOUX_MOVING_AVERAGE: _d(
         Id.ARNAUD_LEGOUX_MOVING_AVERAGE, "Arnaud Legoux", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
         [_o(0, S.SCALAR, R.SMOOTHER, P.PRICE)]),
+    Id.NEW_MOVING_AVERAGE: _d(
+        Id.NEW_MOVING_AVERAGE, "Manfred Dürschner", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
+        [_o(0, S.SCALAR, R.SMOOTHER, P.PRICE)]),
 }
 
 

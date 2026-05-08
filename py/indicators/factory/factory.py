@@ -562,4 +562,9 @@ def create_indicator(
         from ..arnaud_legoux.arnaud_legoux_moving_average.arnaud_legoux_moving_average import ArnaudLegouxMovingAverage
         return ArnaudLegouxMovingAverage(_apply(default_params(), params))
 
+    if identifier == Identifier.NEW_MOVING_AVERAGE:
+        from ..manfred_dürschner.new_moving_average.params import default_params
+        from ..manfred_dürschner.new_moving_average.new_moving_average import NewMovingAverage
+        return NewMovingAverage(_apply(default_params(), params))
+
     raise ValueError(f"unsupported indicator: {identifier}")

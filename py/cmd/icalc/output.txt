@@ -2199,6 +2199,26 @@
     ]
   }
 
+[83] nma(32, 8, 3)
+  Identifier:  NEW_MOVING_AVERAGE
+  Description: New moving average nma(32, 8, 3)
+  Outputs (1):
+    [0] kind=0 shape=0 mnemonic='nma(32, 8, 3)' description='New moving average nma(32, 8, 3)'
+  Full metadata JSON:
+  {
+    "identifier": 83,
+    "mnemonic": "nma(32, 8, 3)",
+    "description": "New moving average nma(32, 8, 3)",
+    "outputs": [
+      {
+        "kind": 0,
+        "shape": 0,
+        "mnemonic": "nma(32, 8, 3)",
+        "description": "New moving average nma(32, 8, 3)"
+      }
+    ]
+  }
+
 
 === Bar Data & Indicator Outputs ===
 
@@ -2286,6 +2306,7 @@ Bar[  0] 2020-01-02  O=91.5000 H=93.2500 L=90.7500 C=91.5000 V=4077500
   jtpo(14)                                      primed=False jtpo(14)=NaN
   jwav(12)                                      primed=False jwav(12)=NaN
   alma(9, 6, 0.85)                              primed=False alma(9, 6, 0.85)=NaN
+  nma(32, 8, 3)                                 primed=False nma(32, 8, 3)=NaN
 
 Bar[  1] 2020-01-03  O=91.5000 H=94.9400 L=91.4050 C=94.8150 V=4955900
   sma(14)                                       primed=False sma(14)=NaN
@@ -2371,6 +2392,7 @@ Bar[  1] 2020-01-03  O=91.5000 H=94.9400 L=91.4050 C=94.8150 V=4955900
   jtpo(14)                                      primed=False jtpo(14)=NaN
   jwav(12)                                      primed=False jwav(12)=91.5000
   alma(9, 6, 0.85)                              primed=False alma(9, 6, 0.85)=NaN
+  nma(32, 8, 3)                                 primed=False nma(32, 8, 3)=NaN
 
 Bar[  2] 2020-01-04  O=94.8150 H=96.3750 L=94.2500 C=94.3750 V=4775300
   sma(14)                                       primed=False sma(14)=NaN
@@ -2456,6 +2478,7 @@ Bar[  2] 2020-01-04  O=94.8150 H=96.3750 L=94.2500 C=94.3750 V=4775300
   jtpo(14)                                      primed=False jtpo(14)=NaN
   jwav(12)                                      primed=False jwav(12)=94.8150
   alma(9, 6, 0.85)                              primed=False alma(9, 6, 0.85)=NaN
+  nma(32, 8, 3)                                 primed=False nma(32, 8, 3)=NaN
 
 Bar[  3] 2020-01-05  O=94.3750 H=96.1900 L=93.5000 C=95.0950 V=4155300
   sma(14)                                       primed=False sma(14)=NaN
@@ -2541,6 +2564,7 @@ Bar[  3] 2020-01-05  O=94.3750 H=96.1900 L=93.5000 C=95.0950 V=4155300
   jtpo(14)                                      primed=False jtpo(14)=NaN
   jwav(12)                                      primed=False jwav(12)=94.3750
   alma(9, 6, 0.85)                              primed=False alma(9, 6, 0.85)=NaN
+  nma(32, 8, 3)                                 primed=False nma(32, 8, 3)=NaN
 
 Bar[  4] 2020-01-06  O=95.0950 H=96.0000 L=92.8150 C=93.7800 V=4593100
   sma(14)                                       primed=False sma(14)=NaN
@@ -2626,6 +2650,7 @@ Bar[  4] 2020-01-06  O=95.0950 H=96.0000 L=92.8150 C=93.7800 V=4593100
   jtpo(14)                                      primed=False jtpo(14)=NaN
   jwav(12)                                      primed=False jwav(12)=95.0950
   alma(9, 6, 0.85)                              primed=False alma(9, 6, 0.85)=NaN
+  nma(32, 8, 3)                                 primed=False nma(32, 8, 3)=NaN
 
 Bar[  5] 2020-01-07  O=93.7800 H=94.7200 L=93.5000 C=94.6250 V=3631300
   sma(14)                                       primed=False sma(14)=NaN
@@ -2711,6 +2736,7 @@ Bar[  5] 2020-01-07  O=93.7800 H=94.7200 L=93.5000 C=94.6250 V=3631300
   jtpo(14)                                      primed=False jtpo(14)=NaN
   jwav(12)                                      primed=False jwav(12)=93.7800
   alma(9, 6, 0.85)                              primed=False alma(9, 6, 0.85)=NaN
+  nma(32, 8, 3)                                 primed=False nma(32, 8, 3)=NaN
 
 Bar[  6] 2020-01-08  O=94.6250 H=95.0000 L=92.0000 C=92.5300 V=3382800
   sma(14)                                       primed=False sma(14)=NaN
@@ -2796,6 +2822,7 @@ Bar[  6] 2020-01-08  O=94.6250 H=95.0000 L=92.0000 C=92.5300 V=3382800
   jtpo(14)                                      primed=False jtpo(14)=NaN
   jwav(12)                                      primed=False jwav(12)=94.6250
   alma(9, 6, 0.85)                              primed=False alma(9, 6, 0.85)=NaN
+  nma(32, 8, 3)                                 primed=False nma(32, 8, 3)=NaN
 
 Bar[  7] 2020-01-09  O=92.5300 H=93.7200 L=89.7500 C=92.7500 V=4954200
   sma(14)                                       primed=False sma(14)=NaN
@@ -2881,6 +2908,7 @@ Bar[  7] 2020-01-09  O=92.5300 H=93.7200 L=89.7500 C=92.7500 V=4954200
   jtpo(14)                                      primed=False jtpo(14)=NaN
   jwav(12)                                      primed=False jwav(12)=92.5300
   alma(9, 6, 0.85)                              primed=False alma(9, 6, 0.85)=NaN
+  nma(32, 8, 3)                                 primed=False nma(32, 8, 3)=NaN
 
 Bar[  8] 2020-01-10  O=92.7500 H=92.4700 L=89.4400 C=90.3150 V=4500000
   sma(14)                                       primed=False sma(14)=NaN
@@ -2966,6 +2994,7 @@ Bar[  8] 2020-01-10  O=92.7500 H=92.4700 L=89.4400 C=90.3150 V=4500000
   jtpo(14)                                      primed=False jtpo(14)=NaN
   jwav(12)                                      primed=False jwav(12)=92.7500
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=92.5191
+  nma(32, 8, 3)                                 primed=False nma(32, 8, 3)=NaN
 
 Bar[  9] 2020-01-11  O=90.3150 H=92.7500 L=90.6250 C=92.4700 V=3397500
   sma(14)                                       primed=False sma(14)=NaN
@@ -3051,6 +3080,7 @@ Bar[  9] 2020-01-11  O=90.3150 H=92.7500 L=90.6250 C=92.4700 V=3397500
   jtpo(14)                                      primed=False jtpo(14)=NaN
   jwav(12)                                      primed=False jwav(12)=90.3150
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=92.0399
+  nma(32, 8, 3)                                 primed=False nma(32, 8, 3)=NaN
 
 Bar[ 10] 2020-01-12  O=92.4700 H=96.2500 L=92.7500 C=96.1250 V=4204500
   sma(14)                                       primed=False sma(14)=NaN
@@ -3136,6 +3166,7 @@ Bar[ 10] 2020-01-12  O=92.4700 H=96.2500 L=92.7500 C=96.1250 V=4204500
   jtpo(14)                                      primed=False jtpo(14)=NaN
   jwav(12)                                      primed=False jwav(12)=92.4700
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=92.7821
+  nma(32, 8, 3)                                 primed=False nma(32, 8, 3)=NaN
 
 Bar[ 11] 2020-01-13  O=96.1250 H=99.6250 L=96.3150 C=97.2500 V=6321400
   sma(14)                                       primed=False sma(14)=NaN
@@ -3221,6 +3252,7 @@ Bar[ 11] 2020-01-13  O=96.1250 H=99.6250 L=96.3150 C=97.2500 V=6321400
   jtpo(14)                                      primed=False jtpo(14)=NaN
   jwav(12)                                      primed=False jwav(12)=96.1250
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=94.3251
+  nma(32, 8, 3)                                 primed=False nma(32, 8, 3)=NaN
 
 Bar[ 12] 2020-01-14  O=97.2500 H=99.1250 L=96.0300 C=98.5000 V=10203600
   sma(14)                                       primed=False sma(14)=NaN
@@ -3306,6 +3338,7 @@ Bar[ 12] 2020-01-14  O=97.2500 H=99.1250 L=96.0300 C=98.5000 V=10203600
   jtpo(14)                                      primed=False jtpo(14)=NaN
   jwav(12)                                      primed=False jwav(12)=97.2500
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=96.0899
+  nma(32, 8, 3)                                 primed=False nma(32, 8, 3)=NaN
 
 Bar[ 13] 2020-01-15  O=98.5000 H=92.7500 L=88.8150 C=89.8750 V=19043900
   sma(14)                                       primed=True  sma(14)=93.8575
@@ -3391,6 +3424,7 @@ Bar[ 13] 2020-01-15  O=98.5000 H=92.7500 L=88.8150 C=89.8750 V=19043900
   jtpo(14)                                      primed=True  jtpo(14)=0.0769
   jwav(12)                                      primed=False jwav(12)=98.5000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=95.4857
+  nma(32, 8, 3)                                 primed=False nma(32, 8, 3)=NaN
 
 Bar[ 14] 2020-01-16  O=89.8750 H=91.3150 L=86.7500 C=91.0000 V=11692000
   sma(14)                                       primed=True  sma(14)=93.8218
@@ -3476,6 +3510,7 @@ Bar[ 14] 2020-01-16  O=89.8750 H=91.3150 L=86.7500 C=91.0000 V=11692000
   jtpo(14)                                      primed=True  jtpo(14)=-0.2000
   jwav(12)                                      primed=False jwav(12)=89.8750
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=93.8500
+  nma(32, 8, 3)                                 primed=False nma(32, 8, 3)=NaN
 
 Bar[ 15] 2020-01-17  O=91.0000 H=93.2500 L=90.9400 C=92.8150 V=9553300
   sma(14)                                       primed=True  sma(14)=93.6789
@@ -3561,6 +3596,7 @@ Bar[ 15] 2020-01-17  O=91.0000 H=93.2500 L=90.9400 C=92.8150 V=9553300
   jtpo(14)                                      primed=True  jtpo(14)=-0.1956
   jwav(12)                                      primed=False jwav(12)=91.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=92.6100
+  nma(32, 8, 3)                                 primed=False nma(32, 8, 3)=NaN
 
 Bar[ 16] 2020-01-18  O=92.8150 H=93.4050 L=88.9050 C=89.1550 V=8920300
   sma(14)                                       primed=True  sma(14)=93.3061
@@ -3646,6 +3682,7 @@ Bar[ 16] 2020-01-18  O=92.8150 H=93.4050 L=88.9050 C=89.1550 V=8920300
   jtpo(14)                                      primed=True  jtpo(14)=-0.3319
   jwav(12)                                      primed=False jwav(12)=92.8150
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=91.4582
+  nma(32, 8, 3)                                 primed=False nma(32, 8, 3)=NaN
 
 Bar[ 17] 2020-01-19  O=89.1550 H=90.6550 L=88.7800 C=89.3450 V=5970900
   sma(14)                                       primed=True  sma(14)=92.8954
@@ -3731,6 +3768,7 @@ Bar[ 17] 2020-01-19  O=89.1550 H=90.6550 L=88.7800 C=89.3450 V=5970900
   jtpo(14)                                      primed=True  jtpo(14)=-0.4330
   jwav(12)                                      primed=False jwav(12)=89.1550
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=90.6023
+  nma(32, 8, 3)                                 primed=False nma(32, 8, 3)=NaN
 
 Bar[ 18] 2020-01-20  O=89.3450 H=91.9700 L=89.2500 C=91.6250 V=5062300
   sma(14)                                       primed=True  sma(14)=92.7414
@@ -3816,6 +3854,7 @@ Bar[ 18] 2020-01-20  O=89.3450 H=91.9700 L=89.2500 C=91.6250 V=5062300
   jtpo(14)                                      primed=True  jtpo(14)=-0.4330
   jwav(12)                                      primed=False jwav(12)=89.3450
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=90.4230
+  nma(32, 8, 3)                                 primed=False nma(32, 8, 3)=NaN
 
 Bar[ 19] 2020-01-21  O=91.6250 H=92.2500 L=89.7500 C=89.8750 V=3705600
   sma(14)                                       primed=True  sma(14)=92.4021
@@ -3901,6 +3940,7 @@ Bar[ 19] 2020-01-21  O=91.6250 H=92.2500 L=89.7500 C=89.8750 V=3705600
   jtpo(14)                                      primed=True  jtpo(14)=-0.4769
   jwav(12)                                      primed=False jwav(12)=91.6250
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=90.3273
+  nma(32, 8, 3)                                 primed=False nma(32, 8, 3)=NaN
 
 Bar[ 20] 2020-01-22  O=89.8750 H=90.3450 L=87.5000 C=88.3750 V=5865600
   sma(14)                                       primed=True  sma(14)=92.1054
@@ -3986,6 +4026,7 @@ Bar[ 20] 2020-01-22  O=89.8750 H=90.3450 L=87.5000 C=88.3750 V=5865600
   jtpo(14)                                      primed=True  jtpo(14)=-0.5868
   jwav(12)                                      primed=False jwav(12)=89.8750
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=89.9268
+  nma(32, 8, 3)                                 primed=False nma(32, 8, 3)=NaN
 
 Bar[ 21] 2020-01-23  O=88.3750 H=88.5000 L=86.5300 C=87.6250 V=5603000
   sma(14)                                       primed=True  sma(14)=91.7393
@@ -4071,6 +4112,7 @@ Bar[ 21] 2020-01-23  O=88.3750 H=88.5000 L=86.5300 C=87.6250 V=5603000
   jtpo(14)                                      primed=True  jtpo(14)=-0.6747
   jwav(12)                                      primed=False jwav(12)=88.3750
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=89.1547
+  nma(32, 8, 3)                                 primed=False nma(32, 8, 3)=NaN
 
 Bar[ 22] 2020-01-24  O=87.6250 H=88.2500 L=84.6250 C=84.7800 V=5811900
   sma(14)                                       primed=True  sma(14)=91.3439
@@ -4156,6 +4198,7 @@ Bar[ 22] 2020-01-24  O=87.6250 H=88.2500 L=84.6250 C=84.7800 V=5811900
   jtpo(14)                                      primed=True  jtpo(14)=-0.8198
   jwav(12)                                      primed=False jwav(12)=87.6250
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=87.7653
+  nma(32, 8, 3)                                 primed=False nma(32, 8, 3)=NaN
 
 Bar[ 23] 2020-01-25  O=84.7800 H=85.5000 L=82.2800 C=83.0000 V=8483800
   sma(14)                                       primed=True  sma(14)=90.6675
@@ -4241,6 +4284,7 @@ Bar[ 23] 2020-01-25  O=84.7800 H=85.5000 L=82.2800 C=83.0000 V=8483800
   jtpo(14)                                      primed=True  jtpo(14)=-0.8725
   jwav(12)                                      primed=False jwav(12)=84.7800
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=86.0321
+  nma(32, 8, 3)                                 primed=False nma(32, 8, 3)=NaN
 
 Bar[ 24] 2020-01-26  O=83.0000 H=84.4400 L=81.5650 C=83.5000 V=5995200
   sma(14)                                       primed=True  sma(14)=89.7657
@@ -4326,6 +4370,7 @@ Bar[ 24] 2020-01-26  O=83.0000 H=84.4400 L=81.5650 C=83.5000 V=5995200
   jtpo(14)                                      primed=True  jtpo(14)=-0.8813
   jwav(12)                                      primed=False jwav(12)=83.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=84.6495
+  nma(32, 8, 3)                                 primed=False nma(32, 8, 3)=NaN
 
 Bar[ 25] 2020-01-27  O=83.5000 H=84.7500 L=80.8750 C=81.3750 V=5408800
   sma(14)                                       primed=True  sma(14)=88.6318
@@ -4411,6 +4456,7 @@ Bar[ 25] 2020-01-27  O=83.5000 H=84.7500 L=80.8750 C=81.3750 V=5408800
   jtpo(14)                                      primed=True  jtpo(14)=-0.8857
   jwav(12)                                      primed=False jwav(12)=83.5000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=83.3811
+  nma(32, 8, 3)                                 primed=False nma(32, 8, 3)=NaN
 
 Bar[ 26] 2020-01-28  O=81.3750 H=84.4400 L=81.2500 C=84.4400 V=5430500
   sma(14)                                       primed=True  sma(14)=87.6275
@@ -4496,6 +4542,7 @@ Bar[ 26] 2020-01-28  O=81.3750 H=84.4400 L=81.2500 C=84.4400 V=5430500
   jtpo(14)                                      primed=True  jtpo(14)=-0.8593
   jwav(12)                                      primed=False jwav(12)=81.3750
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=83.1226
+  nma(32, 8, 3)                                 primed=False nma(32, 8, 3)=NaN
 
 Bar[ 27] 2020-01-29  O=84.4400 H=89.4050 L=84.0650 C=89.2500 V=6283800
   sma(14)                                       primed=True  sma(14)=87.5829
@@ -4581,6 +4628,7 @@ Bar[ 27] 2020-01-29  O=84.4400 H=89.4050 L=84.0650 C=89.2500 V=6283800
   jtpo(14)                                      primed=True  jtpo(14)=-0.7363
   jwav(12)                                      primed=False jwav(12)=84.4400
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=84.4884
+  nma(32, 8, 3)                                 primed=False nma(32, 8, 3)=NaN
 
 Bar[ 28] 2020-01-30  O=89.2500 H=88.1250 L=85.5950 C=86.3750 V=5834800
   sma(14)                                       primed=True  sma(14)=87.2525
@@ -4666,6 +4714,7 @@ Bar[ 28] 2020-01-30  O=89.2500 H=88.1250 L=85.5950 C=86.3750 V=5834800
   jtpo(14)                                      primed=True  jtpo(14)=-0.6703
   jwav(12)                                      primed=False jwav(12)=89.2500
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=85.7947
+  nma(32, 8, 3)                                 primed=False nma(32, 8, 3)=NaN
 
 Bar[ 29] 2020-01-31  O=86.3750 H=89.1250 L=85.9700 C=86.2500 V=4515500
   sma(14)                                       primed=True  sma(14)=86.7836
@@ -4751,6 +4800,7 @@ Bar[ 29] 2020-01-31  O=86.3750 H=89.1250 L=85.9700 C=86.2500 V=4515500
   jtpo(14)                                      primed=True  jtpo(14)=-0.5604
   jwav(12)                                      primed=False jwav(12)=86.3750
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=86.5111
+  nma(32, 8, 3)                                 primed=False nma(32, 8, 3)=NaN
 
 Bar[ 30] 2020-02-01  O=86.2500 H=87.1550 L=84.4050 C=85.2500 V=4493300
   sma(14)                                       primed=True  sma(14)=86.5046
@@ -4836,6 +4886,7 @@ Bar[ 30] 2020-02-01  O=86.2500 H=87.1550 L=84.4050 C=85.2500 V=4493300
   jtpo(14)                                      primed=True  jtpo(14)=-0.5033
   jwav(12)                                      primed=False jwav(12)=86.2500
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=86.3442
+  nma(32, 8, 3)                                 primed=False nma(32, 8, 3)=NaN
 
 Bar[ 31] 2020-02-02  O=85.2500 H=87.2500 L=85.0950 C=87.1250 V=4346100
   sma(14)                                       primed=True  sma(14)=86.3461
@@ -4921,6 +4972,7 @@ Bar[ 31] 2020-02-02  O=85.2500 H=87.2500 L=85.0950 C=87.1250 V=4346100
   jtpo(14)                                      primed=True  jtpo(14)=-0.3363
   jwav(12)                                      primed=False jwav(12)=85.2500
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=86.2884
+  nma(32, 8, 3)                                 primed=False nma(32, 8, 3)=NaN
 
 Bar[ 32] 2020-02-03  O=87.1250 H=87.3750 L=85.5000 C=85.8150 V=3700300
   sma(14)                                       primed=True  sma(14)=85.9311
@@ -5006,6 +5058,7 @@ Bar[ 32] 2020-02-03  O=87.1250 H=87.3750 L=85.5000 C=85.8150 V=3700300
   jtpo(14)                                      primed=True  jtpo(14)=-0.1516
   jwav(12)                                      primed=False jwav(12)=87.1250
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=86.1933
+  nma(32, 8, 3)                                 primed=False nma(32, 8, 3)=NaN
 
 Bar[ 33] 2020-02-04  O=85.8150 H=88.9700 L=85.5300 C=88.9700 V=4600200
   sma(14)                                       primed=True  sma(14)=85.8664
@@ -5091,6 +5144,7 @@ Bar[ 33] 2020-02-04  O=85.8150 H=88.9700 L=85.5300 C=88.9700 V=4600200
   jtpo(14)                                      primed=True  jtpo(14)=0.2220
   jwav(12)                                      primed=False jwav(12)=85.8150
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=86.8081
+  nma(32, 8, 3)                                 primed=False nma(32, 8, 3)=NaN
 
 Bar[ 34] 2020-02-05  O=88.9700 H=90.0000 L=87.8750 C=88.4700 V=4557200
   sma(14)                                       primed=True  sma(14)=85.8732
@@ -5176,6 +5230,7 @@ Bar[ 34] 2020-02-05  O=88.9700 H=90.0000 L=87.8750 C=88.4700 V=4557200
   jtpo(14)                                      primed=True  jtpo(14)=0.4989
   jwav(12)                                      primed=False jwav(12)=88.9700
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=87.5203
+  nma(32, 8, 3)                                 primed=False nma(32, 8, 3)=NaN
 
 Bar[ 35] 2020-02-06  O=88.4700 H=89.8450 L=86.5650 C=86.8750 V=4323600
   sma(14)                                       primed=True  sma(14)=85.8196
@@ -5261,6 +5316,7 @@ Bar[ 35] 2020-02-06  O=88.4700 H=89.8450 L=86.5650 C=86.8750 V=4323600
   jtpo(14)                                      primed=True  jtpo(14)=0.6967
   jwav(12)                                      primed=False jwav(12)=88.4700
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=87.7423
+  nma(32, 8, 3)                                 primed=False nma(32, 8, 3)=NaN
 
 Bar[ 36] 2020-02-07  O=86.8750 H=86.9700 L=84.6550 C=86.8150 V=5237500
   sma(14)                                       primed=True  sma(14)=85.9650
@@ -5346,6 +5402,7 @@ Bar[ 36] 2020-02-07  O=86.8750 H=86.9700 L=84.6550 C=86.8150 V=5237500
   jtpo(14)                                      primed=True  jtpo(14)=0.6527
   jwav(12)                                      primed=False jwav(12)=86.8750
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=87.5351
+  nma(32, 8, 3)                                 primed=False nma(32, 8, 3)=NaN
 
 Bar[ 37] 2020-02-08  O=86.8150 H=85.9400 L=83.2500 C=84.8750 V=7404100
   sma(14)                                       primed=True  sma(14)=86.0989
@@ -5431,6 +5488,7 @@ Bar[ 37] 2020-02-08  O=86.8150 H=85.9400 L=83.2500 C=84.8750 V=7404100
   jtpo(14)                                      primed=True  jtpo(14)=0.4198
   jwav(12)                                      primed=False jwav(12)=86.8150
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=86.7503
+  nma(32, 8, 3)                                 primed=False nma(32, 8, 3)=NaN
 
 Bar[ 38] 2020-02-09  O=84.8750 H=84.7500 L=82.5650 C=84.1900 V=4798400
   sma(14)                                       primed=True  sma(14)=86.1482
@@ -5516,6 +5574,7 @@ Bar[ 38] 2020-02-09  O=84.8750 H=84.7500 L=82.5650 C=84.1900 V=4798400
   jtpo(14)                                      primed=True  jtpo(14)=0.0813
   jwav(12)                                      primed=False jwav(12)=84.8750
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=85.7740
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=84.7775
 
 Bar[ 39] 2020-02-10  O=84.1900 H=85.4700 L=83.4400 C=83.8750 V=4372800
   sma(14)                                       primed=True  sma(14)=86.3268
@@ -5601,6 +5660,7 @@ Bar[ 39] 2020-02-10  O=84.1900 H=85.4700 L=83.4400 C=83.8750 V=4372800
   jtpo(14)                                      primed=True  jtpo(14)=-0.3187
   jwav(12)                                      primed=False jwav(12)=84.1900
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=84.8932
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=84.1984
 
 Bar[ 40] 2020-02-11  O=83.8750 H=84.4700 L=82.5300 C=83.3750 V=3872300
   sma(14)                                       primed=True  sma(14)=86.2507
@@ -5686,6 +5746,7 @@ Bar[ 40] 2020-02-11  O=83.8750 H=84.4700 L=82.5300 C=83.3750 V=3872300
   jtpo(14)                                      primed=True  jtpo(14)=-0.6088
   jwav(12)                                      primed=False jwav(12)=83.8750
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=84.1979
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=83.6489
 
 Bar[ 41] 2020-02-12  O=83.3750 H=88.5000 L=85.0650 C=85.5000 V=10750800
   sma(14)                                       primed=True  sma(14)=85.9829
@@ -5771,6 +5832,7 @@ Bar[ 41] 2020-02-12  O=83.3750 H=88.5000 L=85.0650 C=85.5000 V=10750800
   jtpo(14)                                      primed=True  jtpo(14)=-0.5165
   jwav(12)                                      primed=False jwav(12)=83.3750
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=84.2249
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=83.8288
 
 Bar[ 42] 2020-02-13  O=85.5000 H=89.4700 L=86.8750 C=89.1900 V=5804800
   sma(14)                                       primed=True  sma(14)=86.1839
@@ -5856,6 +5918,7 @@ Bar[ 42] 2020-02-13  O=85.5000 H=89.4700 L=86.8750 C=89.1900 V=5804800
   jtpo(14)                                      primed=True  jtpo(14)=-0.2440
   jwav(12)                                      primed=False jwav(12)=85.5000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=85.4391
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=85.0085
 
 Bar[ 43] 2020-02-14  O=89.1900 H=90.0000 L=88.5300 C=89.4400 V=3785500
   sma(14)                                       primed=True  sma(14)=86.4118
@@ -5941,6 +6004,7 @@ Bar[ 43] 2020-02-14  O=89.1900 H=90.0000 L=88.5300 C=89.4400 V=3785500
   jtpo(14)                                      primed=True  jtpo(14)=-0.0066
   jwav(12)                                      primed=False jwav(12)=89.1900
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=87.0617
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=86.0479
 
 Bar[ 44] 2020-02-15  O=89.4400 H=92.4400 L=89.2800 C=91.0950 V=5014800
   sma(14)                                       primed=True  sma(14)=86.8293
@@ -6026,6 +6090,7 @@ Bar[ 44] 2020-02-15  O=89.4400 H=92.4400 L=89.2800 C=91.0950 V=5014800
   jtpo(14)                                      primed=True  jtpo(14)=0.1429
   jwav(12)                                      primed=False jwav(12)=89.4400
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=88.7557
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=87.3387
 
 Bar[ 45] 2020-02-16  O=91.0950 H=91.4400 L=90.1250 C=90.7500 V=3507700
   sma(14)                                       primed=True  sma(14)=87.0882
@@ -6111,6 +6176,7 @@ Bar[ 45] 2020-02-16  O=91.0950 H=91.4400 L=90.1250 C=90.7500 V=3507700
   jtpo(14)                                      primed=True  jtpo(14)=0.3582
   jwav(12)                                      primed=False jwav(12)=91.0950
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=89.8950
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=88.2721
 
 Bar[ 46] 2020-02-17  O=90.7500 H=92.9700 L=90.7500 C=91.4400 V=4298800
   sma(14)                                       primed=True  sma(14)=87.4900
@@ -6196,6 +6262,7 @@ Bar[ 46] 2020-02-17  O=90.7500 H=92.9700 L=90.7500 C=91.4400 V=4298800
   jtpo(14)                                      primed=True  jtpo(14)=0.5121
   jwav(12)                                      primed=False jwav(12)=90.7500
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=90.6374
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=89.1223
 
 Bar[ 47] 2020-02-18  O=91.4400 H=91.7200 L=89.0000 C=89.0000 V=4842500
   sma(14)                                       primed=True  sma(14)=87.4921
@@ -6281,6 +6348,7 @@ Bar[ 47] 2020-02-18  O=91.4400 H=91.7200 L=89.0000 C=89.0000 V=4842500
   jtpo(14)                                      primed=True  jtpo(14)=0.6044
   jwav(12)                                      primed=False jwav(12)=91.4400
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=90.5231
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=89.0767
 
 Bar[ 48] 2020-02-19  O=89.0000 H=91.1550 L=88.5650 C=91.0000 V=3952200
   sma(14)                                       primed=True  sma(14)=87.6729
@@ -6366,6 +6434,7 @@ Bar[ 48] 2020-02-19  O=89.0000 H=91.1550 L=88.5650 C=91.0000 V=3952200
   jtpo(14)                                      primed=True  jtpo(14)=0.7011
   jwav(12)                                      primed=False jwav(12)=89.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=90.4587
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=89.5618
 
 Bar[ 49] 2020-02-20  O=91.0000 H=91.7500 L=90.0950 C=90.5000 V=3304700
   sma(14)                                       primed=True  sma(14)=87.9318
@@ -6451,6 +6520,7 @@ Bar[ 49] 2020-02-20  O=91.0000 H=91.7500 L=90.0950 C=90.5000 V=3304700
   jtpo(14)                                      primed=True  jtpo(14)=0.7363
   jwav(12)                                      primed=False jwav(12)=91.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=90.4127
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=89.7959
 
 Bar[ 50] 2020-02-21  O=90.5000 H=90.0000 L=89.0000 C=89.0300 V=3462000
   sma(14)                                       primed=True  sma(14)=88.0900
@@ -6536,6 +6606,7 @@ Bar[ 50] 2020-02-21  O=90.5000 H=90.0000 L=89.0000 C=89.0300 V=3462000
   jtpo(14)                                      primed=True  jtpo(14)=0.6571
   jwav(12)                                      primed=False jwav(12)=90.5000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=90.1398
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=89.6012
 
 Bar[ 51] 2020-02-22  O=89.0300 H=88.8750 L=86.4700 C=88.8150 V=7253900
   sma(14)                                       primed=True  sma(14)=88.3714
@@ -6621,6 +6692,7 @@ Bar[ 51] 2020-02-22  O=89.0300 H=88.8750 L=86.4700 C=88.8150 V=7253900
   jtpo(14)                                      primed=True  jtpo(14)=0.4857
   jwav(12)                                      primed=False jwav(12)=89.0300
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=89.6923
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=89.4408
 
 Bar[ 52] 2020-02-23  O=88.8150 H=89.0000 L=84.0000 C=84.2800 V=9753100
   sma(14)                                       primed=True  sma(14)=88.3779
@@ -6706,6 +6778,7 @@ Bar[ 52] 2020-02-23  O=88.8150 H=89.0000 L=84.0000 C=84.2800 V=9753100
   jtpo(14)                                      primed=True  jtpo(14)=0.2088
   jwav(12)                                      primed=False jwav(12)=88.8150
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=88.2444
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=88.1456
 
 Bar[ 53] 2020-02-24  O=84.2800 H=85.2500 L=83.3150 C=83.5000 V=5953000
   sma(14)                                       primed=True  sma(14)=88.3511
@@ -6791,6 +6864,7 @@ Bar[ 53] 2020-02-24  O=84.2800 H=85.2500 L=83.3150 C=83.5000 V=5953000
   jtpo(14)                                      primed=True  jtpo(14)=-0.1297
   jwav(12)                                      primed=False jwav(12)=84.2800
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=86.4274
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=86.9727
 
 Bar[ 54] 2020-02-25  O=83.5000 H=83.8150 L=82.0000 C=82.6900 V=5011700
   sma(14)                                       primed=True  sma(14)=88.3021
@@ -6876,6 +6950,7 @@ Bar[ 54] 2020-02-25  O=83.5000 H=83.8150 L=82.0000 C=82.6900 V=5011700
   jtpo(14)                                      primed=True  jtpo(14)=-0.5297
   jwav(12)                                      primed=False jwav(12)=83.5000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=84.7069
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=85.9008
 
 Bar[ 55] 2020-02-26  O=82.6900 H=85.2500 L=83.2500 C=84.7500 V=5910800
   sma(14)                                       primed=True  sma(14)=88.2486
@@ -6961,6 +7036,7 @@ Bar[ 55] 2020-02-26  O=82.6900 H=85.2500 L=83.2500 C=84.7500 V=5910800
   jtpo(14)                                      primed=True  jtpo(14)=-0.7451
   jwav(12)                                      primed=False jwav(12)=82.6900
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=84.0116
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=85.6641
 
 Bar[ 56] 2020-02-27  O=84.7500 H=86.6250 L=84.7500 C=85.6550 V=4916900
   sma(14)                                       primed=True  sma(14)=87.9961
@@ -7046,6 +7122,7 @@ Bar[ 56] 2020-02-27  O=84.7500 H=86.6250 L=84.7500 C=85.6550 V=4916900
   jtpo(14)                                      primed=True  jtpo(14)=-0.8022
   jwav(12)                                      primed=True  jwav(12)=84.7500
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=84.2559
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=85.7642
 
 Bar[ 57] 2020-02-28  O=85.6550 H=87.9400 L=85.2800 C=86.1900 V=4135000
   sma(14)                                       primed=True  sma(14)=87.7639
@@ -7131,6 +7208,7 @@ Bar[ 57] 2020-02-28  O=85.6550 H=87.9400 L=85.2800 C=86.1900 V=4135000
   jtpo(14)                                      primed=True  jtpo(14)=-0.8110
   jwav(12)                                      primed=True  jwav(12)=85.6550
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=84.9713
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=86.0096
 
 Bar[ 58] 2020-02-29  O=86.1900 H=89.3750 L=87.1900 C=88.9400 V=4054200
   sma(14)                                       primed=True  sma(14)=87.6100
@@ -7216,6 +7294,7 @@ Bar[ 58] 2020-02-29  O=86.1900 H=89.3750 L=87.1900 C=88.9400 V=4054200
   jtpo(14)                                      primed=True  jtpo(14)=-0.6967
   jwav(12)                                      primed=True  jwav(12)=86.1900
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=86.2205
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=86.9165
 
 Bar[ 59] 2020-03-01  O=88.9400 H=90.6250 L=88.4400 C=89.2800 V=3735300
   sma(14)                                       primed=True  sma(14)=87.5050
@@ -7301,6 +7380,7 @@ Bar[ 59] 2020-03-01  O=88.9400 H=90.6250 L=88.4400 C=89.2800 V=3735300
   jtpo(14)                                      primed=True  jtpo(14)=-0.4637
   jwav(12)                                      primed=True  jwav(12)=88.9400
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=87.4951
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=87.6840
 
 Bar[ 60] 2020-03-02  O=89.2800 H=90.7500 L=88.2500 C=88.6250 V=2921900
   sma(14)                                       primed=True  sma(14)=87.3039
@@ -7386,6 +7466,7 @@ Bar[ 60] 2020-03-02  O=89.2800 H=90.7500 L=88.2500 C=88.6250 V=2921900
   jtpo(14)                                      primed=True  jtpo(14)=-0.3187
   jwav(12)                                      primed=True  jwav(12)=89.2800
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=88.3281
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=88.0728
 
 Bar[ 61] 2020-03-03  O=88.6250 H=88.8450 L=87.3450 C=88.5000 V=2658400
   sma(14)                                       primed=True  sma(14)=87.2682
@@ -7471,6 +7552,7 @@ Bar[ 61] 2020-03-03  O=88.6250 H=88.8450 L=87.3450 C=88.5000 V=2658400
   jtpo(14)                                      primed=True  jtpo(14)=-0.2264
   jwav(12)                                      primed=True  jwav(12)=88.6250
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=88.6425
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=88.2778
 
 Bar[ 62] 2020-03-04  O=88.5000 H=91.9700 L=89.2800 C=91.9700 V=4624400
   sma(14)                                       primed=True  sma(14)=87.3375
@@ -7556,6 +7638,7 @@ Bar[ 62] 2020-03-04  O=88.5000 H=91.9700 L=89.2800 C=91.9700 V=4624400
   jtpo(14)                                      primed=True  jtpo(14)=0.1736
   jwav(12)                                      primed=True  jwav(12)=88.5000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=89.4024
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=89.3141
 
 Bar[ 63] 2020-03-05  O=91.9700 H=93.3750 L=91.0950 C=91.5000 V=4372200
   sma(14)                                       primed=True  sma(14)=87.4089
@@ -7641,6 +7724,7 @@ Bar[ 63] 2020-03-05  O=91.9700 H=93.3750 L=91.0950 C=91.5000 V=4372200
   jtpo(14)                                      primed=True  jtpo(14)=0.5121
   jwav(12)                                      primed=True  jwav(12)=91.9700
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=90.2663
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=89.9457
 
 Bar[ 64] 2020-03-06  O=91.5000 H=93.8150 L=89.5300 C=93.2500 V=5831600
   sma(14)                                       primed=True  sma(14)=87.7104
@@ -7726,6 +7810,7 @@ Bar[ 64] 2020-03-06  O=91.5000 H=93.8150 L=89.5300 C=93.2500 V=5831600
   jtpo(14)                                      primed=True  jtpo(14)=0.7626
   jwav(12)                                      primed=True  jwav(12)=91.5000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=91.3805
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=90.8753
 
 Bar[ 65] 2020-03-07  O=93.2500 H=94.0300 L=91.1550 C=93.5000 V=4268600
   sma(14)                                       primed=True  sma(14)=88.0450
@@ -7811,6 +7896,7 @@ Bar[ 65] 2020-03-07  O=93.2500 H=94.0300 L=91.1550 C=93.5000 V=4268600
   jtpo(14)                                      primed=True  jtpo(14)=0.9385
   jwav(12)                                      primed=True  jwav(12)=93.2500
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=92.3377
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=91.6274
 
 Bar[ 66] 2020-03-08  O=93.5000 H=94.0300 L=92.0000 C=93.1550 V=3059200
   sma(14)                                       primed=True  sma(14)=88.6789
@@ -7896,6 +7982,7 @@ Bar[ 66] 2020-03-08  O=93.5000 H=94.0300 L=92.0000 C=93.1550 V=3059200
   jtpo(14)                                      primed=True  jtpo(14)=0.9385
   jwav(12)                                      primed=True  jwav(12)=93.5000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=92.9102
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=92.1119
 
 Bar[ 67] 2020-03-09  O=93.1550 H=91.8150 L=90.5300 C=91.7200 V=4495500
   sma(14)                                       primed=True  sma(14)=89.2661
@@ -7981,6 +8068,7 @@ Bar[ 67] 2020-03-09  O=93.1550 H=91.8150 L=90.5300 C=91.7200 V=4495500
   jtpo(14)                                      primed=True  jtpo(14)=0.8945
   jwav(12)                                      primed=True  jwav(12)=93.1550
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=92.8317
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=92.0869
 
 Bar[ 68] 2020-03-10  O=91.7200 H=92.0000 L=89.9700 C=90.0000 V=3425000
   sma(14)                                       primed=True  sma(14)=89.7882
@@ -8066,6 +8154,7 @@ Bar[ 68] 2020-03-10  O=91.7200 H=92.0000 L=89.9700 C=90.0000 V=3425000
   jtpo(14)                                      primed=True  jtpo(14)=0.8022
   jwav(12)                                      primed=True  jwav(12)=91.7200
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=92.0603
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=91.5794
 
 Bar[ 69] 2020-03-11  O=90.0000 H=91.9400 L=88.8150 C=89.6900 V=3630800
   sma(14)                                       primed=True  sma(14)=90.1411
@@ -8151,6 +8240,7 @@ Bar[ 69] 2020-03-11  O=90.0000 H=91.9400 L=88.8150 C=89.6900 V=3630800
   jtpo(14)                                      primed=True  jtpo(14)=0.6791
   jwav(12)                                      primed=True  jwav(12)=90.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=91.0799
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=91.0963
 
 Bar[ 70] 2020-03-12  O=89.6900 H=89.7500 L=86.7500 C=88.8750 V=4168100
   sma(14)                                       primed=True  sma(14)=90.3711
@@ -8236,6 +8326,7 @@ Bar[ 70] 2020-03-12  O=89.6900 H=89.7500 L=86.7500 C=88.8750 V=4168100
   jtpo(14)                                      primed=True  jtpo(14)=0.4198
   jwav(12)                                      primed=True  jwav(12)=89.6900
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=90.1297
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=90.5123
 
 Bar[ 71] 2020-03-13  O=88.8750 H=88.7500 L=85.0650 C=85.1900 V=5966900
   sma(14)                                       primed=True  sma(14)=90.2996
@@ -8321,6 +8412,7 @@ Bar[ 71] 2020-03-13  O=88.8750 H=88.7500 L=85.0650 C=85.1900 V=5966900
   jtpo(14)                                      primed=True  jtpo(14)=0.0198
   jwav(12)                                      primed=True  jwav(12)=88.8750
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=88.6564
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=89.0805
 
 Bar[ 72] 2020-03-14  O=85.1900 H=86.1550 L=82.0300 C=83.3750 V=7692800
   sma(14)                                       primed=True  sma(14)=89.9021
@@ -8406,6 +8498,7 @@ Bar[ 72] 2020-03-14  O=85.1900 H=86.1550 L=82.0300 C=83.3750 V=7692800
   jtpo(14)                                      primed=True  jtpo(14)=-0.2484
   jwav(12)                                      primed=True  jwav(12)=85.1900
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=86.7772
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=87.5054
 
 Bar[ 73] 2020-03-15  O=83.3750 H=84.8750 L=81.5000 C=84.8750 V=7362500
   sma(14)                                       primed=True  sma(14)=89.5875
@@ -8491,6 +8584,7 @@ Bar[ 73] 2020-03-15  O=83.3750 H=84.8750 L=81.5000 C=84.8750 V=7362500
   jtpo(14)                                      primed=True  jtpo(14)=-0.4725
   jwav(12)                                      primed=True  jwav(12)=83.3750
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=85.4305
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=86.7200
 
 Bar[ 74] 2020-03-16  O=84.8750 H=85.9400 L=82.5650 C=85.9400 V=6581300
   sma(14)                                       primed=True  sma(14)=89.3957
@@ -8576,6 +8670,7 @@ Bar[ 74] 2020-03-16  O=84.8750 H=85.9400 L=82.5650 C=85.9400 V=6581300
   jtpo(14)                                      primed=True  jtpo(14)=-0.6835
   jwav(12)                                      primed=True  jwav(12)=84.8750
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=85.0436
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=86.4518
 
 Bar[ 75] 2020-03-17  O=85.9400 H=99.3750 L=96.3450 C=97.2500 V=19587700
   sma(14)                                       primed=True  sma(14)=90.0207
@@ -8661,6 +8756,7 @@ Bar[ 75] 2020-03-17  O=85.9400 H=99.3750 L=96.3450 C=97.2500 V=19587700
   jtpo(14)                                      primed=True  jtpo(14)=-0.4813
   jwav(12)                                      primed=True  jwav(12)=85.9400
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=87.7777
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=89.3589
 
 Bar[ 76] 2020-03-18  O=97.2500 H=103.2800 L=96.4700 C=99.8750 V=10378600
   sma(14)                                       primed=True  sma(14)=90.5854
@@ -8746,6 +8842,7 @@ Bar[ 76] 2020-03-18  O=97.2500 H=103.2800 L=96.4700 C=99.8750 V=10378600
   jtpo(14)                                      primed=True  jtpo(14)=-0.1780
   jwav(12)                                      primed=True  jwav(12)=97.2500
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=92.1189
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=92.3658
 
 Bar[ 77] 2020-03-19  O=99.8750 H=105.3750 L=101.1550 C=104.9400 V=9334700
   sma(14)                                       primed=True  sma(14)=91.5454
@@ -8831,6 +8928,7 @@ Bar[ 77] 2020-03-19  O=99.8750 H=105.3750 L=101.1550 C=104.9400 V=9334700
   jtpo(14)                                      primed=True  jtpo(14)=0.0681
   jwav(12)                                      primed=True  jwav(12)=99.8750
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=97.2123
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=96.0491
 
 Bar[ 78] 2020-03-20  O=104.9400 H=107.6250 L=104.2500 C=106.0000 V=10467200
   sma(14)                                       primed=True  sma(14)=92.4561
@@ -8916,6 +9014,7 @@ Bar[ 78] 2020-03-20  O=104.9400 H=107.6250 L=104.2500 C=106.0000 V=10467200
   jtpo(14)                                      primed=True  jtpo(14)=0.3055
   jwav(12)                                      primed=True  jwav(12)=104.9400
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=101.4041
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=99.1069
 
 Bar[ 79] 2020-03-21  O=106.0000 H=105.2500 L=101.7500 C=102.5000 V=5671400
   sma(14)                                       primed=True  sma(14)=93.0989
@@ -9001,6 +9100,7 @@ Bar[ 79] 2020-03-21  O=106.0000 H=105.2500 L=101.7500 C=102.5000 V=5671400
   jtpo(14)                                      primed=True  jtpo(14)=0.4901
   jwav(12)                                      primed=True  jwav(12)=106.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=103.2902
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=100.3910
 
 Bar[ 80] 2020-03-22  O=102.5000 H=104.5000 L=101.7200 C=102.4050 V=5645000
   sma(14)                                       primed=True  sma(14)=93.7596
@@ -9086,6 +9186,7 @@ Bar[ 80] 2020-03-22  O=102.5000 H=104.5000 L=101.7200 C=102.4050 V=5645000
   jtpo(14)                                      primed=True  jtpo(14)=0.6220
   jwav(12)                                      primed=True  jwav(12)=102.5000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=103.5242
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=101.1826
 
 Bar[ 81] 2020-03-23  O=102.4050 H=105.5000 L=101.7200 C=104.5950 V=4518600
   sma(14)                                       primed=True  sma(14)=94.6793
@@ -9171,6 +9272,7 @@ Bar[ 81] 2020-03-23  O=102.4050 H=105.5000 L=101.7200 C=104.5950 V=4518600
   jtpo(14)                                      primed=True  jtpo(14)=0.7143
   jwav(12)                                      primed=True  jwav(12)=102.4050
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=103.5355
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=102.2746
 
 Bar[ 82] 2020-03-24  O=104.5950 H=106.1250 L=103.1550 C=106.1250 V=4519500
   sma(14)                                       primed=True  sma(14)=95.8311
@@ -9256,6 +9358,7 @@ Bar[ 82] 2020-03-24  O=104.5950 H=106.1250 L=103.1550 C=106.1250 V=4519500
   jtpo(14)                                      primed=True  jtpo(14)=0.8066
   jwav(12)                                      primed=True  jwav(12)=104.5950
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=104.1148
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=103.4888
 
 Bar[ 83] 2020-03-25  O=106.1250 H=107.9400 L=105.6900 C=106.0000 V=5569700
   sma(14)                                       primed=True  sma(14)=96.9961
@@ -9341,6 +9444,7 @@ Bar[ 83] 2020-03-25  O=106.1250 H=107.9400 L=105.6900 C=106.0000 V=5569700
   jtpo(14)                                      primed=True  jtpo(14)=0.8571
   jwav(12)                                      primed=True  jwav(12)=106.1250
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=104.9471
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=104.4208
 
 Bar[ 84] 2020-03-26  O=106.0000 H=106.2500 L=103.6550 C=106.0650 V=4239700
   sma(14)                                       primed=True  sma(14)=98.2239
@@ -9426,6 +9530,7 @@ Bar[ 84] 2020-03-26  O=106.0000 H=106.2500 L=103.6550 C=106.0650 V=4239700
   jtpo(14)                                      primed=True  jtpo(14)=0.8923
   jwav(12)                                      primed=True  jwav(12)=106.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=105.6053
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=105.2020
 
 Bar[ 85] 2020-03-27  O=106.0650 H=107.0000 L=104.0000 C=104.6250 V=4175300
   sma(14)                                       primed=True  sma(14)=99.6121
@@ -9511,6 +9616,7 @@ Bar[ 85] 2020-03-27  O=106.0650 H=107.0000 L=104.0000 C=104.6250 V=4175300
   jtpo(14)                                      primed=True  jtpo(14)=0.8132
   jwav(12)                                      primed=True  jwav(12)=106.0650
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=105.6097
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=105.4366
 
 Bar[ 86] 2020-03-28  O=104.6250 H=108.7500 L=105.5300 C=108.6250 V=4995300
   sma(14)                                       primed=True  sma(14)=101.4157
@@ -9596,6 +9702,7 @@ Bar[ 86] 2020-03-28  O=104.6250 H=108.7500 L=105.5300 C=108.6250 V=4995300
   jtpo(14)                                      primed=True  jtpo(14)=0.8132
   jwav(12)                                      primed=True  jwav(12)=104.6250
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=106.1644
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=106.6909
 
 Bar[ 87] 2020-03-29  O=108.6250 H=110.9400 L=108.5300 C=109.3150 V=4776600
   sma(14)                                       primed=True  sma(14)=103.1614
@@ -9681,6 +9788,7 @@ Bar[ 87] 2020-03-29  O=108.6250 H=110.9400 L=108.5300 C=109.3150 V=4776600
   jtpo(14)                                      primed=True  jtpo(14)=0.8132
   jwav(12)                                      primed=True  jwav(12)=108.6250
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=107.1666
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=107.8228
 
 Bar[ 88] 2020-03-30  O=109.3150 H=110.9400 L=108.7500 C=110.5000 V=4190000
   sma(14)                                       primed=True  sma(14)=104.9157
@@ -9766,6 +9874,7 @@ Bar[ 88] 2020-03-30  O=109.3150 H=110.9400 L=108.7500 C=110.5000 V=4190000
   jtpo(14)                                      primed=True  jtpo(14)=0.8132
   jwav(12)                                      primed=True  jwav(12)=109.3150
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=108.4813
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=109.0019
 
 Bar[ 89] 2020-03-31  O=110.5000 H=114.2200 L=107.7500 C=112.7500 V=6035300
   sma(14)                                       primed=True  sma(14)=106.0229
@@ -9851,6 +9960,7 @@ Bar[ 89] 2020-03-31  O=110.5000 H=114.2200 L=107.7500 C=112.7500 V=6035300
   jtpo(14)                                      primed=True  jtpo(14)=0.8132
   jwav(12)                                      primed=True  jwav(12)=110.5000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=110.0311
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=110.5126
 
 Bar[ 90] 2020-04-01  O=112.7500 H=123.0000 L=117.0000 C=123.0000 V=12168900
   sma(14)                                       primed=True  sma(14)=107.6746
@@ -9936,6 +10046,7 @@ Bar[ 90] 2020-04-01  O=112.7500 H=123.0000 L=117.0000 C=123.0000 V=12168900
   jtpo(14)                                      primed=True  jtpo(14)=0.8132
   jwav(12)                                      primed=True  jwav(12)=112.7500
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=113.5773
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=114.4293
 
 Bar[ 91] 2020-04-02  O=123.0000 H=121.7500 L=118.0000 C=119.6250 V=9040800
   sma(14)                                       primed=True  sma(14)=108.7236
@@ -10021,6 +10132,7 @@ Bar[ 91] 2020-04-02  O=123.0000 H=121.7500 L=118.0000 C=119.6250 V=9040800
   jtpo(14)                                      primed=True  jtpo(14)=0.8835
   jwav(12)                                      primed=True  jwav(12)=123.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=116.7686
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=116.5412
 
 Bar[ 92] 2020-04-03  O=119.6250 H=119.8150 L=116.0000 C=118.7500 V=5780300
   sma(14)                                       primed=True  sma(14)=109.6343
@@ -10106,6 +10218,7 @@ Bar[ 92] 2020-04-03  O=119.6250 H=119.8150 L=116.0000 C=118.7500 V=5780300
   jtpo(14)                                      primed=True  jtpo(14)=0.9385
   jwav(12)                                      primed=True  jwav(12)=119.6250
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=118.6706
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=117.8736
 
 Bar[ 93] 2020-04-04  O=118.7500 H=120.3150 L=118.5000 C=119.2500 V=4320800
   sma(14)                                       primed=True  sma(14)=110.8307
@@ -10191,6 +10304,7 @@ Bar[ 93] 2020-04-04  O=118.7500 H=120.3150 L=118.5000 C=119.2500 V=4320800
   jtpo(14)                                      primed=True  jtpo(14)=0.9209
   jwav(12)                                      primed=True  jwav(12)=118.7500
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=119.2795
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=118.9533
 
 Bar[ 94] 2020-04-05  O=119.2500 H=119.3750 L=116.5300 C=117.9400 V=3899100
   sma(14)                                       primed=True  sma(14)=111.9404
@@ -10276,6 +10390,7 @@ Bar[ 94] 2020-04-05  O=119.2500 H=119.3750 L=116.5300 C=117.9400 V=3899100
   jtpo(14)                                      primed=True  jtpo(14)=0.8769
   jwav(12)                                      primed=True  jwav(12)=119.2500
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=118.9869
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=119.3722
 
 Bar[ 95] 2020-04-06  O=117.9400 H=118.1900 L=116.2500 C=116.4400 V=3221400
   sma(14)                                       primed=True  sma(14)=112.7864
@@ -10361,6 +10476,7 @@ Bar[ 95] 2020-04-06  O=117.9400 H=118.1900 L=116.2500 C=116.4400 V=3221400
   jtpo(14)                                      primed=True  jtpo(14)=0.8110
   jwav(12)                                      primed=True  jwav(12)=117.9400
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=118.2149
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=119.2712
 
 Bar[ 96] 2020-04-07  O=116.4400 H=116.6900 L=114.5950 C=115.1900 V=3455500
   sma(14)                                       primed=True  sma(14)=113.4339
@@ -10446,6 +10562,7 @@ Bar[ 96] 2020-04-07  O=116.4400 H=116.6900 L=114.5950 C=115.1900 V=3455500
   jtpo(14)                                      primed=True  jtpo(14)=0.7451
   jwav(12)                                      primed=True  jwav(12)=116.4400
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=117.1479
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=118.8646
 
 Bar[ 97] 2020-04-08  O=115.1900 H=115.3450 L=110.8750 C=111.8750 V=4304200
   sma(14)                                       primed=True  sma(14)=113.8536
@@ -10531,6 +10648,7 @@ Bar[ 97] 2020-04-08  O=115.1900 H=115.3450 L=110.8750 C=111.8750 V=4304200
   jtpo(14)                                      primed=True  jtpo(14)=0.5956
   jwav(12)                                      primed=True  jwav(12)=115.1900
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=115.4637
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=117.7242
 
 Bar[ 98] 2020-04-09  O=111.8750 H=113.0000 L=110.5000 C=110.5950 V=4703900
   sma(14)                                       primed=True  sma(14)=114.1771
@@ -10616,6 +10734,7 @@ Bar[ 98] 2020-04-09  O=111.8750 H=113.0000 L=110.5000 C=110.5950 V=4703900
   jtpo(14)                                      primed=True  jtpo(14)=0.4022
   jwav(12)                                      primed=True  jwav(12)=111.8750
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=113.5674
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=116.6080
 
 Bar[ 99] 2020-04-10  O=110.5950 H=118.3150 L=110.7200 C=118.1250 V=8316300
   sma(14)                                       primed=True  sma(14)=115.1414
@@ -10701,6 +10820,7 @@ Bar[ 99] 2020-04-10  O=110.5950 H=118.3150 L=110.7200 C=118.1250 V=8316300
   jtpo(14)                                      primed=True  jtpo(14)=0.2703
   jwav(12)                                      primed=True  jwav(12)=110.5950
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=113.6895
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=117.8645
 
 Bar[100] 2020-04-11  O=118.1250 H=116.8700 L=112.6200 C=116.0000 V=10553900
   sma(14)                                       primed=True  sma(14)=115.6682
@@ -10786,6 +10906,7 @@ Bar[100] 2020-04-11  O=118.1250 H=116.8700 L=112.6200 C=116.0000 V=10553900
   jtpo(14)                                      primed=True  jtpo(14)=0.0681
   jwav(12)                                      primed=True  jwav(12)=118.1250
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=114.5728
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=118.3433
 
 Bar[101] 2020-04-12  O=116.0000 H=116.7500 L=114.1900 C=116.0000 V=6384800
   sma(14)                                       primed=True  sma(14)=116.1457
@@ -10871,6 +10992,7 @@ Bar[101] 2020-04-12  O=116.0000 H=116.7500 L=114.1900 C=116.0000 V=6384800
   jtpo(14)                                      primed=True  jtpo(14)=-0.1670
   jwav(12)                                      primed=True  jwav(12)=116.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=115.5328
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=118.7300
 
 Bar[102] 2020-04-13  O=116.0000 H=113.8700 L=111.1900 C=112.0000 V=7163300
   sma(14)                                       primed=True  sma(14)=116.2529
@@ -10956,6 +11078,7 @@ Bar[102] 2020-04-13  O=116.0000 H=113.8700 L=111.1900 C=112.0000 V=7163300
   jtpo(14)                                      primed=True  jtpo(14)=-0.5275
   jwav(12)                                      primed=True  jwav(12)=116.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=115.0928
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=117.9240
 
 Bar[103] 2020-04-14  O=112.0000 H=114.6200 L=109.4400 C=113.7500 V=7007800
   sma(14)                                       primed=True  sma(14)=116.3243
@@ -11041,6 +11164,7 @@ Bar[103] 2020-04-14  O=112.0000 H=114.6200 L=109.4400 C=113.7500 V=7007800
   jtpo(14)                                      primed=True  jtpo(14)=-0.7429
   jwav(12)                                      primed=True  jwav(12)=112.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=114.3393
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=117.7007
 
 Bar[104] 2020-04-15  O=113.7500 H=115.3100 L=111.5600 C=112.9400 V=5114100
   sma(14)                                       primed=True  sma(14)=115.6057
@@ -11126,6 +11250,7 @@ Bar[104] 2020-04-15  O=113.7500 H=115.3100 L=111.5600 C=112.9400 V=5114100
   jtpo(14)                                      primed=True  jtpo(14)=-0.6769
   jwav(12)                                      primed=True  jwav(12)=113.7500
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=113.6103
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=117.2004
 
 Bar[105] 2020-04-16  O=112.9400 H=116.0000 L=112.4400 C=116.0000 V=5263800
   sma(14)                                       primed=True  sma(14)=115.3468
@@ -11211,6 +11336,7 @@ Bar[105] 2020-04-16  O=112.9400 H=116.0000 L=112.4400 C=116.0000 V=5263800
   jtpo(14)                                      primed=True  jtpo(14)=-0.5253
   jwav(12)                                      primed=True  jwav(12)=112.9400
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=113.8983
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=117.4980
 
 Bar[106] 2020-04-17  O=116.0000 H=121.6900 L=117.5000 C=120.5000 V=6666100
   sma(14)                                       primed=True  sma(14)=115.4718
@@ -11296,6 +11422,7 @@ Bar[106] 2020-04-17  O=116.0000 H=121.6900 L=117.5000 C=120.5000 V=6666100
   jtpo(14)                                      primed=True  jtpo(14)=-0.1297
   jwav(12)                                      primed=True  jwav(12)=116.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=115.6413
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=118.8260
 
 Bar[107] 2020-04-18  O=120.5000 H=119.8700 L=116.0600 C=116.6200 V=7398400
   sma(14)                                       primed=True  sma(14)=115.2839
@@ -11381,6 +11508,7 @@ Bar[107] 2020-04-18  O=120.5000 H=119.8700 L=116.0600 C=116.6200 V=7398400
   jtpo(14)                                      primed=True  jtpo(14)=0.1165
   jwav(12)                                      primed=True  jwav(12)=120.5000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=116.8700
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=118.7132
 
 Bar[108] 2020-04-19  O=116.6200 H=120.8700 L=116.5600 C=117.0000 V=5575000
   sma(14)                                       primed=True  sma(14)=115.2168
@@ -11466,6 +11594,7 @@ Bar[108] 2020-04-19  O=116.6200 H=120.8700 L=116.5600 C=117.0000 V=5575000
   jtpo(14)                                      primed=True  jtpo(14)=0.3934
   jwav(12)                                      primed=True  jwav(12)=116.6200
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=117.3946
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=118.6668
 
 Bar[109] 2020-04-20  O=117.0000 H=116.7500 L=113.3100 C=115.2500 V=4852300
   sma(14)                                       primed=True  sma(14)=115.1318
@@ -11551,6 +11680,7 @@ Bar[109] 2020-04-20  O=117.0000 H=116.7500 L=113.3100 C=115.2500 V=4852300
   jtpo(14)                                      primed=True  jtpo(14)=0.4549
   jwav(12)                                      primed=True  jwav(12)=117.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=116.9216
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=118.1021
 
 Bar[110] 2020-04-21  O=115.2500 H=116.5000 L=112.5600 C=114.3100 V=4298100
   sma(14)                                       primed=True  sma(14)=115.0689
@@ -11636,6 +11766,7 @@ Bar[110] 2020-04-21  O=115.2500 H=116.5000 L=112.5600 C=114.3100 V=4298100
   jtpo(14)                                      primed=True  jtpo(14)=0.3626
   jwav(12)                                      primed=True  jwav(12)=115.2500
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=115.9900
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=117.3764
 
 Bar[111] 2020-04-22  O=114.3100 H=116.0000 L=114.0000 C=115.5000 V=4900500
   sma(14)                                       primed=True  sma(14)=115.3279
@@ -11721,6 +11852,7 @@ Bar[111] 2020-04-22  O=114.3100 H=116.0000 L=114.0000 C=115.5000 V=4900500
   jtpo(14)                                      primed=True  jtpo(14)=0.1429
   jwav(12)                                      primed=True  jwav(12)=114.3100
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=115.4191
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=117.1276
 
 Bar[112] 2020-04-23  O=115.5000 H=118.3100 L=114.7500 C=115.8700 V=4887700
   sma(14)                                       primed=True  sma(14)=115.7046
@@ -11806,6 +11938,7 @@ Bar[112] 2020-04-23  O=115.5000 H=118.3100 L=114.7500 C=115.8700 V=4887700
   jtpo(14)                                      primed=True  jtpo(14)=-0.1121
   jwav(12)                                      primed=True  jwav(12)=115.5000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=115.3338
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=117.0113
 
 Bar[113] 2020-04-24  O=115.8700 H=121.5000 L=118.8700 C=120.6900 V=6964800
   sma(14)                                       primed=True  sma(14)=115.8879
@@ -11891,6 +12024,7 @@ Bar[113] 2020-04-24  O=115.8700 H=121.5000 L=118.8700 C=120.6900 V=6964800
   jtpo(14)                                      primed=True  jtpo(14)=0.2571
   jwav(12)                                      primed=True  jwav(12)=115.8700
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=116.5877
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=118.2081
 
 Bar[114] 2020-04-25  O=120.6900 H=122.0000 L=119.0000 C=120.1900 V=4679200
   sma(14)                                       primed=True  sma(14)=116.1871
@@ -11976,6 +12110,7 @@ Bar[114] 2020-04-25  O=120.6900 H=122.0000 L=119.0000 C=120.1900 V=4679200
   jtpo(14)                                      primed=True  jtpo(14)=0.4549
   jwav(12)                                      primed=True  jwav(12)=120.6900
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=118.1299
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=119.0012
 
 Bar[115] 2020-04-26  O=120.1900 H=121.4400 L=119.7500 C=120.7500 V=9165000
   sma(14)                                       primed=True  sma(14)=116.5264
@@ -12061,6 +12196,7 @@ Bar[115] 2020-04-26  O=120.1900 H=121.4400 L=119.7500 C=120.7500 V=9165000
   jtpo(14)                                      primed=True  jtpo(14)=0.6571
   jwav(12)                                      primed=True  jwav(12)=120.1900
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=119.4756
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=119.7200
 
 Bar[116] 2020-04-27  O=120.7500 H=125.7500 L=122.6200 C=124.7500 V=6469800
   sma(14)                                       primed=True  sma(14)=117.4371
@@ -12146,6 +12282,7 @@ Bar[116] 2020-04-27  O=120.7500 H=125.7500 L=122.6200 C=124.7500 V=6469800
   jtpo(14)                                      primed=True  jtpo(14)=0.6571
   jwav(12)                                      primed=True  jwav(12)=120.7500
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=121.1390
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=121.2827
 
 Bar[117] 2020-04-28  O=124.7500 H=127.7500 L=123.0000 C=123.3700 V=6792000
   sma(14)                                       primed=True  sma(14)=118.1243
@@ -12231,6 +12368,7 @@ Bar[117] 2020-04-28  O=124.7500 H=127.7500 L=123.0000 C=123.3700 V=6792000
   jtpo(14)                                      primed=True  jtpo(14)=0.6571
   jwav(12)                                      primed=True  jwav(12)=124.7500
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=122.3749
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=122.0289
 
 Bar[118] 2020-04-29  O=123.3700 H=124.1900 L=121.7500 C=122.9400 V=4423800
   sma(14)                                       primed=True  sma(14)=118.8386
@@ -12316,6 +12454,7 @@ Bar[118] 2020-04-29  O=123.3700 H=124.1900 L=121.7500 C=122.9400 V=4423800
   jtpo(14)                                      primed=True  jtpo(14)=0.6440
   jwav(12)                                      primed=True  jwav(12)=123.3700
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=123.0344
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=122.3662
 
 Bar[119] 2020-04-30  O=122.9400 H=124.4400 L=121.5600 C=122.5600 V=5231900
   sma(14)                                       primed=True  sma(14)=119.3071
@@ -12401,6 +12540,7 @@ Bar[119] 2020-04-30  O=122.9400 H=124.4400 L=121.5600 C=122.5600 V=5231900
   jtpo(14)                                      primed=True  jtpo(14)=0.7143
   jwav(12)                                      primed=True  jwav(12)=122.9400
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=123.0814
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=122.4432
 
 Bar[120] 2020-05-01  O=122.5600 H=125.7500 L=123.1200 C=123.1200 V=4565600
   sma(14)                                       primed=True  sma(14)=119.4943
@@ -12486,6 +12626,7 @@ Bar[120] 2020-05-01  O=122.5600 H=125.7500 L=123.1200 C=123.1200 V=4565600
   jtpo(14)                                      primed=True  jtpo(14)=0.8110
   jwav(12)                                      primed=True  jwav(12)=122.5600
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=122.9928
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=122.5953
 
 Bar[121] 2020-05-02  O=123.1200 H=124.6900 L=122.1900 C=122.5600 V=6235200
   sma(14)                                       primed=True  sma(14)=119.9186
@@ -12571,6 +12712,7 @@ Bar[121] 2020-05-02  O=123.1200 H=124.6900 L=122.1900 C=122.5600 V=6235200
   jtpo(14)                                      primed=True  jtpo(14)=0.8110
   jwav(12)                                      primed=True  jwav(12)=123.1200
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=122.8509
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=122.5426
 
 Bar[122] 2020-05-03  O=122.5600 H=125.3100 L=122.7500 C=124.6200 V=5225900
   sma(14)                                       primed=True  sma(14)=120.4629
@@ -12656,6 +12798,7 @@ Bar[122] 2020-05-03  O=122.5600 H=125.3100 L=122.7500 C=124.6200 V=5225900
   jtpo(14)                                      primed=True  jtpo(14)=0.8286
   jwav(12)                                      primed=True  jwav(12)=122.5600
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=123.1954
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=123.0569
 
 Bar[123] 2020-05-04  O=124.6200 H=132.0000 L=124.3700 C=129.2500 V=8261400
   sma(14)                                       primed=True  sma(14)=121.4629
@@ -12741,6 +12884,7 @@ Bar[123] 2020-05-04  O=124.6200 H=132.0000 L=124.3700 C=129.2500 V=8261400
   jtpo(14)                                      primed=True  jtpo(14)=0.8330
   jwav(12)                                      primed=True  jwav(12)=124.6200
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=124.7441
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=124.8008
 
 Bar[124] 2020-05-05  O=129.2500 H=131.3100 L=128.0000 C=131.0000 V=5912500
   sma(14)                                       primed=True  sma(14)=122.6550
@@ -12826,6 +12970,7 @@ Bar[124] 2020-05-05  O=129.2500 H=131.3100 L=128.0000 C=131.0000 V=5912500
   jtpo(14)                                      primed=True  jtpo(14)=0.8330
   jwav(12)                                      primed=True  jwav(12)=129.2500
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=127.0072
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=126.6971
 
 Bar[125] 2020-05-06  O=131.0000 H=132.2500 L=129.5000 C=132.2500 V=3545600
   sma(14)                                       primed=True  sma(14)=123.8514
@@ -12911,6 +13056,7 @@ Bar[125] 2020-05-06  O=131.0000 H=132.2500 L=129.5000 C=132.2500 V=3545600
   jtpo(14)                                      primed=True  jtpo(14)=0.8330
   jwav(12)                                      primed=True  jwav(12)=131.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=129.3096
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=128.5262
 
 Bar[126] 2020-05-07  O=132.2500 H=133.8800 L=130.8100 C=131.0000 V=5714500
   sma(14)                                       primed=True  sma(14)=124.9321
@@ -12996,6 +13142,7 @@ Bar[126] 2020-05-07  O=132.2500 H=133.8800 L=130.8100 C=131.0000 V=5714500
   jtpo(14)                                      primed=True  jtpo(14)=0.8242
   jwav(12)                                      primed=True  jwav(12)=132.2500
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=130.6589
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=129.6015
 
 Bar[127] 2020-05-08  O=131.0000 H=133.5000 L=130.6300 C=132.8100 V=6653900
   sma(14)                                       primed=True  sma(14)=125.7979
@@ -13081,6 +13228,7 @@ Bar[127] 2020-05-08  O=131.0000 H=133.5000 L=130.6300 C=132.8100 V=6653900
   jtpo(14)                                      primed=True  jtpo(14)=0.8286
   jwav(12)                                      primed=True  jwav(12)=131.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=131.5402
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=130.8853
 
 Bar[128] 2020-05-09  O=132.8100 H=135.5000 L=132.1300 C=134.0000 V=6094500
   sma(14)                                       primed=True  sma(14)=126.7843
@@ -13166,6 +13314,7 @@ Bar[128] 2020-05-09  O=132.8100 H=135.5000 L=132.1300 C=134.0000 V=6094500
   jtpo(14)                                      primed=True  jtpo(14)=0.8286
   jwav(12)                                      primed=True  jwav(12)=132.8100
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=132.3563
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=132.1558
 
 Bar[129] 2020-05-10  O=134.0000 H=137.4400 L=133.8800 C=137.3800 V=4799200
   sma(14)                                       primed=True  sma(14)=127.9721
@@ -13251,6 +13400,7 @@ Bar[129] 2020-05-10  O=134.0000 H=137.4400 L=133.8800 C=137.3800 V=4799200
   jtpo(14)                                      primed=True  jtpo(14)=0.8286
   jwav(12)                                      primed=True  jwav(12)=134.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=133.8482
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=134.0024
 
 Bar[130] 2020-05-11  O=137.3800 H=138.6900 L=135.3800 C=137.8100 V=5050800
   sma(14)                                       primed=True  sma(14)=128.9050
@@ -13336,6 +13486,7 @@ Bar[130] 2020-05-11  O=137.3800 H=138.6900 L=135.3800 C=137.8100 V=5050800
   jtpo(14)                                      primed=True  jtpo(14)=0.9209
   jwav(12)                                      primed=True  jwav(12)=137.3800
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=135.4939
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=135.4961
 
 Bar[131] 2020-05-12  O=137.8100 H=139.1900 L=135.7500 C=137.8800 V=5648900
   sma(14)                                       primed=True  sma(14)=129.9414
@@ -13421,6 +13572,7 @@ Bar[131] 2020-05-12  O=137.8100 H=139.1900 L=135.7500 C=137.8800 V=5648900
   jtpo(14)                                      primed=True  jtpo(14)=0.9648
   jwav(12)                                      primed=True  jwav(12)=137.8100
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=136.7884
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=136.6200
 
 Bar[132] 2020-05-13  O=137.8800 H=138.5000 L=136.1900 C=137.2500 V=4726300
   sma(14)                                       primed=True  sma(14)=130.9636
@@ -13506,6 +13658,7 @@ Bar[132] 2020-05-13  O=137.8800 H=138.5000 L=136.1900 C=137.2500 V=4726300
   jtpo(14)                                      primed=True  jtpo(14)=0.9560
   jwav(12)                                      primed=True  jwav(12)=137.8800
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=137.3667
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=137.3276
 
 Bar[133] 2020-05-14  O=137.2500 H=138.1300 L=134.5000 C=136.3100 V=5585600
   sma(14)                                       primed=True  sma(14)=131.9457
@@ -13591,6 +13744,7 @@ Bar[133] 2020-05-14  O=137.2500 H=138.1300 L=134.5000 C=136.3100 V=5585600
   jtpo(14)                                      primed=True  jtpo(14)=0.9165
   jwav(12)                                      primed=True  jwav(12)=137.2500
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=137.2493
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=137.6099
 
 Bar[134] 2020-05-15  O=136.3100 H=137.5000 L=135.3800 C=136.2500 V=5124800
   sma(14)                                       primed=True  sma(14)=132.8836
@@ -13676,6 +13830,7 @@ Bar[134] 2020-05-15  O=136.3100 H=137.5000 L=135.3800 C=136.2500 V=5124800
   jtpo(14)                                      primed=True  jtpo(14)=0.8549
   jwav(12)                                      primed=True  jwav(12)=136.3100
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=136.8644
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=137.8016
 
 Bar[135] 2020-05-16  O=136.2500 H=138.8800 L=133.6900 C=134.6300 V=7630200
   sma(14)                                       primed=True  sma(14)=133.7457
@@ -13761,6 +13916,7 @@ Bar[135] 2020-05-16  O=136.2500 H=138.8800 L=133.6900 C=134.6300 V=7630200
   jtpo(14)                                      primed=True  jtpo(14)=0.7626
   jwav(12)                                      primed=True  jwav(12)=136.2500
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=136.1639
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=137.4920
 
 Bar[136] 2020-05-17  O=134.6300 H=132.1300 L=126.0600 C=128.2500 V=14311600
   sma(14)                                       primed=True  sma(14)=134.0050
@@ -13846,6 +14002,7 @@ Bar[136] 2020-05-17  O=134.6300 H=132.1300 L=126.0600 C=128.2500 V=14311600
   jtpo(14)                                      primed=True  jtpo(14)=0.3626
   jwav(12)                                      primed=True  jwav(12)=134.6300
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=134.0837
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=135.5425
 
 Bar[137] 2020-05-18  O=128.2500 H=129.7500 L=126.8700 C=129.0000 V=8793600
   sma(14)                                       primed=True  sma(14)=133.9871
@@ -13931,6 +14088,7 @@ Bar[137] 2020-05-18  O=128.2500 H=129.7500 L=126.8700 C=129.0000 V=8793600
   jtpo(14)                                      primed=True  jtpo(14)=0.0242
   jwav(12)                                      primed=True  jwav(12)=128.2500
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=131.8361
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=134.2555
 
 Bar[138] 2020-05-19  O=129.0000 H=128.5000 L=123.5000 C=123.8700 V=8874200
   sma(14)                                       primed=True  sma(14)=133.4779
@@ -14016,6 +14174,7 @@ Bar[138] 2020-05-19  O=129.0000 H=128.5000 L=123.5000 C=123.8700 V=8874200
   jtpo(14)                                      primed=True  jtpo(14)=-0.2615
   jwav(12)                                      primed=True  jwav(12)=129.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=128.9953
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=131.9473
 
 Bar[139] 2020-05-20  O=123.8700 H=125.4400 L=122.6200 C=124.8100 V=6966600
   sma(14)                                       primed=True  sma(14)=132.9464
@@ -14101,6 +14260,7 @@ Bar[139] 2020-05-20  O=123.8700 H=125.4400 L=122.6200 C=124.8100 V=6966600
   jtpo(14)                                      primed=True  jtpo(14)=-0.4945
   jwav(12)                                      primed=True  jwav(12)=123.8700
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=126.8247
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=130.5226
 
 Bar[140] 2020-05-21  O=124.8100 H=125.1200 L=122.7500 C=123.0000 V=5525500
   sma(14)                                       primed=True  sma(14)=132.3750
@@ -14186,6 +14346,7 @@ Bar[140] 2020-05-21  O=124.8100 H=125.1200 L=122.7500 C=123.0000 V=5525500
   jtpo(14)                                      primed=True  jtpo(14)=-0.6923
   jwav(12)                                      primed=True  jwav(12)=124.8100
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=125.1088
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=129.0206
 
 Bar[141] 2020-05-22  O=123.0000 H=126.5000 L=123.5600 C=126.2500 V=6515500
   sma(14)                                       primed=True  sma(14)=131.9064
@@ -14271,6 +14432,7 @@ Bar[141] 2020-05-22  O=123.0000 H=126.5000 L=123.5600 C=126.2500 V=6515500
   jtpo(14)                                      primed=True  jtpo(14)=-0.8242
   jwav(12)                                      primed=True  jwav(12)=123.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=124.7288
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=128.8102
 
 Bar[142] 2020-05-23  O=126.2500 H=128.6900 L=125.8100 C=128.3800 V=5291900
   sma(14)                                       primed=True  sma(14)=131.5050
@@ -14356,6 +14518,7 @@ Bar[142] 2020-05-23  O=126.2500 H=128.6900 L=125.8100 C=128.3800 V=5291900
   jtpo(14)                                      primed=True  jtpo(14)=-0.8769
   jwav(12)                                      primed=True  jwav(12)=126.2500
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=125.5632
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=129.2640
 
 Bar[143] 2020-05-24  O=128.3800 H=126.6200 L=124.6200 C=125.3700 V=5711700
   sma(14)                                       primed=True  sma(14)=130.6471
@@ -14441,6 +14604,7 @@ Bar[143] 2020-05-24  O=128.3800 H=126.6200 L=124.6200 C=125.3700 V=5711700
   jtpo(14)                                      primed=True  jtpo(14)=-0.8374
   jwav(12)                                      primed=True  jwav(12)=128.3800
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=126.1163
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=128.7827
 
 Bar[144] 2020-05-25  O=125.3700 H=126.6900 L=124.3700 C=125.6900 V=4327700
   sma(14)                                       primed=True  sma(14)=129.7814
@@ -14526,6 +14690,7 @@ Bar[144] 2020-05-25  O=125.3700 H=126.6900 L=124.3700 C=125.6900 V=4327700
   jtpo(14)                                      primed=True  jtpo(14)=-0.7714
   jwav(12)                                      primed=True  jwav(12)=125.3700
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=126.2284
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=128.4139
 
 Bar[145] 2020-05-26  O=125.6900 H=126.0000 L=121.8100 C=122.2500 V=4568000
   sma(14)                                       primed=True  sma(14)=128.6650
@@ -14611,6 +14776,7 @@ Bar[145] 2020-05-26  O=125.6900 H=126.0000 L=121.8100 C=122.2500 V=4568000
   jtpo(14)                                      primed=True  jtpo(14)=-0.7714
   jwav(12)                                      primed=True  jwav(12)=125.6900
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=125.2397
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=127.1068
 
 Bar[146] 2020-05-27  O=122.2500 H=123.1200 L=118.1900 C=119.3700 V=6859200
   sma(14)                                       primed=True  sma(14)=127.3879
@@ -14696,6 +14862,7 @@ Bar[146] 2020-05-27  O=122.2500 H=123.1200 L=118.1900 C=119.3700 V=6859200
   jtpo(14)                                      primed=True  jtpo(14)=-0.7714
   jwav(12)                                      primed=True  jwav(12)=122.2500
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=123.3590
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=125.2372
 
 Bar[147] 2020-05-28  O=119.3700 H=121.8700 L=118.0600 C=118.5000 V=5757500
   sma(14)                                       primed=True  sma(14)=126.1157
@@ -14781,6 +14948,7 @@ Bar[147] 2020-05-28  O=119.3700 H=121.8700 L=118.0600 C=118.5000 V=5757500
   jtpo(14)                                      primed=True  jtpo(14)=-0.7714
   jwav(12)                                      primed=True  jwav(12)=119.3700
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=121.3134
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=123.4928
 
 Bar[148] 2020-05-29  O=118.5000 H=124.0000 L=117.5600 C=123.1900 V=7367000
   sma(14)                                       primed=True  sma(14)=125.1829
@@ -14866,6 +15034,7 @@ Bar[148] 2020-05-29  O=118.5000 H=124.0000 L=117.5600 C=123.1900 V=7367000
   jtpo(14)                                      primed=True  jtpo(14)=-0.7099
   jwav(12)                                      primed=True  jwav(12)=118.5000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=120.8033
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=123.3728
 
 Bar[149] 2020-05-30  O=123.1900 H=127.0000 L=121.0000 C=123.5000 V=6144100
   sma(14)                                       primed=True  sma(14)=124.3879
@@ -14951,6 +15120,7 @@ Bar[149] 2020-05-30  O=123.1900 H=127.0000 L=121.0000 C=123.5000 V=6144100
   jtpo(14)                                      primed=True  jtpo(14)=-0.6264
   jwav(12)                                      primed=True  jwav(12)=123.1900
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=121.4442
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=123.3975
 
 Bar[150] 2020-05-31  O=123.5000 H=124.4400 L=121.1200 C=122.1900 V=4052700
   sma(14)                                       primed=True  sma(14)=123.9550
@@ -15036,6 +15206,7 @@ Bar[150] 2020-05-31  O=123.5000 H=124.4400 L=121.1200 C=122.1900 V=4052700
   jtpo(14)                                      primed=True  jtpo(14)=-0.6264
   jwav(12)                                      primed=True  jwav(12)=123.5000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=122.1600
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=123.0648
 
 Bar[151] 2020-06-01  O=122.1900 H=122.5000 L=118.9400 C=119.3100 V=5849700
   sma(14)                                       primed=True  sma(14)=123.2629
@@ -15121,6 +15292,7 @@ Bar[151] 2020-06-01  O=122.1900 H=122.5000 L=118.9400 C=119.3100 V=5849700
   jtpo(14)                                      primed=True  jtpo(14)=-0.6088
   jwav(12)                                      primed=True  jwav(12)=122.1900
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=121.8178
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=121.9841
 
 Bar[152] 2020-06-02  O=119.3100 H=123.7500 L=119.8100 C=123.3100 V=5544700
   sma(14)                                       primed=True  sma(14)=123.2229
@@ -15206,6 +15378,7 @@ Bar[152] 2020-06-02  O=119.3100 H=123.7500 L=119.8100 C=123.3100 V=5544700
   jtpo(14)                                      primed=True  jtpo(14)=-0.5297
   jwav(12)                                      primed=True  jwav(12)=119.3100
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=121.7667
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=122.1513
 
 Bar[153] 2020-06-03  O=123.3100 H=123.8100 L=121.0000 C=121.1200 V=5032200
   sma(14)                                       primed=True  sma(14)=122.9593
@@ -15291,6 +15464,7 @@ Bar[153] 2020-06-03  O=123.3100 H=123.8100 L=121.0000 C=121.1200 V=5032200
   jtpo(14)                                      primed=True  jtpo(14)=-0.5253
   jwav(12)                                      primed=True  jwav(12)=123.3100
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=121.6074
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=121.6070
 
 Bar[154] 2020-06-04  O=121.1200 H=124.5000 L=122.0000 C=123.3700 V=4400600
   sma(14)                                       primed=True  sma(14)=122.9857
@@ -15376,6 +15550,7 @@ Bar[154] 2020-06-04  O=121.1200 H=124.5000 L=122.0000 C=123.3700 V=4400600
   jtpo(14)                                      primed=True  jtpo(14)=-0.5209
   jwav(12)                                      primed=True  jwav(12)=121.1200
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=122.0147
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=121.6849
 
 Bar[155] 2020-06-05  O=123.3700 H=127.8700 L=124.5000 C=127.3700 V=4894100
   sma(14)                                       primed=True  sma(14)=123.0657
@@ -15461,6 +15636,7 @@ Bar[155] 2020-06-05  O=123.3700 H=127.8700 L=124.5000 C=127.3700 V=4894100
   jtpo(14)                                      primed=True  jtpo(14)=-0.1824
   jwav(12)                                      primed=True  jwav(12)=123.3700
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=123.4202
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=122.7501
 
 Bar[156] 2020-06-06  O=127.3700 H=128.5600 L=126.5600 C=128.5000 V=5140000
   sma(14)                                       primed=True  sma(14)=123.0743
@@ -15546,6 +15722,7 @@ Bar[156] 2020-06-06  O=127.3700 H=128.5600 L=126.5600 C=128.5000 V=5140000
   jtpo(14)                                      primed=True  jtpo(14)=0.2176
   jwav(12)                                      primed=True  jwav(12)=127.3700
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=125.3171
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=123.8624
 
 Bar[157] 2020-06-07  O=128.5000 H=129.6300 L=123.5000 C=123.8700 V=6610900
   sma(14)                                       primed=True  sma(14)=122.9671
@@ -15631,6 +15808,7 @@ Bar[157] 2020-06-07  O=128.5000 H=129.6300 L=123.5000 C=123.8700 V=6610900
   jtpo(14)                                      primed=True  jtpo(14)=0.4330
   jwav(12)                                      primed=True  jwav(12)=128.5000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=125.9496
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=123.4465
 
 Bar[158] 2020-06-08  O=123.8700 H=124.8700 L=121.2500 C=122.9400 V=7585200
   sma(14)                                       primed=True  sma(14)=122.7707
@@ -15716,6 +15894,7 @@ Bar[158] 2020-06-08  O=123.8700 H=124.8700 L=121.2500 C=122.9400 V=7585200
   jtpo(14)                                      primed=True  jtpo(14)=0.5780
   jwav(12)                                      primed=True  jwav(12)=123.8700
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=125.3395
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=122.8252
 
 Bar[159] 2020-06-09  O=122.9400 H=124.3700 L=121.0600 C=121.7500 V=5963100
   sma(14)                                       primed=True  sma(14)=122.7350
@@ -15801,6 +15980,7 @@ Bar[159] 2020-06-09  O=122.9400 H=124.3700 L=121.0600 C=121.7500 V=5963100
   jtpo(14)                                      primed=True  jtpo(14)=0.4462
   jwav(12)                                      primed=True  jwav(12)=122.9400
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=123.9818
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=121.9758
 
 Bar[160] 2020-06-10  O=121.7500 H=124.8700 L=122.3100 C=124.4400 V=6045500
   sma(14)                                       primed=True  sma(14)=123.0971
@@ -15886,6 +16066,7 @@ Bar[160] 2020-06-10  O=121.7500 H=124.8700 L=122.3100 C=124.4400 V=6045500
   jtpo(14)                                      primed=True  jtpo(14)=0.4330
   jwav(12)                                      primed=True  jwav(12)=121.7500
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=123.4005
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=122.0489
 
 Bar[161] 2020-06-11  O=124.4400 H=123.6200 L=121.0000 C=122.0000 V=8443300
   sma(14)                                       primed=True  sma(14)=123.3471
@@ -15971,6 +16152,7 @@ Bar[161] 2020-06-11  O=124.4400 H=123.6200 L=121.0000 C=122.0000 V=8443300
   jtpo(14)                                      primed=True  jtpo(14)=0.1209
   jwav(12)                                      primed=True  jwav(12)=124.4400
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=122.9965
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=121.4856
 
 Bar[162] 2020-06-12  O=122.0000 H=124.0600 L=120.8700 C=122.3700 V=6464700
   sma(14)                                       primed=True  sma(14)=123.2886
@@ -16056,6 +16238,7 @@ Bar[162] 2020-06-12  O=122.0000 H=124.0600 L=120.8700 C=122.3700 V=6464700
   jtpo(14)                                      primed=True  jtpo(14)=0.0725
   jwav(12)                                      primed=True  jwav(12)=122.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=122.7729
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=121.2362
 
 Bar[163] 2020-06-13  O=122.3700 H=125.8700 L=122.0600 C=122.9400 V=6248300
   sma(14)                                       primed=True  sma(14)=123.2486
@@ -16141,6 +16324,7 @@ Bar[163] 2020-06-13  O=122.3700 H=125.8700 L=122.0600 C=122.9400 V=6248300
   jtpo(14)                                      primed=True  jtpo(14)=0.1275
   jwav(12)                                      primed=True  jwav(12)=122.3700
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=122.6820
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=121.3105
 
 Bar[164] 2020-06-14  O=122.9400 H=125.1900 L=122.7500 C=124.0000 V=4357200
   sma(14)                                       primed=True  sma(14)=123.3779
@@ -16226,6 +16410,7 @@ Bar[164] 2020-06-14  O=122.9400 H=125.1900 L=122.7500 C=124.0000 V=4357200
   jtpo(14)                                      primed=True  jtpo(14)=0.1407
   jwav(12)                                      primed=True  jwav(12)=122.9400
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=122.9500
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=121.7572
 
 Bar[165] 2020-06-15  O=124.0000 H=125.6200 L=122.6900 C=123.1900 V=4774700
   sma(14)                                       primed=True  sma(14)=123.6550
@@ -16311,6 +16496,7 @@ Bar[165] 2020-06-15  O=124.0000 H=125.6200 L=122.6900 C=123.1900 V=4774700
   jtpo(14)                                      primed=True  jtpo(14)=-0.1099
   jwav(12)                                      primed=True  jwav(12)=124.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=123.1961
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=121.9537
 
 Bar[166] 2020-06-16  O=123.1900 H=126.0000 L=122.8700 C=124.5600 V=6216900
   sma(14)                                       primed=True  sma(14)=123.7443
@@ -16396,6 +16582,7 @@ Bar[166] 2020-06-16  O=123.1900 H=126.0000 L=122.8700 C=124.5600 V=6216900
   jtpo(14)                                      primed=True  jtpo(14)=0.0484
   jwav(12)                                      primed=True  jwav(12)=123.1900
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=123.6122
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=122.5271
 
 Bar[167] 2020-06-17  O=124.5600 H=128.5000 L=125.5000 C=127.2500 V=6266900
   sma(14)                                       primed=True  sma(14)=124.1821
@@ -16481,6 +16668,7 @@ Bar[167] 2020-06-17  O=124.5600 H=128.5000 L=125.5000 C=127.2500 V=6266900
   jtpo(14)                                      primed=True  jtpo(14)=-0.0527
   jwav(12)                                      primed=True  jwav(12)=124.5600
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=124.5918
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=123.7503
 
 Bar[168] 2020-06-18  O=127.2500 H=126.7500 L=124.2500 C=125.8700 V=5584800
   sma(14)                                       primed=True  sma(14)=124.3607
@@ -16566,6 +16754,7 @@ Bar[168] 2020-06-18  O=127.2500 H=126.7500 L=124.2500 C=125.8700 V=5584800
   jtpo(14)                                      primed=True  jtpo(14)=0.0264
   jwav(12)                                      primed=True  jwav(12)=127.2500
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=125.4018
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=124.3737
 
 Bar[169] 2020-06-19  O=125.8700 H=129.7500 L=128.0000 C=128.8600 V=5284500
   sma(14)                                       primed=True  sma(14)=124.4671
@@ -16651,6 +16840,7 @@ Bar[169] 2020-06-19  O=125.8700 H=129.7500 L=128.0000 C=128.8600 V=5284500
   jtpo(14)                                      primed=True  jtpo(14)=0.4220
   jwav(12)                                      primed=True  jwav(12)=125.8700
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=126.5277
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=125.6352
 
 Bar[170] 2020-06-20  O=128.8600 H=132.6900 L=128.3800 C=132.0000 V=7554500
   sma(14)                                       primed=True  sma(14)=124.7171
@@ -16736,6 +16926,7 @@ Bar[170] 2020-06-20  O=128.8600 H=132.6900 L=128.3800 C=132.0000 V=7554500
   jtpo(14)                                      primed=True  jtpo(14)=0.7648
   jwav(12)                                      primed=True  jwav(12)=128.8600
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=128.2188
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=127.4463
 
 Bar[171] 2020-06-21  O=132.0000 H=133.9400 L=130.6900 C=130.7500 V=7209500
   sma(14)                                       primed=True  sma(14)=125.2086
@@ -16821,6 +17012,7 @@ Bar[171] 2020-06-21  O=132.0000 H=133.9400 L=130.6900 C=130.7500 V=7209500
   jtpo(14)                                      primed=True  jtpo(14)=0.8747
   jwav(12)                                      primed=True  jwav(12)=132.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=129.6302
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=128.4576
 
 Bar[172] 2020-06-22  O=130.7500 H=136.5000 L=131.6300 C=134.7500 V=8424800
   sma(14)                                       primed=True  sma(14)=126.0521
@@ -16906,6 +17098,7 @@ Bar[172] 2020-06-22  O=130.7500 H=136.5000 L=131.6300 C=134.7500 V=8424800
   jtpo(14)                                      primed=True  jtpo(14)=0.9209
   jwav(12)                                      primed=True  jwav(12)=130.7500
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=131.3668
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=130.2623
 
 Bar[173] 2020-06-23  O=134.7500 H=137.6900 L=134.3800 C=135.0000 V=5094500
   sma(14)                                       primed=True  sma(14)=126.9986
@@ -16991,6 +17184,7 @@ Bar[173] 2020-06-23  O=134.7500 H=137.6900 L=134.3800 C=135.0000 V=5094500
   jtpo(14)                                      primed=True  jtpo(14)=0.9209
   jwav(12)                                      primed=True  jwav(12)=134.7500
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=132.9076
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=131.6619
 
 Bar[174] 2020-06-24  O=135.0000 H=135.5600 L=132.0000 C=132.3800 V=4443600
   sma(14)                                       primed=True  sma(14)=127.5657
@@ -17076,6 +17270,7 @@ Bar[174] 2020-06-24  O=135.0000 H=135.5600 L=132.0000 C=132.3800 V=4443600
   jtpo(14)                                      primed=True  jtpo(14)=0.9736
   jwav(12)                                      primed=True  jwav(12)=135.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=133.4756
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=132.0057
 
 Bar[175] 2020-06-25  O=132.3800 H=133.5600 L=131.9400 C=133.3100 V=4591100
   sma(14)                                       primed=True  sma(14)=128.3736
@@ -17161,6 +17356,7 @@ Bar[175] 2020-06-25  O=132.3800 H=133.5600 L=131.9400 C=133.3100 V=4591100
   jtpo(14)                                      primed=True  jtpo(14)=0.9516
   jwav(12)                                      primed=True  jwav(12)=132.3800
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=133.5264
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=132.5179
 
 Bar[176] 2020-06-26  O=133.3100 H=135.0000 L=131.9400 C=131.9400 V=5658400
   sma(14)                                       primed=True  sma(14)=129.0571
@@ -17246,6 +17442,7 @@ Bar[176] 2020-06-26  O=133.3100 H=135.0000 L=131.9400 C=131.9400 V=5658400
   jtpo(14)                                      primed=True  jtpo(14)=0.8813
   jwav(12)                                      primed=True  jwav(12)=133.3100
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=133.0547
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=132.5361
 
 Bar[177] 2020-06-27  O=131.9400 H=132.3800 L=129.5600 C=130.0000 V=6094100
   sma(14)                                       primed=True  sma(14)=129.5614
@@ -17331,6 +17528,7 @@ Bar[177] 2020-06-27  O=131.9400 H=132.3800 L=129.5600 C=130.0000 V=6094100
   jtpo(14)                                      primed=True  jtpo(14)=0.7582
   jwav(12)                                      primed=True  jwav(12)=131.9400
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=132.1331
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=132.0526
 
 Bar[178] 2020-06-28  O=130.0000 H=131.4400 L=123.7500 C=125.3700 V=14862200
   sma(14)                                       primed=True  sma(14)=129.6593
@@ -17416,6 +17614,7 @@ Bar[178] 2020-06-28  O=130.0000 H=131.4400 L=123.7500 C=125.3700 V=14862200
   jtpo(14)                                      primed=True  jtpo(14)=0.4725
   jwav(12)                                      primed=True  jwav(12)=130.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=130.1760
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=130.4538
 
 Bar[179] 2020-06-29  O=125.3700 H=130.8800 L=126.0000 C=130.1300 V=7544700
   sma(14)                                       primed=True  sma(14)=130.1550
@@ -17501,6 +17700,7 @@ Bar[179] 2020-06-29  O=125.3700 H=130.8800 L=126.0000 C=130.1300 V=7544700
   jtpo(14)                                      primed=True  jtpo(14)=0.2879
   jwav(12)                                      primed=True  jwav(12)=125.3700
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=129.1371
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=130.5107
 
 Bar[180] 2020-06-30  O=130.1300 H=129.6300 L=126.2500 C=127.1200 V=6985600
   sma(14)                                       primed=True  sma(14)=130.3379
@@ -17586,6 +17786,7 @@ Bar[180] 2020-06-30  O=130.1300 H=129.6300 L=126.2500 C=127.1200 V=6985600
   jtpo(14)                                      primed=True  jtpo(14)=-0.0505
   jwav(12)                                      primed=True  jwav(12)=130.1300
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=128.3337
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=129.7922
 
 Bar[181] 2020-07-01  O=127.1200 H=127.2500 L=124.3700 C=125.1900 V=8093000
   sma(14)                                       primed=True  sma(14)=130.1907
@@ -17671,6 +17872,7 @@ Bar[181] 2020-07-01  O=127.1200 H=127.2500 L=124.3700 C=125.1900 V=8093000
   jtpo(14)                                      primed=True  jtpo(14)=-0.3407
   jwav(12)                                      primed=True  jwav(12)=127.1200
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=127.4531
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=128.7834
 
 Bar[182] 2020-07-02  O=125.1900 H=127.8100 L=121.4400 C=122.0000 V=7590000
   sma(14)                                       primed=True  sma(14)=129.9143
@@ -17756,6 +17958,7 @@ Bar[182] 2020-07-02  O=125.1900 H=127.8100 L=121.4400 C=122.0000 V=7590000
   jtpo(14)                                      primed=True  jtpo(14)=-0.6396
   jwav(12)                                      primed=True  jwav(12)=125.1900
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=125.8074
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=127.1998
 
 Bar[183] 2020-07-03  O=122.0000 H=125.0000 L=120.4400 C=125.0000 V=7451300
   sma(14)                                       primed=True  sma(14)=129.6386
@@ -17841,6 +18044,7 @@ Bar[183] 2020-07-03  O=122.0000 H=125.0000 L=120.4400 C=125.0000 V=7451300
   jtpo(14)                                      primed=True  jtpo(14)=-0.8374
   jwav(12)                                      primed=True  jwav(12)=122.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=124.7482
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=126.8292
 
 Bar[184] 2020-07-04  O=125.0000 H=126.8100 L=121.3700 C=123.0000 V=7078000
   sma(14)                                       primed=True  sma(14)=128.9957
@@ -17926,6 +18130,7 @@ Bar[184] 2020-07-04  O=125.0000 H=126.8100 L=121.3700 C=123.0000 V=7078000
   jtpo(14)                                      primed=True  jtpo(14)=-0.8901
   jwav(12)                                      primed=True  jwav(12)=125.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=123.9743
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=126.0236
 
 Bar[185] 2020-07-05  O=123.0000 H=124.7500 L=121.6900 C=123.5000 V=7105300
   sma(14)                                       primed=True  sma(14)=128.4779
@@ -18011,6 +18216,7 @@ Bar[185] 2020-07-05  O=123.0000 H=124.7500 L=121.6900 C=123.5000 V=7105300
   jtpo(14)                                      primed=True  jtpo(14)=-0.9385
   jwav(12)                                      primed=True  jwav(12)=123.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=123.6696
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=125.5602
 
 Bar[186] 2020-07-06  O=123.5000 H=122.8100 L=120.0000 C=120.0600 V=8778800
   sma(14)                                       primed=True  sma(14)=127.4286
@@ -18096,6 +18302,7 @@ Bar[186] 2020-07-06  O=123.5000 H=122.8100 L=120.0000 C=120.0600 V=8778800
   jtpo(14)                                      primed=True  jtpo(14)=-0.9429
   jwav(12)                                      primed=True  jwav(12)=123.5000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=122.7803
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=124.2677
 
 Bar[187] 2020-07-07  O=120.0600 H=122.2500 L=119.6200 C=121.0000 V=6643900
   sma(14)                                       primed=True  sma(14)=126.4286
@@ -18181,6 +18388,7 @@ Bar[187] 2020-07-07  O=120.0600 H=122.2500 L=119.6200 C=121.0000 V=6643900
   jtpo(14)                                      primed=True  jtpo(14)=-0.9385
   jwav(12)                                      primed=True  jwav(12)=120.0600
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=121.9048
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=123.5368
 
 Bar[188] 2020-07-08  O=121.0000 H=121.0600 L=115.5000 C=117.7500 V=10563900
   sma(14)                                       primed=True  sma(14)=125.3836
@@ -18266,6 +18474,7 @@ Bar[188] 2020-07-08  O=121.0000 H=121.0600 L=115.5000 C=117.7500 V=10563900
   jtpo(14)                                      primed=True  jtpo(14)=-0.9429
   jwav(12)                                      primed=True  jwav(12)=121.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=120.5634
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=122.1292
 
 Bar[189] 2020-07-09  O=117.7500 H=120.0000 L=116.7500 C=119.8700 V=7043100
   sma(14)                                       primed=True  sma(14)=124.4236
@@ -18351,6 +18560,7 @@ Bar[189] 2020-07-09  O=117.7500 H=120.0000 L=116.7500 C=119.8700 V=7043100
   jtpo(14)                                      primed=True  jtpo(14)=-0.9385
   jwav(12)                                      primed=True  jwav(12)=117.7500
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=119.7989
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=121.6395
 
 Bar[190] 2020-07-10  O=119.8700 H=123.2500 L=119.0600 C=122.0000 V=6438900
   sma(14)                                       primed=True  sma(14)=123.7136
@@ -18436,6 +18646,7 @@ Bar[190] 2020-07-10  O=119.8700 H=123.2500 L=119.0600 C=122.0000 V=6438900
   jtpo(14)                                      primed=True  jtpo(14)=-0.8769
   jwav(12)                                      primed=True  jwav(12)=119.8700
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=120.0095
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=121.8302
 
 Bar[191] 2020-07-11  O=122.0000 H=122.7500 L=119.0600 C=119.1900 V=8057700
   sma(14)                                       primed=True  sma(14)=122.9414
@@ -18521,6 +18732,7 @@ Bar[191] 2020-07-11  O=122.0000 H=122.7500 L=119.0600 C=119.1900 V=8057700
   jtpo(14)                                      primed=True  jtpo(14)=-0.8725
   jwav(12)                                      primed=True  jwav(12)=122.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=120.1174
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=121.2141
 
 Bar[192] 2020-07-12  O=119.1900 H=119.1900 L=115.0600 C=116.3700 V=14240000
   sma(14)                                       primed=True  sma(14)=122.2986
@@ -18606,6 +18818,7 @@ Bar[192] 2020-07-12  O=119.1900 H=119.1900 L=115.0600 C=116.3700 V=14240000
   jtpo(14)                                      primed=True  jtpo(14)=-0.8857
   jwav(12)                                      primed=True  jwav(12)=119.1900
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=119.3568
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=119.9289
 
 Bar[193] 2020-07-13  O=116.3700 H=115.0600 L=111.0600 C=113.5000 V=17872300
   sma(14)                                       primed=True  sma(14)=121.1107
@@ -18691,6 +18904,7 @@ Bar[193] 2020-07-13  O=116.3700 H=115.0600 L=111.0600 C=113.5000 V=17872300
   jtpo(14)                                      primed=True  jtpo(14)=-0.8857
   jwav(12)                                      primed=True  jwav(12)=116.3700
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=117.5241
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=118.1276
 
 Bar[194] 2020-07-14  O=113.5000 H=116.6900 L=113.1200 C=114.2500 V=7831100
   sma(14)                                       primed=True  sma(14)=120.1914
@@ -18776,6 +18990,7 @@ Bar[194] 2020-07-14  O=113.5000 H=116.6900 L=113.1200 C=114.2500 V=7831100
   jtpo(14)                                      primed=True  jtpo(14)=-0.8813
   jwav(12)                                      primed=True  jwav(12)=113.5000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=115.8013
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=116.8782
 
 Bar[195] 2020-07-15  O=114.2500 H=114.8700 L=110.0000 C=110.0000 V=8277700
   sma(14)                                       primed=True  sma(14)=119.1064
@@ -18861,6 +19076,7 @@ Bar[195] 2020-07-15  O=114.2500 H=114.8700 L=110.0000 C=110.0000 V=8277700
   jtpo(14)                                      primed=True  jtpo(14)=-0.8813
   jwav(12)                                      primed=True  jwav(12)=114.2500
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=113.7974
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=114.7373
 
 Bar[196] 2020-07-16  O=110.0000 H=110.8700 L=105.0000 C=105.0600 V=15017800
   sma(14)                                       primed=True  sma(14)=117.8964
@@ -18946,6 +19162,7 @@ Bar[196] 2020-07-16  O=110.0000 H=110.8700 L=105.0000 C=105.0600 V=15017800
   jtpo(14)                                      primed=True  jtpo(14)=-0.9253
   jwav(12)                                      primed=True  jwav(12)=110.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=111.0224
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=111.7272
 
 Bar[197] 2020-07-17  O=105.0600 H=107.2500 L=104.6900 C=107.0000 V=14183300
   sma(14)                                       primed=True  sma(14)=116.6107
@@ -19031,6 +19248,7 @@ Bar[197] 2020-07-17  O=105.0600 H=107.2500 L=104.6900 C=107.0000 V=14183300
   jtpo(14)                                      primed=True  jtpo(14)=-0.9209
   jwav(12)                                      primed=True  jwav(12)=105.0600
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=108.7632
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=109.9408
 
 Bar[198] 2020-07-18  O=107.0000 H=108.8700 L=103.8700 C=107.8700 V=13921100
   sma(14)                                       primed=True  sma(14)=115.5300
@@ -19116,6 +19334,7 @@ Bar[198] 2020-07-18  O=107.0000 H=108.8700 L=103.8700 C=107.8700 V=13921100
   jtpo(14)                                      primed=True  jtpo(14)=-0.9121
   jwav(12)                                      primed=True  jwav(12)=107.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=107.6087
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=108.8347
 
 Bar[199] 2020-07-19  O=107.8700 H=109.0000 L=104.6900 C=107.0000 V=9683000
   sma(14)                                       primed=True  sma(14)=114.3514
@@ -19201,6 +19420,7 @@ Bar[199] 2020-07-19  O=107.8700 H=109.0000 L=104.6900 C=107.0000 V=9683000
   jtpo(14)                                      primed=True  jtpo(14)=-0.8945
   jwav(12)                                      primed=True  jwav(12)=107.8700
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=107.2371
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=107.7745
 
 Bar[200] 2020-07-20  O=107.0000 H=108.5000 L=105.4400 C=107.1200 V=9187300
   sma(14)                                       primed=True  sma(14)=113.4271
@@ -19286,6 +19506,7 @@ Bar[200] 2020-07-20  O=107.0000 H=108.5000 L=105.4400 C=107.1200 V=9187300
   jtpo(14)                                      primed=True  jtpo(14)=-0.8813
   jwav(12)                                      primed=True  jwav(12)=107.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=107.2036
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=107.0085
 
 Bar[201] 2020-07-21  O=107.1200 H=113.0600 L=107.0000 C=107.0000 V=11380500
   sma(14)                                       primed=True  sma(14)=112.4271
@@ -19371,6 +19592,7 @@ Bar[201] 2020-07-21  O=107.1200 H=113.0600 L=107.0000 C=107.0000 V=11380500
   jtpo(14)                                      primed=True  jtpo(14)=-0.8593
   jwav(12)                                      primed=True  jwav(12)=107.1200
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=107.1476
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=106.3708
 
 Bar[202] 2020-07-22  O=107.0000 H=93.0000 L=89.0000 C=91.0000 V=69447300
   sma(14)                                       primed=True  sma(14)=110.5164
@@ -19456,6 +19678,7 @@ Bar[202] 2020-07-22  O=107.0000 H=93.0000 L=89.0000 C=91.0000 V=69447300
   jtpo(14)                                      primed=True  jtpo(14)=-0.8857
   jwav(12)                                      primed=True  jwav(12)=107.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=103.5474
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=101.5622
 
 Bar[203] 2020-07-23  O=91.0000 H=94.6200 L=92.5000 C=93.9400 V=26673600
   sma(14)                                       primed=True  sma(14)=108.6643
@@ -19541,6 +19764,7 @@ Bar[203] 2020-07-23  O=91.0000 H=94.6200 L=92.5000 C=93.9400 V=26673600
   jtpo(14)                                      primed=True  jtpo(14)=-0.8857
   jwav(12)                                      primed=True  jwav(12)=91.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=99.3338
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=98.6168
 
 Bar[204] 2020-07-24  O=93.9400 H=95.1200 L=92.1200 C=93.8700 V=13768400
   sma(14)                                       primed=True  sma(14)=106.6550
@@ -19626,6 +19850,7 @@ Bar[204] 2020-07-24  O=93.9400 H=95.1200 L=92.1200 C=93.8700 V=13768400
   jtpo(14)                                      primed=True  jtpo(14)=-0.8769
   jwav(12)                                      primed=True  jwav(12)=93.9400
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=95.9690
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=96.3558
 
 Bar[205] 2020-07-25  O=93.8700 H=96.0000 L=94.6200 C=95.5000 V=11371600
   sma(14)                                       primed=True  sma(14)=104.9629
@@ -19711,6 +19936,7 @@ Bar[205] 2020-07-25  O=93.8700 H=96.0000 L=94.6200 C=95.5000 V=11371600
   jtpo(14)                                      primed=True  jtpo(14)=-0.8505
   jwav(12)                                      primed=True  jwav(12)=93.8700
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=94.7107
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=95.1680
 
 Bar[206] 2020-07-26  O=95.5000 H=95.5600 L=92.8100 C=93.0000 V=9872200
   sma(14)                                       primed=True  sma(14)=103.2936
@@ -19796,6 +20022,7 @@ Bar[206] 2020-07-26  O=95.5000 H=95.5600 L=92.8100 C=93.0000 V=9872200
   jtpo(14)                                      primed=True  jtpo(14)=-0.8330
   jwav(12)                                      primed=True  jwav(12)=95.5000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=94.2140
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=93.7195
 
 Bar[207] 2020-07-27  O=93.0000 H=95.3100 L=94.2500 C=94.9400 V=9450500
   sma(14)                                       primed=True  sma(14)=101.9679
@@ -19881,6 +20108,7 @@ Bar[207] 2020-07-27  O=93.0000 H=95.3100 L=94.2500 C=94.9400 V=9450500
   jtpo(14)                                      primed=True  jtpo(14)=-0.7802
   jwav(12)                                      primed=True  jwav(12)=93.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=94.2681
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=93.2250
 
 Bar[208] 2020-07-28  O=94.9400 H=99.0000 L=96.2500 C=98.2500 V=11083300
   sma(14)                                       primed=True  sma(14)=100.8250
@@ -19966,6 +20194,7 @@ Bar[208] 2020-07-28  O=94.9400 H=99.0000 L=96.2500 C=98.2500 V=11083300
   jtpo(14)                                      primed=True  jtpo(14)=-0.6879
   jwav(12)                                      primed=True  jwav(12)=94.9400
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=95.1675
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=93.8260
 
 Bar[209] 2020-07-29  O=98.2500 H=98.8100 L=96.3700 C=96.7500 V=9552800
   sma(14)                                       primed=True  sma(14)=99.8786
@@ -20051,6 +20280,7 @@ Bar[209] 2020-07-29  O=98.2500 H=98.8100 L=96.3700 C=96.7500 V=9552800
   jtpo(14)                                      primed=True  jtpo(14)=-0.5692
   jwav(12)                                      primed=True  jwav(12)=98.2500
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=96.0627
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=93.9170
 
 Bar[210] 2020-07-30  O=96.7500 H=96.8100 L=93.6900 C=94.8100 V=11108400
   sma(14)                                       primed=True  sma(14)=99.1464
@@ -20136,6 +20366,7 @@ Bar[210] 2020-07-30  O=96.7500 H=96.8100 L=93.6900 C=94.8100 V=11108400
   jtpo(14)                                      primed=True  jtpo(14)=-0.5253
   jwav(12)                                      primed=True  jwav(12)=96.7500
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=96.2293
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=93.3940
 
 Bar[211] 2020-07-31  O=94.8100 H=95.9400 L=93.5000 C=94.3700 V=10374200
   sma(14)                                       primed=True  sma(14)=98.2443
@@ -20221,6 +20452,7 @@ Bar[211] 2020-07-31  O=94.8100 H=95.9400 L=93.5000 C=94.3700 V=10374200
   jtpo(14)                                      primed=True  jtpo(14)=-0.4286
   jwav(12)                                      primed=True  jwav(12)=94.8100
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=95.7181
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=92.7909
 
 Bar[212] 2020-08-01  O=94.3700 H=94.4400 L=90.0000 C=91.5600 V=16701900
   sma(14)                                       primed=True  sma(14)=97.0793
@@ -20306,6 +20538,7 @@ Bar[212] 2020-08-01  O=94.3700 H=94.4400 L=90.0000 C=91.5600 V=16701900
   jtpo(14)                                      primed=True  jtpo(14)=-0.3846
   jwav(12)                                      primed=True  jwav(12)=94.3700
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=94.4291
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=91.5538
 
 Bar[213] 2020-08-02  O=91.5600 H=92.9400 L=90.1900 C=90.2500 V=13741900
   sma(14)                                       primed=True  sma(14)=95.8829
@@ -20391,6 +20624,7 @@ Bar[213] 2020-08-02  O=91.5600 H=92.9400 L=90.1900 C=90.2500 V=13741900
   jtpo(14)                                      primed=True  jtpo(14)=-0.3934
   jwav(12)                                      primed=True  jwav(12)=91.5600
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=92.8560
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=90.2367
 
 Bar[214] 2020-08-03  O=90.2500 H=93.9400 L=90.5000 C=93.9400 V=8523600
   sma(14)                                       primed=True  sma(14)=94.9414
@@ -20476,6 +20710,7 @@ Bar[214] 2020-08-03  O=90.2500 H=93.9400 L=90.5000 C=93.9400 V=8523600
   jtpo(14)                                      primed=True  jtpo(14)=-0.2242
   jwav(12)                                      primed=True  jwav(12)=90.2500
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=92.3550
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=90.2205
 
 Bar[215] 2020-08-04  O=93.9400 H=95.5000 L=92.1200 C=93.6200 V=9551900
   sma(14)                                       primed=True  sma(14)=93.9857
@@ -20561,6 +20796,7 @@ Bar[215] 2020-08-04  O=93.9400 H=95.5000 L=92.1200 C=93.6200 V=9551900
   jtpo(14)                                      primed=True  jtpo(14)=-0.1055
   jwav(12)                                      primed=True  jwav(12)=93.9400
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=92.5853
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=90.1546
 
 Bar[216] 2020-08-05  O=93.6200 H=97.0600 L=94.1200 C=97.0000 V=8680500
   sma(14)                                       primed=True  sma(14)=94.4143
@@ -20646,6 +20882,7 @@ Bar[216] 2020-08-05  O=93.6200 H=97.0600 L=94.1200 C=97.0000 V=8680500
   jtpo(14)                                      primed=True  jtpo(14)=-0.0923
   jwav(12)                                      primed=True  jwav(12)=93.6200
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=93.8538
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=91.0835
 
 Bar[217] 2020-08-06  O=97.0000 H=97.5000 L=94.8700 C=95.0000 V=7151700
   sma(14)                                       primed=True  sma(14)=94.4900
@@ -20731,6 +20968,7 @@ Bar[217] 2020-08-06  O=97.0000 H=97.5000 L=94.8700 C=95.0000 V=7151700
   jtpo(14)                                      primed=True  jtpo(14)=-0.0462
   jwav(12)                                      primed=True  jwav(12)=97.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=94.7858
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=91.3045
 
 Bar[218] 2020-08-07  O=95.0000 H=96.2500 L=93.0000 C=95.8700 V=9673100
   sma(14)                                       primed=True  sma(14)=94.6329
@@ -20816,6 +21054,7 @@ Bar[218] 2020-08-07  O=95.0000 H=96.2500 L=93.0000 C=95.8700 V=9673100
   jtpo(14)                                      primed=True  jtpo(14)=-0.0066
   jwav(12)                                      primed=True  jwav(12)=95.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=95.3936
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=91.7292
 
 Bar[219] 2020-08-08  O=95.8700 H=96.3700 L=93.8700 C=94.0600 V=6264700
   sma(14)                                       primed=True  sma(14)=94.5300
@@ -20901,6 +21140,7 @@ Bar[219] 2020-08-08  O=95.8700 H=96.3700 L=93.8700 C=94.0600 V=6264700
   jtpo(14)                                      primed=True  jtpo(14)=0.0110
   jwav(12)                                      primed=True  jwav(12)=95.8700
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=95.2545
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=91.5607
 
 Bar[220] 2020-08-09  O=94.0600 H=95.0000 L=93.0000 C=94.6200 V=8541600
   sma(14)                                       primed=True  sma(14)=94.6457
@@ -20986,6 +21226,7 @@ Bar[220] 2020-08-09  O=94.0600 H=95.0000 L=93.0000 C=94.6200 V=8541600
   jtpo(14)                                      primed=True  jtpo(14)=-0.1736
   jwav(12)                                      primed=True  jwav(12)=94.0600
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=94.9491
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=91.5779
 
 Bar[221] 2020-08-10  O=94.6200 H=94.8700 L=92.6200 C=93.7500 V=8358000
   sma(14)                                       primed=True  sma(14)=94.5607
@@ -21071,6 +21312,7 @@ Bar[221] 2020-08-10  O=94.6200 H=94.8700 L=92.6200 C=93.7500 V=8358000
   jtpo(14)                                      primed=True  jtpo(14)=-0.2176
   jwav(12)                                      primed=True  jwav(12)=94.6200
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=94.5129
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=91.3578
 
 Bar[222] 2020-08-11  O=93.7500 H=98.2500 L=93.5600 C=98.0000 V=18720800
   sma(14)                                       primed=True  sma(14)=94.5429
@@ -21156,6 +21398,7 @@ Bar[222] 2020-08-11  O=93.7500 H=98.2500 L=93.5600 C=98.0000 V=18720800
   jtpo(14)                                      primed=True  jtpo(14)=0.1824
   jwav(12)                                      primed=True  jwav(12)=93.7500
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=95.0959
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=92.3915
 
 Bar[223] 2020-08-12  O=98.0000 H=105.1200 L=98.3700 C=103.9400 V=19683100
   sma(14)                                       primed=True  sma(14)=95.0564
@@ -21241,6 +21484,7 @@ Bar[223] 2020-08-12  O=98.0000 H=105.1200 L=98.3700 C=103.9400 V=19683100
   jtpo(14)                                      primed=True  jtpo(14)=0.4945
   jwav(12)                                      primed=True  jwav(12)=98.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=97.4495
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=94.8945
 
 Bar[224] 2020-08-13  O=103.9400 H=108.4400 L=104.4400 C=107.8700 V=13682500
   sma(14)                                       primed=True  sma(14)=95.9893
@@ -21326,6 +21570,7 @@ Bar[224] 2020-08-13  O=103.9400 H=108.4400 L=104.4400 C=107.8700 V=13682500
   jtpo(14)                                      primed=True  jtpo(14)=0.6923
   jwav(12)                                      primed=True  jwav(12)=103.9400
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=101.1031
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=97.9784
 
 Bar[225] 2020-08-14  O=107.8700 H=109.8700 L=106.0000 C=106.0600 V=10668100
   sma(14)                                       primed=True  sma(14)=96.8243
@@ -21411,6 +21656,7 @@ Bar[225] 2020-08-14  O=107.8700 H=109.8700 L=106.0000 C=106.0600 V=10668100
   jtpo(14)                                      primed=True  jtpo(14)=0.8110
   jwav(12)                                      primed=True  jwav(12)=107.8700
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=104.0366
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=99.9039
 
 Bar[226] 2020-08-15  O=106.0600 H=105.0000 L=101.8100 C=104.5000 V=9710600
   sma(14)                                       primed=True  sma(14)=97.7486
@@ -21496,6 +21742,7 @@ Bar[226] 2020-08-15  O=106.0600 H=105.0000 L=101.8100 C=104.5000 V=9710600
   jtpo(14)                                      primed=True  jtpo(14)=0.8022
   jwav(12)                                      primed=True  jwav(12)=106.0600
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=105.2769
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=100.9450
 
 Bar[227] 2020-08-16  O=104.5000 H=106.0000 L=104.1200 C=105.0000 V=3113100
   sma(14)                                       primed=True  sma(14)=98.8021
@@ -21581,6 +21828,7 @@ Bar[227] 2020-08-16  O=104.5000 H=106.0000 L=104.1200 C=105.0000 V=3113100
   jtpo(14)                                      primed=True  jtpo(14)=0.7802
   jwav(12)                                      primed=True  jwav(12)=104.5000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=105.3883
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=101.8560
 
 Bar[228] 2020-08-17  O=105.0000 H=104.9400 L=103.3700 C=104.1900 V=5682000
   sma(14)                                       primed=True  sma(14)=99.5343
@@ -21666,6 +21914,7 @@ Bar[228] 2020-08-17  O=105.0000 H=104.9400 L=103.3700 C=104.1900 V=5682000
   jtpo(14)                                      primed=True  jtpo(14)=0.7714
   jwav(12)                                      primed=True  jwav(12)=105.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=104.9712
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=102.3103
 
 Bar[229] 2020-08-18  O=104.1900 H=104.5000 L=102.1200 C=103.0600 V=5763600
   sma(14)                                       primed=True  sma(14)=100.2086
@@ -21751,6 +22000,7 @@ Bar[229] 2020-08-18  O=104.1900 H=104.5000 L=102.1200 C=103.0600 V=5763600
   jtpo(14)                                      primed=True  jtpo(14)=0.6791
   jwav(12)                                      primed=True  jwav(12)=104.1900
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=104.3430
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=102.3251
 
 Bar[230] 2020-08-19  O=103.0600 H=104.4400 L=102.2500 C=103.4200 V=5340000
   sma(14)                                       primed=True  sma(14)=100.6671
@@ -21836,6 +22086,7 @@ Bar[230] 2020-08-19  O=103.0600 H=104.4400 L=102.2500 C=103.4200 V=5340000
   jtpo(14)                                      primed=True  jtpo(14)=0.6264
   jwav(12)                                      primed=True  jwav(12)=103.0600
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=103.8459
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=102.4854
 
 Bar[231] 2020-08-20  O=103.4200 H=106.3100 L=103.3700 C=105.2700 V=6220800
   sma(14)                                       primed=True  sma(14)=101.4007
@@ -21921,6 +22172,7 @@ Bar[231] 2020-08-20  O=103.4200 H=106.3100 L=103.3700 C=105.2700 V=6220800
   jtpo(14)                                      primed=True  jtpo(14)=0.6088
   jwav(12)                                      primed=True  jwav(12)=103.4200
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=103.9497
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=103.2258
 
 Bar[232] 2020-08-21  O=105.2700 H=112.8700 L=107.9400 C=111.8700 V=14680500
   sma(14)                                       primed=True  sma(14)=102.5436
@@ -22006,6 +22258,7 @@ Bar[232] 2020-08-21  O=105.2700 H=112.8700 L=107.9400 C=111.8700 V=14680500
   jtpo(14)                                      primed=True  jtpo(14)=0.6352
   jwav(12)                                      primed=True  jwav(12)=105.2700
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=105.8493
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=105.7071
 
 Bar[233] 2020-08-22  O=111.8700 H=116.5000 L=112.5000 C=116.0000 V=9933000
   sma(14)                                       primed=True  sma(14)=104.1107
@@ -22091,6 +22344,7 @@ Bar[233] 2020-08-22  O=111.8700 H=116.5000 L=112.5000 C=116.0000 V=9933000
   jtpo(14)                                      primed=True  jtpo(14)=0.6440
   jwav(12)                                      primed=True  jwav(12)=111.8700
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=109.2171
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=108.8520
 
 Bar[234] 2020-08-23  O=116.0000 H=119.1900 L=115.4400 C=116.6200 V=11329500
   sma(14)                                       primed=True  sma(14)=105.6821
@@ -22176,6 +22430,7 @@ Bar[234] 2020-08-23  O=116.0000 H=119.1900 L=115.4400 C=116.6200 V=11329500
   jtpo(14)                                      primed=True  jtpo(14)=0.6484
   jwav(12)                                      primed=True  jwav(12)=116.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=112.6121
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=111.5226
 
 Bar[235] 2020-08-24  O=116.6200 H=121.0000 L=115.5000 C=118.2800 V=8145300
   sma(14)                                       primed=True  sma(14)=107.4343
@@ -22261,6 +22516,7 @@ Bar[235] 2020-08-24  O=116.6200 H=121.0000 L=115.5000 C=118.2800 V=8145300
   jtpo(14)                                      primed=True  jtpo(14)=0.6484
   jwav(12)                                      primed=True  jwav(12)=116.6200
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=115.3284
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=113.9320
 
 Bar[236] 2020-08-25  O=118.2800 H=122.1200 L=112.2500 C=113.3700 V=16644700
   sma(14)                                       primed=True  sma(14)=108.5321
@@ -22346,6 +22602,7 @@ Bar[236] 2020-08-25  O=118.2800 H=122.1200 L=112.2500 C=113.3700 V=16644700
   jtpo(14)                                      primed=True  jtpo(14)=0.6220
   jwav(12)                                      primed=True  jwav(12)=118.2800
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=115.8932
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=114.3636
 
 Bar[237] 2020-08-26  O=113.3700 H=111.9400 L=107.5600 C=109.0000 V=12593800
   sma(14)                                       primed=True  sma(14)=108.8936
@@ -22431,6 +22688,7 @@ Bar[237] 2020-08-26  O=113.3700 H=111.9400 L=107.5600 C=109.0000 V=12593800
   jtpo(14)                                      primed=True  jtpo(14)=0.6132
   jwav(12)                                      primed=True  jwav(12)=113.3700
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=114.2849
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=113.3981
 
 Bar[238] 2020-08-27  O=109.0000 H=112.7500 L=106.5600 C=109.7000 V=7138100
   sma(14)                                       primed=True  sma(14)=109.0243
@@ -22516,6 +22774,7 @@ Bar[238] 2020-08-27  O=109.0000 H=112.7500 L=106.5600 C=109.7000 V=7138100
   jtpo(14)                                      primed=True  jtpo(14)=0.6484
   jwav(12)                                      primed=True  jwav(12)=109.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=112.1723
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=112.7757
 
 Bar[239] 2020-08-28  O=109.7000 H=110.1900 L=106.8700 C=109.2500 V=7442300
   sma(14)                                       primed=True  sma(14)=109.2521
@@ -22601,6 +22860,7 @@ Bar[239] 2020-08-28  O=109.7000 H=110.1900 L=106.8700 C=109.2500 V=7442300
   jtpo(14)                                      primed=True  jtpo(14)=0.6264
   jwav(12)                                      primed=True  jwav(12)=109.7000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=110.5117
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=112.1690
 
 Bar[240] 2020-08-29  O=109.2500 H=107.9400 L=104.5000 C=107.0000 V=9442300
   sma(14)                                       primed=True  sma(14)=109.4307
@@ -22686,6 +22946,7 @@ Bar[240] 2020-08-29  O=109.2500 H=107.9400 L=104.5000 C=107.0000 V=9442300
   jtpo(14)                                      primed=True  jtpo(14)=0.5077
   jwav(12)                                      primed=True  jwav(12)=109.2500
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=109.1799
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=111.1748
 
 Bar[241] 2020-08-30  O=107.0000 H=109.6900 L=105.7500 C=109.1900 V=7123600
   sma(14)                                       primed=True  sma(14)=109.7300
@@ -22771,6 +23032,7 @@ Bar[241] 2020-08-30  O=107.0000 H=109.6900 L=105.7500 C=109.1900 V=7123600
   jtpo(14)                                      primed=True  jtpo(14)=0.3582
   jwav(12)                                      primed=True  jwav(12)=107.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=108.6811
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=111.1308
 
 Bar[242] 2020-08-31  O=109.1900 H=111.0600 L=108.6200 C=110.0000 V=7680600
   sma(14)                                       primed=True  sma(14)=110.1450
@@ -22856,6 +23118,7 @@ Bar[242] 2020-08-31  O=109.1900 H=111.0600 L=108.6200 C=110.0000 V=7680600
   jtpo(14)                                      primed=True  jtpo(14)=0.1956
   jwav(12)                                      primed=True  jwav(12)=109.1900
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=108.8347
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=111.4382
 
 Bar[243] 2020-09-01  O=110.0000 H=110.4400 L=107.7500 C=109.2000 V=4839800
   sma(14)                                       primed=True  sma(14)=110.5836
@@ -22941,6 +23204,7 @@ Bar[243] 2020-09-01  O=110.0000 H=110.4400 L=107.7500 C=109.2000 V=4839800
   jtpo(14)                                      primed=True  jtpo(14)=-0.0462
   jwav(12)                                      primed=True  jwav(12)=110.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=109.1222
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=111.5345
 
 Bar[244] 2020-09-02  O=109.2000 H=110.1200 L=108.0600 C=110.1200 V=4775500
   sma(14)                                       primed=True  sma(14)=111.0621
@@ -23026,6 +23290,7 @@ Bar[244] 2020-09-02  O=109.2000 H=110.1200 L=108.0600 C=110.1200 V=4775500
   jtpo(14)                                      primed=True  jtpo(14)=-0.2659
   jwav(12)                                      primed=True  jwav(12)=109.2000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=109.4966
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=111.8651
 
 Bar[245] 2020-09-03  O=110.1200 H=110.3100 L=108.0000 C=108.0000 V=4008800
   sma(14)                                       primed=True  sma(14)=111.2571
@@ -23111,6 +23376,7 @@ Bar[245] 2020-09-03  O=110.1200 H=110.3100 L=108.0000 C=108.0000 V=4008800
   jtpo(14)                                      primed=True  jtpo(14)=-0.6440
   jwav(12)                                      primed=True  jwav(12)=110.1200
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=109.3032
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=111.5015
 
 Bar[246] 2020-09-04  O=108.0000 H=110.4400 L=108.1900 C=108.6200 V=4533600
   sma(14)                                       primed=True  sma(14)=111.0250
@@ -23196,6 +23462,7 @@ Bar[246] 2020-09-04  O=108.0000 H=110.4400 L=108.1900 C=108.6200 V=4533600
   jtpo(14)                                      primed=True  jtpo(14)=-0.6571
   jwav(12)                                      primed=True  jwav(12)=108.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=108.9917
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=111.3155
 
 Bar[247] 2020-09-05  O=108.6200 H=110.0000 L=108.1200 C=109.7500 V=3741100
   sma(14)                                       primed=True  sma(14)=110.5786
@@ -23281,6 +23548,7 @@ Bar[247] 2020-09-05  O=108.6200 H=110.0000 L=108.1200 C=109.7500 V=3741100
   jtpo(14)                                      primed=True  jtpo(14)=-0.4637
   jwav(12)                                      primed=True  jwav(12)=108.6200
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=108.9761
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=111.4309
 
 Bar[248] 2020-09-06  O=109.7500 H=110.7500 L=109.0600 C=109.8100 V=4084800
   sma(14)                                       primed=True  sma(14)=110.0921
@@ -23366,6 +23634,7 @@ Bar[248] 2020-09-06  O=109.7500 H=110.7500 L=109.0600 C=109.8100 V=4084800
   jtpo(14)                                      primed=True  jtpo(14)=-0.2220
   jwav(12)                                      primed=True  jwav(12)=109.7500
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=109.2202
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=111.4836
 
 Bar[249] 2020-09-07  O=109.8100 H=110.5000 L=108.7500 C=109.0000 V=2685200
   sma(14)                                       primed=True  sma(14)=109.4293
@@ -23451,6 +23720,7 @@ Bar[249] 2020-09-07  O=109.8100 H=110.5000 L=108.7500 C=109.0000 V=2685200
   jtpo(14)                                      primed=True  jtpo(14)=-0.1253
   jwav(12)                                      primed=True  jwav(12)=109.8100
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=109.3462
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=111.2872
 
 Bar[250] 2020-09-08  O=109.0000 H=110.5000 L=108.5600 C=108.7500 V=3438000
   sma(14)                                       primed=True  sma(14)=109.0993
@@ -23536,6 +23806,7 @@ Bar[250] 2020-09-08  O=109.0000 H=110.5000 L=108.5600 C=108.7500 V=3438000
   jtpo(14)                                      primed=True  jtpo(14)=-0.0418
   jwav(12)                                      primed=True  jwav(12)=109.0000
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=109.2387
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=111.0248
 
 Bar[251] 2020-09-09  O=108.7500 H=109.5000 L=106.6200 C=107.8700 V=2870500
   sma(14)                                       primed=True  sma(14)=109.0186
@@ -23621,4 +23892,5 @@ Bar[251] 2020-09-09  O=108.7500 H=109.5000 L=106.6200 C=107.8700 V=2870500
   jtpo(14)                                      primed=True  jtpo(14)=-0.2220
   jwav(12)                                      primed=True  jwav(12)=108.7500
   alma(9, 6, 0.85)                              primed=True  alma(9, 6, 0.85)=108.8289
+  nma(32, 8, 3)                                 primed=True  nma(32, 8, 3)=110.5389
 

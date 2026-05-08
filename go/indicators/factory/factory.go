@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"zpano/indicators/arnaudlegoux/arnaudlegouxmovingaverage"
 	"zpano/indicators/common/absolutepriceoscillator"
 	"zpano/indicators/common/exponentialmovingaverage"
 	"zpano/indicators/common/linearregression"
@@ -56,6 +57,7 @@ import (
 	"zpano/indicators/josephgranville/onbalancevolume"
 	"zpano/indicators/larrywilliams/ultimateoscillator"
 	"zpano/indicators/larrywilliams/williamspercentr"
+	"zpano/indicators/manfreddurschner/newmovingaverage"
 	"zpano/indicators/marcchaikin/advancedecline"
 	"zpano/indicators/marcchaikin/advancedeclineoscillator"
 	"zpano/indicators/markjurik/jurikadaptiverelativetrendstrengthindex"
@@ -90,8 +92,6 @@ import (
 	"zpano/indicators/welleswilder/parabolicstopandreverse"
 	"zpano/indicators/welleswilder/relativestrengthindex"
 	"zpano/indicators/welleswilder/truerange"
-
-	"zpano/indicators/arnaudlegoux/arnaudlegouxmovingaverage"
 )
 
 // lengthParam is a helper struct for indicators that take a bare int length.
@@ -968,6 +968,14 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 		}
 
 		return arnaudlegouxmovingaverage.NewArnaudLegouxMovingAverage(p)
+
+	case core.NewMovingAverage:
+		p := newmovingaverage.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return newmovingaverage.NewNewMovingAverage(p)
 
 	default:
 		return nil, fmt.Errorf("unsupported indicator: %s", identifier)

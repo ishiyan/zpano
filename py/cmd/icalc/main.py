@@ -113,6 +113,7 @@ _IDENTIFIER_MAP: dict[str, Identifier] = {
     'jurikTurningPointOscillator': Identifier.JURIK_TURNING_POINT_OSCILLATOR,
     'jurikWaveletSampler': Identifier.JURIK_WAVELET_SAMPLER,
     'arnaudLegouxMovingAverage': Identifier.ARNAUD_LEGOUX_MOVING_AVERAGE,
+    'newMovingAverage': Identifier.NEW_MOVING_AVERAGE,
 }
 
 

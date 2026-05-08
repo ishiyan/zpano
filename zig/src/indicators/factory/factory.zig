@@ -107,6 +107,7 @@ const jccx_mod = @import("../mark_jurik/jurik_commodity_channel_index/jurik_comm
 const jvelcfb_mod = @import("../mark_jurik/jurik_fractal_adaptive_zero_lag_velocity/jurik_fractal_adaptive_zero_lag_velocity.zig");
 const wav_mod = @import("../mark_jurik/jurik_wavelet_sampler/jurik_wavelet_sampler.zig");
 const alma_mod = @import("../arnaud_legoux/arnaud_legoux_moving_average/arnaud_legoux_moving_average.zig");
+const nma_mod = @import("../manfred_durschner/new_moving_average/new_moving_average.zig");
 
 // patrick_mulloy
 const dema_mod = @import("../patrick_mulloy/double_exponential_moving_average/double_exponential_moving_average.zig");
@@ -990,6 +991,17 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
             .window = getUsize(obj, "window", 9),
             .sigma = getF64(obj, "sigma", 6.0),
             .offset = getF64(obj, "offset", 0.85),
+            .bar_component = getBarComponent(obj),
+            .quote_component = getQuoteComponent(obj),
+            .trade_component = getTradeComponent(obj),
+        }),
+
+        // ── manfred_durschner ───────────────────────────────────────────
+
+        .new_moving_average => createWithAllocParams(nma_mod.NewMovingAverage, nma_mod.NewMovingAverageParams, allocator, obj, .{
+            .primary_period = getUsize(obj, "primaryPeriod", 0),
+            .secondary_period = getUsize(obj, "secondaryPeriod", 8),
+            .ma_type = @enumFromInt(getUsize(obj, "maType", 3)),
             .bar_component = getBarComponent(obj),
             .quote_component = getQuoteComponent(obj),
             .trade_component = getTradeComponent(obj),

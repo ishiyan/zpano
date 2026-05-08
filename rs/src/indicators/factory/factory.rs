@@ -226,6 +226,9 @@ use crate::indicators::welles_wilder::true_range::{TrueRange, TrueRangeParams};
 use crate::indicators::arnaud_legoux::arnaud_legoux_moving_average::{
     ArnaudLegouxMovingAverage, ArnaudLegouxMovingAverageParams,
 };
+use crate::indicators::manfred_durschner::new_moving_average::{
+    NewMovingAverage, NewMovingAverageParams, MAType,
+};
 
 /// Create an indicator from its identifier and a JSON-encoded parameter string.
 ///
@@ -1393,6 +1396,26 @@ pub fn create_indicator(
                 p.offset = v;
             }
             Ok(Box::new(ArnaudLegouxMovingAverage::new(&p)?))
+        }
+
+        Identifier::NewMovingAverage => {
+            let mut p = NewMovingAverageParams::default();
+            if let Some(v) = get_usize(&params, "primary_period") {
+                p.primary_period = v;
+            }
+            if let Some(v) = get_usize(&params, "secondary_period") {
+                p.secondary_period = v;
+            }
+            if let Some(v) = get_usize(&params, "ma_type") {
+                p.ma_type = match v {
+                    0 => MAType::SMA,
+                    1 => MAType::EMA,
+                    2 => MAType::SMMA,
+                    3 => MAType::LWMA,
+                    _ => MAType::LWMA,
+                };
+            }
+            Ok(Box::new(NewMovingAverage::new(&p)?))
         }
 
         _ => Err(format!("unsupported indicator: {:?}", identifier)),

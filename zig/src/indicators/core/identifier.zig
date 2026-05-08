@@ -84,6 +84,7 @@ pub const Identifier = enum(u8) {
     jurik_adaptive_relative_trend_strength_index = 80,
     jurik_turning_point_oscillator = 81,
     arnaud_legoux_moving_average = 82,
+    new_moving_average = 83,
 
     /// Returns the camelCase string representation matching Go's String().
     pub fn asStr(self: Identifier) []const u8 {
@@ -171,6 +172,7 @@ pub const Identifier = enum(u8) {
             .jurik_adaptive_relative_trend_strength_index => "jurikAdaptiveRelativeTrendStrengthIndex",
             .jurik_turning_point_oscillator => "jurikTurningPointOscillator",
             .arnaud_legoux_moving_average => "arnaudLegouxMovingAverage",
+            .new_moving_average => "newMovingAverage",
         };
     }
 
@@ -260,6 +262,7 @@ pub const Identifier = enum(u8) {
             .{ "jurikAdaptiveRelativeTrendStrengthIndex", Identifier.jurik_adaptive_relative_trend_strength_index },
             .{ "jurikTurningPointOscillator", Identifier.jurik_turning_point_oscillator },
             .{ "arnaudLegouxMovingAverage", Identifier.arnaud_legoux_moving_average },
+            .{ "newMovingAverage", Identifier.new_moving_average },
         };
 
         inline for (map) |entry| {

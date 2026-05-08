@@ -81,5 +81,6 @@
   { "identifier": "combBandPassSpectrum", "params": {} },
   { "identifier": "autoCorrelationIndicator", "params": {} },
   { "identifier": "autoCorrelationPeriodogram", "params": {} },
-  { "identifier": "arnaudLegouxMovingAverage", "params": { "window": 9, "sigma": 6.0, "offset": 0.85 } }
+  { "identifier": "arnaudLegouxMovingAverage", "params": { "window": 9, "sigma": 6.0, "offset": 0.85 } },
+  { "identifier": "newMovingAverage", "params": { "primary_period": 0, "secondary_period": 8, "ma_type": 3 } }
 ]

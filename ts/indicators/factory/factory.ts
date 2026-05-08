@@ -197,6 +197,10 @@ import { MaximumEntropySpectrum } from '../custom/maximum-entropy-spectrum/maxim
 import { ArnaudLegouxMovingAverage } from '../arnaud-legoux/arnaud-legoux-moving-average/arnaud-legoux-moving-average.js';
 import { defaultParams as defaultAlmaParams } from '../arnaud-legoux/arnaud-legoux-moving-average/params.js';
 
+// ── manfred-dürschner ───────────────────────────────────────────────────────
+import { NewMovingAverage } from '../manfred-dürschner/new-moving-average/new-moving-average.js';
+import { defaultParams as defaultNmaParams } from '../manfred-dürschner/new-moving-average/params.js';
+
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -579,6 +583,11 @@ export function createIndicator(identifier: IndicatorIdentifier, params?: Record
 
         case IndicatorIdentifier.ArnaudLegouxMovingAverage:
             return new ArnaudLegouxMovingAverage({ ...defaultAlmaParams(), ...p });
+
+        // ── manfred-dürschner ────────────────────────────────────────
+
+        case IndicatorIdentifier.NewMovingAverage:
+            return new NewMovingAverage({ ...defaultNmaParams(), ...p });
 
         default:
             throw new Error(`Unsupported indicator: ${IndicatorIdentifier[identifier] ?? identifier}`);

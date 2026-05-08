@@ -263,4 +263,7 @@ export enum IndicatorIdentifier {
 
   /** Identifies the Arnaud Legoux __Moving Average__ (ALMA) indicator. */
   ArnaudLegouxMovingAverage,
+
+  /** Identifies the New Moving Average (NMA) indicator by Dürschner. */
+  NewMovingAverage,
 }

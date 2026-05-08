@@ -233,4 +233,5 @@ pub const descriptors = [_]Descriptor{
     .{ .identifier = .jurik_fractal_adaptive_zero_lag_velocity, .family = "Mark Jurik", .adaptivity = .adaptive, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .oscillator, .pane = .own }} },
     .{ .identifier = .jurik_adaptive_relative_trend_strength_index, .family = "Mark Jurik", .adaptivity = .adaptive, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .oscillator, .pane = .own }} },
     .{ .identifier = .arnaud_legoux_moving_average, .family = "Arnaud Legoux", .adaptivity = .static_, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .smoother, .pane = .price }} },
+    .{ .identifier = .new_moving_average, .family = "Manfred Dürschner", .adaptivity = .static_, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .smoother, .pane = .price }} },
 };

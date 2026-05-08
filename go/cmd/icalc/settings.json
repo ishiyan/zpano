@@ -81,5 +81,6 @@
   { "identifier": "jurikFractalAdaptiveZeroLagVelocity", "params": { "lo_depth": 5, "hi_depth": 30, "fractal_type": 1, "smooth": 10 } },
   { "identifier": "jurikAdaptiveRelativeTrendStrengthIndex", "params": { "lo_length": 5, "hi_length": 30 } },
   { "identifier": "jurikTurningPointOscillator", "params": { "length": 14 } },
-  { "identifier": "arnaudLegouxMovingAverage", "params": { "window": 9, "sigma": 6.0, "offset": 0.85 } }
+  { "identifier": "arnaudLegouxMovingAverage", "params": { "window": 9, "sigma": 6.0, "offset": 0.85 } },
+  { "identifier": "newMovingAverage", "params": { "primary_period": 0, "secondary_period": 8, "ma_type": 3 } }
 ]

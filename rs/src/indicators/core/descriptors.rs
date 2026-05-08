@@ -1604,4 +1604,17 @@ pub static DESCRIPTORS: &[Descriptor] = &[
             pane: Price,
         }],
     },
+    Descriptor {
+        identifier: NewMovingAverage,
+        family: "Manfred D\u{00fc}rschner",
+        adaptivity: Static,
+        input_requirement: ScalarInput,
+        volume_usage: NoVolume,
+        outputs: &[OutputDescriptor {
+            kind: 1,
+            shape: Scalar,
+            role: Smoother,
+            pane: Price,
+        }],
+    },
 ];

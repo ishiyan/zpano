@@ -555,4 +555,9 @@ var descriptors = map[Identifier]Descriptor{
 		Adaptivity: Static, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
 		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Smoother, Pane: Price}},
 	},
+	NewMovingAverage: {
+		Identifier: NewMovingAverage, Family: "Manfred Dürschner",
+		Adaptivity: Static, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Smoother, Pane: Price}},
+	},
 }
