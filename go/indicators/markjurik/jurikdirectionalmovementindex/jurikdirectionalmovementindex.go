@@ -46,7 +46,7 @@ func newJurikDirectionalMovementIndex(length int) (*JurikDirectionalMovementInde
 	const (
 		invalid = "invalid jurik directional movement index parameters"
 		fmts    = "%s: %s"
-		fmtn    = "dmx(%d)"
+fmtn = "jdmx(%d)"
 		phase   = -100
 		minlen  = 1
 	)

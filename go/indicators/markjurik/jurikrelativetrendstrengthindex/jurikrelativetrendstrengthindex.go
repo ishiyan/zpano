@@ -53,7 +53,7 @@ func newJurikRelativeTrendStrengthIndex(length int,
 		invalid = "invalid jurik relative trend strength index parameters"
 		fmts    = "%s: %s"
 		fmtw    = "%s: %w"
-		fmtn    = "rsx(%d%s)"
+		fmtn    = "jrsx(%d%s)"
 		minlen  = 2
 	)
 

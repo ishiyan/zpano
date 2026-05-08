@@ -20,7 +20,7 @@ const weightsOdd = [4, 8, 16, 32, 64, 128, 256];
 
 /** Function to calculate mnemonic of a JurikCompositeFractalBehaviorIndex indicator. */
 export const jurikCompositeFractalBehaviorIndexMnemonic = (params: JurikCompositeFractalBehaviorIndexParams): string =>
-    'cfb('.concat(
+    'jcfb('.concat(
         params.fractalType.toString(),
         ',',
         params.smooth.toString(),

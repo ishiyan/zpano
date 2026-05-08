@@ -177,7 +177,7 @@ func newJurikCompositeFractalBehaviorIndex(fractalType, smooth int,
 		invalid = "invalid jurik composite fractal behavior index parameters"
 		fmts    = "%s: %s"
 		fmtw    = "%s: %w"
-		fmtn    = "cfb(%d,%d%s)"
+		fmtn    = "jcfb(%d,%d%s)"
 	)
 
 	var (

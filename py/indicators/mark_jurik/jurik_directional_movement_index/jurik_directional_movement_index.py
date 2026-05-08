@@ -38,7 +38,7 @@ class JurikDirectionalMovementIndex(Indicator):
 
         jma_params = JurikMovingAverageParams(length=length, phase=-100)
 
-        self._mnemonic = f"dmx({length})"
+        self._mnemonic = f"jdmx({length})"
         self._description = f"Jurik directional movement index {self._mnemonic}"
         self._primed = False
         self._bar = 0

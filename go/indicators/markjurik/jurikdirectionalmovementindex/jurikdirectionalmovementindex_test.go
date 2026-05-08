@@ -19,7 +19,7 @@ func almostEqual(a, b, eps float64) bool {
 	return math.Abs(a-b) < eps
 }
 
-func testDMX(t *testing.T, length int, expectedBipolar, expectedPlus, expectedMinus []float64) {
+func testJDMX(t *testing.T, length int, expectedBipolar, expectedPlus, expectedMinus []float64) {
 	t.Helper()
 
 	ind, err := newJurikDirectionalMovementIndex(length)
@@ -64,22 +64,22 @@ func testDMX(t *testing.T, length int, expectedBipolar, expectedPlus, expectedMi
 	}
 }
 
-func TestDMXLength2(t *testing.T)  { testDMX(t, 2, dmxBipolarLen2, dmxPlusLen2, dmxMinusLen2) }
-func TestDMXLength3(t *testing.T)  { testDMX(t, 3, dmxBipolarLen3, dmxPlusLen3, dmxMinusLen3) }
-func TestDMXLength4(t *testing.T)  { testDMX(t, 4, dmxBipolarLen4, dmxPlusLen4, dmxMinusLen4) }
-func TestDMXLength5(t *testing.T)  { testDMX(t, 5, dmxBipolarLen5, dmxPlusLen5, dmxMinusLen5) }
-func TestDMXLength6(t *testing.T)  { testDMX(t, 6, dmxBipolarLen6, dmxPlusLen6, dmxMinusLen6) }
-func TestDMXLength7(t *testing.T)  { testDMX(t, 7, dmxBipolarLen7, dmxPlusLen7, dmxMinusLen7) }
-func TestDMXLength8(t *testing.T)  { testDMX(t, 8, dmxBipolarLen8, dmxPlusLen8, dmxMinusLen8) }
-func TestDMXLength9(t *testing.T)  { testDMX(t, 9, dmxBipolarLen9, dmxPlusLen9, dmxMinusLen9) }
-func TestDMXLength10(t *testing.T) { testDMX(t, 10, dmxBipolarLen10, dmxPlusLen10, dmxMinusLen10) }
-func TestDMXLength11(t *testing.T) { testDMX(t, 11, dmxBipolarLen11, dmxPlusLen11, dmxMinusLen11) }
-func TestDMXLength12(t *testing.T) { testDMX(t, 12, dmxBipolarLen12, dmxPlusLen12, dmxMinusLen12) }
-func TestDMXLength13(t *testing.T) { testDMX(t, 13, dmxBipolarLen13, dmxPlusLen13, dmxMinusLen13) }
-func TestDMXLength14(t *testing.T) { testDMX(t, 14, dmxBipolarLen14, dmxPlusLen14, dmxMinusLen14) }
-func TestDMXLength15(t *testing.T) { testDMX(t, 15, dmxBipolarLen15, dmxPlusLen15, dmxMinusLen15) }
-func TestDMXLength16(t *testing.T) { testDMX(t, 16, dmxBipolarLen16, dmxPlusLen16, dmxMinusLen16) }
-func TestDMXLength17(t *testing.T) { testDMX(t, 17, dmxBipolarLen17, dmxPlusLen17, dmxMinusLen17) }
-func TestDMXLength18(t *testing.T) { testDMX(t, 18, dmxBipolarLen18, dmxPlusLen18, dmxMinusLen18) }
-func TestDMXLength19(t *testing.T) { testDMX(t, 19, dmxBipolarLen19, dmxPlusLen19, dmxMinusLen19) }
-func TestDMXLength20(t *testing.T) { testDMX(t, 20, dmxBipolarLen20, dmxPlusLen20, dmxMinusLen20) }
+func TestJDMXLength2(t *testing.T)  { testJDMX(t, 2, dmxBipolarLen2, dmxPlusLen2, dmxMinusLen2) }
+func TestJDMXLength3(t *testing.T)  { testJDMX(t, 3, dmxBipolarLen3, dmxPlusLen3, dmxMinusLen3) }
+func TestJDMXLength4(t *testing.T)  { testJDMX(t, 4, dmxBipolarLen4, dmxPlusLen4, dmxMinusLen4) }
+func TestJDMXLength5(t *testing.T)  { testJDMX(t, 5, dmxBipolarLen5, dmxPlusLen5, dmxMinusLen5) }
+func TestJDMXLength6(t *testing.T)  { testJDMX(t, 6, dmxBipolarLen6, dmxPlusLen6, dmxMinusLen6) }
+func TestJDMXLength7(t *testing.T)  { testJDMX(t, 7, dmxBipolarLen7, dmxPlusLen7, dmxMinusLen7) }
+func TestJDMXLength8(t *testing.T)  { testJDMX(t, 8, dmxBipolarLen8, dmxPlusLen8, dmxMinusLen8) }
+func TestJDMXLength9(t *testing.T)  { testJDMX(t, 9, dmxBipolarLen9, dmxPlusLen9, dmxMinusLen9) }
+func TestJDMXLength10(t *testing.T) { testJDMX(t, 10, dmxBipolarLen10, dmxPlusLen10, dmxMinusLen10) }
+func TestJDMXLength11(t *testing.T) { testJDMX(t, 11, dmxBipolarLen11, dmxPlusLen11, dmxMinusLen11) }
+func TestJDMXLength12(t *testing.T) { testJDMX(t, 12, dmxBipolarLen12, dmxPlusLen12, dmxMinusLen12) }
+func TestJDMXLength13(t *testing.T) { testJDMX(t, 13, dmxBipolarLen13, dmxPlusLen13, dmxMinusLen13) }
+func TestJDMXLength14(t *testing.T) { testJDMX(t, 14, dmxBipolarLen14, dmxPlusLen14, dmxMinusLen14) }
+func TestJDMXLength15(t *testing.T) { testJDMX(t, 15, dmxBipolarLen15, dmxPlusLen15, dmxMinusLen15) }
+func TestJDMXLength16(t *testing.T) { testJDMX(t, 16, dmxBipolarLen16, dmxPlusLen16, dmxMinusLen16) }
+func TestJDMXLength17(t *testing.T) { testJDMX(t, 17, dmxBipolarLen17, dmxPlusLen17, dmxMinusLen17) }
+func TestJDMXLength18(t *testing.T) { testJDMX(t, 18, dmxBipolarLen18, dmxPlusLen18, dmxMinusLen18) }
+func TestJDMXLength19(t *testing.T) { testJDMX(t, 19, dmxBipolarLen19, dmxPlusLen19, dmxMinusLen19) }
+func TestJDMXLength20(t *testing.T) { testJDMX(t, 20, dmxBipolarLen20, dmxPlusLen20, dmxMinusLen20) }

@@ -91,7 +91,7 @@ impl JurikDirectionalMovementIndex {
         let jma_denom = JurikMovingAverage::new(&jma_params)
             .map_err(|e| format!("invalid jurik directional movement index parameters: {}", e))?;
 
-        let mnemonic = format!("dmx({})", params.length);
+        let mnemonic = format!("jdmx({})", params.length);
         let description = format!("Jurik directional movement index {}", mnemonic);
 
         Ok(Self {

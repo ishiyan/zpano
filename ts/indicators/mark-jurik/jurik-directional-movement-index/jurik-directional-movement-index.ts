@@ -42,7 +42,7 @@ export class JurikDirectionalMovementIndex implements Indicator {
             throw new Error('invalid jurik directional movement index parameters: length should be positive');
         }
 
-        this._mnemonic = `dmx(${length})`;
+        this._mnemonic = `jdmx(${length})`;
         this._description = 'Jurik directional movement index ' + this._mnemonic;
 
         const jmaParams = { length, phase: -100 };

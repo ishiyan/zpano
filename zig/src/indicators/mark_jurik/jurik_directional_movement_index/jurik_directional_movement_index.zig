@@ -66,11 +66,11 @@ pub const JurikDirectionalMovementIndex = struct {
         };
 
         var mnemonic_buf: [96]u8 = undefined;
-        const mnemonic = std.fmt.bufPrint(&mnemonic_buf, "dmx({d})", .{length}) catch unreachable;
+        const mnemonic = std.fmt.bufPrint(&mnemonic_buf, "jdmx({d})", .{length}) catch unreachable;
         const mnemonic_len = mnemonic.len;
 
         var desc_buf: [128]u8 = undefined;
-        const desc = std.fmt.bufPrint(&desc_buf, "Jurik directional movement index dmx({d})", .{length}) catch unreachable;
+        const desc = std.fmt.bufPrint(&desc_buf, "Jurik directional movement index jdmx({d})", .{length}) catch unreachable;
         const desc_len = desc.len;
 
         return .{
@@ -335,61 +335,61 @@ fn runDmxTest(length: u32, expected_bipolar: [252]f64, expected_plus: [252]f64, 
     }
 }
 
-test "dmx length 2" {
+test "jdmx length 2" {
     try runDmxTest(2, testdata.dmxBipolarLen2(), testdata.dmxPlusLen2(), true, testdata.dmxMinusLen2());
 }
-test "dmx length 3" {
+test "jdmx length 3" {
     try runDmxTest(3, testdata.dmxBipolarLen3(), testdata.dmxPlusLen3(), true, testdata.dmxMinusLen3());
 }
-test "dmx length 4" {
+test "jdmx length 4" {
     try runDmxTest(4, testdata.dmxBipolarLen4(), testdata.dmxPlusLen4(), true, testdata.dmxMinusLen4());
 }
-test "dmx length 5" {
+test "jdmx length 5" {
     try runDmxTest(5, testdata.dmxBipolarLen5(), testdata.dmxPlusLen5(), true, testdata.dmxMinusLen5());
 }
-test "dmx length 6" {
+test "jdmx length 6" {
     try runDmxTest(6, testdata.dmxBipolarLen6(), testdata.dmxPlusLen6(), true, testdata.dmxMinusLen6());
 }
-test "dmx length 7" {
+test "jdmx length 7" {
     try runDmxTest(7, testdata.dmxBipolarLen7(), testdata.dmxPlusLen7(), true, testdata.dmxMinusLen7());
 }
-test "dmx length 8" {
+test "jdmx length 8" {
     try runDmxTest(8, testdata.dmxBipolarLen8(), testdata.dmxPlusLen8(), true, testdata.dmxMinusLen8());
 }
-test "dmx length 9" {
+test "jdmx length 9" {
     try runDmxTest(9, testdata.dmxBipolarLen9(), testdata.dmxPlusLen9(), true, testdata.dmxMinusLen9());
 }
-test "dmx length 10" {
+test "jdmx length 10" {
     try runDmxTest(10, testdata.dmxBipolarLen10(), testdata.dmxPlusLen10(), true, testdata.dmxMinusLen10());
 }
-test "dmx length 11" {
+test "jdmx length 11" {
     try runDmxTest(11, testdata.dmxBipolarLen11(), testdata.dmxPlusLen11(), true, testdata.dmxMinusLen11());
 }
-test "dmx length 12" {
+test "jdmx length 12" {
     try runDmxTest(12, testdata.dmxBipolarLen12(), testdata.dmxPlusLen12(), true, testdata.dmxMinusLen12());
 }
-test "dmx length 13" {
+test "jdmx length 13" {
     try runDmxTest(13, testdata.dmxBipolarLen13(), testdata.dmxPlusLen13(), true, testdata.dmxMinusLen13());
 }
-test "dmx length 14" {
+test "jdmx length 14" {
     // dmxMinusLen14 is [1]f64 (intentionally empty) — skip minus check.
     try runDmxTest(14, testdata.dmxBipolarLen14(), testdata.dmxPlusLen14(), false, testdata.dmxMinusLen14());
 }
-test "dmx length 15" {
+test "jdmx length 15" {
     try runDmxTest(15, testdata.dmxBipolarLen15(), testdata.dmxPlusLen15(), true, testdata.dmxMinusLen15());
 }
-test "dmx length 16" {
+test "jdmx length 16" {
     try runDmxTest(16, testdata.dmxBipolarLen16(), testdata.dmxPlusLen16(), true, testdata.dmxMinusLen16());
 }
-test "dmx length 17" {
+test "jdmx length 17" {
     try runDmxTest(17, testdata.dmxBipolarLen17(), testdata.dmxPlusLen17(), true, testdata.dmxMinusLen17());
 }
-test "dmx length 18" {
+test "jdmx length 18" {
     try runDmxTest(18, testdata.dmxBipolarLen18(), testdata.dmxPlusLen18(), true, testdata.dmxMinusLen18());
 }
-test "dmx length 19" {
+test "jdmx length 19" {
     try runDmxTest(19, testdata.dmxBipolarLen19(), testdata.dmxPlusLen19(), true, testdata.dmxMinusLen19());
 }
-test "dmx length 20" {
+test "jdmx length 20" {
     try runDmxTest(20, testdata.dmxBipolarLen20(), testdata.dmxPlusLen20(), true, testdata.dmxMinusLen20());
 }

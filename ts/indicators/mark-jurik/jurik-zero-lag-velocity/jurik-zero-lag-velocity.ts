@@ -7,7 +7,7 @@ import { JurikZeroLagVelocityParams } from './params';
 
 /** Function to calculate mnemonic of a JurikZeroLagVelocity indicator. */
 export const jurikZeroLagVelocityMnemonic = (params: JurikZeroLagVelocityParams): string =>
-    'vel('.concat(
+    'jvel('.concat(
         params.depth.toString(),
         componentTripleMnemonic(params.barComponent, params.quoteComponent, params.tradeComponent),
         ')');

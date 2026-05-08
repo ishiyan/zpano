@@ -106,6 +106,12 @@ _IDENTIFIER_MAP: dict[str, Identifier] = {
     'jurikCompositeFractalBehaviorIndex': Identifier.JURIK_COMPOSITE_FRACTAL_BEHAVIOR_INDEX,
     'jurikZeroLagVelocity': Identifier.JURIK_ZERO_LAG_VELOCITY,
     'jurikDirectionalMovementIndex': Identifier.JURIK_DIRECTIONAL_MOVEMENT_INDEX,
+    'jurikAdaptiveRelativeTrendStrengthIndex': Identifier.JURIK_ADAPTIVE_RELATIVE_TREND_STRENGTH_INDEX,
+    'jurikAdaptiveZeroLagVelocity': Identifier.JURIK_ADAPTIVE_ZERO_LAG_VELOCITY,
+    'jurikCommodityChannelIndex': Identifier.JURIK_COMMODITY_CHANNEL_INDEX,
+    'jurikFractalAdaptiveZeroLagVelocity': Identifier.JURIK_FRACTAL_ADAPTIVE_ZERO_LAG_VELOCITY,
+    'jurikTurningPointOscillator': Identifier.JURIK_TURNING_POINT_OSCILLATOR,
+    'jurikWaveletSampler': Identifier.JURIK_WAVELET_SAMPLER,
 }
 
 

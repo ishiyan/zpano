@@ -100,6 +100,12 @@ const jrsx_mod = @import("../mark_jurik/jurik_relative_trend_strength_index/juri
 const jcfb_mod = @import("../mark_jurik/jurik_composite_fractal_behavior_index/jurik_composite_fractal_behavior_index.zig");
 const jvel_mod = @import("../mark_jurik/jurik_zero_lag_velocity/jurik_zero_lag_velocity.zig");
 const jdmx_mod = @import("../mark_jurik/jurik_directional_movement_index/jurik_directional_movement_index.zig");
+const jtpo_mod = @import("../mark_jurik/jurik_turning_point_oscillator/jurik_turning_point_oscillator.zig");
+const jarsx_mod = @import("../mark_jurik/jurik_adaptive_relative_trend_strength_index/jurik_adaptive_relative_trend_strength_index.zig");
+const javel_mod = @import("../mark_jurik/jurik_adaptive_zero_lag_velocity/jurik_adaptive_zero_lag_velocity.zig");
+const jccx_mod = @import("../mark_jurik/jurik_commodity_channel_index/jurik_commodity_channel_index.zig");
+const jvelcfb_mod = @import("../mark_jurik/jurik_fractal_adaptive_zero_lag_velocity/jurik_fractal_adaptive_zero_lag_velocity.zig");
+const wav_mod = @import("../mark_jurik/jurik_wavelet_sampler/jurik_wavelet_sampler.zig");
 
 // patrick_mulloy
 const dema_mod = @import("../patrick_mulloy/double_exponential_moving_average/double_exponential_moving_average.zig");
@@ -926,6 +932,55 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
 
         .jurik_directional_movement_index => createWithParams(jdmx_mod.JurikDirectionalMovementIndex, allocator, jdmx_mod.JurikDirectionalMovementIndex.init(.{
             .length = @as(u32, @intCast(getUsize(obj, "length", 14))),
+        })),
+
+        .jurik_turning_point_oscillator => createWithParams(jtpo_mod.JurikTurningPointOscillator, allocator, jtpo_mod.JurikTurningPointOscillator.init(.{
+            .length = @as(u32, @intCast(getUsize(obj, "length", 14))),
+            .bar_component = getBarComponent(obj),
+            .quote_component = getQuoteComponent(obj),
+            .trade_component = getTradeComponent(obj),
+        })),
+
+        .jurik_commodity_channel_index => createWithParams(jccx_mod.JurikCommodityChannelIndex, allocator, jccx_mod.JurikCommodityChannelIndex.init(.{
+            .length = @as(u32, @intCast(getUsize(obj, "length", 20))),
+            .bar_component = getBarComponent(obj),
+            .quote_component = getQuoteComponent(obj),
+            .trade_component = getTradeComponent(obj),
+        })),
+
+        .jurik_wavelet_sampler => createWithParams(wav_mod.JurikWaveletSampler, allocator, wav_mod.JurikWaveletSampler.init(.{
+            .index = @as(u32, @intCast(getUsize(obj, "index", 12))),
+            .bar_component = getBarComponent(obj),
+            .quote_component = getQuoteComponent(obj),
+            .trade_component = getTradeComponent(obj),
+        })),
+
+        .jurik_adaptive_zero_lag_velocity => createWithParams(javel_mod.JurikAdaptiveZeroLagVelocity, allocator, javel_mod.JurikAdaptiveZeroLagVelocity.init(.{
+            .lo_length = @as(u32, @intCast(getUsize(obj, "loLength", 5))),
+            .hi_length = @as(u32, @intCast(getUsize(obj, "hiLength", 30))),
+            .sensitivity = getF64(obj, "sensitivity", 1.0),
+            .period = getF64(obj, "period", 3.0),
+            .bar_component = getBarComponent(obj),
+            .quote_component = getQuoteComponent(obj),
+            .trade_component = getTradeComponent(obj),
+        })),
+
+        .jurik_fractal_adaptive_zero_lag_velocity => createWithParams(jvelcfb_mod.JurikFractalAdaptiveZeroLagVelocity, allocator, jvelcfb_mod.JurikFractalAdaptiveZeroLagVelocity.init(.{
+            .lo_depth = @as(u32, @intCast(getUsize(obj, "loDepth", 5))),
+            .hi_depth = @as(u32, @intCast(getUsize(obj, "hiDepth", 30))),
+            .fractal_type = @as(u32, @intCast(getUsize(obj, "fractalType", 1))),
+            .smooth = @as(u32, @intCast(getUsize(obj, "smooth", 10))),
+            .bar_component = getBarComponent(obj),
+            .quote_component = getQuoteComponent(obj),
+            .trade_component = getTradeComponent(obj),
+        })),
+
+        .jurik_adaptive_relative_trend_strength_index => createWithParams(jarsx_mod.JurikAdaptiveRelativeTrendStrengthIndex, allocator, jarsx_mod.JurikAdaptiveRelativeTrendStrengthIndex.init(.{
+            .lo_length = @as(u32, @intCast(getUsize(obj, "loLength", 5))),
+            .hi_length = @as(u32, @intCast(getUsize(obj, "hiLength", 30))),
+            .bar_component = getBarComponent(obj),
+            .quote_component = getQuoteComponent(obj),
+            .trade_component = getTradeComponent(obj),
         })),
 
         // ── patrick_mulloy ──────────────────────────────────────────────

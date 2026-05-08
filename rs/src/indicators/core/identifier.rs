@@ -79,6 +79,12 @@ pub enum Identifier {
     JurikCompositeFractalBehaviorIndex = 73,
     JurikZeroLagVelocity = 74,
     JurikDirectionalMovementIndex = 75,
+    JurikCommodityChannelIndex = 76,
+    JurikWaveletSampler = 77,
+    JurikAdaptiveZeroLagVelocity = 78,
+    JurikFractalAdaptiveZeroLagVelocity = 79,
+    JurikAdaptiveRelativeTrendStrengthIndex = 80,
+    JurikTurningPointOscillator = 81,
 }
 
 impl Identifier {
@@ -167,6 +173,12 @@ impl Identifier {
             Self::JurikCompositeFractalBehaviorIndex => "jurikCompositeFractalBehaviorIndex",
             Self::JurikZeroLagVelocity => "jurikZeroLagVelocity",
             Self::JurikDirectionalMovementIndex => "jurikDirectionalMovementIndex",
+            Self::JurikTurningPointOscillator => "jurikTurningPointOscillator",
+            Self::JurikWaveletSampler => "jurikWaveletSampler",
+            Self::JurikCommodityChannelIndex => "jurikCommodityChannelIndex",
+            Self::JurikAdaptiveZeroLagVelocity => "jurikAdaptiveZeroLagVelocity",
+            Self::JurikFractalAdaptiveZeroLagVelocity => "jurikFractalAdaptiveZeroLagVelocity",
+            Self::JurikAdaptiveRelativeTrendStrengthIndex => "jurikAdaptiveRelativeTrendStrengthIndex",
         }
     }
 
@@ -257,6 +269,12 @@ impl Identifier {
             "jurikCompositeFractalBehaviorIndex" => Some(Self::JurikCompositeFractalBehaviorIndex),
             "jurikZeroLagVelocity" => Some(Self::JurikZeroLagVelocity),
             "jurikDirectionalMovementIndex" => Some(Self::JurikDirectionalMovementIndex),
+            "jurikTurningPointOscillator" => Some(Self::JurikTurningPointOscillator),
+            "jurikWaveletSampler" => Some(Self::JurikWaveletSampler),
+            "jurikCommodityChannelIndex" => Some(Self::JurikCommodityChannelIndex),
+            "jurikAdaptiveZeroLagVelocity" => Some(Self::JurikAdaptiveZeroLagVelocity),
+            "jurikFractalAdaptiveZeroLagVelocity" => Some(Self::JurikFractalAdaptiveZeroLagVelocity),
+            "jurikAdaptiveRelativeTrendStrengthIndex" => Some(Self::JurikAdaptiveRelativeTrendStrengthIndex),
             _ => None,
         }
     }

@@ -224,7 +224,7 @@ impl JurikCompositeFractalBehaviorIndex {
         let trade_func = trade_component_value(tc);
 
         let mnemonic = format!(
-            "cfb({},{}{})",
+            "jcfb({},{}{})",
             params.fractal_type,
             params.smooth,
             component_triple_mnemonic(bc, qc, tc)

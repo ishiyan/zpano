@@ -520,4 +520,34 @@ var descriptors = map[Identifier]Descriptor{
 			{Kind: 3 /* Minus */, Shape: shape.Scalar, Role: Oscillator, Pane: Own},
 		},
 	},
+	JurikCommodityChannelIndex: {
+		Identifier: JurikCommodityChannelIndex, Family: "Mark Jurik",
+		Adaptivity: Adaptive, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Oscillator, Pane: Own}},
+	},
+	JurikWaveletSampler: {
+		Identifier: JurikWaveletSampler, Family: "Mark Jurik",
+		Adaptivity: Static, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Smoother, Pane: Price}},
+	},
+	JurikAdaptiveZeroLagVelocity: {
+		Identifier: JurikAdaptiveZeroLagVelocity, Family: "Mark Jurik",
+		Adaptivity: Adaptive, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Oscillator, Pane: Own}},
+	},
+	JurikFractalAdaptiveZeroLagVelocity: {
+		Identifier: JurikFractalAdaptiveZeroLagVelocity, Family: "Mark Jurik",
+		Adaptivity: Adaptive, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Oscillator, Pane: Own}},
+	},
+	JurikAdaptiveRelativeTrendStrengthIndex: {
+		Identifier: JurikAdaptiveRelativeTrendStrengthIndex, Family: "Mark Jurik",
+		Adaptivity: Adaptive, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Oscillator, Pane: Own}},
+	},
+	JurikTurningPointOscillator: {
+		Identifier: JurikTurningPointOscillator, Family: "Mark Jurik",
+		Adaptivity: Static, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Oscillator, Pane: Own}},
+	},
 }

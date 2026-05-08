@@ -58,6 +58,18 @@ import { JurikRelativeTrendStrengthIndex } from '../mark-jurik/jurik-relative-tr
 import { defaultParams as defaultRsxParams } from '../mark-jurik/jurik-relative-trend-strength-index/params.js';
 import { JurikDirectionalMovementIndex } from '../mark-jurik/jurik-directional-movement-index/jurik-directional-movement-index.js';
 import { defaultParams as defaultDmxParams } from '../mark-jurik/jurik-directional-movement-index/params.js';
+import { JurikTurningPointOscillator } from '../mark-jurik/jurik-turning-point-oscillator/jurik-turning-point-oscillator.js';
+import { defaultParams as defaultJtpoParams } from '../mark-jurik/jurik-turning-point-oscillator/params.js';
+import { JurikAdaptiveRelativeTrendStrengthIndex } from '../mark-jurik/jurik-adaptive-relative-trend-strength-index/jurik-adaptive-relative-trend-strength-index.js';
+import { defaultParams as defaultJarsxParams } from '../mark-jurik/jurik-adaptive-relative-trend-strength-index/params.js';
+import { JurikAdaptiveZeroLagVelocity } from '../mark-jurik/jurik-adaptive-zero-lag-velocity/jurik-adaptive-zero-lag-velocity.js';
+import { defaultParams as defaultJavelParams } from '../mark-jurik/jurik-adaptive-zero-lag-velocity/params.js';
+import { JurikCommodityChannelIndex } from '../mark-jurik/jurik-commodity-channel-index/jurik-commodity-channel-index.js';
+import { defaultParams as defaultJccxParams } from '../mark-jurik/jurik-commodity-channel-index/params.js';
+import { JurikFractalAdaptiveZeroLagVelocity } from '../mark-jurik/jurik-fractal-adaptive-zero-lag-velocity/jurik-fractal-adaptive-zero-lag-velocity.js';
+import { defaultParams as defaultJvelcfbParams } from '../mark-jurik/jurik-fractal-adaptive-zero-lag-velocity/params.js';
+import { JurikWaveletSampler } from '../mark-jurik/jurik-wavelet-sampler/jurik-wavelet-sampler.js';
+import { defaultParams as defaultWavParams } from '../mark-jurik/jurik-wavelet-sampler/params.js';
 
 // ── patrick-mulloy ──────────────────────────────────────────────────────────
 import { DoubleExponentialMovingAverage } from '../patrick-mulloy/double-exponential-moving-average/double-exponential-moving-average.js';
@@ -276,6 +288,24 @@ export function createIndicator(identifier: IndicatorIdentifier, params?: Record
 
         case IndicatorIdentifier.JurikDirectionalMovementIndex:
             return new JurikDirectionalMovementIndex({ ...defaultDmxParams(), ...p });
+
+        case IndicatorIdentifier.JurikTurningPointOscillator:
+            return new JurikTurningPointOscillator({ ...defaultJtpoParams(), ...p });
+
+        case IndicatorIdentifier.JurikAdaptiveRelativeTrendStrengthIndex:
+            return new JurikAdaptiveRelativeTrendStrengthIndex({ ...defaultJarsxParams(), ...p });
+
+        case IndicatorIdentifier.JurikAdaptiveZeroLagVelocity:
+            return new JurikAdaptiveZeroLagVelocity({ ...defaultJavelParams(), ...p });
+
+        case IndicatorIdentifier.JurikCommodityChannelIndex:
+            return new JurikCommodityChannelIndex({ ...defaultJccxParams(), ...p });
+
+        case IndicatorIdentifier.JurikFractalAdaptiveZeroLagVelocity:
+            return new JurikFractalAdaptiveZeroLagVelocity({ ...defaultJvelcfbParams(), ...p });
+
+        case IndicatorIdentifier.JurikWaveletSampler:
+            return new JurikWaveletSampler({ ...defaultWavParams(), ...p });
 
         // ── patrick-mulloy ──────────────────────────────────────────────
 

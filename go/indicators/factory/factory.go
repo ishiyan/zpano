@@ -58,10 +58,16 @@ import (
 	"zpano/indicators/larrywilliams/williamspercentr"
 	"zpano/indicators/marcchaikin/advancedecline"
 	"zpano/indicators/marcchaikin/advancedeclineoscillator"
+	"zpano/indicators/markjurik/jurikadaptiverelativetrendstrengthindex"
+	"zpano/indicators/markjurik/jurikadaptivezerolagvelocity"
+	"zpano/indicators/markjurik/jurikcommoditychannelindex"
 	"zpano/indicators/markjurik/jurikcompositefractalbehaviorindex"
 	"zpano/indicators/markjurik/jurikdirectionalmovementindex"
+	"zpano/indicators/markjurik/jurikfractaladaptivezerolagvelocity"
 	"zpano/indicators/markjurik/jurikmovingaverage"
 	"zpano/indicators/markjurik/jurikrelativetrendstrengthindex"
+	"zpano/indicators/markjurik/jurikturningpointoscillator"
+	"zpano/indicators/markjurik/jurikwaveletsampler"
 	"zpano/indicators/markjurik/jurikzerolagvelocity"
 	"zpano/indicators/patrickmulloy/doubleexponentialmovingaverage"
 	"zpano/indicators/patrickmulloy/tripleexponentialmovingaverage"
@@ -680,6 +686,54 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 		}
 
 		return jurikdirectionalmovementindex.NewJurikDirectionalMovementIndex(p)
+
+	case core.JurikCommodityChannelIndex:
+		p := jurikcommoditychannelindex.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return jurikcommoditychannelindex.NewJurikCommodityChannelIndex(p)
+
+	case core.JurikWaveletSampler:
+		p := jurikwaveletsampler.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return jurikwaveletsampler.NewJurikWaveletSampler(p)
+
+	case core.JurikAdaptiveZeroLagVelocity:
+		p := jurikadaptivezerolagvelocity.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return jurikadaptivezerolagvelocity.NewJurikAdaptiveZeroLagVelocity(p)
+
+	case core.JurikFractalAdaptiveZeroLagVelocity:
+		p := jurikfractaladaptivezerolagvelocity.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return jurikfractaladaptivezerolagvelocity.NewJurikFractalAdaptiveZeroLagVelocity(p)
+
+	case core.JurikAdaptiveRelativeTrendStrengthIndex:
+		p := jurikadaptiverelativetrendstrengthindex.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return jurikadaptiverelativetrendstrengthindex.NewJurikAdaptiveRelativeTrendStrengthIndex(p)
+
+	case core.JurikTurningPointOscillator:
+		p := jurikturningpointoscillator.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return jurikturningpointoscillator.NewJurikTurningPointOscillator(p)
 
 	// ── patrickmulloy ────────────────────────────────────────────────────
 

@@ -77,6 +77,12 @@ pub const Identifier = enum(u8) {
     jurik_composite_fractal_behavior_index = 73,
     jurik_zero_lag_velocity = 74,
     jurik_directional_movement_index = 75,
+    jurik_commodity_channel_index = 76,
+    jurik_wavelet_sampler = 77,
+    jurik_adaptive_zero_lag_velocity = 78,
+    jurik_fractal_adaptive_zero_lag_velocity = 79,
+    jurik_adaptive_relative_trend_strength_index = 80,
+    jurik_turning_point_oscillator = 81,
 
     /// Returns the camelCase string representation matching Go's String().
     pub fn asStr(self: Identifier) []const u8 {
@@ -157,6 +163,12 @@ pub const Identifier = enum(u8) {
             .jurik_composite_fractal_behavior_index => "jurikCompositeFractalBehaviorIndex",
             .jurik_zero_lag_velocity => "jurikZeroLagVelocity",
             .jurik_directional_movement_index => "jurikDirectionalMovementIndex",
+            .jurik_commodity_channel_index => "jurikCommodityChannelIndex",
+            .jurik_wavelet_sampler => "jurikWaveletSampler",
+            .jurik_adaptive_zero_lag_velocity => "jurikAdaptiveZeroLagVelocity",
+            .jurik_fractal_adaptive_zero_lag_velocity => "jurikFractalAdaptiveZeroLagVelocity",
+            .jurik_adaptive_relative_trend_strength_index => "jurikAdaptiveRelativeTrendStrengthIndex",
+            .jurik_turning_point_oscillator => "jurikTurningPointOscillator",
         };
     }
 
@@ -239,6 +251,12 @@ pub const Identifier = enum(u8) {
             .{ "jurikCompositeFractalBehaviorIndex", Identifier.jurik_composite_fractal_behavior_index },
             .{ "jurikZeroLagVelocity", Identifier.jurik_zero_lag_velocity },
             .{ "jurikDirectionalMovementIndex", Identifier.jurik_directional_movement_index },
+            .{ "jurikCommodityChannelIndex", Identifier.jurik_commodity_channel_index },
+            .{ "jurikWaveletSampler", Identifier.jurik_wavelet_sampler },
+            .{ "jurikAdaptiveZeroLagVelocity", Identifier.jurik_adaptive_zero_lag_velocity },
+            .{ "jurikFractalAdaptiveZeroLagVelocity", Identifier.jurik_fractal_adaptive_zero_lag_velocity },
+            .{ "jurikAdaptiveRelativeTrendStrengthIndex", Identifier.jurik_adaptive_relative_trend_strength_index },
+            .{ "jurikTurningPointOscillator", Identifier.jurik_turning_point_oscillator },
         };
 
         inline for (map) |entry| {

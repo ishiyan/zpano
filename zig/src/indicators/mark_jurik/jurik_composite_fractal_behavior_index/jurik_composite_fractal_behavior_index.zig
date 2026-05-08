@@ -192,7 +192,7 @@ pub const JurikCompositeFractalBehaviorIndex = struct {
         const triple = component_triple_mnemonic_mod.componentTripleMnemonic(&triple_buf, bc, qc, tc);
 
         var mnemonic_buf: [96]u8 = undefined;
-        const mnemonic = std.fmt.bufPrint(&mnemonic_buf, "cfb({d},{d}{s})", .{
+        const mnemonic = std.fmt.bufPrint(&mnemonic_buf, "jcfb({d},{d}{s})", .{
             fractal_type, smooth, triple,
         }) catch unreachable;
         const mnemonic_len = mnemonic.len;
@@ -472,39 +472,39 @@ fn runCfbTest(fractal_type: u32, smooth: u32, expected: [252]f64) !void {
     try testing.expect(math.isNan(cfb.update(math.nan(f64))));
 }
 
-test "cfb type 1 smooth 2" {
+test "jcfb type 1 smooth 2" {
     try runCfbTest(1, 2, testdata.expectedType1Smooth2());
 }
-test "cfb type 1 smooth 10" {
+test "jcfb type 1 smooth 10" {
     try runCfbTest(1, 10, testdata.expectedType1Smooth10());
 }
-test "cfb type 1 smooth 50" {
+test "jcfb type 1 smooth 50" {
     try runCfbTest(1, 50, testdata.expectedType1Smooth50());
 }
-test "cfb type 2 smooth 2" {
+test "jcfb type 2 smooth 2" {
     try runCfbTest(2, 2, testdata.expectedType2Smooth2());
 }
-test "cfb type 2 smooth 10" {
+test "jcfb type 2 smooth 10" {
     try runCfbTest(2, 10, testdata.expectedType2Smooth10());
 }
-test "cfb type 2 smooth 50" {
+test "jcfb type 2 smooth 50" {
     try runCfbTest(2, 50, testdata.expectedType2Smooth50());
 }
-test "cfb type 3 smooth 2" {
+test "jcfb type 3 smooth 2" {
     try runCfbTest(3, 2, testdata.expectedType3Smooth2());
 }
-test "cfb type 3 smooth 10" {
+test "jcfb type 3 smooth 10" {
     try runCfbTest(3, 10, testdata.expectedType3Smooth10());
 }
-test "cfb type 3 smooth 50" {
+test "jcfb type 3 smooth 50" {
     try runCfbTest(3, 50, testdata.expectedType3Smooth50());
 }
-test "cfb type 4 smooth 2" {
+test "jcfb type 4 smooth 2" {
     try runCfbTest(4, 2, testdata.expectedType4Smooth2());
 }
-test "cfb type 4 smooth 10" {
+test "jcfb type 4 smooth 10" {
     try runCfbTest(4, 10, testdata.expectedType4Smooth10());
 }
-test "cfb type 4 smooth 50" {
+test "jcfb type 4 smooth 50" {
     try runCfbTest(4, 50, testdata.expectedType4Smooth50());
 }

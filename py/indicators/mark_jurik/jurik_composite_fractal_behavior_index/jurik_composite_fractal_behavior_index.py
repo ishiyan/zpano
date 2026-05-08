@@ -139,7 +139,7 @@ class JurikCompositeFractalBehaviorIndex(Indicator):
         quote_func = quote_component_value(qc)
         trade_func = trade_component_value(tc)
 
-        mnemonic = f"cfb({fractal_type},{smooth}{component_triple_mnemonic(bc, qc, tc)})"
+        mnemonic = f"jcfb({fractal_type},{smooth}{component_triple_mnemonic(bc, qc, tc)})"
         description = f"Jurik composite fractal behavior index {mnemonic}"
 
         self._line = LineIndicator(mnemonic, description, bar_func, quote_func, trade_func, self.update)

@@ -453,7 +453,16 @@ banned per the Abbreviation Convention).
 4. **Register the indicator** in `core/identifier` (add a new enum variant in both Go `core.Identifier` and TS `IndicatorIdentifier`).
 5. **Register the descriptor** in `core/descriptors.{go,ts}` — see the Taxonomy section below. A missing descriptor row causes
    `BuildMetadata` to panic at runtime.
-6. **Follow the consistent depth rule** -- the indicator must be exactly two
+6. **Register in the factory** — add a factory case mapping `Identifier` + JSON params → indicator instance.
+7. **Add to `icalc/settings.json`** — add an entry with default params (camelCase identifier string).
+8. **Run icalc** in all implemented languages to verify the indicator produces output without crashing.
+9. **Test data in separate files** — place test input and expected arrays in dedicated files:
+   - Go: `testdata_test.go`
+   - Python: `test_testdata.py`
+   - TypeScript: `testdata.ts`
+   - Zig: `testdata.zig` (or bottom of test file)
+   - Rust: `testdata.rs` (or inline in test module)
+10. **Follow the consistent depth rule** -- the indicator must be exactly two
    levels below `indicators/`.
 
 ## Design Decisions Log
@@ -2437,6 +2446,6 @@ The indicators are not `Send`/`Sync` by default due to internal mutability via `
 ## Related Skills
 
 - **`indicator-checklist`** — Compact (~80 lines) mechanically-verifiable rules for imports, naming, and structure. Use for quick verification or as a checklist during conversion.
-- **`indicator-conversion`** — Full step-by-step conversion workflow for porting indicators between languages.
+- **`indicator-conversion`** — Full step-by-step conversion workflow for porting indicators between languages. Includes the multi-language conversion routing (Go→all, Python→Go→rest, Rust→Go→rest), streaming adaptation, test data generation, factory registration, and icalc verification.
 - **`mbst-indicator-conversion`** — Converting from MBST C# source indicators.
 - **`talib-indicator-conversion`** — Converting from TA-Lib C source indicators.

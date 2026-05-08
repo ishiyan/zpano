@@ -74,5 +74,11 @@
   { "identifier": "discreteFourierTransformSpectrum", "params": {} },
   { "identifier": "combBandPassSpectrum", "params": {} },
   { "identifier": "autoCorrelationIndicator", "params": {} },
-  { "identifier": "autoCorrelationPeriodogram", "params": {} }
+  { "identifier": "autoCorrelationPeriodogram", "params": {} },
+  { "identifier": "jurikCommodityChannelIndex", "params": { "length": 20 } },
+  { "identifier": "jurikWaveletSampler", "params": { "index": 12 } },
+  { "identifier": "jurikAdaptiveZeroLagVelocity", "params": { "lo_length": 5, "hi_length": 30, "sensitivity": 1.0, "period": 3.0 } },
+  { "identifier": "jurikFractalAdaptiveZeroLagVelocity", "params": { "lo_depth": 5, "hi_depth": 30, "fractal_type": 1, "smooth": 10 } },
+  { "identifier": "jurikAdaptiveRelativeTrendStrengthIndex", "params": { "lo_length": 5, "hi_length": 30 } },
+  { "identifier": "jurikTurningPointOscillator", "params": { "length": 14 } }
 ]

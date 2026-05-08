@@ -242,4 +242,22 @@ export enum IndicatorIdentifier {
 
   /** Identifies the Jurik __Directional Movement Index__ (DMX) indicator. */
   JurikDirectionalMovementIndex,
+
+  /** Identifies the Jurik __Adaptive Relative Trend Strength Index__ (JARSX) indicator. */
+  JurikAdaptiveRelativeTrendStrengthIndex,
+
+  /** Identifies the Jurik __Adaptive Zero Lag Velocity__ (JAVEL) indicator. */
+  JurikAdaptiveZeroLagVelocity,
+
+  /** Identifies the Jurik __Commodity Channel Index__ (JCCX) indicator. */
+  JurikCommodityChannelIndex,
+
+  /** Identifies the Jurik __Fractal Adaptive Zero Lag Velocity__ (JVELCFB) indicator. */
+  JurikFractalAdaptiveZeroLagVelocity,
+
+  /** Identifies the Jurik __Turning Point Oscillator__ (JTPO) indicator. */
+  JurikTurningPointOscillator,
+
+  /** Identifies the Jurik __Wavelet Sampler__ (WAV) indicator. */
+  JurikWaveletSampler,
 }

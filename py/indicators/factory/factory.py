@@ -527,4 +527,34 @@ def create_indicator(
         from ..mark_jurik.jurik_directional_movement_index.jurik_directional_movement_index import JurikDirectionalMovementIndex
         return JurikDirectionalMovementIndex(_apply(default_params(), params))
 
+    if identifier == Identifier.JURIK_ADAPTIVE_RELATIVE_TREND_STRENGTH_INDEX:
+        from ..mark_jurik.jurik_adaptive_relative_trend_strength_index.params import default_params
+        from ..mark_jurik.jurik_adaptive_relative_trend_strength_index.jurik_adaptive_relative_trend_strength_index import JurikAdaptiveRelativeTrendStrengthIndex
+        return JurikAdaptiveRelativeTrendStrengthIndex(_apply(default_params(), params))
+
+    if identifier == Identifier.JURIK_ADAPTIVE_ZERO_LAG_VELOCITY:
+        from ..mark_jurik.jurik_adaptive_zero_lag_velocity.params import default_params
+        from ..mark_jurik.jurik_adaptive_zero_lag_velocity.jurik_adaptive_zero_lag_velocity import JurikAdaptiveZeroLagVelocity
+        return JurikAdaptiveZeroLagVelocity(_apply(default_params(), params))
+
+    if identifier == Identifier.JURIK_COMMODITY_CHANNEL_INDEX:
+        from ..mark_jurik.jurik_commodity_channel_index.params import default_params
+        from ..mark_jurik.jurik_commodity_channel_index.jurik_commodity_channel_index import JurikCommodityChannelIndex
+        return JurikCommodityChannelIndex(_apply(default_params(), params))
+
+    if identifier == Identifier.JURIK_FRACTAL_ADAPTIVE_ZERO_LAG_VELOCITY:
+        from ..mark_jurik.jurik_fractal_adaptive_zero_lag_velocity.params import default_params
+        from ..mark_jurik.jurik_fractal_adaptive_zero_lag_velocity.jurik_fractal_adaptive_zero_lag_velocity import JurikFractalAdaptiveZeroLagVelocity
+        return JurikFractalAdaptiveZeroLagVelocity(_apply(default_params(), params))
+
+    if identifier == Identifier.JURIK_TURNING_POINT_OSCILLATOR:
+        from ..mark_jurik.jurik_turning_point_oscillator.params import default_params
+        from ..mark_jurik.jurik_turning_point_oscillator.jurik_turning_point_oscillator import JurikTurningPointOscillator
+        return JurikTurningPointOscillator(_apply(default_params(), params))
+
+    if identifier == Identifier.JURIK_WAVELET_SAMPLER:
+        from ..mark_jurik.jurik_wavelet_sampler.params import default_params
+        from ..mark_jurik.jurik_wavelet_sampler.jurik_wavelet_sampler import JurikWaveletSampler
+        return JurikWaveletSampler(_apply(default_params(), params))
+
     raise ValueError(f"unsupported indicator: {identifier}")

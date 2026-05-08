@@ -364,7 +364,7 @@ impl JurikZeroLagVelocity {
         let trade_func = trade_component_value(tc);
 
         let mnemonic = format!(
-            "vel({}{})",
+            "jvel({}{})",
             params.depth,
             component_triple_mnemonic(bc, qc, tc)
         );

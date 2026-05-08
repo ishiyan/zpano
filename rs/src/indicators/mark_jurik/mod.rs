@@ -1,5 +1,11 @@
+pub mod jurik_adaptive_relative_trend_strength_index;
+pub mod jurik_adaptive_zero_lag_velocity;
+pub mod jurik_commodity_channel_index;
 pub mod jurik_composite_fractal_behavior_index;
 pub mod jurik_directional_movement_index;
+pub mod jurik_fractal_adaptive_zero_lag_velocity;
 pub mod jurik_moving_average;
 pub mod jurik_relative_trend_strength_index;
+pub mod jurik_turning_point_oscillator;
+pub mod jurik_wavelet_sampler;
 pub mod jurik_zero_lag_velocity;

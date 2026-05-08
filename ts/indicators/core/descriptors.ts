@@ -239,6 +239,12 @@ const descriptors: Map<IndicatorIdentifier, Descriptor> = new Map<IndicatorIdent
     out(2, S.Scalar, R.Oscillator, P.Own),
     out(3, S.Scalar, R.Oscillator, P.Own),
   ])],
+  [IndicatorIdentifier.JurikAdaptiveRelativeTrendStrengthIndex, desc(IndicatorIdentifier.JurikAdaptiveRelativeTrendStrengthIndex, 'Mark Jurik', A.Adaptive, I.ScalarInput, V.NoVolume, [out(1, S.Scalar, R.Oscillator, P.Own)])],
+  [IndicatorIdentifier.JurikAdaptiveZeroLagVelocity, desc(IndicatorIdentifier.JurikAdaptiveZeroLagVelocity, 'Mark Jurik', A.Adaptive, I.ScalarInput, V.NoVolume, [out(1, S.Scalar, R.Oscillator, P.Own)])],
+  [IndicatorIdentifier.JurikCommodityChannelIndex, desc(IndicatorIdentifier.JurikCommodityChannelIndex, 'Mark Jurik', A.Adaptive, I.ScalarInput, V.NoVolume, [out(1, S.Scalar, R.Oscillator, P.Own)])],
+  [IndicatorIdentifier.JurikFractalAdaptiveZeroLagVelocity, desc(IndicatorIdentifier.JurikFractalAdaptiveZeroLagVelocity, 'Mark Jurik', A.Adaptive, I.ScalarInput, V.NoVolume, [out(1, S.Scalar, R.Oscillator, P.Own)])],
+  [IndicatorIdentifier.JurikTurningPointOscillator, desc(IndicatorIdentifier.JurikTurningPointOscillator, 'Mark Jurik', A.Static, I.ScalarInput, V.NoVolume, [out(1, S.Scalar, R.Oscillator, P.Own)])],
+  [IndicatorIdentifier.JurikWaveletSampler, desc(IndicatorIdentifier.JurikWaveletSampler, 'Mark Jurik', A.Static, I.ScalarInput, V.NoVolume, [out(1, S.Scalar, R.Smoother, P.Price)])],
 ]);
 
 /**

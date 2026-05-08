@@ -20,7 +20,7 @@ func almostEqual(a, b, epsilon float64) bool {
 
 const epsilon = 1e-13
 
-func testRSX(t *testing.T, length int, expected []float64) {
+func testJRSX(t *testing.T, length int, expected []float64) {
 	t.Helper()
 
 	ind, err := NewJurikRelativeTrendStrengthIndex(&JurikRelativeTrendStrengthIndexParams{Length: length})
@@ -37,17 +37,17 @@ func testRSX(t *testing.T, length int, expected []float64) {
 	}
 }
 
-func TestRSXLength2(t *testing.T)  { t.Parallel(); testRSX(t, 2, expectedLength2) }
-func TestRSXLength3(t *testing.T)  { t.Parallel(); testRSX(t, 3, expectedLength3) }
-func TestRSXLength4(t *testing.T)  { t.Parallel(); testRSX(t, 4, expectedLength4) }
-func TestRSXLength5(t *testing.T)  { t.Parallel(); testRSX(t, 5, expectedLength5) }
-func TestRSXLength6(t *testing.T)  { t.Parallel(); testRSX(t, 6, expectedLength6) }
-func TestRSXLength7(t *testing.T)  { t.Parallel(); testRSX(t, 7, expectedLength7) }
-func TestRSXLength8(t *testing.T)  { t.Parallel(); testRSX(t, 8, expectedLength8) }
-func TestRSXLength9(t *testing.T)  { t.Parallel(); testRSX(t, 9, expectedLength9) }
-func TestRSXLength10(t *testing.T) { t.Parallel(); testRSX(t, 10, expectedLength10) }
-func TestRSXLength11(t *testing.T) { t.Parallel(); testRSX(t, 11, expectedLength11) }
-func TestRSXLength12(t *testing.T) { t.Parallel(); testRSX(t, 12, expectedLength12) }
-func TestRSXLength13(t *testing.T) { t.Parallel(); testRSX(t, 13, expectedLength13) }
-func TestRSXLength14(t *testing.T) { t.Parallel(); testRSX(t, 14, expectedLength14) }
-func TestRSXLength15(t *testing.T) { t.Parallel(); testRSX(t, 15, expectedLength15) }
+func TestJRSXLength2(t *testing.T)  { t.Parallel(); testJRSX(t, 2, expectedLength2) }
+func TestJRSXLength3(t *testing.T)  { t.Parallel(); testJRSX(t, 3, expectedLength3) }
+func TestJRSXLength4(t *testing.T)  { t.Parallel(); testJRSX(t, 4, expectedLength4) }
+func TestJRSXLength5(t *testing.T)  { t.Parallel(); testJRSX(t, 5, expectedLength5) }
+func TestJRSXLength6(t *testing.T)  { t.Parallel(); testJRSX(t, 6, expectedLength6) }
+func TestJRSXLength7(t *testing.T)  { t.Parallel(); testJRSX(t, 7, expectedLength7) }
+func TestJRSXLength8(t *testing.T)  { t.Parallel(); testJRSX(t, 8, expectedLength8) }
+func TestJRSXLength9(t *testing.T)  { t.Parallel(); testJRSX(t, 9, expectedLength9) }
+func TestJRSXLength10(t *testing.T) { t.Parallel(); testJRSX(t, 10, expectedLength10) }
+func TestJRSXLength11(t *testing.T) { t.Parallel(); testJRSX(t, 11, expectedLength11) }
+func TestJRSXLength12(t *testing.T) { t.Parallel(); testJRSX(t, 12, expectedLength12) }
+func TestJRSXLength13(t *testing.T) { t.Parallel(); testJRSX(t, 13, expectedLength13) }
+func TestJRSXLength14(t *testing.T) { t.Parallel(); testJRSX(t, 14, expectedLength14) }
+func TestJRSXLength15(t *testing.T) { t.Parallel(); testJRSX(t, 15, expectedLength15) }

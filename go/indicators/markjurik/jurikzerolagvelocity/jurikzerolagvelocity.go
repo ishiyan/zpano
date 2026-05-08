@@ -288,7 +288,7 @@ func newJurikZeroLagVelocity(depth int,
 		invalid = "invalid jurik zero lag velocity parameters"
 		fmts    = "%s: %s"
 		fmtw    = "%s: %w"
-		fmtn    = "vel(%d%s)"
+fmtn = "jvel(%d%s)"
 	)
 
 	var (

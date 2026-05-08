@@ -42,7 +42,7 @@ class JurikRelativeTrendStrengthIndex(Indicator):
         quote_func = quote_component_value(qc)
         trade_func = trade_component_value(tc)
 
-        mnemonic = f"rsx({length}{component_triple_mnemonic(bc, qc, tc)})"
+        mnemonic = f"jrsx({length}{component_triple_mnemonic(bc, qc, tc)})"
         description = f"Jurik relative trend strength index {mnemonic}"
 
         self._line = LineIndicator(mnemonic, description, bar_func, quote_func, trade_func, self.update)

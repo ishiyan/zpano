@@ -106,7 +106,7 @@ impl JurikRelativeTrendStrengthIndex {
         let trade_func = trade_component_value(tc);
 
         let mnemonic = format!(
-            "rsx({}{})",
+            "jrsx({}{})",
             params.length,
             component_triple_mnemonic(bc, qc, tc)
         );

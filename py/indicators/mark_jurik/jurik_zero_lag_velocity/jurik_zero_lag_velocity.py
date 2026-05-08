@@ -234,7 +234,7 @@ class JurikZeroLagVelocity(Indicator):
         quote_func = quote_component_value(qc)
         trade_func = trade_component_value(tc)
 
-        mnemonic = f"vel({depth}{component_triple_mnemonic(bc, qc, tc)})"
+        mnemonic = f"jvel({depth}{component_triple_mnemonic(bc, qc, tc)})"
         description = f"Jurik zero lag velocity {mnemonic}"
 
         self._line = LineIndicator(mnemonic, description, bar_func, quote_func, trade_func, self.update)

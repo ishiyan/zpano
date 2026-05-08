@@ -254,6 +254,25 @@ const (
 
 	// JurikDirectionalMovementIndex identifies the Jurik Directional Movement Index (DMX) indicator.
 	JurikDirectionalMovementIndex
+
+	// JurikCommodityChannelIndex identifies the Jurik Commodity Channel Index (JCCX) indicator.
+	JurikCommodityChannelIndex
+
+	// JurikWaveletSampler identifies the Jurik Wavelet Sampler (WAV) indicator.
+	JurikWaveletSampler
+
+	// JurikAdaptiveZeroLagVelocity identifies the Jurik Adaptive Zero Lag Velocity (JAVEL) indicator.
+	JurikAdaptiveZeroLagVelocity
+
+	// JurikFractalAdaptiveZeroLagVelocity identifies the Jurik Fractal Adaptive Zero Lag Velocity (JVELCFB) indicator.
+	JurikFractalAdaptiveZeroLagVelocity
+
+	// JurikAdaptiveRelativeTrendStrengthIndex identifies the Jurik Adaptive Relative Trend Strength Index (JARSX) indicator.
+	JurikAdaptiveRelativeTrendStrengthIndex
+
+	// JurikTurningPointOscillator identifies the Jurik Turning Point Oscillator (JTPO) indicator.
+	JurikTurningPointOscillator
+
 	last
 )
 
@@ -335,6 +354,12 @@ const (
 	jurikCompositeFractalBehaviorIndex             = "jurikCompositeFractalBehaviorIndex"
 	jurikZeroLagVelocity                           = "jurikZeroLagVelocity"
 	jurikDirectionalMovementIndex                  = "jurikDirectionalMovementIndex"
+	jurikCommodityChannelIndex                     = "jurikCommodityChannelIndex"
+	jurikWaveletSampler                            = "jurikWaveletSampler"
+	jurikAdaptiveZeroLagVelocity                   = "jurikAdaptiveZeroLagVelocity"
+	jurikFractalAdaptiveZeroLagVelocity            = "jurikFractalAdaptiveZeroLagVelocity"
+	jurikAdaptiveRelativeTrendStrengthIndex         = "jurikAdaptiveRelativeTrendStrengthIndex"
+	jurikTurningPointOscillator                    = "jurikTurningPointOscillator"
 )
 
 // String implements the Stringer interface.
@@ -494,6 +519,18 @@ func (i Identifier) String() string {
 		return jurikZeroLagVelocity
 	case JurikDirectionalMovementIndex:
 		return jurikDirectionalMovementIndex
+	case JurikCommodityChannelIndex:
+		return jurikCommodityChannelIndex
+	case JurikWaveletSampler:
+		return jurikWaveletSampler
+	case JurikAdaptiveZeroLagVelocity:
+		return jurikAdaptiveZeroLagVelocity
+	case JurikFractalAdaptiveZeroLagVelocity:
+		return jurikFractalAdaptiveZeroLagVelocity
+	case JurikAdaptiveRelativeTrendStrengthIndex:
+		return jurikAdaptiveRelativeTrendStrengthIndex
+	case JurikTurningPointOscillator:
+		return jurikTurningPointOscillator
 	default:
 		return unknown
 	}
@@ -690,6 +727,18 @@ func (i *Identifier) UnmarshalJSON(data []byte) error {
 		*i = JurikZeroLagVelocity
 	case jurikDirectionalMovementIndex:
 		*i = JurikDirectionalMovementIndex
+	case jurikCommodityChannelIndex:
+		*i = JurikCommodityChannelIndex
+	case jurikWaveletSampler:
+		*i = JurikWaveletSampler
+	case jurikAdaptiveZeroLagVelocity:
+		*i = JurikAdaptiveZeroLagVelocity
+	case jurikFractalAdaptiveZeroLagVelocity:
+		*i = JurikFractalAdaptiveZeroLagVelocity
+	case jurikAdaptiveRelativeTrendStrengthIndex:
+		*i = JurikAdaptiveRelativeTrendStrengthIndex
+	case jurikTurningPointOscillator:
+		*i = JurikTurningPointOscillator
 	default:
 		return fmt.Errorf(errFmt, s)
 	}

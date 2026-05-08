@@ -137,6 +137,24 @@ use crate::indicators::mark_jurik::jurik_relative_trend_strength_index::{
 use crate::indicators::mark_jurik::jurik_zero_lag_velocity::{
     JurikZeroLagVelocity, JurikZeroLagVelocityParams,
 };
+use crate::indicators::mark_jurik::jurik_turning_point_oscillator::{
+    JurikTurningPointOscillator, JurikTurningPointOscillatorParams,
+};
+use crate::indicators::mark_jurik::jurik_wavelet_sampler::{
+    JurikWaveletSampler, JurikWaveletSamplerParams,
+};
+use crate::indicators::mark_jurik::jurik_adaptive_relative_trend_strength_index::{
+    JurikAdaptiveRelativeTrendStrengthIndex, JurikAdaptiveRelativeTrendStrengthIndexParams,
+};
+use crate::indicators::mark_jurik::jurik_adaptive_zero_lag_velocity::{
+    JurikAdaptiveZeroLagVelocity, JurikAdaptiveZeroLagVelocityParams,
+};
+use crate::indicators::mark_jurik::jurik_commodity_channel_index::{
+    JurikCommodityChannelIndex, JurikCommodityChannelIndexParams,
+};
+use crate::indicators::mark_jurik::jurik_fractal_adaptive_zero_lag_velocity::{
+    JurikFractalAdaptiveZeroLagVelocity, JurikFractalAdaptiveZeroLagVelocityParams,
+};
 
 // ── patrick mulloy ───────────────────────────────────────────────────────────
 use crate::indicators::patrick_mulloy::double_exponential_moving_average::{
@@ -1018,6 +1036,75 @@ pub fn create_indicator(
             Ok(Box::new(JurikDirectionalMovementIndex::new(&p)?))
         }
 
+        Identifier::JurikTurningPointOscillator => {
+            let mut p = JurikTurningPointOscillatorParams::default();
+            if let Some(v) = get_usize(&params, "length") {
+                p.length = v;
+            }
+            Ok(Box::new(JurikTurningPointOscillator::new(&p)?))
+        }
+
+        Identifier::JurikWaveletSampler => {
+            let mut p = JurikWaveletSamplerParams::default();
+            if let Some(v) = get_usize(&params, "index") {
+                p.index = v;
+            }
+            Ok(Box::new(JurikWaveletSampler::new(&p)?))
+        }
+
+        Identifier::JurikAdaptiveRelativeTrendStrengthIndex => {
+            let mut p = JurikAdaptiveRelativeTrendStrengthIndexParams::default();
+            if let Some(v) = get_usize(&params, "loLength") {
+                p.lo_length = v;
+            }
+            if let Some(v) = get_usize(&params, "hiLength") {
+                p.hi_length = v;
+            }
+            Ok(Box::new(JurikAdaptiveRelativeTrendStrengthIndex::new(&p)?))
+        }
+
+        Identifier::JurikAdaptiveZeroLagVelocity => {
+            let mut p = JurikAdaptiveZeroLagVelocityParams::default();
+            if let Some(v) = get_usize(&params, "loLength") {
+                p.lo_length = v;
+            }
+            if let Some(v) = get_usize(&params, "hiLength") {
+                p.hi_length = v;
+            }
+            if let Some(v) = get_f64(&params, "sensitivity") {
+                p.sensitivity = v;
+            }
+            if let Some(v) = get_f64(&params, "period") {
+                p.period = v;
+            }
+            Ok(Box::new(JurikAdaptiveZeroLagVelocity::new(&p)?))
+        }
+
+        Identifier::JurikCommodityChannelIndex => {
+            let mut p = JurikCommodityChannelIndexParams::default();
+            if let Some(v) = get_usize(&params, "length") {
+                p.length = v;
+            }
+            Ok(Box::new(JurikCommodityChannelIndex::new(&p)?))
+        }
+
+        Identifier::JurikFractalAdaptiveZeroLagVelocity => {
+            let mut p = JurikFractalAdaptiveZeroLagVelocityParams::default();
+            if let Some(v) = get_usize(&params, "loDepth") {
+                p.lo_depth = v;
+            }
+            if let Some(v) = get_usize(&params, "hiDepth") {
+                p.hi_depth = v;
+            }
+            if let Some(v) = get_usize(&params, "fractalType") {
+                p.fractal_type = v;
+            }
+            if let Some(v) = get_usize(&params, "smooth") {
+                p.smooth = v;
+            }
+            Ok(Box::new(JurikFractalAdaptiveZeroLagVelocity::new(&p)?))
+        }
+
         // ── patrick mulloy ───────────────────────────────────────────────
         Identifier::DoubleExponentialMovingAverage => {
             if has_key(&params, "smoothingFactor") {
@@ -1353,6 +1440,12 @@ mod tests {
             Identifier::JurikCompositeFractalBehaviorIndex,
             Identifier::JurikZeroLagVelocity,
             Identifier::JurikDirectionalMovementIndex,
+            Identifier::JurikTurningPointOscillator,
+            Identifier::JurikWaveletSampler,
+            Identifier::JurikAdaptiveRelativeTrendStrengthIndex,
+            Identifier::JurikAdaptiveZeroLagVelocity,
+            Identifier::JurikCommodityChannelIndex,
+            Identifier::JurikFractalAdaptiveZeroLagVelocity,
             Identifier::MesaAdaptiveMovingAverage,
             Identifier::FractalAdaptiveMovingAverage,
             Identifier::DominantCycle,

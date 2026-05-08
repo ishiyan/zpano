@@ -7,7 +7,7 @@ import { JurikRelativeTrendStrengthIndexParams } from './params';
 
 /** Function to calculate mnemonic of a JurikRelativeTrendStrengthIndex indicator. */
 export const jurikRelativeTrendStrengthIndexMnemonic = (params: JurikRelativeTrendStrengthIndexParams): string =>
-    'rsx('.concat(
+    'jrsx('.concat(
         params.length.toString(),
         componentTripleMnemonic(params.barComponent, params.quoteComponent, params.tradeComponent),
         ')');

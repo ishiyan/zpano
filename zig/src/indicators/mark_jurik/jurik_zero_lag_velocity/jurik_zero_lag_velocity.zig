@@ -336,7 +336,7 @@ pub const JurikZeroLagVelocity = struct {
         const triple = component_triple_mnemonic_mod.componentTripleMnemonic(&triple_buf, bc, qc, tc);
 
         var mnemonic_buf: [96]u8 = undefined;
-        const mnemonic = std.fmt.bufPrint(&mnemonic_buf, "vel({d}{s})", .{
+        const mnemonic = std.fmt.bufPrint(&mnemonic_buf, "jvel({d}{s})", .{
             depth, triple,
         }) catch unreachable;
         const mnemonic_len = mnemonic.len;
@@ -509,45 +509,45 @@ fn runVelTest(depth: u32, expected: [252]f64) !void {
     try testing.expect(math.isNan(vel.update(math.nan(f64))));
 }
 
-test "vel depth 2" {
+test "jvel depth 2" {
     try runVelTest(2, testdata.expectedDepth2());
 }
-test "vel depth 3" {
+test "jvel depth 3" {
     try runVelTest(3, testdata.expectedDepth3());
 }
-test "vel depth 4" {
+test "jvel depth 4" {
     try runVelTest(4, testdata.expectedDepth4());
 }
-test "vel depth 5" {
+test "jvel depth 5" {
     try runVelTest(5, testdata.expectedDepth5());
 }
-test "vel depth 6" {
+test "jvel depth 6" {
     try runVelTest(6, testdata.expectedDepth6());
 }
-test "vel depth 7" {
+test "jvel depth 7" {
     try runVelTest(7, testdata.expectedDepth7());
 }
-test "vel depth 8" {
+test "jvel depth 8" {
     try runVelTest(8, testdata.expectedDepth8());
 }
-test "vel depth 9" {
+test "jvel depth 9" {
     try runVelTest(9, testdata.expectedDepth9());
 }
-test "vel depth 10" {
+test "jvel depth 10" {
     try runVelTest(10, testdata.expectedDepth10());
 }
-test "vel depth 11" {
+test "jvel depth 11" {
     try runVelTest(11, testdata.expectedDepth11());
 }
-test "vel depth 12" {
+test "jvel depth 12" {
     try runVelTest(12, testdata.expectedDepth12());
 }
-test "vel depth 13" {
+test "jvel depth 13" {
     try runVelTest(13, testdata.expectedDepth13());
 }
-test "vel depth 14" {
+test "jvel depth 14" {
     try runVelTest(14, testdata.expectedDepth14());
 }
-test "vel depth 15" {
+test "jvel depth 15" {
     try runVelTest(15, testdata.expectedDepth15());
 }

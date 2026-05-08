@@ -79,7 +79,7 @@ pub const JurikRelativeTrendStrengthIndex = struct {
         const triple = component_triple_mnemonic_mod.componentTripleMnemonic(&triple_buf, bc, qc, tc);
 
         var mnemonic_buf: [96]u8 = undefined;
-        const mnemonic = std.fmt.bufPrint(&mnemonic_buf, "rsx({d}{s})", .{
+        const mnemonic = std.fmt.bufPrint(&mnemonic_buf, "jrsx({d}{s})", .{
             length, triple,
         }) catch unreachable;
         const mnemonic_len = mnemonic.len;
@@ -338,45 +338,45 @@ fn runRsxTest(length: u32, expected: [252]f64) !void {
     try testing.expect(math.isNan(rsx.update(math.nan(f64))));
 }
 
-test "rsx length 2" {
+test "jrsx length 2" {
     try runRsxTest(2, testdata.expectedLength2());
 }
-test "rsx length 3" {
+test "jrsx length 3" {
     try runRsxTest(3, testdata.expectedLength3());
 }
-test "rsx length 4" {
+test "jrsx length 4" {
     try runRsxTest(4, testdata.expectedLength4());
 }
-test "rsx length 5" {
+test "jrsx length 5" {
     try runRsxTest(5, testdata.expectedLength5());
 }
-test "rsx length 6" {
+test "jrsx length 6" {
     try runRsxTest(6, testdata.expectedLength6());
 }
-test "rsx length 7" {
+test "jrsx length 7" {
     try runRsxTest(7, testdata.expectedLength7());
 }
-test "rsx length 8" {
+test "jrsx length 8" {
     try runRsxTest(8, testdata.expectedLength8());
 }
-test "rsx length 9" {
+test "jrsx length 9" {
     try runRsxTest(9, testdata.expectedLength9());
 }
-test "rsx length 10" {
+test "jrsx length 10" {
     try runRsxTest(10, testdata.expectedLength10());
 }
-test "rsx length 11" {
+test "jrsx length 11" {
     try runRsxTest(11, testdata.expectedLength11());
 }
-test "rsx length 12" {
+test "jrsx length 12" {
     try runRsxTest(12, testdata.expectedLength12());
 }
-test "rsx length 13" {
+test "jrsx length 13" {
     try runRsxTest(13, testdata.expectedLength13());
 }
-test "rsx length 14" {
+test "jrsx length 14" {
     try runRsxTest(14, testdata.expectedLength14());
 }
-test "rsx length 15" {
+test "jrsx length 15" {
     try runRsxTest(15, testdata.expectedLength15());
 }

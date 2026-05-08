@@ -25,6 +25,50 @@ Use the EMA indicator as the canonical reference for multi-constructor indicator
 
 ---
 
+## Conversion Workflow (New Indicators from External Sources)
+
+When converting a new indicator from an external reference implementation into the zpano
+architecture, follow one of these workflows depending on the source language:
+
+### If the external reference is in Go:
+
+1. Convert to "new architecture" Go, adapting non-streaming (array-based) logic to our streaming (sample-by-sample `Update()`) architecture
+2. From converted Go, port to: TypeScript, Python, Zig, Rust
+
+### If the external reference is in Python:
+
+1. Convert to "new architecture" Python, adapting non-streaming logic to streaming
+2. From converted Python, port to Go
+3. From converted Go, port to: TypeScript, Zig, Rust
+
+### If the external reference is in Rust:
+
+1. Convert to "new architecture" Rust, adapting non-streaming logic to streaming
+2. From converted Rust, port to Go
+3. From converted Go, port to: TypeScript, Python, Zig
+
+### Post-conversion steps (all languages):
+
+1. **Test data in separate files** — place test input and expected arrays in dedicated test data files:
+   - Go: `testdata_test.go`
+   - Python: `test_testdata.py`
+   - TypeScript: `testdata.ts` (in spec folder)
+   - Zig: `testdata.zig` (or at bottom of test file if small)
+   - Rust: `testdata.rs` (or inline in test module if small)
+2. **Include ALL parameter combinations** from the reference test suite (typically 9–15 combos).
+3. **Register in factory** — add the indicator to the factory in each implemented language.
+4. **Add to `icalc/settings.json`** — add an entry with default params so the CLI exercises it.
+5. **Run icalc** — verify the indicator produces output without crashing in each language:
+   ```bash
+   cd go && go run ./cmd/icalc settings.json
+   cd ts && npx tsx cmd/icalc/main.ts cmd/icalc/settings.json
+   PYTHONPATH=. python3 -m py.cmd.icalc py/cmd/icalc/settings.json
+   cd zig && zig build icalc -- src/cmd/icalc/settings.json
+   cd rs && cargo run --bin icalc -- src/cmd/icalc/settings.json
+   ```
+
+---
+
 ## Table of Contents
 
 1. [Naming & Style Conventions](#naming--style-conventions)
@@ -668,6 +712,96 @@ Adapt the mnemonics and component values to your specific indicator. The pattern
 - Default component = omitted from mnemonic
 - Non-default component = shown as its mnemonic abbreviation (e.g., `hl/2`, `o`, `h`, `b`, `a`, `v`)
 
+### Go Step 6-A: Create testdata_test.go (separate test data file)
+
+**File:** `testdata_test.go`
+
+When converting from Python, put all test input data and expected output arrays in a separate
+`testdata_test.go` file rather than inlining them in the main `*_test.go` file. This keeps
+the test logic readable and the data maintainable.
+
+**Structure:**
+
+```go
+//nolint:testpackage
+package <indicatorname>
+
+import "math"
+
+// testInput is the shared 252-bar close-price series used across all indicator tests.
+var testInput = []float64{
+    // 10 values per line, full 15-digit precision
+    50.1, 51.2, ...
+}
+
+// expectedLen10 is the expected output for length=10.
+var expectedLen10 = []float64{
+    math.NaN(), math.NaN(), ...,
+    0.123456789012345, ...
+}
+
+// expectedLen14 is the expected output for length=14.
+var expectedLen14 = []float64{ ... }
+
+// expectedDefault is the default-params expected output (alias).
+var expectedDefault = expectedLen14
+```
+
+**Multiple parameter combinations:** You MUST include expected arrays for ALL parameter
+combinations present in the Python `test_testdata.py` (typically 9–15 combos). Do not skip
+any — the goal is full parity with the Python test suite. Name them descriptively:
+`expectedLen10`, `expectedLo2Hi15`, `expectedSens05`, etc.
+
+### Go Step 6-B: Create output_test.go
+
+**File:** `output_test.go`
+
+Every indicator package MUST have an `output_test.go` that tests the output enum's methods.
+Follow the JMA pattern:
+
+```go
+//nolint:testpackage
+package <indicatorname>
+
+import (
+    "encoding/json"
+    "testing"
+)
+
+func TestOutputString(t *testing.T) {
+    t.Parallel()
+    tests := []struct {
+        output Output
+        want   string
+    }{
+        {OutputValue, "value"},
+        // ... all valid outputs
+        {outputLast, "unknown"},
+        {Output(99), "unknown"},
+    }
+    for _, tt := range tests {
+        if got := tt.output.String(); got != tt.want {
+            t.Errorf("Output(%d).String() = %q, want %q", tt.output, got, tt.want)
+        }
+    }
+}
+
+func TestOutputIsKnown(t *testing.T) {
+    t.Parallel()
+    // Test all valid outputs return true, outputLast and beyond return false
+}
+
+func TestOutputMarshalJSON(t *testing.T) {
+    t.Parallel()
+    // Test valid outputs marshal to quoted strings, unknown returns error
+}
+
+func TestOutputUnmarshalJSON(t *testing.T) {
+    t.Parallel()
+    // Test valid strings unmarshal correctly, unknown/invalid returns error
+}
+```
+
 ### Go Step 7: Register the identifier and descriptor
 
 1. **Register the identifier.** If the constant does not already exist in
@@ -688,10 +822,26 @@ Adapt the mnemonics and component values to your specific indicator. The pattern
    `Outputs` slice must match the order of the `[]OutputText` passed by the indicator's
    `Metadata()` method.
 
-### Go Step 8: Verify
+### Go Step 8: Add to icalc settings
+
+Add the new indicator to `go/cmd/icalc/settings.json` so it is exercised by the CLI tool:
+
+```json
+{ "identifier": "myIndicator", "params": { "length": 14 } }
+```
+
+The `identifier` string uses **camelCase** (matching the factory's string mapping).
+
+Then run icalc to verify it doesn't crash:
 
 ```bash
-cd go && go test ./indicators/common/<indicatorname>/...
+cd go && go run ./cmd/icalc settings.json
+```
+
+### Go Step 9: Verify
+
+```bash
+cd go && go test ./indicators/<group>/<indicatorname>/...
 ```
 
 All tests must pass. If the old tests are still present in the `_old` folder, you may need to
@@ -1697,22 +1847,52 @@ case IndicatorIdentifier.MyIndicator:
 
 ### Settings File
 
-Add an entry to `cmd/icalc/settings.json` (shared between Go and TS) so the
+Add an entry to `cmd/icalc/settings.json` (shared across all languages) so the
 new indicator is exercised by the CLI tool:
 
 ```json
 { "identifier": "myIndicator", "params": { "length": 14 } }
 ```
 
+The `identifier` string uses **camelCase** (e.g., `jurikAdaptiveZeroLagVelocity`).
+
+### Identifier String Mapping (Python)
+
+Python's icalc has a manual string→enum mapping dict in `py/cmd/icalc/main.py`.
+You MUST add a new entry mapping the camelCase JSON identifier to the
+`Identifier` enum value:
+
+```python
+# In the IDENTIFIER_MAP dict in py/cmd/icalc/main.py:
+'myIndicator': Identifier.MY_INDICATOR,
+```
+
+Without this entry, icalc will fail with `error: unknown indicator identifier`.
+
 ### Verification
 
-Run `icalc` in both languages to confirm the new indicator loads and processes
-bars without error:
+Run `icalc` in **all implemented languages** to confirm the new indicator loads
+and processes bars without error:
 
 ```bash
+# Go
 cd go && go run ./cmd/icalc settings.json
+
+# TypeScript
 cd ts && npx tsx cmd/icalc/main.ts cmd/icalc/settings.json
+
+# Python
+cd /home/dev/repos/chi/zpano && PYTHONPATH=. python3 -m py.cmd.icalc py/cmd/icalc/settings.json
+
+# Zig
+cd zig && zig build icalc -- src/cmd/icalc/settings.json
+
+# Rust
+cd rs && cargo run --bin icalc -- src/cmd/icalc/settings.json
 ```
+
+If any language reports an unknown identifier or crashes, fix the registration
+before considering the indicator complete.
 
 ---
 
@@ -1893,9 +2073,13 @@ cd /home/dev/repos/chi/zpano && PYTHONPATH=. python3 -m unittest discover -s py/
 # Run a single indicator's tests:
 cd /home/dev/repos/chi/zpano && PYTHONPATH=. python3 -m unittest py.indicators.common.simple_moving_average.test_simple_moving_average
 
-# Run icalc to verify factory integration:
+# Run icalc to verify factory + icalc mapping integration:
 cd /home/dev/repos/chi/zpano && PYTHONPATH=. python3 -m py.cmd.icalc py/cmd/icalc/settings.json
 ```
+
+**Important:** Running icalc is mandatory — it validates both the factory registration
+AND the identifier string mapping in `py/cmd/icalc/main.py`. A passing unit test does
+not guarantee icalc will work (the mapping dict is separate from the factory).
 
 ### Python Import Path Reference
 

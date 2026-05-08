@@ -1,0 +1,22 @@
+"""Jurik adaptive relative trend strength index parameters."""
+
+from dataclasses import dataclass
+from typing import Optional
+from ....entities.bar_component import BarComponent
+from ....entities.quote_component import QuoteComponent
+from ....entities.trade_component import TradeComponent
+
+
+@dataclass
+class JurikAdaptiveRelativeTrendStrengthIndexParams:
+    """Parameters for the Jurik adaptive relative trend strength index indicator."""
+    lo_length: int = 5
+    hi_length: int = 30
+    bar_component: Optional[BarComponent] = None
+    quote_component: Optional[QuoteComponent] = None
+    trade_component: Optional[TradeComponent] = None
+
+
+def default_params() -> JurikAdaptiveRelativeTrendStrengthIndexParams:
+    """Return default parameters."""
+    return JurikAdaptiveRelativeTrendStrengthIndexParams()
