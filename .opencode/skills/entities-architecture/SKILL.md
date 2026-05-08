@@ -6,6 +6,12 @@ This document describes the design decisions, data types, and conventions for th
 **entities** module across all five languages. It is the reference for porting
 entity code and for indicator authors who consume entity types.
 
+> **How to use this document:** Do not attempt to apply all rules at once.
+> 1. Identify your target language (Go, TS, Python, Zig, or Rust).
+> 2. Read only that language's column in each table.
+> 3. The cross-language conventions section defines the rules that must hold
+>    across all ports — consult it only when porting between languages.
+
 ## Scope
 
 The rules in this document apply **only to the `entities/` folder** within each
@@ -103,6 +109,9 @@ those modules are ported. **Do not port these to py/zig/rs as part of entities.*
 
 ## Cross-Language Conventions
 
+The rules below are grouped by concern. When implementing in a single language,
+read only your language's column in each table.
+
 ### File Layout
 
 | Language | Entity files | Component files | Barrel / Root | Test files |
@@ -124,8 +133,10 @@ those modules are ported. **Do not port these to py/zig/rs as part of entities.*
 Go uses `time.Time`, TypeScript uses `Date`, Python uses `datetime.datetime`.
 Zig and Rust use a raw `i64` epoch timestamp (not the `DateTime` struct from
 the daycounting module, which is used only there).
-Go uses short field names (`Bid`, `Ask`) because the type provides context.
-All other languages use descriptive names (`bid_price`, `ask_price`).
+Go uses short field names for all exported struct fields (e.g., `Bid`, `Ask`,
+`Open`, `High`, `Volume`) because the enclosing type name already provides
+context (e.g., `Quote.Bid` is unambiguous). All other languages use descriptive
+compound names (`bid_price`, `ask_price`, `bid_size`, `ask_size`).
 
 ### Enum Numbering
 

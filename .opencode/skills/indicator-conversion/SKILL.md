@@ -13,7 +13,7 @@ The new architecture introduces:
 
 - **Per-indicator packages** (Go) / **per-indicator folders** (TS/Python) instead of a flat shared package
 - **`LineIndicator` embedding/inheritance/composition** that eliminates `UpdateScalar/Bar/Quote/Trade` boilerplate
-- **`ComponentTripleMnemonic`** (bar + quote + trade) replacing `componentPairMnemonic` (bar + quote only)
+- **`ComponentTripleMnemonic`** (bar + quote + trade) replacing `componentPairMnemonic` (bar + quote only). The mnemonic format gains a `%s` placeholder for the component triple string, e.g. `"sma(%d%s)"` where `%s` is the output of `ComponentTripleMnemonic(bc, qc, tc)` — an empty string when all components are defaults, or a suffix like `:h` when non-default components are selected
 - **Zero-value default resolution** for components: zero/undefined/None = use default, don't show in mnemonic
 - **Top-level `Mnemonic` and `Description`** on metadata
 - **Per-indicator output enum** (TS/Python) in a dedicated file
@@ -28,7 +28,19 @@ Use the EMA indicator as the canonical reference for multi-constructor indicator
 ## Conversion Workflow (New Indicators from External Sources)
 
 When converting a new indicator from an external reference implementation into the zpano
-architecture, follow one of these workflows depending on the source language:
+architecture, choose the workflow based on the source language:
+
+| Source Language | Pipeline |
+|----------------|----------|
+| **Go** | Go (new arch) → TS, Python, Zig, Rust |
+| **Python** | Python (new arch) → Go → TS, Zig, Rust |
+| **Rust** | Rust (new arch) → Go → TS, Python, Zig |
+
+In all cases, the first step requires converting non-streaming logic to streaming:
+replace array-based loops in the indicator's core calculation logic (the loops that
+iterate over all input samples to produce output values) with an `Update(sample)`
+method that accepts one value at a time, maintaining state across calls in struct
+fields (running sums, previous values, ring buffers, etc.).
 
 ### If the external reference is in Go:
 
@@ -74,9 +86,9 @@ architecture, follow one of these workflows depending on the source language:
 1. [Naming & Style Conventions](#naming--style-conventions)
 2. [Go Conversion](#go-conversion)
 3. [TypeScript Conversion](#typescript-conversion)
-4. [Python Implementation Guide](#python-porting-guide)
-5. [Zig Implementation Guide](#zig-porting-guide)
-6. [Rust Implementation Guide](#rust-porting-guide)
+4. [Python Implementation Guide](#python-implementation-guide)
+5. [Zig Implementation Guide](#zig-implementation-guide)
+6. [Rust Implementation Guide](#rust-implementation-guide)
 7. [Quick Reference: Import Mapping](#quick-reference-import-mapping)
 8. [Quick Reference: Symbol Renames](#quick-reference-symbol-renames)
 9. [Advanced: Multi-Constructor Indicators](#advanced-multi-constructor-indicators)
@@ -90,37 +102,16 @@ architecture, follow one of these workflows depending on the source language:
 ## Naming & Style Conventions
 
 All identifier, receiver, concurrency, style, and cross-language parity
-rules are defined in the **`indicator-architecture`** skill and MUST be
-followed during conversion. Summary (see that skill for the full tables
-and rationale):
+rules are defined in the **`indicator-architecture`** skill (the authoritative
+reference). Below is a quick-reference checklist of the most critical rules:
 
-- **Abbreviations banned in identifiers** — always expand: `idx→index`,
-  `tmp→temp`, `res→result`, `sig→signal`, `val→value`, `prev→previous`,
-  `avg→average`, `mult→multiplier`, `buf→buffer`, `param→parameter`,
-  `hist→histogram`. Allowed: Go idioms (`err`, `len`, `cap`, `min`,
-  `max`, `num`), the Go `Params`/`params` bundle type, TS `value_`
-  ctor-param idiom.
-- **Go receivers** — compound type name (2+ CamelCase words) → `s`;
-  simple type name (single word) → first-letter of type, lowercased.
-  All methods on a type MUST use the same receiver. If a local would
-  shadow `s` (e.g. in `MarshalJSON`), rename the local to `str`.
-- **Concurrency** — stateful public indicators MUST carry `mu
-  sync.RWMutex`; writers `s.mu.Lock(); defer s.mu.Unlock()`, readers
-  `s.mu.RLock(); defer s.mu.RUnlock()`, defer on the line immediately
-  after Lock. Exceptions: pure delegating wrappers, internal engines
-  guarded by their public wrapper.
-- **Go style invariants** — no `var x T = zero`, no split
-  `var x T; x = expr`; use `any` not `interface{}`; no
-  `make([]T, 0)` (always include capacity); no `new`; grouped imports
-  (stdlib, external, `zpano/*`); every exported symbol has a doc
-  comment, even trivial passthroughs.
-- **Cross-language local-variable parity** — same concept = same name
-  across all five languages (modulo casing convention). Canonical:
-  `sum`, `epsilon`, `temp`/`diff`, `stddev`, `spread`, `bw`, `pctB`
-  (Go/TS) / `pct_b` (Python/Zig/Rust), `amount`, `lengthMinOne`
-  (Go/TS) / `length_min_one` (Python/Zig/Rust); loop counter
-  `i`/`j`/`k`; `index` only when semantically a named index. Never
-  introduce new short forms.
+| Rule | Key Points |
+|------|------------|
+| **Banned abbreviations** | Always expand: `idx→index`, `tmp→temp`, `res→result`, `sig→signal`, `val→value`, `prev→previous`, `avg→average`, `mult→multiplier`, `buf→buffer`, `param→parameter`, `hist→histogram`. Allowed: Go idioms (`err`, `len`, `cap`, `min`, `max`, `num`), `Params`/`params` bundle type, TS `value_` ctor-param idiom. |
+| **Go receivers** | Compound type (2+ words) → `s`; single word → first letter lowercased. All methods on a type MUST use the same receiver. |
+| **Concurrency (Go)** | Stateful public indicators carry `mu sync.RWMutex`; writers lock/defer-unlock, readers rlock/defer-runlock. Exceptions: pure wrappers, internal engines. |
+| **Go style invariants** | No `var x T = zero`; no split `var x T; x = expr`; use `any` not `interface{}`; `make([]T, 0)` must include capacity; no `new`; grouped imports; doc comments on all exports. |
+| **Cross-language variable parity** | Same concept = same name in all languages (adjusted for casing). Canonical: `sum`, `epsilon`, `temp`/`diff`, `stddev`, `spread`, `bw`, `pctB`/`pct_b`, `amount`, `lengthMinOne`/`length_min_one`; loop counter `i`/`j`/`k`; `index` only when semantically a named index. |
 
 When implementing in any language, copy the reference language's
 local-variable names verbatim (adjusted to that language's casing
@@ -129,6 +120,8 @@ convention) where the concept is identical.
 ---
 
 ## Go Conversion
+
+**Steps at a glance:** (1) Create package dir → (2) Params file → (3) Output file → (4) Output test → (5) Main indicator file → (6) Test file → (6A) Test data → (6B) Output test → (7) Register identifier/descriptor → (8) Add to icalc settings → (9) Verify.
 
 ### Go Step 1: Create the new package directory
 
@@ -1763,11 +1756,11 @@ and parameters at runtime. The factory lives at `indicators/factory/` in all
 languages (see the `indicator-architecture` skill for full details).
 
 Each language's implementation guide above includes factory registration steps:
-- Go: [Step 7](#go-step-7-register-the-indicator-type)
+- Go: [Step 7](#go-step-7-register-the-identifier-and-descriptor)
 - TypeScript: built into the conversion steps
 - Python: [Step 6](#step-6-register-in-the-factory)
 - Zig: [Step 7](#step-7-register-in-factory)
-- Rust: [Step 6](#step-6-register-in-factory-1)
+- Rust: [Step 6](#step-6-register-in-factory)
 
 Below are the Go and TypeScript factory patterns (as the reference implementations):
 
@@ -2116,7 +2109,7 @@ from ...common.exponential_moving_average.params import ExponentialMovingAverage
 
 ### Python ↔ Go/TS Name Mapping
 
-See the consolidated [Cross-Language Name Mapping](#cross-language-name-mapping)
+See the consolidated [Cross-Language Name Mapping](#zig--gotstpythonrust-name-mapping)
 table in the Zig section below for the full 5-language comparison.
 
 ---

@@ -35,8 +35,8 @@ Load the `mbst-indicator-architecture` skill for the full MBST type hierarchy re
 
 All identifier, receiver, concurrency, style, and cross-language parity
 rules are defined in the **`indicator-architecture`** skill and MUST be
-followed during conversion. Summary (see that skill for the full tables
-and rationale):
+followed during conversion. The key rules most relevant to MBST conversion
+are listed below (see that skill for the complete reference):
 
 - **Abbreviations banned in identifiers** — always expand: `idx→index`,
   `tmp→temp`, `res→result`, `sig→signal`, `val→value`, `prev→previous`,
@@ -78,13 +78,20 @@ The conversion produces:
 - **Go:** `go/indicators/<author>/<indicator>/` (5 files: params, output, output_test, impl, impl_test)
 - **TS:** `ts/indicators/<author>/<indicator>/` (4 files: params, output, impl, impl.spec)
 
-Always convert Go first, then TypeScript.
+Always convert Go first, then TypeScript — Go is the reference implementation
+and TypeScript ports directly from the Go patterns and test expectations.
 
 ---
 
 ## Determine the Indicator Pattern
 
-Read the MBST source and identify which base class/interface the indicator uses:
+Read the MBST source and identify which base class/interface the indicator uses.
+Follow these steps in order to determine the zpano pattern:
+
+1. Check if the class extends `LineIndicator` directly → single-output `LineIndicator`.
+2. Check if it extends `BandIndicator` → band output pattern.
+3. Otherwise, check if it implements `ILineIndicator`, `IBandIndicator`, or `IHeatmapIndicator`
+   and inspect the actual outputs (see "How to tell if it's multi-output" below).
 
 | MBST Pattern | Zpano Pattern |
 |---|---|

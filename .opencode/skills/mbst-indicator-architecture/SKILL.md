@@ -1,6 +1,6 @@
 ---
 name: mbst-indicator-architecture
-description: Architecture reference for the MBST C# trading indicators library (Mbst.Trading.Indicators). Load when converting MBST indicators to zpano or understanding the MBST source code.
+description: Architecture reference for the MBST C# trading indicators library (Mbst.Trading.Indicators). Use this document for both converting MBST indicators to zpano and understanding the MBST source code structure.
 ---
 
 # MBST Indicator Architecture Reference
@@ -10,6 +10,16 @@ This document describes the architecture of the **MBST C# trading indicators lib
 converted to the zpano multi-language library.
 
 Source files are located in `mbst-to-convert/`.
+
+> **What to ignore during conversion (exhaustive list):**
+>
+> Do not port the items below. This list is complete — all other MBST
+> code within `mbst-to-convert/` should be evaluated for conversion.
+>
+> 1. *UI/Rendering* (no zpano UI layer): `IDrawingIndicator`, `ColorInterpolation`, `ColorInterpolationType`
+> 2. *Infrastructure patterns* (zpano uses Output arrays instead): Facades (`LineIndicatorFacade`, `BandIndicatorFacade`, `HeatmapIndicatorFacade`)
+> 3. *Serialization* (zpano does not serialize indicator state): `[DataContract]`, `[DataMember]`, all WCF annotations
+> 4. *Stateful features* (zpano is append-only, single-threaded update): `*WithOverwritableHistory` interfaces, `updateLock` / lock blocks, `Reset()`, `ToString()`
 
 ---
 
@@ -355,7 +365,7 @@ MBST uses WCF `DataContract` serialization:
 [DataMember]     // on fields
 ```
 
-**Ignore all of these during conversion.** Zpano does not serialize indicator state.
+**Ignore only the WCF serialization annotations during conversion.** Zpano does not serialize indicator state.
 
 ---
 

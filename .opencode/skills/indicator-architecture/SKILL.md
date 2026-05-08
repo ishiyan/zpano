@@ -9,6 +9,22 @@ This document describes the design decisions, folder layout, and naming conventi
 for the **zpano** trading indicators library. It is intended as a reference for both
 human developers and AI agents creating new indicators.
 
+> **How to use this document:** This is a large reference — do NOT try to apply all
+> rules at once. Follow these steps:
+> 1. Identify your task: creating a new indicator, registering in factory, or naming review.
+> 2. Identify your target language (Go, TS, Python, Zig, or Rust).
+> 3. Use the navigation table below to jump directly to the relevant section.
+> 4. Read only that section. Ignore all other language sections.
+
+### Quick Navigation by Task
+
+| Task | Go section | TS section | Python section | Zig section | Rust section |
+|------|-----------|-----------|---------------|------------|-------------|
+| Naming rules | [Go-Specific](#go-specific-conventions) | [TS-Specific](#typescript-specific-conventions) | [Python Reference](#python-reference) | [Zig Reference](#zig-reference) | [Rust Reference](#rust-reference) |
+| LineIndicator pattern | [Go Impl](#go-implementation) | [TS Impl](#typescript-implementation) | [Python Impl](#python-implementation) | [Zig Impl](#zig-implementation) | [Rust Impl](#rust-implementation) |
+| Factory registration | [Indicator Factory](#indicator-factory) | [Indicator Factory](#indicator-factory) | [Factory pattern (Py)](#factory-pattern) | [Factory pattern (Zig)](#factory-pattern-1) | [Factory pattern (Rust)](#factory-pattern-2) |
+| Cross-language rules | [Cross-Language Local-Variable Parity](#cross-language-local-variable-parity) | — | — | — | — |
+
 ## Scope
 
 The rules in this document apply **only to the `indicators/` folder** within each
@@ -1454,7 +1470,16 @@ export function createIndicator(
 
 ### Constructor Pattern Categories
 
-The factory handles five categories of indicator constructors:
+To determine which factory path applies for a given indicator, check these
+conditions **in order** — the first match wins:
+
+1. **No params** → Indicator has no params struct → ignore JSON, call bare constructor.
+2. **SmoothingFactor variant** → JSON contains `"smoothingFactor"` key → call SF constructor.
+3. **Default variant** → JSON is empty AND indicator has a Default constructor → call Default constructor.
+4. **Bare int length** → Params struct has only a `length` field → parse `{"length": N}`.
+5. **Standard params** → (all other cases) → unmarshal JSON into the full params struct.
+
+The five categories with examples:
 
 | Category | Count (Go/TS) | JSON detection | Example |
 |----------|---------------|----------------|---------|

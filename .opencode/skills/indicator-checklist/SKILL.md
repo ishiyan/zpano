@@ -1,6 +1,8 @@
 # Indicator Checklist
 
-Compact verification rules for indicator implementations. Three categories, mechanically verifiable.
+Compact verification rules for indicator implementations. Three categories,
+mechanically verifiable. Focus only on the column corresponding to the language
+you are currently implementing or verifying.
 
 ## 1. Import Patterns
 
@@ -12,12 +14,13 @@ Compact verification rules for indicator implementations. Three categories, mech
 | **Zig** | `@import("entities")` (single barrel, build.zig module) | `@import("../../core/indicator.zig")` (relative file paths) |
 | **Rust** | `use crate::entities::bar::Bar` (absolute crate paths) | `use crate::indicators::core::indicator::Indicator` (absolute crate paths) |
 
-**Rules:**
-- Zig: NEVER import individual entity modules (`@import("bar")`). Always use the `entities` barrel.
-- Go: NEVER import `"zpano/entities/bar"` — the `entities` package is flat.
-- Python: entities are 4 levels up (`....entities`), core is 3 levels up (`...core`).
-- Rust: Always `use crate::` prefix. Never `use super::` for cross-module imports.
-- TS: Never barrel imports from entities (`../../entities`). Import each entity file individually.
+**Per-language import rules:**
+
+- **Go:** NEVER import `"zpano/entities/bar"` — the `entities` package is flat.
+- **TS:** Never barrel imports from entities (`../../entities`). Import each entity file individually.
+- **Python:** Entities are 4 levels up (`....entities`), core is 3 levels up (`...core`).
+- **Zig** (indicator code): NEVER import individual entity modules (`@import("bar")`). Always use the `entities` barrel (`@import("entities")`).
+- **Rust:** Always `use crate::` prefix. Never `use super::` for cross-module imports.
 
 ## 2. Naming Conventions
 
