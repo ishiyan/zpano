@@ -12,7 +12,7 @@ func BenchmarkHomodyneDiscriminatorEstimator(b *testing.B) {
 		AlphaEmaPeriod:            0.2,
 	}
 
-	input := testHomodyneDiscriminatorEstimatorInput()
+	input := testSharedInput()
 
 	for b.Loop() {
 		hde, _ := NewHomodyneDiscriminatorEstimator(&params)
@@ -46,7 +46,7 @@ func BenchmarkDualDifferentiatorEstimator(b *testing.B) {
 		AlphaEmaPeriod:            0.25,
 	}
 
-	input := testDualDifferentiatorEstimatorInput()
+	input := testSharedInput()
 
 	for b.Loop() {
 		dde, _ := NewDualDifferentiatorEstimator(&params)
@@ -63,7 +63,7 @@ func BenchmarkPhaseAccumulatorEstimator(b *testing.B) {
 		AlphaEmaPeriod:            0.15,
 	}
 
-	input := testPhaseAccumulatorEstimatorInput()
+	input := testSharedInput()
 
 	for b.Loop() {
 		pae, _ := NewPhaseAccumulatorEstimator(&params)
