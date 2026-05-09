@@ -42,27 +42,27 @@ export enum IndicatorIdentifier {
     /** Identifies the __Weighted Moving Average__ (WMA) indicator. */
     WeightedMovingAverage,
 
-    // ── arnaudlegoux ──────────────────────────────────────────────────────
+    // ── arnaud legoux ──────────────────────────────────────────────────────
 
     /** Identifies the Arnaud Legoux __Moving Average__ (ALMA) indicator. */
     ArnaudLegouxMovingAverage,
 
-    // ── donaldlambert ─────────────────────────────────────────────────────
+    // ── donald lambert ─────────────────────────────────────────────────────
 
     /** Identifies Donald Lambert's __Commodity Channel Index__ (CCI) indicator. */
     CommodityChannelIndex,
 
-    // ── genequong ─────────────────────────────────────────────────────────
+    // ── gene quong ─────────────────────────────────────────────────────────
 
     /** Identifies Gene Quong's __Money Flow Index__ (MFI) indicator. */
     MoneyFlowIndex,
 
-    // ── georgelane ────────────────────────────────────────────────────────
+    // ── george lane ────────────────────────────────────────────────────────
 
     /** Identifies George Lane's __Stochastic Oscillator__ (STOCH) indicator. */
     Stochastic,
 
-    // ── geraldappel ───────────────────────────────────────────────────────
+    // ── gerald appel ───────────────────────────────────────────────────────
 
     /** Identifies Gerald Appel's __Moving Average Convergence Divergence__ (MACD) indicator. */
     MovingAverageConvergenceDivergence,
@@ -70,17 +70,17 @@ export enum IndicatorIdentifier {
     /** Identifies Gerald Appel's __Percentage Price Oscillator__ (PPO) indicator. */
     PercentagePriceOscillator,
 
-    // ── igorlivshin ───────────────────────────────────────────────────────
+    // ── igor livshin ───────────────────────────────────────────────────────
 
     /** Identifies Igor Livshin's __Balance of Power__ (BOP) indicator. */
     BalanceOfPower,
 
-    // ── jackhutson ────────────────────────────────────────────────────────
+    // ── jack hutson ────────────────────────────────────────────────────────
 
     /** Identifies Jack Hutson's __Triple Exponential Moving Average Oscillator__ (TRIX) indicator. */
     TripleExponentialMovingAverageOscillator,
 
-    // ── johnbollinger ─────────────────────────────────────────────────────
+    // ── john bollinger ─────────────────────────────────────────────────────
 
     /** Identifies the __Bollinger Bands__ (BB) indicator. */
     BollingerBands,
@@ -88,7 +88,7 @@ export enum IndicatorIdentifier {
     /** Identifies John Bollinger's __Bollinger Bands Trend__ (BBTrend) indicator. */
     BollingerBandsTrend,
 
-    // ── johnehlers ────────────────────────────────────────────────────────
+    // ── john ehlers ────────────────────────────────────────────────────────
 
     /** Identifies the Ehlers __Autocorrelation Indicator__ (ACI) heatmap, a bank of Pearson
      * correlation coefficients between the current filtered series and a lagged copy of itself,
@@ -165,12 +165,12 @@ export enum IndicatorIdentifier {
     /** Identifies the Ehler's __Zero-lag Exponential Moving Average__ (ZEMA) indicator. */
     ZeroLagExponentialMovingAverage,
 
-    // ── josephgranville ───────────────────────────────────────────────────
+    // ── joseph granville ───────────────────────────────────────────────────
 
     /** Identifies Joseph Granville's __On-Balance Volume__ (OBV) indicator. */
     OnBalanceVolume,
 
-    // ── larrywilliams ─────────────────────────────────────────────────────
+    // ── larry williams ─────────────────────────────────────────────────────
 
     /** Identifies Larry Williams' __Ultimate Oscillator__ (ULTOSC) indicator. */
     UltimateOscillator,
@@ -178,12 +178,12 @@ export enum IndicatorIdentifier {
     /** Identifies Larry Williams' __Williams %R__ (WILL%R) indicator. */
     WilliamsPercentR,
 
-    // ── manfreddurschner ──────────────────────────────────────────────────
+    // ── manfred durschner ──────────────────────────────────────────────────
 
     /** Identifies the New Moving Average (NMA) indicator by Dürschner. */
     NewMovingAverage,
 
-    // ── marcchaikin ───────────────────────────────────────────────────────
+    // ── marc chaikin ───────────────────────────────────────────────────────
 
     /** Identifies Marc Chaikin's __Advance-Decline__ (A/D) indicator. */
     AdvanceDecline,
@@ -191,7 +191,7 @@ export enum IndicatorIdentifier {
     /** Identifies Marc Chaikin's __Advance-Decline Oscillator__ (ADOSC) indicator. */
     AdvanceDeclineOscillator,
 
-    // ── markjurik ─────────────────────────────────────────────────────────
+    // ── mark jurik ─────────────────────────────────────────────────────────
 
     /** Identifies the Jurik __Adaptive Relative Trend Strength Index__ (JARSX) indicator. */
     JurikAdaptiveRelativeTrendStrengthIndex,
@@ -226,7 +226,7 @@ export enum IndicatorIdentifier {
     /** Identifies the Jurik __Zero Lag Velocity__ (VEL) indicator. */
     JurikZeroLagVelocity,
 
-    // ── patrickmulloy ─────────────────────────────────────────────────────
+    // ── patrick mulloy ─────────────────────────────────────────────────────
 
     /** Identifies the __Double Exponential Moving Average__ (DEMA) indicator. */
     DoubleExponentialMovingAverage,
@@ -234,12 +234,12 @@ export enum IndicatorIdentifier {
     /** Identifies the __Triple Exponential Moving Average__ (TEMA) indicator. */
     TripleExponentialMovingAverage,
 
-    // ── perrykaufman ──────────────────────────────────────────────────────
+    // ── perry kaufman ──────────────────────────────────────────────────────
 
     /** Identifies the __Kaufman Adaptive Moving Average__ (KAMA) indicator. */
     KaufmanAdaptiveMovingAverage,
 
-    // ── timtillson ────────────────────────────────────────────────────────
+    // ── tim tillson ────────────────────────────────────────────────────────
 
     /** Identifies the __T2 Exponential Moving Average__ (T2EMA) indicator. */
     T2ExponentialMovingAverage,
@@ -247,7 +247,7 @@ export enum IndicatorIdentifier {
     /** Identifies the __T3 Exponential Moving Average__ (T3EMA) indicator. */
     T3ExponentialMovingAverage,
 
-    // ── tusharchande ──────────────────────────────────────────────────────
+    // ── tushar chande ──────────────────────────────────────────────────────
 
     /** Identifies Tushar Chande's __Aroon__ (AROON) indicator. */
     Aroon,
@@ -258,13 +258,13 @@ export enum IndicatorIdentifier {
     /** Identifies Tushar Chande's __Stochastic Relative Strength Index__ (STOCHRSI) indicator. */
     StochasticRelativeStrengthIndex,
 
-    // ── vladimirkravchuk ──────────────────────────────────────────────────
+    // ── vladimir kravchuk ──────────────────────────────────────────────────
 
     /** Identifies Vladimir Kravchuk's __Adaptive Trend and Cycle Filter__ (ATCF) suite: a bank of five FIR filters
      * (FATL, SATL, RFTL, RSTL, RBCI) plus three composites (FTLM, STLM, PCCI) applied to a single input series. */
     AdaptiveTrendAndCycleFilter,
 
-    // ── welleswilder ──────────────────────────────────────────────────────
+    // ── welles wilder ──────────────────────────────────────────────────────
 
     /** Identifies Welles Wilder's __Average Directional Movement Index__ (ADX) indicator. */
     AverageDirectionalMovementIndex,

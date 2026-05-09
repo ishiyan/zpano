@@ -74,25 +74,25 @@ _descriptors: dict[Id, Descriptor] = {
         Id.WEIGHTED_MOVING_AVERAGE, "Common", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
         [_o(0, S.SCALAR, R.SMOOTHER, P.PRICE)]),
 
-    # ── arnaudlegoux ──────────────────────────────────────────────────────
+    # ── arnaud legoux ──────────────────────────────────────────────────────
 
     Id.ARNAUD_LEGOUX_MOVING_AVERAGE: _d(
         Id.ARNAUD_LEGOUX_MOVING_AVERAGE, "Arnaud Legoux", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
         [_o(0, S.SCALAR, R.SMOOTHER, P.PRICE)]),
 
-    # ── donaldlambert ─────────────────────────────────────────────────────
+    # ── donald lambert ─────────────────────────────────────────────────────
 
     Id.COMMODITY_CHANNEL_INDEX: _d(
         Id.COMMODITY_CHANNEL_INDEX, "Donald Lambert", A.STATIC, I.BAR_INPUT, V.NO_VOLUME,
         [_o(0, S.SCALAR, R.BOUNDED_OSCILLATOR, P.OWN)]),
 
-    # ── genequong ─────────────────────────────────────────────────────────
+    # ── gene quong ─────────────────────────────────────────────────────────
 
     Id.MONEY_FLOW_INDEX: _d(
         Id.MONEY_FLOW_INDEX, "Gene Quong", A.STATIC, I.BAR_INPUT, V.AGGREGATE_BAR_VOLUME,
         [_o(0, S.SCALAR, R.BOUNDED_OSCILLATOR, P.OWN)]),
 
-    # ── georgelane ────────────────────────────────────────────────────────
+    # ── george lane ────────────────────────────────────────────────────────
 
     Id.STOCHASTIC: _d(
         Id.STOCHASTIC, "George Lane", A.STATIC, I.BAR_INPUT, V.NO_VOLUME,
@@ -100,7 +100,7 @@ _descriptors: dict[Id, Descriptor] = {
          _o(1, S.SCALAR, R.BOUNDED_OSCILLATOR, P.OWN),
          _o(2, S.SCALAR, R.SIGNAL, P.OWN)]),
 
-    # ── geraldappel ───────────────────────────────────────────────────────
+    # ── gerald appel ───────────────────────────────────────────────────────
 
     Id.MOVING_AVERAGE_CONVERGENCE_DIVERGENCE: _d(
         Id.MOVING_AVERAGE_CONVERGENCE_DIVERGENCE, "Gerald Appel", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
@@ -111,19 +111,19 @@ _descriptors: dict[Id, Descriptor] = {
         Id.PERCENTAGE_PRICE_OSCILLATOR, "Gerald Appel", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
         [_o(0, S.SCALAR, R.OSCILLATOR, P.OWN)]),
 
-    # ── igorlivshin ───────────────────────────────────────────────────────
+    # ── igor livshin ───────────────────────────────────────────────────────
 
     Id.BALANCE_OF_POWER: _d(
         Id.BALANCE_OF_POWER, "Igor Livshin", A.STATIC, I.BAR_INPUT, V.NO_VOLUME,
         [_o(0, S.SCALAR, R.BOUNDED_OSCILLATOR, P.OWN)]),
 
-    # ── jackhutson ────────────────────────────────────────────────────────
+    # ── jack hutson ────────────────────────────────────────────────────────
 
     Id.TRIPLE_EXPONENTIAL_MOVING_AVERAGE_OSCILLATOR: _d(
         Id.TRIPLE_EXPONENTIAL_MOVING_AVERAGE_OSCILLATOR, "Jack Hutson", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
         [_o(0, S.SCALAR, R.OSCILLATOR, P.OWN)]),
 
-    # ── johnbollinger ─────────────────────────────────────────────────────
+    # ── john bollinger ─────────────────────────────────────────────────────
 
     Id.BOLLINGER_BANDS: _d(
         Id.BOLLINGER_BANDS, "John Bollinger", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
@@ -137,7 +137,7 @@ _descriptors: dict[Id, Descriptor] = {
         Id.BOLLINGER_BANDS_TREND, "John Bollinger", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
         [_o(0, S.SCALAR, R.OSCILLATOR, P.OWN)]),
 
-    # ── johnehlers ────────────────────────────────────────────────────────
+    # ── john ehlers ────────────────────────────────────────────────────────
 
     Id.AUTO_CORRELATION_INDICATOR: _d(
         Id.AUTO_CORRELATION_INDICATOR, "John Ehlers", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
@@ -228,13 +228,13 @@ _descriptors: dict[Id, Descriptor] = {
         Id.ZERO_LAG_EXPONENTIAL_MOVING_AVERAGE, "John Ehlers", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
         [_o(0, S.SCALAR, R.SMOOTHER, P.PRICE)]),
 
-    # ── josephgranville ───────────────────────────────────────────────────
+    # ── joseph granville ───────────────────────────────────────────────────
 
     Id.ON_BALANCE_VOLUME: _d(
         Id.ON_BALANCE_VOLUME, "Joseph Granville", A.STATIC, I.BAR_INPUT, V.AGGREGATE_BAR_VOLUME,
         [_o(0, S.SCALAR, R.VOLUME_FLOW, P.OWN)]),
 
-    # ── larrywilliams ─────────────────────────────────────────────────────
+    # ── larry williams ─────────────────────────────────────────────────────
 
     Id.ULTIMATE_OSCILLATOR: _d(
         Id.ULTIMATE_OSCILLATOR, "Larry Williams", A.STATIC, I.BAR_INPUT, V.NO_VOLUME,
@@ -243,13 +243,13 @@ _descriptors: dict[Id, Descriptor] = {
         Id.WILLIAMS_PERCENT_R, "Larry Williams", A.STATIC, I.BAR_INPUT, V.NO_VOLUME,
         [_o(0, S.SCALAR, R.BOUNDED_OSCILLATOR, P.OWN)]),
 
-    # ── manfreddurschner ──────────────────────────────────────────────────
+    # ── manfred durschner ──────────────────────────────────────────────────
 
     Id.NEW_MOVING_AVERAGE: _d(
         Id.NEW_MOVING_AVERAGE, "Manfred Dürschner", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
         [_o(0, S.SCALAR, R.SMOOTHER, P.PRICE)]),
 
-    # ── marcchaikin ───────────────────────────────────────────────────────
+    # ── marc chaikin ───────────────────────────────────────────────────────
 
     Id.ADVANCE_DECLINE: _d(
         Id.ADVANCE_DECLINE, "Marc Chaikin", A.STATIC, I.BAR_INPUT, V.AGGREGATE_BAR_VOLUME,
@@ -258,7 +258,7 @@ _descriptors: dict[Id, Descriptor] = {
         Id.ADVANCE_DECLINE_OSCILLATOR, "Marc Chaikin", A.STATIC, I.BAR_INPUT, V.AGGREGATE_BAR_VOLUME,
         [_o(0, S.SCALAR, R.VOLUME_FLOW, P.OWN)]),
 
-    # ── markjurik ─────────────────────────────────────────────────────────
+    # ── mark jurik ─────────────────────────────────────────────────────────
 
     Id.JURIK_ADAPTIVE_RELATIVE_TREND_STRENGTH_INDEX: _d(
         Id.JURIK_ADAPTIVE_RELATIVE_TREND_STRENGTH_INDEX, "Mark Jurik", A.ADAPTIVE, I.SCALAR_INPUT, V.NO_VOLUME,
@@ -296,7 +296,7 @@ _descriptors: dict[Id, Descriptor] = {
         Id.JURIK_ZERO_LAG_VELOCITY, "Mark Jurik", A.ADAPTIVE, I.SCALAR_INPUT, V.NO_VOLUME,
         [_o(0, S.SCALAR, R.OSCILLATOR, P.OWN)]),
 
-    # ── patrickmulloy ─────────────────────────────────────────────────────
+    # ── patrick mulloy ─────────────────────────────────────────────────────
 
     Id.DOUBLE_EXPONENTIAL_MOVING_AVERAGE: _d(
         Id.DOUBLE_EXPONENTIAL_MOVING_AVERAGE, "Patrick Mulloy", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
@@ -305,13 +305,13 @@ _descriptors: dict[Id, Descriptor] = {
         Id.TRIPLE_EXPONENTIAL_MOVING_AVERAGE, "Patrick Mulloy", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
         [_o(0, S.SCALAR, R.SMOOTHER, P.PRICE)]),
 
-    # ── perrykaufman ──────────────────────────────────────────────────────
+    # ── perry kaufman ──────────────────────────────────────────────────────
 
     Id.KAUFMAN_ADAPTIVE_MOVING_AVERAGE: _d(
         Id.KAUFMAN_ADAPTIVE_MOVING_AVERAGE, "Perry Kaufman", A.ADAPTIVE, I.SCALAR_INPUT, V.NO_VOLUME,
         [_o(0, S.SCALAR, R.SMOOTHER, P.PRICE)]),
 
-    # ── timtillson ────────────────────────────────────────────────────────
+    # ── tim tillson ────────────────────────────────────────────────────────
 
     Id.T2_EXPONENTIAL_MOVING_AVERAGE: _d(
         Id.T2_EXPONENTIAL_MOVING_AVERAGE, "Tim Tillson", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
@@ -320,7 +320,7 @@ _descriptors: dict[Id, Descriptor] = {
         Id.T3_EXPONENTIAL_MOVING_AVERAGE, "Tim Tillson", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
         [_o(0, S.SCALAR, R.SMOOTHER, P.PRICE)]),
 
-    # ── tusharchande ──────────────────────────────────────────────────────
+    # ── tushar chande ──────────────────────────────────────────────────────
 
     Id.AROON: _d(
         Id.AROON, "Tushar Chande", A.STATIC, I.BAR_INPUT, V.NO_VOLUME,
@@ -335,7 +335,7 @@ _descriptors: dict[Id, Descriptor] = {
         [_o(0, S.SCALAR, R.BOUNDED_OSCILLATOR, P.OWN),
          _o(1, S.SCALAR, R.SIGNAL, P.OWN)]),
 
-    # ── vladimirkravchuk ──────────────────────────────────────────────────
+    # ── vladimir kravchuk ──────────────────────────────────────────────────
 
     Id.ADAPTIVE_TREND_AND_CYCLE_FILTER: _d(
         Id.ADAPTIVE_TREND_AND_CYCLE_FILTER, "Vladimir Kravchuk", A.ADAPTIVE, I.SCALAR_INPUT, V.NO_VOLUME,
@@ -348,7 +348,7 @@ _descriptors: dict[Id, Descriptor] = {
          _o(6, S.SCALAR, R.OSCILLATOR, P.OWN),
          _o(7, S.SCALAR, R.OSCILLATOR, P.OWN)]),
 
-    # ── welleswilder ──────────────────────────────────────────────────────
+    # ── welles wilder ──────────────────────────────────────────────────────
 
     Id.AVERAGE_DIRECTIONAL_MOVEMENT_INDEX: _d(
         Id.AVERAGE_DIRECTIONAL_MOVEMENT_INDEX, "Welles Wilder", A.STATIC, I.BAR_INPUT, V.NO_VOLUME,

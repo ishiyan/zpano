@@ -41,30 +41,30 @@ pub const descriptors = [_]Descriptor{
     .{ .identifier = .triangular_moving_average, .family = "Common", .adaptivity = .static_, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .smoother, .pane = .price }} },
     .{ .identifier = .variance, .family = "Common", .adaptivity = .static_, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .volatility, .pane = .own }} },
     .{ .identifier = .weighted_moving_average, .family = "Common", .adaptivity = .static_, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .smoother, .pane = .price }} },
-    // ── arnaudlegoux ──────────────────────────────────────────────────────────
+    // ── arnaud legoux ──────────────────────────────────────────────────────────
     .{ .identifier = .arnaud_legoux_moving_average, .family = "Arnaud Legoux", .adaptivity = .static_, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .smoother, .pane = .price }} },
-    // ── donaldlambert ──────────────────────────────────────────────────────────
+    // ── donald lambert ──────────────────────────────────────────────────────────
     .{ .identifier = .commodity_channel_index, .family = "Donald Lambert", .adaptivity = .static_, .input_requirement = .bar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .bounded_oscillator, .pane = .own }} },
-    // ── genequong ──────────────────────────────────────────────────────────
+    // ── gene quong ──────────────────────────────────────────────────────────
     .{ .identifier = .money_flow_index, .family = "Gene Quong", .adaptivity = .static_, .input_requirement = .bar_input, .volume_usage = .aggregate_bar_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .bounded_oscillator, .pane = .own }} },
-    // ── georgelane ──────────────────────────────────────────────────────────
+    // ── george lane ──────────────────────────────────────────────────────────
     .{ .identifier = .stochastic, .family = "George Lane", .adaptivity = .static_, .input_requirement = .bar_input, .volume_usage = .no_volume, .outputs = &[_]OD{
         .{ .kind = 1, .shape = .scalar, .role = .bounded_oscillator, .pane = .own },
         .{ .kind = 2, .shape = .scalar, .role = .bounded_oscillator, .pane = .own },
         .{ .kind = 3, .shape = .scalar, .role = .signal, .pane = .own },
     } },
-    // ── geraldappel ──────────────────────────────────────────────────────────
+    // ── gerald appel ──────────────────────────────────────────────────────────
     .{ .identifier = .moving_average_convergence_divergence, .family = "Gerald Appel", .adaptivity = .static_, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{
         .{ .kind = 1, .shape = .scalar, .role = .oscillator, .pane = .own },
         .{ .kind = 2, .shape = .scalar, .role = .signal, .pane = .own },
         .{ .kind = 3, .shape = .scalar, .role = .histogram, .pane = .own },
     } },
     .{ .identifier = .percentage_price_oscillator, .family = "Gerald Appel", .adaptivity = .static_, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .oscillator, .pane = .own }} },
-    // ── igorlivshin ──────────────────────────────────────────────────────────
+    // ── igor livshin ──────────────────────────────────────────────────────────
     .{ .identifier = .balance_of_power, .family = "Igor Livshin", .adaptivity = .static_, .input_requirement = .bar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .bounded_oscillator, .pane = .own }} },
-    // ── jackhutson ──────────────────────────────────────────────────────────
+    // ── jack hutson ──────────────────────────────────────────────────────────
     .{ .identifier = .triple_exponential_moving_average_oscillator, .family = "Jack Hutson", .adaptivity = .static_, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .oscillator, .pane = .own }} },
-    // ── johnbollinger ──────────────────────────────────────────────────────────
+    // ── john bollinger ──────────────────────────────────────────────────────────
     .{ .identifier = .bollinger_bands, .family = "John Bollinger", .adaptivity = .static_, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{
         .{ .kind = 1, .shape = .scalar, .role = .envelope, .pane = .price },
         .{ .kind = 2, .shape = .scalar, .role = .smoother, .pane = .price },
@@ -74,7 +74,7 @@ pub const descriptors = [_]Descriptor{
         .{ .kind = 6, .shape = .band, .role = .envelope, .pane = .price },
     } },
     .{ .identifier = .bollinger_bands_trend, .family = "John Bollinger", .adaptivity = .static_, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .oscillator, .pane = .own }} },
-    // ── johnehlers ──────────────────────────────────────────────────────────
+    // ── john ehlers ──────────────────────────────────────────────────────────
     .{ .identifier = .auto_correlation_indicator, .family = "John Ehlers", .adaptivity = .static_, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .heatmap, .role = .correlation, .pane = .own }} },
     .{ .identifier = .auto_correlation_periodogram, .family = "John Ehlers", .adaptivity = .adaptive, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .heatmap, .role = .spectrum, .pane = .own }} },
     .{ .identifier = .center_of_gravity_oscillator, .family = "John Ehlers", .adaptivity = .static_, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{
@@ -147,17 +147,17 @@ pub const descriptors = [_]Descriptor{
     } },
     .{ .identifier = .zero_lag_error_correcting_exponential_moving_average, .family = "John Ehlers", .adaptivity = .static_, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .smoother, .pane = .price }} },
     .{ .identifier = .zero_lag_exponential_moving_average, .family = "John Ehlers", .adaptivity = .static_, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .smoother, .pane = .price }} },
-    // ── josephgranville ──────────────────────────────────────────────────────────
+    // ── joseph granville ──────────────────────────────────────────────────────────
     .{ .identifier = .on_balance_volume, .family = "Joseph Granville", .adaptivity = .static_, .input_requirement = .bar_input, .volume_usage = .aggregate_bar_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .volume_flow, .pane = .own }} },
-    // ── larrywilliams ──────────────────────────────────────────────────────────
+    // ── larry williams ──────────────────────────────────────────────────────────
     .{ .identifier = .ultimate_oscillator, .family = "Larry Williams", .adaptivity = .static_, .input_requirement = .bar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .bounded_oscillator, .pane = .own }} },
     .{ .identifier = .williams_percent_r, .family = "Larry Williams", .adaptivity = .static_, .input_requirement = .bar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .bounded_oscillator, .pane = .own }} },
-    // ── manfreddurschner ──────────────────────────────────────────────────────────
+    // ── manfred durschner ──────────────────────────────────────────────────────────
     .{ .identifier = .new_moving_average, .family = "Manfred Dürschner", .adaptivity = .static_, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .smoother, .pane = .price }} },
-    // ── marcchaikin ──────────────────────────────────────────────────────────
+    // ── marc chaikin ──────────────────────────────────────────────────────────
     .{ .identifier = .advance_decline, .family = "Marc Chaikin", .adaptivity = .static_, .input_requirement = .bar_input, .volume_usage = .aggregate_bar_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .volume_flow, .pane = .own }} },
     .{ .identifier = .advance_decline_oscillator, .family = "Marc Chaikin", .adaptivity = .static_, .input_requirement = .bar_input, .volume_usage = .aggregate_bar_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .volume_flow, .pane = .own }} },
-    // ── markjurik ──────────────────────────────────────────────────────────
+    // ── mark jurik ──────────────────────────────────────────────────────────
     .{ .identifier = .jurik_adaptive_relative_trend_strength_index, .family = "Mark Jurik", .adaptivity = .adaptive, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .oscillator, .pane = .own }} },
     .{ .identifier = .jurik_adaptive_zero_lag_velocity, .family = "Mark Jurik", .adaptivity = .adaptive, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .oscillator, .pane = .own }} },
     .{ .identifier = .jurik_commodity_channel_index, .family = "Mark Jurik", .adaptivity = .adaptive, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .oscillator, .pane = .own }} },
@@ -173,15 +173,15 @@ pub const descriptors = [_]Descriptor{
     .{ .identifier = .jurik_turning_point_oscillator, .family = "Mark Jurik", .adaptivity = .static_, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .oscillator, .pane = .own }} },
     .{ .identifier = .jurik_wavelet_sampler, .family = "Mark Jurik", .adaptivity = .static_, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .smoother, .pane = .price }} },
     .{ .identifier = .jurik_zero_lag_velocity, .family = "Mark Jurik", .adaptivity = .adaptive, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .oscillator, .pane = .own }} },
-    // ── patrickmulloy ──────────────────────────────────────────────────────────
+    // ── patrick mulloy ──────────────────────────────────────────────────────────
     .{ .identifier = .double_exponential_moving_average, .family = "Patrick Mulloy", .adaptivity = .static_, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .smoother, .pane = .price }} },
     .{ .identifier = .triple_exponential_moving_average, .family = "Patrick Mulloy", .adaptivity = .static_, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .smoother, .pane = .price }} },
-    // ── perrykaufman ──────────────────────────────────────────────────────────
+    // ── perry kaufman ──────────────────────────────────────────────────────────
     .{ .identifier = .kaufman_adaptive_moving_average, .family = "Perry Kaufman", .adaptivity = .adaptive, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .smoother, .pane = .price }} },
-    // ── timtillson ──────────────────────────────────────────────────────────
+    // ── tim tillson ──────────────────────────────────────────────────────────
     .{ .identifier = .t2_exponential_moving_average, .family = "Tim Tillson", .adaptivity = .static_, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .smoother, .pane = .price }} },
     .{ .identifier = .t3_exponential_moving_average, .family = "Tim Tillson", .adaptivity = .static_, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .smoother, .pane = .price }} },
-    // ── tusharchande ──────────────────────────────────────────────────────────
+    // ── tushar chande ──────────────────────────────────────────────────────────
     .{ .identifier = .aroon, .family = "Tushar Chande", .adaptivity = .static_, .input_requirement = .bar_input, .volume_usage = .no_volume, .outputs = &[_]OD{
         .{ .kind = 1, .shape = .scalar, .role = .bounded_oscillator, .pane = .own },
         .{ .kind = 2, .shape = .scalar, .role = .bounded_oscillator, .pane = .own },
@@ -192,7 +192,7 @@ pub const descriptors = [_]Descriptor{
         .{ .kind = 1, .shape = .scalar, .role = .bounded_oscillator, .pane = .own },
         .{ .kind = 2, .shape = .scalar, .role = .signal, .pane = .own },
     } },
-    // ── vladimirkravchuk ──────────────────────────────────────────────────────────
+    // ── vladimir kravchuk ──────────────────────────────────────────────────────────
     .{ .identifier = .adaptive_trend_and_cycle_filter, .family = "Vladimir Kravchuk", .adaptivity = .adaptive, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{
         .{ .kind = 1, .shape = .scalar, .role = .smoother, .pane = .price },
         .{ .kind = 2, .shape = .scalar, .role = .smoother, .pane = .price },
@@ -203,7 +203,7 @@ pub const descriptors = [_]Descriptor{
         .{ .kind = 7, .shape = .scalar, .role = .oscillator, .pane = .own },
         .{ .kind = 8, .shape = .scalar, .role = .oscillator, .pane = .own },
     } },
-    // ── welleswilder ──────────────────────────────────────────────────────────
+    // ── welles wilder ──────────────────────────────────────────────────────────
     .{ .identifier = .average_directional_movement_index, .family = "Welles Wilder", .adaptivity = .static_, .input_requirement = .bar_input, .volume_usage = .no_volume, .outputs = &[_]OD{
         .{ .kind = 1, .shape = .scalar, .role = .bounded_oscillator, .pane = .own },
         .{ .kind = 2, .shape = .scalar, .role = .bounded_oscillator, .pane = .own },

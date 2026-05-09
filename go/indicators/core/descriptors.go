@@ -86,7 +86,7 @@ var descriptors = map[Identifier]Descriptor{
 		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Smoother, Pane: Price}},
 	},
 
-	// ── arnaudlegoux ──────────────────────────────────────────────────────
+	// ── arnaud legoux ──────────────────────────────────────────────────────
 
 	ArnaudLegouxMovingAverage: {
 		Identifier: ArnaudLegouxMovingAverage, Family: "Arnaud Legoux",
@@ -94,7 +94,7 @@ var descriptors = map[Identifier]Descriptor{
 		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Smoother, Pane: Price}},
 	},
 
-	// ── donaldlambert ─────────────────────────────────────────────────────
+	// ── donald lambert ─────────────────────────────────────────────────────
 
 	CommodityChannelIndex: {
 		Identifier: CommodityChannelIndex, Family: "Donald Lambert",
@@ -102,7 +102,7 @@ var descriptors = map[Identifier]Descriptor{
 		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Scalar, Role: BoundedOscillator, Pane: Own}},
 	},
 
-	// ── genequong ─────────────────────────────────────────────────────────
+	// ── gene quong ─────────────────────────────────────────────────────────
 
 	MoneyFlowIndex: {
 		Identifier: MoneyFlowIndex, Family: "Gene Quong",
@@ -110,7 +110,7 @@ var descriptors = map[Identifier]Descriptor{
 		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Scalar, Role: BoundedOscillator, Pane: Own}},
 	},
 
-	// ── georgelane ────────────────────────────────────────────────────────
+	// ── george lane ────────────────────────────────────────────────────────
 
 	Stochastic: {
 		Identifier: Stochastic, Family: "George Lane",
@@ -122,7 +122,7 @@ var descriptors = map[Identifier]Descriptor{
 		},
 	},
 
-	// ── geraldappel ───────────────────────────────────────────────────────
+	// ── gerald appel ───────────────────────────────────────────────────────
 
 	MovingAverageConvergenceDivergence: {
 		Identifier: MovingAverageConvergenceDivergence, Family: "Gerald Appel",
@@ -139,7 +139,7 @@ var descriptors = map[Identifier]Descriptor{
 		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Oscillator, Pane: Own}},
 	},
 
-	// ── igorlivshin ───────────────────────────────────────────────────────
+	// ── igor livshin ───────────────────────────────────────────────────────
 
 	BalanceOfPower: {
 		Identifier: BalanceOfPower, Family: "Igor Livshin",
@@ -147,7 +147,7 @@ var descriptors = map[Identifier]Descriptor{
 		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Scalar, Role: BoundedOscillator, Pane: Own}},
 	},
 
-	// ── jackhutson ────────────────────────────────────────────────────────
+	// ── jack hutson ────────────────────────────────────────────────────────
 
 	TripleExponentialMovingAverageOscillator: {
 		Identifier: TripleExponentialMovingAverageOscillator, Family: "Jack Hutson",
@@ -155,7 +155,7 @@ var descriptors = map[Identifier]Descriptor{
 		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Oscillator, Pane: Own}},
 	},
 
-	// ── johnbollinger ─────────────────────────────────────────────────────
+	// ── john bollinger ─────────────────────────────────────────────────────
 
 	BollingerBands: {
 		Identifier: BollingerBands, Family: "John Bollinger",
@@ -175,7 +175,7 @@ var descriptors = map[Identifier]Descriptor{
 		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Oscillator, Pane: Own}},
 	},
 
-	// ── johnehlers ────────────────────────────────────────────────────────
+	// ── john ehlers ────────────────────────────────────────────────────────
 
 	AutoCorrelationIndicator: {
 		Identifier: AutoCorrelationIndicator, Family: "John Ehlers",
@@ -334,7 +334,7 @@ var descriptors = map[Identifier]Descriptor{
 		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Smoother, Pane: Price}},
 	},
 
-	// ── josephgranville ───────────────────────────────────────────────────
+	// ── joseph granville ───────────────────────────────────────────────────
 
 	OnBalanceVolume: {
 		Identifier: OnBalanceVolume, Family: "Joseph Granville",
@@ -342,7 +342,7 @@ var descriptors = map[Identifier]Descriptor{
 		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Scalar, Role: VolumeFlow, Pane: Own}},
 	},
 
-	// ── larrywilliams ─────────────────────────────────────────────────────
+	// ── larry williams ─────────────────────────────────────────────────────
 
 	UltimateOscillator: {
 		Identifier: UltimateOscillator, Family: "Larry Williams",
@@ -355,7 +355,7 @@ var descriptors = map[Identifier]Descriptor{
 		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Scalar, Role: BoundedOscillator, Pane: Own}},
 	},
 
-	// ── manfreddurschner ──────────────────────────────────────────────────
+	// ── manfred durschner ──────────────────────────────────────────────────
 
 	NewMovingAverage: {
 		Identifier: NewMovingAverage, Family: "Manfred Dürschner",
@@ -363,7 +363,7 @@ var descriptors = map[Identifier]Descriptor{
 		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Smoother, Pane: Price}},
 	},
 
-	// ── marcchaikin ───────────────────────────────────────────────────────
+	// ── marc chaikin ───────────────────────────────────────────────────────
 
 	AdvanceDecline: {
 		Identifier: AdvanceDecline, Family: "Marc Chaikin",
@@ -376,7 +376,7 @@ var descriptors = map[Identifier]Descriptor{
 		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Scalar, Role: VolumeFlow, Pane: Own}},
 	},
 
-	// ── markjurik ─────────────────────────────────────────────────────────
+	// ── mark jurik ─────────────────────────────────────────────────────────
 
 	JurikAdaptiveRelativeTrendStrengthIndex: {
 		Identifier: JurikAdaptiveRelativeTrendStrengthIndex, Family: "Mark Jurik",
@@ -438,7 +438,7 @@ var descriptors = map[Identifier]Descriptor{
 		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Oscillator, Pane: Own}},
 	},
 
-	// ── patrickmulloy ─────────────────────────────────────────────────────
+	// ── patrick mulloy ─────────────────────────────────────────────────────
 
 	DoubleExponentialMovingAverage: {
 		Identifier: DoubleExponentialMovingAverage, Family: "Patrick Mulloy",
@@ -451,7 +451,7 @@ var descriptors = map[Identifier]Descriptor{
 		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Smoother, Pane: Price}},
 	},
 
-	// ── perrykaufman ──────────────────────────────────────────────────────
+	// ── perry kaufman ──────────────────────────────────────────────────────
 
 	KaufmanAdaptiveMovingAverage: {
 		Identifier: KaufmanAdaptiveMovingAverage, Family: "Perry Kaufman",
@@ -459,7 +459,7 @@ var descriptors = map[Identifier]Descriptor{
 		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Smoother, Pane: Price}},
 	},
 
-	// ── timtillson ────────────────────────────────────────────────────────
+	// ── tim tillson ────────────────────────────────────────────────────────
 
 	T2ExponentialMovingAverage: {
 		Identifier: T2ExponentialMovingAverage, Family: "Tim Tillson",
@@ -472,7 +472,7 @@ var descriptors = map[Identifier]Descriptor{
 		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Smoother, Pane: Price}},
 	},
 
-	// ── tusharchande ──────────────────────────────────────────────────────
+	// ── tushar chande ──────────────────────────────────────────────────────
 
 	Aroon: {
 		Identifier: Aroon, Family: "Tushar Chande",
@@ -497,7 +497,7 @@ var descriptors = map[Identifier]Descriptor{
 		},
 	},
 
-	// ── vladimirkravchuk ──────────────────────────────────────────────────
+	// ── vladimir kravchuk ──────────────────────────────────────────────────
 
 	AdaptiveTrendAndCycleFilter: {
 		Identifier: AdaptiveTrendAndCycleFilter, Family: "Vladimir Kravchuk",
@@ -514,7 +514,7 @@ var descriptors = map[Identifier]Descriptor{
 		},
 	},
 
-	// ── welleswilder ──────────────────────────────────────────────────────
+	// ── welles wilder ──────────────────────────────────────────────────────
 
 	AverageDirectionalMovementIndex: {
 		Identifier: AverageDirectionalMovementIndex, Family: "Welles Wilder",

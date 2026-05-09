@@ -50,27 +50,27 @@ const (
 	// WeightedMovingAverage identifies the Weighted Moving Average (WMA) indicator.
 	WeightedMovingAverage
 
-	// ── arnaudlegoux ──────────────────────────────────────────────────────
+	// ── arnaud legoux ──────────────────────────────────────────────────────
 
 	// ArnaudLegouxMovingAverage identifies the Arnaud Legoux Moving Average (ALMA) indicator.
 	ArnaudLegouxMovingAverage
 
-	// ── donaldlambert ─────────────────────────────────────────────────────
+	// ── donald lambert ─────────────────────────────────────────────────────
 
 	// CommodityChannelIndex identifies the Donald Lambert Commodity Channel Index (CCI) indicator.
 	CommodityChannelIndex
 
-	// ── genequong ─────────────────────────────────────────────────────────
+	// ── gene quong ─────────────────────────────────────────────────────────
 
 	// MoneyFlowIndex identifies the Gene Quong Money Flow Index (MFI) indicator.
 	MoneyFlowIndex
 
-	// ── georgelane ────────────────────────────────────────────────────────
+	// ── george lane ────────────────────────────────────────────────────────
 
 	// Stochastic identifies the George Lane Stochastic Oscillator (STOCH) indicator.
 	Stochastic
 
-	// ── geraldappel ───────────────────────────────────────────────────────
+	// ── gerald appel ───────────────────────────────────────────────────────
 
 	// MovingAverageConvergenceDivergence identifies Gerald Appel's Moving Average Convergence Divergence (MACD) indicator.
 	MovingAverageConvergenceDivergence
@@ -78,17 +78,17 @@ const (
 	// PercentagePriceOscillator identifies the Gerald Appel Percentage Price Oscillator (PPO) indicator.
 	PercentagePriceOscillator
 
-	// ── igorlivshin ───────────────────────────────────────────────────────
+	// ── igor livshin ───────────────────────────────────────────────────────
 
 	// BalanceOfPower identifies the Igor Livshin Balance of Power (BOP) indicator.
 	BalanceOfPower
 
-	// ── jackhutson ────────────────────────────────────────────────────────
+	// ── jack hutson ────────────────────────────────────────────────────────
 
 	// TripleExponentialMovingAverageOscillator identifies Jack Hutson's Triple Exponential Moving Average Oscillator (TRIX) indicator.
 	TripleExponentialMovingAverageOscillator
 
-	// ── johnbollinger ─────────────────────────────────────────────────────
+	// ── john bollinger ─────────────────────────────────────────────────────
 
 	// BollingerBands identifies the Bollinger Bands (BB) indicator.
 	BollingerBands
@@ -96,7 +96,7 @@ const (
 	// BollingerBandsTrend identifies John Bollinger's Bollinger Bands Trend (BBTrend) indicator.
 	BollingerBandsTrend
 
-	// ── johnehlers ────────────────────────────────────────────────────────
+	// ── john ehlers ────────────────────────────────────────────────────────
 
 	// AutoCorrelationIndicator identifies the Autocorrelation Indicator (aci)
 	// heat-map of Pearson correlation coefficients between the current filtered
@@ -176,12 +176,12 @@ const (
 	// ZeroLagExponentialMovingAverage identifies the Ehlers Zero-lag Exponential Moving Average (ZEMA) indicator.
 	ZeroLagExponentialMovingAverage
 
-	// ── josephgranville ───────────────────────────────────────────────────
+	// ── joseph granville ───────────────────────────────────────────────────
 
 	// OnBalanceVolume identifies the Joseph Granville On-Balance Volume (OBV) indicator.
 	OnBalanceVolume
 
-	// ── larrywilliams ─────────────────────────────────────────────────────
+	// ── larry williams ─────────────────────────────────────────────────────
 
 	// UltimateOscillator identifies the Larry Williams Ultimate Oscillator (ULTOSC) indicator.
 	UltimateOscillator
@@ -189,12 +189,12 @@ const (
 	// WilliamsPercentR identifies the Larry Williams Williams %R (WILL%R) indicator.
 	WilliamsPercentR
 
-	// ── manfreddurschner ──────────────────────────────────────────────────
+	// ── manfred durschner ──────────────────────────────────────────────────
 
 	// NewMovingAverage identifies the New Moving Average (NMA) indicator by Dürschner.
 	NewMovingAverage
 
-	// ── marcchaikin ───────────────────────────────────────────────────────
+	// ── marc chaikin ───────────────────────────────────────────────────────
 
 	// AdvanceDecline identifies the Marc Chaikin Advance-Decline (AD) indicator.
 	AdvanceDecline
@@ -202,7 +202,7 @@ const (
 	// AdvanceDeclineOscillator identifies the Marc Chaikin Advance-Decline Oscillator (ADOSC) indicator.
 	AdvanceDeclineOscillator
 
-	// ── markjurik ─────────────────────────────────────────────────────────
+	// ── mark jurik ─────────────────────────────────────────────────────────
 
 	// JurikAdaptiveRelativeTrendStrengthIndex identifies the Jurik Adaptive Relative Trend Strength Index (JARSX) indicator.
 	JurikAdaptiveRelativeTrendStrengthIndex
@@ -237,7 +237,7 @@ const (
 	// JurikZeroLagVelocity identifies the Jurik Zero Lag Velocity (VEL) indicator.
 	JurikZeroLagVelocity
 
-	// ── patrickmulloy ─────────────────────────────────────────────────────
+	// ── patrick mulloy ─────────────────────────────────────────────────────
 
 	// DoubleExponentialMovingAverage identifies the Double Exponential Moving Average (DEMA) indicator.
 	DoubleExponentialMovingAverage
@@ -245,12 +245,12 @@ const (
 	// TripleExponentialMovingAverage identifies the Triple Exponential Moving Average (TEMA) indicator.
 	TripleExponentialMovingAverage
 
-	// ── perrykaufman ──────────────────────────────────────────────────────
+	// ── perry kaufman ──────────────────────────────────────────────────────
 
 	// KaufmanAdaptiveMovingAverage identifies the Kaufman Adaptive Moving Average (KAMA) indicator.
 	KaufmanAdaptiveMovingAverage
 
-	// ── timtillson ────────────────────────────────────────────────────────
+	// ── tim tillson ────────────────────────────────────────────────────────
 
 	// T2ExponentialMovingAverage identifies the T2 Exponential Moving Average (T2) indicator.
 	T2ExponentialMovingAverage
@@ -258,7 +258,7 @@ const (
 	// T3ExponentialMovingAverage identifies the T3 Exponential Moving Average (T3) indicator.
 	T3ExponentialMovingAverage
 
-	// ── tusharchande ──────────────────────────────────────────────────────
+	// ── tushar chande ──────────────────────────────────────────────────────
 
 	// Aroon identifies the Tushar Chande Aroon (AROON) indicator.
 	Aroon
@@ -269,14 +269,14 @@ const (
 	// StochasticRelativeStrengthIndex identifies the Tushar Chande Stochastic RSI (STOCHRSI) indicator.
 	StochasticRelativeStrengthIndex
 
-	// ── vladimirkravchuk ──────────────────────────────────────────────────
+	// ── vladimir kravchuk ──────────────────────────────────────────────────
 
 	// AdaptiveTrendAndCycleFilter identifies the Vladimir Kravchuk Adaptive Trend & Cycle Filter (ATCF)
 	// suite, exposing FATL, SATL, RFTL, RSTL, RBCI FIR-filter outputs together with the derived
 	// FTLM, STLM, and PCCI composites.
 	AdaptiveTrendAndCycleFilter
 
-	// ── welleswilder ──────────────────────────────────────────────────────
+	// ── welles wilder ──────────────────────────────────────────────────────
 
 	// AverageDirectionalMovementIndex identifies the Welles Wilder Average Directional Movement Index (ADX) indicator.
 	AverageDirectionalMovementIndex
@@ -344,33 +344,33 @@ const (
 	variance                       = "variance"
 	weightedMovingAverage          = "weightedMovingAverage"
 
-	// ── arnaudlegoux ──────────────────────────────────────────────────────
+	// ── arnaud legoux ──────────────────────────────────────────────────────
 	arnaudLegouxMovingAverage = "arnaudLegouxMovingAverage"
 
-	// ── donaldlambert ─────────────────────────────────────────────────────
+	// ── donald lambert ─────────────────────────────────────────────────────
 	commodityChannelIndex = "commodityChannelIndex"
 
-	// ── genequong ─────────────────────────────────────────────────────────
+	// ── gene quong ─────────────────────────────────────────────────────────
 	moneyFlowIndex = "moneyFlowIndex"
 
-	// ── georgelane ────────────────────────────────────────────────────────
+	// ── george lane ────────────────────────────────────────────────────────
 	stochastic = "stochastic"
 
-	// ── geraldappel ───────────────────────────────────────────────────────
+	// ── gerald appel ───────────────────────────────────────────────────────
 	movingAverageConvergenceDivergence = "movingAverageConvergenceDivergence"
 	percentagePriceOscillator          = "percentagePriceOscillator"
 
-	// ── igorlivshin ───────────────────────────────────────────────────────
+	// ── igor livshin ───────────────────────────────────────────────────────
 	balanceOfPower = "balanceOfPower"
 
-	// ── jackhutson ────────────────────────────────────────────────────────
+	// ── jack hutson ────────────────────────────────────────────────────────
 	tripleExponentialMovingAverageOscillator = "tripleExponentialMovingAverageOscillator"
 
-	// ── johnbollinger ─────────────────────────────────────────────────────
+	// ── john bollinger ─────────────────────────────────────────────────────
 	bollingerBands      = "bollingerBands"
 	bollingerBandsTrend = "bollingerBandsTrend"
 
-	// ── johnehlers ────────────────────────────────────────────────────────
+	// ── john ehlers ────────────────────────────────────────────────────────
 	autoCorrelationIndicator                       = "autoCorrelationIndicator"
 	autoCorrelationPeriodogram                     = "autoCorrelationPeriodogram"
 	centerOfGravityOscillator                      = "centerOfGravityOscillator"
@@ -393,21 +393,21 @@ const (
 	zeroLagErrorCorrectingExponentialMovingAverage = "zeroLagErrorCorrectingExponentialMovingAverage"
 	zeroLagExponentialMovingAverage                = "zeroLagExponentialMovingAverage"
 
-	// ── josephgranville ───────────────────────────────────────────────────
+	// ── joseph granville ───────────────────────────────────────────────────
 	onBalanceVolume = "onBalanceVolume"
 
-	// ── larrywilliams ─────────────────────────────────────────────────────
+	// ── larry williams ─────────────────────────────────────────────────────
 	ultimateOscillator = "ultimateOscillator"
 	williamsPercentR   = "williamsPercentR"
 
-	// ── manfreddurschner ──────────────────────────────────────────────────
+	// ── manfred durschner ──────────────────────────────────────────────────
 	newMovingAverage = "newMovingAverage"
 
-	// ── marcchaikin ───────────────────────────────────────────────────────
+	// ── marc chaikin ───────────────────────────────────────────────────────
 	advanceDecline           = "advanceDecline"
 	advanceDeclineOscillator = "advanceDeclineOscillator"
 
-	// ── markjurik ─────────────────────────────────────────────────────────
+	// ── mark jurik ─────────────────────────────────────────────────────────
 	jurikAdaptiveRelativeTrendStrengthIndex = "jurikAdaptiveRelativeTrendStrengthIndex"
 	jurikAdaptiveZeroLagVelocity            = "jurikAdaptiveZeroLagVelocity"
 	jurikCommodityChannelIndex              = "jurikCommodityChannelIndex"
@@ -420,26 +420,26 @@ const (
 	jurikWaveletSampler                     = "jurikWaveletSampler"
 	jurikZeroLagVelocity                    = "jurikZeroLagVelocity"
 
-	// ── patrickmulloy ─────────────────────────────────────────────────────
+	// ── patrick mulloy ─────────────────────────────────────────────────────
 	doubleExponentialMovingAverage = "doubleExponentialMovingAverage"
 	tripleExponentialMovingAverage = "tripleExponentialMovingAverage"
 
-	// ── perrykaufman ──────────────────────────────────────────────────────
+	// ── perry kaufman ──────────────────────────────────────────────────────
 	kaufmanAdaptiveMovingAverage = "kaufmanAdaptiveMovingAverage"
 
-	// ── timtillson ────────────────────────────────────────────────────────
+	// ── tim tillson ────────────────────────────────────────────────────────
 	t2ExponentialMovingAverage = "t2ExponentialMovingAverage"
 	t3ExponentialMovingAverage = "t3ExponentialMovingAverage"
 
-	// ── tusharchande ──────────────────────────────────────────────────────
+	// ── tushar chande ──────────────────────────────────────────────────────
 	aroon                           = "aroon"
 	chandeMomentumOscillator        = "chandeMomentumOscillator"
 	stochasticRelativeStrengthIndex = "stochasticRelativeStrengthIndex"
 
-	// ── vladimirkravchuk ──────────────────────────────────────────────────
+	// ── vladimir kravchuk ──────────────────────────────────────────────────
 	adaptiveTrendAndCycleFilter = "adaptiveTrendAndCycleFilter"
 
-	// ── welleswilder ──────────────────────────────────────────────────────
+	// ── welles wilder ──────────────────────────────────────────────────────
 	averageDirectionalMovementIndex       = "averageDirectionalMovementIndex"
 	averageDirectionalMovementIndexRating = "averageDirectionalMovementIndexRating"
 	averageTrueRange                      = "averageTrueRange"
@@ -490,35 +490,35 @@ func (i Identifier) String() string {
 		return variance
 	case WeightedMovingAverage:
 		return weightedMovingAverage
-	// ── arnaudlegoux ──────────────────────────────────────────────────────
+	// ── arnaud legoux ──────────────────────────────────────────────────────
 	case ArnaudLegouxMovingAverage:
 		return arnaudLegouxMovingAverage
-	// ── donaldlambert ─────────────────────────────────────────────────────
+	// ── donald lambert ─────────────────────────────────────────────────────
 	case CommodityChannelIndex:
 		return commodityChannelIndex
-	// ── genequong ─────────────────────────────────────────────────────────
+	// ── gene quong ─────────────────────────────────────────────────────────
 	case MoneyFlowIndex:
 		return moneyFlowIndex
-	// ── georgelane ────────────────────────────────────────────────────────
+	// ── george lane ────────────────────────────────────────────────────────
 	case Stochastic:
 		return stochastic
-	// ── geraldappel ───────────────────────────────────────────────────────
+	// ── gerald appel ───────────────────────────────────────────────────────
 	case MovingAverageConvergenceDivergence:
 		return movingAverageConvergenceDivergence
 	case PercentagePriceOscillator:
 		return percentagePriceOscillator
-	// ── igorlivshin ───────────────────────────────────────────────────────
+	// ── igor livshin ───────────────────────────────────────────────────────
 	case BalanceOfPower:
 		return balanceOfPower
-	// ── jackhutson ────────────────────────────────────────────────────────
+	// ── jack hutson ────────────────────────────────────────────────────────
 	case TripleExponentialMovingAverageOscillator:
 		return tripleExponentialMovingAverageOscillator
-	// ── johnbollinger ─────────────────────────────────────────────────────
+	// ── john bollinger ─────────────────────────────────────────────────────
 	case BollingerBands:
 		return bollingerBands
 	case BollingerBandsTrend:
 		return bollingerBandsTrend
-	// ── johnehlers ────────────────────────────────────────────────────────
+	// ── john ehlers ────────────────────────────────────────────────────────
 	case AutoCorrelationIndicator:
 		return autoCorrelationIndicator
 	case AutoCorrelationPeriodogram:
@@ -561,23 +561,23 @@ func (i Identifier) String() string {
 		return zeroLagErrorCorrectingExponentialMovingAverage
 	case ZeroLagExponentialMovingAverage:
 		return zeroLagExponentialMovingAverage
-	// ── josephgranville ───────────────────────────────────────────────────
+	// ── joseph granville ───────────────────────────────────────────────────
 	case OnBalanceVolume:
 		return onBalanceVolume
-	// ── larrywilliams ─────────────────────────────────────────────────────
+	// ── larry williams ─────────────────────────────────────────────────────
 	case UltimateOscillator:
 		return ultimateOscillator
 	case WilliamsPercentR:
 		return williamsPercentR
-	// ── manfreddurschner ──────────────────────────────────────────────────
+	// ── manfred durschner ──────────────────────────────────────────────────
 	case NewMovingAverage:
 		return newMovingAverage
-	// ── marcchaikin ───────────────────────────────────────────────────────
+	// ── marc chaikin ───────────────────────────────────────────────────────
 	case AdvanceDecline:
 		return advanceDecline
 	case AdvanceDeclineOscillator:
 		return advanceDeclineOscillator
-	// ── markjurik ─────────────────────────────────────────────────────────
+	// ── mark jurik ─────────────────────────────────────────────────────────
 	case JurikAdaptiveRelativeTrendStrengthIndex:
 		return jurikAdaptiveRelativeTrendStrengthIndex
 	case JurikAdaptiveZeroLagVelocity:
@@ -600,30 +600,30 @@ func (i Identifier) String() string {
 		return jurikWaveletSampler
 	case JurikZeroLagVelocity:
 		return jurikZeroLagVelocity
-	// ── patrickmulloy ─────────────────────────────────────────────────────
+	// ── patrick mulloy ─────────────────────────────────────────────────────
 	case DoubleExponentialMovingAverage:
 		return doubleExponentialMovingAverage
 	case TripleExponentialMovingAverage:
 		return tripleExponentialMovingAverage
-	// ── perrykaufman ──────────────────────────────────────────────────────
+	// ── perry kaufman ──────────────────────────────────────────────────────
 	case KaufmanAdaptiveMovingAverage:
 		return kaufmanAdaptiveMovingAverage
-	// ── timtillson ────────────────────────────────────────────────────────
+	// ── tim tillson ────────────────────────────────────────────────────────
 	case T2ExponentialMovingAverage:
 		return t2ExponentialMovingAverage
 	case T3ExponentialMovingAverage:
 		return t3ExponentialMovingAverage
-	// ── tusharchande ──────────────────────────────────────────────────────
+	// ── tushar chande ──────────────────────────────────────────────────────
 	case Aroon:
 		return aroon
 	case ChandeMomentumOscillator:
 		return chandeMomentumOscillator
 	case StochasticRelativeStrengthIndex:
 		return stochasticRelativeStrengthIndex
-	// ── vladimirkravchuk ──────────────────────────────────────────────────
+	// ── vladimir kravchuk ──────────────────────────────────────────────────
 	case AdaptiveTrendAndCycleFilter:
 		return adaptiveTrendAndCycleFilter
-	// ── welleswilder ──────────────────────────────────────────────────────
+	// ── welles wilder ──────────────────────────────────────────────────────
 	case AverageDirectionalMovementIndex:
 		return averageDirectionalMovementIndex
 	case AverageDirectionalMovementIndexRating:
@@ -724,35 +724,35 @@ func (i *Identifier) UnmarshalJSON(data []byte) error {
 		*i = Variance
 	case weightedMovingAverage:
 		*i = WeightedMovingAverage
-	// ── arnaudlegoux ──────────────────────────────────────────────────────
+	// ── arnaud legoux ──────────────────────────────────────────────────────
 	case arnaudLegouxMovingAverage:
 		*i = ArnaudLegouxMovingAverage
-	// ── donaldlambert ─────────────────────────────────────────────────────
+	// ── donald lambert ─────────────────────────────────────────────────────
 	case commodityChannelIndex:
 		*i = CommodityChannelIndex
-	// ── genequong ─────────────────────────────────────────────────────────
+	// ── gene quong ─────────────────────────────────────────────────────────
 	case moneyFlowIndex:
 		*i = MoneyFlowIndex
-	// ── georgelane ────────────────────────────────────────────────────────
+	// ── george lane ────────────────────────────────────────────────────────
 	case stochastic:
 		*i = Stochastic
-	// ── geraldappel ───────────────────────────────────────────────────────
+	// ── gerald appel ───────────────────────────────────────────────────────
 	case movingAverageConvergenceDivergence:
 		*i = MovingAverageConvergenceDivergence
 	case percentagePriceOscillator:
 		*i = PercentagePriceOscillator
-	// ── igorlivshin ───────────────────────────────────────────────────────
+	// ── igor livshin ───────────────────────────────────────────────────────
 	case balanceOfPower:
 		*i = BalanceOfPower
-	// ── jackhutson ────────────────────────────────────────────────────────
+	// ── jack hutson ────────────────────────────────────────────────────────
 	case tripleExponentialMovingAverageOscillator:
 		*i = TripleExponentialMovingAverageOscillator
-	// ── johnbollinger ─────────────────────────────────────────────────────
+	// ── john bollinger ─────────────────────────────────────────────────────
 	case bollingerBands:
 		*i = BollingerBands
 	case bollingerBandsTrend:
 		*i = BollingerBandsTrend
-	// ── johnehlers ────────────────────────────────────────────────────────
+	// ── john ehlers ────────────────────────────────────────────────────────
 	case autoCorrelationIndicator:
 		*i = AutoCorrelationIndicator
 	case autoCorrelationPeriodogram:
@@ -795,23 +795,23 @@ func (i *Identifier) UnmarshalJSON(data []byte) error {
 		*i = ZeroLagErrorCorrectingExponentialMovingAverage
 	case zeroLagExponentialMovingAverage:
 		*i = ZeroLagExponentialMovingAverage
-	// ── josephgranville ───────────────────────────────────────────────────
+	// ── joseph granville ───────────────────────────────────────────────────
 	case onBalanceVolume:
 		*i = OnBalanceVolume
-	// ── larrywilliams ─────────────────────────────────────────────────────
+	// ── larry williams ─────────────────────────────────────────────────────
 	case ultimateOscillator:
 		*i = UltimateOscillator
 	case williamsPercentR:
 		*i = WilliamsPercentR
-	// ── manfreddurschner ──────────────────────────────────────────────────
+	// ── manfred durschner ──────────────────────────────────────────────────
 	case newMovingAverage:
 		*i = NewMovingAverage
-	// ── marcchaikin ───────────────────────────────────────────────────────
+	// ── marc chaikin ───────────────────────────────────────────────────────
 	case advanceDecline:
 		*i = AdvanceDecline
 	case advanceDeclineOscillator:
 		*i = AdvanceDeclineOscillator
-	// ── markjurik ─────────────────────────────────────────────────────────
+	// ── mark jurik ─────────────────────────────────────────────────────────
 	case jurikAdaptiveRelativeTrendStrengthIndex:
 		*i = JurikAdaptiveRelativeTrendStrengthIndex
 	case jurikAdaptiveZeroLagVelocity:
@@ -834,30 +834,30 @@ func (i *Identifier) UnmarshalJSON(data []byte) error {
 		*i = JurikWaveletSampler
 	case jurikZeroLagVelocity:
 		*i = JurikZeroLagVelocity
-	// ── patrickmulloy ─────────────────────────────────────────────────────
+	// ── patrick mulloy ─────────────────────────────────────────────────────
 	case doubleExponentialMovingAverage:
 		*i = DoubleExponentialMovingAverage
 	case tripleExponentialMovingAverage:
 		*i = TripleExponentialMovingAverage
-	// ── perrykaufman ──────────────────────────────────────────────────────
+	// ── perry kaufman ──────────────────────────────────────────────────────
 	case kaufmanAdaptiveMovingAverage:
 		*i = KaufmanAdaptiveMovingAverage
-	// ── timtillson ────────────────────────────────────────────────────────
+	// ── tim tillson ────────────────────────────────────────────────────────
 	case t2ExponentialMovingAverage:
 		*i = T2ExponentialMovingAverage
 	case t3ExponentialMovingAverage:
 		*i = T3ExponentialMovingAverage
-	// ── tusharchande ──────────────────────────────────────────────────────
+	// ── tushar chande ──────────────────────────────────────────────────────
 	case aroon:
 		*i = Aroon
 	case chandeMomentumOscillator:
 		*i = ChandeMomentumOscillator
 	case stochasticRelativeStrengthIndex:
 		*i = StochasticRelativeStrengthIndex
-	// ── vladimirkravchuk ──────────────────────────────────────────────────
+	// ── vladimir kravchuk ──────────────────────────────────────────────────
 	case adaptiveTrendAndCycleFilter:
 		*i = AdaptiveTrendAndCycleFilter
-	// ── welleswilder ──────────────────────────────────────────────────────
+	// ── welles wilder ──────────────────────────────────────────────────────
 	case averageDirectionalMovementIndex:
 		*i = AverageDirectionalMovementIndex
 	case averageDirectionalMovementIndexRating:

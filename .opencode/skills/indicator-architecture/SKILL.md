@@ -319,6 +319,15 @@ Divider format per language:
 | Zig        | `// ── groupname ──────...──` (4-space indent) |
 | Rust       | `// ── groupname ──────...──` (4-space indent) |
 
+The 22 canonical groups in order:
+
+1. common, 2. arnaud legoux, 3. donald lambert, 4. gene quong, 5. george lane,
+6. gerald appel, 7. igor livshin, 8. jack hutson, 9. john bollinger,
+10. john ehlers, 11. joseph granville, 12. larry williams, 13. manfred durschner,
+14. marc chaikin, 15. mark jurik, 16. patrick mulloy, 17. perry kaufman,
+18. tim tillson, 19. tushar chande, 20. vladimir kravchuk, 21. welles wilder,
+22. custom
+
 When adding a new indicator, **append** the new enum member at the end of its
 author group (after the last existing member in that group), assigning the next
 sequential number. Do **not** re-sort alphabetically within the group — this
@@ -1520,6 +1529,19 @@ comment dividers used in identifiers and descriptors. The **common** group comes
 first, author groups are arranged alphabetically, and the **custom** group comes
 last. When adding a new indicator, **append** the new case at the end of its
 author group — do not re-sort alphabetically within the group.
+
+The 22 canonical groups in order:
+
+1. common, 2. arnaud legoux, 3. donald lambert, 4. gene quong, 5. george lane,
+6. gerald appel, 7. igor livshin, 8. jack hutson, 9. john bollinger,
+10. john ehlers, 11. joseph granville, 12. larry williams, 13. manfred durschner,
+14. marc chaikin, 15. mark jurik, 16. patrick mulloy, 17. perry kaufman,
+18. tim tillson, 19. tushar chande, 20. vladimir kravchuk, 21. welles wilder,
+22. custom
+
+This order is identical across identifiers, descriptors, and factory files in
+all 5 languages. Divider labels use the author's name with spaces — e.g.,
+`// ── john ehlers ──...──`.
 
 ### Go API
 

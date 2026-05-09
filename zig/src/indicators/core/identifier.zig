@@ -30,43 +30,43 @@ pub const Identifier = enum(u8) {
     /// Identifies the Weighted Moving Average (WMA) indicator.
     weighted_moving_average = 12,
 
-    // ── arnaudlegoux ──────────────────────────────────────────────────────
+    // ── arnaud legoux ──────────────────────────────────────────────────────
     /// Identifies the Arnaud Legoux Moving Average (ALMA) indicator.
     arnaud_legoux_moving_average = 13,
 
-    // ── donaldlambert ─────────────────────────────────────────────────────
+    // ── donald lambert ─────────────────────────────────────────────────────
     /// Identifies the Donald Lambert Commodity Channel Index (CCI) indicator.
     commodity_channel_index = 14,
 
-    // ── genequong ─────────────────────────────────────────────────────────
+    // ── gene quong ─────────────────────────────────────────────────────────
     /// Identifies the Gene Quong Money Flow Index (MFI) indicator.
     money_flow_index = 15,
 
-    // ── georgelane ────────────────────────────────────────────────────────
+    // ── george lane ────────────────────────────────────────────────────────
     /// Identifies the George Lane Stochastic Oscillator (STOCH) indicator.
     stochastic = 16,
 
-    // ── geraldappel ───────────────────────────────────────────────────────
+    // ── gerald appel ───────────────────────────────────────────────────────
     /// Identifies Gerald Appel's Moving Average Convergence Divergence (MACD) indicator.
     moving_average_convergence_divergence = 17,
     /// Identifies the Gerald Appel Percentage Price Oscillator (PPO) indicator.
     percentage_price_oscillator = 18,
 
-    // ── igorlivshin ───────────────────────────────────────────────────────
+    // ── igor livshin ───────────────────────────────────────────────────────
     /// Identifies the Igor Livshin Balance of Power (BOP) indicator.
     balance_of_power = 19,
 
-    // ── jackhutson ────────────────────────────────────────────────────────
+    // ── jack hutson ────────────────────────────────────────────────────────
     /// Identifies Jack Hutson's Triple Exponential Moving Average Oscillator (TRIX) indicator.
     triple_exponential_moving_average_oscillator = 20,
 
-    // ── johnbollinger ─────────────────────────────────────────────────────
+    // ── john bollinger ─────────────────────────────────────────────────────
     /// Identifies the Bollinger Bands (BB) indicator.
     bollinger_bands = 21,
     /// Identifies John Bollinger's Bollinger Bands Trend (BBTrend) indicator.
     bollinger_bands_trend = 22,
 
-    // ── johnehlers ────────────────────────────────────────────────────────
+    // ── john ehlers ────────────────────────────────────────────────────────
     /// Identifies the Ehlers Autocorrelation Indicator (ACI) heatmap, a bank of Pearson
     /// correlation coefficients between the current filtered series and a lagged copy
     /// of itself, following EasyLanguage listing 8-2.
@@ -125,27 +125,27 @@ pub const Identifier = enum(u8) {
     /// Identifies the Ehlers Zero-lag Exponential Moving Average (ZEMA) indicator.
     zero_lag_exponential_moving_average = 43,
 
-    // ── josephgranville ───────────────────────────────────────────────────
+    // ── joseph granville ───────────────────────────────────────────────────
     /// Identifies the Joseph Granville On-Balance Volume (OBV) indicator.
     on_balance_volume = 44,
 
-    // ── larrywilliams ─────────────────────────────────────────────────────
+    // ── larry williams ─────────────────────────────────────────────────────
     /// Identifies the Larry Williams Ultimate Oscillator (ULTOSC) indicator.
     ultimate_oscillator = 45,
     /// Identifies the Larry Williams Williams %R (WILL%R) indicator.
     williams_percent_r = 46,
 
-    // ── manfreddurschner ──────────────────────────────────────────────────
+    // ── manfred durschner ──────────────────────────────────────────────────
     /// Identifies the New Moving Average (NMA) indicator by Durschner.
     new_moving_average = 47,
 
-    // ── marcchaikin ───────────────────────────────────────────────────────
+    // ── marc chaikin ───────────────────────────────────────────────────────
     /// Identifies the Marc Chaikin Advance-Decline (A/D) indicator.
     advance_decline = 48,
     /// Identifies the Marc Chaikin Advance-Decline Oscillator (ADOSC) indicator.
     advance_decline_oscillator = 49,
 
-    // ── markjurik ─────────────────────────────────────────────────────────
+    // ── mark jurik ─────────────────────────────────────────────────────────
     /// Identifies the Jurik Adaptive Relative Trend Strength Index (JARSX) indicator.
     jurik_adaptive_relative_trend_strength_index = 50,
     /// Identifies the Jurik Adaptive Zero Lag Velocity (JAVEL) indicator.
@@ -169,23 +169,23 @@ pub const Identifier = enum(u8) {
     /// Identifies the Jurik Zero Lag Velocity (VEL) indicator.
     jurik_zero_lag_velocity = 60,
 
-    // ── patrickmulloy ─────────────────────────────────────────────────────
+    // ── patrick mulloy ─────────────────────────────────────────────────────
     /// Identifies the Double Exponential Moving Average (DEMA) indicator.
     double_exponential_moving_average = 61,
     /// Identifies the Triple Exponential Moving Average (TEMA) indicator.
     triple_exponential_moving_average = 62,
 
-    // ── perrykaufman ──────────────────────────────────────────────────────
+    // ── perry kaufman ──────────────────────────────────────────────────────
     /// Identifies the Kaufman Adaptive Moving Average (KAMA) indicator.
     kaufman_adaptive_moving_average = 63,
 
-    // ── timtillson ────────────────────────────────────────────────────────
+    // ── tim tillson ────────────────────────────────────────────────────────
     /// Identifies the T2 Exponential Moving Average (T2EMA) indicator.
     t2_exponential_moving_average = 64,
     /// Identifies the T3 Exponential Moving Average (T3EMA) indicator.
     t3_exponential_moving_average = 65,
 
-    // ── tusharchande ──────────────────────────────────────────────────────
+    // ── tushar chande ──────────────────────────────────────────────────────
     /// Identifies the Tushar Chande Aroon (AROON) indicator.
     aroon = 66,
     /// Identifies the Chande Momentum Oscillator (CMO) indicator.
@@ -193,12 +193,12 @@ pub const Identifier = enum(u8) {
     /// Identifies the Tushar Chande Stochastic RSI (STOCHRSI) indicator.
     stochastic_relative_strength_index = 68,
 
-    // ── vladimirkravchuk ──────────────────────────────────────────────────
+    // ── vladimir kravchuk ──────────────────────────────────────────────────
     /// Identifies Vladimir Kravchuk's Adaptive Trend and Cycle Filter (ATCF) suite: a bank
     /// of five FIR filters (FATL, SATL, RFTL, RSTL, RBCI) plus three composites (FTLM, STLM, PCCI).
     adaptive_trend_and_cycle_filter = 69,
 
-    // ── welleswilder ──────────────────────────────────────────────────────
+    // ── welles wilder ──────────────────────────────────────────────────────
     /// Identifies the Welles Wilder Average Directional Movement Index (ADX) indicator.
     average_directional_movement_index = 70,
     /// Identifies the Welles Wilder Average Directional Movement Index Rating (ADXR) indicator.
@@ -250,33 +250,33 @@ pub const Identifier = enum(u8) {
             .variance => "variance",
             .weighted_moving_average => "weightedMovingAverage",
 
-            // ── arnaudlegoux ──────────────────────────────────────────────────────
+            // ── arnaud legoux ──────────────────────────────────────────────────────
             .arnaud_legoux_moving_average => "arnaudLegouxMovingAverage",
 
-            // ── donaldlambert ─────────────────────────────────────────────────────
+            // ── donald lambert ─────────────────────────────────────────────────────
             .commodity_channel_index => "commodityChannelIndex",
 
-            // ── genequong ─────────────────────────────────────────────────────────
+            // ── gene quong ─────────────────────────────────────────────────────────
             .money_flow_index => "moneyFlowIndex",
 
-            // ── georgelane ────────────────────────────────────────────────────────
+            // ── george lane ────────────────────────────────────────────────────────
             .stochastic => "stochastic",
 
-            // ── geraldappel ───────────────────────────────────────────────────────
+            // ── gerald appel ───────────────────────────────────────────────────────
             .moving_average_convergence_divergence => "movingAverageConvergenceDivergence",
             .percentage_price_oscillator => "percentagePriceOscillator",
 
-            // ── igorlivshin ───────────────────────────────────────────────────────
+            // ── igor livshin ───────────────────────────────────────────────────────
             .balance_of_power => "balanceOfPower",
 
-            // ── jackhutson ────────────────────────────────────────────────────────
+            // ── jack hutson ────────────────────────────────────────────────────────
             .triple_exponential_moving_average_oscillator => "tripleExponentialMovingAverageOscillator",
 
-            // ── johnbollinger ─────────────────────────────────────────────────────
+            // ── john bollinger ─────────────────────────────────────────────────────
             .bollinger_bands => "bollingerBands",
             .bollinger_bands_trend => "bollingerBandsTrend",
 
-            // ── johnehlers ────────────────────────────────────────────────────────
+            // ── john ehlers ────────────────────────────────────────────────────────
             .auto_correlation_indicator => "autoCorrelationIndicator",
             .auto_correlation_periodogram => "autoCorrelationPeriodogram",
             .center_of_gravity_oscillator => "centerOfGravityOscillator",
@@ -299,21 +299,21 @@ pub const Identifier = enum(u8) {
             .zero_lag_error_correcting_exponential_moving_average => "zeroLagErrorCorrectingExponentialMovingAverage",
             .zero_lag_exponential_moving_average => "zeroLagExponentialMovingAverage",
 
-            // ── josephgranville ───────────────────────────────────────────────────
+            // ── joseph granville ───────────────────────────────────────────────────
             .on_balance_volume => "onBalanceVolume",
 
-            // ── larrywilliams ─────────────────────────────────────────────────────
+            // ── larry williams ─────────────────────────────────────────────────────
             .ultimate_oscillator => "ultimateOscillator",
             .williams_percent_r => "williamsPercentR",
 
-            // ── manfreddurschner ──────────────────────────────────────────────────
+            // ── manfred durschner ──────────────────────────────────────────────────
             .new_moving_average => "newMovingAverage",
 
-            // ── marcchaikin ───────────────────────────────────────────────────────
+            // ── marc chaikin ───────────────────────────────────────────────────────
             .advance_decline => "advanceDecline",
             .advance_decline_oscillator => "advanceDeclineOscillator",
 
-            // ── markjurik ─────────────────────────────────────────────────────────
+            // ── mark jurik ─────────────────────────────────────────────────────────
             .jurik_adaptive_relative_trend_strength_index => "jurikAdaptiveRelativeTrendStrengthIndex",
             .jurik_adaptive_zero_lag_velocity => "jurikAdaptiveZeroLagVelocity",
             .jurik_commodity_channel_index => "jurikCommodityChannelIndex",
@@ -326,26 +326,26 @@ pub const Identifier = enum(u8) {
             .jurik_wavelet_sampler => "jurikWaveletSampler",
             .jurik_zero_lag_velocity => "jurikZeroLagVelocity",
 
-            // ── patrickmulloy ─────────────────────────────────────────────────────
+            // ── patrick mulloy ─────────────────────────────────────────────────────
             .double_exponential_moving_average => "doubleExponentialMovingAverage",
             .triple_exponential_moving_average => "tripleExponentialMovingAverage",
 
-            // ── perrykaufman ──────────────────────────────────────────────────────
+            // ── perry kaufman ──────────────────────────────────────────────────────
             .kaufman_adaptive_moving_average => "kaufmanAdaptiveMovingAverage",
 
-            // ── timtillson ────────────────────────────────────────────────────────
+            // ── tim tillson ────────────────────────────────────────────────────────
             .t2_exponential_moving_average => "t2ExponentialMovingAverage",
             .t3_exponential_moving_average => "t3ExponentialMovingAverage",
 
-            // ── tusharchande ──────────────────────────────────────────────────────
+            // ── tushar chande ──────────────────────────────────────────────────────
             .aroon => "aroon",
             .chande_momentum_oscillator => "chandeMomentumOscillator",
             .stochastic_relative_strength_index => "stochasticRelativeStrengthIndex",
 
-            // ── vladimirkravchuk ──────────────────────────────────────────────────
+            // ── vladimir kravchuk ──────────────────────────────────────────────────
             .adaptive_trend_and_cycle_filter => "adaptiveTrendAndCycleFilter",
 
-            // ── welleswilder ──────────────────────────────────────────────────────
+            // ── welles wilder ──────────────────────────────────────────────────────
             .average_directional_movement_index => "averageDirectionalMovementIndex",
             .average_directional_movement_index_rating => "averageDirectionalMovementIndexRating",
             .average_true_range => "averageTrueRange",
@@ -384,33 +384,33 @@ pub const Identifier = enum(u8) {
             .{ "variance", Identifier.variance },
             .{ "weightedMovingAverage", Identifier.weighted_moving_average },
 
-            // ── arnaudlegoux ──────────────────────────────────────────────────────
+            // ── arnaud legoux ──────────────────────────────────────────────────────
             .{ "arnaudLegouxMovingAverage", Identifier.arnaud_legoux_moving_average },
 
-            // ── donaldlambert ─────────────────────────────────────────────────────
+            // ── donald lambert ─────────────────────────────────────────────────────
             .{ "commodityChannelIndex", Identifier.commodity_channel_index },
 
-            // ── genequong ─────────────────────────────────────────────────────────
+            // ── gene quong ─────────────────────────────────────────────────────────
             .{ "moneyFlowIndex", Identifier.money_flow_index },
 
-            // ── georgelane ────────────────────────────────────────────────────────
+            // ── george lane ────────────────────────────────────────────────────────
             .{ "stochastic", Identifier.stochastic },
 
-            // ── geraldappel ───────────────────────────────────────────────────────
+            // ── gerald appel ───────────────────────────────────────────────────────
             .{ "movingAverageConvergenceDivergence", Identifier.moving_average_convergence_divergence },
             .{ "percentagePriceOscillator", Identifier.percentage_price_oscillator },
 
-            // ── igorlivshin ───────────────────────────────────────────────────────
+            // ── igor livshin ───────────────────────────────────────────────────────
             .{ "balanceOfPower", Identifier.balance_of_power },
 
-            // ── jackhutson ────────────────────────────────────────────────────────
+            // ── jack hutson ────────────────────────────────────────────────────────
             .{ "tripleExponentialMovingAverageOscillator", Identifier.triple_exponential_moving_average_oscillator },
 
-            // ── johnbollinger ─────────────────────────────────────────────────────
+            // ── john bollinger ─────────────────────────────────────────────────────
             .{ "bollingerBands", Identifier.bollinger_bands },
             .{ "bollingerBandsTrend", Identifier.bollinger_bands_trend },
 
-            // ── johnehlers ────────────────────────────────────────────────────────
+            // ── john ehlers ────────────────────────────────────────────────────────
             .{ "autoCorrelationIndicator", Identifier.auto_correlation_indicator },
             .{ "autoCorrelationPeriodogram", Identifier.auto_correlation_periodogram },
             .{ "centerOfGravityOscillator", Identifier.center_of_gravity_oscillator },
@@ -433,21 +433,21 @@ pub const Identifier = enum(u8) {
             .{ "zeroLagErrorCorrectingExponentialMovingAverage", Identifier.zero_lag_error_correcting_exponential_moving_average },
             .{ "zeroLagExponentialMovingAverage", Identifier.zero_lag_exponential_moving_average },
 
-            // ── josephgranville ───────────────────────────────────────────────────
+            // ── joseph granville ───────────────────────────────────────────────────
             .{ "onBalanceVolume", Identifier.on_balance_volume },
 
-            // ── larrywilliams ─────────────────────────────────────────────────────
+            // ── larry williams ─────────────────────────────────────────────────────
             .{ "ultimateOscillator", Identifier.ultimate_oscillator },
             .{ "williamsPercentR", Identifier.williams_percent_r },
 
-            // ── manfreddurschner ──────────────────────────────────────────────────
+            // ── manfred durschner ──────────────────────────────────────────────────
             .{ "newMovingAverage", Identifier.new_moving_average },
 
-            // ── marcchaikin ───────────────────────────────────────────────────────
+            // ── marc chaikin ───────────────────────────────────────────────────────
             .{ "advanceDecline", Identifier.advance_decline },
             .{ "advanceDeclineOscillator", Identifier.advance_decline_oscillator },
 
-            // ── markjurik ─────────────────────────────────────────────────────────
+            // ── mark jurik ─────────────────────────────────────────────────────────
             .{ "jurikAdaptiveRelativeTrendStrengthIndex", Identifier.jurik_adaptive_relative_trend_strength_index },
             .{ "jurikAdaptiveZeroLagVelocity", Identifier.jurik_adaptive_zero_lag_velocity },
             .{ "jurikCommodityChannelIndex", Identifier.jurik_commodity_channel_index },
@@ -460,26 +460,26 @@ pub const Identifier = enum(u8) {
             .{ "jurikWaveletSampler", Identifier.jurik_wavelet_sampler },
             .{ "jurikZeroLagVelocity", Identifier.jurik_zero_lag_velocity },
 
-            // ── patrickmulloy ─────────────────────────────────────────────────────
+            // ── patrick mulloy ─────────────────────────────────────────────────────
             .{ "doubleExponentialMovingAverage", Identifier.double_exponential_moving_average },
             .{ "tripleExponentialMovingAverage", Identifier.triple_exponential_moving_average },
 
-            // ── perrykaufman ──────────────────────────────────────────────────────
+            // ── perry kaufman ──────────────────────────────────────────────────────
             .{ "kaufmanAdaptiveMovingAverage", Identifier.kaufman_adaptive_moving_average },
 
-            // ── timtillson ────────────────────────────────────────────────────────
+            // ── tim tillson ────────────────────────────────────────────────────────
             .{ "t2ExponentialMovingAverage", Identifier.t2_exponential_moving_average },
             .{ "t3ExponentialMovingAverage", Identifier.t3_exponential_moving_average },
 
-            // ── tusharchande ──────────────────────────────────────────────────────
+            // ── tushar chande ──────────────────────────────────────────────────────
             .{ "aroon", Identifier.aroon },
             .{ "chandeMomentumOscillator", Identifier.chande_momentum_oscillator },
             .{ "stochasticRelativeStrengthIndex", Identifier.stochastic_relative_strength_index },
 
-            // ── vladimirkravchuk ──────────────────────────────────────────────────
+            // ── vladimir kravchuk ──────────────────────────────────────────────────
             .{ "adaptiveTrendAndCycleFilter", Identifier.adaptive_trend_and_cycle_filter },
 
-            // ── welleswilder ──────────────────────────────────────────────────────
+            // ── welles wilder ──────────────────────────────────────────────────────
             .{ "averageDirectionalMovementIndex", Identifier.average_directional_movement_index },
             .{ "averageDirectionalMovementIndexRating", Identifier.average_directional_movement_index_rating },
             .{ "averageTrueRange", Identifier.average_true_range },

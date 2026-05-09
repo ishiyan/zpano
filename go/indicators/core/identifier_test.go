@@ -26,25 +26,25 @@ func TestIdentifierString(t *testing.T) {
 		{TriangularMovingAverage, triangularMovingAverage},
 		{Variance, variance},
 		{WeightedMovingAverage, weightedMovingAverage},
-		// ── arnaudlegoux ──────────────────────────────────────────────────────
+		// ── arnaud legoux ──────────────────────────────────────────────────────
 		{ArnaudLegouxMovingAverage, arnaudLegouxMovingAverage},
-		// ── donaldlambert ─────────────────────────────────────────────────────
+		// ── donald lambert ─────────────────────────────────────────────────────
 		{CommodityChannelIndex, commodityChannelIndex},
-		// ── genequong ─────────────────────────────────────────────────────────
+		// ── gene quong ─────────────────────────────────────────────────────────
 		{MoneyFlowIndex, moneyFlowIndex},
-		// ── georgelane ────────────────────────────────────────────────────────
+		// ── george lane ────────────────────────────────────────────────────────
 		{Stochastic, stochastic},
-		// ── geraldappel ───────────────────────────────────────────────────────
+		// ── gerald appel ───────────────────────────────────────────────────────
 		{MovingAverageConvergenceDivergence, movingAverageConvergenceDivergence},
 		{PercentagePriceOscillator, percentagePriceOscillator},
-		// ── igorlivshin ───────────────────────────────────────────────────────
+		// ── igor livshin ───────────────────────────────────────────────────────
 		{BalanceOfPower, balanceOfPower},
-		// ── jackhutson ────────────────────────────────────────────────────────
+		// ── jack hutson ────────────────────────────────────────────────────────
 		{TripleExponentialMovingAverageOscillator, tripleExponentialMovingAverageOscillator},
-		// ── johnbollinger ─────────────────────────────────────────────────────
+		// ── john bollinger ─────────────────────────────────────────────────────
 		{BollingerBands, bollingerBands},
 		{BollingerBandsTrend, bollingerBandsTrend},
-		// ── johnehlers ────────────────────────────────────────────────────────
+		// ── john ehlers ────────────────────────────────────────────────────────
 		{AutoCorrelationIndicator, autoCorrelationIndicator},
 		{AutoCorrelationPeriodogram, autoCorrelationPeriodogram},
 		{CenterOfGravityOscillator, centerOfGravityOscillator},
@@ -66,17 +66,17 @@ func TestIdentifierString(t *testing.T) {
 		{TrendCycleMode, trendCycleMode},
 		{ZeroLagErrorCorrectingExponentialMovingAverage, zeroLagErrorCorrectingExponentialMovingAverage},
 		{ZeroLagExponentialMovingAverage, zeroLagExponentialMovingAverage},
-		// ── josephgranville ───────────────────────────────────────────────────
+		// ── joseph granville ───────────────────────────────────────────────────
 		{OnBalanceVolume, onBalanceVolume},
-		// ── larrywilliams ─────────────────────────────────────────────────────
+		// ── larry williams ─────────────────────────────────────────────────────
 		{UltimateOscillator, ultimateOscillator},
 		{WilliamsPercentR, williamsPercentR},
-		// ── manfreddurschner ──────────────────────────────────────────────────
+		// ── manfred durschner ──────────────────────────────────────────────────
 		{NewMovingAverage, newMovingAverage},
-		// ── marcchaikin ───────────────────────────────────────────────────────
+		// ── marc chaikin ───────────────────────────────────────────────────────
 		{AdvanceDecline, advanceDecline},
 		{AdvanceDeclineOscillator, advanceDeclineOscillator},
-		// ── markjurik ─────────────────────────────────────────────────────────
+		// ── mark jurik ─────────────────────────────────────────────────────────
 		{JurikAdaptiveRelativeTrendStrengthIndex, jurikAdaptiveRelativeTrendStrengthIndex},
 		{JurikAdaptiveZeroLagVelocity, jurikAdaptiveZeroLagVelocity},
 		{JurikCommodityChannelIndex, jurikCommodityChannelIndex},
@@ -88,21 +88,21 @@ func TestIdentifierString(t *testing.T) {
 		{JurikTurningPointOscillator, jurikTurningPointOscillator},
 		{JurikWaveletSampler, jurikWaveletSampler},
 		{JurikZeroLagVelocity, jurikZeroLagVelocity},
-		// ── patrickmulloy ─────────────────────────────────────────────────────
+		// ── patrick mulloy ─────────────────────────────────────────────────────
 		{DoubleExponentialMovingAverage, doubleExponentialMovingAverage},
 		{TripleExponentialMovingAverage, tripleExponentialMovingAverage},
-		// ── perrykaufman ──────────────────────────────────────────────────────
+		// ── perry kaufman ──────────────────────────────────────────────────────
 		{KaufmanAdaptiveMovingAverage, kaufmanAdaptiveMovingAverage},
-		// ── timtillson ────────────────────────────────────────────────────────
+		// ── tim tillson ────────────────────────────────────────────────────────
 		{T2ExponentialMovingAverage, t2ExponentialMovingAverage},
 		{T3ExponentialMovingAverage, t3ExponentialMovingAverage},
-		// ── tusharchande ──────────────────────────────────────────────────────
+		// ── tushar chande ──────────────────────────────────────────────────────
 		{Aroon, aroon},
 		{ChandeMomentumOscillator, chandeMomentumOscillator},
 		{StochasticRelativeStrengthIndex, stochasticRelativeStrengthIndex},
-		// ── vladimirkravchuk ──────────────────────────────────────────────────
+		// ── vladimir kravchuk ──────────────────────────────────────────────────
 		{AdaptiveTrendAndCycleFilter, adaptiveTrendAndCycleFilter},
-		// ── welleswilder ──────────────────────────────────────────────────────
+		// ── welles wilder ──────────────────────────────────────────────────────
 		{AverageDirectionalMovementIndex, averageDirectionalMovementIndex},
 		{AverageDirectionalMovementIndexRating, averageDirectionalMovementIndexRating},
 		{AverageTrueRange, averageTrueRange},
@@ -156,25 +156,25 @@ func TestIdentifierIsKnown(t *testing.T) {
 		{TriangularMovingAverage, true},
 		{Variance, true},
 		{WeightedMovingAverage, true},
-		// ── arnaudlegoux ──────────────────────────────────────────────────────
+		// ── arnaud legoux ──────────────────────────────────────────────────────
 		{ArnaudLegouxMovingAverage, true},
-		// ── donaldlambert ─────────────────────────────────────────────────────
+		// ── donald lambert ─────────────────────────────────────────────────────
 		{CommodityChannelIndex, true},
-		// ── genequong ─────────────────────────────────────────────────────────
+		// ── gene quong ─────────────────────────────────────────────────────────
 		{MoneyFlowIndex, true},
-		// ── georgelane ────────────────────────────────────────────────────────
+		// ── george lane ────────────────────────────────────────────────────────
 		{Stochastic, true},
-		// ── geraldappel ───────────────────────────────────────────────────────
+		// ── gerald appel ───────────────────────────────────────────────────────
 		{MovingAverageConvergenceDivergence, true},
 		{PercentagePriceOscillator, true},
-		// ── igorlivshin ───────────────────────────────────────────────────────
+		// ── igor livshin ───────────────────────────────────────────────────────
 		{BalanceOfPower, true},
-		// ── jackhutson ────────────────────────────────────────────────────────
+		// ── jack hutson ────────────────────────────────────────────────────────
 		{TripleExponentialMovingAverageOscillator, true},
-		// ── johnbollinger ─────────────────────────────────────────────────────
+		// ── john bollinger ─────────────────────────────────────────────────────
 		{BollingerBands, true},
 		{BollingerBandsTrend, true},
-		// ── johnehlers ────────────────────────────────────────────────────────
+		// ── john ehlers ────────────────────────────────────────────────────────
 		{AutoCorrelationIndicator, true},
 		{AutoCorrelationPeriodogram, true},
 		{CenterOfGravityOscillator, true},
@@ -196,17 +196,17 @@ func TestIdentifierIsKnown(t *testing.T) {
 		{TrendCycleMode, true},
 		{ZeroLagErrorCorrectingExponentialMovingAverage, true},
 		{ZeroLagExponentialMovingAverage, true},
-		// ── josephgranville ───────────────────────────────────────────────────
+		// ── joseph granville ───────────────────────────────────────────────────
 		{OnBalanceVolume, true},
-		// ── larrywilliams ─────────────────────────────────────────────────────
+		// ── larry williams ─────────────────────────────────────────────────────
 		{UltimateOscillator, true},
 		{WilliamsPercentR, true},
-		// ── manfreddurschner ──────────────────────────────────────────────────
+		// ── manfred durschner ──────────────────────────────────────────────────
 		{NewMovingAverage, true},
-		// ── marcchaikin ───────────────────────────────────────────────────────
+		// ── marc chaikin ───────────────────────────────────────────────────────
 		{AdvanceDecline, true},
 		{AdvanceDeclineOscillator, true},
-		// ── markjurik ─────────────────────────────────────────────────────────
+		// ── mark jurik ─────────────────────────────────────────────────────────
 		{JurikAdaptiveRelativeTrendStrengthIndex, true},
 		{JurikAdaptiveZeroLagVelocity, true},
 		{JurikCommodityChannelIndex, true},
@@ -218,21 +218,21 @@ func TestIdentifierIsKnown(t *testing.T) {
 		{JurikTurningPointOscillator, true},
 		{JurikWaveletSampler, true},
 		{JurikZeroLagVelocity, true},
-		// ── patrickmulloy ─────────────────────────────────────────────────────
+		// ── patrick mulloy ─────────────────────────────────────────────────────
 		{DoubleExponentialMovingAverage, true},
 		{TripleExponentialMovingAverage, true},
-		// ── perrykaufman ──────────────────────────────────────────────────────
+		// ── perry kaufman ──────────────────────────────────────────────────────
 		{KaufmanAdaptiveMovingAverage, true},
-		// ── timtillson ────────────────────────────────────────────────────────
+		// ── tim tillson ────────────────────────────────────────────────────────
 		{T2ExponentialMovingAverage, true},
 		{T3ExponentialMovingAverage, true},
-		// ── tusharchande ──────────────────────────────────────────────────────
+		// ── tushar chande ──────────────────────────────────────────────────────
 		{Aroon, true},
 		{ChandeMomentumOscillator, true},
 		{StochasticRelativeStrengthIndex, true},
-		// ── vladimirkravchuk ──────────────────────────────────────────────────
+		// ── vladimir kravchuk ──────────────────────────────────────────────────
 		{AdaptiveTrendAndCycleFilter, true},
-		// ── welleswilder ──────────────────────────────────────────────────────
+		// ── welles wilder ──────────────────────────────────────────────────────
 		{AverageDirectionalMovementIndex, true},
 		{AverageDirectionalMovementIndexRating, true},
 		{AverageTrueRange, true},
@@ -290,25 +290,25 @@ func TestIdentifierMarshalJSON(t *testing.T) {
 		{TriangularMovingAverage, dqs + triangularMovingAverage + dqs, true},
 		{Variance, dqs + variance + dqs, true},
 		{WeightedMovingAverage, dqs + weightedMovingAverage + dqs, true},
-		// ── arnaudlegoux ──────────────────────────────────────────────────────
+		// ── arnaud legoux ──────────────────────────────────────────────────────
 		{ArnaudLegouxMovingAverage, dqs + arnaudLegouxMovingAverage + dqs, true},
-		// ── donaldlambert ─────────────────────────────────────────────────────
+		// ── donald lambert ─────────────────────────────────────────────────────
 		{CommodityChannelIndex, dqs + commodityChannelIndex + dqs, true},
-		// ── genequong ─────────────────────────────────────────────────────────
+		// ── gene quong ─────────────────────────────────────────────────────────
 		{MoneyFlowIndex, dqs + moneyFlowIndex + dqs, true},
-		// ── georgelane ────────────────────────────────────────────────────────
+		// ── george lane ────────────────────────────────────────────────────────
 		{Stochastic, dqs + stochastic + dqs, true},
-		// ── geraldappel ───────────────────────────────────────────────────────
+		// ── gerald appel ───────────────────────────────────────────────────────
 		{MovingAverageConvergenceDivergence, dqs + movingAverageConvergenceDivergence + dqs, true},
 		{PercentagePriceOscillator, dqs + percentagePriceOscillator + dqs, true},
-		// ── igorlivshin ───────────────────────────────────────────────────────
+		// ── igor livshin ───────────────────────────────────────────────────────
 		{BalanceOfPower, dqs + balanceOfPower + dqs, true},
-		// ── jackhutson ────────────────────────────────────────────────────────
+		// ── jack hutson ────────────────────────────────────────────────────────
 		{TripleExponentialMovingAverageOscillator, dqs + tripleExponentialMovingAverageOscillator + dqs, true},
-		// ── johnbollinger ─────────────────────────────────────────────────────
+		// ── john bollinger ─────────────────────────────────────────────────────
 		{BollingerBands, dqs + bollingerBands + dqs, true},
 		{BollingerBandsTrend, dqs + bollingerBandsTrend + dqs, true},
-		// ── johnehlers ────────────────────────────────────────────────────────
+		// ── john ehlers ────────────────────────────────────────────────────────
 		{AutoCorrelationIndicator, dqs + autoCorrelationIndicator + dqs, true},
 		{AutoCorrelationPeriodogram, dqs + autoCorrelationPeriodogram + dqs, true},
 		{CenterOfGravityOscillator, dqs + centerOfGravityOscillator + dqs, true},
@@ -330,17 +330,17 @@ func TestIdentifierMarshalJSON(t *testing.T) {
 		{TrendCycleMode, dqs + trendCycleMode + dqs, true},
 		{ZeroLagErrorCorrectingExponentialMovingAverage, dqs + zeroLagErrorCorrectingExponentialMovingAverage + dqs, true},
 		{ZeroLagExponentialMovingAverage, dqs + zeroLagExponentialMovingAverage + dqs, true},
-		// ── josephgranville ───────────────────────────────────────────────────
+		// ── joseph granville ───────────────────────────────────────────────────
 		{OnBalanceVolume, dqs + onBalanceVolume + dqs, true},
-		// ── larrywilliams ─────────────────────────────────────────────────────
+		// ── larry williams ─────────────────────────────────────────────────────
 		{UltimateOscillator, dqs + ultimateOscillator + dqs, true},
 		{WilliamsPercentR, dqs + williamsPercentR + dqs, true},
-		// ── manfreddurschner ──────────────────────────────────────────────────
+		// ── manfred durschner ──────────────────────────────────────────────────
 		{NewMovingAverage, dqs + newMovingAverage + dqs, true},
-		// ── marcchaikin ───────────────────────────────────────────────────────
+		// ── marc chaikin ───────────────────────────────────────────────────────
 		{AdvanceDecline, dqs + advanceDecline + dqs, true},
 		{AdvanceDeclineOscillator, dqs + advanceDeclineOscillator + dqs, true},
-		// ── markjurik ─────────────────────────────────────────────────────────
+		// ── mark jurik ─────────────────────────────────────────────────────────
 		{JurikAdaptiveRelativeTrendStrengthIndex, dqs + jurikAdaptiveRelativeTrendStrengthIndex + dqs, true},
 		{JurikAdaptiveZeroLagVelocity, dqs + jurikAdaptiveZeroLagVelocity + dqs, true},
 		{JurikCommodityChannelIndex, dqs + jurikCommodityChannelIndex + dqs, true},
@@ -352,21 +352,21 @@ func TestIdentifierMarshalJSON(t *testing.T) {
 		{JurikTurningPointOscillator, dqs + jurikTurningPointOscillator + dqs, true},
 		{JurikWaveletSampler, dqs + jurikWaveletSampler + dqs, true},
 		{JurikZeroLagVelocity, dqs + jurikZeroLagVelocity + dqs, true},
-		// ── patrickmulloy ─────────────────────────────────────────────────────
+		// ── patrick mulloy ─────────────────────────────────────────────────────
 		{DoubleExponentialMovingAverage, dqs + doubleExponentialMovingAverage + dqs, true},
 		{TripleExponentialMovingAverage, dqs + tripleExponentialMovingAverage + dqs, true},
-		// ── perrykaufman ──────────────────────────────────────────────────────
+		// ── perry kaufman ──────────────────────────────────────────────────────
 		{KaufmanAdaptiveMovingAverage, dqs + kaufmanAdaptiveMovingAverage + dqs, true},
-		// ── timtillson ────────────────────────────────────────────────────────
+		// ── tim tillson ────────────────────────────────────────────────────────
 		{T2ExponentialMovingAverage, dqs + t2ExponentialMovingAverage + dqs, true},
 		{T3ExponentialMovingAverage, dqs + t3ExponentialMovingAverage + dqs, true},
-		// ── tusharchande ──────────────────────────────────────────────────────
+		// ── tushar chande ──────────────────────────────────────────────────────
 		{Aroon, dqs + aroon + dqs, true},
 		{ChandeMomentumOscillator, dqs + chandeMomentumOscillator + dqs, true},
 		{StochasticRelativeStrengthIndex, dqs + stochasticRelativeStrengthIndex + dqs, true},
-		// ── vladimirkravchuk ──────────────────────────────────────────────────
+		// ── vladimir kravchuk ──────────────────────────────────────────────────
 		{AdaptiveTrendAndCycleFilter, dqs + adaptiveTrendAndCycleFilter + dqs, true},
-		// ── welleswilder ──────────────────────────────────────────────────────
+		// ── welles wilder ──────────────────────────────────────────────────────
 		{AverageDirectionalMovementIndex, dqs + averageDirectionalMovementIndex + dqs, true},
 		{AverageDirectionalMovementIndexRating, dqs + averageDirectionalMovementIndexRating + dqs, true},
 		{AverageTrueRange, dqs + averageTrueRange + dqs, true},
@@ -437,25 +437,25 @@ func TestIdentifierUnmarshalJSON(t *testing.T) {
 		{TriangularMovingAverage, dqs + triangularMovingAverage + dqs, true},
 		{Variance, dqs + variance + dqs, true},
 		{WeightedMovingAverage, dqs + weightedMovingAverage + dqs, true},
-		// ── arnaudlegoux ──────────────────────────────────────────────────────
+		// ── arnaud legoux ──────────────────────────────────────────────────────
 		{ArnaudLegouxMovingAverage, dqs + arnaudLegouxMovingAverage + dqs, true},
-		// ── donaldlambert ─────────────────────────────────────────────────────
+		// ── donald lambert ─────────────────────────────────────────────────────
 		{CommodityChannelIndex, dqs + commodityChannelIndex + dqs, true},
-		// ── genequong ─────────────────────────────────────────────────────────
+		// ── gene quong ─────────────────────────────────────────────────────────
 		{MoneyFlowIndex, dqs + moneyFlowIndex + dqs, true},
-		// ── georgelane ────────────────────────────────────────────────────────
+		// ── george lane ────────────────────────────────────────────────────────
 		{Stochastic, dqs + stochastic + dqs, true},
-		// ── geraldappel ───────────────────────────────────────────────────────
+		// ── gerald appel ───────────────────────────────────────────────────────
 		{MovingAverageConvergenceDivergence, dqs + movingAverageConvergenceDivergence + dqs, true},
 		{PercentagePriceOscillator, dqs + percentagePriceOscillator + dqs, true},
-		// ── igorlivshin ───────────────────────────────────────────────────────
+		// ── igor livshin ───────────────────────────────────────────────────────
 		{BalanceOfPower, dqs + balanceOfPower + dqs, true},
-		// ── jackhutson ────────────────────────────────────────────────────────
+		// ── jack hutson ────────────────────────────────────────────────────────
 		{TripleExponentialMovingAverageOscillator, dqs + tripleExponentialMovingAverageOscillator + dqs, true},
-		// ── johnbollinger ─────────────────────────────────────────────────────
+		// ── john bollinger ─────────────────────────────────────────────────────
 		{BollingerBands, dqs + bollingerBands + dqs, true},
 		{BollingerBandsTrend, dqs + bollingerBandsTrend + dqs, true},
-		// ── johnehlers ────────────────────────────────────────────────────────
+		// ── john ehlers ────────────────────────────────────────────────────────
 		{AutoCorrelationIndicator, dqs + autoCorrelationIndicator + dqs, true},
 		{AutoCorrelationPeriodogram, dqs + autoCorrelationPeriodogram + dqs, true},
 		{CenterOfGravityOscillator, dqs + centerOfGravityOscillator + dqs, true},
@@ -477,17 +477,17 @@ func TestIdentifierUnmarshalJSON(t *testing.T) {
 		{TrendCycleMode, dqs + trendCycleMode + dqs, true},
 		{ZeroLagErrorCorrectingExponentialMovingAverage, dqs + zeroLagErrorCorrectingExponentialMovingAverage + dqs, true},
 		{ZeroLagExponentialMovingAverage, dqs + zeroLagExponentialMovingAverage + dqs, true},
-		// ── josephgranville ───────────────────────────────────────────────────
+		// ── joseph granville ───────────────────────────────────────────────────
 		{OnBalanceVolume, dqs + onBalanceVolume + dqs, true},
-		// ── larrywilliams ─────────────────────────────────────────────────────
+		// ── larry williams ─────────────────────────────────────────────────────
 		{UltimateOscillator, dqs + ultimateOscillator + dqs, true},
 		{WilliamsPercentR, dqs + williamsPercentR + dqs, true},
-		// ── manfreddurschner ──────────────────────────────────────────────────
+		// ── manfred durschner ──────────────────────────────────────────────────
 		{NewMovingAverage, dqs + newMovingAverage + dqs, true},
-		// ── marcchaikin ───────────────────────────────────────────────────────
+		// ── marc chaikin ───────────────────────────────────────────────────────
 		{AdvanceDecline, dqs + advanceDecline + dqs, true},
 		{AdvanceDeclineOscillator, dqs + advanceDeclineOscillator + dqs, true},
-		// ── markjurik ─────────────────────────────────────────────────────────
+		// ── mark jurik ─────────────────────────────────────────────────────────
 		{JurikAdaptiveRelativeTrendStrengthIndex, dqs + jurikAdaptiveRelativeTrendStrengthIndex + dqs, true},
 		{JurikAdaptiveZeroLagVelocity, dqs + jurikAdaptiveZeroLagVelocity + dqs, true},
 		{JurikCommodityChannelIndex, dqs + jurikCommodityChannelIndex + dqs, true},
@@ -499,21 +499,21 @@ func TestIdentifierUnmarshalJSON(t *testing.T) {
 		{JurikTurningPointOscillator, dqs + jurikTurningPointOscillator + dqs, true},
 		{JurikWaveletSampler, dqs + jurikWaveletSampler + dqs, true},
 		{JurikZeroLagVelocity, dqs + jurikZeroLagVelocity + dqs, true},
-		// ── patrickmulloy ─────────────────────────────────────────────────────
+		// ── patrick mulloy ─────────────────────────────────────────────────────
 		{DoubleExponentialMovingAverage, dqs + doubleExponentialMovingAverage + dqs, true},
 		{TripleExponentialMovingAverage, dqs + tripleExponentialMovingAverage + dqs, true},
-		// ── perrykaufman ──────────────────────────────────────────────────────
+		// ── perry kaufman ──────────────────────────────────────────────────────
 		{KaufmanAdaptiveMovingAverage, dqs + kaufmanAdaptiveMovingAverage + dqs, true},
-		// ── timtillson ────────────────────────────────────────────────────────
+		// ── tim tillson ────────────────────────────────────────────────────────
 		{T2ExponentialMovingAverage, dqs + t2ExponentialMovingAverage + dqs, true},
 		{T3ExponentialMovingAverage, dqs + t3ExponentialMovingAverage + dqs, true},
-		// ── tusharchande ──────────────────────────────────────────────────────
+		// ── tushar chande ──────────────────────────────────────────────────────
 		{Aroon, dqs + aroon + dqs, true},
 		{ChandeMomentumOscillator, dqs + chandeMomentumOscillator + dqs, true},
 		{StochasticRelativeStrengthIndex, dqs + stochasticRelativeStrengthIndex + dqs, true},
-		// ── vladimirkravchuk ──────────────────────────────────────────────────
+		// ── vladimir kravchuk ──────────────────────────────────────────────────
 		{AdaptiveTrendAndCycleFilter, dqs + adaptiveTrendAndCycleFilter + dqs, true},
-		// ── welleswilder ──────────────────────────────────────────────────────
+		// ── welles wilder ──────────────────────────────────────────────────────
 		{AverageDirectionalMovementIndex, dqs + averageDirectionalMovementIndex + dqs, true},
 		{AverageDirectionalMovementIndexRating, dqs + averageDirectionalMovementIndexRating + dqs, true},
 		{AverageTrueRange, dqs + averageTrueRange + dqs, true},

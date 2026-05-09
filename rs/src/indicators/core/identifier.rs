@@ -31,43 +31,43 @@ pub enum Identifier {
     /// Identifies the Weighted Moving Average (WMA) indicator.
     WeightedMovingAverage = 12,
 
-    // ── arnaudlegoux ──────────────────────────────────────────────────────
+    // ── arnaud legoux ──────────────────────────────────────────────────────
     /// Identifies the Arnaud Legoux Moving Average (ALMA) indicator.
     ArnaudLegouxMovingAverage = 13,
 
-    // ── donaldlambert ─────────────────────────────────────────────────────
+    // ── donald lambert ─────────────────────────────────────────────────────
     /// Identifies the Donald Lambert Commodity Channel Index (CCI) indicator.
     CommodityChannelIndex = 14,
 
-    // ── genequong ─────────────────────────────────────────────────────────
+    // ── gene quong ─────────────────────────────────────────────────────────
     /// Identifies the Gene Quong Money Flow Index (MFI) indicator.
     MoneyFlowIndex = 15,
 
-    // ── georgelane ────────────────────────────────────────────────────────
+    // ── george lane ────────────────────────────────────────────────────────
     /// Identifies the George Lane Stochastic Oscillator (STOCH) indicator.
     Stochastic = 16,
 
-    // ── geraldappel ───────────────────────────────────────────────────────
+    // ── gerald appel ───────────────────────────────────────────────────────
     /// Identifies Gerald Appel's Moving Average Convergence Divergence (MACD) indicator.
     MovingAverageConvergenceDivergence = 17,
     /// Identifies the Gerald Appel Percentage Price Oscillator (PPO) indicator.
     PercentagePriceOscillator = 18,
 
-    // ── igorlivshin ───────────────────────────────────────────────────────
+    // ── igor livshin ───────────────────────────────────────────────────────
     /// Identifies the Igor Livshin Balance of Power (BOP) indicator.
     BalanceOfPower = 19,
 
-    // ── jackhutson ────────────────────────────────────────────────────────
+    // ── jack hutson ────────────────────────────────────────────────────────
     /// Identifies Jack Hutson's Triple Exponential Moving Average Oscillator (TRIX) indicator.
     TripleExponentialMovingAverageOscillator = 20,
 
-    // ── johnbollinger ─────────────────────────────────────────────────────
+    // ── john bollinger ─────────────────────────────────────────────────────
     /// Identifies the Bollinger Bands (BB) indicator.
     BollingerBands = 21,
     /// Identifies John Bollinger's Bollinger Bands Trend (BBTrend) indicator.
     BollingerBandsTrend = 22,
 
-    // ── johnehlers ────────────────────────────────────────────────────────
+    // ── john ehlers ────────────────────────────────────────────────────────
     /// Identifies the Ehlers Autocorrelation Indicator (ACI) heatmap, a bank of Pearson
     /// correlation coefficients between the current filtered series and a lagged copy
     /// of itself, following EasyLanguage listing 8-2.
@@ -126,27 +126,27 @@ pub enum Identifier {
     /// Identifies the Ehlers Zero-lag Exponential Moving Average (ZEMA) indicator.
     ZeroLagExponentialMovingAverage = 43,
 
-    // ── josephgranville ───────────────────────────────────────────────────
+    // ── joseph granville ───────────────────────────────────────────────────
     /// Identifies the Joseph Granville On-Balance Volume (OBV) indicator.
     OnBalanceVolume = 44,
 
-    // ── larrywilliams ─────────────────────────────────────────────────────
+    // ── larry williams ─────────────────────────────────────────────────────
     /// Identifies the Larry Williams Ultimate Oscillator (ULTOSC) indicator.
     UltimateOscillator = 45,
     /// Identifies the Larry Williams Williams %R (WILL%R) indicator.
     WilliamsPercentR = 46,
 
-    // ── manfreddurschner ──────────────────────────────────────────────────
+    // ── manfred durschner ──────────────────────────────────────────────────
     /// Identifies the New Moving Average (NMA) indicator by Durschner.
     NewMovingAverage = 47,
 
-    // ── marcchaikin ───────────────────────────────────────────────────────
+    // ── marc chaikin ───────────────────────────────────────────────────────
     /// Identifies the Marc Chaikin Advance-Decline (A/D) indicator.
     AdvanceDecline = 48,
     /// Identifies the Marc Chaikin Advance-Decline Oscillator (ADOSC) indicator.
     AdvanceDeclineOscillator = 49,
 
-    // ── markjurik ─────────────────────────────────────────────────────────
+    // ── mark jurik ─────────────────────────────────────────────────────────
     /// Identifies the Jurik Adaptive Relative Trend Strength Index (JARSX) indicator.
     JurikAdaptiveRelativeTrendStrengthIndex = 50,
     /// Identifies the Jurik Adaptive Zero Lag Velocity (JAVEL) indicator.
@@ -170,23 +170,23 @@ pub enum Identifier {
     /// Identifies the Jurik Zero Lag Velocity (VEL) indicator.
     JurikZeroLagVelocity = 60,
 
-    // ── patrickmulloy ─────────────────────────────────────────────────────
+    // ── patrick mulloy ─────────────────────────────────────────────────────
     /// Identifies the Double Exponential Moving Average (DEMA) indicator.
     DoubleExponentialMovingAverage = 61,
     /// Identifies the Triple Exponential Moving Average (TEMA) indicator.
     TripleExponentialMovingAverage = 62,
 
-    // ── perrykaufman ──────────────────────────────────────────────────────
+    // ── perry kaufman ──────────────────────────────────────────────────────
     /// Identifies the Kaufman Adaptive Moving Average (KAMA) indicator.
     KaufmanAdaptiveMovingAverage = 63,
 
-    // ── timtillson ────────────────────────────────────────────────────────
+    // ── tim tillson ────────────────────────────────────────────────────────
     /// Identifies the T2 Exponential Moving Average (T2EMA) indicator.
     T2ExponentialMovingAverage = 64,
     /// Identifies the T3 Exponential Moving Average (T3EMA) indicator.
     T3ExponentialMovingAverage = 65,
 
-    // ── tusharchande ──────────────────────────────────────────────────────
+    // ── tushar chande ──────────────────────────────────────────────────────
     /// Identifies the Tushar Chande Aroon (AROON) indicator.
     Aroon = 66,
     /// Identifies the Chande Momentum Oscillator (CMO) indicator.
@@ -194,12 +194,12 @@ pub enum Identifier {
     /// Identifies the Tushar Chande Stochastic RSI (STOCHRSI) indicator.
     StochasticRelativeStrengthIndex = 68,
 
-    // ── vladimirkravchuk ──────────────────────────────────────────────────
+    // ── vladimir kravchuk ──────────────────────────────────────────────────
     /// Identifies Vladimir Kravchuk's Adaptive Trend and Cycle Filter (ATCF) suite: a bank
     /// of five FIR filters (FATL, SATL, RFTL, RSTL, RBCI) plus three composites (FTLM, STLM, PCCI).
     AdaptiveTrendAndCycleFilter = 69,
 
-    // ── welleswilder ──────────────────────────────────────────────────────
+    // ── welles wilder ──────────────────────────────────────────────────────
     /// Identifies the Welles Wilder Average Directional Movement Index (ADX) indicator.
     AverageDirectionalMovementIndex = 70,
     /// Identifies the Welles Wilder Average Directional Movement Index Rating (ADXR) indicator.

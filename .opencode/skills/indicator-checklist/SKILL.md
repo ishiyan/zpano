@@ -134,7 +134,7 @@ Register in `core/identifier` in all 5 languages simultaneously.
 
 **Grouping rules:**
 - Identifiers are grouped by author with `// ──` / `# ──` comment dividers.
-- "common" first, author groups alphabetical, "custom" last.
+- 22 canonical groups in order: common, arnaud legoux, donald lambert, gene quong, george lane, gerald appel, igor livshin, jack hutson, john bollinger, john ehlers, joseph granville, larry williams, manfred durschner, marc chaikin, mark jurik, patrick mulloy, perry kaufman, tim tillson, tushar chande, vladimir kravchuk, welles wilder, custom.
 - **Append** new member at end of its author group — do not re-sort alphabetically.
 - Assign the next sequential number.
 - If new author group needed, insert in alphabetical order between existing groups.
@@ -150,7 +150,7 @@ Outputs order must match the `OutputText[]` passed by `metadata()`.
 
 **Grouping rules (same as identifiers):**
 - Descriptor entries are grouped by author with `// ──` / `# ──` comment dividers.
-- "common" first, author groups alphabetical, "custom" last.
+- Same 22 canonical groups as identifiers (common first, authors alphabetical, custom last).
 - **Append** new entry at end of its author group — do not re-sort alphabetically within a group.
 - If a new author group is needed, insert a new divider in alphabetical order between existing groups.
 
@@ -160,7 +160,7 @@ Register in `factory/factory.{go,ts,py,zig,rs}`.
 
 **Grouping rules (same as identifiers and descriptors):**
 - Factory cases are grouped by author with `// ──` / `# ──` comment dividers.
-- "common" first, author groups alphabetical, "custom" last.
+- 22 canonical groups in order: common, arnaud legoux, donald lambert, gene quong, george lane, gerald appel, igor livshin, jack hutson, john bollinger, john ehlers, joseph granville, larry williams, manfred durschner, marc chaikin, mark jurik, patrick mulloy, perry kaufman, tim tillson, tushar chande, vladimir kravchuk, welles wilder, custom.
 - **Append** new case at end of its author group — do not re-sort alphabetically within a group.
 - If a new author group is needed, insert a new divider in alphabetical order between existing groups.
 

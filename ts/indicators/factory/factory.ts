@@ -47,45 +47,39 @@ import { defaultParams as defaultCorrelParams } from '../common/pearsons-correla
 import { AbsolutePriceOscillator } from '../common/absolute-price-oscillator/absolute-price-oscillator.js';
 import { defaultParams as defaultApoParams } from '../common/absolute-price-oscillator/params.js';
 
-// ── mark-jurik ──────────────────────────────────────────────────────────────
-import { JurikMovingAverage } from '../mark-jurik/jurik-moving-average/jurik-moving-average.js';
-import { defaultParams as defaultJmaParams } from '../mark-jurik/jurik-moving-average/params.js';
-import { JurikCompositeFractalBehaviorIndex } from '../mark-jurik/jurik-composite-fractal-behavior-index/jurik-composite-fractal-behavior-index.js';
-import { defaultParams as defaultCfbParams } from '../mark-jurik/jurik-composite-fractal-behavior-index/params.js';
-import { JurikZeroLagVelocity } from '../mark-jurik/jurik-zero-lag-velocity/jurik-zero-lag-velocity.js';
-import { defaultParams as defaultVelParams } from '../mark-jurik/jurik-zero-lag-velocity/params.js';
-import { JurikRelativeTrendStrengthIndex } from '../mark-jurik/jurik-relative-trend-strength-index/jurik-relative-trend-strength-index.js';
-import { defaultParams as defaultRsxParams } from '../mark-jurik/jurik-relative-trend-strength-index/params.js';
-import { JurikDirectionalMovementIndex } from '../mark-jurik/jurik-directional-movement-index/jurik-directional-movement-index.js';
-import { defaultParams as defaultDmxParams } from '../mark-jurik/jurik-directional-movement-index/params.js';
-import { JurikTurningPointOscillator } from '../mark-jurik/jurik-turning-point-oscillator/jurik-turning-point-oscillator.js';
-import { defaultParams as defaultJtpoParams } from '../mark-jurik/jurik-turning-point-oscillator/params.js';
-import { JurikAdaptiveRelativeTrendStrengthIndex } from '../mark-jurik/jurik-adaptive-relative-trend-strength-index/jurik-adaptive-relative-trend-strength-index.js';
-import { defaultParams as defaultJarsxParams } from '../mark-jurik/jurik-adaptive-relative-trend-strength-index/params.js';
-import { JurikAdaptiveZeroLagVelocity } from '../mark-jurik/jurik-adaptive-zero-lag-velocity/jurik-adaptive-zero-lag-velocity.js';
-import { defaultParams as defaultJavelParams } from '../mark-jurik/jurik-adaptive-zero-lag-velocity/params.js';
-import { JurikCommodityChannelIndex } from '../mark-jurik/jurik-commodity-channel-index/jurik-commodity-channel-index.js';
-import { defaultParams as defaultJccxParams } from '../mark-jurik/jurik-commodity-channel-index/params.js';
-import { JurikFractalAdaptiveZeroLagVelocity } from '../mark-jurik/jurik-fractal-adaptive-zero-lag-velocity/jurik-fractal-adaptive-zero-lag-velocity.js';
-import { defaultParams as defaultJvelcfbParams } from '../mark-jurik/jurik-fractal-adaptive-zero-lag-velocity/params.js';
-import { JurikWaveletSampler } from '../mark-jurik/jurik-wavelet-sampler/jurik-wavelet-sampler.js';
-import { defaultParams as defaultWavParams } from '../mark-jurik/jurik-wavelet-sampler/params.js';
+// ── arnaud-legoux ───────────────────────────────────────────────────────────
+import { ArnaudLegouxMovingAverage } from '../arnaud-legoux/arnaud-legoux-moving-average/arnaud-legoux-moving-average.js';
+import { defaultParams as defaultAlmaParams } from '../arnaud-legoux/arnaud-legoux-moving-average/params.js';
 
-// ── patrick-mulloy ──────────────────────────────────────────────────────────
-import { DoubleExponentialMovingAverage } from '../patrick-mulloy/double-exponential-moving-average/double-exponential-moving-average.js';
-import { defaultLengthParams as defaultDemaLengthParams } from '../patrick-mulloy/double-exponential-moving-average/params.js';
-import { TripleExponentialMovingAverage } from '../patrick-mulloy/triple-exponential-moving-average/triple-exponential-moving-average.js';
-import { defaultLengthParams as defaultTemaLengthParams } from '../patrick-mulloy/triple-exponential-moving-average/params.js';
+// ── donald-lambert ──────────────────────────────────────────────────────────
+import { CommodityChannelIndex } from '../donald-lambert/commodity-channel-index/commodity-channel-index.js';
+import { defaultParams as defaultCciParams } from '../donald-lambert/commodity-channel-index/params.js';
 
-// ── tim-tillson ─────────────────────────────────────────────────────────────
-import { T2ExponentialMovingAverage } from '../tim-tillson/t2-exponential-moving-average/t2-exponential-moving-average.js';
-import { defaultLengthParams as defaultT2LengthParams, defaultSmoothingFactorParams as defaultT2SfParams } from '../tim-tillson/t2-exponential-moving-average/params.js';
-import { T3ExponentialMovingAverage } from '../tim-tillson/t3-exponential-moving-average/t3-exponential-moving-average.js';
-import { defaultLengthParams as defaultT3LengthParams, defaultSmoothingFactorParams as defaultT3SfParams } from '../tim-tillson/t3-exponential-moving-average/params.js';
+// ── gene-quong ──────────────────────────────────────────────────────────────
+import { MoneyFlowIndex } from '../gene-quong/money-flow-index/money-flow-index.js';
+import { defaultParams as defaultMfiParams } from '../gene-quong/money-flow-index/params.js';
 
-// ── perry-kaufman ───────────────────────────────────────────────────────────
-import { KaufmanAdaptiveMovingAverage } from '../perry-kaufman/kaufman-adaptive-moving-average/kaufman-adaptive-moving-average.js';
-import { defaultLengthParams as defaultKamaLengthParams, defaultSmoothingFactorParams as defaultKamaSfParams } from '../perry-kaufman/kaufman-adaptive-moving-average/params.js';
+// ── george-lane ─────────────────────────────────────────────────────────────
+import { Stochastic } from '../george-lane/stochastic/stochastic.js';
+import { defaultParams as defaultStochParams } from '../george-lane/stochastic/params.js';
+
+// ── gerald-appel ────────────────────────────────────────────────────────────
+import { PercentagePriceOscillator } from '../gerald-appel/percentage-price-oscillator/percentage-price-oscillator.js';
+import { defaultParams as defaultPpoParams } from '../gerald-appel/percentage-price-oscillator/params.js';
+import { MovingAverageConvergenceDivergence } from '../gerald-appel/moving-average-convergence-divergence/moving-average-convergence-divergence.js';
+
+// ── igor-livshin ────────────────────────────────────────────────────────────
+import { BalanceOfPower } from '../igor-livshin/balance-of-power/balance-of-power.js';
+
+// ── jack-hutson ─────────────────────────────────────────────────────────────
+import { TripleExponentialMovingAverageOscillator } from '../jack-hutson/triple-exponential-moving-average-oscillator/triple-exponential-moving-average-oscillator.js';
+import { defaultParams as defaultTrixParams } from '../jack-hutson/triple-exponential-moving-average-oscillator/params.js';
+
+// ── john-bollinger ──────────────────────────────────────────────────────────
+import { BollingerBands } from '../john-bollinger/bollinger-bands/bollinger-bands.js';
+import { defaultParams as defaultBbParams } from '../john-bollinger/bollinger-bands/params.js';
+import { BollingerBandsTrend } from '../john-bollinger/bollinger-bands-trend/bollinger-bands-trend.js';
+import { defaultParams as defaultBbtrendParams } from '../john-bollinger/bollinger-bands-trend/params.js';
 
 // ── john-ehlers ─────────────────────────────────────────────────────────────
 import { MesaAdaptiveMovingAverage } from '../john-ehlers/mesa-adaptive-moving-average/mesa-adaptive-moving-average.js';
@@ -121,6 +115,73 @@ import { AutoCorrelationPeriodogram } from '../john-ehlers/auto-correlation-peri
 import { CombBandPassSpectrum } from '../john-ehlers/comb-band-pass-spectrum/comb-band-pass-spectrum.js';
 import { DiscreteFourierTransformSpectrum } from '../john-ehlers/discrete-fourier-transform-spectrum/discrete-fourier-transform-spectrum.js';
 
+// ── joseph-granville ────────────────────────────────────────────────────────
+import { OnBalanceVolume } from '../joseph-granville/on-balance-volume/on-balance-volume.js';
+
+// ── larry-williams ──────────────────────────────────────────────────────────
+import { WilliamsPercentR } from '../larry-williams/williams-percent-r/williams-percent-r.js';
+import { UltimateOscillator } from '../larry-williams/ultimate-oscillator/ultimate-oscillator.js';
+
+// ── manfred-dürschner ───────────────────────────────────────────────────────
+import { NewMovingAverage } from '../manfred-dürschner/new-moving-average/new-moving-average.js';
+import { defaultParams as defaultNmaParams } from '../manfred-dürschner/new-moving-average/params.js';
+
+// ── marc-chaikin ────────────────────────────────────────────────────────────
+import { AdvanceDecline } from '../marc-chaikin/advance-decline/advance-decline.js';
+import { AdvanceDeclineOscillator } from '../marc-chaikin/advance-decline-oscillator/advance-decline-oscillator.js';
+import { defaultParams as defaultAdoscParams } from '../marc-chaikin/advance-decline-oscillator/params.js';
+
+// ── mark-jurik ──────────────────────────────────────────────────────────────
+import { JurikMovingAverage } from '../mark-jurik/jurik-moving-average/jurik-moving-average.js';
+import { defaultParams as defaultJmaParams } from '../mark-jurik/jurik-moving-average/params.js';
+import { JurikCompositeFractalBehaviorIndex } from '../mark-jurik/jurik-composite-fractal-behavior-index/jurik-composite-fractal-behavior-index.js';
+import { defaultParams as defaultCfbParams } from '../mark-jurik/jurik-composite-fractal-behavior-index/params.js';
+import { JurikZeroLagVelocity } from '../mark-jurik/jurik-zero-lag-velocity/jurik-zero-lag-velocity.js';
+import { defaultParams as defaultVelParams } from '../mark-jurik/jurik-zero-lag-velocity/params.js';
+import { JurikRelativeTrendStrengthIndex } from '../mark-jurik/jurik-relative-trend-strength-index/jurik-relative-trend-strength-index.js';
+import { defaultParams as defaultRsxParams } from '../mark-jurik/jurik-relative-trend-strength-index/params.js';
+import { JurikDirectionalMovementIndex } from '../mark-jurik/jurik-directional-movement-index/jurik-directional-movement-index.js';
+import { defaultParams as defaultDmxParams } from '../mark-jurik/jurik-directional-movement-index/params.js';
+import { JurikTurningPointOscillator } from '../mark-jurik/jurik-turning-point-oscillator/jurik-turning-point-oscillator.js';
+import { defaultParams as defaultJtpoParams } from '../mark-jurik/jurik-turning-point-oscillator/params.js';
+import { JurikAdaptiveRelativeTrendStrengthIndex } from '../mark-jurik/jurik-adaptive-relative-trend-strength-index/jurik-adaptive-relative-trend-strength-index.js';
+import { defaultParams as defaultJarsxParams } from '../mark-jurik/jurik-adaptive-relative-trend-strength-index/params.js';
+import { JurikAdaptiveZeroLagVelocity } from '../mark-jurik/jurik-adaptive-zero-lag-velocity/jurik-adaptive-zero-lag-velocity.js';
+import { defaultParams as defaultJavelParams } from '../mark-jurik/jurik-adaptive-zero-lag-velocity/params.js';
+import { JurikCommodityChannelIndex } from '../mark-jurik/jurik-commodity-channel-index/jurik-commodity-channel-index.js';
+import { defaultParams as defaultJccxParams } from '../mark-jurik/jurik-commodity-channel-index/params.js';
+import { JurikFractalAdaptiveZeroLagVelocity } from '../mark-jurik/jurik-fractal-adaptive-zero-lag-velocity/jurik-fractal-adaptive-zero-lag-velocity.js';
+import { defaultParams as defaultJvelcfbParams } from '../mark-jurik/jurik-fractal-adaptive-zero-lag-velocity/params.js';
+import { JurikWaveletSampler } from '../mark-jurik/jurik-wavelet-sampler/jurik-wavelet-sampler.js';
+import { defaultParams as defaultWavParams } from '../mark-jurik/jurik-wavelet-sampler/params.js';
+
+// ── patrick-mulloy ──────────────────────────────────────────────────────────
+import { DoubleExponentialMovingAverage } from '../patrick-mulloy/double-exponential-moving-average/double-exponential-moving-average.js';
+import { defaultLengthParams as defaultDemaLengthParams } from '../patrick-mulloy/double-exponential-moving-average/params.js';
+import { TripleExponentialMovingAverage } from '../patrick-mulloy/triple-exponential-moving-average/triple-exponential-moving-average.js';
+import { defaultLengthParams as defaultTemaLengthParams } from '../patrick-mulloy/triple-exponential-moving-average/params.js';
+
+// ── perry-kaufman ───────────────────────────────────────────────────────────
+import { KaufmanAdaptiveMovingAverage } from '../perry-kaufman/kaufman-adaptive-moving-average/kaufman-adaptive-moving-average.js';
+import { defaultLengthParams as defaultKamaLengthParams, defaultSmoothingFactorParams as defaultKamaSfParams } from '../perry-kaufman/kaufman-adaptive-moving-average/params.js';
+
+// ── tim-tillson ─────────────────────────────────────────────────────────────
+import { T2ExponentialMovingAverage } from '../tim-tillson/t2-exponential-moving-average/t2-exponential-moving-average.js';
+import { defaultLengthParams as defaultT2LengthParams, defaultSmoothingFactorParams as defaultT2SfParams } from '../tim-tillson/t2-exponential-moving-average/params.js';
+import { T3ExponentialMovingAverage } from '../tim-tillson/t3-exponential-moving-average/t3-exponential-moving-average.js';
+import { defaultLengthParams as defaultT3LengthParams, defaultSmoothingFactorParams as defaultT3SfParams } from '../tim-tillson/t3-exponential-moving-average/params.js';
+
+// ── tushar-chande ───────────────────────────────────────────────────────────
+import { ChandeMomentumOscillator } from '../tushar-chande/chande-momentum-oscillator/chande-momentum-oscillator.js';
+import { defaultParams as defaultCmoParams } from '../tushar-chande/chande-momentum-oscillator/params.js';
+import { StochasticRelativeStrengthIndex } from '../tushar-chande/stochastic-relative-strength-index/stochastic-relative-strength-index.js';
+import { defaultParams as defaultStochRsiParams } from '../tushar-chande/stochastic-relative-strength-index/params.js';
+import { Aroon } from '../tushar-chande/aroon/aroon.js';
+import { defaultParams as defaultAroonParams } from '../tushar-chande/aroon/params.js';
+
+// ── vladimir-kravchuk ───────────────────────────────────────────────────────
+import { AdaptiveTrendAndCycleFilter } from '../vladimir-kravchuk/adaptive-trend-and-cycle-filter/adaptive-trend-and-cycle-filter.js';
+
 // ── welles-wilder ───────────────────────────────────────────────────────────
 import { TrueRange } from '../welles-wilder/true-range/true-range.js';
 import { AverageTrueRange } from '../welles-wilder/average-true-range/average-true-range.js';
@@ -136,70 +197,9 @@ import { RelativeStrengthIndex } from '../welles-wilder/relative-strength-index/
 import { defaultParams as defaultRsiParams } from '../welles-wilder/relative-strength-index/params.js';
 import { ParabolicStopAndReverse } from '../welles-wilder/parabolic-stop-and-reverse/parabolic-stop-and-reverse.js';
 
-// ── john-bollinger ──────────────────────────────────────────────────────────
-import { BollingerBands } from '../john-bollinger/bollinger-bands/bollinger-bands.js';
-import { defaultParams as defaultBbParams } from '../john-bollinger/bollinger-bands/params.js';
-import { BollingerBandsTrend } from '../john-bollinger/bollinger-bands-trend/bollinger-bands-trend.js';
-import { defaultParams as defaultBbtrendParams } from '../john-bollinger/bollinger-bands-trend/params.js';
-
-// ── gerald-appel ────────────────────────────────────────────────────────────
-import { PercentagePriceOscillator } from '../gerald-appel/percentage-price-oscillator/percentage-price-oscillator.js';
-import { defaultParams as defaultPpoParams } from '../gerald-appel/percentage-price-oscillator/params.js';
-import { MovingAverageConvergenceDivergence } from '../gerald-appel/moving-average-convergence-divergence/moving-average-convergence-divergence.js';
-
-// ── tushar-chande ───────────────────────────────────────────────────────────
-import { ChandeMomentumOscillator } from '../tushar-chande/chande-momentum-oscillator/chande-momentum-oscillator.js';
-import { defaultParams as defaultCmoParams } from '../tushar-chande/chande-momentum-oscillator/params.js';
-import { StochasticRelativeStrengthIndex } from '../tushar-chande/stochastic-relative-strength-index/stochastic-relative-strength-index.js';
-import { defaultParams as defaultStochRsiParams } from '../tushar-chande/stochastic-relative-strength-index/params.js';
-import { Aroon } from '../tushar-chande/aroon/aroon.js';
-import { defaultParams as defaultAroonParams } from '../tushar-chande/aroon/params.js';
-
-// ── donald-lambert ──────────────────────────────────────────────────────────
-import { CommodityChannelIndex } from '../donald-lambert/commodity-channel-index/commodity-channel-index.js';
-import { defaultParams as defaultCciParams } from '../donald-lambert/commodity-channel-index/params.js';
-
-// ── gene-quong ──────────────────────────────────────────────────────────────
-import { MoneyFlowIndex } from '../gene-quong/money-flow-index/money-flow-index.js';
-import { defaultParams as defaultMfiParams } from '../gene-quong/money-flow-index/params.js';
-
-// ── george-lane ─────────────────────────────────────────────────────────────
-import { Stochastic } from '../george-lane/stochastic/stochastic.js';
-import { defaultParams as defaultStochParams } from '../george-lane/stochastic/params.js';
-
-// ── joseph-granville ────────────────────────────────────────────────────────
-import { OnBalanceVolume } from '../joseph-granville/on-balance-volume/on-balance-volume.js';
-
-// ── igor-livshin ────────────────────────────────────────────────────────────
-import { BalanceOfPower } from '../igor-livshin/balance-of-power/balance-of-power.js';
-
-// ── marc-chaikin ────────────────────────────────────────────────────────────
-import { AdvanceDecline } from '../marc-chaikin/advance-decline/advance-decline.js';
-import { AdvanceDeclineOscillator } from '../marc-chaikin/advance-decline-oscillator/advance-decline-oscillator.js';
-import { defaultParams as defaultAdoscParams } from '../marc-chaikin/advance-decline-oscillator/params.js';
-
-// ── larry-williams ──────────────────────────────────────────────────────────
-import { WilliamsPercentR } from '../larry-williams/williams-percent-r/williams-percent-r.js';
-import { UltimateOscillator } from '../larry-williams/ultimate-oscillator/ultimate-oscillator.js';
-
-// ── jack-hutson ─────────────────────────────────────────────────────────────
-import { TripleExponentialMovingAverageOscillator } from '../jack-hutson/triple-exponential-moving-average-oscillator/triple-exponential-moving-average-oscillator.js';
-import { defaultParams as defaultTrixParams } from '../jack-hutson/triple-exponential-moving-average-oscillator/params.js';
-
-// ── vladimir-kravchuk ───────────────────────────────────────────────────────
-import { AdaptiveTrendAndCycleFilter } from '../vladimir-kravchuk/adaptive-trend-and-cycle-filter/adaptive-trend-and-cycle-filter.js';
-
 // ── custom ──────────────────────────────────────────────────────────────────
 import { GoertzelSpectrum } from '../custom/goertzel-spectrum/goertzel-spectrum.js';
 import { MaximumEntropySpectrum } from '../custom/maximum-entropy-spectrum/maximum-entropy-spectrum.js';
-
-// ── arnaud-legoux ───────────────────────────────────────────────────────────
-import { ArnaudLegouxMovingAverage } from '../arnaud-legoux/arnaud-legoux-moving-average/arnaud-legoux-moving-average.js';
-import { defaultParams as defaultAlmaParams } from '../arnaud-legoux/arnaud-legoux-moving-average/params.js';
-
-// ── manfred-dürschner ───────────────────────────────────────────────────────
-import { NewMovingAverage } from '../manfred-dürschner/new-moving-average/new-moving-average.js';
-import { defaultParams as defaultNmaParams } from '../manfred-dürschner/new-moving-average/params.js';
 
 
 // ---------------------------------------------------------------------------
@@ -280,76 +280,54 @@ export function createIndicator(identifier: IndicatorIdentifier, params?: Record
         case IndicatorIdentifier.LinearRegression:
             return new LinearRegression({ ...defaultLinregParams(), ...p });
 
-        // ── mark-jurik ──────────────────────────────────────────────────
+        // ── arnaud-legoux ───────────────────────────────────────────────
 
-        case IndicatorIdentifier.JurikMovingAverage:
-            return new JurikMovingAverage({ ...defaultJmaParams(), ...p });
+        case IndicatorIdentifier.ArnaudLegouxMovingAverage:
+            return new ArnaudLegouxMovingAverage({ ...defaultAlmaParams(), ...p });
 
-        case IndicatorIdentifier.JurikCompositeFractalBehaviorIndex:
-            return new JurikCompositeFractalBehaviorIndex({ ...defaultCfbParams(), ...p });
+        // ── donald-lambert ──────────────────────────────────────────────
 
-        case IndicatorIdentifier.JurikZeroLagVelocity:
-            return new JurikZeroLagVelocity({ ...defaultVelParams(), ...p });
+        case IndicatorIdentifier.CommodityChannelIndex:
+            return new CommodityChannelIndex({ ...defaultCciParams(), ...p });
 
-        case IndicatorIdentifier.JurikRelativeTrendStrengthIndex:
-            return new JurikRelativeTrendStrengthIndex({ ...defaultRsxParams(), ...p });
+        // ── gene-quong ──────────────────────────────────────────────────
 
-        case IndicatorIdentifier.JurikDirectionalMovementIndex:
-            return new JurikDirectionalMovementIndex({ ...defaultDmxParams(), ...p });
+        case IndicatorIdentifier.MoneyFlowIndex:
+            return new MoneyFlowIndex({ ...defaultMfiParams(), ...p });
 
-        case IndicatorIdentifier.JurikTurningPointOscillator:
-            return new JurikTurningPointOscillator({ ...defaultJtpoParams(), ...p });
+        // ── george-lane ─────────────────────────────────────────────────
 
-        case IndicatorIdentifier.JurikAdaptiveRelativeTrendStrengthIndex:
-            return new JurikAdaptiveRelativeTrendStrengthIndex({ ...defaultJarsxParams(), ...p });
+        case IndicatorIdentifier.Stochastic:
+            return new Stochastic({ ...defaultStochParams(), ...p });
 
-        case IndicatorIdentifier.JurikAdaptiveZeroLagVelocity:
-            return new JurikAdaptiveZeroLagVelocity({ ...defaultJavelParams(), ...p });
+        // ── gerald-appel ────────────────────────────────────────────────
 
-        case IndicatorIdentifier.JurikCommodityChannelIndex:
-            return new JurikCommodityChannelIndex({ ...defaultJccxParams(), ...p });
+        case IndicatorIdentifier.PercentagePriceOscillator:
+            return new PercentagePriceOscillator({ ...defaultPpoParams(), ...p });
 
-        case IndicatorIdentifier.JurikFractalAdaptiveZeroLagVelocity:
-            return new JurikFractalAdaptiveZeroLagVelocity({ ...defaultJvelcfbParams(), ...p });
+        case IndicatorIdentifier.MovingAverageConvergenceDivergence:
+            return new MovingAverageConvergenceDivergence(isEmpty(p) ? undefined : p as any);
 
-        case IndicatorIdentifier.JurikWaveletSampler:
-            return new JurikWaveletSampler({ ...defaultWavParams(), ...p });
+        // ── igor-livshin ────────────────────────────────────────────────
 
-        // ── patrick-mulloy ──────────────────────────────────────────────
+        case IndicatorIdentifier.BalanceOfPower:
+            return new BalanceOfPower();
 
-        case IndicatorIdentifier.DoubleExponentialMovingAverage:
-            if (hasKey(p, 'smoothingFactor')) {
-                return new DoubleExponentialMovingAverage(p as any);
-            }
-            return new DoubleExponentialMovingAverage({ ...defaultDemaLengthParams(), ...p });
+        // ── jack-hutson ─────────────────────────────────────────────────
 
-        case IndicatorIdentifier.TripleExponentialMovingAverage:
-            if (hasKey(p, 'smoothingFactor')) {
-                return new TripleExponentialMovingAverage(p as any);
-            }
-            return new TripleExponentialMovingAverage({ ...defaultTemaLengthParams(), ...p });
+        case IndicatorIdentifier.TripleExponentialMovingAverageOscillator:
+            return new TripleExponentialMovingAverageOscillator({ ...defaultTrixParams(), ...p });
 
-        // ── tim-tillson ─────────────────────────────────────────────────
+        // ── john-bollinger ──────────────────────────────────────────────
 
-        case IndicatorIdentifier.T2ExponentialMovingAverage:
-            if (hasKey(p, 'smoothingFactor')) {
-                return new T2ExponentialMovingAverage({ ...defaultT2SfParams(), ...p } as any);
-            }
-            return new T2ExponentialMovingAverage({ ...defaultT2LengthParams(), ...p });
+        case IndicatorIdentifier.BollingerBands:
+            return new BollingerBands({ ...defaultBbParams(), ...p });
 
-        case IndicatorIdentifier.T3ExponentialMovingAverage:
-            if (hasKey(p, 'smoothingFactor')) {
-                return new T3ExponentialMovingAverage({ ...defaultT3SfParams(), ...p } as any);
-            }
-            return new T3ExponentialMovingAverage({ ...defaultT3LengthParams(), ...p });
-
-        // ── perry-kaufman ───────────────────────────────────────────────
-
-        case IndicatorIdentifier.KaufmanAdaptiveMovingAverage:
-            if (hasKey(p, 'fastestSmoothingFactor') || hasKey(p, 'slowestSmoothingFactor')) {
-                return new KaufmanAdaptiveMovingAverage({ ...defaultKamaSfParams(), ...p } as any);
-            }
-            return new KaufmanAdaptiveMovingAverage({ ...defaultKamaLengthParams(), ...p });
+        case IndicatorIdentifier.BollingerBandsTrend:
+            return new BollingerBandsTrend({
+                ...defaultBbtrendParams(),
+                ...p,
+            });
 
         // ── john-ehlers ─────────────────────────────────────────────────
 
@@ -449,6 +427,120 @@ export function createIndicator(identifier: IndicatorIdentifier, params?: Record
             if (isEmpty(p)) return DiscreteFourierTransformSpectrum.default();
             return DiscreteFourierTransformSpectrum.fromParams(p as any);
 
+        // ── joseph-granville ────────────────────────────────────────────
+
+        case IndicatorIdentifier.OnBalanceVolume:
+            return new OnBalanceVolume(isEmpty(p) ? undefined : p as any);
+
+        // ── larry-williams ──────────────────────────────────────────────
+
+        case IndicatorIdentifier.WilliamsPercentR:
+            return new WilliamsPercentR((p as any).length ?? 14);
+
+        case IndicatorIdentifier.UltimateOscillator:
+            return new UltimateOscillator(isEmpty(p) ? undefined : p as any);
+
+        // ── manfred-dürschner ────────────────────────────────────────────
+
+        case IndicatorIdentifier.NewMovingAverage:
+            return new NewMovingAverage({ ...defaultNmaParams(), ...p });
+
+        // ── marc-chaikin ────────────────────────────────────────────────
+
+        case IndicatorIdentifier.AdvanceDecline:
+            return new AdvanceDecline();
+
+        case IndicatorIdentifier.AdvanceDeclineOscillator:
+            return new AdvanceDeclineOscillator({ ...defaultAdoscParams(), ...p });
+
+        // ── mark-jurik ──────────────────────────────────────────────────
+
+        case IndicatorIdentifier.JurikMovingAverage:
+            return new JurikMovingAverage({ ...defaultJmaParams(), ...p });
+
+        case IndicatorIdentifier.JurikCompositeFractalBehaviorIndex:
+            return new JurikCompositeFractalBehaviorIndex({ ...defaultCfbParams(), ...p });
+
+        case IndicatorIdentifier.JurikZeroLagVelocity:
+            return new JurikZeroLagVelocity({ ...defaultVelParams(), ...p });
+
+        case IndicatorIdentifier.JurikRelativeTrendStrengthIndex:
+            return new JurikRelativeTrendStrengthIndex({ ...defaultRsxParams(), ...p });
+
+        case IndicatorIdentifier.JurikDirectionalMovementIndex:
+            return new JurikDirectionalMovementIndex({ ...defaultDmxParams(), ...p });
+
+        case IndicatorIdentifier.JurikTurningPointOscillator:
+            return new JurikTurningPointOscillator({ ...defaultJtpoParams(), ...p });
+
+        case IndicatorIdentifier.JurikAdaptiveRelativeTrendStrengthIndex:
+            return new JurikAdaptiveRelativeTrendStrengthIndex({ ...defaultJarsxParams(), ...p });
+
+        case IndicatorIdentifier.JurikAdaptiveZeroLagVelocity:
+            return new JurikAdaptiveZeroLagVelocity({ ...defaultJavelParams(), ...p });
+
+        case IndicatorIdentifier.JurikCommodityChannelIndex:
+            return new JurikCommodityChannelIndex({ ...defaultJccxParams(), ...p });
+
+        case IndicatorIdentifier.JurikFractalAdaptiveZeroLagVelocity:
+            return new JurikFractalAdaptiveZeroLagVelocity({ ...defaultJvelcfbParams(), ...p });
+
+        case IndicatorIdentifier.JurikWaveletSampler:
+            return new JurikWaveletSampler({ ...defaultWavParams(), ...p });
+
+        // ── patrick-mulloy ──────────────────────────────────────────────
+
+        case IndicatorIdentifier.DoubleExponentialMovingAverage:
+            if (hasKey(p, 'smoothingFactor')) {
+                return new DoubleExponentialMovingAverage(p as any);
+            }
+            return new DoubleExponentialMovingAverage({ ...defaultDemaLengthParams(), ...p });
+
+        case IndicatorIdentifier.TripleExponentialMovingAverage:
+            if (hasKey(p, 'smoothingFactor')) {
+                return new TripleExponentialMovingAverage(p as any);
+            }
+            return new TripleExponentialMovingAverage({ ...defaultTemaLengthParams(), ...p });
+
+        // ── perry-kaufman ───────────────────────────────────────────────
+
+        case IndicatorIdentifier.KaufmanAdaptiveMovingAverage:
+            if (hasKey(p, 'fastestSmoothingFactor') || hasKey(p, 'slowestSmoothingFactor')) {
+                return new KaufmanAdaptiveMovingAverage({ ...defaultKamaSfParams(), ...p } as any);
+            }
+            return new KaufmanAdaptiveMovingAverage({ ...defaultKamaLengthParams(), ...p });
+
+        // ── tim-tillson ─────────────────────────────────────────────────
+
+        case IndicatorIdentifier.T2ExponentialMovingAverage:
+            if (hasKey(p, 'smoothingFactor')) {
+                return new T2ExponentialMovingAverage({ ...defaultT2SfParams(), ...p } as any);
+            }
+            return new T2ExponentialMovingAverage({ ...defaultT2LengthParams(), ...p });
+
+        case IndicatorIdentifier.T3ExponentialMovingAverage:
+            if (hasKey(p, 'smoothingFactor')) {
+                return new T3ExponentialMovingAverage({ ...defaultT3SfParams(), ...p } as any);
+            }
+            return new T3ExponentialMovingAverage({ ...defaultT3LengthParams(), ...p });
+
+        // ── tushar-chande ───────────────────────────────────────────────
+
+        case IndicatorIdentifier.ChandeMomentumOscillator:
+            return new ChandeMomentumOscillator({ ...defaultCmoParams(), ...p });
+
+        case IndicatorIdentifier.StochasticRelativeStrengthIndex:
+            return new StochasticRelativeStrengthIndex({ ...defaultStochRsiParams(), ...p });
+
+        case IndicatorIdentifier.Aroon:
+            return new Aroon({ ...defaultAroonParams(), ...p });
+
+        // ── vladimir-kravchuk ───────────────────────────────────────────
+
+        case IndicatorIdentifier.AdaptiveTrendAndCycleFilter:
+            if (isEmpty(p)) return AdaptiveTrendAndCycleFilter.default();
+            return AdaptiveTrendAndCycleFilter.fromParams(p as any);
+
         // ── welles-wilder ───────────────────────────────────────────────
 
         case IndicatorIdentifier.TrueRange:
@@ -487,88 +579,6 @@ export function createIndicator(identifier: IndicatorIdentifier, params?: Record
         case IndicatorIdentifier.ParabolicStopAndReverse:
             return new ParabolicStopAndReverse(isEmpty(p) ? undefined : p as any);
 
-        // ── john-bollinger ──────────────────────────────────────────────
-
-        case IndicatorIdentifier.BollingerBands:
-            return new BollingerBands({ ...defaultBbParams(), ...p });
-
-        case IndicatorIdentifier.BollingerBandsTrend:
-            return new BollingerBandsTrend({
-                ...defaultBbtrendParams(),
-                ...p,
-            });
-
-        // ── gerald-appel ────────────────────────────────────────────────
-
-        case IndicatorIdentifier.PercentagePriceOscillator:
-            return new PercentagePriceOscillator({ ...defaultPpoParams(), ...p });
-
-        case IndicatorIdentifier.MovingAverageConvergenceDivergence:
-            return new MovingAverageConvergenceDivergence(isEmpty(p) ? undefined : p as any);
-
-        // ── tushar-chande ───────────────────────────────────────────────
-
-        case IndicatorIdentifier.ChandeMomentumOscillator:
-            return new ChandeMomentumOscillator({ ...defaultCmoParams(), ...p });
-
-        case IndicatorIdentifier.StochasticRelativeStrengthIndex:
-            return new StochasticRelativeStrengthIndex({ ...defaultStochRsiParams(), ...p });
-
-        case IndicatorIdentifier.Aroon:
-            return new Aroon({ ...defaultAroonParams(), ...p });
-
-        // ── donald-lambert ──────────────────────────────────────────────
-
-        case IndicatorIdentifier.CommodityChannelIndex:
-            return new CommodityChannelIndex({ ...defaultCciParams(), ...p });
-
-        // ── gene-quong ──────────────────────────────────────────────────
-
-        case IndicatorIdentifier.MoneyFlowIndex:
-            return new MoneyFlowIndex({ ...defaultMfiParams(), ...p });
-
-        // ── george-lane ─────────────────────────────────────────────────
-
-        case IndicatorIdentifier.Stochastic:
-            return new Stochastic({ ...defaultStochParams(), ...p });
-
-        // ── joseph-granville ────────────────────────────────────────────
-
-        case IndicatorIdentifier.OnBalanceVolume:
-            return new OnBalanceVolume(isEmpty(p) ? undefined : p as any);
-
-        // ── igor-livshin ────────────────────────────────────────────────
-
-        case IndicatorIdentifier.BalanceOfPower:
-            return new BalanceOfPower();
-
-        // ── marc-chaikin ────────────────────────────────────────────────
-
-        case IndicatorIdentifier.AdvanceDecline:
-            return new AdvanceDecline();
-
-        case IndicatorIdentifier.AdvanceDeclineOscillator:
-            return new AdvanceDeclineOscillator({ ...defaultAdoscParams(), ...p });
-
-        // ── larry-williams ──────────────────────────────────────────────
-
-        case IndicatorIdentifier.WilliamsPercentR:
-            return new WilliamsPercentR((p as any).length ?? 14);
-
-        case IndicatorIdentifier.UltimateOscillator:
-            return new UltimateOscillator(isEmpty(p) ? undefined : p as any);
-
-        // ── jack-hutson ─────────────────────────────────────────────────
-
-        case IndicatorIdentifier.TripleExponentialMovingAverageOscillator:
-            return new TripleExponentialMovingAverageOscillator({ ...defaultTrixParams(), ...p });
-
-        // ── vladimir-kravchuk ───────────────────────────────────────────
-
-        case IndicatorIdentifier.AdaptiveTrendAndCycleFilter:
-            if (isEmpty(p)) return AdaptiveTrendAndCycleFilter.default();
-            return AdaptiveTrendAndCycleFilter.fromParams(p as any);
-
         // ── custom ──────────────────────────────────────────────────────
 
         case IndicatorIdentifier.GoertzelSpectrum:
@@ -578,16 +588,6 @@ export function createIndicator(identifier: IndicatorIdentifier, params?: Record
         case IndicatorIdentifier.MaximumEntropySpectrum:
             if (isEmpty(p)) return MaximumEntropySpectrum.default();
             return MaximumEntropySpectrum.fromParams(p as any);
-
-        // ── arnaud-legoux ───────────────────────────────────────────
-
-        case IndicatorIdentifier.ArnaudLegouxMovingAverage:
-            return new ArnaudLegouxMovingAverage({ ...defaultAlmaParams(), ...p });
-
-        // ── manfred-dürschner ────────────────────────────────────────
-
-        case IndicatorIdentifier.NewMovingAverage:
-            return new NewMovingAverage({ ...defaultNmaParams(), ...p });
 
         default:
             throw new Error(`Unsupported indicator: ${IndicatorIdentifier[identifier] ?? identifier}`);

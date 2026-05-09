@@ -207,7 +207,7 @@ pub static DESCRIPTORS: &[Descriptor] = &[
             pane: Price,
         }],
     },
-    // ── arnaudlegoux ──────────────────────────────────────────────────────────
+    // ── arnaud legoux ──────────────────────────────────────────────────────────
     Descriptor {
         identifier: ArnaudLegouxMovingAverage,
         family: "Arnaud Legoux",
@@ -221,7 +221,7 @@ pub static DESCRIPTORS: &[Descriptor] = &[
             pane: Price,
         }],
     },
-    // ── donaldlambert ──────────────────────────────────────────────────────────
+    // ── donald lambert ──────────────────────────────────────────────────────────
     Descriptor {
         identifier: CommodityChannelIndex,
         family: "Donald Lambert",
@@ -235,7 +235,7 @@ pub static DESCRIPTORS: &[Descriptor] = &[
             pane: Own,
         }],
     },
-    // ── genequong ──────────────────────────────────────────────────────────
+    // ── gene quong ──────────────────────────────────────────────────────────
     Descriptor {
         identifier: MoneyFlowIndex,
         family: "Gene Quong",
@@ -249,7 +249,7 @@ pub static DESCRIPTORS: &[Descriptor] = &[
             pane: Own,
         }],
     },
-    // ── georgelane ──────────────────────────────────────────────────────────
+    // ── george lane ──────────────────────────────────────────────────────────
     Descriptor {
         identifier: Stochastic,
         family: "George Lane",
@@ -277,7 +277,7 @@ pub static DESCRIPTORS: &[Descriptor] = &[
             },
         ],
     },
-    // ── geraldappel ──────────────────────────────────────────────────────────
+    // ── gerald appel ──────────────────────────────────────────────────────────
     Descriptor {
         identifier: MovingAverageConvergenceDivergence,
         family: "Gerald Appel",
@@ -318,7 +318,7 @@ pub static DESCRIPTORS: &[Descriptor] = &[
             pane: Own,
         }],
     },
-    // ── igorlivshin ──────────────────────────────────────────────────────────
+    // ── igor livshin ──────────────────────────────────────────────────────────
     Descriptor {
         identifier: BalanceOfPower,
         family: "Igor Livshin",
@@ -332,7 +332,7 @@ pub static DESCRIPTORS: &[Descriptor] = &[
             pane: Own,
         }],
     },
-    // ── jackhutson ──────────────────────────────────────────────────────────
+    // ── jack hutson ──────────────────────────────────────────────────────────
     Descriptor {
         identifier: TripleExponentialMovingAverageOscillator,
         family: "Jack Hutson",
@@ -346,7 +346,7 @@ pub static DESCRIPTORS: &[Descriptor] = &[
             pane: Own,
         }],
     },
-    // ── johnbollinger ──────────────────────────────────────────────────────────
+    // ── john bollinger ──────────────────────────────────────────────────────────
     Descriptor {
         identifier: BollingerBands,
         family: "John Bollinger",
@@ -405,7 +405,7 @@ pub static DESCRIPTORS: &[Descriptor] = &[
             pane: Own,
         }],
     },
-    // ── johnehlers ──────────────────────────────────────────────────────────
+    // ── john ehlers ──────────────────────────────────────────────────────────
     Descriptor {
         identifier: AutoCorrelationIndicator,
         family: "John Ehlers",
@@ -855,7 +855,7 @@ pub static DESCRIPTORS: &[Descriptor] = &[
             pane: Price,
         }],
     },
-    // ── josephgranville ──────────────────────────────────────────────────────────
+    // ── joseph granville ──────────────────────────────────────────────────────────
     Descriptor {
         identifier: OnBalanceVolume,
         family: "Joseph Granville",
@@ -869,7 +869,7 @@ pub static DESCRIPTORS: &[Descriptor] = &[
             pane: Own,
         }],
     },
-    // ── larrywilliams ──────────────────────────────────────────────────────────
+    // ── larry williams ──────────────────────────────────────────────────────────
     Descriptor {
         identifier: UltimateOscillator,
         family: "Larry Williams",
@@ -896,7 +896,7 @@ pub static DESCRIPTORS: &[Descriptor] = &[
             pane: Own,
         }],
     },
-    // ── manfreddurschner ──────────────────────────────────────────────────────────
+    // ── manfred durschner ──────────────────────────────────────────────────────────
     Descriptor {
         identifier: NewMovingAverage,
         family: "Manfred D\u{00fc}rschner",
@@ -910,7 +910,7 @@ pub static DESCRIPTORS: &[Descriptor] = &[
             pane: Price,
         }],
     },
-    // ── marcchaikin ──────────────────────────────────────────────────────────
+    // ── marc chaikin ──────────────────────────────────────────────────────────
     Descriptor {
         identifier: AdvanceDecline,
         family: "Marc Chaikin",
@@ -937,7 +937,7 @@ pub static DESCRIPTORS: &[Descriptor] = &[
             pane: Own,
         }],
     },
-    // ── markjurik ──────────────────────────────────────────────────────────
+    // ── mark jurik ──────────────────────────────────────────────────────────
     Descriptor {
         identifier: JurikAdaptiveRelativeTrendStrengthIndex,
         family: "Mark Jurik",
@@ -1095,7 +1095,7 @@ pub static DESCRIPTORS: &[Descriptor] = &[
             pane: Own,
         }],
     },
-    // ── patrickmulloy ──────────────────────────────────────────────────────────
+    // ── patrick mulloy ──────────────────────────────────────────────────────────
     Descriptor {
         identifier: DoubleExponentialMovingAverage,
         family: "Patrick Mulloy",
@@ -1122,7 +1122,7 @@ pub static DESCRIPTORS: &[Descriptor] = &[
             pane: Price,
         }],
     },
-    // ── perrykaufman ──────────────────────────────────────────────────────────
+    // ── perry kaufman ──────────────────────────────────────────────────────────
     Descriptor {
         identifier: KaufmanAdaptiveMovingAverage,
         family: "Perry Kaufman",
@@ -1136,7 +1136,7 @@ pub static DESCRIPTORS: &[Descriptor] = &[
             pane: Price,
         }],
     },
-    // ── timtillson ──────────────────────────────────────────────────────────
+    // ── tim tillson ──────────────────────────────────────────────────────────
     Descriptor {
         identifier: T2ExponentialMovingAverage,
         family: "Tim Tillson",
@@ -1163,7 +1163,7 @@ pub static DESCRIPTORS: &[Descriptor] = &[
             pane: Price,
         }],
     },
-    // ── tusharchande ──────────────────────────────────────────────────────────
+    // ── tushar chande ──────────────────────────────────────────────────────────
     Descriptor {
         identifier: Aroon,
         family: "Tushar Chande",
@@ -1225,7 +1225,7 @@ pub static DESCRIPTORS: &[Descriptor] = &[
             },
         ],
     },
-    // ── vladimirkravchuk ──────────────────────────────────────────────────────────
+    // ── vladimir kravchuk ──────────────────────────────────────────────────────────
     Descriptor {
         identifier: AdaptiveTrendAndCycleFilter,
         family: "Vladimir Kravchuk",
@@ -1283,7 +1283,7 @@ pub static DESCRIPTORS: &[Descriptor] = &[
             },
         ],
     },
-    // ── welleswilder ──────────────────────────────────────────────────────────
+    // ── welles wilder ──────────────────────────────────────────────────────────
     Descriptor {
         identifier: AverageDirectionalMovementIndex,
         family: "Welles Wilder",

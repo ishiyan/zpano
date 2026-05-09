@@ -1794,7 +1794,11 @@ Below are the Go and TypeScript factory patterns (as the reference implementatio
 ### Go
 
 **Grouping:** Factory cases are grouped by author with `// ── groupname ──...──`
-dividers (common first, authors alphabetical, custom last). Append the new case
+dividers. The 22 canonical groups in order: common, arnaud legoux, donald lambert,
+gene quong, george lane, gerald appel, igor livshin, jack hutson, john bollinger,
+john ehlers, joseph granville, larry williams, manfred durschner, marc chaikin,
+mark jurik, patrick mulloy, perry kaufman, tim tillson, tushar chande,
+vladimir kravchuk, welles wilder, custom. Append the new case
 at the end of its author group — do not re-sort alphabetically within the group.
 
 Add a `case` to the switch in `go/indicators/factory/factory.go` inside

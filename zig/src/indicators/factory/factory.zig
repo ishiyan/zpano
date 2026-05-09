@@ -33,9 +33,8 @@ const apo_mod = @import("../common/absolute_price_oscillator/absolute_price_osci
 const pcc_mod = @import("../common/pearsons_correlation_coefficient/pearsons_correlation_coefficient.zig");
 const linreg_mod = @import("../common/linear_regression/linear_regression.zig");
 
-// custom
-const goertzel_mod = @import("../custom/goertzel_spectrum/goertzel_spectrum.zig");
-const maxent_mod = @import("../custom/maximum_entropy_spectrum/maximum_entropy_spectrum.zig");
+// arnaud_legoux
+const alma_mod = @import("../arnaud_legoux/arnaud_legoux_moving_average/arnaud_legoux_moving_average.zig");
 
 // donald_lambert
 const cci_mod = @import("../donald_lambert/commodity_channel_index/commodity_channel_index.zig");
@@ -90,6 +89,9 @@ const obv_mod = @import("../joseph_granville/on_balance_volume/on_balance_volume
 const wpr_mod = @import("../larry_williams/williams_percent_r/williams_percent_r.zig");
 const uo_mod = @import("../larry_williams/ultimate_oscillator/ultimate_oscillator.zig");
 
+// manfred_durschner
+const nma_mod = @import("../manfred_durschner/new_moving_average/new_moving_average.zig");
+
 // marc_chaikin
 const ad_mod = @import("../marc_chaikin/advance_decline/advance_decline.zig");
 const ado_mod = @import("../marc_chaikin/advance_decline_oscillator/advance_decline_oscillator.zig");
@@ -106,8 +108,6 @@ const javel_mod = @import("../mark_jurik/jurik_adaptive_zero_lag_velocity/jurik_
 const jccx_mod = @import("../mark_jurik/jurik_commodity_channel_index/jurik_commodity_channel_index.zig");
 const jvelcfb_mod = @import("../mark_jurik/jurik_fractal_adaptive_zero_lag_velocity/jurik_fractal_adaptive_zero_lag_velocity.zig");
 const wav_mod = @import("../mark_jurik/jurik_wavelet_sampler/jurik_wavelet_sampler.zig");
-const alma_mod = @import("../arnaud_legoux/arnaud_legoux_moving_average/arnaud_legoux_moving_average.zig");
-const nma_mod = @import("../manfred_durschner/new_moving_average/new_moving_average.zig");
 
 // patrick_mulloy
 const dema_mod = @import("../patrick_mulloy/double_exponential_moving_average/double_exponential_moving_average.zig");
@@ -141,6 +141,10 @@ const adx_mod = @import("../welles_wilder/average_directional_movement_index/ave
 const adxr_mod = @import("../welles_wilder/average_directional_movement_index_rating/average_directional_movement_index_rating.zig");
 const rsi_mod = @import("../welles_wilder/relative_strength_index/relative_strength_index.zig");
 const psar_mod = @import("../welles_wilder/parabolic_stop_and_reverse/parabolic_stop_and_reverse.zig");
+
+// custom
+const goertzel_mod = @import("../custom/goertzel_spectrum/goertzel_spectrum.zig");
+const maxent_mod = @import("../custom/maximum_entropy_spectrum/maximum_entropy_spectrum.zig");
 
 pub const FactoryError = error{
     UnsupportedIndicator,
@@ -404,48 +408,18 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
             .trade_component = getTradeComponent(obj),
         }),
 
-        // ── custom ──────────────────────────────────────────────────────
+        // ── arnaud legoux ────────────────────────────────────────────────
 
-        .goertzel_spectrum => blk: {
-            const p = goertzel_mod.Params{
-                .length = getInt(obj, "length", 0),
-                .min_period = getF64(obj, "minPeriod", 0),
-                .max_period = getF64(obj, "maxPeriod", 0),
-                .spectrum_resolution = getInt(obj, "spectrumResolution", 0),
-                .is_first_order = getBool(obj, "isFirstOrder", false),
-                .disable_spectral_dilation_compensation = getBool(obj, "disableSpectralDilationCompensation", false),
-                .disable_automatic_gain_control = getBool(obj, "disableAutomaticGainControl", false),
-                .automatic_gain_control_decay_factor = getF64(obj, "automaticGainControlDecayFactor", 0),
-                .fixed_normalization = getBool(obj, "fixedNormalization", false),
-                .bar_component = getBarComponent(obj),
-                .quote_component = getQuoteComponent(obj),
-                .trade_component = getTradeComponent(obj),
-            };
-            const ind = goertzel_mod.GoertzelSpectrum.init(allocator, p) catch return FactoryError.IndicatorInitFailed;
-            const ptr = heapAlloc(goertzel_mod.GoertzelSpectrum, allocator, ind) catch return FactoryError.OutOfMemory;
-            break :blk .{ .indicator = ptr.indicator(), .ctx = ptr, .deinit_fn = DeinitFn(goertzel_mod.GoertzelSpectrum) };
-        },
+        .arnaud_legoux_moving_average => createWithAllocParams(alma_mod.ArnaudLegouxMovingAverage, alma_mod.ArnaudLegouxMovingAverageParams, allocator, obj, .{
+            .window = getUsize(obj, "window", 9),
+            .sigma = getF64(obj, "sigma", 6.0),
+            .offset = getF64(obj, "offset", 0.85),
+            .bar_component = getBarComponent(obj),
+            .quote_component = getQuoteComponent(obj),
+            .trade_component = getTradeComponent(obj),
+        }),
 
-        .maximum_entropy_spectrum => blk: {
-            const p = maxent_mod.Params{
-                .length = getInt(obj, "length", 0),
-                .degree = getInt(obj, "degree", 0),
-                .min_period = getF64(obj, "minPeriod", 0),
-                .max_period = getF64(obj, "maxPeriod", 0),
-                .spectrum_resolution = getInt(obj, "spectrumResolution", 0),
-                .disable_automatic_gain_control = getBool(obj, "disableAutomaticGainControl", false),
-                .automatic_gain_control_decay_factor = getF64(obj, "automaticGainControlDecayFactor", 0),
-                .fixed_normalization = getBool(obj, "fixedNormalization", false),
-                .bar_component = getBarComponent(obj),
-                .quote_component = getQuoteComponent(obj),
-                .trade_component = getTradeComponent(obj),
-            };
-            const ind = maxent_mod.MaximumEntropySpectrum.init(allocator, p) catch return FactoryError.IndicatorInitFailed;
-            const ptr = heapAlloc(maxent_mod.MaximumEntropySpectrum, allocator, ind) catch return FactoryError.OutOfMemory;
-            break :blk .{ .indicator = ptr.indicator(), .ctx = ptr, .deinit_fn = DeinitFn(maxent_mod.MaximumEntropySpectrum) };
-        },
-
-        // ── donald_lambert ──────────────────────────────────────────────
+        // ── donald lambert ───────────────────────────────────────────────
 
         .commodity_channel_index => createWithAllocParams(cci_mod.CommodityChannelIndex, cci_mod.CommodityChannelIndexParams, allocator, obj, .{
             .length = getUsize(obj, "length", 14),
@@ -455,7 +429,7 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
             .trade_component = getTradeComponent(obj),
         }),
 
-        // ── gene_quong ──────────────────────────────────────────────────
+        // ── gene quong ───────────────────────────────────────────────────
 
         .money_flow_index => createWithAllocParams(mfi_mod.MoneyFlowIndex, mfi_mod.MoneyFlowIndexParams, allocator, obj, .{
             .length = @as(u32, @intCast(getUsize(obj, "length", 14))),
@@ -464,7 +438,7 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
             .trade_component = getTradeComponent(obj),
         }),
 
-        // ── george_lane ─────────────────────────────────────────────────
+        // ── george lane ──────────────────────────────────────────────────
 
         .stochastic => createWithAllocParams(stoch_mod.Stochastic, stoch_mod.StochasticParams, allocator, obj, .{
             .fast_k_length = getUsize(obj, "fastKLength", 5),
@@ -473,7 +447,7 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
             .first_is_average = getBool(obj, "firstIsAverage", false),
         }),
 
-        // ── gerald_appel ────────────────────────────────────────────────
+        // ── gerald appel ─────────────────────────────────────────────────
 
         .percentage_price_oscillator => createWithAllocParams(ppo_mod.PercentagePriceOscillator, ppo_mod.PercentagePriceOscillatorParams, allocator, obj, .{
             .fast_length = getUsize(obj, "fastLength", 12),
@@ -493,7 +467,7 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
             .trade_component = getTradeComponent(obj),
         }),
 
-        // ── igor_livshin ────────────────────────────────────────────────
+        // ── igor livshin ─────────────────────────────────────────────────
 
         .balance_of_power => blk: {
             const ind = bop_mod.BalanceOfPower.init();
@@ -501,7 +475,7 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
             break :blk .{ .indicator = ptr.indicator(), .ctx = ptr, .deinit_fn = DeinitFn(bop_mod.BalanceOfPower) };
         },
 
-        // ── jack_hutson ─────────────────────────────────────────────────
+        // ── jack hutson ──────────────────────────────────────────────────
 
         .triple_exponential_moving_average_oscillator => createWithParams(trix_mod.TripleExponentialMovingAverageOscillator, allocator, trix_mod.TripleExponentialMovingAverageOscillator.init(.{
             .length = getUsize(obj, "length", 14),
@@ -510,7 +484,7 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
             .trade_component = getTradeComponent(obj),
         })),
 
-        // ── john_bollinger ──────────────────────────────────────────────
+        // ── john bollinger ───────────────────────────────────────────────
 
         .bollinger_bands => createWithAllocParams(bb_mod.BollingerBands, bb_mod.BollingerBandsParams, allocator, obj, .{
             .length = getUsize(obj, "length", 20),
@@ -531,7 +505,7 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
             .trade_component = getTradeComponent(obj),
         }),
 
-        // ── john_ehlers ─────────────────────────────────────────────────
+        // ── john ehlers ──────────────────────────────────────────────────
 
         .super_smoother => createWithParams(ss_mod.SuperSmoother, allocator, ss_mod.SuperSmoother.init(.{
             .shortest_cycle_period = @as(i32, @intCast(getUsize(obj, "shortestCyclePeriod", 10))),
@@ -871,11 +845,11 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
             break :blk .{ .indicator = ptr.indicator(), .ctx = ptr, .deinit_fn = DeinitFn(dfts_mod.DiscreteFourierTransformSpectrum) };
         },
 
-        // ── joseph_granville ────────────────────────────────────────────
+        // ── joseph granville ─────────────────────────────────────────────
 
         .on_balance_volume => createWithParams(obv_mod.OnBalanceVolume, allocator, obv_mod.OnBalanceVolume.init(.{})),
 
-        // ── larry_williams ──────────────────────────────────────────────
+        // ── larry williams ───────────────────────────────────────────────
 
         .williams_percent_r => createWithAllocParams(wpr_mod.WilliamsPercentR, wpr_mod.WilliamsPercentRParams, allocator, obj, .{
             .length = getUsize(obj, "length", 14),
@@ -887,7 +861,18 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
             .length3 = getUsize(obj, "length3", 28),
         }),
 
-        // ── marc_chaikin ────────────────────────────────────────────────
+        // ── manfred durschner ────────────────────────────────────────────
+
+        .new_moving_average => createWithAllocParams(nma_mod.NewMovingAverage, nma_mod.NewMovingAverageParams, allocator, obj, .{
+            .primary_period = getUsize(obj, "primaryPeriod", 0),
+            .secondary_period = getUsize(obj, "secondaryPeriod", 8),
+            .ma_type = @enumFromInt(getUsize(obj, "maType", 3)),
+            .bar_component = getBarComponent(obj),
+            .quote_component = getQuoteComponent(obj),
+            .trade_component = getTradeComponent(obj),
+        }),
+
+        // ── marc chaikin ─────────────────────────────────────────────────
 
         .advance_decline => blk: {
             const ind = ad_mod.AdvanceDecline.init();
@@ -900,7 +885,7 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
             .slow_length = @as(u32, @intCast(getUsize(obj, "slowLength", 10))),
         }),
 
-        // ── mark_jurik ──────────────────────────────────────────────────
+        // ── mark jurik ───────────────────────────────────────────────────
 
         .jurik_moving_average => createWithParams(jma_mod.JurikMovingAverage, allocator, jma_mod.JurikMovingAverage.init(.{
             .length = @as(u32, @intCast(getUsize(obj, "length", 14))),
@@ -985,29 +970,7 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
             .trade_component = getTradeComponent(obj),
         })),
 
-        // ── arnaud_legoux ───────────────────────────────────────────────
-
-        .arnaud_legoux_moving_average => createWithAllocParams(alma_mod.ArnaudLegouxMovingAverage, alma_mod.ArnaudLegouxMovingAverageParams, allocator, obj, .{
-            .window = getUsize(obj, "window", 9),
-            .sigma = getF64(obj, "sigma", 6.0),
-            .offset = getF64(obj, "offset", 0.85),
-            .bar_component = getBarComponent(obj),
-            .quote_component = getQuoteComponent(obj),
-            .trade_component = getTradeComponent(obj),
-        }),
-
-        // ── manfred_durschner ───────────────────────────────────────────
-
-        .new_moving_average => createWithAllocParams(nma_mod.NewMovingAverage, nma_mod.NewMovingAverageParams, allocator, obj, .{
-            .primary_period = getUsize(obj, "primaryPeriod", 0),
-            .secondary_period = getUsize(obj, "secondaryPeriod", 8),
-            .ma_type = @enumFromInt(getUsize(obj, "maType", 3)),
-            .bar_component = getBarComponent(obj),
-            .quote_component = getQuoteComponent(obj),
-            .trade_component = getTradeComponent(obj),
-        }),
-
-        // ── patrick_mulloy ──────────────────────────────────────────────
+        // ── patrick mulloy ───────────────────────────────────────────────
 
         .double_exponential_moving_average => blk: {
             if (hasKey(obj, "smoothingFactor")) {
@@ -1043,7 +1006,7 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
             }));
         },
 
-        // ── perry_kaufman ───────────────────────────────────────────────
+        // ── perry kaufman ────────────────────────────────────────────────
 
         .kaufman_adaptive_moving_average => blk: {
             if (hasKey(obj, "fastestSmoothingFactor") or hasKey(obj, "slowestSmoothingFactor")) {
@@ -1070,7 +1033,7 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
             break :blk .{ .indicator = ptr.indicator(), .ctx = ptr, .deinit_fn = DeinitFn(kama_mod.KaufmanAdaptiveMovingAverage) };
         },
 
-        // ── tim_tillson ─────────────────────────────────────────────────
+        // ── tim tillson ──────────────────────────────────────────────────
 
         .t2_exponential_moving_average => blk: {
             if (hasKey(obj, "smoothingFactor")) {
@@ -1110,7 +1073,7 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
             }));
         },
 
-        // ── tushar_chande ───────────────────────────────────────────────
+        // ── tushar chande ────────────────────────────────────────────────
 
         .chande_momentum_oscillator => createWithAllocParams(cmo_mod.ChandeMomentumOscillator, cmo_mod.ChandeMomentumOscillatorParams, allocator, obj, .{
             .length = getUsize(obj, "length", 14),
@@ -1133,7 +1096,7 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
             .length = getUsize(obj, "length", 14),
         }),
 
-        // ── vladimir_kravchuk ───────────────────────────────────────────
+        // ── vladimir kravchuk ─────────────────────────────────────────────
 
         .adaptive_trend_and_cycle_filter => blk: {
             const ind = atcf_mod.AdaptiveTrendAndCycleFilter.init(allocator) catch return FactoryError.IndicatorInitFailed;
@@ -1141,7 +1104,7 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
             break :blk .{ .indicator = ptr.indicator(), .ctx = ptr, .deinit_fn = DeinitFn(atcf_mod.AdaptiveTrendAndCycleFilter) };
         },
 
-        // ── welles_wilder ───────────────────────────────────────────────
+        // ── welles wilder ────────────────────────────────────────────────
 
         .true_range => blk: {
             const ind = tr_mod.TrueRange.init();
@@ -1230,6 +1193,47 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
             .acceleration_short = getF64(obj, "accelerationShort", 0),
             .acceleration_max_short = getF64(obj, "accelerationMaxShort", 0),
         })),
+
+        // ── custom ──────────────────────────────────────────────────────
+
+        .goertzel_spectrum => blk: {
+            const p = goertzel_mod.Params{
+                .length = getInt(obj, "length", 0),
+                .min_period = getF64(obj, "minPeriod", 0),
+                .max_period = getF64(obj, "maxPeriod", 0),
+                .spectrum_resolution = getInt(obj, "spectrumResolution", 0),
+                .is_first_order = getBool(obj, "isFirstOrder", false),
+                .disable_spectral_dilation_compensation = getBool(obj, "disableSpectralDilationCompensation", false),
+                .disable_automatic_gain_control = getBool(obj, "disableAutomaticGainControl", false),
+                .automatic_gain_control_decay_factor = getF64(obj, "automaticGainControlDecayFactor", 0),
+                .fixed_normalization = getBool(obj, "fixedNormalization", false),
+                .bar_component = getBarComponent(obj),
+                .quote_component = getQuoteComponent(obj),
+                .trade_component = getTradeComponent(obj),
+            };
+            const ind = goertzel_mod.GoertzelSpectrum.init(allocator, p) catch return FactoryError.IndicatorInitFailed;
+            const ptr = heapAlloc(goertzel_mod.GoertzelSpectrum, allocator, ind) catch return FactoryError.OutOfMemory;
+            break :blk .{ .indicator = ptr.indicator(), .ctx = ptr, .deinit_fn = DeinitFn(goertzel_mod.GoertzelSpectrum) };
+        },
+
+        .maximum_entropy_spectrum => blk: {
+            const p = maxent_mod.Params{
+                .length = getInt(obj, "length", 0),
+                .degree = getInt(obj, "degree", 0),
+                .min_period = getF64(obj, "minPeriod", 0),
+                .max_period = getF64(obj, "maxPeriod", 0),
+                .spectrum_resolution = getInt(obj, "spectrumResolution", 0),
+                .disable_automatic_gain_control = getBool(obj, "disableAutomaticGainControl", false),
+                .automatic_gain_control_decay_factor = getF64(obj, "automaticGainControlDecayFactor", 0),
+                .fixed_normalization = getBool(obj, "fixedNormalization", false),
+                .bar_component = getBarComponent(obj),
+                .quote_component = getQuoteComponent(obj),
+                .trade_component = getTradeComponent(obj),
+            };
+            const ind = maxent_mod.MaximumEntropySpectrum.init(allocator, p) catch return FactoryError.IndicatorInitFailed;
+            const ptr = heapAlloc(maxent_mod.MaximumEntropySpectrum, allocator, ind) catch return FactoryError.OutOfMemory;
+            break :blk .{ .indicator = ptr.indicator(), .ctx = ptr, .deinit_fn = DeinitFn(maxent_mod.MaximumEntropySpectrum) };
+        },
     };
 }
 

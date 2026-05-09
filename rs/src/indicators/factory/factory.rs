@@ -40,12 +40,9 @@ use crate::indicators::common::weighted_moving_average::{
     WeightedMovingAverage, WeightedMovingAverageParams,
 };
 
-// ── custom ───────────────────────────────────────────────────────────────────
-use crate::indicators::custom::goertzel_spectrum::goertzel_spectrum::{
-    GoertzelSpectrum, GoertzelSpectrumParams,
-};
-use crate::indicators::custom::maximum_entropy_spectrum::maximum_entropy_spectrum::{
-    MaximumEntropySpectrum, MaximumEntropySpectrumParams,
+// ── arnaud legoux ────────────────────────────────────────────────────────────
+use crate::indicators::arnaud_legoux::arnaud_legoux_moving_average::{
+    ArnaudLegouxMovingAverage, ArnaudLegouxMovingAverageParams,
 };
 
 // ── donald lambert ───────────────────────────────────────────────────────────
@@ -113,6 +110,11 @@ use crate::indicators::larry_williams::ultimate_oscillator::{
 };
 use crate::indicators::larry_williams::williams_percent_r::{
     WilliamsPercentR, WilliamsPercentRParams,
+};
+
+// ── manfred durschner ────────────────────────────────────────────────────────
+use crate::indicators::manfred_durschner::new_moving_average::{
+    NewMovingAverage, NewMovingAverageParams, MAType,
 };
 
 // ── marc chaikin ─────────────────────────────────────────────────────────────
@@ -223,11 +225,13 @@ use crate::indicators::welles_wilder::relative_strength_index::{
     RelativeStrengthIndex, RelativeStrengthIndexParams,
 };
 use crate::indicators::welles_wilder::true_range::{TrueRange, TrueRangeParams};
-use crate::indicators::arnaud_legoux::arnaud_legoux_moving_average::{
-    ArnaudLegouxMovingAverage, ArnaudLegouxMovingAverageParams,
+
+// ── custom ───────────────────────────────────────────────────────────────────
+use crate::indicators::custom::goertzel_spectrum::goertzel_spectrum::{
+    GoertzelSpectrum, GoertzelSpectrumParams,
 };
-use crate::indicators::manfred_durschner::new_moving_average::{
-    NewMovingAverage, NewMovingAverageParams, MAType,
+use crate::indicators::custom::maximum_entropy_spectrum::maximum_entropy_spectrum::{
+    MaximumEntropySpectrum, MaximumEntropySpectrumParams,
 };
 
 /// Create an indicator from its identifier and a JSON-encoded parameter string.
@@ -375,67 +379,19 @@ pub fn create_indicator(
             Ok(Box::new(LinearRegression::new(&p)?))
         }
 
-        // ── custom ───────────────────────────────────────────────────────
-        Identifier::GoertzelSpectrum => {
-            let mut p = GoertzelSpectrumParams::default();
-            if !is_empty_object(&params) {
-                if let Some(v) = get_usize(&params, "length") {
-                    p.length = v;
-                }
-                if let Some(v) = get_f64(&params, "minPeriod") {
-                    p.min_period = v;
-                }
-                if let Some(v) = get_f64(&params, "maxPeriod") {
-                    p.max_period = v;
-                }
-                if let Some(v) = get_usize(&params, "spectrumResolution") {
-                    p.spectrum_resolution = v;
-                }
-                if let Some(v) = get_bool(&params, "isFirstOrder") {
-                    p.is_first_order = v;
-                }
-                if let Some(v) = get_bool(&params, "disableSpectralDilationCompensation") {
-                    p.disable_spectral_dilation_compensation = v;
-                }
-                if let Some(v) = get_bool(&params, "disableAutomaticGainControl") {
-                    p.disable_automatic_gain_control = v;
-                }
-                if let Some(v) = get_f64(&params, "automaticGainControlDecayFactor") {
-                    p.automatic_gain_control_decay_factor = v;
-                }
-                if let Some(v) = get_bool(&params, "fixedNormalization") {
-                    p.fixed_normalization = v;
-                }
+        // ── arnaud legoux ────────────────────────────────────────────────
+        Identifier::ArnaudLegouxMovingAverage => {
+            let mut p = ArnaudLegouxMovingAverageParams::default();
+            if let Some(v) = get_usize(&params, "window") {
+                p.window = v;
             }
-            Ok(Box::new(GoertzelSpectrum::new(&p)?))
-        }
-
-        Identifier::MaximumEntropySpectrum => {
-            let mut p = MaximumEntropySpectrumParams::default();
-            if !is_empty_object(&params) {
-                if let Some(v) = get_usize(&params, "length") {
-                    p.length = v;
-                }
-                if let Some(v) = get_usize(&params, "degree") {
-                    p.degree = v;
-                }
-                if let Some(v) = get_f64(&params, "minPeriod") {
-                    p.min_period = v;
-                }
-                if let Some(v) = get_f64(&params, "maxPeriod") {
-                    p.max_period = v;
-                }
-                if let Some(v) = get_bool(&params, "disableAutomaticGainControl") {
-                    p.disable_automatic_gain_control = v;
-                }
-                if let Some(v) = get_f64(&params, "automaticGainControlDecayFactor") {
-                    p.automatic_gain_control_decay_factor = v;
-                }
-                if let Some(v) = get_bool(&params, "fixedNormalization") {
-                    p.fixed_normalization = v;
-                }
+            if let Some(v) = get_f64(&params, "sigma") {
+                p.sigma = v;
             }
-            Ok(Box::new(MaximumEntropySpectrum::new(&p)?))
+            if let Some(v) = get_f64(&params, "offset") {
+                p.offset = v;
+            }
+            Ok(Box::new(ArnaudLegouxMovingAverage::new(&p)?))
         }
 
         // ── donald lambert ───────────────────────────────────────────────
@@ -981,6 +937,27 @@ pub fn create_indicator(
             Ok(Box::new(UltimateOscillator::new(&p)?))
         }
 
+        // ── manfred durschner ────────────────────────────────────────────
+        Identifier::NewMovingAverage => {
+            let mut p = NewMovingAverageParams::default();
+            if let Some(v) = get_usize(&params, "primary_period") {
+                p.primary_period = v;
+            }
+            if let Some(v) = get_usize(&params, "secondary_period") {
+                p.secondary_period = v;
+            }
+            if let Some(v) = get_usize(&params, "ma_type") {
+                p.ma_type = match v {
+                    0 => MAType::SMA,
+                    1 => MAType::EMA,
+                    2 => MAType::SMMA,
+                    3 => MAType::LWMA,
+                    _ => MAType::LWMA,
+                };
+            }
+            Ok(Box::new(NewMovingAverage::new(&p)?))
+        }
+
         // ── marc chaikin ─────────────────────────────────────────────────
         Identifier::AdvanceDecline => Ok(Box::new(AdvanceDecline::new(&AdvanceDeclineParams)?)),
 
@@ -1384,38 +1361,67 @@ pub fn create_indicator(
             Ok(Box::new(ParabolicStopAndReverse::new(&p)?))
         }
 
-        Identifier::ArnaudLegouxMovingAverage => {
-            let mut p = ArnaudLegouxMovingAverageParams::default();
-            if let Some(v) = get_usize(&params, "window") {
-                p.window = v;
+        // ── custom ───────────────────────────────────────────────────────
+        Identifier::GoertzelSpectrum => {
+            let mut p = GoertzelSpectrumParams::default();
+            if !is_empty_object(&params) {
+                if let Some(v) = get_usize(&params, "length") {
+                    p.length = v;
+                }
+                if let Some(v) = get_f64(&params, "minPeriod") {
+                    p.min_period = v;
+                }
+                if let Some(v) = get_f64(&params, "maxPeriod") {
+                    p.max_period = v;
+                }
+                if let Some(v) = get_usize(&params, "spectrumResolution") {
+                    p.spectrum_resolution = v;
+                }
+                if let Some(v) = get_bool(&params, "isFirstOrder") {
+                    p.is_first_order = v;
+                }
+                if let Some(v) = get_bool(&params, "disableSpectralDilationCompensation") {
+                    p.disable_spectral_dilation_compensation = v;
+                }
+                if let Some(v) = get_bool(&params, "disableAutomaticGainControl") {
+                    p.disable_automatic_gain_control = v;
+                }
+                if let Some(v) = get_f64(&params, "automaticGainControlDecayFactor") {
+                    p.automatic_gain_control_decay_factor = v;
+                }
+                if let Some(v) = get_bool(&params, "fixedNormalization") {
+                    p.fixed_normalization = v;
+                }
             }
-            if let Some(v) = get_f64(&params, "sigma") {
-                p.sigma = v;
-            }
-            if let Some(v) = get_f64(&params, "offset") {
-                p.offset = v;
-            }
-            Ok(Box::new(ArnaudLegouxMovingAverage::new(&p)?))
+            Ok(Box::new(GoertzelSpectrum::new(&p)?))
         }
 
-        Identifier::NewMovingAverage => {
-            let mut p = NewMovingAverageParams::default();
-            if let Some(v) = get_usize(&params, "primary_period") {
-                p.primary_period = v;
+        Identifier::MaximumEntropySpectrum => {
+            let mut p = MaximumEntropySpectrumParams::default();
+            if !is_empty_object(&params) {
+                if let Some(v) = get_usize(&params, "length") {
+                    p.length = v;
+                }
+                if let Some(v) = get_usize(&params, "degree") {
+                    p.degree = v;
+                }
+                if let Some(v) = get_f64(&params, "minPeriod") {
+                    p.min_period = v;
+                }
+                if let Some(v) = get_f64(&params, "maxPeriod") {
+                    p.max_period = v;
+                }
+                if let Some(v) = get_bool(&params, "disableAutomaticGainControl") {
+                    p.disable_automatic_gain_control = v;
+                }
+                if let Some(v) = get_f64(&params, "automaticGainControlDecayFactor") {
+                    p.automatic_gain_control_decay_factor = v;
+                }
+                if let Some(v) = get_bool(&params, "fixedNormalization") {
+                    p.fixed_normalization = v;
+                }
             }
-            if let Some(v) = get_usize(&params, "secondary_period") {
-                p.secondary_period = v;
-            }
-            if let Some(v) = get_usize(&params, "ma_type") {
-                p.ma_type = match v {
-                    0 => MAType::SMA,
-                    1 => MAType::EMA,
-                    2 => MAType::SMMA,
-                    3 => MAType::LWMA,
-                    _ => MAType::LWMA,
-                };
-            }
-            Ok(Box::new(NewMovingAverage::new(&p)?))
+            Ok(Box::new(MaximumEntropySpectrum::new(&p)?))
         }
 
         _ => Err(format!("unsupported indicator: {:?}", identifier)),

@@ -47,27 +47,27 @@ class Identifier(IntEnum):
     # Identifies the Weighted Moving Average (WMA) indicator.
     WEIGHTED_MOVING_AVERAGE = 12
 
-    # ── arnaudlegoux ──────────────────────────────────────────────────────
+    # ── arnaud legoux ──────────────────────────────────────────────────────
 
     # Identifies the Arnaud Legoux Moving Average (ALMA) indicator.
     ARNAUD_LEGOUX_MOVING_AVERAGE = 13
 
-    # ── donaldlambert ─────────────────────────────────────────────────────
+    # ── donald lambert ─────────────────────────────────────────────────────
 
     # Identifies the Donald Lambert Commodity Channel Index (CCI) indicator.
     COMMODITY_CHANNEL_INDEX = 14
 
-    # ── genequong ─────────────────────────────────────────────────────────
+    # ── gene quong ─────────────────────────────────────────────────────────
 
     # Identifies the Gene Quong Money Flow Index (MFI) indicator.
     MONEY_FLOW_INDEX = 15
 
-    # ── georgelane ────────────────────────────────────────────────────────
+    # ── george lane ────────────────────────────────────────────────────────
 
     # Identifies the George Lane Stochastic Oscillator (STOCH) indicator.
     STOCHASTIC = 16
 
-    # ── geraldappel ───────────────────────────────────────────────────────
+    # ── gerald appel ───────────────────────────────────────────────────────
 
     # Identifies Gerald Appel's Moving Average Convergence Divergence (MACD) indicator.
     MOVING_AVERAGE_CONVERGENCE_DIVERGENCE = 17
@@ -75,17 +75,17 @@ class Identifier(IntEnum):
     # Identifies the Gerald Appel Percentage Price Oscillator (PPO) indicator.
     PERCENTAGE_PRICE_OSCILLATOR = 18
 
-    # ── igorlivshin ───────────────────────────────────────────────────────
+    # ── igor livshin ───────────────────────────────────────────────────────
 
     # Identifies the Igor Livshin Balance of Power (BOP) indicator.
     BALANCE_OF_POWER = 19
 
-    # ── jackhutson ────────────────────────────────────────────────────────
+    # ── jack hutson ────────────────────────────────────────────────────────
 
     # Identifies Jack Hutson's Triple Exponential Moving Average Oscillator (TRIX) indicator.
     TRIPLE_EXPONENTIAL_MOVING_AVERAGE_OSCILLATOR = 20
 
-    # ── johnbollinger ─────────────────────────────────────────────────────
+    # ── john bollinger ─────────────────────────────────────────────────────
 
     # Identifies the Bollinger Bands (BB) indicator.
     BOLLINGER_BANDS = 21
@@ -93,7 +93,7 @@ class Identifier(IntEnum):
     # Identifies John Bollinger's Bollinger Bands Trend (BBTrend) indicator.
     BOLLINGER_BANDS_TREND = 22
 
-    # ── johnehlers ────────────────────────────────────────────────────────
+    # ── john ehlers ────────────────────────────────────────────────────────
 
     # Identifies the Ehlers Autocorrelation Indicator (ACI) heatmap, a bank of Pearson
     # correlation coefficients between the current filtered series and a lagged copy
@@ -173,12 +173,12 @@ class Identifier(IntEnum):
     # Identifies the Ehlers Zero-lag Exponential Moving Average (ZEMA) indicator.
     ZERO_LAG_EXPONENTIAL_MOVING_AVERAGE = 43
 
-    # ── josephgranville ───────────────────────────────────────────────────
+    # ── joseph granville ───────────────────────────────────────────────────
 
     # Identifies the Joseph Granville On-Balance Volume (OBV) indicator.
     ON_BALANCE_VOLUME = 44
 
-    # ── larrywilliams ─────────────────────────────────────────────────────
+    # ── larry williams ─────────────────────────────────────────────────────
 
     # Identifies the Larry Williams Ultimate Oscillator (ULTOSC) indicator.
     ULTIMATE_OSCILLATOR = 45
@@ -186,12 +186,12 @@ class Identifier(IntEnum):
     # Identifies the Larry Williams Williams %R (WILL%R) indicator.
     WILLIAMS_PERCENT_R = 46
 
-    # ── manfreddurschner ──────────────────────────────────────────────────
+    # ── manfred durschner ──────────────────────────────────────────────────
 
     # Identifies the New Moving Average (NMA) indicator by Durschner.
     NEW_MOVING_AVERAGE = 47
 
-    # ── marcchaikin ───────────────────────────────────────────────────────
+    # ── marc chaikin ───────────────────────────────────────────────────────
 
     # Identifies the Marc Chaikin Advance-Decline (A/D) indicator.
     ADVANCE_DECLINE = 48
@@ -199,7 +199,7 @@ class Identifier(IntEnum):
     # Identifies the Marc Chaikin Advance-Decline Oscillator (ADOSC) indicator.
     ADVANCE_DECLINE_OSCILLATOR = 49
 
-    # ── markjurik ─────────────────────────────────────────────────────────
+    # ── mark jurik ─────────────────────────────────────────────────────────
 
     # Identifies the Jurik Adaptive Relative Trend Strength Index (JARSX) indicator.
     JURIK_ADAPTIVE_RELATIVE_TREND_STRENGTH_INDEX = 50
@@ -234,7 +234,7 @@ class Identifier(IntEnum):
     # Identifies the Jurik Zero Lag Velocity (VEL) indicator.
     JURIK_ZERO_LAG_VELOCITY = 60
 
-    # ── patrickmulloy ─────────────────────────────────────────────────────
+    # ── patrick mulloy ─────────────────────────────────────────────────────
 
     # Identifies the Double Exponential Moving Average (DEMA) indicator.
     DOUBLE_EXPONENTIAL_MOVING_AVERAGE = 61
@@ -242,12 +242,12 @@ class Identifier(IntEnum):
     # Identifies the Triple Exponential Moving Average (TEMA) indicator.
     TRIPLE_EXPONENTIAL_MOVING_AVERAGE = 62
 
-    # ── perrykaufman ──────────────────────────────────────────────────────
+    # ── perry kaufman ──────────────────────────────────────────────────────
 
     # Identifies the Kaufman Adaptive Moving Average (KAMA) indicator.
     KAUFMAN_ADAPTIVE_MOVING_AVERAGE = 63
 
-    # ── timtillson ────────────────────────────────────────────────────────
+    # ── tim tillson ────────────────────────────────────────────────────────
 
     # Identifies the T2 Exponential Moving Average (T2EMA) indicator.
     T2_EXPONENTIAL_MOVING_AVERAGE = 64
@@ -255,7 +255,7 @@ class Identifier(IntEnum):
     # Identifies the T3 Exponential Moving Average (T3EMA) indicator.
     T3_EXPONENTIAL_MOVING_AVERAGE = 65
 
-    # ── tusharchande ──────────────────────────────────────────────────────
+    # ── tushar chande ──────────────────────────────────────────────────────
 
     # Identifies the Tushar Chande Aroon (AROON) indicator.
     AROON = 66
@@ -266,13 +266,13 @@ class Identifier(IntEnum):
     # Identifies the Tushar Chande Stochastic RSI (STOCHRSI) indicator.
     STOCHASTIC_RELATIVE_STRENGTH_INDEX = 68
 
-    # ── vladimirkravchuk ──────────────────────────────────────────────────
+    # ── vladimir kravchuk ──────────────────────────────────────────────────
 
     # Identifies Vladimir Kravchuk's Adaptive Trend and Cycle Filter (ATCF) suite: a bank
     # of five FIR filters (FATL, SATL, RFTL, RSTL, RBCI) plus three composites (FTLM, STLM, PCCI).
     ADAPTIVE_TREND_AND_CYCLE_FILTER = 69
 
-    # ── welleswilder ──────────────────────────────────────────────────────
+    # ── welles wilder ──────────────────────────────────────────────────────
 
     # Identifies the Welles Wilder Average Directional Movement Index (ADX) indicator.
     AVERAGE_DIRECTIONAL_MOVEMENT_INDEX = 70

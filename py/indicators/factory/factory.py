@@ -122,40 +122,35 @@ def create_indicator(
         from ..common.linear_regression.linear_regression import LinearRegression
         return LinearRegression(_apply(default_params(), params))
 
-    # ── custom ────────────────────────────────────────────────────────────
+    # ── arnaud legoux ─────────────────────────────────────────────────────
 
-    if identifier == Identifier.GOERTZEL_SPECTRUM:
-        from ..custom.goertzel_spectrum.params import default_params
-        from ..custom.goertzel_spectrum.goertzel_spectrum import GoertzelSpectrum
-        return GoertzelSpectrum(_apply(default_params(), params))
+    if identifier == Identifier.ARNAUD_LEGOUX_MOVING_AVERAGE:
+        from ..arnaud_legoux.arnaud_legoux_moving_average.params import default_params
+        from ..arnaud_legoux.arnaud_legoux_moving_average.arnaud_legoux_moving_average import ArnaudLegouxMovingAverage
+        return ArnaudLegouxMovingAverage(_apply(default_params(), params))
 
-    if identifier == Identifier.MAXIMUM_ENTROPY_SPECTRUM:
-        from ..custom.maximum_entropy_spectrum.params import default_params
-        from ..custom.maximum_entropy_spectrum.maximum_entropy_spectrum import MaximumEntropySpectrum
-        return MaximumEntropySpectrum(_apply(default_params(), params))
-
-    # ── donald_lambert ────────────────────────────────────────────────────
+    # ── donald lambert ────────────────────────────────────────────────────
 
     if identifier == Identifier.COMMODITY_CHANNEL_INDEX:
         from ..donald_lambert.commodity_channel_index.params import default_params
         from ..donald_lambert.commodity_channel_index.commodity_channel_index import CommodityChannelIndex
         return CommodityChannelIndex(_apply(default_params(), params))
 
-    # ── gene_quong ────────────────────────────────────────────────────────
+    # ── gene quong ────────────────────────────────────────────────────────
 
     if identifier == Identifier.MONEY_FLOW_INDEX:
         from ..gene_quong.money_flow_index.params import default_params
         from ..gene_quong.money_flow_index.money_flow_index import MoneyFlowIndex
         return MoneyFlowIndex(_apply(default_params(), params))
 
-    # ── george_lane ───────────────────────────────────────────────────────
+    # ── george lane ───────────────────────────────────────────────────────
 
     if identifier == Identifier.STOCHASTIC:
         from ..george_lane.stochastic.params import default_params
         from ..george_lane.stochastic.stochastic import Stochastic
         return Stochastic(_apply(default_params(), params))
 
-    # ── gerald_appel ──────────────────────────────────────────────────────
+    # ── gerald appel ──────────────────────────────────────────────────────
 
     if identifier == Identifier.PERCENTAGE_PRICE_OSCILLATOR:
         from ..gerald_appel.percentage_price_oscillator.params import default_params
@@ -167,21 +162,21 @@ def create_indicator(
         from ..gerald_appel.moving_average_convergence_divergence.moving_average_convergence_divergence import MovingAverageConvergenceDivergence
         return MovingAverageConvergenceDivergence(_apply(default_params(), params))
 
-    # ── igor_livshin ──────────────────────────────────────────────────────
+    # ── igor livshin ──────────────────────────────────────────────────────
 
     if identifier == Identifier.BALANCE_OF_POWER:
         from ..igor_livshin.balance_of_power.params import default_params
         from ..igor_livshin.balance_of_power.balance_of_power import BalanceOfPower
         return BalanceOfPower(_apply(default_params(), params))
 
-    # ── jack_hutson ───────────────────────────────────────────────────────
+    # ── jack hutson ───────────────────────────────────────────────────────
 
     if identifier == Identifier.TRIPLE_EXPONENTIAL_MOVING_AVERAGE_OSCILLATOR:
         from ..jack_hutson.triple_exponential_moving_average_oscillator.params import default_params
         from ..jack_hutson.triple_exponential_moving_average_oscillator.triple_exponential_moving_average_oscillator import TripleExponentialMovingAverageOscillator
         return TripleExponentialMovingAverageOscillator(_apply(default_params(), params))
 
-    # ── john_bollinger ────────────────────────────────────────────────────
+    # ── john bollinger ────────────────────────────────────────────────────
 
     if identifier == Identifier.BOLLINGER_BANDS:
         from ..john_bollinger.bollinger_bands.params import default_params
@@ -193,7 +188,7 @@ def create_indicator(
         from ..john_bollinger.bollinger_bands_trend.bollinger_bands_trend import BollingerBandsTrend
         return BollingerBandsTrend(_apply(default_params(), params))
 
-    # ── john_ehlers ───────────────────────────────────────────────────────
+    # ── john ehlers ───────────────────────────────────────────────────────
 
     if identifier == Identifier.SUPER_SMOOTHER:
         from ..john_ehlers.super_smoother.params import default_params
@@ -327,14 +322,14 @@ def create_indicator(
         from ..john_ehlers.discrete_fourier_transform_spectrum.discrete_fourier_transform_spectrum import DiscreteFourierTransformSpectrum
         return DiscreteFourierTransformSpectrum(_apply(default_params(), params))
 
-    # ── joseph_granville ──────────────────────────────────────────────────
+    # ── joseph granville ──────────────────────────────────────────────────
 
     if identifier == Identifier.ON_BALANCE_VOLUME:
         from ..joseph_granville.on_balance_volume.params import default_params
         from ..joseph_granville.on_balance_volume.on_balance_volume import OnBalanceVolume
         return OnBalanceVolume(_apply(default_params(), params))
 
-    # ── larry_williams ────────────────────────────────────────────────────
+    # ── larry williams ────────────────────────────────────────────────────
 
     if identifier == Identifier.WILLIAMS_PERCENT_R:
         from ..larry_williams.williams_percent_r.williams_percent_r import WilliamsPercentR
@@ -348,7 +343,14 @@ def create_indicator(
         from ..larry_williams.ultimate_oscillator.ultimate_oscillator import UltimateOscillator
         return UltimateOscillator(_apply(default_params(), params))
 
-    # ── marc_chaikin ──────────────────────────────────────────────────────
+    # ── manfred durschner ─────────────────────────────────────────────────
+
+    if identifier == Identifier.NEW_MOVING_AVERAGE:
+        from ..manfred_dürschner.new_moving_average.params import default_params
+        from ..manfred_dürschner.new_moving_average.new_moving_average import NewMovingAverage
+        return NewMovingAverage(_apply(default_params(), params))
+
+    # ── marc chaikin ──────────────────────────────────────────────────────
 
     if identifier == Identifier.ADVANCE_DECLINE:
         from ..marc_chaikin.advance_decline.params import default_params
@@ -360,14 +362,64 @@ def create_indicator(
         from ..marc_chaikin.advance_decline_oscillator.advance_decline_oscillator import AdvanceDeclineOscillator
         return AdvanceDeclineOscillator(_apply(default_params(), params))
 
-    # ── mark_jurik ────────────────────────────────────────────────────────
+    # ── mark jurik ────────────────────────────────────────────────────────
 
     if identifier == Identifier.JURIK_MOVING_AVERAGE:
         from ..mark_jurik.jurik_moving_average.params import default_params
         from ..mark_jurik.jurik_moving_average.jurik_moving_average import JurikMovingAverage
         return JurikMovingAverage(_apply(default_params(), params))
 
-    # ── patrick_mulloy ────────────────────────────────────────────────────
+    if identifier == Identifier.JURIK_RELATIVE_TREND_STRENGTH_INDEX:
+        from ..mark_jurik.jurik_relative_trend_strength_index.params import default_params
+        from ..mark_jurik.jurik_relative_trend_strength_index.jurik_relative_trend_strength_index import JurikRelativeTrendStrengthIndex
+        return JurikRelativeTrendStrengthIndex(_apply(default_params(), params))
+
+    if identifier == Identifier.JURIK_COMPOSITE_FRACTAL_BEHAVIOR_INDEX:
+        from ..mark_jurik.jurik_composite_fractal_behavior_index.params import default_params
+        from ..mark_jurik.jurik_composite_fractal_behavior_index.jurik_composite_fractal_behavior_index import JurikCompositeFractalBehaviorIndex
+        return JurikCompositeFractalBehaviorIndex(_apply(default_params(), params))
+
+    if identifier == Identifier.JURIK_ZERO_LAG_VELOCITY:
+        from ..mark_jurik.jurik_zero_lag_velocity.params import default_params
+        from ..mark_jurik.jurik_zero_lag_velocity.jurik_zero_lag_velocity import JurikZeroLagVelocity
+        return JurikZeroLagVelocity(_apply(default_params(), params))
+
+    if identifier == Identifier.JURIK_DIRECTIONAL_MOVEMENT_INDEX:
+        from ..mark_jurik.jurik_directional_movement_index.params import default_params
+        from ..mark_jurik.jurik_directional_movement_index.jurik_directional_movement_index import JurikDirectionalMovementIndex
+        return JurikDirectionalMovementIndex(_apply(default_params(), params))
+
+    if identifier == Identifier.JURIK_ADAPTIVE_RELATIVE_TREND_STRENGTH_INDEX:
+        from ..mark_jurik.jurik_adaptive_relative_trend_strength_index.params import default_params
+        from ..mark_jurik.jurik_adaptive_relative_trend_strength_index.jurik_adaptive_relative_trend_strength_index import JurikAdaptiveRelativeTrendStrengthIndex
+        return JurikAdaptiveRelativeTrendStrengthIndex(_apply(default_params(), params))
+
+    if identifier == Identifier.JURIK_ADAPTIVE_ZERO_LAG_VELOCITY:
+        from ..mark_jurik.jurik_adaptive_zero_lag_velocity.params import default_params
+        from ..mark_jurik.jurik_adaptive_zero_lag_velocity.jurik_adaptive_zero_lag_velocity import JurikAdaptiveZeroLagVelocity
+        return JurikAdaptiveZeroLagVelocity(_apply(default_params(), params))
+
+    if identifier == Identifier.JURIK_COMMODITY_CHANNEL_INDEX:
+        from ..mark_jurik.jurik_commodity_channel_index.params import default_params
+        from ..mark_jurik.jurik_commodity_channel_index.jurik_commodity_channel_index import JurikCommodityChannelIndex
+        return JurikCommodityChannelIndex(_apply(default_params(), params))
+
+    if identifier == Identifier.JURIK_FRACTAL_ADAPTIVE_ZERO_LAG_VELOCITY:
+        from ..mark_jurik.jurik_fractal_adaptive_zero_lag_velocity.params import default_params
+        from ..mark_jurik.jurik_fractal_adaptive_zero_lag_velocity.jurik_fractal_adaptive_zero_lag_velocity import JurikFractalAdaptiveZeroLagVelocity
+        return JurikFractalAdaptiveZeroLagVelocity(_apply(default_params(), params))
+
+    if identifier == Identifier.JURIK_TURNING_POINT_OSCILLATOR:
+        from ..mark_jurik.jurik_turning_point_oscillator.params import default_params
+        from ..mark_jurik.jurik_turning_point_oscillator.jurik_turning_point_oscillator import JurikTurningPointOscillator
+        return JurikTurningPointOscillator(_apply(default_params(), params))
+
+    if identifier == Identifier.JURIK_WAVELET_SAMPLER:
+        from ..mark_jurik.jurik_wavelet_sampler.params import default_params
+        from ..mark_jurik.jurik_wavelet_sampler.jurik_wavelet_sampler import JurikWaveletSampler
+        return JurikWaveletSampler(_apply(default_params(), params))
+
+    # ── patrick mulloy ────────────────────────────────────────────────────
 
     if identifier == Identifier.DOUBLE_EXPONENTIAL_MOVING_AVERAGE:
         if _has_key(params, 'smoothing_factor'):
@@ -389,7 +441,7 @@ def create_indicator(
         from ..patrick_mulloy.triple_exponential_moving_average.triple_exponential_moving_average import TripleExponentialMovingAverage
         return TripleExponentialMovingAverage.from_length(_apply(default_length_params(), params))
 
-    # ── perry_kaufman ─────────────────────────────────────────────────────
+    # ── perry kaufman ─────────────────────────────────────────────────────
 
     if identifier == Identifier.KAUFMAN_ADAPTIVE_MOVING_AVERAGE:
         if _has_key(params, 'fastest_smoothing_factor') or _has_key(params, 'slowest_smoothing_factor'):
@@ -400,7 +452,7 @@ def create_indicator(
         from ..perry_kaufman.kaufman_adaptive_moving_average.kaufman_adaptive_moving_average import KaufmanAdaptiveMovingAverage
         return KaufmanAdaptiveMovingAverage.from_length(_apply(default_length_params(), params))
 
-    # ── tim_tillson ───────────────────────────────────────────────────────
+    # ── tim tillson ───────────────────────────────────────────────────────
 
     if identifier == Identifier.T2_EXPONENTIAL_MOVING_AVERAGE:
         if _has_key(params, 'smoothing_factor'):
@@ -420,7 +472,7 @@ def create_indicator(
         from ..tim_tillson.t3_exponential_moving_average.t3_exponential_moving_average import T3ExponentialMovingAverage
         return T3ExponentialMovingAverage.from_length(_apply(default_length_params(), params))
 
-    # ── tushar_chande ─────────────────────────────────────────────────────
+    # ── tushar chande ─────────────────────────────────────────────────────
 
     if identifier == Identifier.CHANDE_MOMENTUM_OSCILLATOR:
         from ..tushar_chande.chande_momentum_oscillator.params import default_params
@@ -437,7 +489,7 @@ def create_indicator(
         from ..tushar_chande.aroon.aroon import Aroon
         return Aroon(_apply(default_params(), params))
 
-    # ── vladimir_kravchuk ─────────────────────────────────────────────────
+    # ── vladimir kravchuk ─────────────────────────────────────────────────
 
     if identifier == Identifier.ADAPTIVE_TREND_AND_CYCLE_FILTER:
         from ..vladimir_kravchuk.adaptive_trend_and_cycle_filter.params import default_params
@@ -446,7 +498,7 @@ def create_indicator(
             return AdaptiveTrendAndCycleFilter(_apply(default_params(), None))
         return AdaptiveTrendAndCycleFilter(_apply(default_params(), params))
 
-    # ── welles_wilder ─────────────────────────────────────────────────────
+    # ── welles wilder ─────────────────────────────────────────────────────
 
     if identifier == Identifier.TRUE_RANGE:
         from ..welles_wilder.true_range.true_range import TrueRange
@@ -507,64 +559,16 @@ def create_indicator(
         from ..welles_wilder.parabolic_stop_and_reverse.parabolic_stop_and_reverse import ParabolicStopAndReverse
         return ParabolicStopAndReverse(_apply(default_params(), params))
 
-    if identifier == Identifier.JURIK_RELATIVE_TREND_STRENGTH_INDEX:
-        from ..mark_jurik.jurik_relative_trend_strength_index.params import default_params
-        from ..mark_jurik.jurik_relative_trend_strength_index.jurik_relative_trend_strength_index import JurikRelativeTrendStrengthIndex
-        return JurikRelativeTrendStrengthIndex(_apply(default_params(), params))
+    # ── custom ────────────────────────────────────────────────────────────
 
-    if identifier == Identifier.JURIK_COMPOSITE_FRACTAL_BEHAVIOR_INDEX:
-        from ..mark_jurik.jurik_composite_fractal_behavior_index.params import default_params
-        from ..mark_jurik.jurik_composite_fractal_behavior_index.jurik_composite_fractal_behavior_index import JurikCompositeFractalBehaviorIndex
-        return JurikCompositeFractalBehaviorIndex(_apply(default_params(), params))
+    if identifier == Identifier.GOERTZEL_SPECTRUM:
+        from ..custom.goertzel_spectrum.params import default_params
+        from ..custom.goertzel_spectrum.goertzel_spectrum import GoertzelSpectrum
+        return GoertzelSpectrum(_apply(default_params(), params))
 
-    if identifier == Identifier.JURIK_ZERO_LAG_VELOCITY:
-        from ..mark_jurik.jurik_zero_lag_velocity.params import default_params
-        from ..mark_jurik.jurik_zero_lag_velocity.jurik_zero_lag_velocity import JurikZeroLagVelocity
-        return JurikZeroLagVelocity(_apply(default_params(), params))
-
-    if identifier == Identifier.JURIK_DIRECTIONAL_MOVEMENT_INDEX:
-        from ..mark_jurik.jurik_directional_movement_index.params import default_params
-        from ..mark_jurik.jurik_directional_movement_index.jurik_directional_movement_index import JurikDirectionalMovementIndex
-        return JurikDirectionalMovementIndex(_apply(default_params(), params))
-
-    if identifier == Identifier.JURIK_ADAPTIVE_RELATIVE_TREND_STRENGTH_INDEX:
-        from ..mark_jurik.jurik_adaptive_relative_trend_strength_index.params import default_params
-        from ..mark_jurik.jurik_adaptive_relative_trend_strength_index.jurik_adaptive_relative_trend_strength_index import JurikAdaptiveRelativeTrendStrengthIndex
-        return JurikAdaptiveRelativeTrendStrengthIndex(_apply(default_params(), params))
-
-    if identifier == Identifier.JURIK_ADAPTIVE_ZERO_LAG_VELOCITY:
-        from ..mark_jurik.jurik_adaptive_zero_lag_velocity.params import default_params
-        from ..mark_jurik.jurik_adaptive_zero_lag_velocity.jurik_adaptive_zero_lag_velocity import JurikAdaptiveZeroLagVelocity
-        return JurikAdaptiveZeroLagVelocity(_apply(default_params(), params))
-
-    if identifier == Identifier.JURIK_COMMODITY_CHANNEL_INDEX:
-        from ..mark_jurik.jurik_commodity_channel_index.params import default_params
-        from ..mark_jurik.jurik_commodity_channel_index.jurik_commodity_channel_index import JurikCommodityChannelIndex
-        return JurikCommodityChannelIndex(_apply(default_params(), params))
-
-    if identifier == Identifier.JURIK_FRACTAL_ADAPTIVE_ZERO_LAG_VELOCITY:
-        from ..mark_jurik.jurik_fractal_adaptive_zero_lag_velocity.params import default_params
-        from ..mark_jurik.jurik_fractal_adaptive_zero_lag_velocity.jurik_fractal_adaptive_zero_lag_velocity import JurikFractalAdaptiveZeroLagVelocity
-        return JurikFractalAdaptiveZeroLagVelocity(_apply(default_params(), params))
-
-    if identifier == Identifier.JURIK_TURNING_POINT_OSCILLATOR:
-        from ..mark_jurik.jurik_turning_point_oscillator.params import default_params
-        from ..mark_jurik.jurik_turning_point_oscillator.jurik_turning_point_oscillator import JurikTurningPointOscillator
-        return JurikTurningPointOscillator(_apply(default_params(), params))
-
-    if identifier == Identifier.JURIK_WAVELET_SAMPLER:
-        from ..mark_jurik.jurik_wavelet_sampler.params import default_params
-        from ..mark_jurik.jurik_wavelet_sampler.jurik_wavelet_sampler import JurikWaveletSampler
-        return JurikWaveletSampler(_apply(default_params(), params))
-
-    if identifier == Identifier.ARNAUD_LEGOUX_MOVING_AVERAGE:
-        from ..arnaud_legoux.arnaud_legoux_moving_average.params import default_params
-        from ..arnaud_legoux.arnaud_legoux_moving_average.arnaud_legoux_moving_average import ArnaudLegouxMovingAverage
-        return ArnaudLegouxMovingAverage(_apply(default_params(), params))
-
-    if identifier == Identifier.NEW_MOVING_AVERAGE:
-        from ..manfred_dürschner.new_moving_average.params import default_params
-        from ..manfred_dürschner.new_moving_average.new_moving_average import NewMovingAverage
-        return NewMovingAverage(_apply(default_params(), params))
+    if identifier == Identifier.MAXIMUM_ENTROPY_SPECTRUM:
+        from ..custom.maximum_entropy_spectrum.params import default_params
+        from ..custom.maximum_entropy_spectrum.maximum_entropy_spectrum import MaximumEntropySpectrum
+        return MaximumEntropySpectrum(_apply(default_params(), params))
 
     raise ValueError(f"unsupported indicator: {identifier}")

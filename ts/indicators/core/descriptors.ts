@@ -57,19 +57,19 @@ const descriptors: Map<IndicatorIdentifier, Descriptor> = new Map<IndicatorIdent
   [IndicatorIdentifier.Variance, desc(IndicatorIdentifier.Variance, 'Common', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Volatility, P.Own)])],
   [IndicatorIdentifier.WeightedMovingAverage, desc(IndicatorIdentifier.WeightedMovingAverage, 'Common', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Smoother, P.Price)])],
 
-  // ── arnaudlegoux ──────────────────────────────────────────────────────
+  // ── arnaud legoux ──────────────────────────────────────────────────────
 
   [IndicatorIdentifier.ArnaudLegouxMovingAverage, desc(IndicatorIdentifier.ArnaudLegouxMovingAverage, 'Arnaud Legoux', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Smoother, P.Price)])],
 
-  // ── donaldlambert ─────────────────────────────────────────────────────
+  // ── donald lambert ─────────────────────────────────────────────────────
 
   [IndicatorIdentifier.CommodityChannelIndex, desc(IndicatorIdentifier.CommodityChannelIndex, 'Donald Lambert', A.Static, I.BarInput, V.NoVolume, [out(0, S.Scalar, R.BoundedOscillator, P.Own)])],
 
-  // ── genequong ─────────────────────────────────────────────────────────
+  // ── gene quong ─────────────────────────────────────────────────────────
 
   [IndicatorIdentifier.MoneyFlowIndex, desc(IndicatorIdentifier.MoneyFlowIndex, 'Gene Quong', A.Static, I.BarInput, V.AggregateBarVolume, [out(0, S.Scalar, R.BoundedOscillator, P.Own)])],
 
-  // ── georgelane ────────────────────────────────────────────────────────
+  // ── george lane ────────────────────────────────────────────────────────
 
   [IndicatorIdentifier.Stochastic, desc(IndicatorIdentifier.Stochastic, 'George Lane', A.Static, I.BarInput, V.NoVolume, [
     out(0, S.Scalar, R.BoundedOscillator, P.Own),
@@ -77,7 +77,7 @@ const descriptors: Map<IndicatorIdentifier, Descriptor> = new Map<IndicatorIdent
     out(2, S.Scalar, R.Signal, P.Own),
   ])],
 
-  // ── geraldappel ───────────────────────────────────────────────────────
+  // ── gerald appel ───────────────────────────────────────────────────────
 
   [IndicatorIdentifier.MovingAverageConvergenceDivergence, desc(IndicatorIdentifier.MovingAverageConvergenceDivergence, 'Gerald Appel', A.Static, I.ScalarInput, V.NoVolume, [
     out(0, S.Scalar, R.Oscillator, P.Own),
@@ -86,15 +86,15 @@ const descriptors: Map<IndicatorIdentifier, Descriptor> = new Map<IndicatorIdent
   ])],
   [IndicatorIdentifier.PercentagePriceOscillator, desc(IndicatorIdentifier.PercentagePriceOscillator, 'Gerald Appel', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Oscillator, P.Own)])],
 
-  // ── igorlivshin ───────────────────────────────────────────────────────
+  // ── igor livshin ───────────────────────────────────────────────────────
 
   [IndicatorIdentifier.BalanceOfPower, desc(IndicatorIdentifier.BalanceOfPower, 'Igor Livshin', A.Static, I.BarInput, V.NoVolume, [out(0, S.Scalar, R.BoundedOscillator, P.Own)])],
 
-  // ── jackhutson ────────────────────────────────────────────────────────
+  // ── jack hutson ────────────────────────────────────────────────────────
 
   [IndicatorIdentifier.TripleExponentialMovingAverageOscillator, desc(IndicatorIdentifier.TripleExponentialMovingAverageOscillator, 'Jack Hutson', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Oscillator, P.Own)])],
 
-  // ── johnbollinger ─────────────────────────────────────────────────────
+  // ── john bollinger ─────────────────────────────────────────────────────
 
   [IndicatorIdentifier.BollingerBands, desc(IndicatorIdentifier.BollingerBands, 'John Bollinger', A.Static, I.ScalarInput, V.NoVolume, [
     out(0, S.Scalar, R.Envelope, P.Price),
@@ -106,7 +106,7 @@ const descriptors: Map<IndicatorIdentifier, Descriptor> = new Map<IndicatorIdent
   ])],
   [IndicatorIdentifier.BollingerBandsTrend, desc(IndicatorIdentifier.BollingerBandsTrend, 'John Bollinger', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Oscillator, P.Own)])],
 
-  // ── johnehlers ────────────────────────────────────────────────────────
+  // ── john ehlers ────────────────────────────────────────────────────────
 
   [IndicatorIdentifier.AutoCorrelationIndicator, desc(IndicatorIdentifier.AutoCorrelationIndicator, 'John Ehlers', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Heatmap, R.Correlation, P.Own)])],
   [IndicatorIdentifier.AutoCorrelationPeriodogram, desc(IndicatorIdentifier.AutoCorrelationPeriodogram, 'John Ehlers', A.Adaptive, I.ScalarInput, V.NoVolume, [out(0, S.Heatmap, R.Spectrum, P.Own)])],
@@ -181,25 +181,25 @@ const descriptors: Map<IndicatorIdentifier, Descriptor> = new Map<IndicatorIdent
   [IndicatorIdentifier.ZeroLagErrorCorrectingExponentialMovingAverage, desc(IndicatorIdentifier.ZeroLagErrorCorrectingExponentialMovingAverage, 'John Ehlers', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Smoother, P.Price)])],
   [IndicatorIdentifier.ZeroLagExponentialMovingAverage, desc(IndicatorIdentifier.ZeroLagExponentialMovingAverage, 'John Ehlers', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Smoother, P.Price)])],
 
-  // ── josephgranville ───────────────────────────────────────────────────
+  // ── joseph granville ───────────────────────────────────────────────────
 
   [IndicatorIdentifier.OnBalanceVolume, desc(IndicatorIdentifier.OnBalanceVolume, 'Joseph Granville', A.Static, I.BarInput, V.AggregateBarVolume, [out(0, S.Scalar, R.VolumeFlow, P.Own)])],
 
-  // ── larrywilliams ─────────────────────────────────────────────────────
+  // ── larry williams ─────────────────────────────────────────────────────
 
   [IndicatorIdentifier.UltimateOscillator, desc(IndicatorIdentifier.UltimateOscillator, 'Larry Williams', A.Static, I.BarInput, V.NoVolume, [out(0, S.Scalar, R.BoundedOscillator, P.Own)])],
   [IndicatorIdentifier.WilliamsPercentR, desc(IndicatorIdentifier.WilliamsPercentR, 'Larry Williams', A.Static, I.BarInput, V.NoVolume, [out(0, S.Scalar, R.BoundedOscillator, P.Own)])],
 
-  // ── manfreddurschner ──────────────────────────────────────────────────
+  // ── manfred durschner ──────────────────────────────────────────────────
 
   [IndicatorIdentifier.NewMovingAverage, desc(IndicatorIdentifier.NewMovingAverage, 'Manfred Dürschner', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Smoother, P.Price)])],
 
-  // ── marcchaikin ───────────────────────────────────────────────────────
+  // ── marc chaikin ───────────────────────────────────────────────────────
 
   [IndicatorIdentifier.AdvanceDecline, desc(IndicatorIdentifier.AdvanceDecline, 'Marc Chaikin', A.Static, I.BarInput, V.AggregateBarVolume, [out(0, S.Scalar, R.VolumeFlow, P.Own)])],
   [IndicatorIdentifier.AdvanceDeclineOscillator, desc(IndicatorIdentifier.AdvanceDeclineOscillator, 'Marc Chaikin', A.Static, I.BarInput, V.AggregateBarVolume, [out(0, S.Scalar, R.VolumeFlow, P.Own)])],
 
-  // ── markjurik ─────────────────────────────────────────────────────────
+  // ── mark jurik ─────────────────────────────────────────────────────────
 
   [IndicatorIdentifier.JurikAdaptiveRelativeTrendStrengthIndex, desc(IndicatorIdentifier.JurikAdaptiveRelativeTrendStrengthIndex, 'Mark Jurik', A.Adaptive, I.ScalarInput, V.NoVolume, [out(1, S.Scalar, R.Oscillator, P.Own)])],
   [IndicatorIdentifier.JurikAdaptiveZeroLagVelocity, desc(IndicatorIdentifier.JurikAdaptiveZeroLagVelocity, 'Mark Jurik', A.Adaptive, I.ScalarInput, V.NoVolume, [out(1, S.Scalar, R.Oscillator, P.Own)])],
@@ -217,21 +217,21 @@ const descriptors: Map<IndicatorIdentifier, Descriptor> = new Map<IndicatorIdent
   [IndicatorIdentifier.JurikWaveletSampler, desc(IndicatorIdentifier.JurikWaveletSampler, 'Mark Jurik', A.Static, I.ScalarInput, V.NoVolume, [out(1, S.Scalar, R.Smoother, P.Price)])],
   [IndicatorIdentifier.JurikZeroLagVelocity, desc(IndicatorIdentifier.JurikZeroLagVelocity, 'Mark Jurik', A.Adaptive, I.ScalarInput, V.NoVolume, [out(1, S.Scalar, R.Oscillator, P.Own)])],
 
-  // ── patrickmulloy ─────────────────────────────────────────────────────
+  // ── patrick mulloy ─────────────────────────────────────────────────────
 
   [IndicatorIdentifier.DoubleExponentialMovingAverage, desc(IndicatorIdentifier.DoubleExponentialMovingAverage, 'Patrick Mulloy', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Smoother, P.Price)])],
   [IndicatorIdentifier.TripleExponentialMovingAverage, desc(IndicatorIdentifier.TripleExponentialMovingAverage, 'Patrick Mulloy', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Smoother, P.Price)])],
 
-  // ── perrykaufman ──────────────────────────────────────────────────────
+  // ── perry kaufman ──────────────────────────────────────────────────────
 
   [IndicatorIdentifier.KaufmanAdaptiveMovingAverage, desc(IndicatorIdentifier.KaufmanAdaptiveMovingAverage, 'Perry Kaufman', A.Adaptive, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Smoother, P.Price)])],
 
-  // ── timtillson ────────────────────────────────────────────────────────
+  // ── tim tillson ────────────────────────────────────────────────────────
 
   [IndicatorIdentifier.T2ExponentialMovingAverage, desc(IndicatorIdentifier.T2ExponentialMovingAverage, 'Tim Tillson', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Smoother, P.Price)])],
   [IndicatorIdentifier.T3ExponentialMovingAverage, desc(IndicatorIdentifier.T3ExponentialMovingAverage, 'Tim Tillson', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Smoother, P.Price)])],
 
-  // ── tusharchande ──────────────────────────────────────────────────────
+  // ── tushar chande ──────────────────────────────────────────────────────
 
   [IndicatorIdentifier.Aroon, desc(IndicatorIdentifier.Aroon, 'Tushar Chande', A.Static, I.BarInput, V.NoVolume, [
     out(0, S.Scalar, R.BoundedOscillator, P.Own),
@@ -244,7 +244,7 @@ const descriptors: Map<IndicatorIdentifier, Descriptor> = new Map<IndicatorIdent
     out(1, S.Scalar, R.Signal, P.Own),
   ])],
 
-  // ── vladimirkravchuk ──────────────────────────────────────────────────
+  // ── vladimir kravchuk ──────────────────────────────────────────────────
 
   [IndicatorIdentifier.AdaptiveTrendAndCycleFilter, desc(IndicatorIdentifier.AdaptiveTrendAndCycleFilter, 'Vladimir Kravchuk', A.Adaptive, I.ScalarInput, V.NoVolume, [
     out(0, S.Scalar, R.Smoother, P.Price),
@@ -257,7 +257,7 @@ const descriptors: Map<IndicatorIdentifier, Descriptor> = new Map<IndicatorIdent
     out(7, S.Scalar, R.Oscillator, P.Own),
   ])],
 
-  // ── welleswilder ──────────────────────────────────────────────────────
+  // ── welles wilder ──────────────────────────────────────────────────────
 
   [IndicatorIdentifier.AverageDirectionalMovementIndex, desc(IndicatorIdentifier.AverageDirectionalMovementIndex, 'Welles Wilder', A.Static, I.BarInput, V.NoVolume, [
     out(0, S.Scalar, R.BoundedOscillator, P.Own),

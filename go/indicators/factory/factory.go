@@ -135,7 +135,7 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 	}
 
 	switch identifier {
-	// ── common ────────────────────────────────────────────────────────────
+	// ── common ──────────────────────────────────────────────────────────────
 
 	case core.SimpleMovingAverage:
 		p := simplemovingaverage.DefaultParams()
@@ -250,33 +250,17 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 
 		return linearregression.New(p)
 
-	// ── custom ───────────────────────────────────────────────────────────
+	// ── arnaud legoux ────────────────────────────────────────────────────────
 
-	case core.GoertzelSpectrum:
-		if isEmptyObject(b) {
-			return goertzelspectrum.NewGoertzelSpectrumDefault()
-		}
-
-		p := &goertzelspectrum.Params{}
+	case core.ArnaudLegouxMovingAverage:
+		p := arnaudlegouxmovingaverage.DefaultParams()
 		if err := unmarshal(b, p); err != nil {
 			return nil, err
 		}
 
-		return goertzelspectrum.NewGoertzelSpectrumParams(p)
+		return arnaudlegouxmovingaverage.NewArnaudLegouxMovingAverage(p)
 
-	case core.MaximumEntropySpectrum:
-		if isEmptyObject(b) {
-			return maximumentropyspectrum.NewMaximumEntropySpectrumDefault()
-		}
-
-		p := &maximumentropyspectrum.Params{}
-		if err := unmarshal(b, p); err != nil {
-			return nil, err
-		}
-
-		return maximumentropyspectrum.NewMaximumEntropySpectrumParams(p)
-
-	// ── donaldlambert ────────────────────────────────────────────────────
+	// ── donald lambert ───────────────────────────────────────────────────────
 
 	case core.CommodityChannelIndex:
 		p := commoditychannelindex.DefaultParams()
@@ -286,7 +270,7 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 
 		return commoditychannelindex.NewCommodityChannelIndex(p)
 
-	// ── genequong ────────────────────────────────────────────────────────
+	// ── gene quong ────────────────────────────────────────────────────────
 
 	case core.MoneyFlowIndex:
 		p := moneyflowindex.DefaultParams()
@@ -296,7 +280,7 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 
 		return moneyflowindex.NewMoneyFlowIndex(p)
 
-	// ── georgelane ───────────────────────────────────────────────────────
+	// ── george lane ───────────────────────────────────────────────────────
 
 	case core.Stochastic:
 		p := stochastic.DefaultParams()
@@ -306,7 +290,7 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 
 		return stochastic.NewStochastic(p)
 
-	// ── geraldappel ──────────────────────────────────────────────────────
+	// ── gerald appel ──────────────────────────────────────────────────────
 
 	case core.PercentagePriceOscillator:
 		p := percentagepriceoscillator.DefaultParams()
@@ -324,12 +308,12 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 
 		return movingaverageconvergencedivergence.NewMovingAverageConvergenceDivergence(p)
 
-	// ── igorlivshin ──────────────────────────────────────────────────────
+	// ── igor livshin ──────────────────────────────────────────────────────
 
 	case core.BalanceOfPower:
 		return balanceofpower.NewBalanceOfPower(&balanceofpower.BalanceOfPowerParams{})
 
-	// ── jackhutson ───────────────────────────────────────────────────────
+	// ── jack hutson ───────────────────────────────────────────────────────
 
 	case core.TripleExponentialMovingAverageOscillator:
 		p := tripleexponentialmovingaverageoscillator.DefaultParams()
@@ -339,7 +323,7 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 
 		return tripleexponentialmovingaverageoscillator.NewTripleExponentialMovingAverageOscillator(p)
 
-	// ── johnbollinger ────────────────────────────────────────────────────
+	// ── john bollinger ────────────────────────────────────────────────────
 
 	case core.BollingerBands:
 		p := bollingerbands.DefaultParams()
@@ -357,7 +341,7 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 
 		return bollingerbandstrend.NewBollingerBandsTrend(p)
 
-	// ── johnehlers ───────────────────────────────────────────────────────
+	// ── john ehlers ───────────────────────────────────────────────────────
 
 	case core.SuperSmoother:
 		p := supersmoother.DefaultParams()
@@ -606,7 +590,7 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 
 		return discretefouriertransformspectrum.NewDiscreteFourierTransformSpectrumParams(p)
 
-	// ── josephgranville ──────────────────────────────────────────────────
+	// ── joseph granville ──────────────────────────────────────────────────
 
 	case core.OnBalanceVolume:
 		p := &onbalancevolume.OnBalanceVolumeParams{}
@@ -616,7 +600,7 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 
 		return onbalancevolume.NewOnBalanceVolume(p)
 
-	// ── larrywilliams ────────────────────────────────────────────────────
+	// ── larry williams ────────────────────────────────────────────────────
 
 	case core.WilliamsPercentR:
 		p := &lengthParam{Length: 14}
@@ -634,7 +618,17 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 
 		return ultimateoscillator.NewUltimateOscillator(p)
 
-	// ── marcchaikin ──────────────────────────────────────────────────────
+	// ── manfred durschner ────────────────────────────────────────────────────
+
+	case core.NewMovingAverage:
+		p := newmovingaverage.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return newmovingaverage.NewNewMovingAverage(p)
+
+	// ── marc chaikin ─────────────────────────────────────────────────────────
 
 	case core.AdvanceDecline:
 		return advancedecline.NewAdvanceDecline(&advancedecline.AdvanceDeclineParams{})
@@ -647,7 +641,7 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 
 		return advancedeclineoscillator.NewAdvanceDeclineOscillator(p)
 
-	// ── markjurik ────────────────────────────────────────────────────────
+	// ── mark jurik ────────────────────────────────────────────────────────
 
 	case core.JurikMovingAverage:
 		p := jurikmovingaverage.DefaultParams()
@@ -737,7 +731,7 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 
 		return jurikturningpointoscillator.NewJurikTurningPointOscillator(p)
 
-	// ── patrickmulloy ────────────────────────────────────────────────────
+	// ── patrick mulloy ────────────────────────────────────────────────────
 
 	case core.DoubleExponentialMovingAverage:
 		if hasKey(b, "smoothingFactor") {
@@ -773,7 +767,7 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 
 		return tripleexponentialmovingaverage.NewTripleExponentialMovingAverageLength(p)
 
-	// ── perrykaufman ─────────────────────────────────────────────────────
+	// ── perry kaufman ─────────────────────────────────────────────────────
 
 	case core.KaufmanAdaptiveMovingAverage:
 		if hasKey(b, "fastestSmoothingFactor") || hasKey(b, "slowestSmoothingFactor") {
@@ -792,7 +786,7 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 
 		return kaufmanadaptivemovingaverage.NewKaufmanAdaptiveMovingAverageLength(p)
 
-	// ── timtillson ───────────────────────────────────────────────────────
+	// ── tim tillson ───────────────────────────────────────────────────────
 
 	case core.T2ExponentialMovingAverage:
 		if hasKey(b, "smoothingFactor") {
@@ -828,7 +822,7 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 
 		return t3exponentialmovingaverage.NewT3ExponentialMovingAverageLength(p)
 
-	// ── tusharchande ─────────────────────────────────────────────────────
+	// ── tushar chande ─────────────────────────────────────────────────────
 
 	case core.ChandeMomentumOscillator:
 		p := chandemomentumoscillator.DefaultParams()
@@ -854,7 +848,7 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 
 		return aroon.NewAroon(p)
 
-	// ── vladimirkravchuk ─────────────────────────────────────────────────
+	// ── vladimir kravchuk ─────────────────────────────────────────────────
 
 	case core.AdaptiveTrendAndCycleFilter:
 		if isEmptyObject(b) {
@@ -868,7 +862,7 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 
 		return adaptivetrendandcyclefilter.NewAdaptiveTrendAndCycleFilterParams(p)
 
-	// ── welleswilder ─────────────────────────────────────────────────────
+	// ── welles wilder ─────────────────────────────────────────────────────
 
 	case core.TrueRange:
 		return truerange.NewTrueRange(), nil
@@ -961,21 +955,31 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 
 		return parabolicstopandreverse.NewParabolicStopAndReverse(p)
 
-	case core.ArnaudLegouxMovingAverage:
-		p := arnaudlegouxmovingaverage.DefaultParams()
+	// ── custom ──────────────────────────────────────────────────────────────
+
+	case core.GoertzelSpectrum:
+		if isEmptyObject(b) {
+			return goertzelspectrum.NewGoertzelSpectrumDefault()
+		}
+
+		p := &goertzelspectrum.Params{}
 		if err := unmarshal(b, p); err != nil {
 			return nil, err
 		}
 
-		return arnaudlegouxmovingaverage.NewArnaudLegouxMovingAverage(p)
+		return goertzelspectrum.NewGoertzelSpectrumParams(p)
 
-	case core.NewMovingAverage:
-		p := newmovingaverage.DefaultParams()
+	case core.MaximumEntropySpectrum:
+		if isEmptyObject(b) {
+			return maximumentropyspectrum.NewMaximumEntropySpectrumDefault()
+		}
+
+		p := &maximumentropyspectrum.Params{}
 		if err := unmarshal(b, p); err != nil {
 			return nil, err
 		}
 
-		return newmovingaverage.NewNewMovingAverage(p)
+		return maximumentropyspectrum.NewMaximumEntropySpectrumParams(p)
 
 	default:
 		return nil, fmt.Errorf("unsupported indicator: %s", identifier)
