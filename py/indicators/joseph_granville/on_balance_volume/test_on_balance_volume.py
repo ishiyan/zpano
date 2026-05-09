@@ -11,10 +11,7 @@ from ...core.identifier import Identifier
 from ....entities.bar import Bar
 from ....entities.scalar import Scalar
 
-
-_PRICES = [1, 2, 8, 4, 9, 6, 7, 13, 9, 10, 3, 12]
-_VOLUMES = [100, 90, 200, 150, 500, 100, 300, 150, 100, 300, 200, 100]
-_EXPECTED = [100, 190, 390, 240, 740, 640, 940, 1090, 990, 1290, 1090, 1190]
+from .test_testdata import _PRICES, _VOLUMES, _EXPECTED
 
 
 def _round_to(v: float, digits: int) -> float:

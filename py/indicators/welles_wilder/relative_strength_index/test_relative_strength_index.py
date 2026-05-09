@@ -1,6 +1,5 @@
 import math
 import unittest
-from datetime import datetime
 
 from py.indicators.welles_wilder.relative_strength_index.relative_strength_index import RelativeStrengthIndex
 from py.indicators.welles_wilder.relative_strength_index.params import RelativeStrengthIndexParams
@@ -11,26 +10,10 @@ from py.entities.trade import Trade
 from py.entities.scalar import Scalar
 from py.entities.bar_component import BarComponent
 
+from .test_testdata import TEST_INPUT_1, TEST_EXPECTED_1, TEST_TIME
+
 
 # Test data from TA-Lib reference (length=9, 25 entries).
-TEST_INPUT_1 = [
-    91.15, 90.50, 92.55, 94.70, 95.55, 94.00, 91.30, 91.95, 92.45, 93.80,
-    92.50, 94.55, 96.75, 97.80, 98.40, 98.15, 96.70, 98.85, 98.90, 100.50,
-    102.60, 104.80, 103.80, 103.10, 102.00,
-]
-
-TEST_EXPECTED_1 = [
-    math.nan, math.nan, math.nan, math.nan, math.nan,
-    math.nan, math.nan, math.nan, math.nan,
-    60.6425702811244, 54.2677448337826, 61.4558190165176, 67.6034767388667,
-    70.1590191481383, 71.5992400904851, 70.0152589447766, 61.1833361324987,
-    67.9312249318593, 68.076417836971, 72.5504646296262, 77.2568847385616,
-    81.0801123570899, 74.6619680507228, 70.2808713845906, 63.6754215506388,
-]
-
-TEST_TIME = datetime(2021, 4, 1)
-
-
 def _create() -> RelativeStrengthIndex:
     return RelativeStrengthIndex(RelativeStrengthIndexParams(length=9))
 
