@@ -246,17 +246,8 @@ pub const SimpleMovingAverage = struct {
 // ---------------------------------------------------------------------------
 
 const testing = std.testing;
+const testdata = @import("testdata.zig");
 
-fn testInput() [51]f64 {
-    return .{
-        64.59, 64.23, 65.26, 65.24, 65.07, 65.14, 64.98, 64.76, 65.11, 65.46,
-        65.94, 66.10, 66.87, 66.56, 66.71, 66.19, 66.14, 66.64, 67.33, 68.18,
-        67.48, 67.19, 66.46, 67.20, 67.62, 67.66, 67.89, 69.19, 69.68, 69.31,
-        69.11, 69.27, 68.97, 69.11, 69.50, 69.70, 69.94, 69.11, 67.64, 67.75,
-        67.47, 67.50, 68.18, 67.35, 66.74, 67.00, 67.46, 67.36, 67.37, 67.78,
-        67.96,
-    };
-}
 
 fn expected3() [51]f64 {
     return .{
@@ -311,7 +302,7 @@ fn checkUpdate(comptime nan_count: usize, comptime total: usize, sma: *SimpleMov
 }
 
 test "sma update length 3" {
-    const input = testInput();
+    const input = testdata.testInput();
     const exp = expected3();
     var sma = try createSma(testing.allocator, 3);
     defer sma.deinit();
@@ -319,7 +310,7 @@ test "sma update length 3" {
 }
 
 test "sma update length 5" {
-    const input = testInput();
+    const input = testdata.testInput();
     const exp = expected5();
     var sma = try createSma(testing.allocator, 5);
     defer sma.deinit();
@@ -327,7 +318,7 @@ test "sma update length 5" {
 }
 
 test "sma update length 10" {
-    const input = testInput();
+    const input = testdata.testInput();
     const exp = expected10();
     var sma = try createSma(testing.allocator, 10);
     defer sma.deinit();
@@ -335,7 +326,7 @@ test "sma update length 10" {
 }
 
 test "sma is primed" {
-    const input = testInput();
+    const input = testdata.testInput();
     var sma = try createSma(testing.allocator, 3);
     defer sma.deinit();
 

@@ -167,25 +167,13 @@ impl Indicator for OnBalanceVolume {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use super::super::testdata::testdata;
     use crate::indicators::core::outputs::shape::Shape;
-
-    fn test_prices() -> Vec<f64> {
-        vec![1.0, 2.0, 8.0, 4.0, 9.0, 6.0, 7.0, 13.0, 9.0, 10.0, 3.0, 12.0]
-    }
-
-    fn test_volumes() -> Vec<f64> {
-        vec![100.0, 90.0, 200.0, 150.0, 500.0, 100.0, 300.0, 150.0, 100.0, 300.0, 200.0, 100.0]
-    }
-
-    fn test_expected() -> Vec<f64> {
-        vec![100.0, 190.0, 390.0, 240.0, 740.0, 640.0, 940.0, 1090.0, 990.0, 1290.0, 1090.0, 1190.0]
-    }
-
     #[test]
     fn test_with_volume() {
-        let prices = test_prices();
-        let vol = test_volumes();
-        let expected = test_expected();
+        let prices = testdata::test_prices();
+        let vol = testdata::test_volumes();
+        let expected = testdata::test_expected();
 
         let mut obv = OnBalanceVolume::new(&OnBalanceVolumeParams::default()).unwrap();
 
@@ -254,9 +242,9 @@ mod tests {
 
     #[test]
     fn test_update_bar() {
-        let prices = test_prices();
-        let vol = test_volumes();
-        let expected = test_expected();
+        let prices = testdata::test_prices();
+        let vol = testdata::test_volumes();
+        let expected = testdata::test_expected();
 
         let mut obv = OnBalanceVolume::new(&OnBalanceVolumeParams::default()).unwrap();
 

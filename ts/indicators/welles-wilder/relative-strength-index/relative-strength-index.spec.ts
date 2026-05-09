@@ -4,22 +4,9 @@ import { RelativeStrengthIndex } from './relative-strength-index';
 import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { Shape } from '../../core/outputs/shape/shape';
 import { RelativeStrengthIndexOutput } from './output';
+import { input, expected } from './testdata';
 
 // Test data from TA-Lib reference (length=9, 25 entries).
-const input = [
-  91.15, 90.50, 92.55, 94.70, 95.55, 94.00, 91.30, 91.95, 92.45, 93.80,
-  92.50, 94.55, 96.75, 97.80, 98.40, 98.15, 96.70, 98.85, 98.90, 100.50,
-  102.60, 104.80, 103.80, 103.10, 102.00,
-];
-
-const expected = [
-  NaN, NaN, NaN, NaN, NaN, NaN, NaN, NaN, NaN,
-  60.6425702811244, 54.2677448337826, 61.4558190165176, 67.6034767388667,
-  70.1590191481383, 71.5992400904851, 70.0152589447766, 61.1833361324987,
-  67.9312249318593, 68.076417836971, 72.5504646296262, 77.2568847385616,
-  81.0801123570899, 74.6619680507228, 70.2808713845906, 63.6754215506388,
-];
-
 describe('RelativeStrengthIndex', () => {
   const tolerance = 1e-9;
 

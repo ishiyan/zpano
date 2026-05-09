@@ -290,10 +290,8 @@ pub const Variance = struct {
 // ---------------------------------------------------------------------------
 
 const testing = std.testing;
+const testdata = @import("testdata.zig");
 
-fn testInput() [12]f64 {
-    return .{ 1, 2, 8, 4, 9, 6, 7, 13, 9, 10, 3, 12 };
-}
 
 fn createVariance(allocator: std.mem.Allocator, length: usize, unbiased: bool) !Variance {
     var v = try Variance.init(allocator, .{ .length = length, .is_unbiased = unbiased });
@@ -306,7 +304,7 @@ fn almostEqual(a: f64, b: f64, eps: f64) bool {
 }
 
 test "variance population length 3" {
-    const input = testInput();
+    const input = testdata.testInput();
     var v = try createVariance(testing.allocator, 3, false);
     defer v.deinit();
 
@@ -330,7 +328,7 @@ test "variance population length 3" {
 }
 
 test "variance population length 5" {
-    const input = testInput();
+    const input = testdata.testInput();
     var v = try createVariance(testing.allocator, 5, false);
     defer v.deinit();
 
@@ -350,7 +348,7 @@ test "variance population length 5" {
 }
 
 test "variance sample length 3" {
-    const input = testInput();
+    const input = testdata.testInput();
     var v = try createVariance(testing.allocator, 3, true);
     defer v.deinit();
 
@@ -374,7 +372,7 @@ test "variance sample length 3" {
 }
 
 test "variance is primed" {
-    const input = testInput();
+    const input = testdata.testInput();
     var v = try createVariance(testing.allocator, 3, false);
     defer v.deinit();
 

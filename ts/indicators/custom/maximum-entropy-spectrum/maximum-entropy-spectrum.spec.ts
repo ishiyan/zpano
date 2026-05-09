@@ -12,7 +12,7 @@ import {
   testInputTest1,
   testInputTest2,
   testInputTest3,
-} from './data.spec';
+} from './testdata';
 import { MaximumEntropySpectrum } from './maximum-entropy-spectrum';
 import { MaximumEntropySpectrumEstimator } from './estimator';
 import { MaximumEntropySpectrumOutput } from './output';

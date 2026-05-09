@@ -4,12 +4,9 @@ import { OnBalanceVolume } from './on-balance-volume';
 import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { Shape } from '../../core/outputs/shape/shape';
 import { OnBalanceVolumeOutput } from './output';
+import { prices, volumes, expected } from './testdata';
 
 // C# test data: 12 entries.
-const prices = [1, 2, 8, 4, 9, 6, 7, 13, 9, 10, 3, 12];
-const volumes = [100, 90, 200, 150, 500, 100, 300, 150, 100, 300, 200, 100];
-const expected = [100, 190, 390, 240, 740, 640, 940, 1090, 990, 1290, 1090, 1190];
-
 function roundTo(v: number, digits: number): number {
   const p = Math.pow(10, digits);
   return Math.round(v * p) / p;

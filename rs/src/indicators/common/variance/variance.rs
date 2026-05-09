@@ -207,35 +207,8 @@ impl Indicator for Variance {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use super::super::testdata::testdata;
     use crate::indicators::core::outputs::shape::Shape;
-
-    fn test_input() -> Vec<f64> {
-        vec![1.0, 2.0, 8.0, 4.0, 9.0, 6.0, 7.0, 13.0, 9.0, 10.0, 3.0, 12.0]
-    }
-
-    fn expected_len3_population() -> Vec<f64> {
-        vec![
-            f64::NAN, f64::NAN,
-            9.55555555555556000, 6.22222222222222000, 4.66666666666667000, 4.22222222222222000, 1.55555555555556000,
-            9.55555555555556000, 6.22222222222222000, 2.88888888888889000, 9.55555555555556000, 14.88888888888890000,
-        ]
-    }
-
-    fn expected_len5_population() -> Vec<f64> {
-        vec![
-            f64::NAN, f64::NAN, f64::NAN, f64::NAN,
-            10.16000, 6.56000, 2.96000, 9.36000, 5.76000, 6.00000, 11.04000, 12.24000,
-        ]
-    }
-
-    fn expected_len3_sample() -> Vec<f64> {
-        vec![
-            f64::NAN, f64::NAN,
-            14.3333333333333000, 9.3333333333333400, 7.0000000000000000, 6.3333333333333400, 2.3333333333333300,
-            14.3333333333333000, 9.3333333333333400, 4.3333333333333400, 14.3333333333333000, 22.3333333333333000,
-        ]
-    }
-
     fn create_variance(length: usize, unbiased: bool) -> Variance {
         Variance::new(&VarianceParams { length, is_unbiased: unbiased, ..Default::default() }).unwrap()
     }
@@ -243,8 +216,8 @@ mod tests {
     #[test]
     fn test_population_variance_length_3() {
         let mut v = create_variance(3, false);
-        let input = test_input();
-        let expected = expected_len3_population();
+        let input = testdata::test_input();
+        let expected = testdata::expected_len3_population();
 
         for i in 0..2 {
             assert!(v.update(input[i]).is_nan(), "[{}] expected NaN", i);
@@ -261,8 +234,8 @@ mod tests {
     #[test]
     fn test_population_variance_length_5() {
         let mut v = create_variance(5, false);
-        let input = test_input();
-        let expected = expected_len5_population();
+        let input = testdata::test_input();
+        let expected = testdata::expected_len5_population();
 
         for i in 0..4 {
             assert!(v.update(input[i]).is_nan(), "[{}] expected NaN", i);
@@ -277,8 +250,8 @@ mod tests {
     #[test]
     fn test_sample_variance_length_3() {
         let mut v = create_variance(3, true);
-        let input = test_input();
-        let expected = expected_len3_sample();
+        let input = testdata::test_input();
+        let expected = testdata::expected_len3_sample();
 
         for i in 0..2 {
             assert!(v.update(input[i]).is_nan(), "[{}] expected NaN", i);
@@ -294,7 +267,7 @@ mod tests {
 
     #[test]
     fn test_is_primed() {
-        let input = test_input();
+        let input = testdata::test_input();
         let mut v = create_variance(3, false);
 
         assert!(!v.is_primed());

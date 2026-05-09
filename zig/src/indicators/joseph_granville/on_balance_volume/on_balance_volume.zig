@@ -212,18 +212,8 @@ pub const OnBalanceVolume = struct {
 // ---------------------------------------------------------------------------
 
 const testing = std.testing;
+const testdata = @import("testdata.zig");
 
-fn testPrices() [12]f64 {
-    return .{ 1, 2, 8, 4, 9, 6, 7, 13, 9, 10, 3, 12 };
-}
-
-fn testVolumes() [12]f64 {
-    return .{ 100, 90, 200, 150, 500, 100, 300, 150, 100, 300, 200, 100 };
-}
-
-fn testExpected() [12]f64 {
-    return .{ 100, 190, 390, 240, 740, 640, 940, 1090, 990, 1290, 1090, 1190 };
-}
 
 fn createObv() OnBalanceVolume {
     var obv = OnBalanceVolume.init(.{});
@@ -232,9 +222,9 @@ fn createObv() OnBalanceVolume {
 }
 
 test "on balance volume with volume" {
-    const prices = testPrices();
-    const vol = testVolumes();
-    const expected = testExpected();
+    const prices = testdata.testPrices();
+    const vol = testdata.testVolumes();
+    const expected = testdata.testExpected();
 
     var obv = createObv();
 
@@ -290,9 +280,9 @@ test "on balance volume update scalar" {
 }
 
 test "on balance volume update bar" {
-    const prices = testPrices();
-    const vol = testVolumes();
-    const expected = testExpected();
+    const prices = testdata.testPrices();
+    const vol = testdata.testVolumes();
+    const expected = testdata.testExpected();
     const time: i64 = 1617235200;
 
     var obv = createObv();

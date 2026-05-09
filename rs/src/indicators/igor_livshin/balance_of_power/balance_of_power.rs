@@ -144,52 +144,15 @@ impl Indicator for BalanceOfPower {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use super::super::testdata::testdata;
     use crate::indicators::core::outputs::shape::Shape;
-
-    fn test_open() -> Vec<f64> {
-        vec![
-            92.500, 91.500, 95.155, 93.970, 95.500, 94.500, 95.000, 91.500, 91.815, 91.125,
-            93.875, 97.500, 98.815, 92.000, 91.125, 91.875, 93.405, 89.750, 89.345, 92.250,
-        ]
-    }
-
-    fn test_high() -> Vec<f64> {
-        vec![
-            93.250000, 94.940000, 96.375000, 96.190000, 96.000000, 94.720000, 95.000000, 93.720000, 92.470000, 92.750000,
-            96.250000, 99.625000, 99.125000, 92.750000, 91.315000, 93.250000, 93.405000, 90.655000, 91.970000, 92.250000,
-        ]
-    }
-
-    fn test_low() -> Vec<f64> {
-        vec![
-            90.750000, 91.405000, 94.250000, 93.500000, 92.815000, 93.500000, 92.000000, 89.750000, 89.440000, 90.625000,
-            92.750000, 96.315000, 96.030000, 88.815000, 86.750000, 90.940000, 88.905000, 88.780000, 89.250000, 89.750000,
-        ]
-    }
-
-    fn test_close() -> Vec<f64> {
-        vec![
-            91.500000, 94.815000, 94.375000, 95.095000, 93.780000, 94.625000, 92.530000, 92.750000, 90.315000, 92.470000,
-            96.125000, 97.250000, 98.500000, 89.875000, 91.000000, 92.815000, 89.155000, 89.345000, 91.625000, 89.875000,
-        ]
-    }
-
-    fn test_expected() -> Vec<f64> {
-        vec![
-            -0.400000000000000, 0.937765205091938, -0.367058823529412, 0.418215613382900, -0.540031397174254,
-            0.102459016393443, -0.823333333333333, 0.314861460957179, -0.495049504950495, 0.632941176470588,
-            0.642857142857143, -0.075528700906344, -0.101777059773828, -0.540025412960610, -0.027382256297919,
-            0.406926406926406, -0.944444444444444, -0.216000000000001, 0.838235294117648, -0.950000000000000,
-        ]
-    }
-
     #[test]
     fn test_ohlc() {
-        let open = test_open();
-        let high = test_high();
-        let low = test_low();
-        let close = test_close();
-        let expected = test_expected();
+        let open = testdata::test_open();
+        let high = testdata::test_high();
+        let low = testdata::test_low();
+        let close = testdata::test_close();
+        let expected = testdata::test_expected();
 
         let mut bop = BalanceOfPower::new(&BalanceOfPowerParams).unwrap();
 
@@ -250,11 +213,11 @@ mod tests {
 
     #[test]
     fn test_update_bar() {
-        let open = test_open();
-        let high = test_high();
-        let low = test_low();
-        let close = test_close();
-        let expected = test_expected();
+        let open = testdata::test_open();
+        let high = testdata::test_high();
+        let low = testdata::test_low();
+        let close = testdata::test_close();
+        let expected = testdata::test_expected();
 
         let mut bop = BalanceOfPower::new(&BalanceOfPowerParams).unwrap();
 

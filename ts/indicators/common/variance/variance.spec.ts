@@ -4,12 +4,9 @@ import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { Shape } from '../../core/outputs/shape/shape';
 import { VarianceOutput } from './output';
 import { Variance } from './variance';
+import { input } from './testdata';
 
 // Variance input test data.
-const input = [
-  1, 2, 8, 4, 9, 6, 7, 13, 9, 10, 3, 12
-];
-
 describe('Variance', () => {
   const epsilon = 10e-2;
 

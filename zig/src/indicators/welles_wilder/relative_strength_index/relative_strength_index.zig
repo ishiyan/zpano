@@ -254,6 +254,8 @@ pub const RelativeStrengthIndex = struct {
 // ============================================================================
 
 const testing = std.testing;
+const testdata = @import("testdata.zig");
+
 
 fn almostEqual(a: f64, b: f64, tolerance: f64) bool {
     if (math.isNan(a) and math.isNan(b)) return true;
@@ -262,55 +264,15 @@ fn almostEqual(a: f64, b: f64, tolerance: f64) bool {
 }
 
 // Test data from TA-Lib reference (length=9, 25 entries).
-const test_input_1 = [_]f64{
-    91.15,  90.50,  92.55,  94.70,  95.55,  94.00, 91.30, 91.95, 92.45, 93.80,
-    92.50,  94.55,  96.75,  97.80,  98.40,  98.15, 96.70, 98.85, 98.90, 100.50,
-    102.60, 104.80, 103.80, 103.10, 102.00,
-};
-
-const test_expected_1 = [_]f64{
-    math.nan(f64),    math.nan(f64),    math.nan(f64),    math.nan(f64),    math.nan(f64),
-    math.nan(f64),    math.nan(f64),    math.nan(f64),    math.nan(f64),    60.6425702811244,
-    54.2677448337826, 61.4558190165176, 67.6034767388667, 70.1590191481383, 71.5992400904851,
-    70.0152589447766, 61.1833361324987, 67.9312249318593, 68.0764178369710, 72.5504646296262,
-    77.2568847385616, 81.0801123570899, 74.6619680507228, 70.2808713845906, 63.6754215506388,
-};
-
 // Test data from TA-Lib reference (length=14, 252 entries, same as DM+).
-const test_input_2 = [_]f64{
-    44.34, 44.09, 43.61, 44.33, 44.83, 45.10, 45.42, 45.84, 46.08, 45.89,
-    46.03, 45.61, 46.28, 46.28, 46.00, 46.03, 46.41, 46.22, 45.64, 46.21,
-    46.25, 45.71, 46.45, 45.78, 45.35, 44.03, 44.18, 44.22, 44.57, 43.42,
-    42.66, 43.13, 44.94, 43.61, 44.33, 44.83, 45.10, 45.42, 45.84, 46.08,
-    45.89, 46.03, 45.61, 46.28, 46.28, 46.00, 46.03, 46.41, 46.22, 45.64,
-    46.21, 46.25, 45.71, 46.45, 45.78, 45.35, 44.03, 44.18, 44.22, 44.57,
-    43.42, 42.66, 43.13, 44.94, 43.61, 44.33, 44.83, 45.10, 45.42, 45.84,
-    46.08, 45.89, 46.03, 45.61, 46.28, 46.28, 46.00, 46.03, 46.41, 46.22,
-    45.64, 46.21, 46.25, 45.71, 46.45, 45.78, 45.35, 44.03, 44.18, 44.22,
-    44.57, 43.42, 42.66, 43.13, 44.94, 43.61, 44.33, 44.83, 45.10, 45.42,
-    45.84, 46.08, 45.89, 46.03, 45.61, 46.28, 46.28, 46.00, 46.03, 46.41,
-    46.22, 45.64, 46.21, 46.25, 45.71, 46.45, 45.78, 45.35, 44.03, 44.18,
-    44.22, 44.57, 43.42, 42.66, 43.13, 44.94, 43.61, 44.33, 44.83, 45.10,
-    45.42, 45.84, 46.08, 45.89, 46.03, 45.61, 46.28, 46.28, 46.00, 46.03,
-    46.41, 46.22, 45.64, 46.21, 46.25, 45.71, 46.45, 45.78, 45.35, 44.03,
-    44.18, 44.22, 44.57, 43.42, 42.66, 43.13, 44.94, 43.61, 44.33, 44.83,
-    45.10, 45.42, 45.84, 46.08, 45.89, 46.03, 45.61, 46.28, 46.28, 46.00,
-    46.03, 46.41, 46.22, 45.64, 46.21, 46.25, 45.71, 46.45, 45.78, 45.35,
-    44.03, 44.18, 44.22, 44.57, 43.42, 42.66, 43.13, 44.94, 43.61, 44.33,
-    44.83, 45.10, 45.42, 45.84, 46.08, 45.89, 46.03, 45.61, 46.28, 46.28,
-    46.00, 46.03, 46.41, 46.22, 45.64, 46.21, 46.25, 45.71, 46.45, 45.78,
-    45.35, 44.03, 44.18, 44.22, 44.57, 43.42, 42.66, 43.13, 44.94, 43.61,
-    44.33,
-};
-
 test "RelativeStrengthIndex update length=9" {
     const tolerance = 1e-9;
     var rsi: RelativeStrengthIndex = try RelativeStrengthIndex.init(.{ .length = 9 });
     rsi.fixSlices();
 
-    for (0..test_input_1.len) |i| {
-        const act = rsi.update(test_input_1[i]);
-        const exp = test_expected_1[i];
+    for (0..testdata.test_input_1.len) |i| {
+        const act = rsi.update(testdata.test_input_1[i]);
+        const exp = testdata.test_expected_1[i];
 
         if (math.isNan(exp)) {
             try testing.expect(math.isNan(act));
@@ -328,8 +290,8 @@ test "RelativeStrengthIndex update length=14" {
     rsi.fixSlices();
 
     var act: f64 = math.nan(f64);
-    for (0..test_input_2.len) |i| {
-        act = rsi.update(test_input_2[i]);
+    for (0..testdata.test_input_2.len) |i| {
+        act = rsi.update(testdata.test_input_2[i]);
         if (i < 14) {
             try testing.expect(math.isNan(act));
         }
@@ -382,11 +344,11 @@ test "RelativeStrengthIndex updateBar" {
     rsi.fixSlices();
 
     for (0..8) |i| {
-        const bar = Bar{ .time = @intCast(i), .open = 0, .high = 0, .low = 0, .close = test_input_1[i], .volume = 0 };
+        const bar = Bar{ .time = @intCast(i), .open = 0, .high = 0, .low = 0, .close = testdata.test_input_1[i], .volume = 0 };
         _ = rsi.updateBar(&bar);
     }
 
-    const bar = Bar{ .time = 42, .open = 0, .high = 0, .low = 0, .close = test_input_1[8], .volume = 0 };
+    const bar = Bar{ .time = 42, .open = 0, .high = 0, .low = 0, .close = testdata.test_input_1[8], .volume = 0 };
     const out = rsi.updateBar(&bar);
     try testing.expectEqual(@as(usize, 1), out.len);
 }

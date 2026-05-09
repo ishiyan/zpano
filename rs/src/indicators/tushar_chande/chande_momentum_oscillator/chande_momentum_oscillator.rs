@@ -211,23 +211,7 @@ impl Indicator for ChandeMomentumOscillator {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    fn test_book_input() -> Vec<f64> {
-        vec![
-            101.0313, 101.0313, 101.1250, 101.9687, 102.7813,
-            103.0000, 102.9687, 103.0625, 102.9375, 102.7188,
-            102.7500, 102.9063, 102.9687,
-        ]
-    }
-
-    fn test_book_expected() -> Vec<f64> {
-        vec![
-            f64::NAN, f64::NAN, f64::NAN, f64::NAN, f64::NAN,
-            f64::NAN, f64::NAN, f64::NAN, f64::NAN, f64::NAN,
-            69.61963786608334, 71.42857142857143, 71.08377992828775,
-        ]
-    }
-
+    use super::super::testdata::testdata;
     fn create_cmo(length: usize) -> ChandeMomentumOscillator {
         ChandeMomentumOscillator::new(&ChandeMomentumOscillatorParams {
             length,
@@ -237,8 +221,8 @@ mod tests {
 
     #[test]
     fn test_cmo_update_book_length10() {
-        let input = test_book_input();
-        let expected = test_book_expected();
+        let input = testdata::test_book_input();
+        let expected = testdata::test_book_expected();
         let mut cmo = create_cmo(10);
 
         for i in 0..10 {
