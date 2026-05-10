@@ -22,6 +22,7 @@ from .core.defaults import (
     DEFAULT_LONG_SHADOW, DEFAULT_VERY_LONG_SHADOW, DEFAULT_SHORT_SHADOW, DEFAULT_VERY_SHORT_SHADOW,
     DEFAULT_NEAR, DEFAULT_FAR, DEFAULT_EQUAL,
 )
+from .core.pattern_identifier import PatternIdentifier
 from .core.primitives import (
     is_white, is_black, real_body, white_real_body, black_real_body,
     upper_shadow, lower_shadow, white_upper_shadow, black_upper_shadow,
@@ -298,3 +299,25 @@ class CandlestickPatterns:
     from .patterns.up_down_gap_side_by_side_white_lines import up_down_gap_side_by_side_white_lines
     from .patterns.upside_gap_two_crows import upside_gap_two_crows
     from .patterns.x_side_gap_three_methods import x_side_gap_three_methods
+
+    # ------------------------------------------------------------------
+    # Evaluate by PatternIdentifier
+    # ------------------------------------------------------------------
+
+    def evaluate(self, pattern_identifier: PatternIdentifier) -> int:
+        """Evaluate a single pattern by its identifier.
+
+        Args:
+            pattern_identifier: A ``PatternIdentifier`` enum member.
+
+        Returns:
+            The pattern result (e.g. -100, 0, +100, +200).
+        """
+        return _DISPATCH[pattern_identifier](self)
+
+
+# Dispatch table: PatternIdentifier → unbound method.  Built once at import time.
+_DISPATCH: dict[PatternIdentifier, object] = {
+    PatternIdentifier(i): getattr(CandlestickPatterns, PatternIdentifier(i).method_name)
+    for i in range(len(PatternIdentifier))
+}
