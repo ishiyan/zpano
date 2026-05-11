@@ -27,7 +27,9 @@
     "roundtrips/**/*.ts",
     "symbology/**/*.ts",
     "entities/**/*.ts",
-    "indicators/**/*.ts"
+    "indicators/**/*.ts",
+    "fuzzy/**/*.ts",
+    "signals/**/*.ts"
   ],
   "exclude": [
     "node_modules",
