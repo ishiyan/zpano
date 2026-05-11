@@ -52,11 +52,23 @@ py/fuzzy/                          # Shared fuzzy logic primitives
     test_operators.py              # Unit tests for operators
     test_defuzzify.py              # Unit tests for defuzzification
 
-py/signals/                        # Future: indicator-based signal generation
-    __init__.py                    # Placeholder (scaffolded)
+py/signals/                        # Indicator-based fuzzy signal generation
+    __init__.py                    # Exports all signal functions
+    threshold.py                   # mu_above, mu_below, mu_overbought, mu_oversold
+    crossover.py                   # mu_crosses_above/below, mu_line_crosses_above/below
+    band.py                        # mu_above_band, mu_below_band, mu_between_bands
+    histogram.py                   # mu_turns_positive, mu_turns_negative
+    compose.py                     # signal_and, signal_or, signal_not, signal_strength
+    test_threshold.py              # Tests per file
+    test_crossover.py
+    test_band.py
+    test_histogram.py
+    test_compose.py
 ```
 
-The `py/fuzzy/` package has **zero dependencies** on other zpano modules. It is a standalone math library. Consumers (candlestick patterns, future signals) import from it.
+Both packages are implemented in all five languages (Python, Go, TypeScript, Rust, Zig). See "Cross-Language Implementation Reference" below for per-language details.
+
+The `py/fuzzy/` and `py/signals/` packages have **zero dependencies** on other zpano modules. They are standalone math libraries. `signals/` imports from `fuzzy/`; consumers (candlestick patterns, trading systems) import from both.
 
 ## Design Decisions
 
@@ -404,31 +416,170 @@ All existing test data (TA-Lib reference + euronext + nyse, ~60 cases per patter
 3. **Monotonicity**: As a bar more strongly satisfies a condition, confidence should increase
 4. **Width=0 degrades to crisp**: With `fuzz_ratio=0`, fuzzy output should match crisp output exactly (modulo the 0.5 membership at exact thresholds)
 
-## Future: Indicator Signals
+## Signals Module
 
-The `py/fuzzy/` package is designed to serve both candlestick patterns and future indicator-based signals.
+The `signals/` package provides fuzzy signal primitives for indicator-based signal generation. It imports from `fuzzy/` and has **zero other dependencies**. Implemented in all five languages.
 
-### Planned Signal Types
+### Signal Functions
 
-| Signal | Crisp | Fuzzy |
-|--------|-------|-------|
-| Threshold crossing | `rsi > 70` | `mu_greater(rsi, 70, width=5)` |
-| Moving average crossover | `slow > fast and prev_slow <= prev_fast` | `mu_crosses_above(prev_diff, curr_diff, width)` |
-| Bollinger band touch | `price > upper_band` | `mu_greater(price, upper_band, width)` |
-| MACD histogram sign change | `hist > 0 and prev_hist <= 0` | Fuzzy crossover of zero line |
+Five files, each with focused responsibility:
 
-### Signal Composition
+**threshold** — Degree to which a value is above/below a level, with overbought/oversold convenience wrappers:
+- `mu_above(value, threshold, width, shape)` — degree value > threshold
+- `mu_below(value, threshold, width, shape)` — degree value < threshold
+- `mu_overbought(value, threshold, width, shape)` — alias for mu_above (semantic clarity)
+- `mu_oversold(value, threshold, width, shape)` — alias for mu_below (semantic clarity)
 
-Multiple fuzzy signals combine using t-norms:
+**crossover** — Degree to which a value or line pair crosses a level between two time steps:
+- `mu_crosses_above(prev, curr, threshold, width, shape)` — product of "was below" × "is now above"
+- `mu_crosses_below(prev, curr, threshold, width, shape)` — product of "was above" × "is now below"
+- `mu_line_crosses_above(prev_a, curr_a, prev_b, curr_b, width, shape)` — line A crosses above line B
+- `mu_line_crosses_below(prev_a, curr_a, prev_b, curr_b, width, shape)` — line A crosses below line B
+
+**band** — Degree to which a value is outside or inside a band:
+- `mu_above_band(value, upper, width, shape)` — degree value > upper band
+- `mu_below_band(value, lower, width, shape)` — degree value < lower band
+- `mu_between_bands(value, lower, upper, width, shape)` — degree value is between bands; uses `width = spread * 0.5` for both edges
+
+**histogram** — Degree to which a histogram value changes sign:
+- `mu_turns_positive(prev, curr, width, shape)` — product of "was negative" × "is now positive"
+- `mu_turns_negative(prev, curr, width, shape)` — product of "was positive" × "is now negative"
+
+**compose** — Combine and transform fuzzy signals:
+- `signal_and(signals...)` — product t-norm of all signals (variadic in Python/Go/TS; slice in Rust/Zig)
+- `signal_or(a, b)` — probabilistic s-norm: `a + b - a * b`
+- `signal_not(a)` — fuzzy negation: `1 - a`
+- `signal_strength(signal, alpha)` — soft alpha-cut preserving continuous values (returns 0.0 if signal < alpha, otherwise returns signal unchanged)
+
+### Signal Composition Example
+
 ```python
 # "Buy when RSI is oversold AND MACD crosses up AND price near support"
-μ_rsi = mu_less(rsi, 30, width=5)
-μ_macd = mu_crosses_above(prev_macd, curr_macd, width=0.5)
-μ_support = mu_near(price, support_level, width=price * 0.01)
-buy_confidence = t_product_all(μ_rsi, μ_macd, μ_support)
+mu_rsi = mu_below(rsi, 30, width=5)
+mu_macd = mu_crosses_above(prev_macd, curr_macd, threshold=0.0, width=0.5)
+mu_support = mu_near(price, support_level, width=price * 0.01)
+buy_confidence = signal_and(mu_rsi, mu_macd, mu_support)
 ```
 
-This will be implemented in `py/signals/` when the indicator signal work begins.
+### Key Design Decisions for Signals
+
+**D8: Crossover = product of two memberships**. `mu_crosses_above(prev, curr, threshold, width)` = `mu_below(prev, threshold, width) * mu_above(curr, threshold, width)`. This naturally produces 0 when either condition fails, and peaks when both "was clearly below" and "is clearly above" are strong.
+
+**D9: mu_between_bands width derivation**. Uses `width = spread * 0.5` where `spread = upper - lower`. The caller-supplied `width` parameter is ignored for the internal edge calculations — the band spread itself determines the transition zone. When spread ≤ 0, returns 0.0.
+
+**D10: signal_strength is NOT alpha_cut**. `signal_strength` preserves the continuous fuzzy value (returns the original signal if it passes the alpha threshold). `alpha_cut` discretizes to crisp integer levels. They serve different purposes.
+
+**D11: signal_and variadic vs slice**. Python, Go, and TypeScript use variadic parameters for ergonomic call syntax. Rust and Zig use slice parameters (`&[f64]`, `[]const f64`) because variadic functions are not idiomatic in those languages. Empty input returns 1.0 (identity element of product t-norm). Single input returns that value unchanged.
+
+## Cross-Language Implementation Reference
+
+### Package / Module Structure
+
+```
+py/fuzzy/                          # Python package with __init__.py barrel
+    membership.py, operators.py, defuzzify.py
+    test_membership.py, test_operators.py, test_defuzzify.py
+py/signals/
+    threshold.py, crossover.py, band.py, histogram.py, compose.py
+    test_threshold.py, test_crossover.py, test_band.py, test_histogram.py, test_compose.py
+
+go/fuzzy/                          # Go package "fuzzy"
+    membership.go, operators.go, defuzzify.go
+    membership_test.go, operators_test.go, defuzzify_test.go
+go/signals/                        # Go package "signals"
+    doc.go, threshold.go, crossover.go, band.go, histogram.go, compose.go
+    signals_test.go                # single combined test file
+
+ts/fuzzy/                          # TypeScript with index.ts barrel
+    index.ts, membership.ts, operators.ts, defuzzify.ts
+    membership.spec.ts, operators.spec.ts, defuzzify.spec.ts
+ts/signals/
+    index.ts, threshold.ts, crossover.ts, band.ts, histogram.ts, compose.ts
+    threshold.spec.ts, crossover.spec.ts, band.spec.ts, histogram.spec.ts, compose.spec.ts
+
+rs/src/fuzzy/                      # Rust module with mod.rs re-exports
+    mod.rs, membership.rs, operators.rs, defuzzify.rs
+rs/src/signals/
+    mod.rs, threshold.rs, crossover.rs, band.rs, histogram.rs, compose.rs
+    # Tests inline in each .rs file (#[cfg(test)] mod tests)
+
+zig/src/fuzzy/                     # Zig — per-file build.zig modules
+    membership.zig, operators.zig, defuzzify.zig
+zig/src/signals/
+    threshold.zig, crossover.zig, band.zig, histogram.zig, compose.zig
+    # Tests inline at bottom of each .zig file
+```
+
+### Naming Conventions
+
+| Concept | Python | Go | TypeScript | Rust | Zig |
+|---------|--------|----|------------|------|-----|
+| mu_above | `mu_above` | `MuAbove` | `muAbove` | `mu_above` | `muAbove` |
+| signal_and | `signal_and` | `SignalAnd` | `signalAnd` | `signal_and` | `signalAnd` |
+| MembershipShape | `MembershipShape(IntEnum)` | `MembershipShape int` | `enum MembershipShape` | `#[repr(u8)] enum MembershipShape` | `enum(u8) { sigmoid = 0, linear = 1 }` |
+| SIGMOID member | `SIGMOID = 0` | `Sigmoid MembershipShape = 0` | `SIGMOID = 0` | `Sigmoid = 0` | `sigmoid = 0` |
+| File naming | `snake_case.py` | `lowercase.go` | `kebab-case.ts` | `snake_case.rs` | `snake_case.zig` |
+
+### Import Patterns (signals → fuzzy)
+
+| Language | Import |
+|----------|--------|
+| Python | `from ..fuzzy import MembershipShape, mu_greater, mu_less` (relative parent) |
+| Go | `import "zpano/fuzzy"` → `fuzzy.MuGreater(...)` |
+| TypeScript | `import { MembershipShape, muGreater } from '../fuzzy/index.ts';` |
+| Rust | `use crate::fuzzy::{MembershipShape, mu_greater, mu_less};` |
+| Zig | `const membership = @import("membership");` — imports build.zig module names, NOT `@import("../fuzzy/...")` |
+
+**Zig note**: Zig has no unified `fuzzy` module. Each file (`membership`, `operators`, `defuzzify`) is a separate build.zig module. Signals modules import them individually: `threshold.zig` imports `membership`; `crossover.zig` imports `membership`; `band.zig` imports `membership`; `histogram.zig` imports `membership`; `compose.zig` imports `operators`.
+
+### Test Organization
+
+| Language | Style | Details |
+|----------|-------|---------|
+| Python | Separate test files | `test_*.py` per source file, `unittest.TestCase` subclasses, `assertAlmostEqual(places=13)` |
+| Go | Combined test file for signals | `signals_test.go` covers all signal functions; fuzzy has per-file test files. `t.Run()` subtests |
+| TypeScript | Separate spec files | `*.spec.ts` per source file, Jasmine `describe`/`it`, `toBeCloseTo(expected, 13)` |
+| Rust | Inline tests | `#[cfg(test)] mod tests` at bottom of each `.rs` file. Each module defines local `almost_equal` helper |
+| Zig | Inline tests | `test "name" { }` blocks at bottom of each `.zig` file. Each file defines local `almostEqual` helper |
+
+### Test Counts
+
+| Language | Fuzzy Tests | Signals Tests | Total |
+|----------|------------|---------------|-------|
+| Python | 86 | 75 | 161 |
+| Go | ~40 | ~30 | ~70 |
+| TypeScript | 160 combined | — | 160 |
+| Rust | 85 | 48 | 133 |
+| Zig | 40 | 93 | 133 |
+
+### Zig Build System Wiring
+
+Zig requires explicit module registration in `build.zig`:
+
+**Library modules** (for production imports):
+```
+b.addModule("membership", ...) — src/fuzzy/membership.zig (no deps)
+b.addModule("operators", ...)  — src/fuzzy/operators.zig (no deps)
+b.addModule("defuzzify", ...)  — src/fuzzy/defuzzify.zig (imports: operators)
+b.addModule("sig_threshold", ...) — src/signals/threshold.zig (imports: membership)
+b.addModule("sig_crossover", ...) — src/signals/crossover.zig (imports: membership)
+b.addModule("sig_band", ...)      — src/signals/band.zig (imports: membership)
+b.addModule("sig_histogram", ...) — src/signals/histogram.zig (imports: membership)
+b.addModule("sig_compose", ...)   — src/signals/compose.zig (imports: operators)
+```
+
+**Test modules** require: `b.createModule()` → `b.addTest(.{ .root_module = mod })` → `b.addRunArtifact()` → `test_step.dependOn()`. Forgetting `addRunArtifact` + `dependOn` causes "unused local constant" errors and tests silently don't run.
+
+### Exp Clamp Constant
+
+All languages clamp the sigmoid exponent to `[-500, 500]` to avoid floating-point overflow in `exp()`. This is implemented in `membership` and produces deterministic 0.0 or 1.0 at extreme inputs.
+
+### Width = 0 Behavior
+
+All membership functions degrade to crisp step functions when `width = 0`:
+- `mu_less(x, t, 0)` → 1.0 if x < t, 0.5 if x == t, 0.0 if x > t
+- `mu_near(x, t, 0)` → 1.0 if x == t, 0.0 otherwise
+- Consistent across all five languages
 
 ## References
 
