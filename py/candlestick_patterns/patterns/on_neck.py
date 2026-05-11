@@ -24,7 +24,7 @@ def on_neck(self) -> int:
     o1, h1, l1, c1 = self._bar(2)
     o2, h2, l2, c2 = self._bar(1)
 
-    eq = self._avg(self._equal, 1)
+    eq = self._avg(self._equal, 2)
 
     if (is_black(o1, c1) and
             real_body(o1, c1) > self._avg(self._long_body, 2) and

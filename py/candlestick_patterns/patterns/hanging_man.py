@@ -28,12 +28,12 @@ def hanging_man(self) -> int:
     o1, h1, l1, c1 = self._bar(2)
     o2, h2, l2, c2 = self._bar(1)
 
-    near_avg = self._avg(self._near, 1)
+    near_avg = self._avg(self._near, 2)
 
     if (real_body(o2, c2) < self._avg(self._short_body, 1) and
             lower_shadow(o2, l2, c2) > self._avg(self._long_shadow, 1) and
             upper_shadow(o2, h2, c2) < self._avg(self._very_short_shadow, 1) and
-            max(o2, c2) >= h1 - near_avg):
+            min(o2, c2) >= h1 - near_avg):
         return -100
 
     return 0
