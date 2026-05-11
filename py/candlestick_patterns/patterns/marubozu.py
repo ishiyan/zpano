@@ -2,9 +2,10 @@
 from __future__ import annotations
 
 from ..core.primitives import is_white, real_body, upper_shadow, lower_shadow
+from ...fuzzy import t_product_all
 
 
-def marubozu(self) -> int:
+def marubozu(self) -> float:
     """Marubozu: a one-candle pattern.
 
     Must have:
@@ -16,19 +17,24 @@ def marubozu(self) -> int:
     The meaning of "very short" for shadows is specified with
     self._very_short_shadow.
 
+    Category B: direction from candle color.
+
     Returns:
-        +100 for bullish (white), -100 for bearish (black), 0 for no pattern.
+        Continuous float in [-100, +100].
     """
     if not self._enough(1, self._long_body, self._very_short_shadow):
-        return 0
+        return 0.0
 
     o, h, l, c = self._bar(1)
 
-    vs = self._avg(self._very_short_shadow, 1)
+    # Fuzzy: long body, very short shadows.
+    mu_long = self._mu_greater(real_body(o, c), self._long_body, 1)
+    mu_us = self._mu_less(upper_shadow(o, h, c), self._very_short_shadow, 1)
+    mu_ls = self._mu_less(lower_shadow(o, l, c), self._very_short_shadow, 1)
 
-    if (real_body(o, c) > self._avg(self._long_body, 1) and
-            upper_shadow(o, h, c) < vs and
-            lower_shadow(o, l, c) < vs):
-        return 100 if is_white(o, c) else -100
+    confidence = t_product_all(mu_long, mu_us, mu_ls)
 
-    return 0
+    # Crisp direction from color.
+    direction = 1 if is_white(o, c) else -1
+
+    return direction * confidence * 100.0

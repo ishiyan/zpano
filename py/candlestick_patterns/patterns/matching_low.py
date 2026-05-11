@@ -2,9 +2,10 @@
 from __future__ import annotations
 
 from ..core.primitives import is_black
+from ...fuzzy import t_product_all
 
 
-def matching_low(self) -> int:
+def matching_low(self) -> float:
     """Matching Low: a two-candle bullish pattern.
 
     Must have:
@@ -13,20 +14,24 @@ def matching_low(self) -> int:
 
     The meaning of "equal" is specified with self._equal.
 
+    Category A: always bullish (continuous).
+
     Returns:
-        +100 for bullish, 0 for no pattern.
+        Continuous float in [0, 100].  Always bullish.
     """
     if not self._enough(2, self._equal):
-        return 0
+        return 0.0
 
     o1, h1, l1, c1 = self._bar(2)
     o2, h2, l2, c2 = self._bar(1)
 
-    eq = self._avg(self._equal, 2)
+    # Crisp gates: both black.
+    if not (is_black(o1, c1) and is_black(o2, c2)):
+        return 0.0
 
-    if (is_black(o1, c1) and is_black(o2, c2) and
-            c2 <= c1 + eq and
-            c2 >= c1 - eq):
-        return 100
+    # Fuzzy: close equal to prior close (two-sided band).
+    mu_eq = self._mu_less(abs(c2 - c1), self._equal, 2)
 
-    return 0
+    confidence = mu_eq
+
+    return confidence * 100.0

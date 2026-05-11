@@ -2,9 +2,10 @@
 from __future__ import annotations
 
 from ..core.primitives import is_white, is_black
+from ...fuzzy import t_product_all
 
 
-def stick_sandwich(self) -> int:
+def stick_sandwich(self) -> float:
     """Stick Sandwich: a three-candle bullish pattern.
 
     Must have:
@@ -15,22 +16,26 @@ def stick_sandwich(self) -> int:
 
     The meaning of "equal" is specified with self._equal.
 
+    Category A: always bullish (continuous).
+
     Returns:
-        +100 for bullish, 0 for no pattern.
+        Continuous float in [0, 100].  Always bullish.
     """
     if not self._enough(3, self._equal):
-        return 0
+        return 0.0
 
     o1, h1, l1, c1 = self._bar(3)
     o2, h2, l2, c2 = self._bar(2)
     o3, h3, l3, c3 = self._bar(1)
 
-    eq = self._avg(self._equal, 3)
+    # Crisp gates: colors and gap.
+    if not (is_black(o1, c1) and is_white(o2, c2) and is_black(o3, c3)
+            and l2 > c1):
+        return 0.0
 
-    if (is_black(o1, c1) and is_white(o2, c2) and is_black(o3, c3) and
-            l2 > c1 and
-            c3 <= c1 + eq and
-            c3 >= c1 - eq):
-        return 100
+    # Fuzzy: third close equals first close (two-sided band).
+    mu_eq = self._mu_less(abs(c3 - c1), self._equal, 3)
 
-    return 0
+    confidence = mu_eq
+
+    return confidence * 100.0

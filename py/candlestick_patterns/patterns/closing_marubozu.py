@@ -2,9 +2,10 @@
 from __future__ import annotations
 
 from ..core.primitives import is_white, real_body, upper_shadow, lower_shadow
+from ...fuzzy import t_product_all
 
 
-def closing_marubozu(self) -> int:
+def closing_marubozu(self) -> float:
     """Closing Marubozu: a one-candle pattern.
 
     A long candle with a very short shadow on the closing side:
@@ -15,19 +16,32 @@ def closing_marubozu(self) -> int:
     The meaning of "very short" for shadows is specified with
     self._very_short_shadow.
 
+    Category C: both branches evaluated, return stronger signal.
+
     Returns:
-        +100 for bullish, -100 for bearish, 0 for no pattern.
+        Continuous float in [-100, +100].
     """
     if not self._enough(1, self._long_body, self._very_short_shadow):
-        return 0
+        return 0.0
 
     o, h, l, c = self._bar(1)
 
-    if real_body(o, c) > self._avg(self._long_body, 1):
-        vs = self._avg(self._very_short_shadow, 1)
-        if is_white(o, c) and upper_shadow(o, h, c) < vs:
-            return 100
-        if lower_shadow(o, l, c) < vs:
-            return -100
+    mu_long = self._mu_greater(real_body(o, c), self._long_body, 1)
 
-    return 0
+    # Bullish: white + very short upper shadow.
+    bull_signal = 0.0
+    if is_white(o, c):
+        mu_vs = self._mu_less(upper_shadow(o, h, c), self._very_short_shadow, 1)
+        conf = t_product_all(mu_long, mu_vs)
+        bull_signal = conf * 100.0
+
+    # Bearish: black (not white) + very short lower shadow.
+    bear_signal = 0.0
+    if not is_white(o, c):
+        mu_vs = self._mu_less(lower_shadow(o, l, c), self._very_short_shadow, 1)
+        conf = t_product_all(mu_long, mu_vs)
+        bear_signal = -conf * 100.0
+
+    if abs(bull_signal) >= abs(bear_signal):
+        return bull_signal
+    return bear_signal

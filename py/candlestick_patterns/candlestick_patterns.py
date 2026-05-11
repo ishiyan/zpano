@@ -32,6 +32,11 @@ from .core.primitives import (
     is_real_body_encloses_real_body, is_real_body_encloses_open, is_real_body_encloses_close,
     is_high_exceeds_close, is_opens_within,
 )
+from ..fuzzy import (
+    MembershipShape,
+    mu_less, mu_greater, mu_greater_equal, mu_near, mu_direction,
+    t_product_all,
+)
 
 
 # Minimum history size: 5-candle patterns + 10 default criterion period + 5 margin.
@@ -123,7 +128,13 @@ class CandlestickPatterns:
         near: Criterion | None = None,
         far: Criterion | None = None,
         equal: Criterion | None = None,
+        fuzz_ratio: float = 0.2,
+        shape: MembershipShape = MembershipShape.SIGMOID,
     ) -> None:
+        # Fuzzy configuration.
+        self._fuzz_ratio = fuzz_ratio
+        self._shape = shape
+
         # Criteria (use copies of defaults so mutations don't leak).
         self._long_body = _CriterionState(
             (long_body or DEFAULT_LONG_BODY).copy())
@@ -232,6 +243,61 @@ class CandlestickPatterns:
         `ref_shift` bar's OHLC as the reference (for period==0 criteria)."""
         o, h, l, c = self._bar(ref_shift)
         return cs.avg(self._history, shift - 1, o, h, l, c)
+
+    # ------------------------------------------------------------------
+    # Fuzzy membership helpers
+    # ------------------------------------------------------------------
+
+    def _width(self, cs: _CriterionState, shift: int) -> float:
+        """Compute the fuzzy transition width for a criterion at a given shift."""
+        avg = self._avg(cs, shift)
+        return self._fuzz_ratio * avg if avg > 0.0 else 0.0
+
+    def _mu_less(self, value: float, cs: _CriterionState, shift: int) -> float:
+        """Fuzzy 'value < avg': degree of membership."""
+        avg = self._avg(cs, shift)
+        return mu_less(value, avg, self._fuzz_ratio * avg if avg > 0.0 else 0.0,
+                       self._shape)
+
+    def _mu_greater(self, value: float, cs: _CriterionState, shift: int) -> float:
+        """Fuzzy 'value > avg': degree of membership."""
+        avg = self._avg(cs, shift)
+        return mu_greater(value, avg, self._fuzz_ratio * avg if avg > 0.0 else 0.0,
+                          self._shape)
+
+    def _mu_near_value(self, value: float, target: float,
+                       cs: _CriterionState, shift: int) -> float:
+        """Fuzzy 'value ≈ target ± avg': degree of closeness."""
+        avg = self._avg(cs, shift)
+        width = self._fuzz_ratio * avg if avg > 0.0 else 0.0
+        return mu_near(value, target, width, self._shape)
+
+    def _mu_ge_raw(self, value: float, threshold: float, width: float) -> float:
+        """Fuzzy 'value >= threshold' with explicit width (no criterion)."""
+        return mu_greater_equal(value, threshold, width, self._shape)
+
+    def _mu_gt_raw(self, value: float, threshold: float, width: float) -> float:
+        """Fuzzy 'value > threshold' with explicit width (no criterion)."""
+        return mu_greater(value, threshold, width, self._shape)
+
+    def _mu_lt_raw(self, value: float, threshold: float, width: float) -> float:
+        """Fuzzy 'value < threshold' with explicit width (no criterion)."""
+        return mu_less(value, threshold, width, self._shape)
+
+    def _mu_bullish(self, o: float, c: float, shift: int = 1) -> float:
+        """Fuzzy degree of bullishness ∈ [0, 1]."""
+        d = self._mu_direction_raw(o, c, shift)
+        return max(0.0, d)
+
+    def _mu_bearish(self, o: float, c: float, shift: int = 1) -> float:
+        """Fuzzy degree of bearishness ∈ [0, 1]."""
+        d = self._mu_direction_raw(o, c, shift)
+        return max(0.0, -d)
+
+    def _mu_direction_raw(self, o: float, c: float, shift: int = 1) -> float:
+        """Raw fuzzy direction ∈ [-1, +1]."""
+        avg = self._avg(self._short_body, shift)
+        return mu_direction(o, c, avg, steepness=2.0)
 
     # ------------------------------------------------------------------
     # Pattern methods -- 61 patterns

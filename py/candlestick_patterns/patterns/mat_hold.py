@@ -2,11 +2,12 @@
 from __future__ import annotations
 
 from ..core.primitives import is_white, is_black, real_body, is_real_body_gap_up
+from ...fuzzy import t_product_all
 
 MAT_HOLD_PENETRATION_FACTOR: float = 0.5
 
 
-def mat_hold(self) -> int:
+def mat_hold(self) -> float:
     """Mat Hold: a five-candle bullish continuation pattern.
 
     Must have:
@@ -18,11 +19,13 @@ def mat_hold(self) -> int:
     - fifth candle: white, opens above prior close, closes above
       highest high of reaction candles.
 
+    Category A: always bullish (continuous).
+
     Returns:
-        +100 for bullish, 0 for no pattern.
+        Continuous float in [0, 100].  Always bullish.
     """
     if not self._enough(5, self._long_body, self._short_body):
-        return 0
+        return 0.0
 
     o1, h1, l1, c1 = self._bar(5)
     o2, h2, l2, c2 = self._bar(4)
@@ -32,41 +35,45 @@ def mat_hold(self) -> int:
 
     penetration = MAT_HOLD_PENETRATION_FACTOR
 
-    # 1st long, then 3 small
-    if not (real_body(o1, c1) > self._avg(self._long_body, 5) and
-            real_body(o2, c2) < self._avg(self._short_body, 4) and
-            real_body(o3, c3) < self._avg(self._short_body, 3) and
-            real_body(o4, c4) < self._avg(self._short_body, 2)):
-        return 0
-
-    # White, black, ?, ?, white
+    # Crisp gates: colors.
     if not (is_white(o1, c1) and is_black(o2, c2) and is_white(o5, c5)):
-        return 0
+        return 0.0
 
-    # Upside gap 1st to 2nd
+    # Crisp: gap up from 1st to 2nd.
     if not is_real_body_gap_up(o1, c1, o2, c2):
-        return 0
+        return 0.0
 
-    # 3rd to 4th hold within 1st: a part of real body within 1st range
+    # Crisp: 3rd to 4th hold within 1st range.
     if not (min(o3, c3) < c1 and min(o4, c4) < c1):
-        return 0
+        return 0.0
 
-    # Reaction days don't penetrate first body too much
-    if not (min(o3, c3) > c1 - real_body(o1, c1) * penetration and
-            min(o4, c4) > c1 - real_body(o1, c1) * penetration):
-        return 0
+    # Crisp: reaction days don't penetrate first body too much.
+    rb1 = real_body(o1, c1)
+    if not (min(o3, c3) > c1 - rb1 * penetration and
+            min(o4, c4) > c1 - rb1 * penetration):
+        return 0.0
 
-    # 2nd to 4th are falling
+    # Crisp: 2nd to 4th are falling.
     if not (max(o3, c3) < o2 and
             max(o4, c4) < max(o3, c3)):
-        return 0
+        return 0.0
 
-    # 5th opens above prior close
+    # Crisp: 5th opens above prior close.
     if not (o5 > c4):
-        return 0
+        return 0.0
 
-    # 5th closes above highest high of reaction candles
-    if c5 > max(h2, h3, h4):
-        return 100
+    # Crisp: 5th closes above highest high of reaction candles.
+    if not (c5 > max(h2, h3, h4)):
+        return 0.0
 
-    return 0
+    # Fuzzy: first candle long.
+    mu_long1 = self._mu_greater(rb1, self._long_body, 5)
+
+    # Fuzzy: 2nd, 3rd, 4th short.
+    mu_short2 = self._mu_less(real_body(o2, c2), self._short_body, 4)
+    mu_short3 = self._mu_less(real_body(o3, c3), self._short_body, 3)
+    mu_short4 = self._mu_less(real_body(o4, c4), self._short_body, 2)
+
+    confidence = t_product_all(mu_long1, mu_short2, mu_short3, mu_short4)
+
+    return confidence * 100.0

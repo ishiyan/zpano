@@ -27,13 +27,13 @@ def _hikkake_modified_update(self) -> None:
         # Bullish: 4th breaks low, 2nd close near its low
         if (h4 < h3 and l4 < l3 and
                 c2 <= l2 + near_avg):
-            self._hikmod_pattern_result = 100
+            self._hikmod_pattern_result = 100.0
             self._hikmod_pattern_idx = self._count  # current bar index (1-based count)
             return
         # Bearish: 4th breaks high, 2nd close near its high
         if (h4 > h3 and l4 > l3 and
                 c2 >= h2 - near_avg):
-            self._hikmod_pattern_result = -100
+            self._hikmod_pattern_result = -100.0
             self._hikmod_pattern_idx = self._count
             return
 
@@ -52,14 +52,14 @@ def _hikkake_modified_update(self) -> None:
 
         if self._hikmod_pattern_result > 0 and c4 > h_3rd:
             # confirmed — consume the pattern
-            self._hikmod_last_signal = 200
-            self._hikmod_pattern_result = 0
+            self._hikmod_last_signal = 200.0
+            self._hikmod_pattern_result = 0.0
             self._hikmod_pattern_idx = 0
             self._hikmod_confirmed = True
             return
         if self._hikmod_pattern_result < 0 and c4 < l_3rd:
-            self._hikmod_last_signal = -200
-            self._hikmod_pattern_result = 0
+            self._hikmod_last_signal = -200.0
+            self._hikmod_pattern_result = 0.0
             self._hikmod_pattern_idx = 0
             self._hikmod_confirmed = True
             return
@@ -67,18 +67,18 @@ def _hikkake_modified_update(self) -> None:
     # If we passed the 3-bar window, reset.
     if (self._hikmod_pattern_result != 0 and
             self._count > self._hikmod_pattern_idx + 3):
-        self._hikmod_pattern_result = 0
+        self._hikmod_pattern_result = 0.0
         self._hikmod_pattern_idx = 0
 
 
-def hikkake_modified(self) -> int:
+def hikkake_modified(self) -> float:
     """Hikkake Modified: a four-candle pattern with near criterion.
 
     Returns:
-        +100/-100 for detection, +200/-200 for confirmation, 0 otherwise.
+        +100.0/-100.0 for detection, +200.0/-200.0 for confirmation, 0.0 otherwise.
     """
     if self._count < 4:
-        return 0
+        return 0.0
 
     # If pattern was just detected this bar (takes priority over confirmation)
     if (self._hikmod_pattern_idx == self._count and
@@ -89,4 +89,4 @@ def hikkake_modified(self) -> int:
     if self._hikmod_confirmed:
         return self._hikmod_last_signal
 
-    return 0
+    return 0.0

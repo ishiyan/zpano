@@ -2,12 +2,12 @@
 from __future__ import annotations
 
 
-def hikkake(self) -> int:
+def hikkake(self) -> float:
     """Hikkake: a three-candle pattern with stateful confirmation.
 
     TA-Lib behavior:
-    - Detection bar: outputs +100 (bullish) or -100 (bearish)
-    - Confirmation bar (within 3 bars of detection): outputs +200 or -200
+    - Detection bar: outputs +100.0 (bullish) or -100.0 (bearish)
+    - Confirmation bar (within 3 bars of detection): outputs +200.0 or -200.0
     - If a new hikkake is detected on the same bar as a confirmation,
       the new hikkake takes priority.
 
@@ -20,11 +20,11 @@ def hikkake(self) -> int:
     2nd candle (bear) within 3 bars.
 
     Returns:
-        +100/-100 for initial detection, +200/-200 for confirmation,
-        0 for no pattern.
+        +100.0/-100.0 for initial detection, +200.0/-200.0 for confirmation,
+        0.0 for no pattern.
     """
     if not self._enough(3):
-        return 0
+        return 0.0
 
     # Check for new hikkake pattern at current bar.
     o1, h1, l1, c1 = self._bar(3)
@@ -35,10 +35,10 @@ def hikkake(self) -> int:
     if h2 < h1 and l2 > l1:
         # Bullish: 3rd has lower high AND lower low.
         if h3 < h2 and l3 < l2:
-            return 100
+            return 100.0
         # Bearish: 3rd has higher high AND higher low.
         if h3 > h2 and l3 > l2:
-            return -100
+            return -100.0
 
     # No new pattern — check for confirmation of a recent hikkake.
     # Look back 1-3 bars for a hikkake pattern.
@@ -56,9 +56,9 @@ def hikkake(self) -> int:
             continue
 
         if p3h < p2h and p3l < p2l:
-            pattern_result = 100  # bullish
+            pattern_result = 100.0  # bullish
         elif p3h > p2h and p3l > p2l:
-            pattern_result = -100  # bearish
+            pattern_result = -100.0  # bearish
         else:
             continue
 
@@ -96,8 +96,8 @@ def hikkake(self) -> int:
         # Current bar confirms?
         _, _, _, cc = self._bar(1)
         if pattern_result > 0 and cc > p2h:
-            return 200
+            return 200.0
         if pattern_result < 0 and cc < p2l:
-            return -200
+            return -200.0
 
-    return 0
+    return 0.0
