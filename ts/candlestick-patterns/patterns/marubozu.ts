@@ -1,0 +1,37 @@
+/** Marubozu pattern (1-candle). */
+import { CandlestickPatternsEngine } from '../core/engine.ts';
+import { tProductAll } from '../../fuzzy/index.ts';
+import { realBody, upperShadow, lowerShadow, isWhite } from '../core/primitives.ts';
+
+/**
+ * Marubozu: a one-candle pattern.
+ *
+ * Must have:
+ * - long real body,
+ * - very short upper shadow,
+ * - very short lower shadow.
+ *
+ * The meaning of "long" is specified with `longBody`.
+ * The meaning of "very short" for shadows is specified with `veryShortShadow`.
+ *
+ * Category B: direction from candle color.
+ *
+ * Returns:
+ *     Continuous float in [-100, +100].
+ */
+export function marubozu(cp: CandlestickPatternsEngine): number {
+    if (!cp.enough(1, cp.longBody, cp.veryShortShadow)) return 0.0;
+
+    const b = cp.bar(1);
+
+    // Fuzzy: long body, very short shadows.
+    const muLong = cp.muGreaterCS(realBody(b.o, b.c), cp.longBody, 1);
+    const muUS = cp.muLessCS(upperShadow(b.o, b.h, b.c), cp.veryShortShadow, 1);
+    const muLS = cp.muLessCS(lowerShadow(b.o, b.l, b.c), cp.veryShortShadow, 1);
+
+    const confidence = tProductAll(muLong, muUS, muLS);
+
+    // Crisp direction from color.
+    const direction = isWhite(b.o, b.c) ? 1 : -1;
+    return direction * confidence * 100.0;
+}

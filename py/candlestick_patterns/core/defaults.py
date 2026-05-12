@@ -1,4 +1,4 @@
-"""Default criterion definitions matching the original C# implementation."""
+"""Default criterion definitions matching the Ta-Lib implementation."""
 
 from .range_entity import RangeEntity
 from .criterion import Criterion

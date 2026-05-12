@@ -1,6 +1,7 @@
 /// Band signals.
-const membership = @import("membership");
-const operators = @import("operators");
+const fuzzy = @import("fuzzy");
+const membership = fuzzy.membership;
+const operators = fuzzy.operators;
 
 const MembershipShape = membership.MembershipShape;
 

@@ -29,7 +29,8 @@
     "entities/**/*.ts",
     "indicators/**/*.ts",
     "fuzzy/**/*.ts",
-    "signals/**/*.ts"
+    "signals/**/*.ts",
+    "candlestick-patterns/**/*.ts"
   ],
   "exclude": [
     "node_modules",

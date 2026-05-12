@@ -6,9 +6,14 @@ Usage:
     cp = CandlestickPatterns()
     for bar in bars:
         cp.update(bar.open, bar.high, bar.low, bar.close)
-        result = cp.abandoned_baby()  # -100, 0, or +100
+        result = cp.abandoned_baby()  # continuous float in [-100, +100]
 
-Each pattern method inspects the most recent N bars (stored in a ring buffer)
+Each pattern method returns a continuous confidence value in [-100, +100],
+where positive values indicate bullish signals and negative values indicate
+bearish signals. The magnitude reflects the fuzzy confidence of the match.
+Use ``fuzzy.alpha_cut`` to convert to crisp {-100, 0, +100} if needed.
+
+The engine inspects the most recent N bars (stored in a ring buffer)
 and the incrementally maintained running totals for each criterion, giving
 O(1) per bar after the warmup period.
 """
@@ -110,9 +115,11 @@ class CandlestickPatterns:
     Call ``update(open, high, low, close)`` for each new bar, then call any pattern
     method to get the result for the current bar.
 
-    Pattern methods return:
-        +100 for bullish match, -100 for bearish match, 0 for no match.
-        Some patterns return +50/-50 for unconfirmed signals (Hikkake, HikkakeModified).
+    Pattern methods return a continuous float in [-100, +100]:
+        positive: bullish signal, negative: bearish signal, near zero: no match.
+        The magnitude reflects the fuzzy confidence of the match.
+        Hikkake and HikkakeModified may return intermediate values for
+        unconfirmed signals.
     """
 
     def __init__(

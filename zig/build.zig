@@ -272,23 +272,21 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
-    // --- Fuzzy library modules (no dependencies) ---
-    const membership_mod = b.addModule("membership", .{
-        .root_source_file = b.path("src/fuzzy/membership.zig"),
+    // --- Fuzzy library module (barrel re-exporting membership, operators, defuzzify) ---
+    const fuzzy_mod = b.addModule("fuzzy", .{
+        .root_source_file = b.path("src/fuzzy/fuzzy.zig"),
         .target = target,
         .optimize = optimize,
     });
 
-    const operators_fz_mod = b.addModule("operators", .{
-        .root_source_file = b.path("src/fuzzy/operators.zig"),
+    // --- Candlestick patterns library module (depends on fuzzy) ---
+    const candlestick_patterns_mod = b.addModule("candlestick_patterns", .{
+        .root_source_file = b.path("src/candlestick_patterns/candlestick_patterns.zig"),
         .target = target,
         .optimize = optimize,
-    });
-
-    _ = b.addModule("defuzzify", .{
-        .root_source_file = b.path("src/fuzzy/defuzzify.zig"),
-        .target = target,
-        .optimize = optimize,
+        .imports = &.{
+            .{ .name = "fuzzy", .module = fuzzy_mod },
+        },
     });
 
     // --- Signals library modules (depend on fuzzy) ---
@@ -297,7 +295,7 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
         .imports = &.{
-            .{ .name = "membership", .module = membership_mod },
+            .{ .name = "fuzzy", .module = fuzzy_mod },
         },
     });
 
@@ -306,8 +304,7 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
         .imports = &.{
-            .{ .name = "membership", .module = membership_mod },
-            .{ .name = "operators", .module = operators_fz_mod },
+            .{ .name = "fuzzy", .module = fuzzy_mod },
         },
     });
 
@@ -316,8 +313,7 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
         .imports = &.{
-            .{ .name = "membership", .module = membership_mod },
-            .{ .name = "operators", .module = operators_fz_mod },
+            .{ .name = "fuzzy", .module = fuzzy_mod },
         },
     });
 
@@ -326,8 +322,7 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
         .imports = &.{
-            .{ .name = "membership", .module = membership_mod },
-            .{ .name = "operators", .module = operators_fz_mod },
+            .{ .name = "fuzzy", .module = fuzzy_mod },
         },
     });
 
@@ -336,7 +331,7 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
         .imports = &.{
-            .{ .name = "operators", .module = operators_fz_mod },
+            .{ .name = "fuzzy", .module = fuzzy_mod },
         },
     });
 
@@ -513,21 +508,9 @@ pub fn build(b: *std.Build) void {
         },
     });
 
-    // --- Fuzzy test modules ---
-    const membership_test_mod = b.createModule(.{
-        .root_source_file = b.path("src/fuzzy/membership.zig"),
-        .target = target,
-        .optimize = optimize,
-    });
-
-    const operators_fz_test_mod = b.createModule(.{
-        .root_source_file = b.path("src/fuzzy/operators.zig"),
-        .target = target,
-        .optimize = optimize,
-    });
-
-    const defuzzify_test_mod = b.createModule(.{
-        .root_source_file = b.path("src/fuzzy/defuzzify.zig"),
+    // --- Fuzzy test module (barrel) ---
+    const fuzzy_test_mod = b.createModule(.{
+        .root_source_file = b.path("src/fuzzy/fuzzy.zig"),
         .target = target,
         .optimize = optimize,
     });
@@ -538,7 +521,7 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
         .imports = &.{
-            .{ .name = "membership", .module = membership_mod },
+            .{ .name = "fuzzy", .module = fuzzy_mod },
         },
     });
 
@@ -547,8 +530,7 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
         .imports = &.{
-            .{ .name = "membership", .module = membership_mod },
-            .{ .name = "operators", .module = operators_fz_mod },
+            .{ .name = "fuzzy", .module = fuzzy_mod },
         },
     });
 
@@ -557,8 +539,7 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
         .imports = &.{
-            .{ .name = "membership", .module = membership_mod },
-            .{ .name = "operators", .module = operators_fz_mod },
+            .{ .name = "fuzzy", .module = fuzzy_mod },
         },
     });
 
@@ -567,8 +548,7 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
         .imports = &.{
-            .{ .name = "membership", .module = membership_mod },
-            .{ .name = "operators", .module = operators_fz_mod },
+            .{ .name = "fuzzy", .module = fuzzy_mod },
         },
     });
 
@@ -577,7 +557,18 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
         .imports = &.{
-            .{ .name = "operators", .module = operators_fz_mod },
+            .{ .name = "fuzzy", .module = fuzzy_mod },
+        },
+    });
+
+    // --- Candlestick patterns test module ---
+    const cp_test_mod = b.createModule(.{
+        .root_source_file = b.path("src/candlestick_patterns/candlestick_patterns_test.zig"),
+        .target = target,
+        .optimize = optimize,
+        .imports = &.{
+            .{ .name = "candlestick_patterns", .module = candlestick_patterns_mod },
+            .{ .name = "fuzzy", .module = fuzzy_mod },
         },
     });
 
@@ -604,14 +595,13 @@ pub fn build(b: *std.Build) void {
     const quote_component_tests = b.addTest(.{ .root_module = quote_component_test_mod, .filters = filters });
     const trade_component_tests = b.addTest(.{ .root_module = trade_component_test_mod, .filters = filters });
     const indicators_tests = b.addTest(.{ .root_module = indicators_test_mod, .filters = filters });
-    const membership_tests = b.addTest(.{ .root_module = membership_test_mod, .filters = filters });
-    const operators_fz_tests = b.addTest(.{ .root_module = operators_fz_test_mod, .filters = filters });
-    const defuzzify_tests = b.addTest(.{ .root_module = defuzzify_test_mod, .filters = filters });
+    const fuzzy_tests = b.addTest(.{ .root_module = fuzzy_test_mod, .filters = filters });
     const sig_threshold_tests = b.addTest(.{ .root_module = sig_threshold_test_mod, .filters = filters });
     const sig_crossover_tests = b.addTest(.{ .root_module = sig_crossover_test_mod, .filters = filters });
     const sig_band_tests = b.addTest(.{ .root_module = sig_band_test_mod, .filters = filters });
     const sig_histogram_tests = b.addTest(.{ .root_module = sig_histogram_test_mod, .filters = filters });
     const sig_compose_tests = b.addTest(.{ .root_module = sig_compose_test_mod, .filters = filters });
+    const cp_tests = b.addTest(.{ .root_module = cp_test_mod, .filters = filters });
 
     const run_conventions_tests = b.addRunArtifact(conventions_tests);
     const run_daycounting_tests = b.addRunArtifact(daycounting_tests);
@@ -635,14 +625,13 @@ pub fn build(b: *std.Build) void {
     const run_quote_component_tests = b.addRunArtifact(quote_component_tests);
     const run_trade_component_tests = b.addRunArtifact(trade_component_tests);
     const run_indicators_tests = b.addRunArtifact(indicators_tests);
-    const run_membership_tests = b.addRunArtifact(membership_tests);
-    const run_operators_fz_tests = b.addRunArtifact(operators_fz_tests);
-    const run_defuzzify_tests = b.addRunArtifact(defuzzify_tests);
+    const run_fuzzy_tests = b.addRunArtifact(fuzzy_tests);
     const run_sig_threshold_tests = b.addRunArtifact(sig_threshold_tests);
     const run_sig_crossover_tests = b.addRunArtifact(sig_crossover_tests);
     const run_sig_band_tests = b.addRunArtifact(sig_band_tests);
     const run_sig_histogram_tests = b.addRunArtifact(sig_histogram_tests);
     const run_sig_compose_tests = b.addRunArtifact(sig_compose_tests);
+    const run_cp_tests = b.addRunArtifact(cp_tests);
 
     const test_step = b.step("test", "Run all tests");
     test_step.dependOn(&run_conventions_tests.step);
@@ -667,12 +656,11 @@ pub fn build(b: *std.Build) void {
     test_step.dependOn(&run_quote_component_tests.step);
     test_step.dependOn(&run_trade_component_tests.step);
     test_step.dependOn(&run_indicators_tests.step);
-    test_step.dependOn(&run_membership_tests.step);
-    test_step.dependOn(&run_operators_fz_tests.step);
-    test_step.dependOn(&run_defuzzify_tests.step);
+    test_step.dependOn(&run_fuzzy_tests.step);
     test_step.dependOn(&run_sig_threshold_tests.step);
     test_step.dependOn(&run_sig_crossover_tests.step);
     test_step.dependOn(&run_sig_band_tests.step);
     test_step.dependOn(&run_sig_histogram_tests.step);
     test_step.dependOn(&run_sig_compose_tests.step);
+    test_step.dependOn(&run_cp_tests.step);
 }

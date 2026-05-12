@@ -503,7 +503,8 @@ rs/src/signals/
     mod.rs, threshold.rs, crossover.rs, band.rs, histogram.rs, compose.rs
     # Tests inline in each .rs file (#[cfg(test)] mod tests)
 
-zig/src/fuzzy/                     # Zig — per-file build.zig modules
+zig/src/fuzzy/                     # Zig — barrel module with sub-file re-exports
+    fuzzy.zig                      # Barrel: pub const membership/operators/defuzzify = @import("*.zig")
     membership.zig, operators.zig, defuzzify.zig
 zig/src/signals/
     threshold.zig, crossover.zig, band.zig, histogram.zig, compose.zig
@@ -528,9 +529,9 @@ zig/src/signals/
 | Go | `import "zpano/fuzzy"` → `fuzzy.MuGreater(...)` |
 | TypeScript | `import { MembershipShape, muGreater } from '../fuzzy/index.ts';` |
 | Rust | `use crate::fuzzy::{MembershipShape, mu_greater, mu_less};` |
-| Zig | `const membership = @import("membership");` — imports build.zig module names, NOT `@import("../fuzzy/...")` |
+| Zig | `const fuzzy = @import("fuzzy"); const membership = fuzzy.membership;` — single bundled module |
 
-**Zig note**: Zig has no unified `fuzzy` module. Each file (`membership`, `operators`, `defuzzify`) is a separate build.zig module. Signals modules import them individually: `threshold.zig` imports `membership`; `crossover.zig` imports `membership`; `band.zig` imports `membership`; `histogram.zig` imports `membership`; `compose.zig` imports `operators`.
+**Zig note**: Zig has a unified `fuzzy` barrel module (`src/fuzzy/fuzzy.zig`) registered as a single `b.addModule("fuzzy", ...)` in build.zig. It re-exports `membership`, `operators`, and `defuzzify` as sub-namespaces. Consumer files import `@import("fuzzy")` and access sub-modules: `fuzzy.membership.muLess(...)`, or create local aliases like `const membership = fuzzy.membership;`.
 
 ### Test Organization
 
@@ -558,14 +559,12 @@ Zig requires explicit module registration in `build.zig`:
 
 **Library modules** (for production imports):
 ```
-b.addModule("membership", ...) — src/fuzzy/membership.zig (no deps)
-b.addModule("operators", ...)  — src/fuzzy/operators.zig (no deps)
-b.addModule("defuzzify", ...)  — src/fuzzy/defuzzify.zig (imports: operators)
-b.addModule("sig_threshold", ...) — src/signals/threshold.zig (imports: membership)
-b.addModule("sig_crossover", ...) — src/signals/crossover.zig (imports: membership)
-b.addModule("sig_band", ...)      — src/signals/band.zig (imports: membership)
-b.addModule("sig_histogram", ...) — src/signals/histogram.zig (imports: membership)
-b.addModule("sig_compose", ...)   — src/signals/compose.zig (imports: operators)
+b.addModule("fuzzy", ...)          — src/fuzzy/fuzzy.zig (barrel, no deps)
+b.addModule("sig_threshold", ...) — src/signals/threshold.zig (imports: fuzzy)
+b.addModule("sig_crossover", ...) — src/signals/crossover.zig (imports: fuzzy)
+b.addModule("sig_band", ...)      — src/signals/band.zig (imports: fuzzy)
+b.addModule("sig_histogram", ...) — src/signals/histogram.zig (imports: fuzzy)
+b.addModule("sig_compose", ...)   — src/signals/compose.zig (imports: fuzzy)
 ```
 
 **Test modules** require: `b.createModule()` → `b.addTest(.{ .root_module = mod })` → `b.addRunArtifact()` → `test_step.dependOn()`. Forgetting `addRunArtifact` + `dependOn` causes "unused local constant" errors and tests silently don't run.

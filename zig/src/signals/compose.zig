@@ -1,5 +1,6 @@
 /// Signal composition utilities.
-const operators = @import("operators");
+const fuzzy = @import("fuzzy");
+const operators = fuzzy.operators;
 
 /// Combine signals with product t-norm (fuzzy AND).
 pub fn signalAnd(signals: []const f64) f64 {

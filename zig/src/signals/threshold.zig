@@ -1,7 +1,8 @@
 /// Threshold crossing signals.
 ///
 /// Fuzzy membership for indicator values relative to fixed thresholds.
-const membership = @import("membership");
+const fuzzy = @import("fuzzy");
+const membership = fuzzy.membership;
 
 pub const MembershipShape = membership.MembershipShape;
 
