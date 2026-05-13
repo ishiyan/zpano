@@ -7,3 +7,4 @@ pub mod indicators;
 pub mod fuzzy;
 pub mod signals;
 pub mod candlestick_patterns;
+pub mod signal_ensemble;

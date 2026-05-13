@@ -335,6 +335,13 @@ pub fn build(b: *std.Build) void {
         },
     });
 
+    // --- Signal ensemble library module (standalone — zero dependencies) ---
+    _ = b.addModule("signal_ensemble", .{
+        .root_source_file = b.path("src/signal_ensemble/signal_ensemble.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+
     // --- Test modules (separate modules that share the same source files) ---
     const conventions_test_mod = b.createModule(.{
         .root_source_file = b.path("src/daycounting/conventions.zig"),
@@ -572,6 +579,13 @@ pub fn build(b: *std.Build) void {
         },
     });
 
+    // --- Signal ensemble test module (barrel) ---
+    const signal_ensemble_test_mod = b.createModule(.{
+        .root_source_file = b.path("src/signal_ensemble/signal_ensemble.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+
     // --- Tests ---
     const conventions_tests = b.addTest(.{ .root_module = conventions_test_mod, .filters = filters });
     const daycounting_tests = b.addTest(.{ .root_module = daycounting_test_mod, .filters = filters });
@@ -602,6 +616,7 @@ pub fn build(b: *std.Build) void {
     const sig_histogram_tests = b.addTest(.{ .root_module = sig_histogram_test_mod, .filters = filters });
     const sig_compose_tests = b.addTest(.{ .root_module = sig_compose_test_mod, .filters = filters });
     const cp_tests = b.addTest(.{ .root_module = cp_test_mod, .filters = filters });
+    const signal_ensemble_tests = b.addTest(.{ .root_module = signal_ensemble_test_mod, .filters = filters });
 
     const run_conventions_tests = b.addRunArtifact(conventions_tests);
     const run_daycounting_tests = b.addRunArtifact(daycounting_tests);
@@ -632,6 +647,7 @@ pub fn build(b: *std.Build) void {
     const run_sig_histogram_tests = b.addRunArtifact(sig_histogram_tests);
     const run_sig_compose_tests = b.addRunArtifact(sig_compose_tests);
     const run_cp_tests = b.addRunArtifact(cp_tests);
+    const run_signal_ensemble_tests = b.addRunArtifact(signal_ensemble_tests);
 
     const test_step = b.step("test", "Run all tests");
     test_step.dependOn(&run_conventions_tests.step);
@@ -663,4 +679,5 @@ pub fn build(b: *std.Build) void {
     test_step.dependOn(&run_sig_histogram_tests.step);
     test_step.dependOn(&run_sig_compose_tests.step);
     test_step.dependOn(&run_cp_tests.step);
+    test_step.dependOn(&run_signal_ensemble_tests.step);
 }

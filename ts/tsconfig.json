@@ -30,7 +30,8 @@
     "indicators/**/*.ts",
     "fuzzy/**/*.ts",
     "signals/**/*.ts",
-    "candlestick-patterns/**/*.ts"
+    "candlestick-patterns/**/*.ts",
+    "signal-ensemble/**/*.ts"
   ],
   "exclude": [
     "node_modules",
