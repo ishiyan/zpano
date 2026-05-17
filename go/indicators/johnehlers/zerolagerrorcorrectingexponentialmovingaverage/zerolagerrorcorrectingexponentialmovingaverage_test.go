@@ -17,7 +17,7 @@ func testZecemaTime() time.Time {
 }
 
 func testZecemaCreate(sf float64, gl float64, gs float64) *ZeroLagErrorCorrectingExponentialMovingAverage {
-	params := ZeroLagErrorCorrectingExponentialMovingAverageParams{
+	params := Params{
 		SmoothingFactor: sf,
 		GainLimit:       gl,
 		GainStep:        gs,
@@ -230,7 +230,7 @@ func TestNewZeroLagErrorCorrectingExponentialMovingAverage(t *testing.T) { //nol
 
 	t.Run("valid defaults", func(t *testing.T) {
 		t.Parallel()
-		params := ZeroLagErrorCorrectingExponentialMovingAverageParams{
+		params := Params{
 			SmoothingFactor: 0.095, GainLimit: 5, GainStep: 0.1,
 		}
 
@@ -242,7 +242,7 @@ func TestNewZeroLagErrorCorrectingExponentialMovingAverage(t *testing.T) { //nol
 
 	t.Run("smoothing factor = 0", func(t *testing.T) {
 		t.Parallel()
-		params := ZeroLagErrorCorrectingExponentialMovingAverageParams{
+		params := Params{
 			SmoothingFactor: 0, GainLimit: 5, GainStep: 0.1,
 		}
 
@@ -253,7 +253,7 @@ func TestNewZeroLagErrorCorrectingExponentialMovingAverage(t *testing.T) { //nol
 
 	t.Run("smoothing factor < 0", func(t *testing.T) {
 		t.Parallel()
-		params := ZeroLagErrorCorrectingExponentialMovingAverageParams{
+		params := Params{
 			SmoothingFactor: -0.1, GainLimit: 5, GainStep: 0.1,
 		}
 
@@ -264,7 +264,7 @@ func TestNewZeroLagErrorCorrectingExponentialMovingAverage(t *testing.T) { //nol
 
 	t.Run("smoothing factor > 1", func(t *testing.T) {
 		t.Parallel()
-		params := ZeroLagErrorCorrectingExponentialMovingAverageParams{
+		params := Params{
 			SmoothingFactor: 1.1, GainLimit: 5, GainStep: 0.1,
 		}
 
@@ -275,7 +275,7 @@ func TestNewZeroLagErrorCorrectingExponentialMovingAverage(t *testing.T) { //nol
 
 	t.Run("smoothing factor = 1", func(t *testing.T) {
 		t.Parallel()
-		params := ZeroLagErrorCorrectingExponentialMovingAverageParams{
+		params := Params{
 			SmoothingFactor: 1, GainLimit: 5, GainStep: 0.1,
 		}
 
@@ -286,7 +286,7 @@ func TestNewZeroLagErrorCorrectingExponentialMovingAverage(t *testing.T) { //nol
 
 	t.Run("gain limit = 0", func(t *testing.T) {
 		t.Parallel()
-		params := ZeroLagErrorCorrectingExponentialMovingAverageParams{
+		params := Params{
 			SmoothingFactor: 0.095, GainLimit: 0, GainStep: 0.1,
 		}
 
@@ -297,7 +297,7 @@ func TestNewZeroLagErrorCorrectingExponentialMovingAverage(t *testing.T) { //nol
 
 	t.Run("gain limit < 0", func(t *testing.T) {
 		t.Parallel()
-		params := ZeroLagErrorCorrectingExponentialMovingAverageParams{
+		params := Params{
 			SmoothingFactor: 0.095, GainLimit: -1, GainStep: 0.1,
 		}
 
@@ -308,7 +308,7 @@ func TestNewZeroLagErrorCorrectingExponentialMovingAverage(t *testing.T) { //nol
 
 	t.Run("gain step = 0", func(t *testing.T) {
 		t.Parallel()
-		params := ZeroLagErrorCorrectingExponentialMovingAverageParams{
+		params := Params{
 			SmoothingFactor: 0.095, GainLimit: 5, GainStep: 0,
 		}
 
@@ -319,7 +319,7 @@ func TestNewZeroLagErrorCorrectingExponentialMovingAverage(t *testing.T) { //nol
 
 	t.Run("gain step < 0", func(t *testing.T) {
 		t.Parallel()
-		params := ZeroLagErrorCorrectingExponentialMovingAverageParams{
+		params := Params{
 			SmoothingFactor: 0.095, GainLimit: 5, GainStep: -0.1,
 		}
 
@@ -330,7 +330,7 @@ func TestNewZeroLagErrorCorrectingExponentialMovingAverage(t *testing.T) { //nol
 
 	t.Run("invalid bar component", func(t *testing.T) {
 		t.Parallel()
-		params := ZeroLagErrorCorrectingExponentialMovingAverageParams{
+		params := Params{
 			SmoothingFactor: 0.095, GainLimit: 5, GainStep: 0.1,
 			BarComponent: entities.BarComponent(9999),
 		}
@@ -342,7 +342,7 @@ func TestNewZeroLagErrorCorrectingExponentialMovingAverage(t *testing.T) { //nol
 
 	t.Run("invalid quote component", func(t *testing.T) {
 		t.Parallel()
-		params := ZeroLagErrorCorrectingExponentialMovingAverageParams{
+		params := Params{
 			SmoothingFactor: 0.095, GainLimit: 5, GainStep: 0.1,
 			QuoteComponent: entities.QuoteComponent(9999),
 		}
@@ -354,7 +354,7 @@ func TestNewZeroLagErrorCorrectingExponentialMovingAverage(t *testing.T) { //nol
 
 	t.Run("invalid trade component", func(t *testing.T) {
 		t.Parallel()
-		params := ZeroLagErrorCorrectingExponentialMovingAverageParams{
+		params := Params{
 			SmoothingFactor: 0.095, GainLimit: 5, GainStep: 0.1,
 			TradeComponent: entities.TradeComponent(9999),
 		}
@@ -366,7 +366,7 @@ func TestNewZeroLagErrorCorrectingExponentialMovingAverage(t *testing.T) { //nol
 
 	t.Run("non-default bar component", func(t *testing.T) {
 		t.Parallel()
-		params := ZeroLagErrorCorrectingExponentialMovingAverageParams{
+		params := Params{
 			SmoothingFactor: 0.095, GainLimit: 5, GainStep: 0.1,
 			BarComponent: entities.BarOpenPrice,
 		}

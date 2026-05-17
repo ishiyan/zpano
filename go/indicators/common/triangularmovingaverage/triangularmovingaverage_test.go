@@ -348,7 +348,7 @@ func TestNewTriangularMovingAverage(t *testing.T) { //nolint: funlen
 			factor         = 1. / 12.
 		)
 
-		params := TriangularMovingAverageParams{
+		params := Params{
 			Length: evenLength, BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
 		}
 
@@ -377,7 +377,7 @@ func TestNewTriangularMovingAverage(t *testing.T) { //nolint: funlen
 			factor        = 1. / 9.
 		)
 
-		params := TriangularMovingAverageParams{
+		params := Params{
 			Length: oddLength, BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
 		}
 
@@ -399,7 +399,7 @@ func TestNewTriangularMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("length = 1", func(t *testing.T) {
 		t.Parallel()
-		params := TriangularMovingAverageParams{
+		params := Params{
 			Length: 1, BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
 		}
 
@@ -410,7 +410,7 @@ func TestNewTriangularMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("length = 0", func(t *testing.T) {
 		t.Parallel()
-		params := TriangularMovingAverageParams{
+		params := Params{
 			Length: 0, BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
 		}
 
@@ -421,7 +421,7 @@ func TestNewTriangularMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("length < 0", func(t *testing.T) {
 		t.Parallel()
-		params := TriangularMovingAverageParams{
+		params := Params{
 			Length: -1, BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
 		}
 
@@ -432,7 +432,7 @@ func TestNewTriangularMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("invalid bar component", func(t *testing.T) {
 		t.Parallel()
-		params := TriangularMovingAverageParams{
+		params := Params{
 			Length: length, BarComponent: entities.BarComponent(9999), QuoteComponent: qc, TradeComponent: tc,
 		}
 
@@ -443,7 +443,7 @@ func TestNewTriangularMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("invalid quote component", func(t *testing.T) {
 		t.Parallel()
-		params := TriangularMovingAverageParams{
+		params := Params{
 			Length: length, BarComponent: bc, QuoteComponent: entities.QuoteComponent(9999), TradeComponent: tc,
 		}
 
@@ -454,7 +454,7 @@ func TestNewTriangularMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("invalid trade component", func(t *testing.T) {
 		t.Parallel()
-		params := TriangularMovingAverageParams{
+		params := Params{
 			Length: length, BarComponent: bc, QuoteComponent: qc, TradeComponent: entities.TradeComponent(9999),
 		}
 
@@ -468,7 +468,7 @@ func TestNewTriangularMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("all components zero", func(t *testing.T) {
 		t.Parallel()
-		params := TriangularMovingAverageParams{Length: length}
+		params := Params{Length: length}
 
 		trima, err := NewTriangularMovingAverage(&params)
 		check("err == nil", true, err == nil)
@@ -478,7 +478,7 @@ func TestNewTriangularMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("only bar component set", func(t *testing.T) {
 		t.Parallel()
-		params := TriangularMovingAverageParams{Length: length, BarComponent: entities.BarMedianPrice}
+		params := Params{Length: length, BarComponent: entities.BarMedianPrice}
 
 		trima, err := NewTriangularMovingAverage(&params)
 		check("err == nil", true, err == nil)
@@ -488,7 +488,7 @@ func TestNewTriangularMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("only quote component set", func(t *testing.T) {
 		t.Parallel()
-		params := TriangularMovingAverageParams{Length: length, QuoteComponent: entities.QuoteBidPrice}
+		params := Params{Length: length, QuoteComponent: entities.QuoteBidPrice}
 
 		trima, err := NewTriangularMovingAverage(&params)
 		check("err == nil", true, err == nil)
@@ -498,7 +498,7 @@ func TestNewTriangularMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("only trade component set", func(t *testing.T) {
 		t.Parallel()
-		params := TriangularMovingAverageParams{Length: length, TradeComponent: entities.TradeVolume}
+		params := Params{Length: length, TradeComponent: entities.TradeVolume}
 
 		trima, err := NewTriangularMovingAverage(&params)
 		check("err == nil", true, err == nil)
@@ -508,7 +508,7 @@ func TestNewTriangularMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("bar and quote components set", func(t *testing.T) {
 		t.Parallel()
-		params := TriangularMovingAverageParams{
+		params := Params{
 			Length: length, BarComponent: entities.BarOpenPrice, QuoteComponent: entities.QuoteBidPrice,
 		}
 
@@ -520,7 +520,7 @@ func TestNewTriangularMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("bar and trade components set", func(t *testing.T) {
 		t.Parallel()
-		params := TriangularMovingAverageParams{
+		params := Params{
 			Length: length, BarComponent: entities.BarHighPrice, TradeComponent: entities.TradeVolume,
 		}
 
@@ -532,7 +532,7 @@ func TestNewTriangularMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("quote and trade components set", func(t *testing.T) {
 		t.Parallel()
-		params := TriangularMovingAverageParams{
+		params := Params{
 			Length: length, QuoteComponent: entities.QuoteAskPrice, TradeComponent: entities.TradeVolume,
 		}
 
@@ -544,7 +544,7 @@ func TestNewTriangularMovingAverage(t *testing.T) { //nolint: funlen
 }
 
 func testTriangularMovingAverageCreate(length int) *TriangularMovingAverage {
-	params := TriangularMovingAverageParams{
+	params := Params{
 		Length: length,
 	}
 

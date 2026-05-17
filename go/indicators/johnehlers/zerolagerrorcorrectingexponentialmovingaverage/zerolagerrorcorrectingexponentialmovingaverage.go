@@ -39,7 +39,7 @@ type ZeroLagErrorCorrectingExponentialMovingAverage struct {
 // NewZeroLagErrorCorrectingExponentialMovingAverage returns an instance of the indicator created using supplied parameters.
 //
 //nolint:funlen,cyclop
-func NewZeroLagErrorCorrectingExponentialMovingAverage(p *ZeroLagErrorCorrectingExponentialMovingAverageParams) (*ZeroLagErrorCorrectingExponentialMovingAverage, error) {
+func NewZeroLagErrorCorrectingExponentialMovingAverage(p *Params) (*ZeroLagErrorCorrectingExponentialMovingAverage, error) {
 	const (
 		invalid = "invalid zero-lag error-correcting exponential moving average parameters"
 		fmts    = "%s: %s"

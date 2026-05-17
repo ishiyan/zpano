@@ -233,7 +233,7 @@ type NewMovingAverage struct {
 }
 
 // NewNewMovingAverage returns an instance of the indicator created using supplied parameters.
-func NewNewMovingAverage(p *NewMovingAverageParams) (*NewMovingAverage, error) {
+func NewNewMovingAverage(p *Params) (*NewMovingAverage, error) {
 	const (
 		fmtn = "nma(%d, %d, %d%s)"
 	)

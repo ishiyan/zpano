@@ -19,7 +19,7 @@ func almostEqual(a, b, eps float64) bool {
 func testTPO(t *testing.T, length int, expected []float64) {
 	t.Helper()
 
-	ind, err := NewJurikTurningPointOscillator(&JurikTurningPointOscillatorParams{
+	ind, err := NewJurikTurningPointOscillator(&Params{
 		Length: length,
 	})
 	if err != nil {

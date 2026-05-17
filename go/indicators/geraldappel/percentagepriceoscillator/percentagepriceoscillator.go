@@ -37,7 +37,7 @@ type PercentagePriceOscillator struct {
 }
 
 // NewPercentagePriceOscillator returns an instance of the indicator created using supplied parameters.
-func NewPercentagePriceOscillator(p *PercentagePriceOscillatorParams) (*PercentagePriceOscillator, error) {
+func NewPercentagePriceOscillator(p *Params) (*PercentagePriceOscillator, error) {
 	const (
 		invalid   = "invalid percentage price oscillator parameters"
 		fmts      = "%s: %s"
@@ -119,13 +119,13 @@ func NewPercentagePriceOscillator(p *PercentagePriceOscillatorParams) (*Percenta
 		maLabel = "SMA"
 
 		fast, e := simplemovingaverage.NewSimpleMovingAverage(
-			&simplemovingaverage.SimpleMovingAverageParams{Length: p.FastLength})
+			&simplemovingaverage.Params{Length: p.FastLength})
 		if e != nil {
 			return nil, fmt.Errorf(fmtw, invalid, e)
 		}
 
 		slow, e := simplemovingaverage.NewSimpleMovingAverage(
-			&simplemovingaverage.SimpleMovingAverageParams{Length: p.SlowLength})
+			&simplemovingaverage.Params{Length: p.SlowLength})
 		if e != nil {
 			return nil, fmt.Errorf(fmtw, invalid, e)
 		}

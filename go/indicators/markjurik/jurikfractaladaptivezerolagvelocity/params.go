@@ -2,8 +2,8 @@ package jurikfractaladaptivezerolagvelocity
 
 import "zpano/entities"
 
-// JurikFractalAdaptiveZeroLagVelocityParams describes the parameters of the indicator.
-type JurikFractalAdaptiveZeroLagVelocityParams struct {
+// Params describes the parameters of the indicator.
+type Params struct {
 	// LoDepth is the minimum depth for the velocity computation.
 	LoDepth int `json:"lo_depth"`
 
@@ -27,8 +27,8 @@ type JurikFractalAdaptiveZeroLagVelocityParams struct {
 }
 
 // DefaultParams returns default parameters for the indicator.
-func DefaultParams() *JurikFractalAdaptiveZeroLagVelocityParams {
-	return &JurikFractalAdaptiveZeroLagVelocityParams{
+func DefaultParams() *Params {
+	return &Params{
 		LoDepth:     5,
 		HiDepth:     30,
 		FractalType: 1,

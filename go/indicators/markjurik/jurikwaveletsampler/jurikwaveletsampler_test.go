@@ -19,7 +19,7 @@ func almostEqual(a, b, eps float64) bool {
 func TestWAVDefault(t *testing.T) {
 	t.Parallel()
 
-	ind, err := NewJurikWaveletSampler(&JurikWaveletSamplerParams{
+	ind, err := NewJurikWaveletSampler(&Params{
 		Index: 12,
 	})
 	if err != nil {
@@ -58,7 +58,7 @@ func TestWAVDefault(t *testing.T) {
 func TestWAVIndex6(t *testing.T) {
 	t.Parallel()
 
-	ind, err := NewJurikWaveletSampler(&JurikWaveletSamplerParams{Index: 6})
+	ind, err := NewJurikWaveletSampler(&Params{Index: 6})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -86,7 +86,7 @@ func TestWAVIndex6(t *testing.T) {
 func TestWAVIndex16(t *testing.T) {
 	t.Parallel()
 
-	ind, err := NewJurikWaveletSampler(&JurikWaveletSamplerParams{Index: 16})
+	ind, err := NewJurikWaveletSampler(&Params{Index: 16})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

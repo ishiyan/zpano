@@ -12,11 +12,11 @@ func TestMJurikovingAverageOutputString(t *testing.T) {
 		o    Output
 		text string
 	}{
-		{MovingAverage, movingAverageValue},
-		{movingAverageLast, movingAverageUnknown},
-		{Output(0), movingAverageUnknown},
-		{Output(9999), movingAverageUnknown},
-		{Output(-9999), movingAverageUnknown},
+		{MovingAverage, valueStr},
+		{movingAverageLast, unknownStr},
+		{Output(0), unknownStr},
+		{Output(9999), unknownStr},
+		{Output(-9999), unknownStr},
 	}
 
 	for _, tt := range tests {
@@ -64,7 +64,7 @@ func TestMovingAverageOutputMarshalJSON(t *testing.T) {
 		json      string
 		succeeded bool
 	}{
-		{MovingAverage, dqs + movingAverageValue + dqs, true},
+		{MovingAverage, dqs + valueStr + dqs, true},
 		{movingAverageLast, nilstr, false},
 		{Output(9999), nilstr, false},
 		{Output(-9999), nilstr, false},
@@ -105,8 +105,8 @@ func TestMovingAverageOutputUnmarshalJSON(t *testing.T) {
 		json      string
 		succeeded bool
 	}{
-		{MovingAverage, dqs + movingAverageValue + dqs, true},
-		{zero, dqs + movingAverageUnknown + dqs, false},
+		{MovingAverage, dqs + valueStr + dqs, true},
+		{zero, dqs + unknownStr + dqs, false},
 		{zero, dqs + "foobar" + dqs, false},
 	}
 

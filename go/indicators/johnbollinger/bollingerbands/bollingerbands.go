@@ -61,7 +61,7 @@ type BollingerBands struct {
 // NewBollingerBands returns an instance of the indicator created using supplied parameters.
 //
 //nolint:funlen,cyclop
-func NewBollingerBands(p *BollingerBandsParams) (*BollingerBands, error) {
+func NewBollingerBands(p *Params) (*BollingerBands, error) {
 	const (
 		invalid          = "invalid bollinger bands parameters"
 		fmts             = "%s: %s"
@@ -130,7 +130,7 @@ func NewBollingerBands(p *BollingerBandsParams) (*BollingerBands, error) {
 	}
 
 	// Create variance sub-indicator.
-	v, err := variance.NewVariance(&variance.VarianceParams{
+	v, err := variance.NewVariance(&variance.Params{
 		Length:         length,
 		IsUnbiased:     isUnbiased,
 		BarComponent:   bc,
@@ -164,7 +164,7 @@ func NewBollingerBands(p *BollingerBandsParams) (*BollingerBands, error) {
 		maLabel = "SMA"
 
 		sma, e := simplemovingaverage.NewSimpleMovingAverage(
-			&simplemovingaverage.SimpleMovingAverageParams{Length: length})
+			&simplemovingaverage.Params{Length: length})
 		if e != nil {
 			return nil, fmt.Errorf(fmtw, invalid, e)
 		}

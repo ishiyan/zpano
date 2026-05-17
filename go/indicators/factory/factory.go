@@ -25,6 +25,15 @@ import (
 	"zpano/indicators/custom/goertzelspectrum"
 	"zpano/indicators/custom/maximumentropyspectrum"
 	"zpano/indicators/donaldlambert/commoditychannelindex"
+	"zpano/indicators/jeanphilippepoton/fractaldimensionindex"
+	fractalgraphdimensionindex "zpano/indicators/jeanphilippepoton/fractalgraphdimensionindex"
+	"zpano/indicators/jeanphilippepoton/fractaladaptivesimplemovingaverage"
+	"zpano/indicators/jeanphilippepoton/fractaladaptivesimplemovingaverage2"
+	"zpano/indicators/jeanphilippepoton/rescaledfractaladaptivesimplemovingaverage"
+	"zpano/indicators/jeanphilippepoton/fractalbands"
+	"zpano/indicators/jeanphilippepoton/fractalbandshybrideadaptive"
+	"zpano/indicators/jeanphilippepoton/fractionalbands"
+	"zpano/indicators/jeanphilippepoton/hurstdifference"
 	"zpano/indicators/genequong/moneyflowindex"
 	"zpano/indicators/georgelane/stochastic"
 	"zpano/indicators/geraldappel/movingaverageconvergencedivergence"
@@ -311,7 +320,7 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 	// ── igor livshin ──────────────────────────────────────────────────────
 
 	case core.BalanceOfPower:
-		return balanceofpower.NewBalanceOfPower(&balanceofpower.BalanceOfPowerParams{})
+		return balanceofpower.NewBalanceOfPower(&balanceofpower.Params{})
 
 	// ── jack hutson ───────────────────────────────────────────────────────
 
@@ -593,7 +602,7 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 	// ── joseph granville ──────────────────────────────────────────────────
 
 	case core.OnBalanceVolume:
-		p := &onbalancevolume.OnBalanceVolumeParams{}
+		p := &onbalancevolume.Params{}
 		if err := unmarshal(b, p); err != nil {
 			return nil, err
 		}
@@ -631,7 +640,7 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 	// ── marc chaikin ─────────────────────────────────────────────────────────
 
 	case core.AdvanceDecline:
-		return advancedecline.NewAdvanceDecline(&advancedecline.AdvanceDeclineParams{})
+		return advancedecline.NewAdvanceDecline(&advancedecline.Params{})
 
 	case core.AdvanceDeclineOscillator:
 		p := advancedeclineoscillator.DefaultParams()
@@ -980,6 +989,80 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 		}
 
 		return maximumentropyspectrum.NewMaximumEntropySpectrumParams(p)
+
+	// ── jean-philippe poton ───────────────────────────────────────────────
+
+	case core.FractalDimensionIndex:
+		p := fractaldimensionindex.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return fractaldimensionindex.NewFractalDimensionIndex(p)
+
+	case core.FractalGraphDimensionIndex:
+		p := fractalgraphdimensionindex.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return fractalgraphdimensionindex.NewFractalGraphDimensionIndex(p)
+
+	case core.FractalAdaptiveSimpleMovingAverage:
+		p := fractaladaptivesimplemovingaverage.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return fractaladaptivesimplemovingaverage.NewFractalAdaptiveSimpleMovingAverage(p)
+
+	case core.FractalAdaptiveSimpleMovingAverage2:
+		p := fractaladaptivesimplemovingaverage2.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return fractaladaptivesimplemovingaverage2.NewFractalAdaptiveSimpleMovingAverage2(p)
+
+	case core.RescaledFractalAdaptiveSimpleMovingAverage:
+		p := rescaledfractaladaptivesimplemovingaverage.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return rescaledfractaladaptivesimplemovingaverage.NewRescaledFractalAdaptiveSimpleMovingAverage(p)
+
+	case core.FractalBands:
+		p := fractalbands.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return fractalbands.NewFractalBands(p)
+
+	case core.FractalBandsHybrideAdaptive:
+		p := fractalbandshybrideadaptive.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return fractalbandshybrideadaptive.NewFractalBandsHybrideAdaptive(p)
+
+	case core.FractionalBands:
+		p := fractionalbands.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return fractionalbands.NewFractionalBands(p)
+
+	case core.HurstDifference:
+		p := hurstdifference.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return hurstdifference.NewHurstDifference(p)
 
 	default:
 		return nil, fmt.Errorf("unsupported indicator: %s", identifier)

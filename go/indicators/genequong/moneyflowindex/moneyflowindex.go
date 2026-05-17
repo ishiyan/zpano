@@ -42,7 +42,7 @@ type MoneyFlowIndex struct {
 }
 
 // NewMoneyFlowIndex returns an instance of the indicator created using supplied parameters.
-func NewMoneyFlowIndex(p *MoneyFlowIndexParams) (*MoneyFlowIndex, error) {
+func NewMoneyFlowIndex(p *Params) (*MoneyFlowIndex, error) {
 	const (
 		invalid   = "invalid money flow index parameters"
 		fmts      = "%s: %s"

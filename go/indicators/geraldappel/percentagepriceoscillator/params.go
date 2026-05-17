@@ -13,8 +13,8 @@ const (
 	EMA
 )
 
-// PercentagePriceOscillatorParams describes parameters to create an instance of the indicator.
-type PercentagePriceOscillatorParams struct {
+// Params describes parameters to create an instance of the indicator.
+type Params struct {
 	// FastLength is the number of periods for the fast moving average.
 	//
 	// The value should be greater than 1.
@@ -52,9 +52,9 @@ type PercentagePriceOscillatorParams struct {
 	TradeComponent entities.TradeComponent
 }
 
-// DefaultParams returns a [PercentagePriceOscillatorParams] value populated with conventional defaults.
-func DefaultParams() *PercentagePriceOscillatorParams {
-	return &PercentagePriceOscillatorParams{
+// DefaultParams returns a [Params] value populated with conventional defaults.
+func DefaultParams() *Params {
+	return &Params{
 		FastLength: 12,
 		SlowLength: 26,
 	}

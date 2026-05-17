@@ -22,7 +22,7 @@ func TestStochastic_5_SMA3_SMA4_SingleValue(t *testing.T) {
 	low := testInputLow()
 	close := testInputClose()
 
-	ind, err := NewStochastic(&StochasticParams{
+	ind, err := NewStochastic(&Params{
 		FastKLength: 5,
 		SlowKLength: 3,
 		SlowDLength: 4,
@@ -63,7 +63,7 @@ func TestStochastic_5_SMA3_SMA3_FirstValue(t *testing.T) {
 	low := testInputLow()
 	close := testInputClose()
 
-	ind, err := NewStochastic(&StochasticParams{
+	ind, err := NewStochastic(&Params{
 		FastKLength: 5,
 		SlowKLength: 3,
 		SlowDLength: 3,
@@ -104,7 +104,7 @@ func TestStochastic_5_SMA3_SMA3_LastValue(t *testing.T) {
 	low := testInputLow()
 	close := testInputClose()
 
-	ind, err := NewStochastic(&StochasticParams{
+	ind, err := NewStochastic(&Params{
 		FastKLength: 5,
 		SlowKLength: 3,
 		SlowDLength: 3,
@@ -139,7 +139,7 @@ func TestStochastic_5_SMA3_SMA4_LastValue(t *testing.T) {
 	low := testInputLow()
 	close := testInputClose()
 
-	ind, err := NewStochastic(&StochasticParams{
+	ind, err := NewStochastic(&Params{
 		FastKLength: 5,
 		SlowKLength: 3,
 		SlowDLength: 4,
@@ -166,7 +166,7 @@ func TestStochastic_5_SMA3_SMA4_LastValue(t *testing.T) {
 func TestStochasticIsPrimed(t *testing.T) {
 	t.Parallel()
 
-	ind, err := NewStochastic(&StochasticParams{
+	ind, err := NewStochastic(&Params{
 		FastKLength: 5,
 		SlowKLength: 3,
 		SlowDLength: 3,
@@ -202,7 +202,7 @@ func TestStochasticIsPrimed(t *testing.T) {
 func TestStochasticNaN(t *testing.T) {
 	t.Parallel()
 
-	ind, err := NewStochastic(&StochasticParams{
+	ind, err := NewStochastic(&Params{
 		FastKLength: 5,
 		SlowKLength: 3,
 		SlowDLength: 3,
@@ -228,7 +228,7 @@ func TestStochasticNaN(t *testing.T) {
 func TestStochasticMetadata(t *testing.T) {
 	t.Parallel()
 
-	ind, err := NewStochastic(&StochasticParams{
+	ind, err := NewStochastic(&Params{
 		FastKLength: 5,
 		SlowKLength: 3,
 		SlowDLength: 3,
@@ -278,7 +278,7 @@ func TestStochasticUpdateBar(t *testing.T) {
 	low := testInputLow()
 	close := testInputClose()
 
-	ind, err := NewStochastic(&StochasticParams{
+	ind, err := NewStochastic(&Params{
 		FastKLength: 5,
 		SlowKLength: 3,
 		SlowDLength: 3,
@@ -328,7 +328,7 @@ func TestStochasticInvalidParams(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		_, err := NewStochastic(&StochasticParams{
+		_, err := NewStochastic(&Params{
 			FastKLength: tt.fastKLength,
 			SlowKLength: tt.slowKLength,
 			SlowDLength: tt.slowDLength,

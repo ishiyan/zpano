@@ -318,3 +318,32 @@ class Identifier(IntEnum):
     # Identifies the Maximum Entropy Spectrum (MESPECT) heatmap indicator, a Burg
     # maximum-entropy auto-regressive power spectrum over a configurable cycle-period range.
     MAXIMUM_ENTROPY_SPECTRUM = 83
+
+    # ── jean-philippe poton ───────────────────────────────────────────────
+
+    # Identifies the Fractal Dimension Index (FDI) indicator.
+    FRACTAL_DIMENSION_INDEX = 84
+
+    # Identifies the Fractal Graph Dimension Index (FGDI) indicator.
+    FRACTAL_GRAPH_DIMENSION_INDEX = 85
+
+    # Identifies the Fractal Adaptive Simple Moving Average (FRASMA) indicator.
+    FRACTAL_ADAPTIVE_SIMPLE_MOVING_AVERAGE = 86
+
+    # Identifies the Fractal Adaptive Simple Moving Average 2 (FRASMA2) indicator.
+    FRACTAL_ADAPTIVE_SIMPLE_MOVING_AVERAGE_2 = 87
+
+    # Identifies the RS Fractal Adaptive Simple Moving Average (RSFRASMA) indicator.
+    RESCALED_FRACTAL_ADAPTIVE_SIMPLE_MOVING_AVERAGE = 88
+
+    # Identifies the Fractal Bands (FBAN) indicator.
+    FRACTAL_BANDS = 89
+
+    # Identifies the Fractal Bands Hybride Adaptive (FBANHA) indicator.
+    FRACTAL_BANDS_HYBRIDE_ADAPTIVE = 90
+
+    # Identifies the Fractional Bands (FCTBAN) indicator.
+    FRACTIONAL_BANDS = 91
+
+    # Identifies the Hurst Difference (HURDIF) indicator.
+    HURST_DIFFERENCE = 92

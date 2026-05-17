@@ -21,7 +21,7 @@ func TestStochasticRSI_14_14_1_SMA(t *testing.T) {
 
 	input := testInput()
 
-	ind, err := NewStochasticRelativeStrengthIndex(&StochasticRelativeStrengthIndexParams{
+	ind, err := NewStochasticRelativeStrengthIndex(&Params{
 		Length:      14,
 		FastKLength: 14,
 		FastDLength: 1,
@@ -78,7 +78,7 @@ func TestStochasticRSI_14_45_1_SMA(t *testing.T) {
 
 	input := testInput()
 
-	ind, err := NewStochasticRelativeStrengthIndex(&StochasticRelativeStrengthIndexParams{
+	ind, err := NewStochasticRelativeStrengthIndex(&Params{
 		Length:      14,
 		FastKLength: 45,
 		FastDLength: 1,
@@ -135,7 +135,7 @@ func TestStochasticRSI_11_13_16_SMA(t *testing.T) {
 
 	input := testInput()
 
-	ind, err := NewStochasticRelativeStrengthIndex(&StochasticRelativeStrengthIndexParams{
+	ind, err := NewStochasticRelativeStrengthIndex(&Params{
 		Length:      11,
 		FastKLength: 13,
 		FastDLength: 16,
@@ -191,7 +191,7 @@ func TestStochasticRSI_11_13_16_SMA(t *testing.T) {
 func TestStochasticRSIIsPrimed(t *testing.T) {
 	t.Parallel()
 
-	ind, err := NewStochasticRelativeStrengthIndex(&StochasticRelativeStrengthIndexParams{
+	ind, err := NewStochasticRelativeStrengthIndex(&Params{
 		Length:      14,
 		FastKLength: 14,
 		FastDLength: 1,
@@ -223,7 +223,7 @@ func TestStochasticRSIIsPrimed(t *testing.T) {
 func TestStochasticRSINaN(t *testing.T) {
 	t.Parallel()
 
-	ind, err := NewStochasticRelativeStrengthIndex(&StochasticRelativeStrengthIndexParams{
+	ind, err := NewStochasticRelativeStrengthIndex(&Params{
 		Length:      14,
 		FastKLength: 14,
 		FastDLength: 1,
@@ -245,7 +245,7 @@ func TestStochasticRSINaN(t *testing.T) {
 func TestStochasticRSIMetadata(t *testing.T) {
 	t.Parallel()
 
-	ind, err := NewStochasticRelativeStrengthIndex(&StochasticRelativeStrengthIndexParams{
+	ind, err := NewStochasticRelativeStrengthIndex(&Params{
 		Length:      14,
 		FastKLength: 14,
 		FastDLength: 3,
@@ -289,7 +289,7 @@ func TestStochasticRSIUpdateEntity(t *testing.T) {
 
 	input := testInput()
 
-	ind, err := NewStochasticRelativeStrengthIndex(&StochasticRelativeStrengthIndexParams{
+	ind, err := NewStochasticRelativeStrengthIndex(&Params{
 		Length:      14,
 		FastKLength: 14,
 		FastDLength: 1,
@@ -339,7 +339,7 @@ func TestStochasticRSIInvalidParams(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		_, err := NewStochasticRelativeStrengthIndex(&StochasticRelativeStrengthIndexParams{
+		_, err := NewStochasticRelativeStrengthIndex(&Params{
 			Length:      tt.length,
 			FastKLength: tt.fastKLength,
 			FastDLength: tt.fastDLength,

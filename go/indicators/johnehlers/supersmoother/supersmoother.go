@@ -48,7 +48,7 @@ type SuperSmoother struct {
 // NewSuperSmoother returns an instance of the indicator created using supplied parameters.
 //
 //nolint:funlen,cyclop
-func NewSuperSmoother(p *SuperSmootherParams) (*SuperSmoother, error) {
+func NewSuperSmoother(p *Params) (*SuperSmoother, error) {
 	const (
 		invalid = "invalid super smoother parameters"
 		fmts    = "%s: %s"

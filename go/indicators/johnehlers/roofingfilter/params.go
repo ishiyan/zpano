@@ -2,8 +2,8 @@ package roofingfilter
 
 import "zpano/entities"
 
-// RoofingFilterParams describes parameters to create an instance of the indicator.
-type RoofingFilterParams struct {
+// Params describes parameters to create an instance of the indicator.
+type Params struct {
 	// ShortestCyclePeriod is the shortest cycle period in bars.
 	// The Roofing Filter attenuates all cycle periods shorter than this one.
 	//
@@ -40,9 +40,9 @@ type RoofingFilterParams struct {
 	TradeComponent entities.TradeComponent
 }
 
-// DefaultParams returns a [RoofingFilterParams] value populated with Ehlers defaults.
-func DefaultParams() *RoofingFilterParams {
-	return &RoofingFilterParams{
+// DefaultParams returns a [Params] value populated with Ehlers defaults.
+func DefaultParams() *Params {
+	return &Params{
 		ShortestCyclePeriod: 10,
 		LongestCyclePeriod:  48,
 	}

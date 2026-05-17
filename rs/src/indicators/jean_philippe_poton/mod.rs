@@ -1,0 +1,9 @@
+pub mod fractal_dimension_index;
+pub mod fractal_graph_dimension_index;
+pub mod fractal_adaptive_simple_moving_average;
+pub mod fractal_adaptive_simple_moving_average_2;
+pub mod rescaled_fractal_adaptive_simple_moving_average;
+pub mod fractal_bands;
+pub mod fractal_bands_hybride_adaptive;
+pub mod fractional_bands;
+pub mod hurst_difference;

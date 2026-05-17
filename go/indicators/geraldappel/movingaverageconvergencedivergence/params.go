@@ -13,8 +13,8 @@ const (
 	SMA
 )
 
-// MovingAverageConvergenceDivergenceParams describes parameters to create an instance of the indicator.
-type MovingAverageConvergenceDivergenceParams struct {
+// Params describes parameters to create an instance of the indicator.
+type Params struct {
 	// FastLength is the number of periods for the fast moving average.
 	//
 	// The value should be greater than 1. The default value is 12.
@@ -62,9 +62,9 @@ type MovingAverageConvergenceDivergenceParams struct {
 	TradeComponent entities.TradeComponent
 }
 
-// DefaultParams returns a [MovingAverageConvergenceDivergenceParams] value populated with conventional defaults.
-func DefaultParams() *MovingAverageConvergenceDivergenceParams {
-	return &MovingAverageConvergenceDivergenceParams{
+// DefaultParams returns a [Params] value populated with conventional defaults.
+func DefaultParams() *Params {
+	return &Params{
 		FastLength:   12,
 		SlowLength:   26,
 		SignalLength: 9,

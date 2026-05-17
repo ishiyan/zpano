@@ -76,7 +76,7 @@ func testTime() time.Time {
 }
 
 func testCreate1Pole() *RoofingFilter {
-	params := RoofingFilterParams{
+	params := Params{
 		ShortestCyclePeriod: 10,
 		LongestCyclePeriod:  48,
 	}
@@ -87,7 +87,7 @@ func testCreate1Pole() *RoofingFilter {
 }
 
 func testCreate1PoleZeroMean() *RoofingFilter {
-	params := RoofingFilterParams{
+	params := Params{
 		ShortestCyclePeriod: 10,
 		LongestCyclePeriod:  48,
 		HasZeroMean:         true,
@@ -99,7 +99,7 @@ func testCreate1PoleZeroMean() *RoofingFilter {
 }
 
 func testCreate2Pole() *RoofingFilter {
-	params := RoofingFilterParams{
+	params := Params{
 		ShortestCyclePeriod:      40,
 		LongestCyclePeriod:       80,
 		HasTwoPoleHighpassFilter: true,

@@ -12,11 +12,11 @@ func TestVarianceOutputString(t *testing.T) {
 		o    Output
 		text string
 	}{
-		{Value, varianceValue},
-		{outputLast, varianceUnknown},
-		{Output(0), varianceUnknown},
-		{Output(9999), varianceUnknown},
-		{Output(-9999), varianceUnknown},
+		{Value, valueStr},
+		{outputLast, unknownStr},
+		{Output(0), unknownStr},
+		{Output(9999), unknownStr},
+		{Output(-9999), unknownStr},
 	}
 
 	for _, tt := range tests {
@@ -64,7 +64,7 @@ func TestVarianceOutputMarshalJSON(t *testing.T) {
 		json      string
 		succeeded bool
 	}{
-		{Value, dqs + varianceValue + dqs, true},
+		{Value, dqs + valueStr + dqs, true},
 		{outputLast, nilstr, false},
 		{Output(9999), nilstr, false},
 		{Output(-9999), nilstr, false},
@@ -105,8 +105,8 @@ func TestVarianceOutputUnmarshalJSON(t *testing.T) {
 		json      string
 		succeeded bool
 	}{
-		{Value, dqs + varianceValue + dqs, true},
-		{zero, dqs + varianceUnknown + dqs, false},
+		{Value, dqs + valueStr + dqs, true},
+		{zero, dqs + unknownStr + dqs, false},
 		{zero, dqs + "foobar" + dqs, false},
 	}
 

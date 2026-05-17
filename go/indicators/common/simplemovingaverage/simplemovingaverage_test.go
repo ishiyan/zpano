@@ -271,7 +271,7 @@ func TestNewSimpleMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("length > 1", func(t *testing.T) {
 		t.Parallel()
-		params := SimpleMovingAverageParams{
+		params := Params{
 			Length: length, BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
 		}
 
@@ -289,7 +289,7 @@ func TestNewSimpleMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("length = 1", func(t *testing.T) {
 		t.Parallel()
-		params := SimpleMovingAverageParams{
+		params := Params{
 			Length: 1, BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
 		}
 
@@ -300,7 +300,7 @@ func TestNewSimpleMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("length = 0", func(t *testing.T) {
 		t.Parallel()
-		params := SimpleMovingAverageParams{
+		params := Params{
 			Length: 0, BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
 		}
 
@@ -311,7 +311,7 @@ func TestNewSimpleMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("length < 0", func(t *testing.T) {
 		t.Parallel()
-		params := SimpleMovingAverageParams{
+		params := Params{
 			Length: -1, BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
 		}
 
@@ -322,7 +322,7 @@ func TestNewSimpleMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("invalid bar component", func(t *testing.T) {
 		t.Parallel()
-		params := SimpleMovingAverageParams{
+		params := Params{
 			Length: length, BarComponent: entities.BarComponent(9999), QuoteComponent: qc, TradeComponent: tc,
 		}
 
@@ -333,7 +333,7 @@ func TestNewSimpleMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("invalid quote component", func(t *testing.T) {
 		t.Parallel()
-		params := SimpleMovingAverageParams{
+		params := Params{
 			Length: length, BarComponent: bc, QuoteComponent: entities.QuoteComponent(9999), TradeComponent: tc,
 		}
 
@@ -344,7 +344,7 @@ func TestNewSimpleMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("invalid trade component", func(t *testing.T) {
 		t.Parallel()
-		params := SimpleMovingAverageParams{
+		params := Params{
 			Length: length, BarComponent: bc, QuoteComponent: qc, TradeComponent: entities.TradeComponent(9999),
 		}
 
@@ -358,7 +358,7 @@ func TestNewSimpleMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("all components zero", func(t *testing.T) {
 		t.Parallel()
-		params := SimpleMovingAverageParams{Length: length}
+		params := Params{Length: length}
 
 		sma, err := NewSimpleMovingAverage(&params)
 		check("err == nil", true, err == nil)
@@ -368,7 +368,7 @@ func TestNewSimpleMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("only bar component set", func(t *testing.T) {
 		t.Parallel()
-		params := SimpleMovingAverageParams{Length: length, BarComponent: entities.BarMedianPrice}
+		params := Params{Length: length, BarComponent: entities.BarMedianPrice}
 
 		sma, err := NewSimpleMovingAverage(&params)
 		check("err == nil", true, err == nil)
@@ -378,7 +378,7 @@ func TestNewSimpleMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("only quote component set", func(t *testing.T) {
 		t.Parallel()
-		params := SimpleMovingAverageParams{Length: length, QuoteComponent: entities.QuoteBidPrice}
+		params := Params{Length: length, QuoteComponent: entities.QuoteBidPrice}
 
 		sma, err := NewSimpleMovingAverage(&params)
 		check("err == nil", true, err == nil)
@@ -388,7 +388,7 @@ func TestNewSimpleMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("only trade component set", func(t *testing.T) {
 		t.Parallel()
-		params := SimpleMovingAverageParams{Length: length, TradeComponent: entities.TradeVolume}
+		params := Params{Length: length, TradeComponent: entities.TradeVolume}
 
 		sma, err := NewSimpleMovingAverage(&params)
 		check("err == nil", true, err == nil)
@@ -398,7 +398,7 @@ func TestNewSimpleMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("bar and quote components set", func(t *testing.T) {
 		t.Parallel()
-		params := SimpleMovingAverageParams{
+		params := Params{
 			Length: length, BarComponent: entities.BarOpenPrice, QuoteComponent: entities.QuoteBidPrice,
 		}
 
@@ -410,7 +410,7 @@ func TestNewSimpleMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("bar and trade components set", func(t *testing.T) {
 		t.Parallel()
-		params := SimpleMovingAverageParams{
+		params := Params{
 			Length: length, BarComponent: entities.BarHighPrice, TradeComponent: entities.TradeVolume,
 		}
 
@@ -422,7 +422,7 @@ func TestNewSimpleMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("quote and trade components set", func(t *testing.T) {
 		t.Parallel()
-		params := SimpleMovingAverageParams{
+		params := Params{
 			Length: length, QuoteComponent: entities.QuoteAskPrice, TradeComponent: entities.TradeVolume,
 		}
 
@@ -434,7 +434,7 @@ func TestNewSimpleMovingAverage(t *testing.T) { //nolint: funlen
 }
 
 func testSimpleMovingAverageCreate(length int) *SimpleMovingAverage {
-	params := SimpleMovingAverageParams{
+	params := Params{
 		Length: length,
 	}
 

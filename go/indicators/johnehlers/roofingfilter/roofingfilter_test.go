@@ -309,7 +309,7 @@ func TestNewRoofingFilter(t *testing.T) { //nolint: funlen
 
 	t.Run("valid params", func(t *testing.T) {
 		t.Parallel()
-		params := RoofingFilterParams{
+		params := Params{
 			ShortestCyclePeriod: shortest, LongestCyclePeriod: longest,
 			BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
 		}
@@ -323,7 +323,7 @@ func TestNewRoofingFilter(t *testing.T) { //nolint: funlen
 
 	t.Run("2-pole mnemonic", func(t *testing.T) {
 		t.Parallel()
-		params := RoofingFilterParams{
+		params := Params{
 			ShortestCyclePeriod: shortest, LongestCyclePeriod: longest,
 			HasTwoPoleHighpassFilter: true,
 		}
@@ -335,7 +335,7 @@ func TestNewRoofingFilter(t *testing.T) { //nolint: funlen
 
 	t.Run("zero-mean mnemonic", func(t *testing.T) {
 		t.Parallel()
-		params := RoofingFilterParams{
+		params := Params{
 			ShortestCyclePeriod: shortest, LongestCyclePeriod: longest,
 			HasZeroMean: true,
 		}
@@ -347,7 +347,7 @@ func TestNewRoofingFilter(t *testing.T) { //nolint: funlen
 
 	t.Run("shortest < 2", func(t *testing.T) {
 		t.Parallel()
-		params := RoofingFilterParams{
+		params := Params{
 			ShortestCyclePeriod: 1, LongestCyclePeriod: longest,
 			BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
 		}
@@ -359,7 +359,7 @@ func TestNewRoofingFilter(t *testing.T) { //nolint: funlen
 
 	t.Run("longest <= shortest", func(t *testing.T) {
 		t.Parallel()
-		params := RoofingFilterParams{
+		params := Params{
 			ShortestCyclePeriod: shortest, LongestCyclePeriod: shortest,
 			BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
 		}
@@ -371,7 +371,7 @@ func TestNewRoofingFilter(t *testing.T) { //nolint: funlen
 
 	t.Run("invalid bar component", func(t *testing.T) {
 		t.Parallel()
-		params := RoofingFilterParams{
+		params := Params{
 			ShortestCyclePeriod: shortest, LongestCyclePeriod: longest,
 			BarComponent: entities.BarComponent(9999), QuoteComponent: qc, TradeComponent: tc,
 		}
@@ -383,7 +383,7 @@ func TestNewRoofingFilter(t *testing.T) { //nolint: funlen
 
 	t.Run("invalid quote component", func(t *testing.T) {
 		t.Parallel()
-		params := RoofingFilterParams{
+		params := Params{
 			ShortestCyclePeriod: shortest, LongestCyclePeriod: longest,
 			BarComponent: bc, QuoteComponent: entities.QuoteComponent(9999), TradeComponent: tc,
 		}
@@ -395,7 +395,7 @@ func TestNewRoofingFilter(t *testing.T) { //nolint: funlen
 
 	t.Run("invalid trade component", func(t *testing.T) {
 		t.Parallel()
-		params := RoofingFilterParams{
+		params := Params{
 			ShortestCyclePeriod: shortest, LongestCyclePeriod: longest,
 			BarComponent: bc, QuoteComponent: qc, TradeComponent: entities.TradeComponent(9999),
 		}
@@ -407,7 +407,7 @@ func TestNewRoofingFilter(t *testing.T) { //nolint: funlen
 
 	t.Run("all components zero", func(t *testing.T) {
 		t.Parallel()
-		params := RoofingFilterParams{ShortestCyclePeriod: shortest, LongestCyclePeriod: longest}
+		params := Params{ShortestCyclePeriod: shortest, LongestCyclePeriod: longest}
 
 		rf, err := NewRoofingFilter(&params)
 		check("err == nil", true, err == nil)
@@ -416,7 +416,7 @@ func TestNewRoofingFilter(t *testing.T) { //nolint: funlen
 
 	t.Run("bar component set to open", func(t *testing.T) {
 		t.Parallel()
-		params := RoofingFilterParams{
+		params := Params{
 			ShortestCyclePeriod: shortest, LongestCyclePeriod: longest,
 			BarComponent: entities.BarOpenPrice,
 		}

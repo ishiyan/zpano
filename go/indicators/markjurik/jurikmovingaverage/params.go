@@ -2,8 +2,8 @@ package jurikmovingaverage
 
 import "zpano/entities" //nolint:depguard
 
-// JurikMovingAverageParams describes parameters to create an instance of the indicator.
-type JurikMovingAverageParams struct {
+// Params describes parameters to create an instance of the indicator.
+type Params struct {
 	// Length is the length (the number of time periods, ℓ) determines
 	// the degree of smoothness and it can be any positive value.
 	//
@@ -45,9 +45,9 @@ type JurikMovingAverageParams struct {
 	TradeComponent entities.TradeComponent
 }
 
-// DefaultParams returns a [JurikMovingAverageParams] value populated with conventional defaults.
-func DefaultParams() *JurikMovingAverageParams {
-	return &JurikMovingAverageParams{
+// DefaultParams returns a [Params] value populated with conventional defaults.
+func DefaultParams() *Params {
+	return &Params{
 		Length: 14,
 		Phase:  0,
 	}

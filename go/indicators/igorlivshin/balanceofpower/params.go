@@ -1,8 +1,8 @@
 package balanceofpower
 
-// BalanceOfPowerParams describes parameters to create an instance of the indicator.
+// Params describes parameters to create an instance of the indicator.
 // Balance of Power requires OHLC bar data and has no configurable parameters.
-type BalanceOfPowerParams struct{}
+type Params struct{}
 
-// DefaultParams returns a [BalanceOfPowerParams] value populated with conventional defaults.
-func DefaultParams() *BalanceOfPowerParams { return &BalanceOfPowerParams{} }
+// DefaultParams returns a [Params] value populated with conventional defaults.
+func DefaultParams() *Params { return &Params{} }

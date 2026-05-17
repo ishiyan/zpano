@@ -22,7 +22,7 @@ func TestBalanceOfPowerOHLC(t *testing.T) {
 	expected := testExpected()
 	count := len(open)
 
-	bop, err := NewBalanceOfPower(&BalanceOfPowerParams{})
+	bop, err := NewBalanceOfPower(&Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -50,7 +50,7 @@ func TestBalanceOfPowerOHLC(t *testing.T) {
 func TestBalanceOfPowerIsPrimed(t *testing.T) {
 	t.Parallel()
 
-	bop, err := NewBalanceOfPower(&BalanceOfPowerParams{})
+	bop, err := NewBalanceOfPower(&Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -69,7 +69,7 @@ func TestBalanceOfPowerIsPrimed(t *testing.T) {
 func TestBalanceOfPowerNaN(t *testing.T) {
 	t.Parallel()
 
-	bop, err := NewBalanceOfPower(&BalanceOfPowerParams{})
+	bop, err := NewBalanceOfPower(&Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -103,7 +103,7 @@ func TestBalanceOfPowerNaN(t *testing.T) {
 func TestBalanceOfPowerZeroRange(t *testing.T) {
 	t.Parallel()
 
-	bop, err := NewBalanceOfPower(&BalanceOfPowerParams{})
+	bop, err := NewBalanceOfPower(&Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -118,7 +118,7 @@ func TestBalanceOfPowerZeroRange(t *testing.T) {
 func TestBalanceOfPowerScalarAlwaysZero(t *testing.T) {
 	t.Parallel()
 
-	bop, err := NewBalanceOfPower(&BalanceOfPowerParams{})
+	bop, err := NewBalanceOfPower(&Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -138,7 +138,7 @@ func TestBalanceOfPowerScalarAlwaysZero(t *testing.T) {
 func TestBalanceOfPowerMetadata(t *testing.T) {
 	t.Parallel()
 
-	bop, err := NewBalanceOfPower(&BalanceOfPowerParams{})
+	bop, err := NewBalanceOfPower(&Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -182,7 +182,7 @@ func TestBalanceOfPowerUpdateBar(t *testing.T) {
 	close := testClose()
 	expected := testExpected()
 
-	bop, err := NewBalanceOfPower(&BalanceOfPowerParams{})
+	bop, err := NewBalanceOfPower(&Params{})
 	if err != nil {
 		t.Fatal(err)
 	}

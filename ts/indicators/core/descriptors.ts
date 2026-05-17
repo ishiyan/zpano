@@ -313,6 +313,18 @@ const descriptors: Map<IndicatorIdentifier, Descriptor> = new Map<IndicatorIdent
 
   [IndicatorIdentifier.GoertzelSpectrum, desc(IndicatorIdentifier.GoertzelSpectrum, 'Custom', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Heatmap, R.Spectrum, P.Own)])],
   [IndicatorIdentifier.MaximumEntropySpectrum, desc(IndicatorIdentifier.MaximumEntropySpectrum, 'Custom', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Heatmap, R.Spectrum, P.Own)])],
+
+  // ── jean-philippe poton ───────────────────────────────────────────────
+
+  [IndicatorIdentifier.FractalDimensionIndex, desc(IndicatorIdentifier.FractalDimensionIndex, 'Jean-Philippe Poton', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Oscillator, P.Own)])],
+  [IndicatorIdentifier.FractalGraphDimensionIndex, desc(IndicatorIdentifier.FractalGraphDimensionIndex, 'Jean-Philippe Poton', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Oscillator, P.Own), out(1, S.Scalar, R.Oscillator, P.Own), out(2, S.Scalar, R.Oscillator, P.Own), out(3, S.Scalar, R.Oscillator, P.Own), out(4, S.Band, R.Envelope, P.Own)])],
+  [IndicatorIdentifier.FractalAdaptiveSimpleMovingAverage, desc(IndicatorIdentifier.FractalAdaptiveSimpleMovingAverage, 'Jean-Philippe Poton', A.Adaptive, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Smoother, P.Price)])],
+  [IndicatorIdentifier.FractalAdaptiveSimpleMovingAverage2, desc(IndicatorIdentifier.FractalAdaptiveSimpleMovingAverage2, 'Jean-Philippe Poton', A.Adaptive, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Smoother, P.Price)])],
+  [IndicatorIdentifier.RescaledFractalAdaptiveSimpleMovingAverage, desc(IndicatorIdentifier.RescaledFractalAdaptiveSimpleMovingAverage, 'Jean-Philippe Poton', A.Adaptive, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Smoother, P.Price)])],
+  [IndicatorIdentifier.FractalBands, desc(IndicatorIdentifier.FractalBands, 'Jean-Philippe Poton', A.Adaptive, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Smoother, P.Price), out(1, S.Scalar, R.Envelope, P.Price), out(2, S.Scalar, R.Envelope, P.Price), out(3, S.Band, R.Envelope, P.Price)])],
+  [IndicatorIdentifier.FractalBandsHybrideAdaptive, desc(IndicatorIdentifier.FractalBandsHybrideAdaptive, 'Jean-Philippe Poton', A.Adaptive, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Smoother, P.Price), out(1, S.Scalar, R.Envelope, P.Price), out(2, S.Scalar, R.Envelope, P.Price), out(3, S.Band, R.Envelope, P.Price)])],
+  [IndicatorIdentifier.FractionalBands, desc(IndicatorIdentifier.FractionalBands, 'Jean-Philippe Poton', A.Adaptive, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Smoother, P.Price), out(1, S.Scalar, R.Envelope, P.Price), out(2, S.Scalar, R.Envelope, P.Price), out(3, S.Band, R.Envelope, P.Price)])],
+  [IndicatorIdentifier.HurstDifference, desc(IndicatorIdentifier.HurstDifference, 'Jean-Philippe Poton', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Oscillator, P.Own), out(1, S.Scalar, R.Oscillator, P.Own)])],
 ]);
 
 /**

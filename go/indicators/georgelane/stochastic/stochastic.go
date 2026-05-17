@@ -63,7 +63,7 @@ type Stochastic struct {
 }
 
 // NewStochastic returns an instance of the indicator created using supplied parameters.
-func NewStochastic(p *StochasticParams) (*Stochastic, error) {
+func NewStochastic(p *Params) (*Stochastic, error) {
 	const (
 		invalid   = "invalid stochastic parameters"
 		fmts      = "%s: %s"
@@ -130,7 +130,7 @@ func createMA(maType MovingAverageType, length int, firstIsAverage bool) (lineUp
 		return ema, "EMA", nil
 	default:
 		sma, e := simplemovingaverage.NewSimpleMovingAverage(
-			&simplemovingaverage.SimpleMovingAverageParams{Length: length})
+			&simplemovingaverage.Params{Length: length})
 		if e != nil {
 			return nil, "", e
 		}

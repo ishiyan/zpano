@@ -11,11 +11,11 @@ func TestAdaptiveZeroLagVelocityOutputString(t *testing.T) {
 		o    Output
 		text string
 	}{
-		{Value, adaptiveZeroLagVelocityValue},
-		{adaptiveZeroLagVelocityLast, adaptiveZeroLagVelocityUnknown},
-		{Output(0), adaptiveZeroLagVelocityUnknown},
-		{Output(9999), adaptiveZeroLagVelocityUnknown},
-		{Output(-9999), adaptiveZeroLagVelocityUnknown},
+		{Value, valueStr},
+		{adaptiveZeroLagVelocityLast, unknownStr},
+		{Output(0), unknownStr},
+		{Output(9999), unknownStr},
+		{Output(-9999), unknownStr},
 	}
 	for _, tt := range tests {
 		exp := tt.text
@@ -56,7 +56,7 @@ func TestAdaptiveZeroLagVelocityOutputMarshalJSON(t *testing.T) {
 		json      string
 		succeeded bool
 	}{
-		{Value, dqs + adaptiveZeroLagVelocityValue + dqs, true},
+		{Value, dqs + valueStr + dqs, true},
 		{adaptiveZeroLagVelocityLast, nilstr, false},
 		{Output(9999), nilstr, false},
 		{Output(-9999), nilstr, false},
@@ -89,8 +89,8 @@ func TestAdaptiveZeroLagVelocityOutputUnmarshalJSON(t *testing.T) {
 		json      string
 		succeeded bool
 	}{
-		{Value, dqs + adaptiveZeroLagVelocityValue + dqs, true},
-		{zero, dqs + adaptiveZeroLagVelocityUnknown + dqs, false},
+		{Value, dqs + valueStr + dqs, true},
+		{zero, dqs + unknownStr + dqs, false},
 		{zero, dqs + "foobar" + dqs, false},
 	}
 	for _, tt := range tests {

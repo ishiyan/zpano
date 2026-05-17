@@ -26,7 +26,7 @@ type StandardDeviation struct {
 }
 
 // NewStandardDeviation returns an instnce of the StandardDeviation indicator created using supplied parameters.
-func NewStandardDeviation(p *StandardDeviationParams) (*StandardDeviation, error) {
+func NewStandardDeviation(p *Params) (*StandardDeviation, error) {
 	const (
 		fmtn = "stdev.%c(%d%s)"
 	)
@@ -49,7 +49,7 @@ func NewStandardDeviation(p *StandardDeviationParams) (*StandardDeviation, error
 	}
 
 	// Create the underlying variance indicator.
-	vp := &variance.VarianceParams{
+	vp := &variance.Params{
 		Length:         p.Length,
 		IsUnbiased:     p.IsUnbiased,
 		BarComponent:   bc,

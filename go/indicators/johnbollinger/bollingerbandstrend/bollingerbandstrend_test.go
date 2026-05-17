@@ -25,7 +25,7 @@ func TestBollingerBandsTrend_SampleStdDev_FullData(t *testing.T) {
 	expected := testSampleExpected()
 
 	boolTrue := true
-	ind, err := NewBollingerBandsTrend(&BollingerBandsTrendParams{
+	ind, err := NewBollingerBandsTrend(&Params{
 		FastLength: 20,
 		SlowLength: 50,
 		IsUnbiased: &boolTrue,
@@ -60,7 +60,7 @@ func TestBollingerBandsTrend_PopulationStdDev_FullData(t *testing.T) {
 	expected := testPopulationExpected()
 
 	boolFalse := false
-	ind, err := NewBollingerBandsTrend(&BollingerBandsTrendParams{
+	ind, err := NewBollingerBandsTrend(&Params{
 		FastLength: 20,
 		SlowLength: 50,
 		IsUnbiased: &boolFalse,
@@ -89,7 +89,7 @@ func TestBollingerBandsTrend_PopulationStdDev_FullData(t *testing.T) {
 func TestBollingerBandsTrendIsPrimed(t *testing.T) {
 	t.Parallel()
 
-	ind, err := NewBollingerBandsTrend(&BollingerBandsTrendParams{
+	ind, err := NewBollingerBandsTrend(&Params{
 		FastLength: 20,
 		SlowLength: 50,
 	})
@@ -120,7 +120,7 @@ func TestBollingerBandsTrendIsPrimed(t *testing.T) {
 func TestBollingerBandsTrendNaN(t *testing.T) {
 	t.Parallel()
 
-	ind, err := NewBollingerBandsTrend(&BollingerBandsTrendParams{
+	ind, err := NewBollingerBandsTrend(&Params{
 		FastLength: 20,
 		SlowLength: 50,
 	})
@@ -137,7 +137,7 @@ func TestBollingerBandsTrendNaN(t *testing.T) {
 func TestBollingerBandsTrendMetadata(t *testing.T) {
 	t.Parallel()
 
-	ind, err := NewBollingerBandsTrend(&BollingerBandsTrendParams{
+	ind, err := NewBollingerBandsTrend(&Params{
 		FastLength: 20,
 		SlowLength: 50,
 	})
@@ -174,7 +174,7 @@ func TestBollingerBandsTrendUpdateScalar(t *testing.T) {
 	expected := testSampleExpected()
 
 	boolTrue := true
-	ind, err := NewBollingerBandsTrend(&BollingerBandsTrendParams{
+	ind, err := NewBollingerBandsTrend(&Params{
 		FastLength: 20,
 		SlowLength: 50,
 		IsUnbiased: &boolTrue,
@@ -209,7 +209,7 @@ func TestBollingerBandsTrendDefaultParams(t *testing.T) {
 	t.Parallel()
 
 	// Default fast=20, slow=50.
-	ind, err := NewBollingerBandsTrend(&BollingerBandsTrendParams{})
+	ind, err := NewBollingerBandsTrend(&Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -250,7 +250,7 @@ func TestBollingerBandsTrendInvalidParams(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		_, err := NewBollingerBandsTrend(&BollingerBandsTrendParams{
+		_, err := NewBollingerBandsTrend(&Params{
 			FastLength: tt.fastLength,
 			SlowLength: tt.slowLength,
 		})

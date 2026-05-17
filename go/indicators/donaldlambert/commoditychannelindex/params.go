@@ -6,8 +6,8 @@ import "zpano/entities"
 // The value of 0.015 ensures that approximately 70 to 80 percent of CCI values fall between -100 and +100.
 const DefaultInverseScalingFactor = 0.015
 
-// CommodityChannelIndexParams describes parameters to create an instance of the indicator.
-type CommodityChannelIndexParams struct {
+// Params describes parameters to create an instance of the indicator.
+type Params struct {
 	// Length is the number of time periods of the commodity channel index.
 	//
 	// The value should be greater than 1.
@@ -36,9 +36,9 @@ type CommodityChannelIndexParams struct {
 	TradeComponent entities.TradeComponent
 }
 
-// DefaultParams returns a [CommodityChannelIndexParams] value populated with conventional defaults.
-func DefaultParams() *CommodityChannelIndexParams {
-	return &CommodityChannelIndexParams{
+// DefaultParams returns a [Params] value populated with conventional defaults.
+func DefaultParams() *Params {
+	return &Params{
 		Length:               20,
 		InverseScalingFactor: DefaultInverseScalingFactor,
 	}

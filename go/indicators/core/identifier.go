@@ -323,6 +323,35 @@ const (
 	// heat-map of cyclic activity estimated via Burg's maximum-entropy auto-regressive method.
 	MaximumEntropySpectrum
 
+	// ── jean-philippe poton ───────────────────────────────────────────────
+
+	// FractalDimensionIndex identifies the Fractal Dimension Index (FDI) indicator.
+	FractalDimensionIndex
+
+	// FractalGraphDimensionIndex identifies the Fractal Graph Dimension Index (FGDI) indicator.
+	FractalGraphDimensionIndex
+
+	// FractalAdaptiveSimpleMovingAverage identifies the Fractal Adaptive Simple Moving Average (FRASMA) indicator.
+	FractalAdaptiveSimpleMovingAverage
+
+	// FractalAdaptiveSimpleMovingAverage2 identifies the Fractal Adaptive Simple Moving Average 2 (FRASMA2) indicator.
+	FractalAdaptiveSimpleMovingAverage2
+
+	// RescaledFractalAdaptiveSimpleMovingAverage identifies the RS Fractal Adaptive Simple Moving Average (RSFRASMA) indicator.
+	RescaledFractalAdaptiveSimpleMovingAverage
+
+	// FractalBands identifies the Fractal Bands (FBAN) indicator.
+	FractalBands
+
+	// FractalBandsHybrideAdaptive identifies the Fractal Bands Hybride Adaptive (FBANHA) indicator.
+	FractalBandsHybrideAdaptive
+
+	// FractionalBands identifies the Fractional Bands (FCTBAN) indicator.
+	FractionalBands
+
+	// HurstDifference identifies the Hurst Difference (HURDIF) indicator.
+	HurstDifference
+
 	last
 )
 
@@ -456,6 +485,17 @@ const (
 	// ── custom ────────────────────────────────────────────────────────────
 	goertzelSpectrum       = "goertzelSpectrum"
 	maximumEntropySpectrum = "maximumEntropySpectrum"
+
+	// ── jean-philippe poton ───────────────────────────────────────────────
+	fractalDimensionIndex          = "fractalDimensionIndex"
+	fractalGraphDimensionIndex     = "fractalGraphDimensionIndex"
+	fractalAdaptiveSimpleMovingAverage  = "fractalAdaptiveSimpleMovingAverage"
+	fractalAdaptiveSimpleMovingAverage2 = "fractalAdaptiveSimpleMovingAverage2"
+	rescaledFractalAdaptiveSimpleMovingAverage = "rescaledFractalAdaptiveSimpleMovingAverage"
+	fractalBands                         = "fractalBands"
+	fractalBandsHybrideAdaptive          = "fractalBandsHybrideAdaptive"
+	fractionalBands                      = "fractionalBands"
+	hurstDifference                      = "hurstDifference"
 )
 
 // String implements the Stringer interface.
@@ -653,6 +693,25 @@ func (i Identifier) String() string {
 		return goertzelSpectrum
 	case MaximumEntropySpectrum:
 		return maximumEntropySpectrum
+	// ── jean-philippe poton ───────────────────────────────────────────────
+	case FractalDimensionIndex:
+		return fractalDimensionIndex
+	case FractalGraphDimensionIndex:
+		return fractalGraphDimensionIndex
+	case FractalAdaptiveSimpleMovingAverage:
+		return fractalAdaptiveSimpleMovingAverage
+	case FractalAdaptiveSimpleMovingAverage2:
+		return fractalAdaptiveSimpleMovingAverage2
+	case RescaledFractalAdaptiveSimpleMovingAverage:
+		return rescaledFractalAdaptiveSimpleMovingAverage
+	case FractalBands:
+		return fractalBands
+	case FractalBandsHybrideAdaptive:
+		return fractalBandsHybrideAdaptive
+	case FractionalBands:
+		return fractionalBands
+	case HurstDifference:
+		return hurstDifference
 	default:
 		return unknown
 	}
@@ -887,6 +946,25 @@ func (i *Identifier) UnmarshalJSON(data []byte) error {
 		*i = GoertzelSpectrum
 	case maximumEntropySpectrum:
 		*i = MaximumEntropySpectrum
+	// ── jean-philippe poton ───────────────────────────────────────────────
+	case fractalDimensionIndex:
+		*i = FractalDimensionIndex
+	case fractalGraphDimensionIndex:
+		*i = FractalGraphDimensionIndex
+	case fractalAdaptiveSimpleMovingAverage:
+		*i = FractalAdaptiveSimpleMovingAverage
+	case fractalAdaptiveSimpleMovingAverage2:
+		*i = FractalAdaptiveSimpleMovingAverage2
+	case rescaledFractalAdaptiveSimpleMovingAverage:
+		*i = RescaledFractalAdaptiveSimpleMovingAverage
+	case fractalBands:
+		*i = FractalBands
+	case fractalBandsHybrideAdaptive:
+		*i = FractalBandsHybrideAdaptive
+	case fractionalBands:
+		*i = FractionalBands
+	case hurstDifference:
+		*i = HurstDifference
 	default:
 		return fmt.Errorf(errFmt, s)
 	}

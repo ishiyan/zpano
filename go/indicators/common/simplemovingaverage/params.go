@@ -2,8 +2,8 @@ package simplemovingaverage
 
 import "zpano/entities"
 
-// SimpleMovingAverageParams describes parameters to create an instance of the indicator.
-type SimpleMovingAverageParams struct {
+// Params describes parameters to create an instance of the indicator.
+type Params struct {
 	// Length is the length (the number of time periods, ℓ) of the moving window to calculate the average.
 	//
 	// The value should be greater than 1.
@@ -25,9 +25,9 @@ type SimpleMovingAverageParams struct {
 	TradeComponent entities.TradeComponent
 }
 
-// DefaultParams returns a SimpleMovingAverageParams value populated with conventional defaults.
-func DefaultParams() *SimpleMovingAverageParams {
-	return &SimpleMovingAverageParams{
+// DefaultParams returns a Params value populated with conventional defaults.
+func DefaultParams() *Params {
+	return &Params{
 		Length: 20,
 	}
 }

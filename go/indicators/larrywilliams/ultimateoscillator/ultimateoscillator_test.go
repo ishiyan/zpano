@@ -17,14 +17,14 @@ func TestNewUltimateOscillator(t *testing.T) {
 
 	tests := []struct {
 		name    string
-		params  UltimateOscillatorParams
+		params  Params
 		wantErr bool
 	}{
-		{"default params", UltimateOscillatorParams{}, false},
-		{"custom params", UltimateOscillatorParams{Length1: 5, Length2: 10, Length3: 20}, false},
-		{"length1 too small", UltimateOscillatorParams{Length1: 1}, true},
-		{"length2 too small", UltimateOscillatorParams{Length2: 1}, true},
-		{"length3 too small", UltimateOscillatorParams{Length3: 1}, true},
+		{"default params", Params{}, false},
+		{"custom params", Params{Length1: 5, Length2: 10, Length3: 20}, false},
+		{"length1 too small", Params{Length1: 1}, true},
+		{"length2 too small", Params{Length2: 1}, true},
+		{"length3 too small", Params{Length3: 1}, true},
 	}
 
 	for _, tt := range tests {
@@ -53,7 +53,7 @@ func TestUltimateOscillatorUpdate(t *testing.T) {
 	t.Run("period 7-14-28 all 252 rows", func(t *testing.T) {
 		t.Parallel()
 
-		ind, err := NewUltimateOscillator(&UltimateOscillatorParams{})
+		ind, err := NewUltimateOscillator(&Params{})
 		if err != nil {
 			t.Fatalf("NewUltimateOscillator() error = %v", err)
 		}
@@ -91,11 +91,11 @@ func TestUltimateOscillatorIsPrimed(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		params   UltimateOscillatorParams
+		params   Params
 		primedAt int // index at which IsPrimed should first be true
 	}{
-		{"default 7-14-28", UltimateOscillatorParams{}, 28},
-		{"custom 2-3-4", UltimateOscillatorParams{Length1: 2, Length2: 3, Length3: 4}, 4},
+		{"default 7-14-28", Params{}, 28},
+		{"custom 2-3-4", Params{Length1: 2, Length2: 3, Length3: 4}, 4},
 	}
 
 	for _, tt := range tests {
@@ -129,7 +129,7 @@ func TestUltimateOscillatorIsPrimed(t *testing.T) {
 func TestUltimateOscillatorMetadata(t *testing.T) {
 	t.Parallel()
 
-	ind, err := NewUltimateOscillator(&UltimateOscillatorParams{})
+	ind, err := NewUltimateOscillator(&Params{})
 	if err != nil {
 		t.Fatalf("error: %v", err)
 	}
@@ -165,7 +165,7 @@ func TestUltimateOscillatorUpdateEntity(t *testing.T) {
 	t.Run("update bar", func(t *testing.T) {
 		t.Parallel()
 
-		ind, _ := NewUltimateOscillator(&UltimateOscillatorParams{})
+		ind, _ := NewUltimateOscillator(&Params{})
 
 		bar := &entities.Bar{Time: now, High: 100, Low: 90, Close: 95, Open: 92, Volume: 1000}
 		output := ind.UpdateBar(bar)
@@ -187,7 +187,7 @@ func TestUltimateOscillatorUpdateEntity(t *testing.T) {
 	t.Run("update quote", func(t *testing.T) {
 		t.Parallel()
 
-		ind, _ := NewUltimateOscillator(&UltimateOscillatorParams{})
+		ind, _ := NewUltimateOscillator(&Params{})
 
 		quote := &entities.Quote{Time: now, Bid: 100, Ask: 102}
 		output := ind.UpdateQuote(quote)
@@ -200,7 +200,7 @@ func TestUltimateOscillatorUpdateEntity(t *testing.T) {
 	t.Run("update trade", func(t *testing.T) {
 		t.Parallel()
 
-		ind, _ := NewUltimateOscillator(&UltimateOscillatorParams{})
+		ind, _ := NewUltimateOscillator(&Params{})
 
 		trade := &entities.Trade{Time: now, Price: 100, Volume: 500}
 		output := ind.UpdateTrade(trade)
@@ -213,7 +213,7 @@ func TestUltimateOscillatorUpdateEntity(t *testing.T) {
 	t.Run("update scalar", func(t *testing.T) {
 		t.Parallel()
 
-		ind, _ := NewUltimateOscillator(&UltimateOscillatorParams{})
+		ind, _ := NewUltimateOscillator(&Params{})
 
 		scalar := &entities.Scalar{Time: now, Value: 100}
 		output := ind.UpdateScalar(scalar)
@@ -227,7 +227,7 @@ func TestUltimateOscillatorUpdateEntity(t *testing.T) {
 func TestUltimateOscillatorNaN(t *testing.T) {
 	t.Parallel()
 
-	ind, _ := NewUltimateOscillator(&UltimateOscillatorParams{})
+	ind, _ := NewUltimateOscillator(&Params{})
 
 	// NaN input should return NaN without corrupting state.
 	result := ind.Update(math.NaN(), 100, 90)
@@ -263,7 +263,7 @@ func TestUltimateOscillatorTaLibSpotChecks(t *testing.T) {
 	lows := testInputLow()
 	closes := testInputClose()
 
-	ind, err := NewUltimateOscillator(&UltimateOscillatorParams{})
+	ind, err := NewUltimateOscillator(&Params{})
 	if err != nil {
 		t.Fatalf("error: %v", err)
 	}

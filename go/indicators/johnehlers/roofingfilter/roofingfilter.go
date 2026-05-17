@@ -54,7 +54,7 @@ type RoofingFilter struct {
 // NewRoofingFilter returns an instance of the indicator created using supplied parameters.
 //
 //nolint:funlen,cyclop
-func NewRoofingFilter(p *RoofingFilterParams) (*RoofingFilter, error) {
+func NewRoofingFilter(p *Params) (*RoofingFilter, error) {
 	const (
 		invalid = "invalid roofing filter parameters"
 		fmts    = "%s: %s"

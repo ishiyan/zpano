@@ -2,8 +2,8 @@ package jurikadaptivezerolagvelocity
 
 import "zpano/entities"
 
-// JurikAdaptiveZeroLagVelocityParams describes the parameters of the indicator.
-type JurikAdaptiveZeroLagVelocityParams struct {
+// Params describes the parameters of the indicator.
+type Params struct {
 	// LoLength is the minimum adaptive depth.
 	LoLength int `json:"lo_length"`
 
@@ -27,8 +27,8 @@ type JurikAdaptiveZeroLagVelocityParams struct {
 }
 
 // DefaultParams returns default parameters for the indicator.
-func DefaultParams() *JurikAdaptiveZeroLagVelocityParams {
-	return &JurikAdaptiveZeroLagVelocityParams{
+func DefaultParams() *Params {
+	return &Params{
 		LoLength:    5,
 		HiLength:    30,
 		Sensitivity: 1.0,

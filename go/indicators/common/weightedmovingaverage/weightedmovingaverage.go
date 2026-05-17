@@ -50,7 +50,7 @@ type WeightedMovingAverage struct {
 }
 
 // NewWeightedMovingAverage returns an instnce of the indicator created using supplied parameters.
-func NewWeightedMovingAverage(p *WeightedMovingAverageParams) (*WeightedMovingAverage, error) {
+func NewWeightedMovingAverage(p *Params) (*WeightedMovingAverage, error) {
 	const (
 		invalid = "invalid weighted moving average parameters"
 		fmts    = "%s: %s"

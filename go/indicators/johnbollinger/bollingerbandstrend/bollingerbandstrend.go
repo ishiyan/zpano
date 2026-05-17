@@ -79,7 +79,7 @@ type BollingerBandsTrend struct {
 // NewBollingerBandsTrend returns an instance of the indicator created using supplied parameters.
 //
 //nolint:funlen,cyclop
-func NewBollingerBandsTrend(p *BollingerBandsTrendParams) (*BollingerBandsTrend, error) {
+func NewBollingerBandsTrend(p *Params) (*BollingerBandsTrend, error) {
 	const (
 		invalid           = "invalid bollinger bands trend parameters"
 		fmts              = "%s: %s"
@@ -192,7 +192,7 @@ func newBBLine(
 	maType MovingAverageType, firstIsAverage bool,
 	bc entities.BarComponent, qc entities.QuoteComponent, tc entities.TradeComponent,
 ) (*bbLine, error) {
-	v, err := variance.NewVariance(&variance.VarianceParams{
+	v, err := variance.NewVariance(&variance.Params{
 		Length:         length,
 		IsUnbiased:     isUnbiased,
 		BarComponent:   bc,
@@ -219,7 +219,7 @@ func newBBLine(
 		ma = ema
 	default:
 		sma, e := simplemovingaverage.NewSimpleMovingAverage(
-			&simplemovingaverage.SimpleMovingAverageParams{Length: length})
+			&simplemovingaverage.Params{Length: length})
 		if e != nil {
 			return nil, e
 		}

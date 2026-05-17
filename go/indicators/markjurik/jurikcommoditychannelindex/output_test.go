@@ -11,11 +11,11 @@ func TestCommodityChannelIndexOutputString(t *testing.T) {
 		o    Output
 		text string
 	}{
-		{Value, commodityChannelIndexValue},
-		{commodityChannelIndexLast, commodityChannelIndexUnknown},
-		{Output(0), commodityChannelIndexUnknown},
-		{Output(9999), commodityChannelIndexUnknown},
-		{Output(-9999), commodityChannelIndexUnknown},
+		{Value, valueStr},
+		{commodityChannelIndexLast, unknownStr},
+		{Output(0), unknownStr},
+		{Output(9999), unknownStr},
+		{Output(-9999), unknownStr},
 	}
 	for _, tt := range tests {
 		exp := tt.text
@@ -56,7 +56,7 @@ func TestCommodityChannelIndexOutputMarshalJSON(t *testing.T) {
 		json      string
 		succeeded bool
 	}{
-		{Value, dqs + commodityChannelIndexValue + dqs, true},
+		{Value, dqs + valueStr + dqs, true},
 		{commodityChannelIndexLast, nilstr, false},
 		{Output(9999), nilstr, false},
 		{Output(-9999), nilstr, false},
@@ -89,8 +89,8 @@ func TestCommodityChannelIndexOutputUnmarshalJSON(t *testing.T) {
 		json      string
 		succeeded bool
 	}{
-		{Value, dqs + commodityChannelIndexValue + dqs, true},
-		{zero, dqs + commodityChannelIndexUnknown + dqs, false},
+		{Value, dqs + valueStr + dqs, true},
+		{zero, dqs + unknownStr + dqs, false},
 		{zero, dqs + "foobar" + dqs, false},
 	}
 	for _, tt := range tests {

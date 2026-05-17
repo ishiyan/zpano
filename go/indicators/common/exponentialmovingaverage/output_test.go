@@ -12,11 +12,11 @@ func TestExponentialMovingAverageOutputString(t *testing.T) {
 		o    Output
 		text string
 	}{
-		{Value, exponentialMovingAverageValue},
-		{outputLast, exponentialMovingAverageUnknown},
-		{Output(0), exponentialMovingAverageUnknown},
-		{Output(9999), exponentialMovingAverageUnknown},
-		{Output(-9999), exponentialMovingAverageUnknown},
+		{Value, valueStr},
+		{outputLast, unknownStr},
+		{Output(0), unknownStr},
+		{Output(9999), unknownStr},
+		{Output(-9999), unknownStr},
 	}
 
 	for _, tt := range tests {
@@ -64,7 +64,7 @@ func TestExponentialMovingAverageOutputMarshalJSON(t *testing.T) {
 		json      string
 		succeeded bool
 	}{
-		{Value, dqs + exponentialMovingAverageValue + dqs, true},
+		{Value, dqs + valueStr + dqs, true},
 		{outputLast, nilstr, false},
 		{Output(9999), nilstr, false},
 		{Output(-9999), nilstr, false},
@@ -105,8 +105,8 @@ func TestExponentialMovingAverageOutputUnmarshalJSON(t *testing.T) {
 		json      string
 		succeeded bool
 	}{
-		{Value, dqs + exponentialMovingAverageValue + dqs, true},
-		{zero, dqs + exponentialMovingAverageUnknown + dqs, false},
+		{Value, dqs + valueStr + dqs, true},
+		{zero, dqs + unknownStr + dqs, false},
 		{zero, dqs + "foobar" + dqs, false},
 	}
 

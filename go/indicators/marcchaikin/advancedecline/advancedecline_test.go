@@ -23,7 +23,7 @@ func TestAdvanceDeclineWithVolume(t *testing.T) {
 	expected := testExpectedAD()
 	count := len(highs)
 
-	ad, err := NewAdvanceDecline(&AdvanceDeclineParams{})
+	ad, err := NewAdvanceDecline(&Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -59,7 +59,7 @@ func TestAdvanceDeclineTaLibSpotChecks(t *testing.T) {
 	volumes := testVolumes()
 	count := len(highs)
 
-	ad, err := NewAdvanceDecline(&AdvanceDeclineParams{})
+	ad, err := NewAdvanceDecline(&Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -96,7 +96,7 @@ func TestAdvanceDeclineUpdateBar(t *testing.T) {
 
 	const digits = 2
 
-	ad, err := NewAdvanceDecline(&AdvanceDeclineParams{})
+	ad, err := NewAdvanceDecline(&Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -134,7 +134,7 @@ func TestAdvanceDeclineUpdateBar(t *testing.T) {
 func TestAdvanceDeclineScalarUpdate(t *testing.T) {
 	t.Parallel()
 
-	ad, err := NewAdvanceDecline(&AdvanceDeclineParams{})
+	ad, err := NewAdvanceDecline(&Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -153,7 +153,7 @@ func TestAdvanceDeclineScalarUpdate(t *testing.T) {
 func TestAdvanceDeclineNaN(t *testing.T) {
 	t.Parallel()
 
-	ad, err := NewAdvanceDecline(&AdvanceDeclineParams{})
+	ad, err := NewAdvanceDecline(&Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -182,7 +182,7 @@ func TestAdvanceDeclineNaN(t *testing.T) {
 func TestAdvanceDeclineNotPrimedInitially(t *testing.T) {
 	t.Parallel()
 
-	ad, err := NewAdvanceDecline(&AdvanceDeclineParams{})
+	ad, err := NewAdvanceDecline(&Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -204,7 +204,7 @@ func TestAdvanceDeclineNotPrimedInitially(t *testing.T) {
 func TestAdvanceDeclineMetadata(t *testing.T) {
 	t.Parallel()
 
-	ad, err := NewAdvanceDecline(&AdvanceDeclineParams{})
+	ad, err := NewAdvanceDecline(&Params{})
 	if err != nil {
 		t.Fatal(err)
 	}

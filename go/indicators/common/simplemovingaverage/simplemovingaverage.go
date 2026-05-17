@@ -34,7 +34,7 @@ type SimpleMovingAverage struct {
 }
 
 // NewSimpleMovingAverage returns an instnce of the indicator created using supplied parameters.
-func NewSimpleMovingAverage(p *SimpleMovingAverageParams) (*SimpleMovingAverage, error) {
+func NewSimpleMovingAverage(p *Params) (*SimpleMovingAverage, error) {
 	const (
 		invalid = "invalid simple moving average parameters"
 		fmts    = "%s: %s"

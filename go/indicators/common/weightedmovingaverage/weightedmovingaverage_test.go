@@ -273,7 +273,7 @@ func TestNewWeightedMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("length > 1", func(t *testing.T) {
 		t.Parallel()
-		params := WeightedMovingAverageParams{
+		params := Params{
 			Length: length, BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
 		}
 
@@ -293,7 +293,7 @@ func TestNewWeightedMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("length = 1", func(t *testing.T) {
 		t.Parallel()
-		params := WeightedMovingAverageParams{
+		params := Params{
 			Length: 1, BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
 		}
 
@@ -304,7 +304,7 @@ func TestNewWeightedMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("length = 0", func(t *testing.T) {
 		t.Parallel()
-		params := WeightedMovingAverageParams{
+		params := Params{
 			Length: 0, BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
 		}
 
@@ -315,7 +315,7 @@ func TestNewWeightedMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("length < 0", func(t *testing.T) {
 		t.Parallel()
-		params := WeightedMovingAverageParams{
+		params := Params{
 			Length: -1, BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
 		}
 
@@ -326,7 +326,7 @@ func TestNewWeightedMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("invalid bar component", func(t *testing.T) {
 		t.Parallel()
-		params := WeightedMovingAverageParams{
+		params := Params{
 			Length: length, BarComponent: entities.BarComponent(9999), QuoteComponent: qc, TradeComponent: tc,
 		}
 
@@ -337,7 +337,7 @@ func TestNewWeightedMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("invalid quote component", func(t *testing.T) {
 		t.Parallel()
-		params := WeightedMovingAverageParams{
+		params := Params{
 			Length: length, BarComponent: bc, QuoteComponent: entities.QuoteComponent(9999), TradeComponent: tc,
 		}
 
@@ -348,7 +348,7 @@ func TestNewWeightedMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("invalid trade component", func(t *testing.T) {
 		t.Parallel()
-		params := WeightedMovingAverageParams{
+		params := Params{
 			Length: length, BarComponent: bc, QuoteComponent: qc, TradeComponent: entities.TradeComponent(9999),
 		}
 
@@ -362,7 +362,7 @@ func TestNewWeightedMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("all components zero", func(t *testing.T) {
 		t.Parallel()
-		params := WeightedMovingAverageParams{Length: length}
+		params := Params{Length: length}
 
 		wma, err := NewWeightedMovingAverage(&params)
 		check("err == nil", true, err == nil)
@@ -372,7 +372,7 @@ func TestNewWeightedMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("only bar component set", func(t *testing.T) {
 		t.Parallel()
-		params := WeightedMovingAverageParams{Length: length, BarComponent: entities.BarMedianPrice}
+		params := Params{Length: length, BarComponent: entities.BarMedianPrice}
 
 		wma, err := NewWeightedMovingAverage(&params)
 		check("err == nil", true, err == nil)
@@ -382,7 +382,7 @@ func TestNewWeightedMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("only quote component set", func(t *testing.T) {
 		t.Parallel()
-		params := WeightedMovingAverageParams{Length: length, QuoteComponent: entities.QuoteBidPrice}
+		params := Params{Length: length, QuoteComponent: entities.QuoteBidPrice}
 
 		wma, err := NewWeightedMovingAverage(&params)
 		check("err == nil", true, err == nil)
@@ -392,7 +392,7 @@ func TestNewWeightedMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("only trade component set", func(t *testing.T) {
 		t.Parallel()
-		params := WeightedMovingAverageParams{Length: length, TradeComponent: entities.TradeVolume}
+		params := Params{Length: length, TradeComponent: entities.TradeVolume}
 
 		wma, err := NewWeightedMovingAverage(&params)
 		check("err == nil", true, err == nil)
@@ -402,7 +402,7 @@ func TestNewWeightedMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("bar and quote components set", func(t *testing.T) {
 		t.Parallel()
-		params := WeightedMovingAverageParams{
+		params := Params{
 			Length: length, BarComponent: entities.BarOpenPrice, QuoteComponent: entities.QuoteBidPrice,
 		}
 
@@ -414,7 +414,7 @@ func TestNewWeightedMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("bar and trade components set", func(t *testing.T) {
 		t.Parallel()
-		params := WeightedMovingAverageParams{
+		params := Params{
 			Length: length, BarComponent: entities.BarHighPrice, TradeComponent: entities.TradeVolume,
 		}
 
@@ -426,7 +426,7 @@ func TestNewWeightedMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("quote and trade components set", func(t *testing.T) {
 		t.Parallel()
-		params := WeightedMovingAverageParams{
+		params := Params{
 			Length: length, QuoteComponent: entities.QuoteAskPrice, TradeComponent: entities.TradeVolume,
 		}
 
@@ -438,7 +438,7 @@ func TestNewWeightedMovingAverage(t *testing.T) { //nolint: funlen
 }
 
 func testWeightedMovingAverageCreate(length int) *WeightedMovingAverage {
-	params := WeightedMovingAverageParams{
+	params := Params{
 		Length: length,
 	}
 

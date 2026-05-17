@@ -37,7 +37,7 @@ type CommodityChannelIndex struct {
 }
 
 // NewCommodityChannelIndex returns an instance of the indicator created using supplied parameters.
-func NewCommodityChannelIndex(p *CommodityChannelIndexParams) (*CommodityChannelIndex, error) {
+func NewCommodityChannelIndex(p *Params) (*CommodityChannelIndex, error) {
 	const (
 		invalid   = "invalid commodity channel index parameters"
 		fmts      = "%s: %s"

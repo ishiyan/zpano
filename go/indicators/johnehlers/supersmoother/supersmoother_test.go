@@ -204,7 +204,7 @@ func TestNewSuperSmoother(t *testing.T) { //nolint: funlen
 
 	t.Run("period >= 2", func(t *testing.T) {
 		t.Parallel()
-		params := SuperSmootherParams{
+		params := Params{
 			ShortestCyclePeriod: period, BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
 		}
 
@@ -217,7 +217,7 @@ func TestNewSuperSmoother(t *testing.T) { //nolint: funlen
 
 	t.Run("period = 1", func(t *testing.T) {
 		t.Parallel()
-		params := SuperSmootherParams{
+		params := Params{
 			ShortestCyclePeriod: 1, BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
 		}
 
@@ -228,7 +228,7 @@ func TestNewSuperSmoother(t *testing.T) { //nolint: funlen
 
 	t.Run("period = 0", func(t *testing.T) {
 		t.Parallel()
-		params := SuperSmootherParams{
+		params := Params{
 			ShortestCyclePeriod: 0, BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
 		}
 
@@ -239,7 +239,7 @@ func TestNewSuperSmoother(t *testing.T) { //nolint: funlen
 
 	t.Run("period < 0", func(t *testing.T) {
 		t.Parallel()
-		params := SuperSmootherParams{
+		params := Params{
 			ShortestCyclePeriod: -1, BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
 		}
 
@@ -250,7 +250,7 @@ func TestNewSuperSmoother(t *testing.T) { //nolint: funlen
 
 	t.Run("invalid bar component", func(t *testing.T) {
 		t.Parallel()
-		params := SuperSmootherParams{
+		params := Params{
 			ShortestCyclePeriod: period, BarComponent: entities.BarComponent(9999), QuoteComponent: qc, TradeComponent: tc,
 		}
 
@@ -261,7 +261,7 @@ func TestNewSuperSmoother(t *testing.T) { //nolint: funlen
 
 	t.Run("invalid quote component", func(t *testing.T) {
 		t.Parallel()
-		params := SuperSmootherParams{
+		params := Params{
 			ShortestCyclePeriod: period, BarComponent: bc, QuoteComponent: entities.QuoteComponent(9999), TradeComponent: tc,
 		}
 
@@ -272,7 +272,7 @@ func TestNewSuperSmoother(t *testing.T) { //nolint: funlen
 
 	t.Run("invalid trade component", func(t *testing.T) {
 		t.Parallel()
-		params := SuperSmootherParams{
+		params := Params{
 			ShortestCyclePeriod: period, BarComponent: bc, QuoteComponent: qc, TradeComponent: entities.TradeComponent(9999),
 		}
 
@@ -283,7 +283,7 @@ func TestNewSuperSmoother(t *testing.T) { //nolint: funlen
 
 	t.Run("all components zero", func(t *testing.T) {
 		t.Parallel()
-		params := SuperSmootherParams{ShortestCyclePeriod: period}
+		params := Params{ShortestCyclePeriod: period}
 
 		ss, err := NewSuperSmoother(&params)
 		check("err == nil", true, err == nil)
@@ -293,7 +293,7 @@ func TestNewSuperSmoother(t *testing.T) { //nolint: funlen
 
 	t.Run("only bar component set to open", func(t *testing.T) {
 		t.Parallel()
-		params := SuperSmootherParams{ShortestCyclePeriod: period, BarComponent: entities.BarOpenPrice}
+		params := Params{ShortestCyclePeriod: period, BarComponent: entities.BarOpenPrice}
 
 		ss, err := NewSuperSmoother(&params)
 		check("err == nil", true, err == nil)

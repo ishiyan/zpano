@@ -13,8 +13,8 @@ const (
 	EMA
 )
 
-// AbsolutePriceOscillatorParams describes parameters to create an instance of the indicator.
-type AbsolutePriceOscillatorParams struct {
+// Params describes parameters to create an instance of the indicator.
+type Params struct {
 	// FastLength is the number of periods for the fast moving average.
 	//
 	// The value should be greater than 1.
@@ -52,9 +52,9 @@ type AbsolutePriceOscillatorParams struct {
 	TradeComponent entities.TradeComponent
 }
 
-// DefaultParams returns a AbsolutePriceOscillatorParams value populated with conventional defaults.
-func DefaultParams() *AbsolutePriceOscillatorParams {
-	return &AbsolutePriceOscillatorParams{
+// DefaultParams returns a Params value populated with conventional defaults.
+func DefaultParams() *Params {
+	return &Params{
 		FastLength: 12,
 		SlowLength: 26,
 	}

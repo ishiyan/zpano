@@ -2,8 +2,8 @@ package supersmoother
 
 import "zpano/entities"
 
-// SuperSmootherParams describes parameters to create an instance of the indicator.
-type SuperSmootherParams struct {
+// Params describes parameters to create an instance of the indicator.
+type Params struct {
 	// ShortestCyclePeriod is the shortest cycle period in bars.
 	// The Super Smoother attenuates all cycle periods shorter than this one.
 	//
@@ -26,9 +26,9 @@ type SuperSmootherParams struct {
 	TradeComponent entities.TradeComponent
 }
 
-// DefaultParams returns a [SuperSmootherParams] value populated with Ehlers defaults.
-func DefaultParams() *SuperSmootherParams {
-	return &SuperSmootherParams{
+// DefaultParams returns a [Params] value populated with Ehlers defaults.
+func DefaultParams() *Params {
+	return &Params{
 		ShortestCyclePeriod: 10,
 	}
 }

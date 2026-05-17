@@ -33,7 +33,7 @@ type AdvanceDecline struct {
 }
 
 // NewAdvanceDecline returns an instance of the indicator created using supplied parameters.
-func NewAdvanceDecline(_ *AdvanceDeclineParams) (*AdvanceDecline, error) {
+func NewAdvanceDecline(_ *Params) (*AdvanceDecline, error) {
 	mnemonic := "ad"
 	desc := "Advance-Decline"
 

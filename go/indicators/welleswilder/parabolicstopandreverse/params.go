@@ -1,11 +1,11 @@
 package parabolicstopandreverse
 
-// ParabolicStopAndReverseParams describes parameters to create an instance of the indicator.
+// Params describes parameters to create an instance of the indicator.
 //
 // The Parabolic SAR Extended supports separate acceleration factor parameters for long
 // and short directions. For the standard Parabolic SAR behavior, use the same values
 // for both long and short parameters (which is the default).
-type ParabolicStopAndReverseParams struct {
+type Params struct {
 	// StartValue controls the initial direction and SAR value.
 	//
 	//  0  = Auto-detect direction using the first two bars (default).
@@ -52,9 +52,9 @@ type ParabolicStopAndReverseParams struct {
 	AccelerationMaxShort float64
 }
 
-// DefaultParams returns a [ParabolicStopAndReverseParams] value populated with conventional defaults.
-func DefaultParams() *ParabolicStopAndReverseParams {
-	return &ParabolicStopAndReverseParams{
+// DefaultParams returns a [Params] value populated with conventional defaults.
+func DefaultParams() *Params {
+	return &Params{
 		StartValue:            0,
 		OffsetOnReverse:       0,
 		AccelerationInitLong:  0.02,

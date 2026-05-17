@@ -21,7 +21,7 @@ func TestMoneyFlowIndexWithVolume(t *testing.T) {
 	expected := testExpectedMfi()
 	count := len(tp)
 
-	mfi, err := NewMoneyFlowIndex(&MoneyFlowIndexParams{Length: 14})
+	mfi, err := NewMoneyFlowIndex(&Params{Length: 14})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -66,7 +66,7 @@ func TestMoneyFlowIndexVolume1(t *testing.T) {
 	expected := testExpectedMfiVolume1()
 	count := len(tp)
 
-	mfi, err := NewMoneyFlowIndex(&MoneyFlowIndexParams{Length: 14})
+	mfi, err := NewMoneyFlowIndex(&Params{Length: 14})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -97,7 +97,7 @@ func TestMoneyFlowIndexVolume1(t *testing.T) {
 func TestMoneyFlowIndexIsPrimed(t *testing.T) {
 	t.Parallel()
 
-	mfi, err := NewMoneyFlowIndex(&MoneyFlowIndexParams{Length: 5})
+	mfi, err := NewMoneyFlowIndex(&Params{Length: 5})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -129,7 +129,7 @@ func TestMoneyFlowIndexIsPrimed(t *testing.T) {
 func TestMoneyFlowIndexNaN(t *testing.T) {
 	t.Parallel()
 
-	mfi, err := NewMoneyFlowIndex(&MoneyFlowIndexParams{Length: 5})
+	mfi, err := NewMoneyFlowIndex(&Params{Length: 5})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -153,7 +153,7 @@ func TestMoneyFlowIndexNaN(t *testing.T) {
 func TestMoneyFlowIndexMetadata(t *testing.T) {
 	t.Parallel()
 
-	mfi, err := NewMoneyFlowIndex(&MoneyFlowIndexParams{Length: 14})
+	mfi, err := NewMoneyFlowIndex(&Params{Length: 14})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -187,7 +187,7 @@ func TestMoneyFlowIndexUpdateScalar(t *testing.T) {
 
 	tp := testTypicalPrices()
 
-	mfi, err := NewMoneyFlowIndex(&MoneyFlowIndexParams{Length: 14})
+	mfi, err := NewMoneyFlowIndex(&Params{Length: 14})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -237,7 +237,7 @@ func TestMoneyFlowIndexUpdateBar(t *testing.T) {
 		4204500, 6321400, 10203600, 19043900, 11692000,
 	}
 
-	mfi, err := NewMoneyFlowIndex(&MoneyFlowIndexParams{Length: 14})
+	mfi, err := NewMoneyFlowIndex(&Params{Length: 14})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -290,7 +290,7 @@ func TestMoneyFlowIndexInvalidParams(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		_, err := NewMoneyFlowIndex(&MoneyFlowIndexParams{
+		_, err := NewMoneyFlowIndex(&Params{
 			Length: tt.length,
 		})
 		if err == nil {
@@ -303,7 +303,7 @@ func TestMoneyFlowIndexSmallSum(t *testing.T) {
 	t.Parallel()
 
 	// When sum < 1, MFI should be 0.
-	mfi, err := NewMoneyFlowIndex(&MoneyFlowIndexParams{Length: 2})
+	mfi, err := NewMoneyFlowIndex(&Params{Length: 2})
 	if err != nil {
 		t.Fatal(err)
 	}

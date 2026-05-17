@@ -12,11 +12,11 @@ func TestStandardDeviationOutputString(t *testing.T) {
 		o    Output
 		text string
 	}{
-		{Value, standardDeviationValue},
-		{outputLast, standardDeviationUnknown},
-		{Output(0), standardDeviationUnknown},
-		{Output(9999), standardDeviationUnknown},
-		{Output(-9999), standardDeviationUnknown},
+		{Value, valueStr},
+		{outputLast, unknownStr},
+		{Output(0), unknownStr},
+		{Output(9999), unknownStr},
+		{Output(-9999), unknownStr},
 	}
 
 	for _, tt := range tests {
@@ -64,7 +64,7 @@ func TestStandardDeviationOutputMarshalJSON(t *testing.T) {
 		json      string
 		succeeded bool
 	}{
-		{Value, dqs + standardDeviationValue + dqs, true},
+		{Value, dqs + valueStr + dqs, true},
 		{outputLast, nilstr, false},
 		{Output(9999), nilstr, false},
 		{Output(-9999), nilstr, false},
@@ -105,8 +105,8 @@ func TestStandardDeviationOutputUnmarshalJSON(t *testing.T) {
 		json      string
 		succeeded bool
 	}{
-		{Value, dqs + standardDeviationValue + dqs, true},
-		{zero, dqs + standardDeviationUnknown + dqs, false},
+		{Value, dqs + valueStr + dqs, true},
+		{zero, dqs + unknownStr + dqs, false},
 		{zero, dqs + "foobar" + dqs, false},
 	}
 

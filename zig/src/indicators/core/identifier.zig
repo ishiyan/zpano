@@ -231,6 +231,26 @@ pub const Identifier = enum(u8) {
     /// maximum-entropy auto-regressive power spectrum over a configurable cycle-period range.
     maximum_entropy_spectrum = 83,
 
+    // ── jean-philippe poton ───────────────────────────────────────────────
+    /// Identifies the Fractal Dimension Index (FDI) indicator.
+    fractal_dimension_index = 84,
+    /// Identifies the Fractal Graph Dimension Index (FGDI) indicator.
+    fractal_graph_dimension_index = 85,
+    /// Identifies the Fractal Adaptive Simple Moving Average (FRASMA) indicator.
+    fractal_adaptive_simple_moving_average = 86,
+    /// Identifies the Fractal Adaptive Simple Moving Average 2 (FRASMA2) indicator.
+    fractal_adaptive_simple_moving_average_2 = 87,
+    /// Identifies the RS Fractal Adaptive Simple Moving Average (RSFRASMA) indicator.
+    rescaled_fractal_adaptive_simple_moving_average = 88,
+    /// Identifies the Fractal Bands (FBAN) indicator.
+    fractal_bands = 89,
+    /// Identifies the Fractal Bands Hybride Adaptive (FBANHA) indicator.
+    fractal_bands_hybride_adaptive = 90,
+    /// Identifies the Fractional Bands (FCTBAN) indicator.
+    fractional_bands = 91,
+    /// Identifies the Hurst Difference (HURDIF) indicator.
+    hurst_difference = 92,
+
     /// Returns the camelCase string representation matching Go's String().
     pub fn asStr(self: Identifier) []const u8 {
         return switch (self) {
@@ -362,6 +382,17 @@ pub const Identifier = enum(u8) {
             // ── custom ────────────────────────────────────────────────────────────
             .goertzel_spectrum => "goertzelSpectrum",
             .maximum_entropy_spectrum => "maximumEntropySpectrum",
+
+            // ── jean-philippe poton ───────────────────────────────────────────────
+            .fractal_dimension_index => "fractalDimensionIndex",
+            .fractal_graph_dimension_index => "fractalGraphDimensionIndex",
+            .fractal_adaptive_simple_moving_average => "fractalAdaptiveSimpleMovingAverage",
+            .fractal_adaptive_simple_moving_average_2 => "fractalAdaptiveSimpleMovingAverage2",
+            .rescaled_fractal_adaptive_simple_moving_average => "rescaledFractalAdaptiveSimpleMovingAverage",
+            .fractal_bands => "fractalBands",
+            .fractal_bands_hybride_adaptive => "fractalBandsHybrideAdaptive",
+            .fractional_bands => "fractionalBands",
+            .hurst_difference => "hurstDifference",
         };
     }
 
@@ -496,6 +527,17 @@ pub const Identifier = enum(u8) {
             // ── custom ────────────────────────────────────────────────────────────
             .{ "goertzelSpectrum", Identifier.goertzel_spectrum },
             .{ "maximumEntropySpectrum", Identifier.maximum_entropy_spectrum },
+
+            // ── jean-philippe poton ───────────────────────────────────────────────
+            .{ "fractalDimensionIndex", Identifier.fractal_dimension_index },
+            .{ "fractalGraphDimensionIndex", Identifier.fractal_graph_dimension_index },
+            .{ "fractalAdaptiveSimpleMovingAverage", Identifier.fractal_adaptive_simple_moving_average },
+            .{ "fractalAdaptiveSimpleMovingAverage2", Identifier.fractal_adaptive_simple_moving_average_2 },
+            .{ "rescaledFractalAdaptiveSimpleMovingAverage", Identifier.rescaled_fractal_adaptive_simple_moving_average },
+            .{ "fractalBands", Identifier.fractal_bands },
+            .{ "fractalBandsHybrideAdaptive", Identifier.fractal_bands_hybride_adaptive },
+            .{ "fractionalBands", Identifier.fractional_bands },
+            .{ "hurstDifference", Identifier.hurst_difference },
         };
 
         inline for (map) |entry| {

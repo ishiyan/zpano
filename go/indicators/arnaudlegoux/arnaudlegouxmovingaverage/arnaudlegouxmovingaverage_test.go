@@ -17,7 +17,7 @@ func testAlmaTime() time.Time {
 }
 
 func testAlmaCreate(window int, sigma float64, offset float64) *ArnaudLegouxMovingAverage {
-	alma, _ := NewArnaudLegouxMovingAverage(&ArnaudLegouxMovingAverageParams{
+	alma, _ := NewArnaudLegouxMovingAverage(&Params{
 		Window: window,
 		Sigma:  sigma,
 		Offset: offset,
@@ -253,7 +253,7 @@ func TestArnaudLegouxMovingAverageConstructionErrors(t *testing.T) {
 
 	t.Run("window = 0", func(t *testing.T) {
 		t.Parallel()
-		_, err := NewArnaudLegouxMovingAverage(&ArnaudLegouxMovingAverageParams{Window: 0, Sigma: 6.0, Offset: 0.85})
+		_, err := NewArnaudLegouxMovingAverage(&Params{Window: 0, Sigma: 6.0, Offset: 0.85})
 		if err == nil {
 			t.Error("expected error")
 		}
@@ -261,7 +261,7 @@ func TestArnaudLegouxMovingAverageConstructionErrors(t *testing.T) {
 
 	t.Run("window = -1", func(t *testing.T) {
 		t.Parallel()
-		_, err := NewArnaudLegouxMovingAverage(&ArnaudLegouxMovingAverageParams{Window: -1, Sigma: 6.0, Offset: 0.85})
+		_, err := NewArnaudLegouxMovingAverage(&Params{Window: -1, Sigma: 6.0, Offset: 0.85})
 		if err == nil {
 			t.Error("expected error")
 		}
@@ -269,7 +269,7 @@ func TestArnaudLegouxMovingAverageConstructionErrors(t *testing.T) {
 
 	t.Run("sigma = 0", func(t *testing.T) {
 		t.Parallel()
-		_, err := NewArnaudLegouxMovingAverage(&ArnaudLegouxMovingAverageParams{Window: 9, Sigma: 0, Offset: 0.85})
+		_, err := NewArnaudLegouxMovingAverage(&Params{Window: 9, Sigma: 0, Offset: 0.85})
 		if err == nil {
 			t.Error("expected error")
 		}
@@ -277,7 +277,7 @@ func TestArnaudLegouxMovingAverageConstructionErrors(t *testing.T) {
 
 	t.Run("sigma = -1", func(t *testing.T) {
 		t.Parallel()
-		_, err := NewArnaudLegouxMovingAverage(&ArnaudLegouxMovingAverageParams{Window: 9, Sigma: -1, Offset: 0.85})
+		_, err := NewArnaudLegouxMovingAverage(&Params{Window: 9, Sigma: -1, Offset: 0.85})
 		if err == nil {
 			t.Error("expected error")
 		}
@@ -285,7 +285,7 @@ func TestArnaudLegouxMovingAverageConstructionErrors(t *testing.T) {
 
 	t.Run("offset = -0.1", func(t *testing.T) {
 		t.Parallel()
-		_, err := NewArnaudLegouxMovingAverage(&ArnaudLegouxMovingAverageParams{Window: 9, Sigma: 6.0, Offset: -0.1})
+		_, err := NewArnaudLegouxMovingAverage(&Params{Window: 9, Sigma: 6.0, Offset: -0.1})
 		if err == nil {
 			t.Error("expected error")
 		}
@@ -293,7 +293,7 @@ func TestArnaudLegouxMovingAverageConstructionErrors(t *testing.T) {
 
 	t.Run("offset = 1.1", func(t *testing.T) {
 		t.Parallel()
-		_, err := NewArnaudLegouxMovingAverage(&ArnaudLegouxMovingAverageParams{Window: 9, Sigma: 6.0, Offset: 1.1})
+		_, err := NewArnaudLegouxMovingAverage(&Params{Window: 9, Sigma: 6.0, Offset: 1.1})
 		if err == nil {
 			t.Error("expected error")
 		}
@@ -305,7 +305,7 @@ func TestArnaudLegouxMovingAverageMnemonics(t *testing.T) {
 
 	t.Run("all components zero", func(t *testing.T) {
 		t.Parallel()
-		alma, _ := NewArnaudLegouxMovingAverage(&ArnaudLegouxMovingAverageParams{Window: 9, Sigma: 6.0, Offset: 0.85})
+		alma, _ := NewArnaudLegouxMovingAverage(&Params{Window: 9, Sigma: 6.0, Offset: 0.85})
 		if alma.LineIndicator.Mnemonic != "alma(9, 6, 0.85)" {
 			t.Errorf("mnemonic: expected alma(9, 6, 0.85), got %v", alma.LineIndicator.Mnemonic)
 		}
@@ -313,7 +313,7 @@ func TestArnaudLegouxMovingAverageMnemonics(t *testing.T) {
 
 	t.Run("only bar component set", func(t *testing.T) {
 		t.Parallel()
-		alma, _ := NewArnaudLegouxMovingAverage(&ArnaudLegouxMovingAverageParams{
+		alma, _ := NewArnaudLegouxMovingAverage(&Params{
 			Window: 9, Sigma: 6.0, Offset: 0.85, BarComponent: entities.BarMedianPrice,
 		})
 		if alma.LineIndicator.Mnemonic != "alma(9, 6, 0.85, hl/2)" {
@@ -323,7 +323,7 @@ func TestArnaudLegouxMovingAverageMnemonics(t *testing.T) {
 
 	t.Run("only quote component set", func(t *testing.T) {
 		t.Parallel()
-		alma, _ := NewArnaudLegouxMovingAverage(&ArnaudLegouxMovingAverageParams{
+		alma, _ := NewArnaudLegouxMovingAverage(&Params{
 			Window: 9, Sigma: 6.0, Offset: 0.85, QuoteComponent: entities.QuoteBidPrice,
 		})
 		if alma.LineIndicator.Mnemonic != "alma(9, 6, 0.85, b)" {
@@ -333,7 +333,7 @@ func TestArnaudLegouxMovingAverageMnemonics(t *testing.T) {
 
 	t.Run("only trade component set", func(t *testing.T) {
 		t.Parallel()
-		alma, _ := NewArnaudLegouxMovingAverage(&ArnaudLegouxMovingAverageParams{
+		alma, _ := NewArnaudLegouxMovingAverage(&Params{
 			Window: 9, Sigma: 6.0, Offset: 0.85, TradeComponent: entities.TradeVolume,
 		})
 		if alma.LineIndicator.Mnemonic != "alma(9, 6, 0.85, v)" {
@@ -343,7 +343,7 @@ func TestArnaudLegouxMovingAverageMnemonics(t *testing.T) {
 
 	t.Run("bar and quote components set", func(t *testing.T) {
 		t.Parallel()
-		alma, _ := NewArnaudLegouxMovingAverage(&ArnaudLegouxMovingAverageParams{
+		alma, _ := NewArnaudLegouxMovingAverage(&Params{
 			Window: 9, Sigma: 6.0, Offset: 0.85,
 			BarComponent: entities.BarOpenPrice, QuoteComponent: entities.QuoteBidPrice,
 		})

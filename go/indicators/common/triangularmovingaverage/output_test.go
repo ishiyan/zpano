@@ -12,11 +12,11 @@ func TestTriangularMovingAverageOutputString(t *testing.T) {
 		o    Output
 		text string
 	}{
-		{Value, triangularMovingAverageValue},
-		{outputLast, triangularMovingAverageUnknown},
-		{Output(0), triangularMovingAverageUnknown},
-		{Output(9999), triangularMovingAverageUnknown},
-		{Output(-9999), triangularMovingAverageUnknown},
+		{Value, valueStr},
+		{outputLast, unknownStr},
+		{Output(0), unknownStr},
+		{Output(9999), unknownStr},
+		{Output(-9999), unknownStr},
 	}
 
 	for _, tt := range tests {
@@ -64,7 +64,7 @@ func TestTriangularMovingAverageOutputMarshalJSON(t *testing.T) {
 		json      string
 		succeeded bool
 	}{
-		{Value, dqs + triangularMovingAverageValue + dqs, true},
+		{Value, dqs + valueStr + dqs, true},
 		{outputLast, nilstr, false},
 		{Output(9999), nilstr, false},
 		{Output(-9999), nilstr, false},
@@ -105,8 +105,8 @@ func TestTriangularMovingAverageOutputUnmarshalJSON(t *testing.T) {
 		json      string
 		succeeded bool
 	}{
-		{Value, dqs + triangularMovingAverageValue + dqs, true},
-		{zero, dqs + triangularMovingAverageUnknown + dqs, false},
+		{Value, dqs + valueStr + dqs, true},
+		{zero, dqs + unknownStr + dqs, false},
 		{zero, dqs + "foobar" + dqs, false},
 	}
 

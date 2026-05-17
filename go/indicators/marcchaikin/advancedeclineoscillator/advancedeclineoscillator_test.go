@@ -23,7 +23,7 @@ func TestAdvanceDeclineOscillatorEMA(t *testing.T) {
 	expected := testExpectedEMA()
 	count := len(highs)
 
-	adosc, err := NewAdvanceDeclineOscillator(&AdvanceDeclineOscillatorParams{
+	adosc, err := NewAdvanceDeclineOscillator(&Params{
 		FastLength:        3,
 		SlowLength:        10,
 		MovingAverageType: EMA,
@@ -78,7 +78,7 @@ func TestAdvanceDeclineOscillatorSMA(t *testing.T) {
 	expected := testExpectedSMA()
 	count := len(highs)
 
-	adosc, err := NewAdvanceDeclineOscillator(&AdvanceDeclineOscillatorParams{
+	adosc, err := NewAdvanceDeclineOscillator(&Params{
 		FastLength:        3,
 		SlowLength:        10,
 		MovingAverageType: SMA,
@@ -135,7 +135,7 @@ func TestAdvanceDeclineOscillatorTaLibSpotChecks(t *testing.T) {
 	t.Run("ADOSC_3_10", func(t *testing.T) {
 		t.Parallel()
 
-		adosc, err := NewAdvanceDeclineOscillator(&AdvanceDeclineOscillatorParams{
+		adosc, err := NewAdvanceDeclineOscillator(&Params{
 			FastLength:        3,
 			SlowLength:        10,
 			MovingAverageType: EMA,
@@ -175,7 +175,7 @@ func TestAdvanceDeclineOscillatorTaLibSpotChecks(t *testing.T) {
 	t.Run("ADOSC_5_2", func(t *testing.T) {
 		t.Parallel()
 
-		adosc, err := NewAdvanceDeclineOscillator(&AdvanceDeclineOscillatorParams{
+		adosc, err := NewAdvanceDeclineOscillator(&Params{
 			FastLength:        5,
 			SlowLength:        2,
 			MovingAverageType: EMA,
@@ -205,7 +205,7 @@ func TestAdvanceDeclineOscillatorUpdateBar(t *testing.T) {
 
 	const digits = 2
 
-	adosc, err := NewAdvanceDeclineOscillator(&AdvanceDeclineOscillatorParams{
+	adosc, err := NewAdvanceDeclineOscillator(&Params{
 		FastLength:        3,
 		SlowLength:        10,
 		MovingAverageType: EMA,
@@ -256,7 +256,7 @@ func TestAdvanceDeclineOscillatorUpdateBar(t *testing.T) {
 func TestAdvanceDeclineOscillatorNaN(t *testing.T) {
 	t.Parallel()
 
-	adosc, err := NewAdvanceDeclineOscillator(&AdvanceDeclineOscillatorParams{
+	adosc, err := NewAdvanceDeclineOscillator(&Params{
 		FastLength:        3,
 		SlowLength:        10,
 		MovingAverageType: EMA,
@@ -289,7 +289,7 @@ func TestAdvanceDeclineOscillatorNaN(t *testing.T) {
 func TestAdvanceDeclineOscillatorNotPrimedInitially(t *testing.T) {
 	t.Parallel()
 
-	adosc, err := NewAdvanceDeclineOscillator(&AdvanceDeclineOscillatorParams{
+	adosc, err := NewAdvanceDeclineOscillator(&Params{
 		FastLength:        3,
 		SlowLength:        10,
 		MovingAverageType: EMA,
@@ -315,7 +315,7 @@ func TestAdvanceDeclineOscillatorNotPrimedInitially(t *testing.T) {
 func TestAdvanceDeclineOscillatorMetadata(t *testing.T) {
 	t.Parallel()
 
-	adosc, err := NewAdvanceDeclineOscillator(&AdvanceDeclineOscillatorParams{
+	adosc, err := NewAdvanceDeclineOscillator(&Params{
 		FastLength:        3,
 		SlowLength:        10,
 		MovingAverageType: EMA,
@@ -355,7 +355,7 @@ func TestAdvanceDeclineOscillatorInvalidParams(t *testing.T) {
 	t.Parallel()
 
 	// Fast length < 2.
-	_, err := NewAdvanceDeclineOscillator(&AdvanceDeclineOscillatorParams{
+	_, err := NewAdvanceDeclineOscillator(&Params{
 		FastLength:        1,
 		SlowLength:        10,
 		MovingAverageType: EMA,
@@ -365,7 +365,7 @@ func TestAdvanceDeclineOscillatorInvalidParams(t *testing.T) {
 	}
 
 	// Slow length < 2.
-	_, err = NewAdvanceDeclineOscillator(&AdvanceDeclineOscillatorParams{
+	_, err = NewAdvanceDeclineOscillator(&Params{
 		FastLength:        3,
 		SlowLength:        1,
 		MovingAverageType: EMA,

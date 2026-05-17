@@ -19,7 +19,7 @@ func almostEqual(a, b, eps float64) bool {
 func testFAZLV(t *testing.T, loDepth, hiDepth, fractalType, smooth int, expected []float64) {
 	t.Helper()
 
-	ind, err := NewJurikFractalAdaptiveZeroLagVelocity(&JurikFractalAdaptiveZeroLagVelocityParams{
+	ind, err := NewJurikFractalAdaptiveZeroLagVelocity(&Params{
 		LoDepth:     loDepth,
 		HiDepth:     hiDepth,
 		FractalType: fractalType,

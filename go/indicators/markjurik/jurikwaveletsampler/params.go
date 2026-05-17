@@ -2,8 +2,8 @@ package jurikwaveletsampler
 
 import "zpano/entities"
 
-// JurikWaveletSamplerParams describes the parameters of the indicator.
-type JurikWaveletSamplerParams struct {
+// Params describes the parameters of the indicator.
+type Params struct {
 	// Index is the number of wavelet columns (1-18).
 	Index int `json:"index"`
 
@@ -18,8 +18,8 @@ type JurikWaveletSamplerParams struct {
 }
 
 // DefaultParams returns default parameters for the indicator.
-func DefaultParams() *JurikWaveletSamplerParams {
-	return &JurikWaveletSamplerParams{
+func DefaultParams() *Params {
+	return &Params{
 		Index: 12,
 	}
 }

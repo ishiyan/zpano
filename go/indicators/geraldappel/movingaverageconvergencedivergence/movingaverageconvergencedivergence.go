@@ -59,7 +59,7 @@ type MovingAverageConvergenceDivergence struct {
 //
 //nolint:funlen,cyclop
 func NewMovingAverageConvergenceDivergence(
-	p *MovingAverageConvergenceDivergenceParams,
+	p *Params,
 ) (*MovingAverageConvergenceDivergence, error) {
 	const (
 		invalid           = "invalid moving average convergence divergence parameters"
@@ -185,7 +185,7 @@ func newMA(maType MovingAverageType, length int, firstIsAverage bool) (lineUpdat
 	switch maType {
 	case SMA:
 		return simplemovingaverage.NewSimpleMovingAverage(
-			&simplemovingaverage.SimpleMovingAverageParams{Length: length})
+			&simplemovingaverage.Params{Length: length})
 	default: // EMA (zero value)
 		return exponentialmovingaverage.NewExponentialMovingAverageLength(
 			&exponentialmovingaverage.ExponentialMovingAverageLengthParams{

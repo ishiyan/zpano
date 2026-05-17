@@ -38,7 +38,7 @@ type JurikWaveletSampler struct {
 }
 
 // NewJurikWaveletSampler returns an instance of the indicator.
-func NewJurikWaveletSampler(p *JurikWaveletSamplerParams) (*JurikWaveletSampler, error) {
+func NewJurikWaveletSampler(p *Params) (*JurikWaveletSampler, error) {
 	return newJurikWaveletSampler(p.Index, p.BarComponent, p.QuoteComponent, p.TradeComponent)
 }
 

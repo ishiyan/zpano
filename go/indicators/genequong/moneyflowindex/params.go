@@ -2,8 +2,8 @@ package moneyflowindex
 
 import "zpano/entities"
 
-// MoneyFlowIndexParams describes parameters to create an instance of the indicator.
-type MoneyFlowIndexParams struct {
+// Params describes parameters to create an instance of the indicator.
+type Params struct {
 	// Length is the number of time periods of the Money Flow Index.
 	//
 	// The value should be greater than 0. The default value is 14.
@@ -25,9 +25,9 @@ type MoneyFlowIndexParams struct {
 	TradeComponent entities.TradeComponent
 }
 
-// DefaultParams returns a [MoneyFlowIndexParams] value populated with conventional defaults.
-func DefaultParams() *MoneyFlowIndexParams {
-	return &MoneyFlowIndexParams{
+// DefaultParams returns a [Params] value populated with conventional defaults.
+func DefaultParams() *Params {
+	return &Params{
 		Length: 14,
 	}
 }

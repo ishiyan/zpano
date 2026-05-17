@@ -18,7 +18,7 @@ func TestTripleExponentialMovingAverageOscillatorValues(t *testing.T) {
 	expected := testExpected()
 
 	ind, err := NewTripleExponentialMovingAverageOscillator(
-		&TripleExponentialMovingAverageOscillatorParams{Length: 5},
+		&Params{Length: 5},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -49,7 +49,7 @@ func TestTripleExponentialMovingAverageOscillatorSpotChecks(t *testing.T) {
 	closes := testCloses()
 
 	ind, err := NewTripleExponentialMovingAverageOscillator(
-		&TripleExponentialMovingAverageOscillatorParams{Length: 5},
+		&Params{Length: 5},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -84,7 +84,7 @@ func TestTripleExponentialMovingAverageOscillatorIsPrimed(t *testing.T) {
 	closes := testCloses()
 
 	ind, err := NewTripleExponentialMovingAverageOscillator(
-		&TripleExponentialMovingAverageOscillatorParams{Length: 5},
+		&Params{Length: 5},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -108,7 +108,7 @@ func TestTripleExponentialMovingAverageOscillatorMetadata(t *testing.T) {
 	t.Parallel()
 
 	ind, err := NewTripleExponentialMovingAverageOscillator(
-		&TripleExponentialMovingAverageOscillatorParams{Length: 30},
+		&Params{Length: 30},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -144,7 +144,7 @@ func TestTripleExponentialMovingAverageOscillatorInvalidParams(t *testing.T) {
 	t.Parallel()
 
 	_, err := NewTripleExponentialMovingAverageOscillator(
-		&TripleExponentialMovingAverageOscillatorParams{Length: 0},
+		&Params{Length: 0},
 	)
 	if err == nil {
 		t.Error("expected error for zero length")
@@ -155,7 +155,7 @@ func TestTripleExponentialMovingAverageOscillatorNaN(t *testing.T) {
 	t.Parallel()
 
 	ind, err := NewTripleExponentialMovingAverageOscillator(
-		&TripleExponentialMovingAverageOscillatorParams{Length: 5},
+		&Params{Length: 5},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -172,17 +172,17 @@ func TestTripleExponentialMovingAverageOscillatorMnemonic(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		params   TripleExponentialMovingAverageOscillatorParams
+		params   Params
 		mnemonic string
 	}{
 		{
 			name:     "default components",
-			params:   TripleExponentialMovingAverageOscillatorParams{Length: 5},
+			params:   Params{Length: 5},
 			mnemonic: "trix(5)",
 		},
 		{
 			name: "bar component",
-			params: TripleExponentialMovingAverageOscillatorParams{
+			params: Params{
 				Length:       5,
 				BarComponent: entities.BarMedianPrice,
 			},
@@ -190,7 +190,7 @@ func TestTripleExponentialMovingAverageOscillatorMnemonic(t *testing.T) {
 		},
 		{
 			name: "quote component",
-			params: TripleExponentialMovingAverageOscillatorParams{
+			params: Params{
 				Length:         5,
 				QuoteComponent: entities.QuoteBidPrice,
 			},
@@ -198,7 +198,7 @@ func TestTripleExponentialMovingAverageOscillatorMnemonic(t *testing.T) {
 		},
 		{
 			name: "trade component",
-			params: TripleExponentialMovingAverageOscillatorParams{
+			params: Params{
 				Length:         5,
 				TradeComponent: entities.TradeVolume,
 			},
@@ -206,7 +206,7 @@ func TestTripleExponentialMovingAverageOscillatorMnemonic(t *testing.T) {
 		},
 		{
 			name: "bar and quote components",
-			params: TripleExponentialMovingAverageOscillatorParams{
+			params: Params{
 				Length:         5,
 				BarComponent:   entities.BarOpenPrice,
 				QuoteComponent: entities.QuoteBidPrice,
@@ -235,7 +235,7 @@ func TestTripleExponentialMovingAverageOscillatorUpdateBar(t *testing.T) {
 	t.Parallel()
 
 	ind, err := NewTripleExponentialMovingAverageOscillator(
-		&TripleExponentialMovingAverageOscillatorParams{Length: 5},
+		&Params{Length: 5},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -252,7 +252,7 @@ func TestTripleExponentialMovingAverageOscillatorUpdateQuote(t *testing.T) {
 	t.Parallel()
 
 	ind, err := NewTripleExponentialMovingAverageOscillator(
-		&TripleExponentialMovingAverageOscillatorParams{Length: 5},
+		&Params{Length: 5},
 	)
 	if err != nil {
 		t.Fatal(err)
@@ -269,7 +269,7 @@ func TestTripleExponentialMovingAverageOscillatorUpdateTrade(t *testing.T) {
 	t.Parallel()
 
 	ind, err := NewTripleExponentialMovingAverageOscillator(
-		&TripleExponentialMovingAverageOscillatorParams{Length: 5},
+		&Params{Length: 5},
 	)
 	if err != nil {
 		t.Fatal(err)

@@ -2,8 +2,8 @@ package jurikturningpointoscillator
 
 import "zpano/entities"
 
-// JurikTurningPointOscillatorParams describes the parameters of the indicator.
-type JurikTurningPointOscillatorParams struct {
+// Params describes the parameters of the indicator.
+type Params struct {
 	// Length controls the lookback window for the Spearman rank correlation.
 	Length int `json:"length"`
 
@@ -18,8 +18,8 @@ type JurikTurningPointOscillatorParams struct {
 }
 
 // DefaultParams returns default parameters for the indicator.
-func DefaultParams() *JurikTurningPointOscillatorParams {
-	return &JurikTurningPointOscillatorParams{
+func DefaultParams() *Params {
+	return &Params{
 		Length: 14,
 	}
 }

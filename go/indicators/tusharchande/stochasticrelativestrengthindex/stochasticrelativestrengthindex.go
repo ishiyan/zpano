@@ -64,7 +64,7 @@ type StochasticRelativeStrengthIndex struct {
 }
 
 // NewStochasticRelativeStrengthIndex returns an instance of the indicator created using supplied parameters.
-func NewStochasticRelativeStrengthIndex(p *StochasticRelativeStrengthIndexParams) (*StochasticRelativeStrengthIndex, error) {
+func NewStochasticRelativeStrengthIndex(p *Params) (*StochasticRelativeStrengthIndex, error) {
 	const (
 		invalid       = "invalid stochastic relative strength index parameters"
 		fmts          = "%s: %s"
@@ -120,7 +120,7 @@ func NewStochasticRelativeStrengthIndex(p *StochasticRelativeStrengthIndexParams
 	}
 
 	// Create internal RSI.
-	rsi, rsiErr := relativestrengthindex.NewRelativeStrengthIndex(&relativestrengthindex.RelativeStrengthIndexParams{
+	rsi, rsiErr := relativestrengthindex.NewRelativeStrengthIndex(&relativestrengthindex.Params{
 		Length: p.Length,
 	})
 	if rsiErr != nil {
@@ -154,7 +154,7 @@ func NewStochasticRelativeStrengthIndex(p *StochasticRelativeStrengthIndexParams
 			maLabel = "SMA"
 
 			sma, e := simplemovingaverage.NewSimpleMovingAverage(
-				&simplemovingaverage.SimpleMovingAverageParams{Length: p.FastDLength})
+				&simplemovingaverage.Params{Length: p.FastDLength})
 			if e != nil {
 				return nil, fmt.Errorf(fmtw, invalid, e)
 			}

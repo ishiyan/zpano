@@ -11,11 +11,11 @@ func TestFractalAdaptiveZeroLagVelocityOutputString(t *testing.T) {
 		o    Output
 		text string
 	}{
-		{Value, fractalAdaptiveZeroLagVelocityValue},
-		{fractalAdaptiveZeroLagVelocityLast, fractalAdaptiveZeroLagVelocityUnknown},
-		{Output(0), fractalAdaptiveZeroLagVelocityUnknown},
-		{Output(9999), fractalAdaptiveZeroLagVelocityUnknown},
-		{Output(-9999), fractalAdaptiveZeroLagVelocityUnknown},
+		{Value, valueStr},
+		{fractalAdaptiveZeroLagVelocityLast, unknownStr},
+		{Output(0), unknownStr},
+		{Output(9999), unknownStr},
+		{Output(-9999), unknownStr},
 	}
 	for _, tt := range tests {
 		exp := tt.text
@@ -56,7 +56,7 @@ func TestFractalAdaptiveZeroLagVelocityOutputMarshalJSON(t *testing.T) {
 		json      string
 		succeeded bool
 	}{
-		{Value, dqs + fractalAdaptiveZeroLagVelocityValue + dqs, true},
+		{Value, dqs + valueStr + dqs, true},
 		{fractalAdaptiveZeroLagVelocityLast, nilstr, false},
 		{Output(9999), nilstr, false},
 		{Output(-9999), nilstr, false},
@@ -89,8 +89,8 @@ func TestFractalAdaptiveZeroLagVelocityOutputUnmarshalJSON(t *testing.T) {
 		json      string
 		succeeded bool
 	}{
-		{Value, dqs + fractalAdaptiveZeroLagVelocityValue + dqs, true},
-		{zero, dqs + fractalAdaptiveZeroLagVelocityUnknown + dqs, false},
+		{Value, dqs + valueStr + dqs, true},
+		{zero, dqs + unknownStr + dqs, false},
 		{zero, dqs + "foobar" + dqs, false},
 	}
 	for _, tt := range tests {

@@ -82,7 +82,7 @@ type ParabolicStopAndReverse struct {
 }
 
 // NewParabolicStopAndReverse returns an instance of the indicator created using supplied parameters.
-func NewParabolicStopAndReverse(p *ParabolicStopAndReverseParams) (*ParabolicStopAndReverse, error) {
+func NewParabolicStopAndReverse(p *Params) (*ParabolicStopAndReverse, error) {
 	const invalid = "invalid parabolic stop and reverse parameters"
 
 	// Resolve defaults.

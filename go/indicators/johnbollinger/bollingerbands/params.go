@@ -13,8 +13,8 @@ const (
 	EMA
 )
 
-// BollingerBandsParams describes parameters to create an instance of the indicator.
-type BollingerBandsParams struct {
+// Params describes parameters to create an instance of the indicator.
+type Params struct {
 	// Length is the number of periods for the moving average and standard deviation.
 	//
 	// The value should be greater than 1. The default value is 5.
@@ -63,9 +63,9 @@ type BollingerBandsParams struct {
 	TradeComponent entities.TradeComponent
 }
 
-// DefaultParams returns a [BollingerBandsParams] value populated with conventional defaults.
-func DefaultParams() *BollingerBandsParams {
-	return &BollingerBandsParams{
+// DefaultParams returns a [Params] value populated with conventional defaults.
+func DefaultParams() *Params {
+	return &Params{
 		Length:          5,
 		UpperMultiplier: 2.0,
 		LowerMultiplier: 2.0,

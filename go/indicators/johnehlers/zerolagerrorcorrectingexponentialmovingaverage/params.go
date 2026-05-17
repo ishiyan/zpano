@@ -2,8 +2,8 @@ package zerolagerrorcorrectingexponentialmovingaverage
 
 import "zpano/entities"
 
-// ZeroLagErrorCorrectingExponentialMovingAverageParams describes parameters to create an instance of the indicator.
-type ZeroLagErrorCorrectingExponentialMovingAverageParams struct {
+// Params describes parameters to create an instance of the indicator.
+type Params struct {
 	// SmoothingFactor is the smoothing factor (alpha) of the EMA.
 	//
 	// alpha = 2/(length + 1), 0 < alpha <= 1, 1 <= length.
@@ -36,9 +36,9 @@ type ZeroLagErrorCorrectingExponentialMovingAverageParams struct {
 	TradeComponent entities.TradeComponent
 }
 
-// DefaultParams returns a [ZeroLagErrorCorrectingExponentialMovingAverageParams] value populated with Ehlers defaults.
-func DefaultParams() *ZeroLagErrorCorrectingExponentialMovingAverageParams {
-	return &ZeroLagErrorCorrectingExponentialMovingAverageParams{
+// DefaultParams returns a [Params] value populated with Ehlers defaults.
+func DefaultParams() *Params {
+	return &Params{
 		SmoothingFactor: 0.095,
 		GainLimit:       5,
 		GainStep:        0.1,

@@ -159,7 +159,7 @@ type JurikAdaptiveZeroLagVelocity struct {
 }
 
 // NewJurikAdaptiveZeroLagVelocity returns an instance of the indicator.
-func NewJurikAdaptiveZeroLagVelocity(p *JurikAdaptiveZeroLagVelocityParams) (*JurikAdaptiveZeroLagVelocity, error) {
+func NewJurikAdaptiveZeroLagVelocity(p *Params) (*JurikAdaptiveZeroLagVelocity, error) {
 	return newJurikAdaptiveZeroLagVelocity(p.LoLength, p.HiLength, p.Sensitivity, p.Period,
 		p.BarComponent, p.QuoteComponent, p.TradeComponent)
 }

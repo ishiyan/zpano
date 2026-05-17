@@ -201,6 +201,25 @@ import { ParabolicStopAndReverse } from '../welles-wilder/parabolic-stop-and-rev
 import { GoertzelSpectrum } from '../custom/goertzel-spectrum/goertzel-spectrum.js';
 import { MaximumEntropySpectrum } from '../custom/maximum-entropy-spectrum/maximum-entropy-spectrum.js';
 
+// ── jean-philippe poton ─────────────────────────────────────────────────────
+import { FractalDimensionIndex } from '../jean-philippe-poton/fractal-dimension-index/fractal-dimension-index.js';
+import { defaultParams as defaultFdiParams } from '../jean-philippe-poton/fractal-dimension-index/params.js';
+import { FractalGraphDimensionIndex } from '../jean-philippe-poton/fractal-graph-dimension-index/fractal-graph-dimension-index.js';
+import { defaultParams as defaultFgdiParams } from '../jean-philippe-poton/fractal-graph-dimension-index/params.js';
+import { FractalAdaptiveSimpleMovingAverage } from '../jean-philippe-poton/fractal-adaptive-simple-moving-average/fractal-adaptive-simple-moving-average.js';
+import { defaultParams as defaultFrasmaParams } from '../jean-philippe-poton/fractal-adaptive-simple-moving-average/params.js';
+import { FractalAdaptiveSimpleMovingAverage2 } from '../jean-philippe-poton/fractal-adaptive-simple-moving-average-2/fractal-adaptive-simple-moving-average-2.js';
+import { defaultParams as defaultFrasma2Params } from '../jean-philippe-poton/fractal-adaptive-simple-moving-average-2/params.js';
+import { RescaledFractalAdaptiveSimpleMovingAverage } from '../jean-philippe-poton/rescaled-fractal-adaptive-simple-moving-average/rescaled-fractal-adaptive-simple-moving-average.js';
+import { defaultParams as defaultRsfrasmaParams } from '../jean-philippe-poton/rescaled-fractal-adaptive-simple-moving-average/params.js';
+import { FractalBands } from '../jean-philippe-poton/fractal-bands/fractal-bands.js';
+import { defaultParams as defaultFbanParams } from '../jean-philippe-poton/fractal-bands/params.js';
+import { FractalBandsHybrideAdaptive } from '../jean-philippe-poton/fractal-bands-hybride-adaptive/fractal-bands-hybride-adaptive.js';
+import { defaultParams as defaultFbanhaParams } from '../jean-philippe-poton/fractal-bands-hybride-adaptive/params.js';
+import { FractionalBands } from '../jean-philippe-poton/fractional-bands/fractional-bands.js';
+import { HurstDifference } from '../jean-philippe-poton/hurst-difference/hurst-difference.js';
+import { defaultParams as defaultFctbanParams } from '../jean-philippe-poton/fractional-bands/params.js';
+import { defaultParams as defaultHurdifParams } from '../jean-philippe-poton/hurst-difference/params.js';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -588,6 +607,35 @@ export function createIndicator(identifier: IndicatorIdentifier, params?: Record
         case IndicatorIdentifier.MaximumEntropySpectrum:
             if (isEmpty(p)) return MaximumEntropySpectrum.default();
             return MaximumEntropySpectrum.fromParams(p as any);
+
+        // ── jean-philippe poton ───────────────────────────────────────────
+
+        case IndicatorIdentifier.FractalDimensionIndex:
+            return new FractalDimensionIndex({ ...defaultFdiParams(), ...p });
+
+        case IndicatorIdentifier.FractalGraphDimensionIndex:
+            return new FractalGraphDimensionIndex({ ...defaultFgdiParams(), ...p });
+
+        case IndicatorIdentifier.FractalAdaptiveSimpleMovingAverage:
+            return new FractalAdaptiveSimpleMovingAverage({ ...defaultFrasmaParams(), ...p });
+
+        case IndicatorIdentifier.FractalAdaptiveSimpleMovingAverage2:
+            return new FractalAdaptiveSimpleMovingAverage2({ ...defaultFrasma2Params(), ...p });
+
+        case IndicatorIdentifier.RescaledFractalAdaptiveSimpleMovingAverage:
+            return new RescaledFractalAdaptiveSimpleMovingAverage({ ...defaultRsfrasmaParams(), ...p });
+
+        case IndicatorIdentifier.FractalBands:
+            return new FractalBands({ ...defaultFbanParams(), ...p });
+
+        case IndicatorIdentifier.FractalBandsHybrideAdaptive:
+            return new FractalBandsHybrideAdaptive({ ...defaultFbanhaParams(), ...p });
+
+        case IndicatorIdentifier.FractionalBands:
+            return new FractionalBands({ ...defaultFctbanParams(), ...p });
+
+        case IndicatorIdentifier.HurstDifference:
+            return new HurstDifference({ ...defaultHurdifParams(), ...p });
 
         default:
             throw new Error(`Unsupported indicator: ${IndicatorIdentifier[identifier] ?? identifier}`);

@@ -29,7 +29,7 @@ type ArnaudLegouxMovingAverage struct {
 }
 
 // NewArnaudLegouxMovingAverage returns an instance of the indicator created using supplied parameters.
-func NewArnaudLegouxMovingAverage(p *ArnaudLegouxMovingAverageParams) (*ArnaudLegouxMovingAverage, error) {
+func NewArnaudLegouxMovingAverage(p *Params) (*ArnaudLegouxMovingAverage, error) {
 	const (
 		invalid = "invalid Arnaud Legoux moving average parameters"
 		fmts    = "%s: %s"

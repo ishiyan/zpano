@@ -11,8 +11,8 @@ const (
 	EMA
 )
 
-// StochasticParams describes parameters to create an instance of the indicator.
-type StochasticParams struct {
+// Params describes parameters to create an instance of the indicator.
+type Params struct {
 	// FastKLength is the lookback period for the raw %K calculation (highest high / lowest low).
 	//
 	// The value should be greater than 0. The default value is 5.
@@ -45,9 +45,9 @@ type StochasticParams struct {
 	FirstIsAverage bool
 }
 
-// DefaultParams returns a [StochasticParams] value populated with conventional defaults.
-func DefaultParams() *StochasticParams {
-	return &StochasticParams{
+// DefaultParams returns a [Params] value populated with conventional defaults.
+func DefaultParams() *Params {
+	return &Params{
 		FastKLength: 5,
 		SlowKLength: 3,
 		SlowDLength: 3,

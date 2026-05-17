@@ -22,3 +22,4 @@ pub mod welles_wilder;
 pub mod john_ehlers;
 pub mod arnaud_legoux;
 pub mod manfred_durschner;
+pub mod jean_philippe_poton;

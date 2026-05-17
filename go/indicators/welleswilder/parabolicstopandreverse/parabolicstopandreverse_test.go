@@ -17,7 +17,7 @@ func TestParabolicStopAndReverse252Bar(t *testing.T) {
 
 	const tol = 1e-6
 
-	sar, err := NewParabolicStopAndReverse(&ParabolicStopAndReverseParams{})
+	sar, err := NewParabolicStopAndReverse(&Params{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -49,7 +49,7 @@ func TestParabolicStopAndReverseWilder(t *testing.T) {
 
 	const tol = 1e-3
 
-	sar, err := NewParabolicStopAndReverse(&ParabolicStopAndReverseParams{})
+	sar, err := NewParabolicStopAndReverse(&Params{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -90,7 +90,7 @@ func TestParabolicStopAndReverseWilder(t *testing.T) {
 func TestParabolicStopAndReverseIsPrimed(t *testing.T) {
 	t.Parallel()
 
-	sar, err := NewParabolicStopAndReverse(&ParabolicStopAndReverseParams{})
+	sar, err := NewParabolicStopAndReverse(&Params{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -117,7 +117,7 @@ func TestParabolicStopAndReverseIsPrimed(t *testing.T) {
 func TestParabolicStopAndReverseMetadata(t *testing.T) {
 	t.Parallel()
 
-	sar, err := NewParabolicStopAndReverse(&ParabolicStopAndReverseParams{})
+	sar, err := NewParabolicStopAndReverse(&Params{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -150,14 +150,14 @@ func TestParabolicStopAndReverseConstructorValidation(t *testing.T) {
 
 	tests := []struct {
 		name   string
-		params ParabolicStopAndReverseParams
+		params Params
 		valid  bool
 	}{
-		{"defaults", ParabolicStopAndReverseParams{}, true},
-		{"negative long init", ParabolicStopAndReverseParams{AccelerationInitLong: -0.01}, false},
-		{"negative short step", ParabolicStopAndReverseParams{AccelerationShort: -0.01}, false},
-		{"negative offset", ParabolicStopAndReverseParams{OffsetOnReverse: -0.01}, false},
-		{"custom valid", ParabolicStopAndReverseParams{
+		{"defaults", Params{}, true},
+		{"negative long init", Params{AccelerationInitLong: -0.01}, false},
+		{"negative short step", Params{AccelerationShort: -0.01}, false},
+		{"negative offset", Params{OffsetOnReverse: -0.01}, false},
+		{"custom valid", Params{
 			AccelerationInitLong:  0.01,
 			AccelerationLong:      0.01,
 			AccelerationMaxLong:   0.10,
@@ -165,8 +165,8 @@ func TestParabolicStopAndReverseConstructorValidation(t *testing.T) {
 			AccelerationShort:     0.03,
 			AccelerationMaxShort:  0.30,
 		}, true},
-		{"start value positive", ParabolicStopAndReverseParams{StartValue: 100.0}, true},
-		{"start value negative", ParabolicStopAndReverseParams{StartValue: -100.0}, true},
+		{"start value positive", Params{StartValue: 100.0}, true},
+		{"start value negative", Params{StartValue: -100.0}, true},
 	}
 
 	for _, tt := range tests {
@@ -184,7 +184,7 @@ func TestParabolicStopAndReverseConstructorValidation(t *testing.T) {
 func TestParabolicStopAndReverseUpdateBar(t *testing.T) {
 	t.Parallel()
 
-	sar, err := NewParabolicStopAndReverse(&ParabolicStopAndReverseParams{})
+	sar, err := NewParabolicStopAndReverse(&Params{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -211,7 +211,7 @@ func TestParabolicStopAndReverseUpdateBar(t *testing.T) {
 func TestParabolicStopAndReverseNaN(t *testing.T) {
 	t.Parallel()
 
-	sar, err := NewParabolicStopAndReverse(&ParabolicStopAndReverseParams{})
+	sar, err := NewParabolicStopAndReverse(&Params{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -236,7 +236,7 @@ func TestParabolicStopAndReverseNaN(t *testing.T) {
 func TestParabolicStopAndReverseForcedStartLong(t *testing.T) {
 	t.Parallel()
 
-	sar, err := NewParabolicStopAndReverse(&ParabolicStopAndReverseParams{
+	sar, err := NewParabolicStopAndReverse(&Params{
 		StartValue: 85.0,
 	})
 	if err != nil {
@@ -262,7 +262,7 @@ func TestParabolicStopAndReverseForcedStartLong(t *testing.T) {
 func TestParabolicStopAndReverseForcedStartShort(t *testing.T) {
 	t.Parallel()
 
-	sar, err := NewParabolicStopAndReverse(&ParabolicStopAndReverseParams{
+	sar, err := NewParabolicStopAndReverse(&Params{
 		StartValue: -100.0,
 	})
 	if err != nil {

@@ -277,7 +277,7 @@ func (s *velAux3State) feed(sample float64, barIdx int) float64 {
 }
 
 // NewJurikZeroLagVelocity returns an instance of the indicator created using supplied parameters.
-func NewJurikZeroLagVelocity(p *JurikZeroLagVelocityParams) (*JurikZeroLagVelocity, error) {
+func NewJurikZeroLagVelocity(p *Params) (*JurikZeroLagVelocity, error) {
 	return newJurikZeroLagVelocity(p.Depth, p.BarComponent, p.QuoteComponent, p.TradeComponent)
 }
 

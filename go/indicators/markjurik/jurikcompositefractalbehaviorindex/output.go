@@ -15,17 +15,17 @@ const (
 )
 
 const (
-	valueString  = "value"
-	valueUnknown = "unknown"
+	valueStr  = "value"
+	unknownStr = "unknown"
 )
 
 // String implements the Stringer interface.
 func (o Output) String() string {
 	switch o {
 	case Value:
-		return valueString
+		return valueStr
 	default:
-		return valueUnknown
+		return unknownStr
 	}
 }
 
@@ -43,7 +43,7 @@ func (o Output) MarshalJSON() ([]byte, error) {
 	)
 
 	s := o.String()
-	if s == valueUnknown {
+	if s == unknownStr {
 		return nil, fmt.Errorf(errFmt, s)
 	}
 
@@ -66,7 +66,7 @@ func (o *Output) UnmarshalJSON(data []byte) error {
 	s := string(d)
 
 	switch s {
-	case valueString:
+	case valueStr:
 		*o = Value
 	default:
 		return fmt.Errorf(errFmt, s)

@@ -2,8 +2,8 @@ package jurikcommoditychannelindex
 
 import "zpano/entities"
 
-// JurikCommodityChannelIndexParams describes the parameters of the indicator.
-type JurikCommodityChannelIndexParams struct {
+// Params describes the parameters of the indicator.
+type Params struct {
 	// Length controls the slow JMA length.
 	Length int `json:"length"`
 
@@ -18,8 +18,8 @@ type JurikCommodityChannelIndexParams struct {
 }
 
 // DefaultParams returns default parameters for the indicator.
-func DefaultParams() *JurikCommodityChannelIndexParams {
-	return &JurikCommodityChannelIndexParams{
+func DefaultParams() *Params {
+	return &Params{
 		Length: 20,
 	}
 }

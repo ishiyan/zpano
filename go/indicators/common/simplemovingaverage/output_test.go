@@ -12,11 +12,11 @@ func TestSimpleMovingAverageOutputString(t *testing.T) {
 		o    Output
 		text string
 	}{
-		{Value, simpleMovingAverageValue},
-		{outputLast, simpleMovingAverageUnknown},
-		{Output(0), simpleMovingAverageUnknown},
-		{Output(9999), simpleMovingAverageUnknown},
-		{Output(-9999), simpleMovingAverageUnknown},
+		{Value, valueStr},
+		{outputLast, unknownStr},
+		{Output(0), unknownStr},
+		{Output(9999), unknownStr},
+		{Output(-9999), unknownStr},
 	}
 
 	for _, tt := range tests {
@@ -64,7 +64,7 @@ func TestSimpleMovingAverageOutputMarshalJSON(t *testing.T) {
 		json      string
 		succeeded bool
 	}{
-		{Value, dqs + simpleMovingAverageValue + dqs, true},
+		{Value, dqs + valueStr + dqs, true},
 		{outputLast, nilstr, false},
 		{Output(9999), nilstr, false},
 		{Output(-9999), nilstr, false},
@@ -105,8 +105,8 @@ func TestSimpleMovingAverageOutputUnmarshalJSON(t *testing.T) {
 		json      string
 		succeeded bool
 	}{
-		{Value, dqs + simpleMovingAverageValue + dqs, true},
-		{zero, dqs + simpleMovingAverageUnknown + dqs, false},
+		{Value, dqs + valueStr + dqs, true},
+		{zero, dqs + unknownStr + dqs, false},
 		{zero, dqs + "foobar" + dqs, false},
 	}
 

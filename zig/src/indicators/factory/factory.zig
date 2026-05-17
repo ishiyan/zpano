@@ -146,6 +146,17 @@ const psar_mod = @import("../welles_wilder/parabolic_stop_and_reverse/parabolic_
 const goertzel_mod = @import("../custom/goertzel_spectrum/goertzel_spectrum.zig");
 const maxent_mod = @import("../custom/maximum_entropy_spectrum/maximum_entropy_spectrum.zig");
 
+// jean-philippe poton
+const fdi_mod = @import("../jean_philippe_poton/fractal_dimension_index/fractal_dimension_index.zig");
+const fgdi_mod = @import("../jean_philippe_poton/fractal_graph_dimension_index/fractal_graph_dimension_index.zig");
+const frasma_mod = @import("../jean_philippe_poton/fractal_adaptive_simple_moving_average/fractal_adaptive_simple_moving_average.zig");
+const frasma2_mod = @import("../jean_philippe_poton/fractal_adaptive_simple_moving_average_2/fractal_adaptive_simple_moving_average_2.zig");
+const rsfrasma_mod = @import("../jean_philippe_poton/rescaled_fractal_adaptive_simple_moving_average/rescaled_fractal_adaptive_simple_moving_average.zig");
+const fban_mod = @import("../jean_philippe_poton/fractal_bands/fractal_bands.zig");
+const fbanha_mod = @import("../jean_philippe_poton/fractal_bands_hybride_adaptive/fractal_bands_hybride_adaptive.zig");
+const fctban_mod = @import("../jean_philippe_poton/fractional_bands/fractional_bands.zig");
+const hurdif_mod = @import("../jean_philippe_poton/hurst_difference/hurst_difference.zig");
+
 pub const FactoryError = error{
     UnsupportedIndicator,
     InvalidParams,
@@ -1233,6 +1244,119 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
             const ind = maxent_mod.MaximumEntropySpectrum.init(allocator, p) catch return FactoryError.IndicatorInitFailed;
             const ptr = heapAlloc(maxent_mod.MaximumEntropySpectrum, allocator, ind) catch return FactoryError.OutOfMemory;
             break :blk .{ .indicator = ptr.indicator(), .ctx = ptr, .deinit_fn = DeinitFn(maxent_mod.MaximumEntropySpectrum) };
+        },
+
+        .fractal_dimension_index => blk: {
+            const p = fdi_mod.FractalDimensionIndexParams{
+                .period = @as(usize, @intCast(if (getInt(obj, "period", 0) > 0) getInt(obj, "period", 0) else 30)),
+                .bar_component = getBarComponent(obj),
+                .quote_component = getQuoteComponent(obj),
+                .trade_component = getTradeComponent(obj),
+            };
+            const ind = fdi_mod.FractalDimensionIndex.init(allocator, p) catch return FactoryError.IndicatorInitFailed;
+            const ptr = heapAlloc(fdi_mod.FractalDimensionIndex, allocator, ind) catch return FactoryError.OutOfMemory;
+            break :blk .{ .indicator = ptr.indicator(), .ctx = ptr, .deinit_fn = DeinitFn(fdi_mod.FractalDimensionIndex) };
+        },
+
+        .fractal_graph_dimension_index => blk: {
+            const p = fgdi_mod.FractalGraphDimensionIndexParams{
+                .period = @as(usize, @intCast(if (getInt(obj, "period", 0) > 0) getInt(obj, "period", 0) else 30)),
+                .bar_component = getBarComponent(obj),
+                .quote_component = getQuoteComponent(obj),
+                .trade_component = getTradeComponent(obj),
+            };
+            const ind = fgdi_mod.FractalGraphDimensionIndex.init(allocator, p) catch return FactoryError.IndicatorInitFailed;
+            const ptr = heapAlloc(fgdi_mod.FractalGraphDimensionIndex, allocator, ind) catch return FactoryError.OutOfMemory;
+            break :blk .{ .indicator = ptr.indicator(), .ctx = ptr, .deinit_fn = DeinitFn(fgdi_mod.FractalGraphDimensionIndex) };
+        },
+
+        .fractal_adaptive_simple_moving_average => blk: {
+            const p = frasma_mod.FractalAdaptiveSimpleMovingAverageParams{
+                .period = @as(usize, @intCast(if (getInt(obj, "period", 0) > 0) getInt(obj, "period", 0) else 30)),
+                .normal_speed = @as(usize, @intCast(if (getInt(obj, "normalSpeed", 0) > 0) getInt(obj, "normalSpeed", 0) else 20)),
+                .bar_component = getBarComponent(obj),
+                .quote_component = getQuoteComponent(obj),
+                .trade_component = getTradeComponent(obj),
+            };
+            const ind = frasma_mod.FractalAdaptiveSimpleMovingAverage.init(allocator, p) catch return FactoryError.IndicatorInitFailed;
+            const ptr = heapAlloc(frasma_mod.FractalAdaptiveSimpleMovingAverage, allocator, ind) catch return FactoryError.OutOfMemory;
+            break :blk .{ .indicator = ptr.indicator(), .ctx = ptr, .deinit_fn = DeinitFn(frasma_mod.FractalAdaptiveSimpleMovingAverage) };
+        },
+        .fractal_adaptive_simple_moving_average_2 => blk: {
+            const p = frasma2_mod.FractalAdaptiveSimpleMovingAverage2Params{
+                .period = @as(usize, @intCast(if (getInt(obj, "period", 0) > 0) getInt(obj, "period", 0) else 30)),
+                .normal_speed = @as(usize, @intCast(if (getInt(obj, "normalSpeed", 0) > 0) getInt(obj, "normalSpeed", 0) else 20)),
+                .bar_component = getBarComponent(obj),
+                .quote_component = getQuoteComponent(obj),
+                .trade_component = getTradeComponent(obj),
+            };
+            const ind = frasma2_mod.FractalAdaptiveSimpleMovingAverage2.init(allocator, p) catch return FactoryError.IndicatorInitFailed;
+            const ptr = heapAlloc(frasma2_mod.FractalAdaptiveSimpleMovingAverage2, allocator, ind) catch return FactoryError.OutOfMemory;
+            break :blk .{ .indicator = ptr.indicator(), .ctx = ptr, .deinit_fn = DeinitFn(frasma2_mod.FractalAdaptiveSimpleMovingAverage2) };
+        },
+        .rescaled_fractal_adaptive_simple_moving_average => blk: {
+            const p = rsfrasma_mod.RescaledFractalAdaptiveSimpleMovingAverageParams{
+                .period = @as(usize, @intCast(if (getInt(obj, "period", 0) > 0) getInt(obj, "period", 0) else 64)),
+                .normal_speed = @as(usize, @intCast(if (getInt(obj, "normal_speed", 0) > 0) getInt(obj, "normal_speed", 0) else 30)),
+                .price_scale = getF64(obj, "price_scale", 1.0),
+                .bar_component = getBarComponent(obj),
+                .quote_component = getQuoteComponent(obj),
+                .trade_component = getTradeComponent(obj),
+            };
+            const ind = rsfrasma_mod.RescaledFractalAdaptiveSimpleMovingAverage.init(allocator, p) catch return FactoryError.IndicatorInitFailed;
+            const ptr = heapAlloc(rsfrasma_mod.RescaledFractalAdaptiveSimpleMovingAverage, allocator, ind) catch return FactoryError.OutOfMemory;
+            break :blk .{ .indicator = ptr.indicator(), .ctx = ptr, .deinit_fn = DeinitFn(rsfrasma_mod.RescaledFractalAdaptiveSimpleMovingAverage) };
+        },
+        .fractal_bands => blk: {
+            const p = fban_mod.FractalBandsParams{
+                .period = @as(usize, @intCast(if (getInt(obj, "period", 0) > 0) getInt(obj, "period", 0) else 30)),
+                .normal_speed = @as(usize, @intCast(if (getInt(obj, "normalSpeed", 0) > 0) getInt(obj, "normalSpeed", 0) else 20)),
+                .alpha = getF64(obj, "alpha", 2.0),
+                .bar_component = getBarComponent(obj),
+                .quote_component = getQuoteComponent(obj),
+                .trade_component = getTradeComponent(obj),
+            };
+            const ind = fban_mod.FractalBands.init(allocator, p) catch return FactoryError.IndicatorInitFailed;
+            const ptr = heapAlloc(fban_mod.FractalBands, allocator, ind) catch return FactoryError.OutOfMemory;
+            break :blk .{ .indicator = ptr.indicator(), .ctx = ptr, .deinit_fn = DeinitFn(fban_mod.FractalBands) };
+        },
+        .fractal_bands_hybride_adaptive => blk: {
+            const p = fbanha_mod.FractalBandsHybrideAdaptiveParams{
+                .period = @as(usize, @intCast(if (getInt(obj, "period", 0) > 0) getInt(obj, "period", 0) else 30)),
+                .normal_speed_fallback = @as(usize, @intCast(if (getInt(obj, "normalSpeedFallback", 0) > 0) getInt(obj, "normalSpeedFallback", 0) else 30)),
+                .alpha = getF64(obj, "alpha", 2.0),
+                .nyquist = getF64(obj, "nyquist", 0.5),
+                .alpha_hp = getF64(obj, "alphaHP", 0.07),
+                .bar_component = getBarComponent(obj),
+                .quote_component = getQuoteComponent(obj),
+                .trade_component = getTradeComponent(obj),
+            };
+            const ind = fbanha_mod.FractalBandsHybrideAdaptive.init(allocator, p) catch return FactoryError.IndicatorInitFailed;
+            const ptr = heapAlloc(fbanha_mod.FractalBandsHybrideAdaptive, allocator, ind) catch return FactoryError.OutOfMemory;
+            break :blk .{ .indicator = ptr.indicator(), .ctx = ptr, .deinit_fn = DeinitFn(fbanha_mod.FractalBandsHybrideAdaptive) };
+        },
+        .fractional_bands => blk: {
+            const p = fctban_mod.FractionalBandsParams{
+                .period = @as(usize, @intCast(if (getInt(obj, "period", 0) > 0) getInt(obj, "period", 0) else 30)),
+                .price_scale = getF64(obj, "priceScale", 1.0),
+                .bar_component = getBarComponent(obj),
+                .quote_component = getQuoteComponent(obj),
+                .trade_component = getTradeComponent(obj),
+            };
+            const ind = fctban_mod.FractionalBands.init(allocator, p) catch return FactoryError.IndicatorInitFailed;
+            const ptr = heapAlloc(fctban_mod.FractionalBands, allocator, ind) catch return FactoryError.OutOfMemory;
+            break :blk .{ .indicator = ptr.indicator(), .ctx = ptr, .deinit_fn = DeinitFn(fctban_mod.FractionalBands) };
+        },
+        .hurst_difference => blk: {
+            const p = hurdif_mod.HurstDifferenceParams{
+                .period = @as(usize, @intCast(if (getInt(obj, "period", 0) > 0) getInt(obj, "period", 0) else 30)),
+                .bar_component = getBarComponent(obj),
+                .quote_component = getQuoteComponent(obj),
+                .trade_component = getTradeComponent(obj),
+            };
+            const ind = hurdif_mod.HurstDifference.init(allocator, p) catch return FactoryError.IndicatorInitFailed;
+            const ptr = heapAlloc(hurdif_mod.HurstDifference, allocator, ind) catch return FactoryError.OutOfMemory;
+            break :blk .{ .indicator = ptr.indicator(), .ctx = ptr, .deinit_fn = DeinitFn(hurdif_mod.HurstDifference) };
         },
     };
 }

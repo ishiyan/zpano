@@ -13,8 +13,8 @@ const (
 	EMA
 )
 
-// BollingerBandsTrendParams describes parameters to create an instance of the indicator.
-type BollingerBandsTrendParams struct {
+// Params describes parameters to create an instance of the indicator.
+type Params struct {
 	// FastLength is the number of periods for the fast (shorter) Bollinger Band.
 	//
 	// The value should be greater than 1. The default value is 20.
@@ -68,9 +68,9 @@ type BollingerBandsTrendParams struct {
 	TradeComponent entities.TradeComponent
 }
 
-// DefaultParams returns a [BollingerBandsTrendParams] value populated with conventional defaults.
-func DefaultParams() *BollingerBandsTrendParams {
-	return &BollingerBandsTrendParams{
+// DefaultParams returns a [Params] value populated with conventional defaults.
+func DefaultParams() *Params {
+	return &Params{
 		FastLength:      20,
 		SlowLength:      50,
 		UpperMultiplier: 2.0,

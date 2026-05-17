@@ -19,7 +19,7 @@ func almostEqual(a, b, eps float64) bool {
 func testARTSI(t *testing.T, loLength, hiLength int, expected []float64) {
 	t.Helper()
 
-	ind, err := NewJurikAdaptiveRelativeTrendStrengthIndex(&JurikAdaptiveRelativeTrendStrengthIndexParams{
+	ind, err := NewJurikAdaptiveRelativeTrendStrengthIndex(&Params{
 		LoLength: loLength,
 		HiLength: hiLength,
 	})

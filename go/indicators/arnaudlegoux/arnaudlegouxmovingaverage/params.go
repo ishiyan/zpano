@@ -2,8 +2,8 @@ package arnaudlegouxmovingaverage
 
 import "zpano/entities"
 
-// ArnaudLegouxMovingAverageParams describes parameters to create an instance of the indicator.
-type ArnaudLegouxMovingAverageParams struct {
+// Params describes parameters to create an instance of the indicator.
+type Params struct {
 	// Window is the number of bars in the lookback window.
 	//
 	// The value should be greater than 0.
@@ -35,9 +35,9 @@ type ArnaudLegouxMovingAverageParams struct {
 	TradeComponent entities.TradeComponent
 }
 
-// DefaultParams returns an ArnaudLegouxMovingAverageParams value populated with conventional defaults.
-func DefaultParams() *ArnaudLegouxMovingAverageParams {
-	return &ArnaudLegouxMovingAverageParams{
+// DefaultParams returns an Params value populated with conventional defaults.
+func DefaultParams() *Params {
+	return &Params{
 		Window: 9,
 		Sigma:  6.0,
 		Offset: 0.85,

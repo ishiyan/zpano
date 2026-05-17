@@ -12,11 +12,11 @@ func TestKaufmanAdaptiveMovingAverageOutputString(t *testing.T) {
 		o    Output
 		text string
 	}{
-		{Value, kaufmanAdaptiveMovingAverageValue},
-		{outputLast, kaufmanAdaptiveMovingAverageUnknown},
-		{Output(0), kaufmanAdaptiveMovingAverageUnknown},
-		{Output(9999), kaufmanAdaptiveMovingAverageUnknown},
-		{Output(-9999), kaufmanAdaptiveMovingAverageUnknown},
+		{Value, valueStr},
+		{outputLast, unknownStr},
+		{Output(0), unknownStr},
+		{Output(9999), unknownStr},
+		{Output(-9999), unknownStr},
 	}
 
 	for _, tt := range tests {
@@ -64,7 +64,7 @@ func TestKaufmanAdaptiveMovingAverageOutputMarshalJSON(t *testing.T) {
 		json      string
 		succeeded bool
 	}{
-		{Value, dqs + kaufmanAdaptiveMovingAverageValue + dqs, true},
+		{Value, dqs + valueStr + dqs, true},
 		{outputLast, nilstr, false},
 		{Output(9999), nilstr, false},
 		{Output(-9999), nilstr, false},
@@ -105,8 +105,8 @@ func TestKaufmanAdaptiveMovingAverageOutputUnmarshalJSON(t *testing.T) {
 		json      string
 		succeeded bool
 	}{
-		{Value, dqs + kaufmanAdaptiveMovingAverageValue + dqs, true},
-		{zero, dqs + kaufmanAdaptiveMovingAverageUnknown + dqs, false},
+		{Value, dqs + valueStr + dqs, true},
+		{zero, dqs + unknownStr + dqs, false},
 		{zero, dqs + "foobar" + dqs, false},
 	}
 

@@ -2,8 +2,8 @@ package tripleexponentialmovingaverageoscillator
 
 import "zpano/entities"
 
-// TripleExponentialMovingAverageOscillatorParams describes parameters to create an instance of the indicator.
-type TripleExponentialMovingAverageOscillatorParams struct {
+// Params describes parameters to create an instance of the indicator.
+type Params struct {
 	// Length is the number of time periods for the three chained EMA calculations.
 	//
 	// The value should be greater than or equal to 1. The default value is 30.
@@ -25,9 +25,9 @@ type TripleExponentialMovingAverageOscillatorParams struct {
 	TradeComponent entities.TradeComponent
 }
 
-// DefaultParams returns a [TripleExponentialMovingAverageOscillatorParams] value populated with conventional defaults.
-func DefaultParams() *TripleExponentialMovingAverageOscillatorParams {
-	return &TripleExponentialMovingAverageOscillatorParams{
+// DefaultParams returns a [Params] value populated with conventional defaults.
+func DefaultParams() *Params {
+	return &Params{
 		Length: 30,
 	}
 }

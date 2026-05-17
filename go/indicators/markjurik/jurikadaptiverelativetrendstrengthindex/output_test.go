@@ -11,11 +11,11 @@ func TestAdaptiveRelativeTrendStrengthIndexOutputString(t *testing.T) {
 		o    Output
 		text string
 	}{
-		{Value, adaptiveRelativeTrendStrengthIndexValue},
-		{adaptiveRelativeTrendStrengthIndexLast, adaptiveRelativeTrendStrengthIndexUnknown},
-		{Output(0), adaptiveRelativeTrendStrengthIndexUnknown},
-		{Output(9999), adaptiveRelativeTrendStrengthIndexUnknown},
-		{Output(-9999), adaptiveRelativeTrendStrengthIndexUnknown},
+		{Value, valueStr},
+		{adaptiveRelativeTrendStrengthIndexLast, unknownStr},
+		{Output(0), unknownStr},
+		{Output(9999), unknownStr},
+		{Output(-9999), unknownStr},
 	}
 	for _, tt := range tests {
 		exp := tt.text
@@ -56,7 +56,7 @@ func TestAdaptiveRelativeTrendStrengthIndexOutputMarshalJSON(t *testing.T) {
 		json      string
 		succeeded bool
 	}{
-		{Value, dqs + adaptiveRelativeTrendStrengthIndexValue + dqs, true},
+		{Value, dqs + valueStr + dqs, true},
 		{adaptiveRelativeTrendStrengthIndexLast, nilstr, false},
 		{Output(9999), nilstr, false},
 		{Output(-9999), nilstr, false},
@@ -89,8 +89,8 @@ func TestAdaptiveRelativeTrendStrengthIndexOutputUnmarshalJSON(t *testing.T) {
 		json      string
 		succeeded bool
 	}{
-		{Value, dqs + adaptiveRelativeTrendStrengthIndexValue + dqs, true},
-		{zero, dqs + adaptiveRelativeTrendStrengthIndexUnknown + dqs, false},
+		{Value, dqs + valueStr + dqs, true},
+		{zero, dqs + unknownStr + dqs, false},
 		{zero, dqs + "foobar" + dqs, false},
 	}
 	for _, tt := range tests {

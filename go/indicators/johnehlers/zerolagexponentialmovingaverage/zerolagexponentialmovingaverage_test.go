@@ -17,7 +17,7 @@ func testZemaTime() time.Time {
 }
 
 func testZemaCreate(sf float64, gf float64, ml int) *ZeroLagExponentialMovingAverage {
-	params := ZeroLagExponentialMovingAverageParams{
+	params := Params{
 		SmoothingFactor:        sf,
 		VelocityGainFactor:     gf,
 		VelocityMomentumLength: ml,
@@ -229,7 +229,7 @@ func TestNewZeroLagExponentialMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("valid defaults", func(t *testing.T) {
 		t.Parallel()
-		params := ZeroLagExponentialMovingAverageParams{
+		params := Params{
 			SmoothingFactor: 0.25, VelocityGainFactor: 0.5, VelocityMomentumLength: 3,
 		}
 
@@ -241,7 +241,7 @@ func TestNewZeroLagExponentialMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("smoothing factor = 0", func(t *testing.T) {
 		t.Parallel()
-		params := ZeroLagExponentialMovingAverageParams{
+		params := Params{
 			SmoothingFactor: 0, VelocityGainFactor: 0.5, VelocityMomentumLength: 3,
 		}
 
@@ -252,7 +252,7 @@ func TestNewZeroLagExponentialMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("smoothing factor < 0", func(t *testing.T) {
 		t.Parallel()
-		params := ZeroLagExponentialMovingAverageParams{
+		params := Params{
 			SmoothingFactor: -0.1, VelocityGainFactor: 0.5, VelocityMomentumLength: 3,
 		}
 
@@ -263,7 +263,7 @@ func TestNewZeroLagExponentialMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("smoothing factor > 1", func(t *testing.T) {
 		t.Parallel()
-		params := ZeroLagExponentialMovingAverageParams{
+		params := Params{
 			SmoothingFactor: 1.1, VelocityGainFactor: 0.5, VelocityMomentumLength: 3,
 		}
 
@@ -274,7 +274,7 @@ func TestNewZeroLagExponentialMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("smoothing factor = 1", func(t *testing.T) {
 		t.Parallel()
-		params := ZeroLagExponentialMovingAverageParams{
+		params := Params{
 			SmoothingFactor: 1, VelocityGainFactor: 0.5, VelocityMomentumLength: 3,
 		}
 
@@ -285,7 +285,7 @@ func TestNewZeroLagExponentialMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("momentum length = 0", func(t *testing.T) {
 		t.Parallel()
-		params := ZeroLagExponentialMovingAverageParams{
+		params := Params{
 			SmoothingFactor: 0.25, VelocityGainFactor: 0.5, VelocityMomentumLength: 0,
 		}
 
@@ -296,7 +296,7 @@ func TestNewZeroLagExponentialMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("momentum length < 0", func(t *testing.T) {
 		t.Parallel()
-		params := ZeroLagExponentialMovingAverageParams{
+		params := Params{
 			SmoothingFactor: 0.25, VelocityGainFactor: 0.5, VelocityMomentumLength: -1,
 		}
 
@@ -307,7 +307,7 @@ func TestNewZeroLagExponentialMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("invalid bar component", func(t *testing.T) {
 		t.Parallel()
-		params := ZeroLagExponentialMovingAverageParams{
+		params := Params{
 			SmoothingFactor: 0.25, VelocityGainFactor: 0.5, VelocityMomentumLength: 3,
 			BarComponent: entities.BarComponent(9999),
 		}
@@ -319,7 +319,7 @@ func TestNewZeroLagExponentialMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("invalid quote component", func(t *testing.T) {
 		t.Parallel()
-		params := ZeroLagExponentialMovingAverageParams{
+		params := Params{
 			SmoothingFactor: 0.25, VelocityGainFactor: 0.5, VelocityMomentumLength: 3,
 			QuoteComponent: entities.QuoteComponent(9999),
 		}
@@ -331,7 +331,7 @@ func TestNewZeroLagExponentialMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("invalid trade component", func(t *testing.T) {
 		t.Parallel()
-		params := ZeroLagExponentialMovingAverageParams{
+		params := Params{
 			SmoothingFactor: 0.25, VelocityGainFactor: 0.5, VelocityMomentumLength: 3,
 			TradeComponent: entities.TradeComponent(9999),
 		}
@@ -343,7 +343,7 @@ func TestNewZeroLagExponentialMovingAverage(t *testing.T) { //nolint: funlen
 
 	t.Run("non-default bar component", func(t *testing.T) {
 		t.Parallel()
-		params := ZeroLagExponentialMovingAverageParams{
+		params := Params{
 			SmoothingFactor: 0.25, VelocityGainFactor: 0.5, VelocityMomentumLength: 3,
 			BarComponent: entities.BarOpenPrice,
 		}

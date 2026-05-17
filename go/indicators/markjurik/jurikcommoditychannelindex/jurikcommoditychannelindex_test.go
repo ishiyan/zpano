@@ -19,7 +19,7 @@ func almostEqual(a, b, eps float64) bool {
 func testJCCX(t *testing.T, length int, expected []float64) {
 	t.Helper()
 
-	ind, err := NewJurikCommodityChannelIndex(&JurikCommodityChannelIndexParams{
+	ind, err := NewJurikCommodityChannelIndex(&Params{
 		Length: length,
 	})
 	if err != nil {

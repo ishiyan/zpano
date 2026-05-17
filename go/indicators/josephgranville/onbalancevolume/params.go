@@ -2,8 +2,8 @@ package onbalancevolume
 
 import "zpano/entities"
 
-// OnBalanceVolumeParams describes parameters to create an instance of the indicator.
-type OnBalanceVolumeParams struct {
+// Params describes parameters to create an instance of the indicator.
+type Params struct {
 	// BarComponent indicates the component of a bar to use when updating the indicator with a bar sample.
 	//
 	// If zero, the default (BarClosePrice) is used.
@@ -20,5 +20,5 @@ type OnBalanceVolumeParams struct {
 	TradeComponent entities.TradeComponent
 }
 
-// DefaultParams returns a [OnBalanceVolumeParams] value populated with conventional defaults.
-func DefaultParams() *OnBalanceVolumeParams { return &OnBalanceVolumeParams{} }
+// DefaultParams returns a [Params] value populated with conventional defaults.
+func DefaultParams() *Params { return &Params{} }

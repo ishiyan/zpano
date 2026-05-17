@@ -19,7 +19,7 @@ func almostEqual(a, b, eps float64) bool {
 func testCFB(t *testing.T, fractalType, smooth int, expected []float64) {
 	t.Helper()
 
-	cfb, err := NewJurikCompositeFractalBehaviorIndex(&JurikCompositeFractalBehaviorIndexParams{
+	cfb, err := NewJurikCompositeFractalBehaviorIndex(&Params{
 		FractalType: fractalType,
 		Smooth:      smooth,
 	})

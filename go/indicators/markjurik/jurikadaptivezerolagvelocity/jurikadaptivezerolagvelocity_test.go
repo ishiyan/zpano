@@ -19,7 +19,7 @@ func almostEqual(a, b, eps float64) bool {
 func testAZLV(t *testing.T, loLength, hiLength int, sensitivity, period float64, expected []float64) {
 	t.Helper()
 
-	ind, err := NewJurikAdaptiveZeroLagVelocity(&JurikAdaptiveZeroLagVelocityParams{
+	ind, err := NewJurikAdaptiveZeroLagVelocity(&Params{
 		LoLength:    loLength,
 		HiLength:    hiLength,
 		Sensitivity: sensitivity,

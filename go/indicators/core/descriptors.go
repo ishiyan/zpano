@@ -626,4 +626,76 @@ var descriptors = map[Identifier]Descriptor{
 		Adaptivity: Static, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
 		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Heatmap, Role: Spectrum, Pane: Own}},
 	},
+
+	// ── jean-philippe poton ───────────────────────────────────────────────
+
+	FractalDimensionIndex: {
+		Identifier: FractalDimensionIndex, Family: "Jean-Philippe Poton",
+		Adaptivity: Static, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Oscillator, Pane: Own}},
+	},
+	FractalGraphDimensionIndex: {
+		Identifier: FractalGraphDimensionIndex, Family: "Jean-Philippe Poton",
+		Adaptivity: Static, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{
+			{Kind: 1 /* Fgdi */, Shape: shape.Scalar, Role: Oscillator, Pane: Own},
+			{Kind: 2 /* Upper */, Shape: shape.Scalar, Role: Oscillator, Pane: Own},
+			{Kind: 3 /* Lower */, Shape: shape.Scalar, Role: Oscillator, Pane: Own},
+			{Kind: 4 /* Stddev */, Shape: shape.Scalar, Role: Oscillator, Pane: Own},
+			{Kind: 5 /* Band */, Shape: shape.Band, Role: Envelope, Pane: Own},
+		},
+	},
+	FractalAdaptiveSimpleMovingAverage: {
+		Identifier: FractalAdaptiveSimpleMovingAverage, Family: "Jean-Philippe Poton",
+		Adaptivity: Adaptive, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{{Kind: 0 /* Value */, Shape: shape.Scalar, Role: Smoother, Pane: Price}},
+	},
+	FractalAdaptiveSimpleMovingAverage2: {
+		Identifier: FractalAdaptiveSimpleMovingAverage2, Family: "Jean-Philippe Poton",
+		Adaptivity: Adaptive, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{{Kind: 0 /* Value */, Shape: shape.Scalar, Role: Smoother, Pane: Price}},
+	},
+	RescaledFractalAdaptiveSimpleMovingAverage: {
+		Identifier: RescaledFractalAdaptiveSimpleMovingAverage, Family: "Jean-Philippe Poton",
+		Adaptivity: Adaptive, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{{Kind: 0 /* Value */, Shape: shape.Scalar, Role: Smoother, Pane: Price}},
+	},
+	FractalBands: {
+		Identifier: FractalBands, Family: "Jean-Philippe Poton",
+		Adaptivity: Adaptive, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{
+			{Kind: 0 /* Value */, Shape: shape.Scalar, Role: Smoother, Pane: Price},
+			{Kind: 1 /* Upper */, Shape: shape.Scalar, Role: Envelope, Pane: Price},
+			{Kind: 2 /* Lower */, Shape: shape.Scalar, Role: Envelope, Pane: Price},
+			{Kind: 3 /* Band */, Shape: shape.Band, Role: Envelope, Pane: Price},
+		},
+	},
+	FractalBandsHybrideAdaptive: {
+		Identifier: FractalBandsHybrideAdaptive, Family: "Jean-Philippe Poton",
+		Adaptivity: Adaptive, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{
+			{Kind: 0 /* Value */, Shape: shape.Scalar, Role: Smoother, Pane: Price},
+			{Kind: 1 /* Upper */, Shape: shape.Scalar, Role: Envelope, Pane: Price},
+			{Kind: 2 /* Lower */, Shape: shape.Scalar, Role: Envelope, Pane: Price},
+			{Kind: 3 /* Band */, Shape: shape.Band, Role: Envelope, Pane: Price},
+		},
+	},
+	FractionalBands: {
+		Identifier: FractionalBands, Family: "Jean-Philippe Poton",
+		Adaptivity: Adaptive, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{
+			{Kind: 0 /* Value */, Shape: shape.Scalar, Role: Smoother, Pane: Price},
+			{Kind: 1 /* Upper */, Shape: shape.Scalar, Role: Envelope, Pane: Price},
+			{Kind: 2 /* Lower */, Shape: shape.Scalar, Role: Envelope, Pane: Price},
+			{Kind: 3 /* Band */, Shape: shape.Band, Role: Envelope, Pane: Price},
+		},
+	},
+	HurstDifference: {
+		Identifier: HurstDifference, Family: "Jean-Philippe Poton",
+		Adaptivity: Static, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{
+			{Kind: 1 /* HurstDiff */, Shape: shape.Scalar, Role: Oscillator, Pane: Own},
+			{Kind: 2 /* Fgdi */, Shape: shape.Scalar, Role: Oscillator, Pane: Own},
+		},
+	},
 }

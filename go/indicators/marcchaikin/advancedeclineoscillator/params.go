@@ -11,8 +11,8 @@ const (
 	EMA
 )
 
-// AdvanceDeclineOscillatorParams describes parameters to create an instance of the indicator.
-type AdvanceDeclineOscillatorParams struct {
+// Params describes parameters to create an instance of the indicator.
+type Params struct {
 	// FastLength is the number of periods for the fast moving average.
 	//
 	// The value should be greater than 1. Default is 3.
@@ -36,9 +36,9 @@ type AdvanceDeclineOscillatorParams struct {
 	FirstIsAverage bool
 }
 
-// DefaultParams returns a [AdvanceDeclineOscillatorParams] value populated with conventional defaults.
-func DefaultParams() *AdvanceDeclineOscillatorParams {
-	return &AdvanceDeclineOscillatorParams{
+// DefaultParams returns a [Params] value populated with conventional defaults.
+func DefaultParams() *Params {
+	return &Params{
 		FastLength: 3,
 		SlowLength: 10,
 	}

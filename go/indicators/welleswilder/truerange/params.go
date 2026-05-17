@@ -1,12 +1,12 @@
 package truerange
 
-// TrueRangeParams describes parameters to create an instance of the indicator.
+// Params describes parameters to create an instance of the indicator.
 //
 // The True Range indicator has no configurable parameters.
 // This struct exists for consistency with other indicators.
-type TrueRangeParams struct{}
+type Params struct{}
 
-// DefaultParams returns a [TrueRangeParams] value populated with conventional defaults.
-func DefaultParams() *TrueRangeParams {
-	return &TrueRangeParams{}
+// DefaultParams returns a [Params] value populated with conventional defaults.
+func DefaultParams() *Params {
+	return &Params{}
 }

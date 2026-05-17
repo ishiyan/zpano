@@ -30,7 +30,7 @@ type RelativeStrengthIndex struct {
 }
 
 // NewRelativeStrengthIndex returns an instance of the indicator created using supplied parameters.
-func NewRelativeStrengthIndex(p *RelativeStrengthIndexParams) (*RelativeStrengthIndex, error) {
+func NewRelativeStrengthIndex(p *Params) (*RelativeStrengthIndex, error) {
 	const (
 		invalid   = "invalid relative strength index parameters"
 		fmts      = "%s: %s"

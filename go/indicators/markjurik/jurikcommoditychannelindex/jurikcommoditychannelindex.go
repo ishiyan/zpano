@@ -23,7 +23,7 @@ type JurikCommodityChannelIndex struct {
 }
 
 // NewJurikCommodityChannelIndex returns an instance of the indicator.
-func NewJurikCommodityChannelIndex(p *JurikCommodityChannelIndexParams) (*JurikCommodityChannelIndex, error) {
+func NewJurikCommodityChannelIndex(p *Params) (*JurikCommodityChannelIndex, error) {
 	return newJurikCommodityChannelIndex(p.Length, p.BarComponent, p.QuoteComponent, p.TradeComponent)
 }
 
@@ -75,8 +75,8 @@ func newJurikCommodityChannelIndex(length int,
 	mnemonic := fmt.Sprintf(fmtn, length, core.ComponentTripleMnemonic(bc, qc, tc))
 	desc := "Jurik commodity channel index " + mnemonic
 
-	fastParams := &jurikmovingaverage.JurikMovingAverageParams{Length: 4, Phase: 0}
-	slowParams := &jurikmovingaverage.JurikMovingAverageParams{Length: length, Phase: 0}
+	fastParams := &jurikmovingaverage.Params{Length: 4, Phase: 0}
+	slowParams := &jurikmovingaverage.Params{Length: length, Phase: 0}
 
 	fastJMA, err := jurikmovingaverage.NewJurikMovingAverage(fastParams)
 	if err != nil {

@@ -32,7 +32,7 @@ type AbsolutePriceOscillator struct {
 }
 
 // NewAbsolutePriceOscillator returns an instance of the indicator created using supplied parameters.
-func NewAbsolutePriceOscillator(p *AbsolutePriceOscillatorParams) (*AbsolutePriceOscillator, error) {
+func NewAbsolutePriceOscillator(p *Params) (*AbsolutePriceOscillator, error) {
 	const (
 		invalid   = "invalid absolute price oscillator parameters"
 		fmts      = "%s: %s"
@@ -114,13 +114,13 @@ func NewAbsolutePriceOscillator(p *AbsolutePriceOscillatorParams) (*AbsolutePric
 		maLabel = "SMA"
 
 		fast, e := simplemovingaverage.NewSimpleMovingAverage(
-			&simplemovingaverage.SimpleMovingAverageParams{Length: p.FastLength})
+			&simplemovingaverage.Params{Length: p.FastLength})
 		if e != nil {
 			return nil, fmt.Errorf(fmtw, invalid, e)
 		}
 
 		slow, e := simplemovingaverage.NewSimpleMovingAverage(
-			&simplemovingaverage.SimpleMovingAverageParams{Length: p.SlowLength})
+			&simplemovingaverage.Params{Length: p.SlowLength})
 		if e != nil {
 			return nil, fmt.Errorf(fmtw, invalid, e)
 		}

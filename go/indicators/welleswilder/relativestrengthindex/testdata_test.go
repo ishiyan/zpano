@@ -63,7 +63,7 @@ func testTime() time.Time {
 }
 
 func testCreate() *RelativeStrengthIndex {
-	params := RelativeStrengthIndexParams{Length: 9}
+	params := Params{Length: 9}
 
 	rsi, _ := NewRelativeStrengthIndex(&params)
 

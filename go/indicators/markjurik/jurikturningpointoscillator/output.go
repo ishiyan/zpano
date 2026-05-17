@@ -13,16 +13,16 @@ const (
 )
 
 const (
-	turningPointOscillatorValue   = "value"
-	turningPointOscillatorUnknown = "unknown"
+	valueStr   = "value"
+	unknownStr = "unknown"
 )
 
 func (o Output) String() string {
 	switch o {
 	case Value:
-		return turningPointOscillatorValue
+		return valueStr
 	default:
-		return turningPointOscillatorUnknown
+		return unknownStr
 	}
 }
 
@@ -37,7 +37,7 @@ func (o Output) MarshalJSON() ([]byte, error) {
 		dqc    = '"'
 	)
 	s := o.String()
-	if s == turningPointOscillatorUnknown {
+	if s == unknownStr {
 		return nil, fmt.Errorf(errFmt, s)
 	}
 	b := make([]byte, 0, len(s)+extra)
@@ -55,7 +55,7 @@ func (o *Output) UnmarshalJSON(data []byte) error {
 	d := bytes.Trim(data, dqs)
 	s := string(d)
 	switch s {
-	case turningPointOscillatorValue:
+	case valueStr:
 		*o = Value
 	default:
 		return fmt.Errorf(errFmt, s)

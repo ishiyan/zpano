@@ -150,6 +150,16 @@ pub const corona_trend_vigor = @import("john_ehlers/corona_trend_vigor/corona_tr
 pub const goertzel_spectrum = @import("custom/goertzel_spectrum/goertzel_spectrum.zig");
 pub const maximum_entropy_spectrum = @import("custom/maximum_entropy_spectrum/maximum_entropy_spectrum.zig");
 
+pub const fractal_dimension_index = @import("jean_philippe_poton/fractal_dimension_index/fractal_dimension_index.zig");
+pub const fractal_graph_dimension_index = @import("jean_philippe_poton/fractal_graph_dimension_index/fractal_graph_dimension_index.zig");
+pub const fractal_adaptive_simple_moving_average = @import("jean_philippe_poton/fractal_adaptive_simple_moving_average/fractal_adaptive_simple_moving_average.zig");
+pub const fractal_adaptive_simple_moving_average_2 = @import("jean_philippe_poton/fractal_adaptive_simple_moving_average_2/fractal_adaptive_simple_moving_average_2.zig");
+pub const rescaled_fractal_adaptive_simple_moving_average = @import("jean_philippe_poton/rescaled_fractal_adaptive_simple_moving_average/rescaled_fractal_adaptive_simple_moving_average.zig");
+pub const fractal_bands = @import("jean_philippe_poton/fractal_bands/fractal_bands.zig");
+pub const fractal_bands_hybride_adaptive = @import("jean_philippe_poton/fractal_bands_hybride_adaptive/fractal_bands_hybride_adaptive.zig");
+pub const fractional_bands = @import("jean_philippe_poton/fractional_bands/fractional_bands.zig");
+pub const hurst_difference = @import("jean_philippe_poton/hurst_difference/hurst_difference.zig");
+
 pub const hilbert_transformer = @import("john_ehlers/hilbert_transformer/hilbert_transformer.zig");
 pub const homodyne_discriminator = @import("john_ehlers/hilbert_transformer/homodyne_discriminator.zig");
 pub const homodyne_discriminator_unrolled = @import("john_ehlers/hilbert_transformer/homodyne_discriminator_unrolled.zig");
@@ -248,6 +258,15 @@ comptime {
     _ = corona_trend_vigor;
     _ = goertzel_spectrum;
     _ = maximum_entropy_spectrum;
+    _ = fractal_dimension_index;
+    _ = fractal_graph_dimension_index;
+    _ = fractal_adaptive_simple_moving_average;
+    _ = fractal_adaptive_simple_moving_average_2;
+    _ = rescaled_fractal_adaptive_simple_moving_average;
+    _ = fractal_bands;
+    _ = fractal_bands_hybride_adaptive;
+    _ = fractional_bands;
+    _ = hurst_difference;
     _ = frequency_response;
     _ = factory;
     _ = arnaud_legoux_moving_average;

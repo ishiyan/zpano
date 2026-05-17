@@ -31,7 +31,7 @@ func TestBollingerBands_SampleStdDev_Length20_FullData(t *testing.T) {
 	expPctB := testSamplePercentBandExpected()
 
 	boolTrue := true
-	ind, err := NewBollingerBands(&BollingerBandsParams{
+	ind, err := NewBollingerBands(&Params{
 		Length:     20,
 		IsUnbiased: &boolTrue,
 	})
@@ -94,7 +94,7 @@ func TestBollingerBands_PopulationStdDev_Length20_FullData(t *testing.T) {
 	expPctB := testPopulationPercentBandExpected()
 
 	boolFalse := false
-	ind, err := NewBollingerBands(&BollingerBandsParams{
+	ind, err := NewBollingerBands(&Params{
 		Length:     20,
 		IsUnbiased: &boolFalse,
 	})
@@ -147,7 +147,7 @@ func TestBollingerBandsIsPrimed(t *testing.T) {
 	t.Parallel()
 
 	boolTrue := true
-	ind, err := NewBollingerBands(&BollingerBandsParams{
+	ind, err := NewBollingerBands(&Params{
 		Length:     20,
 		IsUnbiased: &boolTrue,
 	})
@@ -178,7 +178,7 @@ func TestBollingerBandsIsPrimed(t *testing.T) {
 func TestBollingerBandsNaN(t *testing.T) {
 	t.Parallel()
 
-	ind, err := NewBollingerBands(&BollingerBandsParams{Length: 20})
+	ind, err := NewBollingerBands(&Params{Length: 20})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -208,7 +208,7 @@ func TestBollingerBandsNaN(t *testing.T) {
 func TestBollingerBandsMetadata(t *testing.T) {
 	t.Parallel()
 
-	ind, err := NewBollingerBands(&BollingerBandsParams{Length: 20})
+	ind, err := NewBollingerBands(&Params{Length: 20})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -257,7 +257,7 @@ func TestBollingerBandsUpdateScalar(t *testing.T) {
 	expUpper := testSampleUpperBandExpected()
 
 	boolTrue := true
-	ind, err := NewBollingerBands(&BollingerBandsParams{
+	ind, err := NewBollingerBands(&Params{
 		Length:     20,
 		IsUnbiased: &boolTrue,
 	})
@@ -327,7 +327,7 @@ func TestBollingerBandsInvalidParams(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		_, err := NewBollingerBands(&BollingerBandsParams{Length: tt.length})
+		_, err := NewBollingerBands(&Params{Length: tt.length})
 		if err == nil {
 			t.Errorf("%s: expected error, got nil", tt.name)
 		}

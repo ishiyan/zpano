@@ -51,7 +51,7 @@ type JurikMovingAverage struct {
 }
 
 // NewJurikMovingAverage returns an instnce of the indicator created using supplied parameters.
-func NewJurikMovingAverage(p *JurikMovingAverageParams) (*JurikMovingAverage, error) {
+func NewJurikMovingAverage(p *Params) (*JurikMovingAverage, error) {
 	return newJurikMovingAverage(p.Length, p.Phase,
 		p.BarComponent, p.QuoteComponent, p.TradeComponent)
 }

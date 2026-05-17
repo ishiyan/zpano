@@ -240,7 +240,7 @@ func TestNewStandardDeviation(t *testing.T) { //nolint: funlen
 
 	t.Run("length > 1, unbiased", func(t *testing.T) {
 		t.Parallel()
-		params := StandardDeviationParams{
+		params := Params{
 			Length: length, IsUnbiased: true, BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
 		}
 
@@ -253,7 +253,7 @@ func TestNewStandardDeviation(t *testing.T) { //nolint: funlen
 
 	t.Run("length > 1, biased", func(t *testing.T) {
 		t.Parallel()
-		params := StandardDeviationParams{
+		params := Params{
 			Length: length, IsUnbiased: false, BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
 		}
 
@@ -266,7 +266,7 @@ func TestNewStandardDeviation(t *testing.T) { //nolint: funlen
 
 	t.Run("length = 1", func(t *testing.T) {
 		t.Parallel()
-		params := StandardDeviationParams{
+		params := Params{
 			Length: 1, IsUnbiased: true, BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
 		}
 
@@ -277,7 +277,7 @@ func TestNewStandardDeviation(t *testing.T) { //nolint: funlen
 
 	t.Run("length = 0", func(t *testing.T) {
 		t.Parallel()
-		params := StandardDeviationParams{
+		params := Params{
 			Length: 0, IsUnbiased: true, BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
 		}
 
@@ -288,7 +288,7 @@ func TestNewStandardDeviation(t *testing.T) { //nolint: funlen
 
 	t.Run("length = -1", func(t *testing.T) {
 		t.Parallel()
-		params := StandardDeviationParams{
+		params := Params{
 			Length: -1, IsUnbiased: true, BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
 		}
 
@@ -299,7 +299,7 @@ func TestNewStandardDeviation(t *testing.T) { //nolint: funlen
 
 	t.Run("invalid bar component", func(t *testing.T) {
 		t.Parallel()
-		params := StandardDeviationParams{
+		params := Params{
 			Length: length, IsUnbiased: true, BarComponent: entities.BarComponent(9999), QuoteComponent: qc, TradeComponent: tc,
 		}
 
@@ -310,7 +310,7 @@ func TestNewStandardDeviation(t *testing.T) { //nolint: funlen
 
 	t.Run("invalid quote component", func(t *testing.T) {
 		t.Parallel()
-		params := StandardDeviationParams{
+		params := Params{
 			Length: length, IsUnbiased: true, BarComponent: bc, QuoteComponent: entities.QuoteComponent(9999), TradeComponent: tc,
 		}
 
@@ -321,7 +321,7 @@ func TestNewStandardDeviation(t *testing.T) { //nolint: funlen
 
 	t.Run("invalid trade component", func(t *testing.T) {
 		t.Parallel()
-		params := StandardDeviationParams{
+		params := Params{
 			Length: length, IsUnbiased: true, BarComponent: bc, QuoteComponent: qc, TradeComponent: entities.TradeComponent(9999),
 		}
 
@@ -335,7 +335,7 @@ func TestNewStandardDeviation(t *testing.T) { //nolint: funlen
 
 	t.Run("all components zero", func(t *testing.T) {
 		t.Parallel()
-		params := StandardDeviationParams{Length: length, IsUnbiased: true}
+		params := Params{Length: length, IsUnbiased: true}
 
 		sd, err := NewStandardDeviation(&params)
 		check("err == nil", true, err == nil)
@@ -345,7 +345,7 @@ func TestNewStandardDeviation(t *testing.T) { //nolint: funlen
 
 	t.Run("only bar component set", func(t *testing.T) {
 		t.Parallel()
-		params := StandardDeviationParams{Length: length, IsUnbiased: true, BarComponent: entities.BarMedianPrice}
+		params := Params{Length: length, IsUnbiased: true, BarComponent: entities.BarMedianPrice}
 
 		sd, err := NewStandardDeviation(&params)
 		check("err == nil", true, err == nil)
@@ -355,7 +355,7 @@ func TestNewStandardDeviation(t *testing.T) { //nolint: funlen
 
 	t.Run("only quote component set", func(t *testing.T) {
 		t.Parallel()
-		params := StandardDeviationParams{Length: length, IsUnbiased: true, QuoteComponent: entities.QuoteBidPrice}
+		params := Params{Length: length, IsUnbiased: true, QuoteComponent: entities.QuoteBidPrice}
 
 		sd, err := NewStandardDeviation(&params)
 		check("err == nil", true, err == nil)
@@ -365,7 +365,7 @@ func TestNewStandardDeviation(t *testing.T) { //nolint: funlen
 
 	t.Run("only trade component set", func(t *testing.T) {
 		t.Parallel()
-		params := StandardDeviationParams{Length: length, IsUnbiased: true, TradeComponent: entities.TradeVolume}
+		params := Params{Length: length, IsUnbiased: true, TradeComponent: entities.TradeVolume}
 
 		sd, err := NewStandardDeviation(&params)
 		check("err == nil", true, err == nil)
@@ -375,7 +375,7 @@ func TestNewStandardDeviation(t *testing.T) { //nolint: funlen
 }
 
 func testStandardDeviationCreate(length int, unbiased bool) *StandardDeviation {
-	params := StandardDeviationParams{
+	params := Params{
 		Length: length, IsUnbiased: unbiased,
 	}
 

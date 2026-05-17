@@ -16,17 +16,17 @@ const (
 )
 
 const (
-	simpleMovingAverageValue   = "value"
-	simpleMovingAverageUnknown = "unknown"
+	valueStr   = "value"
+	unknownStr = "unknown"
 )
 
 // String implements the Stringer interface.
 func (o Output) String() string {
 	switch o {
 	case Value:
-		return simpleMovingAverageValue
+		return valueStr
 	default:
-		return simpleMovingAverageUnknown
+		return unknownStr
 	}
 }
 
@@ -44,7 +44,7 @@ func (o Output) MarshalJSON() ([]byte, error) {
 	)
 
 	s := o.String()
-	if s == simpleMovingAverageUnknown {
+	if s == unknownStr {
 		return nil, fmt.Errorf(errFmt, s)
 	}
 
@@ -67,7 +67,7 @@ func (o *Output) UnmarshalJSON(data []byte) error {
 	s := string(d)
 
 	switch s {
-	case simpleMovingAverageValue:
+	case valueStr:
 		*o = Value
 	default:
 		return fmt.Errorf(errFmt, s)

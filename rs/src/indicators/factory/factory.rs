@@ -234,6 +234,35 @@ use crate::indicators::custom::maximum_entropy_spectrum::maximum_entropy_spectru
     MaximumEntropySpectrum, MaximumEntropySpectrumParams,
 };
 
+// ── jean-philippe poton ──────────────────────────────────────────────────────
+use crate::indicators::jean_philippe_poton::fractal_dimension_index::{
+    FractalDimensionIndex, FractalDimensionIndexParams,
+};
+use crate::indicators::jean_philippe_poton::fractal_graph_dimension_index::{
+    FractalGraphDimensionIndex, FractalGraphDimensionIndexParams,
+};
+use crate::indicators::jean_philippe_poton::fractal_adaptive_simple_moving_average::{
+    FractalAdaptiveSimpleMovingAverage, FractalAdaptiveSimpleMovingAverageParams,
+};
+use crate::indicators::jean_philippe_poton::fractal_adaptive_simple_moving_average_2::{
+    FractalAdaptiveSimpleMovingAverage2, FractalAdaptiveSimpleMovingAverage2Params,
+};
+use crate::indicators::jean_philippe_poton::rescaled_fractal_adaptive_simple_moving_average::{
+    RescaledFractalAdaptiveSimpleMovingAverage, RescaledFractalAdaptiveSimpleMovingAverageParams,
+};
+use crate::indicators::jean_philippe_poton::fractal_bands::{
+    FractalBands, FractalBandsParams,
+};
+use crate::indicators::jean_philippe_poton::fractal_bands_hybride_adaptive::{
+    FractalBandsHybrideAdaptive, FractalBandsHybrideAdaptiveParams,
+};
+use crate::indicators::jean_philippe_poton::fractional_bands::{
+    FractionalBands, FractionalBandsParams,
+};
+use crate::indicators::jean_philippe_poton::hurst_difference::{
+    HurstDifference, HurstDifferenceParams,
+};
+
 /// Create an indicator from its identifier and a JSON-encoded parameter string.
 ///
 /// If `params_json` is empty or `"{}"`, default parameters are used.
@@ -1422,6 +1451,73 @@ pub fn create_indicator(
                 }
             }
             Ok(Box::new(MaximumEntropySpectrum::new(&p)?))
+        }
+
+        // ── jean-philippe poton ───────────────────────────────────────────
+
+        Identifier::FractalDimensionIndex => {
+            let mut p = FractalDimensionIndexParams::default();
+            if let Some(v) = get_usize(&params, "period") { p.period = v; }
+            Ok(Box::new(FractalDimensionIndex::new(&p)?))
+        }
+
+        Identifier::FractalGraphDimensionIndex => {
+            let mut p = FractalGraphDimensionIndexParams::default();
+            if let Some(v) = get_usize(&params, "period") { p.period = v; }
+            Ok(Box::new(FractalGraphDimensionIndex::new(&p)?))
+        }
+
+        Identifier::FractalAdaptiveSimpleMovingAverage => {
+            let mut p = FractalAdaptiveSimpleMovingAverageParams::default();
+            if let Some(v) = get_usize(&params, "period") { p.period = v; }
+            if let Some(v) = get_usize(&params, "normalSpeed") { p.normal_speed = v; }
+            Ok(Box::new(FractalAdaptiveSimpleMovingAverage::new(&p)?))
+        }
+
+        Identifier::FractalAdaptiveSimpleMovingAverage2 => {
+            let mut p = FractalAdaptiveSimpleMovingAverage2Params::default();
+            if let Some(v) = get_usize(&params, "period") { p.period = v; }
+            if let Some(v) = get_usize(&params, "normalSpeed") { p.normal_speed = v; }
+            Ok(Box::new(FractalAdaptiveSimpleMovingAverage2::new(&p)?))
+        }
+
+        Identifier::RescaledFractalAdaptiveSimpleMovingAverage => {
+            let mut p = RescaledFractalAdaptiveSimpleMovingAverageParams::default();
+            if let Some(v) = get_usize(&params, "period") { p.period = v; }
+            if let Some(v) = get_usize(&params, "normal_speed") { p.normal_speed = v; }
+            if let Some(v) = get_f64(&params, "price_scale") { p.price_scale = v; }
+            Ok(Box::new(RescaledFractalAdaptiveSimpleMovingAverage::new(&p)?))
+        }
+
+        Identifier::FractalBands => {
+            let mut p = FractalBandsParams::default();
+            if let Some(v) = get_usize(&params, "period") { p.period = v; }
+            if let Some(v) = get_usize(&params, "normalSpeed") { p.normal_speed = v; }
+            if let Some(v) = get_f64(&params, "alpha") { p.alpha = v; }
+            Ok(Box::new(FractalBands::new(&p)?))
+        }
+
+        Identifier::FractalBandsHybrideAdaptive => {
+            let mut p = FractalBandsHybrideAdaptiveParams::default();
+            if let Some(v) = get_usize(&params, "period") { p.period = v; }
+            if let Some(v) = get_usize(&params, "normalSpeedFallback") { p.normal_speed_fallback = v; }
+            if let Some(v) = get_f64(&params, "alpha") { p.alpha = v; }
+            if let Some(v) = get_f64(&params, "nyquist") { p.nyquist = v; }
+            if let Some(v) = get_f64(&params, "alphaHp") { p.alpha_hp = v; }
+            Ok(Box::new(FractalBandsHybrideAdaptive::new(&p)?))
+        }
+
+        Identifier::FractionalBands => {
+            let mut p = FractionalBandsParams::default();
+            if let Some(v) = get_usize(&params, "period") { p.period = v; }
+            if let Some(v) = get_f64(&params, "priceScale") { p.price_scale = v; }
+            Ok(Box::new(FractionalBands::new(&p)?))
+        }
+
+        Identifier::HurstDifference => {
+            let mut p = HurstDifferenceParams::default();
+            if let Some(v) = get_usize(&params, "period") { p.period = v; }
+            Ok(Box::new(HurstDifference::new(&p)?))
         }
 
         _ => Err(format!("unsupported indicator: {:?}", identifier)),

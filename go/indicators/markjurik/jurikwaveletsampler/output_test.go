@@ -11,11 +11,11 @@ func TestWaveletSamplerOutputString(t *testing.T) {
 		o    Output
 		text string
 	}{
-		{Value, waveletSamplerValue},
-		{waveletSamplerLast, waveletSamplerUnknown},
-		{Output(0), waveletSamplerUnknown},
-		{Output(9999), waveletSamplerUnknown},
-		{Output(-9999), waveletSamplerUnknown},
+		{Value, valueStr},
+		{waveletSamplerLast, unknownStr},
+		{Output(0), unknownStr},
+		{Output(9999), unknownStr},
+		{Output(-9999), unknownStr},
 	}
 	for _, tt := range tests {
 		exp := tt.text
@@ -56,7 +56,7 @@ func TestWaveletSamplerOutputMarshalJSON(t *testing.T) {
 		json      string
 		succeeded bool
 	}{
-		{Value, dqs + waveletSamplerValue + dqs, true},
+		{Value, dqs + valueStr + dqs, true},
 		{waveletSamplerLast, nilstr, false},
 		{Output(9999), nilstr, false},
 		{Output(-9999), nilstr, false},
@@ -89,8 +89,8 @@ func TestWaveletSamplerOutputUnmarshalJSON(t *testing.T) {
 		json      string
 		succeeded bool
 	}{
-		{Value, dqs + waveletSamplerValue + dqs, true},
-		{zero, dqs + waveletSamplerUnknown + dqs, false},
+		{Value, dqs + valueStr + dqs, true},
+		{zero, dqs + unknownStr + dqs, false},
 		{zero, dqs + "foobar" + dqs, false},
 	}
 	for _, tt := range tests {

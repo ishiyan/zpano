@@ -48,7 +48,7 @@ type JurikAdaptiveRelativeTrendStrengthIndex struct {
 }
 
 // NewJurikAdaptiveRelativeTrendStrengthIndex returns an instance of the indicator.
-func NewJurikAdaptiveRelativeTrendStrengthIndex(p *JurikAdaptiveRelativeTrendStrengthIndexParams) (*JurikAdaptiveRelativeTrendStrengthIndex, error) {
+func NewJurikAdaptiveRelativeTrendStrengthIndex(p *Params) (*JurikAdaptiveRelativeTrendStrengthIndex, error) {
 	return newJurikAdaptiveRelativeTrendStrengthIndex(p.LoLength, p.HiLength, p.BarComponent, p.QuoteComponent, p.TradeComponent)
 }
 

@@ -62,7 +62,7 @@ type UltimateOscillator struct {
 }
 
 // NewUltimateOscillator returns a new instance of the Ultimate Oscillator indicator.
-func NewUltimateOscillator(p *UltimateOscillatorParams) (*UltimateOscillator, error) {
+func NewUltimateOscillator(p *Params) (*UltimateOscillator, error) {
 	l1 := p.Length1
 	if l1 == 0 {
 		l1 = defaultLength1

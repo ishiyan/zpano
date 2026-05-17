@@ -2,8 +2,8 @@ package jurikzerolagvelocity
 
 import "zpano/entities"
 
-// JurikZeroLagVelocityParams describes the parameters of the indicator.
-type JurikZeroLagVelocityParams struct {
+// Params describes the parameters of the indicator.
+type Params struct {
 	// Depth controls the linear regression window (window = Depth+1).
 	Depth int `json:"depth"`
 
@@ -18,8 +18,8 @@ type JurikZeroLagVelocityParams struct {
 }
 
 // DefaultParams returns default parameters for the indicator.
-func DefaultParams() *JurikZeroLagVelocityParams {
-	return &JurikZeroLagVelocityParams{
+func DefaultParams() *Params {
+	return &Params{
 		Depth: 10,
 	}
 }

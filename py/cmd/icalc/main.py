@@ -114,6 +114,15 @@ _IDENTIFIER_MAP: dict[str, Identifier] = {
     'jurikWaveletSampler': Identifier.JURIK_WAVELET_SAMPLER,
     'arnaudLegouxMovingAverage': Identifier.ARNAUD_LEGOUX_MOVING_AVERAGE,
     'newMovingAverage': Identifier.NEW_MOVING_AVERAGE,
+    'fractalDimensionIndex': Identifier.FRACTAL_DIMENSION_INDEX,
+    'fractalGraphDimensionIndex': Identifier.FRACTAL_GRAPH_DIMENSION_INDEX,
+    'fractalAdaptiveSimpleMovingAverage': Identifier.FRACTAL_ADAPTIVE_SIMPLE_MOVING_AVERAGE,
+    'fractalAdaptiveSimpleMovingAverage2': Identifier.FRACTAL_ADAPTIVE_SIMPLE_MOVING_AVERAGE_2,
+    'rescaledFractalAdaptiveSimpleMovingAverage': Identifier.RESCALED_FRACTAL_ADAPTIVE_SIMPLE_MOVING_AVERAGE,
+    'fractalBands': Identifier.FRACTAL_BANDS,
+    'fractalBandsHybrideAdaptive': Identifier.FRACTAL_BANDS_HYBRIDE_ADAPTIVE,
+    'fractionalBands': Identifier.FRACTIONAL_BANDS,
+    'hurstDifference': Identifier.HURST_DIFFERENCE,
 }
 
 

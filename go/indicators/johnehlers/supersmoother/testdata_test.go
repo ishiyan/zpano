@@ -123,7 +123,7 @@ func testSuperSmootherTime() time.Time {
 }
 
 func testSuperSmootherCreate(period int) *SuperSmoother {
-	params := SuperSmootherParams{
+	params := Params{
 		ShortestCyclePeriod: period,
 	}
 

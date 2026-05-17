@@ -18,7 +18,7 @@ func TestCommodityChannelIndexLength11(t *testing.T) {
 
 	input := testInput()
 
-	cci, err := NewCommodityChannelIndex(&CommodityChannelIndexParams{
+	cci, err := NewCommodityChannelIndex(&Params{
 		Length: 11,
 	})
 	if err != nil {
@@ -71,7 +71,7 @@ func TestCommodityChannelIndexLength2(t *testing.T) {
 
 	input := testInput()
 
-	cci, err := NewCommodityChannelIndex(&CommodityChannelIndexParams{
+	cci, err := NewCommodityChannelIndex(&Params{
 		Length: 2,
 	})
 	if err != nil {
@@ -108,7 +108,7 @@ func TestCommodityChannelIndexLength2(t *testing.T) {
 func TestCommodityChannelIndexIsPrimed(t *testing.T) {
 	t.Parallel()
 
-	cci, err := NewCommodityChannelIndex(&CommodityChannelIndexParams{
+	cci, err := NewCommodityChannelIndex(&Params{
 		Length: 5,
 	})
 	if err != nil {
@@ -142,7 +142,7 @@ func TestCommodityChannelIndexIsPrimed(t *testing.T) {
 func TestCommodityChannelIndexNaN(t *testing.T) {
 	t.Parallel()
 
-	cci, err := NewCommodityChannelIndex(&CommodityChannelIndexParams{
+	cci, err := NewCommodityChannelIndex(&Params{
 		Length: 5,
 	})
 	if err != nil {
@@ -158,7 +158,7 @@ func TestCommodityChannelIndexNaN(t *testing.T) {
 func TestCommodityChannelIndexMetadata(t *testing.T) {
 	t.Parallel()
 
-	cci, err := NewCommodityChannelIndex(&CommodityChannelIndexParams{
+	cci, err := NewCommodityChannelIndex(&Params{
 		Length: 20,
 	})
 	if err != nil {
@@ -194,7 +194,7 @@ func TestCommodityChannelIndexUpdateEntity(t *testing.T) {
 
 	input := testInput()
 
-	cci, err := NewCommodityChannelIndex(&CommodityChannelIndexParams{
+	cci, err := NewCommodityChannelIndex(&Params{
 		Length: 11,
 	})
 	if err != nil {
@@ -235,7 +235,7 @@ func TestCommodityChannelIndexInvalidParams(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		_, err := NewCommodityChannelIndex(&CommodityChannelIndexParams{
+		_, err := NewCommodityChannelIndex(&Params{
 			Length: tt.length,
 		})
 		if err == nil {
@@ -248,7 +248,7 @@ func TestCommodityChannelIndexCustomScalingFactor(t *testing.T) {
 	t.Parallel()
 
 	// With custom inverse scaling factor, values should scale differently.
-	cci, err := NewCommodityChannelIndex(&CommodityChannelIndexParams{
+	cci, err := NewCommodityChannelIndex(&Params{
 		Length:               5,
 		InverseScalingFactor: 0.03,
 	})

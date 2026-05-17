@@ -2,8 +2,8 @@ package variance
 
 import "zpano/entities"
 
-// VarianceParams describes parameters to create an instance of the indicator.
-type VarianceParams struct {
+// Params describes parameters to create an instance of the indicator.
+type Params struct {
 	// Length is the length (the number of time periods, ℓ) of the moving window to calculate the variance.
 	//
 	// The value should be greater than 1.
@@ -31,9 +31,9 @@ type VarianceParams struct {
 	TradeComponent entities.TradeComponent
 }
 
-// DefaultParams returns a VarianceParams value populated with conventional defaults.
-func DefaultParams() *VarianceParams {
-	return &VarianceParams{
+// DefaultParams returns a Params value populated with conventional defaults.
+func DefaultParams() *Params {
+	return &Params{
 		Length:     20,
 		IsUnbiased: true,
 	}

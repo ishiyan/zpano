@@ -165,7 +165,7 @@ type JurikCompositeFractalBehaviorIndex struct {
 }
 
 // NewJurikCompositeFractalBehaviorIndex returns an instance of the indicator created using supplied parameters.
-func NewJurikCompositeFractalBehaviorIndex(p *JurikCompositeFractalBehaviorIndexParams) (*JurikCompositeFractalBehaviorIndex, error) {
+func NewJurikCompositeFractalBehaviorIndex(p *Params) (*JurikCompositeFractalBehaviorIndex, error) {
 	return newJurikCompositeFractalBehaviorIndex(p.FractalType, p.Smooth,
 		p.BarComponent, p.QuoteComponent, p.TradeComponent)
 }

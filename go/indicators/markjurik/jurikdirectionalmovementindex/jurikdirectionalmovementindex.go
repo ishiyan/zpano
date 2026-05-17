@@ -38,7 +38,7 @@ type JurikDirectionalMovementIndex struct {
 }
 
 // NewJurikDirectionalMovementIndex returns an instance of the indicator created using supplied parameters.
-func NewJurikDirectionalMovementIndex(p *JurikDirectionalMovementIndexParams) (*JurikDirectionalMovementIndex, error) {
+func NewJurikDirectionalMovementIndex(p *Params) (*JurikDirectionalMovementIndex, error) {
 	return newJurikDirectionalMovementIndex(p.Length)
 }
 
@@ -55,7 +55,7 @@ fmtn = "jdmx(%d)"
 		return nil, fmt.Errorf(fmts, invalid, "length should be positive")
 	}
 
-	jmaParams := &jurikmovingaverage.JurikMovingAverageParams{
+	jmaParams := &jurikmovingaverage.Params{
 		Length: length,
 		Phase:  phase,
 	}

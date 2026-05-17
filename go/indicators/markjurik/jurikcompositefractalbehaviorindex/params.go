@@ -2,8 +2,8 @@ package jurikcompositefractalbehaviorindex
 
 import "zpano/entities" //nolint:depguard
 
-// JurikCompositeFractalBehaviorIndexParams describes parameters to create an instance of the indicator.
-type JurikCompositeFractalBehaviorIndexParams struct {
+// Params describes parameters to create an instance of the indicator.
+type Params struct {
 	// FractalType controls the maximum fractal depth. Valid values are 1–4:
 	//   1 = JCFB24 (8 depths: 2,3,4,6,8,12,16,24)
 	//   2 = JCFB48 (10 depths: +32,48)
@@ -25,9 +25,9 @@ type JurikCompositeFractalBehaviorIndexParams struct {
 	TradeComponent entities.TradeComponent
 }
 
-// DefaultParams returns a [JurikCompositeFractalBehaviorIndexParams] value populated with conventional defaults.
-func DefaultParams() *JurikCompositeFractalBehaviorIndexParams {
-	return &JurikCompositeFractalBehaviorIndexParams{
+// DefaultParams returns a [Params] value populated with conventional defaults.
+func DefaultParams() *Params {
+	return &Params{
 		FractalType: 1,
 		Smooth:      10,
 	}

@@ -23,7 +23,7 @@ func TestAbsolutePriceOscillatorSMA1226(t *testing.T) {
 
 	input := testInput()
 
-	apo, err := NewAbsolutePriceOscillator(&AbsolutePriceOscillatorParams{
+	apo, err := NewAbsolutePriceOscillator(&Params{
 		FastLength: 12,
 		SlowLength: 26,
 	})
@@ -77,7 +77,7 @@ func TestAbsolutePriceOscillatorEMA1226(t *testing.T) {
 
 	input := testInput()
 
-	apo, err := NewAbsolutePriceOscillator(&AbsolutePriceOscillatorParams{
+	apo, err := NewAbsolutePriceOscillator(&Params{
 		FastLength:        12,
 		SlowLength:        26,
 		MovingAverageType: EMA,
@@ -125,7 +125,7 @@ func TestAbsolutePriceOscillatorEMA1226(t *testing.T) {
 func TestAbsolutePriceOscillatorIsPrimed(t *testing.T) {
 	t.Parallel()
 
-	apo, err := NewAbsolutePriceOscillator(&AbsolutePriceOscillatorParams{
+	apo, err := NewAbsolutePriceOscillator(&Params{
 		FastLength: 3,
 		SlowLength: 5,
 	})
@@ -161,7 +161,7 @@ func TestAbsolutePriceOscillatorIsPrimed(t *testing.T) {
 func TestAbsolutePriceOscillatorNaN(t *testing.T) {
 	t.Parallel()
 
-	apo, err := NewAbsolutePriceOscillator(&AbsolutePriceOscillatorParams{
+	apo, err := NewAbsolutePriceOscillator(&Params{
 		FastLength: 2,
 		SlowLength: 3,
 	})
@@ -178,7 +178,7 @@ func TestAbsolutePriceOscillatorNaN(t *testing.T) {
 func TestAbsolutePriceOscillatorMetadata(t *testing.T) {
 	t.Parallel()
 
-	apo, err := NewAbsolutePriceOscillator(&AbsolutePriceOscillatorParams{
+	apo, err := NewAbsolutePriceOscillator(&Params{
 		FastLength: 12,
 		SlowLength: 26,
 	})
@@ -213,7 +213,7 @@ func TestAbsolutePriceOscillatorMetadata(t *testing.T) {
 func TestAbsolutePriceOscillatorMetadataEMA(t *testing.T) {
 	t.Parallel()
 
-	apo, err := NewAbsolutePriceOscillator(&AbsolutePriceOscillatorParams{
+	apo, err := NewAbsolutePriceOscillator(&Params{
 		FastLength:        12,
 		SlowLength:        26,
 		MovingAverageType: EMA,
@@ -237,7 +237,7 @@ func TestAbsolutePriceOscillatorUpdateEntity(t *testing.T) {
 
 	input := testInput()
 
-	apo, err := NewAbsolutePriceOscillator(&AbsolutePriceOscillatorParams{
+	apo, err := NewAbsolutePriceOscillator(&Params{
 		FastLength: 2,
 		SlowLength: 3,
 	})
@@ -283,7 +283,7 @@ func TestAbsolutePriceOscillatorInvalidParams(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		_, err := NewAbsolutePriceOscillator(&AbsolutePriceOscillatorParams{
+		_, err := NewAbsolutePriceOscillator(&Params{
 			FastLength: tt.fast,
 			SlowLength: tt.slow,
 		})

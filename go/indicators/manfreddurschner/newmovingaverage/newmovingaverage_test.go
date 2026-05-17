@@ -17,7 +17,7 @@ func testNmaTime() time.Time {
 }
 
 func testNmaCreate(primaryPeriod int, secondaryPeriod int, maType MAType) *NewMovingAverage {
-	nma, _ := NewNewMovingAverage(&NewMovingAverageParams{
+	nma, _ := NewNewMovingAverage(&Params{
 		PrimaryPeriod:   primaryPeriod,
 		SecondaryPeriod: secondaryPeriod,
 		MAType:          maType,
@@ -237,7 +237,7 @@ func TestNewMovingAverageConstructorErrors(t *testing.T) {
 	t.Run("invalid bar component", func(t *testing.T) {
 		t.Parallel()
 
-		_, err := NewNewMovingAverage(&NewMovingAverageParams{
+		_, err := NewNewMovingAverage(&Params{
 			PrimaryPeriod:   32,
 			SecondaryPeriod: 8,
 			MAType:          LWMA,

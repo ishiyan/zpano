@@ -2,8 +2,8 @@ package jurikadaptiverelativetrendstrengthindex
 
 import "zpano/entities"
 
-// JurikAdaptiveRelativeTrendStrengthIndexParams describes the parameters of the indicator.
-type JurikAdaptiveRelativeTrendStrengthIndexParams struct {
+// Params describes the parameters of the indicator.
+type Params struct {
 	// LoLength is the minimum adaptive RSX length.
 	LoLength int `json:"lo_length"`
 
@@ -21,8 +21,8 @@ type JurikAdaptiveRelativeTrendStrengthIndexParams struct {
 }
 
 // DefaultParams returns default parameters for the indicator.
-func DefaultParams() *JurikAdaptiveRelativeTrendStrengthIndexParams {
-	return &JurikAdaptiveRelativeTrendStrengthIndexParams{
+func DefaultParams() *Params {
+	return &Params{
 		LoLength: 5,
 		HiLength: 30,
 	}

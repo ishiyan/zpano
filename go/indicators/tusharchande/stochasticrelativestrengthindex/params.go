@@ -13,8 +13,8 @@ const (
 	EMA
 )
 
-// StochasticRelativeStrengthIndexParams describes parameters to create an instance of the indicator.
-type StochasticRelativeStrengthIndexParams struct {
+// Params describes parameters to create an instance of the indicator.
+type Params struct {
 	// Length is the number of periods for the RSI calculation.
 	//
 	// The value should be greater than 1. The default value is 14.
@@ -57,9 +57,9 @@ type StochasticRelativeStrengthIndexParams struct {
 	TradeComponent entities.TradeComponent
 }
 
-// DefaultParams returns a [StochasticRelativeStrengthIndexParams] value populated with conventional defaults.
-func DefaultParams() *StochasticRelativeStrengthIndexParams {
-	return &StochasticRelativeStrengthIndexParams{
+// DefaultParams returns a [Params] value populated with conventional defaults.
+func DefaultParams() *Params {
+	return &Params{
 		Length:      14,
 		FastKLength: 5,
 		FastDLength: 3,

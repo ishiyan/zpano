@@ -23,7 +23,7 @@ const epsilon = 1e-13
 func testJRSX(t *testing.T, length int, expected []float64) {
 	t.Helper()
 
-	ind, err := NewJurikRelativeTrendStrengthIndex(&JurikRelativeTrendStrengthIndexParams{Length: length})
+	ind, err := NewJurikRelativeTrendStrengthIndex(&Params{Length: length})
 	if err != nil {
 		t.Fatal(err)
 	}

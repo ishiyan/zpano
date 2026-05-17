@@ -27,7 +27,7 @@ func TestMovingAverageConvergenceDivergenceDefaultParams(t *testing.T) {
 	expSignal := testSignalExpected()
 	expHistogram := testHistogramExpected()
 
-	ind, err := NewMovingAverageConvergenceDivergence(&MovingAverageConvergenceDivergenceParams{})
+	ind, err := NewMovingAverageConvergenceDivergence(&Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -84,7 +84,7 @@ func TestMovingAverageConvergenceDivergenceTaLibSpotCheck(t *testing.T) {
 
 	closingPrice := testInput()
 
-	ind, err := NewMovingAverageConvergenceDivergence(&MovingAverageConvergenceDivergenceParams{})
+	ind, err := NewMovingAverageConvergenceDivergence(&Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -103,7 +103,7 @@ func TestMovingAverageConvergenceDivergenceTaLibSpotCheck(t *testing.T) {
 	_ = histogram
 
 	// Spot check at index 33 (first signal output).
-	ind2, _ := NewMovingAverageConvergenceDivergence(&MovingAverageConvergenceDivergenceParams{})
+	ind2, _ := NewMovingAverageConvergenceDivergence(&Params{})
 
 	for i := 0; i <= 33; i++ {
 		macd, signal, histogram = ind2.Update(closingPrice[i])
@@ -131,7 +131,7 @@ func TestMovingAverageConvergenceDivergencePeriodInversion(t *testing.T) {
 	closingPrice := testInput()
 
 	// TaLib test: passing fast=26, slow=12 should auto-swap and produce same output.
-	ind, err := NewMovingAverageConvergenceDivergence(&MovingAverageConvergenceDivergenceParams{
+	ind, err := NewMovingAverageConvergenceDivergence(&Params{
 		FastLength: 26,
 		SlowLength: 12,
 	})
@@ -157,7 +157,7 @@ func TestMovingAverageConvergenceDivergencePeriodInversion(t *testing.T) {
 func TestMovingAverageConvergenceDivergenceIsPrimed(t *testing.T) {
 	t.Parallel()
 
-	ind, err := NewMovingAverageConvergenceDivergence(&MovingAverageConvergenceDivergenceParams{
+	ind, err := NewMovingAverageConvergenceDivergence(&Params{
 		FastLength:   3,
 		SlowLength:   5,
 		SignalLength: 2,
@@ -188,7 +188,7 @@ func TestMovingAverageConvergenceDivergenceIsPrimed(t *testing.T) {
 func TestMovingAverageConvergenceDivergenceNaN(t *testing.T) {
 	t.Parallel()
 
-	ind, err := NewMovingAverageConvergenceDivergence(&MovingAverageConvergenceDivergenceParams{})
+	ind, err := NewMovingAverageConvergenceDivergence(&Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -210,7 +210,7 @@ func TestMovingAverageConvergenceDivergenceNaN(t *testing.T) {
 func TestMovingAverageConvergenceDivergenceMetadata(t *testing.T) {
 	t.Parallel()
 
-	ind, err := NewMovingAverageConvergenceDivergence(&MovingAverageConvergenceDivergenceParams{})
+	ind, err := NewMovingAverageConvergenceDivergence(&Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -254,7 +254,7 @@ func TestMovingAverageConvergenceDivergenceMetadata(t *testing.T) {
 func TestMovingAverageConvergenceDivergenceMetadataSMA(t *testing.T) {
 	t.Parallel()
 
-	ind, err := NewMovingAverageConvergenceDivergence(&MovingAverageConvergenceDivergenceParams{
+	ind, err := NewMovingAverageConvergenceDivergence(&Params{
 		MovingAverageType: SMA,
 	})
 	if err != nil {
@@ -277,7 +277,7 @@ func TestMovingAverageConvergenceDivergenceUpdateScalar(t *testing.T) {
 
 	closingPrice := testInput()
 
-	ind, err := NewMovingAverageConvergenceDivergence(&MovingAverageConvergenceDivergenceParams{})
+	ind, err := NewMovingAverageConvergenceDivergence(&Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -342,7 +342,7 @@ func TestMovingAverageConvergenceDivergenceInvalidParams(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		_, err := NewMovingAverageConvergenceDivergence(&MovingAverageConvergenceDivergenceParams{
+		_, err := NewMovingAverageConvergenceDivergence(&Params{
 			FastLength:   tt.fast,
 			SlowLength:   tt.slow,
 			SignalLength: tt.signal,

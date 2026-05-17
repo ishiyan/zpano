@@ -29,7 +29,7 @@ type OnBalanceVolume struct {
 }
 
 // NewOnBalanceVolume returns an instance of the indicator created using supplied parameters.
-func NewOnBalanceVolume(p *OnBalanceVolumeParams) (*OnBalanceVolume, error) {
+func NewOnBalanceVolume(p *Params) (*OnBalanceVolume, error) {
 	const (
 		invalid = "invalid on-balance volume parameters"
 		fmtw    = "%s: %w"

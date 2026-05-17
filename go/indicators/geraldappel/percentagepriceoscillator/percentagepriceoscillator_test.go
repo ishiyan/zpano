@@ -18,7 +18,7 @@ func TestPercentagePriceOscillatorSMA32(t *testing.T) {
 
 	input := testInput()
 
-	ppo, err := NewPercentagePriceOscillator(&PercentagePriceOscillatorParams{
+	ppo, err := NewPercentagePriceOscillator(&Params{
 		FastLength: 2,
 		SlowLength: 3,
 	})
@@ -72,7 +72,7 @@ func TestPercentagePriceOscillatorSMA2612(t *testing.T) {
 
 	input := testInput()
 
-	ppo, err := NewPercentagePriceOscillator(&PercentagePriceOscillatorParams{
+	ppo, err := NewPercentagePriceOscillator(&Params{
 		FastLength: 12,
 		SlowLength: 26,
 	})
@@ -122,7 +122,7 @@ func TestPercentagePriceOscillatorEMA2612(t *testing.T) {
 
 	input := testInput()
 
-	ppo, err := NewPercentagePriceOscillator(&PercentagePriceOscillatorParams{
+	ppo, err := NewPercentagePriceOscillator(&Params{
 		FastLength:        12,
 		SlowLength:        26,
 		MovingAverageType: EMA,
@@ -170,7 +170,7 @@ func TestPercentagePriceOscillatorEMA2612(t *testing.T) {
 func TestPercentagePriceOscillatorIsPrimed(t *testing.T) {
 	t.Parallel()
 
-	ppo, err := NewPercentagePriceOscillator(&PercentagePriceOscillatorParams{
+	ppo, err := NewPercentagePriceOscillator(&Params{
 		FastLength: 3,
 		SlowLength: 5,
 	})
@@ -206,7 +206,7 @@ func TestPercentagePriceOscillatorIsPrimed(t *testing.T) {
 func TestPercentagePriceOscillatorNaN(t *testing.T) {
 	t.Parallel()
 
-	ppo, err := NewPercentagePriceOscillator(&PercentagePriceOscillatorParams{
+	ppo, err := NewPercentagePriceOscillator(&Params{
 		FastLength: 2,
 		SlowLength: 3,
 	})
@@ -223,7 +223,7 @@ func TestPercentagePriceOscillatorNaN(t *testing.T) {
 func TestPercentagePriceOscillatorMetadata(t *testing.T) {
 	t.Parallel()
 
-	ppo, err := NewPercentagePriceOscillator(&PercentagePriceOscillatorParams{
+	ppo, err := NewPercentagePriceOscillator(&Params{
 		FastLength: 12,
 		SlowLength: 26,
 	})
@@ -258,7 +258,7 @@ func TestPercentagePriceOscillatorMetadata(t *testing.T) {
 func TestPercentagePriceOscillatorMetadataEMA(t *testing.T) {
 	t.Parallel()
 
-	ppo, err := NewPercentagePriceOscillator(&PercentagePriceOscillatorParams{
+	ppo, err := NewPercentagePriceOscillator(&Params{
 		FastLength:        12,
 		SlowLength:        26,
 		MovingAverageType: EMA,
@@ -282,7 +282,7 @@ func TestPercentagePriceOscillatorUpdateEntity(t *testing.T) {
 
 	input := testInput()
 
-	ppo, err := NewPercentagePriceOscillator(&PercentagePriceOscillatorParams{
+	ppo, err := NewPercentagePriceOscillator(&Params{
 		FastLength: 2,
 		SlowLength: 3,
 	})
@@ -326,7 +326,7 @@ func TestPercentagePriceOscillatorInvalidParams(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		_, err := NewPercentagePriceOscillator(&PercentagePriceOscillatorParams{
+		_, err := NewPercentagePriceOscillator(&Params{
 			FastLength: tt.fast,
 			SlowLength: tt.slow,
 		})

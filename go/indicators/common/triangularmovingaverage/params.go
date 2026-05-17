@@ -2,8 +2,8 @@ package triangularmovingaverage
 
 import "zpano/entities"
 
-// TriangularMovingAverageParams describes parameters to create an instance of the indicator.
-type TriangularMovingAverageParams struct {
+// Params describes parameters to create an instance of the indicator.
+type Params struct {
 	// Length is the length (the number of time periods, ℓ) of the moving window to calculate the average.
 	//
 	// The value should be greater than 1.
@@ -25,9 +25,9 @@ type TriangularMovingAverageParams struct {
 	TradeComponent entities.TradeComponent
 }
 
-// DefaultParams returns a TriangularMovingAverageParams value populated with conventional defaults.
-func DefaultParams() *TriangularMovingAverageParams {
-	return &TriangularMovingAverageParams{
+// DefaultParams returns a Params value populated with conventional defaults.
+func DefaultParams() *Params {
+	return &Params{
 		Length: 20,
 	}
 }

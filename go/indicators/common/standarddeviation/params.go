@@ -2,8 +2,8 @@ package standarddeviation
 
 import "zpano/entities"
 
-// StandardDeviationParams describes parameters to create an instance of the indicator.
-type StandardDeviationParams struct {
+// Params describes parameters to create an instance of the indicator.
+type Params struct {
 	// Length is the length (the number of time periods, ℓ) of the moving window to calculate the standard deviation.
 	//
 	// The value should be greater than 1.
@@ -31,9 +31,9 @@ type StandardDeviationParams struct {
 	TradeComponent entities.TradeComponent
 }
 
-// DefaultParams returns a StandardDeviationParams value populated with conventional defaults.
-func DefaultParams() *StandardDeviationParams {
-	return &StandardDeviationParams{
+// DefaultParams returns a Params value populated with conventional defaults.
+func DefaultParams() *Params {
+	return &Params{
 		Length:     20,
 		IsUnbiased: true,
 	}

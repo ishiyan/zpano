@@ -49,7 +49,7 @@ func TestRelativeStrengthIndexUpdate2(t *testing.T) {
 	input := testInput2()
 	rsi := &RelativeStrengthIndex{}
 
-	params := RelativeStrengthIndexParams{Length: 14}
+	params := Params{Length: 14}
 	r, _ := NewRelativeStrengthIndex(&params)
 	rsi = r
 
@@ -75,7 +75,7 @@ func TestRelativeStrengthIndexUpdate2(t *testing.T) {
 func TestRelativeStrengthIndexIsPrimed(t *testing.T) {
 	t.Parallel()
 
-	params := RelativeStrengthIndexParams{Length: 5}
+	params := Params{Length: 5}
 	rsi, _ := NewRelativeStrengthIndex(&params)
 
 	if rsi.IsPrimed() {
@@ -234,7 +234,7 @@ func TestNewRelativeStrengthIndex(t *testing.T) {
 
 	t.Run("valid params", func(t *testing.T) {
 		t.Parallel()
-		params := RelativeStrengthIndexParams{
+		params := Params{
 			Length: length, BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
 		}
 
@@ -247,7 +247,7 @@ func TestNewRelativeStrengthIndex(t *testing.T) {
 
 	t.Run("length < 2", func(t *testing.T) {
 		t.Parallel()
-		params := RelativeStrengthIndexParams{
+		params := Params{
 			Length: 1, BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
 		}
 
@@ -258,7 +258,7 @@ func TestNewRelativeStrengthIndex(t *testing.T) {
 
 	t.Run("invalid bar component", func(t *testing.T) {
 		t.Parallel()
-		params := RelativeStrengthIndexParams{
+		params := Params{
 			Length: length, BarComponent: entities.BarComponent(9999),
 			QuoteComponent: qc, TradeComponent: tc,
 		}
@@ -270,7 +270,7 @@ func TestNewRelativeStrengthIndex(t *testing.T) {
 
 	t.Run("invalid quote component", func(t *testing.T) {
 		t.Parallel()
-		params := RelativeStrengthIndexParams{
+		params := Params{
 			Length: length, BarComponent: bc,
 			QuoteComponent: entities.QuoteComponent(9999), TradeComponent: tc,
 		}
@@ -282,7 +282,7 @@ func TestNewRelativeStrengthIndex(t *testing.T) {
 
 	t.Run("invalid trade component", func(t *testing.T) {
 		t.Parallel()
-		params := RelativeStrengthIndexParams{
+		params := Params{
 			Length: length, BarComponent: bc, QuoteComponent: qc,
 			TradeComponent: entities.TradeComponent(9999),
 		}
@@ -294,7 +294,7 @@ func TestNewRelativeStrengthIndex(t *testing.T) {
 
 	t.Run("bar component set to open", func(t *testing.T) {
 		t.Parallel()
-		params := RelativeStrengthIndexParams{
+		params := Params{
 			Length: length, BarComponent: entities.BarOpenPrice,
 		}
 

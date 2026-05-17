@@ -66,7 +66,7 @@ type TriangularMovingAverage struct {
 }
 
 // NewTriangularMovingAverage returns an instnce of the indicator created using supplied parameters.
-func NewTriangularMovingAverage(p *TriangularMovingAverageParams) (*TriangularMovingAverage, error) { //nolint:funlen
+func NewTriangularMovingAverage(p *Params) (*TriangularMovingAverage, error) { //nolint:funlen
 	const (
 		invalid = "invalid triangular moving average parameters"
 		fmts    = "%s: %s"

@@ -33,7 +33,7 @@ type Variance struct {
 }
 
 // NewVariance returns an instnce of the Variance indicator created using supplied parameters.
-func NewVariance(p *VarianceParams) (*Variance, error) {
+func NewVariance(p *Params) (*Variance, error) {
 	const (
 		invalid = "invalid variance parameters"
 		fmts    = "%s: %s"

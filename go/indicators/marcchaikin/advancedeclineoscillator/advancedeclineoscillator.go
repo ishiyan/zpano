@@ -45,7 +45,7 @@ type AdvanceDeclineOscillator struct {
 }
 
 // NewAdvanceDeclineOscillator returns an instance of the indicator created using supplied parameters.
-func NewAdvanceDeclineOscillator(p *AdvanceDeclineOscillatorParams) (*AdvanceDeclineOscillator, error) {
+func NewAdvanceDeclineOscillator(p *Params) (*AdvanceDeclineOscillator, error) {
 	const (
 		invalid   = "invalid advance-decline oscillator parameters"
 		fmts      = "%s: %s"
@@ -70,13 +70,13 @@ func NewAdvanceDeclineOscillator(p *AdvanceDeclineOscillatorParams) (*AdvanceDec
 		maLabel = "SMA"
 
 		fast, e := simplemovingaverage.NewSimpleMovingAverage(
-			&simplemovingaverage.SimpleMovingAverageParams{Length: p.FastLength})
+			&simplemovingaverage.Params{Length: p.FastLength})
 		if e != nil {
 			return nil, fmt.Errorf(fmtw, invalid, e)
 		}
 
 		slow, e := simplemovingaverage.NewSimpleMovingAverage(
-			&simplemovingaverage.SimpleMovingAverageParams{Length: p.SlowLength})
+			&simplemovingaverage.Params{Length: p.SlowLength})
 		if e != nil {
 			return nil, fmt.Errorf(fmtw, invalid, e)
 		}

@@ -305,7 +305,7 @@ func TestNewMovingAverage(t *testing.T) { //nolint: funlen
 		}
 	}
 
-	checkInstance := func(params *JurikMovingAverageParams, mnemonic string) {
+	checkInstance := func(params *Params, mnemonic string) {
 		t.Helper()
 
 		jma, err := NewJurikMovingAverage(params)
@@ -315,7 +315,7 @@ func TestNewMovingAverage(t *testing.T) { //nolint: funlen
 		check("primed", false, jma.primed)
 	}
 
-	checkError := func(params *JurikMovingAverageParams, e string) {
+	checkError := func(params *Params, e string) {
 		t.Helper()
 
 		jma, err := NewJurikMovingAverage(params)
@@ -326,7 +326,7 @@ func TestNewMovingAverage(t *testing.T) { //nolint: funlen
 	t.Run("length > 1, phase = 30", func(t *testing.T) {
 		t.Parallel()
 
-		checkInstance(&JurikMovingAverageParams{
+		checkInstance(&Params{
 			Length: length10, Phase: phase30, BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
 		}, "jma(10, 30, hl/2)")
 	})
@@ -334,7 +334,7 @@ func TestNewMovingAverage(t *testing.T) { //nolint: funlen
 	t.Run("length = 1, phase = 30", func(t *testing.T) {
 		t.Parallel()
 
-		checkInstance(&JurikMovingAverageParams{
+		checkInstance(&Params{
 			Length: length1, Phase: phase30, BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
 		}, "jma(1, 30, hl/2)")
 	})
@@ -342,7 +342,7 @@ func TestNewMovingAverage(t *testing.T) { //nolint: funlen
 	t.Run("length = 0", func(t *testing.T) {
 		t.Parallel()
 
-		checkError(&JurikMovingAverageParams{
+		checkError(&Params{
 			Length: length0, Phase: phase30, BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
 		}, errlen)
 	})
@@ -350,7 +350,7 @@ func TestNewMovingAverage(t *testing.T) { //nolint: funlen
 	t.Run("length < 0", func(t *testing.T) {
 		t.Parallel()
 
-		checkError(&JurikMovingAverageParams{
+		checkError(&Params{
 			Length: lengthMin1, Phase: phase30, BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
 		}, errlen)
 	})
@@ -358,7 +358,7 @@ func TestNewMovingAverage(t *testing.T) { //nolint: funlen
 	t.Run("length = 10, phase < -100", func(t *testing.T) {
 		t.Parallel()
 
-		checkError(&JurikMovingAverageParams{
+		checkError(&Params{
 			Length: length10, Phase: phaseMin101, BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
 		}, errpha)
 	})
@@ -366,7 +366,7 @@ func TestNewMovingAverage(t *testing.T) { //nolint: funlen
 	t.Run("length = 10, phase > 100", func(t *testing.T) {
 		t.Parallel()
 
-		checkError(&JurikMovingAverageParams{
+		checkError(&Params{
 			Length: length10, Phase: phase101, BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
 		}, errpha)
 	})
@@ -374,7 +374,7 @@ func TestNewMovingAverage(t *testing.T) { //nolint: funlen
 	t.Run("length = 10, phase = -100", func(t *testing.T) {
 		t.Parallel()
 
-		checkInstance(&JurikMovingAverageParams{
+		checkInstance(&Params{
 			Length: length10, Phase: phaseMin100, BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
 		}, "jma(10, -100, hl/2)")
 	})
@@ -382,7 +382,7 @@ func TestNewMovingAverage(t *testing.T) { //nolint: funlen
 	t.Run("length = 10, phase = -30", func(t *testing.T) {
 		t.Parallel()
 
-		checkInstance(&JurikMovingAverageParams{
+		checkInstance(&Params{
 			Length: length10, Phase: phaseMin30, BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
 		}, "jma(10, -30, hl/2)")
 	})
@@ -390,7 +390,7 @@ func TestNewMovingAverage(t *testing.T) { //nolint: funlen
 	t.Run("length = 10, phase = 0", func(t *testing.T) {
 		t.Parallel()
 
-		checkInstance(&JurikMovingAverageParams{
+		checkInstance(&Params{
 			Length: length10, Phase: phase0, BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
 		}, "jma(10, 0, hl/2)")
 	})
@@ -398,7 +398,7 @@ func TestNewMovingAverage(t *testing.T) { //nolint: funlen
 	t.Run("length = 10, phase = 100", func(t *testing.T) {
 		t.Parallel()
 
-		checkInstance(&JurikMovingAverageParams{
+		checkInstance(&Params{
 			Length: length10, Phase: phase100, BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
 		}, "jma(10, 100, hl/2)")
 	})
@@ -406,7 +406,7 @@ func TestNewMovingAverage(t *testing.T) { //nolint: funlen
 	t.Run("invalid bar component", func(t *testing.T) {
 		t.Parallel()
 
-		checkError(&JurikMovingAverageParams{
+		checkError(&Params{
 			Length: length10, Phase: phase30,
 			BarComponent: entities.BarComponent(9999), QuoteComponent: qc, TradeComponent: tc,
 		}, errbc)
@@ -415,7 +415,7 @@ func TestNewMovingAverage(t *testing.T) { //nolint: funlen
 	t.Run("invalid quote component", func(t *testing.T) {
 		t.Parallel()
 
-		checkError(&JurikMovingAverageParams{
+		checkError(&Params{
 			Length: length10, Phase: phase30,
 			BarComponent: bc, QuoteComponent: entities.QuoteComponent(9999), TradeComponent: tc,
 		}, errqc)
@@ -424,7 +424,7 @@ func TestNewMovingAverage(t *testing.T) { //nolint: funlen
 	t.Run("invalid trade component", func(t *testing.T) {
 		t.Parallel()
 
-		checkError(&JurikMovingAverageParams{
+		checkError(&Params{
 			Length: length10, Phase: phase30,
 			BarComponent: bc, QuoteComponent: qc, TradeComponent: entities.TradeComponent(9999),
 		}, errtc)
@@ -436,7 +436,7 @@ func TestNewMovingAverage(t *testing.T) { //nolint: funlen
 	t.Run("all components zero", func(t *testing.T) {
 		t.Parallel()
 
-		checkInstance(&JurikMovingAverageParams{
+		checkInstance(&Params{
 			Length: length10, Phase: phase30,
 		}, "jma(10, 30)")
 	})
@@ -444,7 +444,7 @@ func TestNewMovingAverage(t *testing.T) { //nolint: funlen
 	t.Run("only bar component set", func(t *testing.T) {
 		t.Parallel()
 
-		checkInstance(&JurikMovingAverageParams{
+		checkInstance(&Params{
 			Length: length10, Phase: phase30, BarComponent: entities.BarMedianPrice,
 		}, "jma(10, 30, hl/2)")
 	})
@@ -452,7 +452,7 @@ func TestNewMovingAverage(t *testing.T) { //nolint: funlen
 	t.Run("only quote component set", func(t *testing.T) {
 		t.Parallel()
 
-		checkInstance(&JurikMovingAverageParams{
+		checkInstance(&Params{
 			Length: length10, Phase: phase30, QuoteComponent: entities.QuoteBidPrice,
 		}, "jma(10, 30, b)")
 	})
@@ -460,7 +460,7 @@ func TestNewMovingAverage(t *testing.T) { //nolint: funlen
 	t.Run("only trade component set", func(t *testing.T) {
 		t.Parallel()
 
-		checkInstance(&JurikMovingAverageParams{
+		checkInstance(&Params{
 			Length: length10, Phase: phase30, TradeComponent: entities.TradeVolume,
 		}, "jma(10, 30, v)")
 	})
@@ -468,7 +468,7 @@ func TestNewMovingAverage(t *testing.T) { //nolint: funlen
 	t.Run("bar and quote components set", func(t *testing.T) {
 		t.Parallel()
 
-		checkInstance(&JurikMovingAverageParams{
+		checkInstance(&Params{
 			Length: length10, Phase: phase30,
 			BarComponent: entities.BarOpenPrice, QuoteComponent: entities.QuoteBidPrice,
 		}, "jma(10, 30, o, b)")
@@ -477,7 +477,7 @@ func TestNewMovingAverage(t *testing.T) { //nolint: funlen
 	t.Run("bar and trade components set", func(t *testing.T) {
 		t.Parallel()
 
-		checkInstance(&JurikMovingAverageParams{
+		checkInstance(&Params{
 			Length: length10, Phase: phase30,
 			BarComponent: entities.BarHighPrice, TradeComponent: entities.TradeVolume,
 		}, "jma(10, 30, h, v)")
@@ -486,7 +486,7 @@ func TestNewMovingAverage(t *testing.T) { //nolint: funlen
 	t.Run("quote and trade components set", func(t *testing.T) {
 		t.Parallel()
 
-		checkInstance(&JurikMovingAverageParams{
+		checkInstance(&Params{
 			Length: length10, Phase: phase30,
 			QuoteComponent: entities.QuoteAskPrice, TradeComponent: entities.TradeVolume,
 		}, "jma(10, 30, a, v)")
@@ -494,7 +494,7 @@ func TestNewMovingAverage(t *testing.T) { //nolint: funlen
 }
 
 func testJurikMovingAverageCreate(length, phase int) *JurikMovingAverage {
-	params := JurikMovingAverageParams{
+	params := Params{
 		Length: length, Phase: phase,
 	}
 

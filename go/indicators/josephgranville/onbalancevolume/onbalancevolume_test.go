@@ -20,7 +20,7 @@ func TestOnBalanceVolumeWithVolume(t *testing.T) {
 	expected := testExpected()
 	count := len(prices)
 
-	obv, err := NewOnBalanceVolume(&OnBalanceVolumeParams{})
+	obv, err := NewOnBalanceVolume(&Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -48,7 +48,7 @@ func TestOnBalanceVolumeWithVolume(t *testing.T) {
 func TestOnBalanceVolumeIsPrimed(t *testing.T) {
 	t.Parallel()
 
-	obv, err := NewOnBalanceVolume(&OnBalanceVolumeParams{})
+	obv, err := NewOnBalanceVolume(&Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -71,7 +71,7 @@ func TestOnBalanceVolumeIsPrimed(t *testing.T) {
 func TestOnBalanceVolumeNaN(t *testing.T) {
 	t.Parallel()
 
-	obv, err := NewOnBalanceVolume(&OnBalanceVolumeParams{})
+	obv, err := NewOnBalanceVolume(&Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -95,7 +95,7 @@ func TestOnBalanceVolumeNaN(t *testing.T) {
 func TestOnBalanceVolumeMetadata(t *testing.T) {
 	t.Parallel()
 
-	obv, err := NewOnBalanceVolume(&OnBalanceVolumeParams{})
+	obv, err := NewOnBalanceVolume(&Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -127,7 +127,7 @@ func TestOnBalanceVolumeMetadata(t *testing.T) {
 func TestOnBalanceVolumeUpdateScalar(t *testing.T) {
 	t.Parallel()
 
-	obv, err := NewOnBalanceVolume(&OnBalanceVolumeParams{})
+	obv, err := NewOnBalanceVolume(&Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -157,7 +157,7 @@ func TestOnBalanceVolumeUpdateBar(t *testing.T) {
 	vol := testVolumes()
 	expected := testExpected()
 
-	obv, err := NewOnBalanceVolume(&OnBalanceVolumeParams{})
+	obv, err := NewOnBalanceVolume(&Params{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -183,7 +183,7 @@ func TestOnBalanceVolumeUpdateBar(t *testing.T) {
 func TestOnBalanceVolumeEqualPrices(t *testing.T) {
 	t.Parallel()
 
-	obv, err := NewOnBalanceVolume(&OnBalanceVolumeParams{})
+	obv, err := NewOnBalanceVolume(&Params{})
 	if err != nil {
 		t.Fatal(err)
 	}

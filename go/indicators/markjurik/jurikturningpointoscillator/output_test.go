@@ -11,11 +11,11 @@ func TestTurningPointOscillatorOutputString(t *testing.T) {
 		o    Output
 		text string
 	}{
-		{Value, turningPointOscillatorValue},
-		{turningPointOscillatorLast, turningPointOscillatorUnknown},
-		{Output(0), turningPointOscillatorUnknown},
-		{Output(9999), turningPointOscillatorUnknown},
-		{Output(-9999), turningPointOscillatorUnknown},
+		{Value, valueStr},
+		{turningPointOscillatorLast, unknownStr},
+		{Output(0), unknownStr},
+		{Output(9999), unknownStr},
+		{Output(-9999), unknownStr},
 	}
 	for _, tt := range tests {
 		exp := tt.text
@@ -56,7 +56,7 @@ func TestTurningPointOscillatorOutputMarshalJSON(t *testing.T) {
 		json      string
 		succeeded bool
 	}{
-		{Value, dqs + turningPointOscillatorValue + dqs, true},
+		{Value, dqs + valueStr + dqs, true},
 		{turningPointOscillatorLast, nilstr, false},
 		{Output(9999), nilstr, false},
 		{Output(-9999), nilstr, false},
@@ -89,8 +89,8 @@ func TestTurningPointOscillatorOutputUnmarshalJSON(t *testing.T) {
 		json      string
 		succeeded bool
 	}{
-		{Value, dqs + turningPointOscillatorValue + dqs, true},
-		{zero, dqs + turningPointOscillatorUnknown + dqs, false},
+		{Value, dqs + valueStr + dqs, true},
+		{zero, dqs + unknownStr + dqs, false},
 		{zero, dqs + "foobar" + dqs, false},
 	}
 	for _, tt := range tests {

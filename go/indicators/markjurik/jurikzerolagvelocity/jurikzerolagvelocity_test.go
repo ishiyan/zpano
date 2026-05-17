@@ -19,7 +19,7 @@ func almostEqual(a, b, eps float64) bool {
 func testVEL(t *testing.T, depth int, expected []float64) {
 	t.Helper()
 
-	vel, err := NewJurikZeroLagVelocity(&JurikZeroLagVelocityParams{
+	vel, err := NewJurikZeroLagVelocity(&Params{
 		Depth: depth,
 	})
 	if err != nil {

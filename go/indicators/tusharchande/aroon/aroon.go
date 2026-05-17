@@ -48,7 +48,7 @@ type Aroon struct {
 }
 
 // NewAroon returns an instance of the indicator created using supplied parameters.
-func NewAroon(p *AroonParams) (*Aroon, error) {
+func NewAroon(p *Params) (*Aroon, error) {
 	const (
 		invalid   = "invalid aroon parameters"
 		fmts      = "%s: %s"

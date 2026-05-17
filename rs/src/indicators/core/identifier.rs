@@ -231,6 +231,26 @@ pub enum Identifier {
     /// Identifies the Maximum Entropy Spectrum (MESPECT) heatmap indicator, a Burg
     /// maximum-entropy auto-regressive power spectrum over a configurable cycle-period range.
     MaximumEntropySpectrum = 83,
+
+    // ── jean-philippe poton ───────────────────────────────────────────────
+    /// Identifies the Fractal Dimension Index (FDI) indicator.
+    FractalDimensionIndex = 84,
+    /// Identifies the Fractal Graph Dimension Index (FGDI) indicator.
+    FractalGraphDimensionIndex = 85,
+    /// Identifies the Fractal Adaptive Simple Moving Average (FRASMA) indicator.
+    FractalAdaptiveSimpleMovingAverage = 86,
+    /// Identifies the Fractal Adaptive Simple Moving Average 2 (FRASMA2) indicator.
+    FractalAdaptiveSimpleMovingAverage2 = 87,
+    /// Identifies the RS Fractal Adaptive Simple Moving Average (RSFRASMA) indicator.
+    RescaledFractalAdaptiveSimpleMovingAverage = 88,
+    /// Identifies the Fractal Bands (FBAN) indicator.
+    FractalBands = 89,
+    /// Identifies the Fractal Bands Hybride Adaptive (FBANHA) indicator.
+    FractalBandsHybrideAdaptive = 90,
+    /// Identifies the Fractional Bands (FCTBAN) indicator.
+    FractionalBands = 91,
+    /// Identifies the Hurst Difference (HURDIF) indicator.
+    HurstDifference = 92,
 }
 
 impl Identifier {
@@ -329,6 +349,15 @@ impl Identifier {
             Self::TrueRange => "trueRange",
             Self::GoertzelSpectrum => "goertzelSpectrum",
             Self::MaximumEntropySpectrum => "maximumEntropySpectrum",
+            Self::FractalDimensionIndex => "fractalDimensionIndex",
+            Self::FractalGraphDimensionIndex => "fractalGraphDimensionIndex",
+            Self::FractalAdaptiveSimpleMovingAverage => "fractalAdaptiveSimpleMovingAverage",
+            Self::FractalAdaptiveSimpleMovingAverage2 => "fractalAdaptiveSimpleMovingAverage2",
+            Self::RescaledFractalAdaptiveSimpleMovingAverage => "rescaledFractalAdaptiveSimpleMovingAverage",
+            Self::FractalBands => "fractalBands",
+            Self::FractalBandsHybrideAdaptive => "fractalBandsHybrideAdaptive",
+            Self::FractionalBands => "fractionalBands",
+            Self::HurstDifference => "hurstDifference",
         }
     }
 
@@ -431,6 +460,15 @@ impl Identifier {
             "trueRange" => Some(Self::TrueRange),
             "goertzelSpectrum" => Some(Self::GoertzelSpectrum),
             "maximumEntropySpectrum" => Some(Self::MaximumEntropySpectrum),
+            "fractalDimensionIndex" => Some(Self::FractalDimensionIndex),
+            "fractalGraphDimensionIndex" => Some(Self::FractalGraphDimensionIndex),
+            "fractalAdaptiveSimpleMovingAverage" => Some(Self::FractalAdaptiveSimpleMovingAverage),
+            "fractalAdaptiveSimpleMovingAverage2" => Some(Self::FractalAdaptiveSimpleMovingAverage2),
+            "rescaledFractalAdaptiveSimpleMovingAverage" => Some(Self::RescaledFractalAdaptiveSimpleMovingAverage),
+            "fractalBands" => Some(Self::FractalBands),
+            "fractalBandsHybrideAdaptive" => Some(Self::FractalBandsHybrideAdaptive),
+            "fractionalBands" => Some(Self::FractionalBands),
+            "hurstDifference" => Some(Self::HurstDifference),
             _ => None,
         }
     }

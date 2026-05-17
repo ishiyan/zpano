@@ -2,8 +2,8 @@ package newmovingaverage
 
 import "zpano/entities"
 
-// NewMovingAverageParams holds the parameters for the NewMovingAverage indicator.
-type NewMovingAverageParams struct {
+// Params holds the parameters for the NewMovingAverage indicator.
+type Params struct {
 	// PrimaryPeriod is the period for the primary (outer) moving average.
 	//
 	// If 0 or too small, it is auto-resolved via Nyquist constraint.
@@ -33,9 +33,9 @@ type NewMovingAverageParams struct {
 	TradeComponent entities.TradeComponent `json:"trade_component"`
 }
 
-// DefaultParams returns a NewMovingAverageParams value populated with conventional defaults.
-func DefaultParams() *NewMovingAverageParams {
-	return &NewMovingAverageParams{
+// DefaultParams returns a Params value populated with conventional defaults.
+func DefaultParams() *Params {
+	return &Params{
 		PrimaryPeriod:   0,
 		SecondaryPeriod: 8,
 		MAType:          LWMA,

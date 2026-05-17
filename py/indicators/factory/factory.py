@@ -571,4 +571,51 @@ def create_indicator(
         from ..custom.maximum_entropy_spectrum.maximum_entropy_spectrum import MaximumEntropySpectrum
         return MaximumEntropySpectrum(_apply(default_params(), params))
 
+    # ── jean-philippe poton ───────────────────────────────────────────────
+
+    if identifier == Identifier.FRACTAL_DIMENSION_INDEX:
+        from ..jean_philippe_poton.fractal_dimension_index.params import default_params
+        from ..jean_philippe_poton.fractal_dimension_index.fractal_dimension_index import FractalDimensionIndex
+        return FractalDimensionIndex(_apply(default_params(), params))
+
+    if identifier == Identifier.FRACTAL_GRAPH_DIMENSION_INDEX:
+        from ..jean_philippe_poton.fractal_graph_dimension_index.params import default_params
+        from ..jean_philippe_poton.fractal_graph_dimension_index.fractal_graph_dimension_index import FractalGraphDimensionIndex
+        return FractalGraphDimensionIndex(_apply(default_params(), params))
+
+    if identifier == Identifier.FRACTAL_ADAPTIVE_SIMPLE_MOVING_AVERAGE:
+        from ..jean_philippe_poton.fractal_adaptive_simple_moving_average.params import default_params
+        from ..jean_philippe_poton.fractal_adaptive_simple_moving_average.fractal_adaptive_simple_moving_average import FractalAdaptiveSimpleMovingAverage
+        return FractalAdaptiveSimpleMovingAverage(_apply(default_params(), params))
+
+    if identifier == Identifier.FRACTAL_ADAPTIVE_SIMPLE_MOVING_AVERAGE_2:
+        from ..jean_philippe_poton.fractal_adaptive_simple_moving_average_2.params import default_params
+        from ..jean_philippe_poton.fractal_adaptive_simple_moving_average_2.fractal_adaptive_simple_moving_average_2 import FractalAdaptiveSimpleMovingAverage2
+        return FractalAdaptiveSimpleMovingAverage2(_apply(default_params(), params))
+
+    if identifier == Identifier.RESCALED_FRACTAL_ADAPTIVE_SIMPLE_MOVING_AVERAGE:
+        from ..jean_philippe_poton.rescaled_fractal_adaptive_simple_moving_average.params import default_params
+        from ..jean_philippe_poton.rescaled_fractal_adaptive_simple_moving_average.rescaled_fractal_adaptive_simple_moving_average import RescaledFractalAdaptiveSimpleMovingAverage
+        return RescaledFractalAdaptiveSimpleMovingAverage(_apply(default_params(), params))
+
+    if identifier == Identifier.FRACTAL_BANDS:
+        from ..jean_philippe_poton.fractal_bands.params import default_params
+        from ..jean_philippe_poton.fractal_bands.fractal_bands import FractalBands
+        return FractalBands(_apply(default_params(), params))
+
+    if identifier == Identifier.FRACTAL_BANDS_HYBRIDE_ADAPTIVE:
+        from ..jean_philippe_poton.fractal_bands_hybride_adaptive.params import default_params
+        from ..jean_philippe_poton.fractal_bands_hybride_adaptive.fractal_bands_hybride_adaptive import FractalBandsHybrideAdaptive
+        return FractalBandsHybrideAdaptive(_apply(default_params(), params))
+
+    if identifier == Identifier.FRACTIONAL_BANDS:
+        from ..jean_philippe_poton.fractional_bands.params import default_params
+        from ..jean_philippe_poton.fractional_bands.fractional_bands import FractionalBands
+        return FractionalBands(_apply(default_params(), params))
+
+    if identifier == Identifier.HURST_DIFFERENCE:
+        from ..jean_philippe_poton.hurst_difference.params import default_params
+        from ..jean_philippe_poton.hurst_difference.hurst_difference import HurstDifference
+        return HurstDifference(_apply(default_params(), params))
+
     raise ValueError(f"unsupported indicator: {identifier}")

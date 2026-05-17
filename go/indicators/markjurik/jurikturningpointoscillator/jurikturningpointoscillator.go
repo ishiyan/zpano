@@ -25,7 +25,7 @@ type JurikTurningPointOscillator struct {
 }
 
 // NewJurikTurningPointOscillator returns an instance of the indicator created using supplied parameters.
-func NewJurikTurningPointOscillator(p *JurikTurningPointOscillatorParams) (*JurikTurningPointOscillator, error) {
+func NewJurikTurningPointOscillator(p *Params) (*JurikTurningPointOscillator, error) {
 	return newJurikTurningPointOscillator(p.Length, p.BarComponent, p.QuoteComponent, p.TradeComponent)
 }
 

@@ -20,7 +20,7 @@ func TestAroon_Length14_FullData(t *testing.T) {
 	low := testInputLow()
 	expected := testExpected()
 
-	ind, err := NewAroon(&AroonParams{Length: 14})
+	ind, err := NewAroon(&Params{Length: 14})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -53,7 +53,7 @@ func TestAroon_Length14_FullData(t *testing.T) {
 func TestAroonIsPrimed(t *testing.T) {
 	t.Parallel()
 
-	ind, err := NewAroon(&AroonParams{Length: 14})
+	ind, err := NewAroon(&Params{Length: 14})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -84,7 +84,7 @@ func TestAroonIsPrimed(t *testing.T) {
 func TestAroonNaN(t *testing.T) {
 	t.Parallel()
 
-	ind, err := NewAroon(&AroonParams{Length: 14})
+	ind, err := NewAroon(&Params{Length: 14})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -106,7 +106,7 @@ func TestAroonNaN(t *testing.T) {
 func TestAroonMetadata(t *testing.T) {
 	t.Parallel()
 
-	ind, err := NewAroon(&AroonParams{Length: 14})
+	ind, err := NewAroon(&Params{Length: 14})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -152,7 +152,7 @@ func TestAroonUpdateBar(t *testing.T) {
 	low := testInputLow()
 	expected := testExpected()
 
-	ind, err := NewAroon(&AroonParams{Length: 14})
+	ind, err := NewAroon(&Params{Length: 14})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -202,7 +202,7 @@ func TestAroonInvalidParams(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		_, err := NewAroon(&AroonParams{Length: tt.length})
+		_, err := NewAroon(&Params{Length: tt.length})
 		if err == nil {
 			t.Errorf("%s: expected error, got nil", tt.name)
 		}

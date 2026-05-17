@@ -310,4 +310,33 @@ export enum IndicatorIdentifier {
     /** Identifies the __Maximum Entropy Spectrum__ (MESPECT) heatmap indicator, a Burg maximum-entropy
      * auto-regressive power spectrum over a configurable cycle-period range. */
     MaximumEntropySpectrum,
+
+    // ── jean-philippe poton ───────────────────────────────────────────────
+
+    /** Identifies the __Fractal Dimension Index__ (FDI) indicator. */
+    FractalDimensionIndex,
+
+    /** Identifies the __Fractal Graph Dimension Index__ (FGDI) indicator. */
+    FractalGraphDimensionIndex,
+
+    /** Identifies the __Fractal Adaptive Simple Moving Average__ (FRASMA) indicator. */
+    FractalAdaptiveSimpleMovingAverage,
+
+    /** Identifies the __Fractal Adaptive Simple Moving Average 2__ (FRASMA2) indicator. */
+    FractalAdaptiveSimpleMovingAverage2,
+
+    /** Identifies the __Rescaled Fractal Adaptive Simple Moving Average__ (RSFRASMA) indicator. */
+    RescaledFractalAdaptiveSimpleMovingAverage,
+
+    /** Identifies the __Fractal Bands__ (FBAN) indicator. */
+    FractalBands,
+
+    /** Identifies the __Fractal Bands Hybride Adaptive__ (FBANHA) indicator. */
+    FractalBandsHybrideAdaptive,
+
+    /** Identifies the __Fractional Bands__ (FCTBAN) indicator. */
+    FractionalBands,
+
+    /** Identifies the __Hurst Difference__ (HURDIF) indicator. */
+    HurstDifference,
 }

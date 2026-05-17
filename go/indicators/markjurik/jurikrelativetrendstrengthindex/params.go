@@ -2,8 +2,8 @@ package jurikrelativetrendstrengthindex
 
 import "zpano/entities" //nolint:depguard
 
-// JurikRelativeTrendStrengthIndexParams describes parameters to create an instance of the indicator.
-type JurikRelativeTrendStrengthIndexParams struct {
+// Params describes parameters to create an instance of the indicator.
+type Params struct {
 	// Length is the smoothing period. Values below 2 are clamped to produce
 	// a minimum internal smoothing window of 5 bars.
 	//
@@ -20,9 +20,9 @@ type JurikRelativeTrendStrengthIndexParams struct {
 	TradeComponent entities.TradeComponent
 }
 
-// DefaultParams returns a [JurikRelativeTrendStrengthIndexParams] value populated with conventional defaults.
-func DefaultParams() *JurikRelativeTrendStrengthIndexParams {
-	return &JurikRelativeTrendStrengthIndexParams{
+// DefaultParams returns a [Params] value populated with conventional defaults.
+func DefaultParams() *Params {
+	return &Params{
 		Length: 14,
 	}
 }

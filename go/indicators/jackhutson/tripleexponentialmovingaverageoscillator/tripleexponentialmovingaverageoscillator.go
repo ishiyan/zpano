@@ -38,7 +38,7 @@ type TripleExponentialMovingAverageOscillator struct {
 // NewTripleExponentialMovingAverageOscillator returns an instance of the indicator
 // created using supplied parameters.
 func NewTripleExponentialMovingAverageOscillator(
-	p *TripleExponentialMovingAverageOscillatorParams,
+	p *Params,
 ) (*TripleExponentialMovingAverageOscillator, error) {
 	const (
 		invalid = "invalid triple exponential moving average oscillator parameters"

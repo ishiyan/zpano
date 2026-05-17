@@ -36,7 +36,7 @@ type ZeroLagExponentialMovingAverage struct {
 // NewZeroLagExponentialMovingAverage returns an instance of the indicator created using supplied parameters.
 //
 //nolint:funlen,cyclop
-func NewZeroLagExponentialMovingAverage(p *ZeroLagExponentialMovingAverageParams) (*ZeroLagExponentialMovingAverage, error) {
+func NewZeroLagExponentialMovingAverage(p *Params) (*ZeroLagExponentialMovingAverage, error) {
 	const (
 		invalid = "invalid zero-lag exponential moving average parameters"
 		fmts    = "%s: %s"

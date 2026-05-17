@@ -32,7 +32,7 @@ type BalanceOfPower struct {
 }
 
 // NewBalanceOfPower returns an instance of the indicator created using supplied parameters.
-func NewBalanceOfPower(_ *BalanceOfPowerParams) (*BalanceOfPower, error) {
+func NewBalanceOfPower(_ *Params) (*BalanceOfPower, error) {
 	mnemonic := "bop"
 	desc := "Balance of Power"
 
