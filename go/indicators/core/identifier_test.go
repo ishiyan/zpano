@@ -118,6 +118,8 @@ func TestIdentifierString(t *testing.T) {
 		// ── custom ────────────────────────────────────────────────────────────
 		{GoertzelSpectrum, goertzelSpectrum},
 		{MaximumEntropySpectrum, maximumEntropySpectrum},
+		// ── doug schaff ───────────────────────────────────────────────────────
+		{SchaffTrendCycle, schaffTrendCycle},
 		// ── boundary ──────────────────────────────────────────────────────────
 		{last, unknown},
 		{Identifier(0), unknown},
@@ -248,6 +250,8 @@ func TestIdentifierIsKnown(t *testing.T) {
 		// ── custom ────────────────────────────────────────────────────────────
 		{GoertzelSpectrum, true},
 		{MaximumEntropySpectrum, true},
+		// ── doug schaff ───────────────────────────────────────────────────────
+		{SchaffTrendCycle, true},
 		// ── boundary ──────────────────────────────────────────────────────────
 		{last, false},
 		{Identifier(0), false},
@@ -382,6 +386,8 @@ func TestIdentifierMarshalJSON(t *testing.T) {
 		// ── custom ────────────────────────────────────────────────────────────
 		{GoertzelSpectrum, dqs + goertzelSpectrum + dqs, true},
 		{MaximumEntropySpectrum, dqs + maximumEntropySpectrum + dqs, true},
+		// ── doug schaff ───────────────────────────────────────────────────────
+		{SchaffTrendCycle, dqs + schaffTrendCycle + dqs, true},
 		// ── boundary ──────────────────────────────────────────────────────────
 		{last, nilstr, false},
 		{Identifier(9999), nilstr, false},
@@ -529,6 +535,8 @@ func TestIdentifierUnmarshalJSON(t *testing.T) {
 		// ── custom ────────────────────────────────────────────────────────────
 		{GoertzelSpectrum, dqs + goertzelSpectrum + dqs, true},
 		{MaximumEntropySpectrum, dqs + maximumEntropySpectrum + dqs, true},
+		// ── doug schaff ───────────────────────────────────────────────────────
+		{SchaffTrendCycle, dqs + schaffTrendCycle + dqs, true},
 		// ── boundary ──────────────────────────────────────────────────────────
 		{zero, "\"unknown\"", false},
 		{zero, "\"foobar\"", false},

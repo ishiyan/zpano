@@ -160,6 +160,8 @@ pub const fractal_bands_hybride_adaptive = @import("jean_philippe_poton/fractal_
 pub const fractional_bands = @import("jean_philippe_poton/fractional_bands/fractional_bands.zig");
 pub const hurst_difference = @import("jean_philippe_poton/hurst_difference/hurst_difference.zig");
 
+pub const schaff_trend_cycle = @import("doug_schaff/schaff_trend_cycle/schaff_trend_cycle.zig");
+
 pub const hilbert_transformer = @import("john_ehlers/hilbert_transformer/hilbert_transformer.zig");
 pub const homodyne_discriminator = @import("john_ehlers/hilbert_transformer/homodyne_discriminator.zig");
 pub const homodyne_discriminator_unrolled = @import("john_ehlers/hilbert_transformer/homodyne_discriminator_unrolled.zig");
@@ -267,6 +269,7 @@ comptime {
     _ = fractal_bands_hybride_adaptive;
     _ = fractional_bands;
     _ = hurst_difference;
+    _ = schaff_trend_cycle;
     _ = frequency_response;
     _ = factory;
     _ = arnaud_legoux_moving_average;

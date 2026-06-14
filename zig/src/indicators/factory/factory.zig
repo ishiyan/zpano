@@ -156,6 +156,7 @@ const fban_mod = @import("../jean_philippe_poton/fractal_bands/fractal_bands.zig
 const fbanha_mod = @import("../jean_philippe_poton/fractal_bands_hybride_adaptive/fractal_bands_hybride_adaptive.zig");
 const fctban_mod = @import("../jean_philippe_poton/fractional_bands/fractional_bands.zig");
 const hurdif_mod = @import("../jean_philippe_poton/hurst_difference/hurst_difference.zig");
+const stc_mod = @import("../doug_schaff/schaff_trend_cycle/schaff_trend_cycle.zig");
 
 pub const FactoryError = error{
     UnsupportedIndicator,
@@ -1358,6 +1359,17 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
             const ptr = heapAlloc(hurdif_mod.HurstDifference, allocator, ind) catch return FactoryError.OutOfMemory;
             break :blk .{ .indicator = ptr.indicator(), .ctx = ptr, .deinit_fn = DeinitFn(hurdif_mod.HurstDifference) };
         },
+
+        // ── doug schaff ───────────────────────────────────────────────────
+        .schaff_trend_cycle => createWithAllocParams(stc_mod.SchaffTrendCycle, stc_mod.SchaffTrendCycleParams, allocator, obj, .{
+            .fast = getUsize(obj, "fast", 23),
+            .slow = getUsize(obj, "slow", 50),
+            .tclen = getUsize(obj, "tclen", 10),
+            .factor = getF64(obj, "factor", 0.5),
+            .bar_component = getBarComponent(obj),
+            .quote_component = getQuoteComponent(obj),
+            .trade_component = getTradeComponent(obj),
+        }),
     };
 }
 

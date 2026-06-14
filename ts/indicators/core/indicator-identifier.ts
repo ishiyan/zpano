@@ -339,4 +339,9 @@ export enum IndicatorIdentifier {
 
     /** Identifies the __Hurst Difference__ (HURDIF) indicator. */
     HurstDifference,
+
+    // ── doug schaff ───────────────────────────────────────────────────────
+
+    /** Identifies the Doug Schaff __Schaff Trend Cycle__ (STC) indicator. */
+    SchaffTrendCycle,
 }

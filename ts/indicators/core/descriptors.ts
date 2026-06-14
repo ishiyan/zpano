@@ -325,6 +325,9 @@ const descriptors: Map<IndicatorIdentifier, Descriptor> = new Map<IndicatorIdent
   [IndicatorIdentifier.FractalBandsHybrideAdaptive, desc(IndicatorIdentifier.FractalBandsHybrideAdaptive, 'Jean-Philippe Poton', A.Adaptive, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Smoother, P.Price), out(1, S.Scalar, R.Envelope, P.Price), out(2, S.Scalar, R.Envelope, P.Price), out(3, S.Band, R.Envelope, P.Price)])],
   [IndicatorIdentifier.FractionalBands, desc(IndicatorIdentifier.FractionalBands, 'Jean-Philippe Poton', A.Adaptive, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Smoother, P.Price), out(1, S.Scalar, R.Envelope, P.Price), out(2, S.Scalar, R.Envelope, P.Price), out(3, S.Band, R.Envelope, P.Price)])],
   [IndicatorIdentifier.HurstDifference, desc(IndicatorIdentifier.HurstDifference, 'Jean-Philippe Poton', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Oscillator, P.Own), out(1, S.Scalar, R.Oscillator, P.Own)])],
+
+  // ── doug schaff ───────────────────────────────────────────────────────
+  [IndicatorIdentifier.SchaffTrendCycle, desc(IndicatorIdentifier.SchaffTrendCycle, 'Doug Schaff', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.BoundedOscillator, P.Own), out(1, S.Scalar, R.Oscillator, P.Own), out(2, S.Scalar, R.BoundedOscillator, P.Own)])],
 ]);
 
 /**

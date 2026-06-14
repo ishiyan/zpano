@@ -698,4 +698,16 @@ var descriptors = map[Identifier]Descriptor{
 			{Kind: 2 /* Fgdi */, Shape: shape.Scalar, Role: Oscillator, Pane: Own},
 		},
 	},
+
+	// ── doug schaff ───────────────────────────────────────────────────────
+
+	SchaffTrendCycle: {
+		Identifier: SchaffTrendCycle, Family: "Doug Schaff",
+		Adaptivity: Static, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{
+			{Kind: 1 /* STC */, Shape: shape.Scalar, Role: BoundedOscillator, Pane: Own},
+			{Kind: 2 /* MACD */, Shape: shape.Scalar, Role: Oscillator, Pane: Own},
+			{Kind: 3 /* PF */, Shape: shape.Scalar, Role: BoundedOscillator, Pane: Own},
+		},
+	},
 }

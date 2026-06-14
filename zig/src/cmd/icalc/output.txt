@@ -649,6 +649,14 @@
     [0] kind=1 shape=scalar mnemonic="hurdif(30)" description="Hurst difference hurdif(30)"
     [1] kind=2 shape=scalar mnemonic="fgdi" description="FGDI"
 
+[93] stc(23,50,10,0.50)
+  Identifier:  schaffTrendCycle
+  Description: Schaff Trend Cycle stc(23,50,10,0.50)
+  Outputs (3):
+    [0] kind=1 shape=scalar mnemonic="stc(23,50,10,0.50) stc" description="Schaff Trend Cycle stc(23,50,10,0.50) STC"
+    [1] kind=2 shape=scalar mnemonic="stc(23,50,10,0.50) macd" description="Schaff Trend Cycle stc(23,50,10,0.50) MACD"
+    [2] kind=3 shape=scalar mnemonic="stc(23,50,10,0.50) pf" description="Schaff Trend Cycle stc(23,50,10,0.50) PF"
+
 
 === Bar Data & Indicator Outputs ===
 
@@ -746,6 +754,7 @@ Bar[  0] 2020-01-02  O=91.5000 H=93.2500 L=90.7500 C=91.5000 V=4077500
   fbanha(30,30,2,0.5,0.07)                      primed=false fbanha(30,30,2,0.5,0.07)=NaN upper=NaN lower=NaN band=Band(NaN) 
   fctban(30,1)                                  primed=false fctban(30,1)=NaN upper=NaN lower=NaN band=Band(NaN) 
   hurdif(30)                                    primed=false hurdif(30)=NaN 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[  1] 2020-01-03  O=91.5000 H=94.9400 L=91.4050 C=94.8150 V=4955900
   sma(14)                                       primed=false sma(14)=NaN 
@@ -841,6 +850,7 @@ Bar[  1] 2020-01-03  O=91.5000 H=94.9400 L=91.4050 C=94.8150 V=4955900
   fbanha(30,30,2,0.5,0.07)                      primed=false fbanha(30,30,2,0.5,0.07)=NaN upper=NaN lower=NaN band=Band(NaN) 
   fctban(30,1)                                  primed=false fctban(30,1)=NaN upper=NaN lower=NaN band=Band(NaN) 
   hurdif(30)                                    primed=false hurdif(30)=NaN 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[  2] 2020-01-04  O=94.8150 H=96.3750 L=94.2500 C=94.3750 V=4775300
   sma(14)                                       primed=false sma(14)=NaN 
@@ -936,6 +946,7 @@ Bar[  2] 2020-01-04  O=94.8150 H=96.3750 L=94.2500 C=94.3750 V=4775300
   fbanha(30,30,2,0.5,0.07)                      primed=false fbanha(30,30,2,0.5,0.07)=NaN upper=NaN lower=NaN band=Band(NaN) 
   fctban(30,1)                                  primed=false fctban(30,1)=NaN upper=NaN lower=NaN band=Band(NaN) 
   hurdif(30)                                    primed=false hurdif(30)=NaN 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[  3] 2020-01-05  O=94.3750 H=96.1900 L=93.5000 C=95.0950 V=4155300
   sma(14)                                       primed=false sma(14)=NaN 
@@ -1031,6 +1042,7 @@ Bar[  3] 2020-01-05  O=94.3750 H=96.1900 L=93.5000 C=95.0950 V=4155300
   fbanha(30,30,2,0.5,0.07)                      primed=false fbanha(30,30,2,0.5,0.07)=NaN upper=NaN lower=NaN band=Band(NaN) 
   fctban(30,1)                                  primed=false fctban(30,1)=NaN upper=NaN lower=NaN band=Band(NaN) 
   hurdif(30)                                    primed=false hurdif(30)=NaN 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[  4] 2020-01-06  O=95.0950 H=96.0000 L=92.8150 C=93.7800 V=4593100
   sma(14)                                       primed=false sma(14)=NaN 
@@ -1126,6 +1138,7 @@ Bar[  4] 2020-01-06  O=95.0950 H=96.0000 L=92.8150 C=93.7800 V=4593100
   fbanha(30,30,2,0.5,0.07)                      primed=false fbanha(30,30,2,0.5,0.07)=NaN upper=NaN lower=NaN band=Band(NaN) 
   fctban(30,1)                                  primed=false fctban(30,1)=NaN upper=NaN lower=NaN band=Band(NaN) 
   hurdif(30)                                    primed=false hurdif(30)=NaN 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[  5] 2020-01-07  O=93.7800 H=94.7200 L=93.5000 C=94.6250 V=3631300
   sma(14)                                       primed=false sma(14)=NaN 
@@ -1221,6 +1234,7 @@ Bar[  5] 2020-01-07  O=93.7800 H=94.7200 L=93.5000 C=94.6250 V=3631300
   fbanha(30,30,2,0.5,0.07)                      primed=false fbanha(30,30,2,0.5,0.07)=NaN upper=NaN lower=NaN band=Band(NaN) 
   fctban(30,1)                                  primed=false fctban(30,1)=NaN upper=NaN lower=NaN band=Band(NaN) 
   hurdif(30)                                    primed=false hurdif(30)=NaN 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[  6] 2020-01-08  O=94.6250 H=95.0000 L=92.0000 C=92.5300 V=3382800
   sma(14)                                       primed=false sma(14)=NaN 
@@ -1316,6 +1330,7 @@ Bar[  6] 2020-01-08  O=94.6250 H=95.0000 L=92.0000 C=92.5300 V=3382800
   fbanha(30,30,2,0.5,0.07)                      primed=false fbanha(30,30,2,0.5,0.07)=NaN upper=NaN lower=NaN band=Band(NaN) 
   fctban(30,1)                                  primed=false fctban(30,1)=NaN upper=NaN lower=NaN band=Band(NaN) 
   hurdif(30)                                    primed=false hurdif(30)=NaN 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[  7] 2020-01-09  O=92.5300 H=93.7200 L=89.7500 C=92.7500 V=4954200
   sma(14)                                       primed=false sma(14)=NaN 
@@ -1411,6 +1426,7 @@ Bar[  7] 2020-01-09  O=92.5300 H=93.7200 L=89.7500 C=92.7500 V=4954200
   fbanha(30,30,2,0.5,0.07)                      primed=false fbanha(30,30,2,0.5,0.07)=NaN upper=NaN lower=NaN band=Band(NaN) 
   fctban(30,1)                                  primed=false fctban(30,1)=NaN upper=NaN lower=NaN band=Band(NaN) 
   hurdif(30)                                    primed=false hurdif(30)=NaN 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[  8] 2020-01-10  O=92.7500 H=92.4700 L=89.4400 C=90.3150 V=4500000
   sma(14)                                       primed=false sma(14)=NaN 
@@ -1506,6 +1522,7 @@ Bar[  8] 2020-01-10  O=92.7500 H=92.4700 L=89.4400 C=90.3150 V=4500000
   fbanha(30,30,2,0.5,0.07)                      primed=false fbanha(30,30,2,0.5,0.07)=NaN upper=NaN lower=NaN band=Band(NaN) 
   fctban(30,1)                                  primed=false fctban(30,1)=NaN upper=NaN lower=NaN band=Band(NaN) 
   hurdif(30)                                    primed=false hurdif(30)=NaN 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[  9] 2020-01-11  O=90.3150 H=92.7500 L=90.6250 C=92.4700 V=3397500
   sma(14)                                       primed=false sma(14)=NaN 
@@ -1601,6 +1618,7 @@ Bar[  9] 2020-01-11  O=90.3150 H=92.7500 L=90.6250 C=92.4700 V=3397500
   fbanha(30,30,2,0.5,0.07)                      primed=false fbanha(30,30,2,0.5,0.07)=NaN upper=NaN lower=NaN band=Band(NaN) 
   fctban(30,1)                                  primed=false fctban(30,1)=NaN upper=NaN lower=NaN band=Band(NaN) 
   hurdif(30)                                    primed=false hurdif(30)=NaN 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 10] 2020-01-12  O=92.4700 H=96.2500 L=92.7500 C=96.1250 V=4204500
   sma(14)                                       primed=false sma(14)=NaN 
@@ -1696,6 +1714,7 @@ Bar[ 10] 2020-01-12  O=92.4700 H=96.2500 L=92.7500 C=96.1250 V=4204500
   fbanha(30,30,2,0.5,0.07)                      primed=false fbanha(30,30,2,0.5,0.07)=NaN upper=NaN lower=NaN band=Band(NaN) 
   fctban(30,1)                                  primed=false fctban(30,1)=NaN upper=NaN lower=NaN band=Band(NaN) 
   hurdif(30)                                    primed=false hurdif(30)=NaN 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 11] 2020-01-13  O=96.1250 H=99.6250 L=96.3150 C=97.2500 V=6321400
   sma(14)                                       primed=false sma(14)=NaN 
@@ -1791,6 +1810,7 @@ Bar[ 11] 2020-01-13  O=96.1250 H=99.6250 L=96.3150 C=97.2500 V=6321400
   fbanha(30,30,2,0.5,0.07)                      primed=false fbanha(30,30,2,0.5,0.07)=NaN upper=NaN lower=NaN band=Band(NaN) 
   fctban(30,1)                                  primed=false fctban(30,1)=NaN upper=NaN lower=NaN band=Band(NaN) 
   hurdif(30)                                    primed=false hurdif(30)=NaN 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 12] 2020-01-14  O=97.2500 H=99.1250 L=96.0300 C=98.5000 V=10203600
   sma(14)                                       primed=false sma(14)=NaN 
@@ -1886,6 +1906,7 @@ Bar[ 12] 2020-01-14  O=97.2500 H=99.1250 L=96.0300 C=98.5000 V=10203600
   fbanha(30,30,2,0.5,0.07)                      primed=false fbanha(30,30,2,0.5,0.07)=NaN upper=NaN lower=NaN band=Band(NaN) 
   fctban(30,1)                                  primed=false fctban(30,1)=NaN upper=NaN lower=NaN band=Band(NaN) 
   hurdif(30)                                    primed=false hurdif(30)=NaN 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 13] 2020-01-15  O=98.5000 H=92.7500 L=88.8150 C=89.8750 V=19043900
   sma(14)                                       primed=true  sma(14)=93.8575 
@@ -1981,6 +2002,7 @@ Bar[ 13] 2020-01-15  O=98.5000 H=92.7500 L=88.8150 C=89.8750 V=19043900
   fbanha(30,30,2,0.5,0.07)                      primed=false fbanha(30,30,2,0.5,0.07)=NaN upper=NaN lower=NaN band=Band(NaN) 
   fctban(30,1)                                  primed=false fctban(30,1)=NaN upper=NaN lower=NaN band=Band(NaN) 
   hurdif(30)                                    primed=false hurdif(30)=NaN 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 14] 2020-01-16  O=89.8750 H=91.3150 L=86.7500 C=91.0000 V=11692000
   sma(14)                                       primed=true  sma(14)=93.8218 
@@ -2076,6 +2098,7 @@ Bar[ 14] 2020-01-16  O=89.8750 H=91.3150 L=86.7500 C=91.0000 V=11692000
   fbanha(30,30,2,0.5,0.07)                      primed=false fbanha(30,30,2,0.5,0.07)=NaN upper=NaN lower=NaN band=Band(NaN) 
   fctban(30,1)                                  primed=false fctban(30,1)=NaN upper=NaN lower=NaN band=Band(NaN) 
   hurdif(30)                                    primed=false hurdif(30)=NaN 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 15] 2020-01-17  O=91.0000 H=93.2500 L=90.9400 C=92.8150 V=9553300
   sma(14)                                       primed=true  sma(14)=93.6789 
@@ -2171,6 +2194,7 @@ Bar[ 15] 2020-01-17  O=91.0000 H=93.2500 L=90.9400 C=92.8150 V=9553300
   fbanha(30,30,2,0.5,0.07)                      primed=false fbanha(30,30,2,0.5,0.07)=NaN upper=NaN lower=NaN band=Band(NaN) 
   fctban(30,1)                                  primed=false fctban(30,1)=NaN upper=NaN lower=NaN band=Band(NaN) 
   hurdif(30)                                    primed=false hurdif(30)=NaN 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 16] 2020-01-18  O=92.8150 H=93.4050 L=88.9050 C=89.1550 V=8920300
   sma(14)                                       primed=true  sma(14)=93.3061 
@@ -2266,6 +2290,7 @@ Bar[ 16] 2020-01-18  O=92.8150 H=93.4050 L=88.9050 C=89.1550 V=8920300
   fbanha(30,30,2,0.5,0.07)                      primed=false fbanha(30,30,2,0.5,0.07)=NaN upper=NaN lower=NaN band=Band(NaN) 
   fctban(30,1)                                  primed=false fctban(30,1)=NaN upper=NaN lower=NaN band=Band(NaN) 
   hurdif(30)                                    primed=false hurdif(30)=NaN 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 17] 2020-01-19  O=89.1550 H=90.6550 L=88.7800 C=89.3450 V=5970900
   sma(14)                                       primed=true  sma(14)=92.8954 
@@ -2361,6 +2386,7 @@ Bar[ 17] 2020-01-19  O=89.1550 H=90.6550 L=88.7800 C=89.3450 V=5970900
   fbanha(30,30,2,0.5,0.07)                      primed=false fbanha(30,30,2,0.5,0.07)=NaN upper=NaN lower=NaN band=Band(NaN) 
   fctban(30,1)                                  primed=false fctban(30,1)=NaN upper=NaN lower=NaN band=Band(NaN) 
   hurdif(30)                                    primed=false hurdif(30)=NaN 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 18] 2020-01-20  O=89.3450 H=91.9700 L=89.2500 C=91.6250 V=5062300
   sma(14)                                       primed=true  sma(14)=92.7414 
@@ -2456,6 +2482,7 @@ Bar[ 18] 2020-01-20  O=89.3450 H=91.9700 L=89.2500 C=91.6250 V=5062300
   fbanha(30,30,2,0.5,0.07)                      primed=false fbanha(30,30,2,0.5,0.07)=NaN upper=NaN lower=NaN band=Band(NaN) 
   fctban(30,1)                                  primed=false fctban(30,1)=NaN upper=NaN lower=NaN band=Band(NaN) 
   hurdif(30)                                    primed=false hurdif(30)=NaN 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 19] 2020-01-21  O=91.6250 H=92.2500 L=89.7500 C=89.8750 V=3705600
   sma(14)                                       primed=true  sma(14)=92.4021 
@@ -2551,6 +2578,7 @@ Bar[ 19] 2020-01-21  O=91.6250 H=92.2500 L=89.7500 C=89.8750 V=3705600
   fbanha(30,30,2,0.5,0.07)                      primed=false fbanha(30,30,2,0.5,0.07)=NaN upper=NaN lower=NaN band=Band(NaN) 
   fctban(30,1)                                  primed=false fctban(30,1)=NaN upper=NaN lower=NaN band=Band(NaN) 
   hurdif(30)                                    primed=false hurdif(30)=NaN 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 20] 2020-01-22  O=89.8750 H=90.3450 L=87.5000 C=88.3750 V=5865600
   sma(14)                                       primed=true  sma(14)=92.1054 
@@ -2646,6 +2674,7 @@ Bar[ 20] 2020-01-22  O=89.8750 H=90.3450 L=87.5000 C=88.3750 V=5865600
   fbanha(30,30,2,0.5,0.07)                      primed=false fbanha(30,30,2,0.5,0.07)=NaN upper=NaN lower=NaN band=Band(NaN) 
   fctban(30,1)                                  primed=false fctban(30,1)=NaN upper=NaN lower=NaN band=Band(NaN) 
   hurdif(30)                                    primed=false hurdif(30)=NaN 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 21] 2020-01-23  O=88.3750 H=88.5000 L=86.5300 C=87.6250 V=5603000
   sma(14)                                       primed=true  sma(14)=91.7393 
@@ -2741,6 +2770,7 @@ Bar[ 21] 2020-01-23  O=88.3750 H=88.5000 L=86.5300 C=87.6250 V=5603000
   fbanha(30,30,2,0.5,0.07)                      primed=false fbanha(30,30,2,0.5,0.07)=NaN upper=NaN lower=NaN band=Band(NaN) 
   fctban(30,1)                                  primed=false fctban(30,1)=NaN upper=NaN lower=NaN band=Band(NaN) 
   hurdif(30)                                    primed=false hurdif(30)=NaN 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 22] 2020-01-24  O=87.6250 H=88.2500 L=84.6250 C=84.7800 V=5811900
   sma(14)                                       primed=true  sma(14)=91.3439 
@@ -2836,6 +2866,7 @@ Bar[ 22] 2020-01-24  O=87.6250 H=88.2500 L=84.6250 C=84.7800 V=5811900
   fbanha(30,30,2,0.5,0.07)                      primed=false fbanha(30,30,2,0.5,0.07)=NaN upper=NaN lower=NaN band=Band(NaN) 
   fctban(30,1)                                  primed=false fctban(30,1)=NaN upper=NaN lower=NaN band=Band(NaN) 
   hurdif(30)                                    primed=false hurdif(30)=NaN 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 23] 2020-01-25  O=84.7800 H=85.5000 L=82.2800 C=83.0000 V=8483800
   sma(14)                                       primed=true  sma(14)=90.6675 
@@ -2931,6 +2962,7 @@ Bar[ 23] 2020-01-25  O=84.7800 H=85.5000 L=82.2800 C=83.0000 V=8483800
   fbanha(30,30,2,0.5,0.07)                      primed=false fbanha(30,30,2,0.5,0.07)=NaN upper=NaN lower=NaN band=Band(NaN) 
   fctban(30,1)                                  primed=false fctban(30,1)=NaN upper=NaN lower=NaN band=Band(NaN) 
   hurdif(30)                                    primed=false hurdif(30)=NaN 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 24] 2020-01-26  O=83.0000 H=84.4400 L=81.5650 C=83.5000 V=5995200
   sma(14)                                       primed=true  sma(14)=89.7657 
@@ -3026,6 +3058,7 @@ Bar[ 24] 2020-01-26  O=83.0000 H=84.4400 L=81.5650 C=83.5000 V=5995200
   fbanha(30,30,2,0.5,0.07)                      primed=false fbanha(30,30,2,0.5,0.07)=NaN upper=NaN lower=NaN band=Band(NaN) 
   fctban(30,1)                                  primed=false fctban(30,1)=NaN upper=NaN lower=NaN band=Band(NaN) 
   hurdif(30)                                    primed=false hurdif(30)=NaN 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 25] 2020-01-27  O=83.5000 H=84.7500 L=80.8750 C=81.3750 V=5408800
   sma(14)                                       primed=true  sma(14)=88.6318 
@@ -3121,6 +3154,7 @@ Bar[ 25] 2020-01-27  O=83.5000 H=84.7500 L=80.8750 C=81.3750 V=5408800
   fbanha(30,30,2,0.5,0.07)                      primed=false fbanha(30,30,2,0.5,0.07)=NaN upper=NaN lower=NaN band=Band(NaN) 
   fctban(30,1)                                  primed=false fctban(30,1)=NaN upper=NaN lower=NaN band=Band(NaN) 
   hurdif(30)                                    primed=false hurdif(30)=NaN 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 26] 2020-01-28  O=81.3750 H=84.4400 L=81.2500 C=84.4400 V=5430500
   sma(14)                                       primed=true  sma(14)=87.6275 
@@ -3216,6 +3250,7 @@ Bar[ 26] 2020-01-28  O=81.3750 H=84.4400 L=81.2500 C=84.4400 V=5430500
   fbanha(30,30,2,0.5,0.07)                      primed=false fbanha(30,30,2,0.5,0.07)=NaN upper=NaN lower=NaN band=Band(NaN) 
   fctban(30,1)                                  primed=false fctban(30,1)=NaN upper=NaN lower=NaN band=Band(NaN) 
   hurdif(30)                                    primed=false hurdif(30)=NaN 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 27] 2020-01-29  O=84.4400 H=89.4050 L=84.0650 C=89.2500 V=6283800
   sma(14)                                       primed=true  sma(14)=87.5829 
@@ -3311,6 +3346,7 @@ Bar[ 27] 2020-01-29  O=84.4400 H=89.4050 L=84.0650 C=89.2500 V=6283800
   fbanha(30,30,2,0.5,0.07)                      primed=false fbanha(30,30,2,0.5,0.07)=NaN upper=NaN lower=NaN band=Band(NaN) 
   fctban(30,1)                                  primed=false fctban(30,1)=NaN upper=NaN lower=NaN band=Band(NaN) 
   hurdif(30)                                    primed=false hurdif(30)=NaN 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 28] 2020-01-30  O=89.2500 H=88.1250 L=85.5950 C=86.3750 V=5834800
   sma(14)                                       primed=true  sma(14)=87.2525 
@@ -3406,6 +3442,7 @@ Bar[ 28] 2020-01-30  O=89.2500 H=88.1250 L=85.5950 C=86.3750 V=5834800
   fbanha(30,30,2,0.5,0.07)                      primed=false fbanha(30,30,2,0.5,0.07)=NaN upper=NaN lower=NaN band=Band(NaN) 
   fctban(30,1)                                  primed=false fctban(30,1)=NaN upper=NaN lower=NaN band=Band(NaN) 
   hurdif(30)                                    primed=false hurdif(30)=NaN 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 29] 2020-01-31  O=86.3750 H=89.1250 L=85.9700 C=86.2500 V=4515500
   sma(14)                                       primed=true  sma(14)=86.7836 
@@ -3501,6 +3538,7 @@ Bar[ 29] 2020-01-31  O=86.3750 H=89.1250 L=85.9700 C=86.2500 V=4515500
   fbanha(30,30,2,0.5,0.07)                      primed=false fbanha(30,30,2,0.5,0.07)=NaN upper=NaN lower=NaN band=Band(NaN) 
   fctban(30,1)                                  primed=false fctban(30,1)=NaN upper=NaN lower=NaN band=Band(NaN) 
   hurdif(30)                                    primed=false hurdif(30)=NaN 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 30] 2020-02-01  O=86.2500 H=87.1550 L=84.4050 C=85.2500 V=4493300
   sma(14)                                       primed=true  sma(14)=86.5046 
@@ -3596,6 +3634,7 @@ Bar[ 30] 2020-02-01  O=86.2500 H=87.1550 L=84.4050 C=85.2500 V=4493300
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=87.4394 upper=102.1795 lower=72.6994 band=Band(72.6994,102.1795) 
   fctban(30,1)                                  primed=true  fctban(30,1)=90.2180 upper=99.1994 lower=81.2366 band=Band(81.2366,99.1994) 
   hurdif(30)                                    primed=true  hurdif(30)=NaN 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 31] 2020-02-02  O=85.2500 H=87.2500 L=85.0950 C=87.1250 V=4346100
   sma(14)                                       primed=true  sma(14)=86.3461 
@@ -3691,6 +3730,7 @@ Bar[ 31] 2020-02-02  O=85.2500 H=87.2500 L=85.0950 C=87.1250 V=4346100
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=85.9400 upper=102.7817 lower=69.0983 band=Band(69.0983,102.7817) 
   fctban(30,1)                                  primed=true  fctban(30,1)=89.8095 upper=98.9210 lower=80.6980 band=Band(80.6980,98.9210) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0049 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 32] 2020-02-03  O=87.1250 H=87.3750 L=85.5000 C=85.8150 V=3700300
   sma(14)                                       primed=true  sma(14)=85.9311 
@@ -3786,6 +3826,7 @@ Bar[ 32] 2020-02-03  O=87.1250 H=87.3750 L=85.5000 C=85.8150 V=3700300
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=85.2380 upper=102.8364 lower=67.6396 band=Band(67.6396,102.8364) 
   fctban(30,1)                                  primed=true  fctban(30,1)=89.4895 upper=98.4342 lower=80.5448 band=Band(80.5448,98.4342) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0020 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 33] 2020-02-04  O=85.8150 H=88.9700 L=85.5300 C=88.9700 V=4600200
   sma(14)                                       primed=true  sma(14)=85.8664 
@@ -3881,6 +3922,7 @@ Bar[ 33] 2020-02-04  O=85.8150 H=88.9700 L=85.5300 C=88.9700 V=4600200
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=86.6844 upper=100.9335 lower=72.4352 band=Band(72.4352,100.9335) 
   fctban(30,1)                                  primed=true  fctban(30,1)=89.3236 upper=97.9674 lower=80.6799 band=Band(80.6799,97.9674) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0068 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 34] 2020-02-05  O=88.9700 H=90.0000 L=87.8750 C=88.4700 V=4557200
   sma(14)                                       primed=true  sma(14)=85.8732 
@@ -3976,6 +4018,7 @@ Bar[ 34] 2020-02-05  O=88.9700 H=90.0000 L=87.8750 C=88.4700 V=4557200
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=86.8936 upper=100.4143 lower=73.3728 band=Band(73.3728,100.4143) 
   fctban(30,1)                                  primed=true  fctban(30,1)=89.2952 upper=97.6160 lower=80.9744 band=Band(80.9744,97.6160) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0010 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 35] 2020-02-06  O=88.4700 H=89.8450 L=86.5650 C=86.8750 V=4323600
   sma(14)                                       primed=true  sma(14)=85.8196 
@@ -4071,6 +4114,7 @@ Bar[ 35] 2020-02-06  O=88.4700 H=89.8450 L=86.5650 C=86.8750 V=4323600
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=86.9650 upper=99.7677 lower=74.1623 band=Band(74.1623,99.7677) 
   fctban(30,1)                                  primed=true  fctban(30,1)=89.0368 upper=97.1780 lower=80.8957 band=Band(80.8957,97.1780) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0018 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 36] 2020-02-07  O=86.8750 H=86.9700 L=84.6550 C=86.8150 V=5237500
   sma(14)                                       primed=true  sma(14)=85.9650 
@@ -4166,6 +4210,7 @@ Bar[ 36] 2020-02-07  O=86.8750 H=86.9700 L=84.6550 C=86.8150 V=5237500
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=87.0457 upper=99.4801 lower=74.6113 band=Band(74.6113,99.4801) 
   fctban(30,1)                                  primed=true  fctban(30,1)=88.8463 upper=96.9583 lower=80.7344 band=Band(80.7344,96.9583) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0001 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 37] 2020-02-08  O=86.8150 H=85.9400 L=83.2500 C=84.8750 V=7404100
   sma(14)                                       primed=true  sma(14)=86.0989 
@@ -4261,6 +4306,7 @@ Bar[ 37] 2020-02-08  O=86.8150 H=85.9400 L=83.2500 C=84.8750 V=7404100
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=86.7744 upper=99.1568 lower=74.3920 band=Band(74.3920,99.1568) 
   fctban(30,1)                                  primed=true  fctban(30,1)=88.5838 upper=96.6860 lower=80.4817 band=Band(80.4817,96.6860) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0019 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 38] 2020-02-09  O=84.8750 H=84.7500 L=82.5650 C=84.1900 V=4798400
   sma(14)                                       primed=true  sma(14)=86.1482 
@@ -4356,6 +4402,7 @@ Bar[ 38] 2020-02-09  O=84.8750 H=84.7500 L=82.5650 C=84.1900 V=4798400
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=86.4872 upper=99.1808 lower=73.7937 band=Band(73.7937,99.1808) 
   fctban(30,1)                                  primed=true  fctban(30,1)=88.3797 upper=96.6523 lower=80.1071 band=Band(80.1071,96.6523) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0053 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 39] 2020-02-10  O=84.1900 H=85.4700 L=83.4400 C=83.8750 V=4372800
   sma(14)                                       primed=true  sma(14)=86.3268 
@@ -4451,6 +4498,7 @@ Bar[ 39] 2020-02-10  O=84.1900 H=85.4700 L=83.4400 C=83.8750 V=4372800
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=86.2282 upper=98.9545 lower=73.5019 band=Band(73.5019,98.9545) 
   fctban(30,1)                                  primed=true  fctban(30,1)=87.8162 upper=96.2409 lower=79.3915 band=Band(79.3915,96.2409) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0124 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 40] 2020-02-11  O=83.8750 H=84.4700 L=82.5300 C=83.3750 V=3872300
   sma(14)                                       primed=true  sma(14)=86.2507 
@@ -4546,6 +4594,7 @@ Bar[ 40] 2020-02-11  O=83.8750 H=84.4700 L=82.5300 C=83.3750 V=3872300
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=86.2507 upper=98.0591 lower=74.4424 band=Band(74.4424,98.0591) 
   fctban(30,1)                                  primed=true  fctban(30,1)=87.3378 upper=95.6212 lower=79.0543 band=Band(79.0543,95.6212) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0021 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 41] 2020-02-12  O=83.3750 H=88.5000 L=85.0650 C=85.5000 V=10750800
   sma(14)                                       primed=true  sma(14)=85.9829 
@@ -4641,6 +4690,7 @@ Bar[ 41] 2020-02-12  O=83.3750 H=88.5000 L=85.0650 C=85.5000 V=10750800
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=86.2007 upper=96.5282 lower=75.8731 band=Band(75.8731,96.5282) 
   fctban(30,1)                                  primed=true  fctban(30,1)=86.7829 upper=94.2166 lower=79.3491 band=Band(79.3491,94.2166) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0035 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 42] 2020-02-13  O=85.5000 H=89.4700 L=86.8750 C=89.1900 V=5804800
   sma(14)                                       primed=true  sma(14)=86.1839 
@@ -4736,6 +4786,7 @@ Bar[ 42] 2020-02-13  O=85.5000 H=89.4700 L=86.8750 C=89.1900 V=5804800
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=86.2729 upper=94.3994 lower=78.1465 band=Band(78.1465,94.3994) 
   fctban(30,1)                                  primed=true  fctban(30,1)=86.8659 upper=92.6810 lower=81.0507 band=Band(81.0507,92.6810) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0680 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 43] 2020-02-14  O=89.1900 H=90.0000 L=88.5300 C=89.4400 V=3785500
   sma(14)                                       primed=true  sma(14)=86.4118 
@@ -4831,6 +4882,7 @@ Bar[ 43] 2020-02-14  O=89.1900 H=90.0000 L=88.5300 C=89.4400 V=3785500
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=86.0478 upper=93.9922 lower=78.1033 band=Band(78.1033,93.9922) 
   fctban(30,1)                                  primed=true  fctban(30,1)=87.7023 upper=92.9038 lower=82.5007 band=Band(82.5007,92.9038) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0035 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 44] 2020-02-15  O=89.4400 H=92.4400 L=89.2800 C=91.0950 V=5014800
   sma(14)                                       primed=true  sma(14)=86.8293 
@@ -4926,6 +4978,7 @@ Bar[ 44] 2020-02-15  O=89.4400 H=92.4400 L=89.2800 C=91.0950 V=5014800
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=86.2881 upper=94.0545 lower=78.5216 band=Band(78.5216,94.0545) 
   fctban(30,1)                                  primed=true  fctban(30,1)=87.5158 upper=92.6893 lower=82.3422 band=Band(82.3422,92.6893) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0007 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 45] 2020-02-16  O=91.0950 H=91.4400 L=90.1250 C=90.7500 V=3507700
   sma(14)                                       primed=true  sma(14)=87.0882 
@@ -5021,6 +5074,7 @@ Bar[ 45] 2020-02-16  O=91.0950 H=91.4400 L=90.1250 C=90.7500 V=3507700
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=86.3391 upper=93.7354 lower=78.9429 band=Band(78.9429,93.7354) 
   fctban(30,1)                                  primed=true  fctban(30,1)=87.2809 upper=92.2070 lower=82.3548 band=Band(82.3548,92.2070) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0092 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 46] 2020-02-17  O=90.7500 H=92.9700 L=90.7500 C=91.4400 V=4298800
   sma(14)                                       primed=true  sma(14)=87.4900 
@@ -5116,6 +5170,7 @@ Bar[ 46] 2020-02-17  O=90.7500 H=92.9700 L=90.7500 C=91.4400 V=4298800
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=86.4808 upper=94.0452 lower=78.9164 band=Band(78.9164,94.0452) 
   fctban(30,1)                                  primed=true  fctban(30,1)=87.3283 upper=92.3146 lower=82.3421 band=Band(82.3421,92.3146) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0019 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 47] 2020-02-18  O=91.4400 H=91.7200 L=89.0000 C=89.0000 V=4842500
   sma(14)                                       primed=true  sma(14)=87.4921 
@@ -5211,6 +5266,7 @@ Bar[ 47] 2020-02-18  O=91.4400 H=91.7200 L=89.0000 C=89.0000 V=4842500
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=86.6165 upper=94.0432 lower=79.1897 band=Band(79.1897,94.0432) 
   fctban(30,1)                                  primed=true  fctban(30,1)=87.2677 upper=92.2095 lower=82.3259 band=Band(82.3259,92.2095) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0008 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 48] 2020-02-19  O=89.0000 H=91.1550 L=88.5650 C=91.0000 V=3952200
   sma(14)                                       primed=true  sma(14)=87.6729 
@@ -5306,6 +5362,7 @@ Bar[ 48] 2020-02-19  O=89.0000 H=91.1550 L=88.5650 C=91.0000 V=3952200
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=86.7415 upper=94.0466 lower=79.4364 band=Band(79.4364,94.0466) 
   fctban(30,1)                                  primed=true  fctban(30,1)=87.3775 upper=92.2870 lower=82.4680 band=Band(82.4680,92.2870) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0054 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 49] 2020-02-20  O=91.0000 H=91.7500 L=90.0950 C=90.5000 V=3304700
   sma(14)                                       primed=true  sma(14)=87.9318 
@@ -5401,6 +5458,7 @@ Bar[ 49] 2020-02-20  O=91.0000 H=91.7500 L=90.0950 C=90.5000 V=3304700
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=86.8757 upper=94.2421 lower=79.5093 band=Band(79.5093,94.2421) 
   fctban(30,1)                                  primed=true  fctban(30,1)=87.3094 upper=92.1841 lower=82.4347 band=Band(82.4347,92.1841) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0048 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 50] 2020-02-21  O=90.5000 H=90.0000 L=89.0000 C=89.0300 V=3462000
   sma(14)                                       primed=true  sma(14)=88.0900 
@@ -5496,6 +5554,7 @@ Bar[ 50] 2020-02-21  O=90.5000 H=90.0000 L=89.0000 C=89.0300 V=3462000
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=87.0275 upper=94.4312 lower=79.6238 band=Band(79.6238,94.4312) 
   fctban(30,1)                                  primed=true  fctban(30,1)=87.3057 upper=92.2448 lower=82.3666 band=Band(82.3666,92.2448) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0035 
+  stc(23,50,10,0.50)                            primed=false stc(23,50,10,0.50) stc=NaN stc(23,50,10,0.50) macd=0.0000 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 51] 2020-02-22  O=89.0300 H=88.8750 L=86.4700 C=88.8150 V=7253900
   sma(14)                                       primed=true  sma(14)=88.3714 
@@ -5591,6 +5650,7 @@ Bar[ 51] 2020-02-22  O=89.0300 H=88.8750 L=86.4700 C=88.8150 V=7253900
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=87.2352 upper=94.7212 lower=79.7492 band=Band(79.7492,94.7212) 
   fctban(30,1)                                  primed=true  fctban(30,1)=87.2901 upper=92.2124 lower=82.3679 band=Band(82.3679,92.2124) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0129 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0000 stc(23,50,10,0.50) macd=-0.3590 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 52] 2020-02-23  O=88.8150 H=89.0000 L=84.0000 C=84.2800 V=9753100
   sma(14)                                       primed=true  sma(14)=88.3779 
@@ -5686,6 +5746,7 @@ Bar[ 52] 2020-02-23  O=88.8150 H=89.0000 L=84.0000 C=84.2800 V=9753100
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=87.1333 upper=94.6012 lower=79.6654 band=Band(79.6654,94.6012) 
   fctban(30,1)                                  primed=true  fctban(30,1)=86.9892 upper=92.0440 lower=81.9345 band=Band(81.9345,92.0440) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0143 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0000 stc(23,50,10,0.50) macd=-0.5329 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 53] 2020-02-24  O=84.2800 H=85.2500 L=83.3150 C=83.5000 V=5953000
   sma(14)                                       primed=true  sma(14)=88.3511 
@@ -5781,6 +5842,7 @@ Bar[ 53] 2020-02-24  O=84.2800 H=85.2500 L=83.3150 C=83.5000 V=5953000
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=87.3389 upper=94.8132 lower=79.8647 band=Band(79.8647,94.8132) 
   fctban(30,1)                                  primed=true  fctban(30,1)=86.8866 upper=91.7654 lower=82.0079 band=Band(82.0079,91.7654) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0013 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0000 stc(23,50,10,0.50) macd=-0.7186 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 54] 2020-02-25  O=83.5000 H=83.8150 L=82.0000 C=82.6900 V=5011700
   sma(14)                                       primed=true  sma(14)=88.3021 
@@ -5876,6 +5938,7 @@ Bar[ 54] 2020-02-25  O=83.5000 H=83.8150 L=82.0000 C=82.6900 V=5011700
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=87.1786 upper=94.7149 lower=79.6424 band=Band(79.6424,94.7149) 
   fctban(30,1)                                  primed=true  fctban(30,1)=86.7194 upper=91.6609 lower=81.7780 band=Band(81.7780,91.6609) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0065 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0000 stc(23,50,10,0.50) macd=-0.9157 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 55] 2020-02-26  O=82.6900 H=85.2500 L=83.2500 C=84.7500 V=5910800
   sma(14)                                       primed=true  sma(14)=88.2486 
@@ -5971,6 +6034,7 @@ Bar[ 55] 2020-02-26  O=82.6900 H=85.2500 L=83.2500 C=84.7500 V=5910800
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=87.1893 upper=94.2638 lower=80.1149 band=Band(80.1149,94.2638) 
   fctban(30,1)                                  primed=true  fctban(30,1)=86.6349 upper=91.4207 lower=81.8490 band=Band(81.8490,91.4207) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0268 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0000 stc(23,50,10,0.50) macd=-0.9953 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 56] 2020-02-27  O=84.7500 H=86.6250 L=84.7500 C=85.6550 V=4916900
   sma(14)                                       primed=true  sma(14)=87.9961 
@@ -6066,6 +6130,7 @@ Bar[ 56] 2020-02-27  O=84.7500 H=86.6250 L=84.7500 C=85.6550 V=4916900
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=87.1382 upper=94.0187 lower=80.2576 band=Band(80.2576,94.0187) 
   fctban(30,1)                                  primed=true  fctban(30,1)=86.6351 upper=91.1419 lower=82.1284 band=Band(82.1284,91.1419) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0216 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0000 stc(23,50,10,0.50) macd=-1.0223 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[ 57] 2020-02-28  O=85.6550 H=87.9400 L=85.2800 C=86.1900 V=4135000
   sma(14)                                       primed=true  sma(14)=87.7639 
@@ -6161,6 +6226,7 @@ Bar[ 57] 2020-02-28  O=85.6550 H=87.9400 L=85.2800 C=86.1900 V=4135000
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=87.1571 upper=94.0884 lower=80.2258 band=Band(80.2258,94.0884) 
   fctban(30,1)                                  primed=true  fctban(30,1)=86.7544 upper=91.3612 lower=82.1476 band=Band(82.1476,91.3612) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0137 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=50.0000 stc(23,50,10,0.50) macd=-1.0191 stc(23,50,10,0.50) pf=0.1565 
 
 Bar[ 58] 2020-02-29  O=86.1900 H=89.3750 L=87.1900 C=88.9400 V=4054200
   sma(14)                                       primed=true  sma(14)=87.6100 
@@ -6256,6 +6322,7 @@ Bar[ 58] 2020-02-29  O=86.1900 H=89.3750 L=87.1900 C=88.9400 V=4054200
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=87.1693 upper=94.1498 lower=80.1889 band=Band(80.1889,94.1498) 
   fctban(30,1)                                  primed=true  fctban(30,1)=87.0823 upper=91.8166 lower=82.3479 band=Band(82.3479,91.8166) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0147 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=75.0000 stc(23,50,10,0.50) macd=-0.8916 stc(23,50,10,0.50) pf=6.4696 
 
 Bar[ 59] 2020-03-01  O=88.9400 H=90.6250 L=88.4400 C=89.2800 V=3735300
   sma(14)                                       primed=true  sma(14)=87.5050 
@@ -6351,6 +6418,7 @@ Bar[ 59] 2020-03-01  O=88.9400 H=90.6250 L=88.4400 C=89.2800 V=3735300
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=87.5379 upper=94.6279 lower=80.4478 band=Band(80.4478,94.6279) 
   fctban(30,1)                                  primed=true  fctban(30,1)=87.1469 upper=91.7895 lower=82.5043 band=Band(82.5043,91.7895) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0035 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=87.5000 stc(23,50,10,0.50) macd=-0.7614 stc(23,50,10,0.50) pf=15.9935 
 
 Bar[ 60] 2020-03-02  O=89.2800 H=90.7500 L=88.2500 C=88.6250 V=2921900
   sma(14)                                       primed=true  sma(14)=87.3039 
@@ -6446,6 +6514,7 @@ Bar[ 60] 2020-03-02  O=89.2800 H=90.7500 L=88.2500 C=88.6250 V=2921900
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=87.9835 upper=95.2083 lower=80.7587 band=Band(80.7587,95.2083) 
   fctban(30,1)                                  primed=true  fctban(30,1)=87.2700 upper=91.9194 lower=82.6206 band=Band(82.6206,91.9194) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0071 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=93.7500 stc(23,50,10,0.50) macd=-0.6732 stc(23,50,10,0.50) pf=34.3138 
 
 Bar[ 61] 2020-03-03  O=88.6250 H=88.8450 L=87.3450 C=88.5000 V=2658400
   sma(14)                                       primed=true  sma(14)=87.2682 
@@ -6541,6 +6610,7 @@ Bar[ 61] 2020-03-03  O=88.6250 H=88.8450 L=87.3450 C=88.5000 V=2658400
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=87.7975 upper=94.9632 lower=80.6318 band=Band(80.6318,94.9632) 
   fctban(30,1)                                  primed=true  fctban(30,1)=87.2744 upper=92.0020 lower=82.5467 band=Band(82.5467,92.0020) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0063 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=96.8750 stc(23,50,10,0.50) macd=-0.5988 stc(23,50,10,0.50) pf=60.4243 
 
 Bar[ 62] 2020-03-04  O=88.5000 H=91.9700 L=89.2800 C=91.9700 V=4624400
   sma(14)                                       primed=true  sma(14)=87.3375 
@@ -6636,6 +6706,7 @@ Bar[ 62] 2020-03-04  O=88.5000 H=91.9700 L=89.2800 C=91.9700 V=4624400
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=87.8079 upper=95.2100 lower=80.4058 band=Band(80.4058,95.2100) 
   fctban(30,1)                                  primed=true  fctban(30,1)=87.5164 upper=92.6157 lower=82.4171 band=Band(82.4171,92.6157) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0113 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=98.4375 stc(23,50,10,0.50) macd=-0.3782 stc(23,50,10,0.50) pf=80.2122 
 
 Bar[ 63] 2020-03-05  O=91.9700 H=93.3750 L=91.0950 C=91.5000 V=4372200
   sma(14)                                       primed=true  sma(14)=87.4089 
@@ -6731,6 +6802,7 @@ Bar[ 63] 2020-03-05  O=91.9700 H=93.3750 L=91.0950 C=91.5000 V=4372200
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=88.1256 upper=95.9055 lower=80.3458 band=Band(80.3458,95.9055) 
   fctban(30,1)                                  primed=true  fctban(30,1)=87.6531 upper=92.8728 lower=82.4334 band=Band(82.4334,92.8728) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0002 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.2188 stc(23,50,10,0.50) macd=-0.2034 stc(23,50,10,0.50) pf=90.1061 
 
 Bar[ 64] 2020-03-06  O=91.5000 H=93.8150 L=89.5300 C=93.2500 V=5831600
   sma(14)                                       primed=true  sma(14)=87.7104 
@@ -6826,6 +6898,7 @@ Bar[ 64] 2020-03-06  O=91.5000 H=93.8150 L=89.5300 C=93.2500 V=5831600
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=88.5371 upper=97.0497 lower=80.0245 band=Band(80.0245,97.0497) 
   fctban(30,1)                                  primed=true  fctban(30,1)=87.8298 upper=93.7093 lower=81.9504 band=Band(81.9504,93.7093) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0278 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.6094 stc(23,50,10,0.50) macd=0.0284 stc(23,50,10,0.50) pf=95.0530 
 
 Bar[ 65] 2020-03-07  O=93.2500 H=94.0300 L=91.1550 C=93.5000 V=4268600
   sma(14)                                       primed=true  sma(14)=88.0450 
@@ -6921,6 +6994,7 @@ Bar[ 65] 2020-03-07  O=93.2500 H=94.0300 L=91.1550 C=93.5000 V=4268600
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=88.8704 upper=97.9813 lower=79.7595 band=Band(79.7595,97.9813) 
   fctban(30,1)                                  primed=true  fctban(30,1)=88.0507 upper=94.3141 lower=81.7873 band=Band(81.7873,94.3141) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0047 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.8047 stc(23,50,10,0.50) macd=0.2434 stc(23,50,10,0.50) pf=97.5265 
 
 Bar[ 66] 2020-03-08  O=93.5000 H=94.0300 L=92.0000 C=93.1550 V=3059200
   sma(14)                                       primed=true  sma(14)=88.6789 
@@ -7016,6 +7090,7 @@ Bar[ 66] 2020-03-08  O=93.5000 H=94.0300 L=92.0000 C=93.1550 V=3059200
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=89.0356 upper=98.4432 lower=79.6280 band=Band(79.6280,98.4432) 
   fctban(30,1)                                  primed=true  fctban(30,1)=88.2620 upper=94.7642 lower=81.7598 band=Band(81.7598,94.7642) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0090 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.9023 stc(23,50,10,0.50) macd=0.4169 stc(23,50,10,0.50) pf=98.7633 
 
 Bar[ 67] 2020-03-09  O=93.1550 H=91.8150 L=90.5300 C=91.7200 V=4495500
   sma(14)                                       primed=true  sma(14)=89.2661 
@@ -7111,6 +7186,7 @@ Bar[ 67] 2020-03-09  O=93.1550 H=91.8150 L=90.5300 C=91.7200 V=4495500
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=89.1306 upper=98.4617 lower=79.7996 band=Band(79.7996,98.4617) 
   fctban(30,1)                                  primed=true  fctban(30,1)=88.6384 upper=95.2759 lower=82.0010 band=Band(82.0010,95.2759) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0044 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.9512 stc(23,50,10,0.50) macd=0.5049 stc(23,50,10,0.50) pf=99.3816 
 
 Bar[ 68] 2020-03-10  O=91.7200 H=92.0000 L=89.9700 C=90.0000 V=3425000
   sma(14)                                       primed=true  sma(14)=89.7882 
@@ -7206,6 +7282,7 @@ Bar[ 68] 2020-03-10  O=91.7200 H=92.0000 L=89.9700 C=90.0000 V=3425000
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=89.1654 upper=98.1292 lower=80.2016 band=Band(80.2016,98.1292) 
   fctban(30,1)                                  primed=true  fctban(30,1)=88.6838 upper=95.0601 lower=82.3076 band=Band(82.3076,95.0601) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0077 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.9756 stc(23,50,10,0.50) macd=0.5049 stc(23,50,10,0.50) pf=99.6908 
 
 Bar[ 69] 2020-03-11  O=90.0000 H=91.9400 L=88.8150 C=89.6900 V=3630800
   sma(14)                                       primed=true  sma(14)=90.1411 
@@ -7301,6 +7378,7 @@ Bar[ 69] 2020-03-11  O=90.0000 H=91.9400 L=88.8150 C=89.6900 V=3630800
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=89.1092 upper=97.6398 lower=80.5786 band=Band(80.5786,97.6398) 
   fctban(30,1)                                  primed=true  fctban(30,1)=88.8777 upper=94.8919 lower=82.8635 band=Band(82.8635,94.8919) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0008 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.6090 stc(23,50,10,0.50) macd=0.4896 stc(23,50,10,0.50) pf=99.1955 
 
 Bar[ 70] 2020-03-12  O=89.6900 H=89.7500 L=86.7500 C=88.8750 V=4168100
   sma(14)                                       primed=true  sma(14)=90.3711 
@@ -7396,6 +7474,7 @@ Bar[ 70] 2020-03-12  O=89.6900 H=89.7500 L=86.7500 C=88.8750 V=4168100
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=89.0342 upper=97.0287 lower=81.0397 band=Band(81.0397,97.0287) 
   fctban(30,1)                                  primed=true  fctban(30,1)=89.0610 upper=94.7307 lower=83.3913 band=Band(83.3913,94.7307) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0077 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=95.8582 stc(23,50,10,0.50) macd=0.4386 stc(23,50,10,0.50) pf=96.5917 
 
 Bar[ 71] 2020-03-13  O=88.8750 H=88.7500 L=85.0650 C=85.1900 V=5966900
   sma(14)                                       primed=true  sma(14)=90.2996 
@@ -7491,6 +7570,7 @@ Bar[ 71] 2020-03-13  O=88.8750 H=88.7500 L=85.0650 C=85.1900 V=5966900
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=88.8863 upper=96.8824 lower=80.8903 band=Band(80.8903,96.8824) 
   fctban(30,1)                                  primed=true  fctban(30,1)=89.0507 upper=94.8395 lower=83.2618 band=Band(83.2618,94.8395) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0000 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=54.3355 stc(23,50,10,0.50) macd=0.2296 stc(23,50,10,0.50) pf=82.7079 
 
 Bar[ 72] 2020-03-14  O=85.1900 H=86.1550 L=82.0300 C=83.3750 V=7692800
   sma(14)                                       primed=true  sma(14)=89.9021 
@@ -7586,6 +7666,7 @@ Bar[ 72] 2020-03-14  O=85.1900 H=86.1550 L=82.0300 C=83.3750 V=7692800
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=88.5592 upper=97.1396 lower=79.9788 band=Band(79.9788,97.1396) 
   fctban(30,1)                                  primed=true  fctban(30,1)=88.8568 upper=95.0091 lower=82.7045 band=Band(82.7045,95.0091) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0085 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=27.1677 stc(23,50,10,0.50) macd=-0.0353 stc(23,50,10,0.50) pf=53.2243 
 
 Bar[ 73] 2020-03-15  O=83.3750 H=84.8750 L=81.5000 C=84.8750 V=7362500
   sma(14)                                       primed=true  sma(14)=89.5875 
@@ -7681,6 +7762,7 @@ Bar[ 73] 2020-03-15  O=83.3750 H=84.8750 L=81.5000 C=84.8750 V=7362500
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=88.3142 upper=97.1102 lower=79.5182 band=Band(79.5182,97.1102) 
   fctban(30,1)                                  primed=true  fctban(30,1)=88.7047 upper=94.9017 lower=82.5076 band=Band(82.5076,94.9017) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0009 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=13.5839 stc(23,50,10,0.50) macd=-0.2022 stc(23,50,10,0.50) pf=26.6121 
 
 Bar[ 74] 2020-03-16  O=84.8750 H=85.9400 L=82.5650 C=85.9400 V=6581300
   sma(14)                                       primed=true  sma(14)=89.3957 
@@ -7776,6 +7858,7 @@ Bar[ 74] 2020-03-16  O=84.8750 H=85.9400 L=82.5650 C=85.9400 V=6581300
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=88.7490 upper=97.5332 lower=79.9648 band=Band(79.9648,97.5332) 
   fctban(30,1)                                  primed=true  fctban(30,1)=88.5328 upper=94.7537 lower=82.3120 band=Band(82.3120,94.7537) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0037 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=6.7919 stc(23,50,10,0.50) macd=-0.3016 stc(23,50,10,0.50) pf=13.3061 
 
 Bar[ 75] 2020-03-17  O=85.9400 H=99.3750 L=96.3450 C=97.2500 V=19587700
   sma(14)                                       primed=true  sma(14)=90.0207 
@@ -7871,6 +7954,7 @@ Bar[ 75] 2020-03-17  O=85.9400 H=99.3750 L=96.3450 C=97.2500 V=19587700
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=89.9193 upper=100.2880 lower=79.5507 band=Band(79.5507,100.2880) 
   fctban(30,1)                                  primed=true  fctban(30,1)=88.5572 upper=96.6181 lower=80.4963 band=Band(80.4963,96.6181) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0109 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=14.3426 stc(23,50,10,0.50) macd=0.1108 stc(23,50,10,0.50) pf=32.2185 
 
 Bar[ 76] 2020-03-18  O=97.2500 H=103.2800 L=96.4700 C=99.8750 V=10378600
   sma(14)                                       primed=true  sma(14)=90.5854 
@@ -7966,6 +8050,7 @@ Bar[ 76] 2020-03-18  O=97.2500 H=103.2800 L=96.4700 C=99.8750 V=10378600
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=89.9950 upper=101.8173 lower=78.1727 band=Band(78.1727,101.8173) 
   fctban(30,1)                                  primed=true  fctban(30,1)=88.9614 upper=97.8979 lower=80.0249 band=Band(80.0249,97.8979) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0345 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=37.7341 stc(23,50,10,0.50) macd=0.5894 stc(23,50,10,0.50) pf=66.1093 
 
 Bar[ 77] 2020-03-19  O=99.8750 H=105.3750 L=101.1550 C=104.9400 V=9334700
   sma(14)                                       primed=true  sma(14)=91.5454 
@@ -8061,6 +8146,7 @@ Bar[ 77] 2020-03-19  O=99.8750 H=105.3750 L=101.1550 C=104.9400 V=9334700
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=91.2900 upper=106.7346 lower=75.8454 band=Band(75.8454,106.7346) 
   fctban(30,1)                                  primed=true  fctban(30,1)=89.7294 upper=102.9169 lower=76.5419 band=Band(76.5419,102.9169) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0398 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=59.2379 stc(23,50,10,0.50) macd=1.2325 stc(23,50,10,0.50) pf=83.0546 
 
 Bar[ 78] 2020-03-20  O=104.9400 H=107.6250 L=104.2500 C=106.0000 V=10467200
   sma(14)                                       primed=true  sma(14)=92.4561 
@@ -8156,6 +8242,7 @@ Bar[ 78] 2020-03-20  O=104.9400 H=107.6250 L=104.2500 C=106.0000 V=10467200
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=94.6079 upper=116.5164 lower=72.6993 band=Band(72.6993,116.5164) 
   fctban(30,1)                                  primed=true  fctban(30,1)=90.6294 upper=106.3752 lower=74.8836 band=Band(74.8836,106.3752) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0076 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=75.1550 stc(23,50,10,0.50) macd=1.8416 stc(23,50,10,0.50) pf=91.5273 
 
 Bar[ 79] 2020-03-21  O=106.0000 H=105.2500 L=101.7500 C=102.5000 V=5671400
   sma(14)                                       primed=true  sma(14)=93.0989 
@@ -8251,6 +8338,7 @@ Bar[ 79] 2020-03-21  O=106.0000 H=105.2500 L=101.7500 C=102.5000 V=5671400
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=97.3400 upper=124.7981 lower=69.8819 band=Band(69.8819,124.7981) 
   fctban(30,1)                                  primed=true  fctban(30,1)=91.4218 upper=108.5937 lower=74.2499 band=Band(74.2499,108.5937) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0075 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=87.0804 stc(23,50,10,0.50) macd=2.2177 stc(23,50,10,0.50) pf=95.7637 
 
 Bar[ 80] 2020-03-22  O=102.5000 H=104.5000 L=101.7200 C=102.4050 V=5645000
   sma(14)                                       primed=true  sma(14)=93.7596 
@@ -8346,6 +8434,7 @@ Bar[ 80] 2020-03-22  O=102.5000 H=104.5000 L=101.7200 C=102.4050 V=5645000
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=94.2429 upper=116.0341 lower=72.4518 band=Band(72.4518,116.0341) 
   fctban(30,1)                                  primed=true  fctban(30,1)=91.8442 upper=109.6430 lower=74.0455 band=Band(74.0455,109.6430) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0001 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=93.5402 stc(23,50,10,0.50) macd=2.5374 stc(23,50,10,0.50) pf=97.8818 
 
 Bar[ 81] 2020-03-23  O=102.4050 H=105.5000 L=101.7200 C=104.5950 V=4518600
   sma(14)                                       primed=true  sma(14)=94.6793 
@@ -8441,6 +8530,7 @@ Bar[ 81] 2020-03-23  O=102.4050 H=105.5000 L=101.7200 C=104.5950 V=4518600
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=94.4820 upper=116.9854 lower=71.9786 band=Band(71.9786,116.9854) 
   fctban(30,1)                                  primed=true  fctban(30,1)=92.6075 upper=111.8894 lower=73.3256 band=Band(73.3256,111.8894) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0089 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=96.7701 stc(23,50,10,0.50) macd=2.9073 stc(23,50,10,0.50) pf=98.9409 
 
 Bar[ 82] 2020-03-24  O=104.5950 H=106.1250 L=103.1550 C=106.1250 V=4519500
   sma(14)                                       primed=true  sma(14)=95.8311 
@@ -8536,6 +8626,7 @@ Bar[ 82] 2020-03-24  O=104.5950 H=106.1250 L=103.1550 C=106.1250 V=4519500
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=95.0888 upper=118.6045 lower=71.5732 band=Band(71.5732,118.6045) 
   fctban(30,1)                                  primed=true  fctban(30,1)=93.6830 upper=115.1141 lower=72.2519 band=Band(72.2519,115.1141) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0014 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=98.3850 stc(23,50,10,0.50) macd=3.2911 stc(23,50,10,0.50) pf=99.4705 
 
 Bar[ 83] 2020-03-25  O=106.1250 H=107.9400 L=105.6900 C=106.0000 V=5569700
   sma(14)                                       primed=true  sma(14)=96.9961 
@@ -8631,6 +8722,7 @@ Bar[ 83] 2020-03-25  O=106.1250 H=107.9400 L=105.6900 C=106.0000 V=5569700
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=95.5795 upper=119.4700 lower=71.6890 band=Band(71.6890,119.4700) 
   fctban(30,1)                                  primed=true  fctban(30,1)=94.3654 upper=116.2850 lower=72.4458 band=Band(72.4458,116.2850) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0013 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.1925 stc(23,50,10,0.50) macd=3.6129 stc(23,50,10,0.50) pf=99.7352 
 
 Bar[ 84] 2020-03-26  O=106.0000 H=106.2500 L=103.6550 C=106.0650 V=4239700
   sma(14)                                       primed=true  sma(14)=98.2239 
@@ -8726,6 +8818,7 @@ Bar[ 84] 2020-03-26  O=106.0000 H=106.2500 L=103.6550 C=106.0650 V=4239700
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=96.2408 upper=120.3530 lower=72.1286 band=Band(72.1286,120.3530) 
   fctban(30,1)                                  primed=true  fctban(30,1)=95.0368 upper=117.3799 lower=72.6937 band=Band(72.6937,117.3799) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0000 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.5963 stc(23,50,10,0.50) macd=3.8873 stc(23,50,10,0.50) pf=99.8676 
 
 Bar[ 85] 2020-03-27  O=106.0650 H=107.0000 L=104.0000 C=104.6250 V=4175300
   sma(14)                                       primed=true  sma(14)=99.6121 
@@ -8821,6 +8914,7 @@ Bar[ 85] 2020-03-27  O=106.0650 H=107.0000 L=104.0000 C=104.6250 V=4175300
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=96.6600 upper=120.6577 lower=72.6623 band=Band(72.6623,120.6577) 
   fctban(30,1)                                  primed=true  fctban(30,1)=95.6768 upper=118.1994 lower=73.1542 band=Band(73.1542,118.1994) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0018 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.7981 stc(23,50,10,0.50) macd=4.0528 stc(23,50,10,0.50) pf=99.9338 
 
 Bar[ 86] 2020-03-28  O=104.6250 H=108.7500 L=105.5300 C=108.6250 V=4995300
   sma(14)                                       primed=true  sma(14)=101.4157 
@@ -8916,6 +9010,7 @@ Bar[ 86] 2020-03-28  O=104.6250 H=108.7500 L=105.5300 C=108.6250 V=4995300
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=97.4335 upper=122.2715 lower=72.5955 band=Band(72.5955,122.2715) 
   fctban(30,1)                                  primed=true  fctban(30,1)=96.4818 upper=121.6582 lower=71.3054 band=Band(71.3054,121.6582) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0080 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.8991 stc(23,50,10,0.50) macd=4.3617 stc(23,50,10,0.50) pf=99.9669 
 
 Bar[ 87] 2020-03-29  O=108.6250 H=110.9400 L=108.5300 C=109.3150 V=4776600
   sma(14)                                       primed=true  sma(14)=103.1614 
@@ -9011,6 +9106,7 @@ Bar[ 87] 2020-03-29  O=108.6250 H=110.9400 L=108.5300 C=109.3150 V=4776600
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=98.3133 upper=123.9549 lower=72.6716 band=Band(72.6716,123.9549) 
   fctban(30,1)                                  primed=true  fctban(30,1)=97.1756 upper=122.3872 lower=71.9640 band=Band(71.9640,122.3872) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0120 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.9495 stc(23,50,10,0.50) macd=4.6500 stc(23,50,10,0.50) pf=99.9835 
 
 Bar[ 88] 2020-03-30  O=109.3150 H=110.9400 L=108.7500 C=110.5000 V=4190000
   sma(14)                                       primed=true  sma(14)=104.9157 
@@ -9106,6 +9202,7 @@ Bar[ 88] 2020-03-30  O=109.3150 H=110.9400 L=108.7500 C=110.5000 V=4190000
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=99.3383 upper=126.3804 lower=72.2961 band=Band(72.2961,126.3804) 
   fctban(30,1)                                  primed=true  fctban(30,1)=98.1308 upper=126.3644 lower=69.8972 band=Band(69.8972,126.3644) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0063 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.9748 stc(23,50,10,0.50) macd=4.9410 stc(23,50,10,0.50) pf=99.9917 
 
 Bar[ 89] 2020-03-31  O=110.5000 H=114.2200 L=107.7500 C=112.7500 V=6035300
   sma(14)                                       primed=true  sma(14)=106.0229 
@@ -9201,6 +9298,7 @@ Bar[ 89] 2020-03-31  O=110.5000 H=114.2200 L=107.7500 C=112.7500 V=6035300
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=100.4913 upper=129.1373 lower=71.8452 band=Band(71.8452,129.1373) 
   fctban(30,1)                                  primed=true  fctban(30,1)=98.9329 upper=130.3428 lower=67.5230 band=Band(67.5230,130.3428) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0100 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.9874 stc(23,50,10,0.50) macd=5.2804 stc(23,50,10,0.50) pf=99.9959 
 
 Bar[ 90] 2020-04-01  O=112.7500 H=123.0000 L=117.0000 C=123.0000 V=12168900
   sma(14)                                       primed=true  sma(14)=107.6746 
@@ -9296,6 +9394,7 @@ Bar[ 90] 2020-04-01  O=112.7500 H=123.0000 L=117.0000 C=123.0000 V=12168900
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=103.0926 upper=136.7424 lower=69.4428 band=Band(69.4428,136.7424) 
   fctban(30,1)                                  primed=true  fctban(30,1)=101.0234 upper=146.4431 lower=55.6037 band=Band(55.6037,146.4431) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0232 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.9937 stc(23,50,10,0.50) macd=6.0143 stc(23,50,10,0.50) pf=99.9979 
 
 Bar[ 91] 2020-04-02  O=123.0000 H=121.7500 L=118.0000 C=119.6250 V=9040800
   sma(14)                                       primed=true  sma(14)=108.7236 
@@ -9391,6 +9490,7 @@ Bar[ 91] 2020-04-02  O=123.0000 H=121.7500 L=118.0000 C=119.6250 V=9040800
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=103.9193 upper=138.6223 lower=69.2162 band=Band(69.2162,138.6223) 
   fctban(30,1)                                  primed=true  fctban(30,1)=101.8322 upper=144.0073 lower=59.6570 band=Band(59.6570,144.0073) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0003 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.9968 stc(23,50,10,0.50) macd=6.4920 stc(23,50,10,0.50) pf=99.9990 
 
 Bar[ 92] 2020-04-03  O=119.6250 H=119.8150 L=116.0000 C=118.7500 V=5780300
   sma(14)                                       primed=true  sma(14)=109.6343 
@@ -9486,6 +9586,7 @@ Bar[ 92] 2020-04-03  O=119.6250 H=119.8150 L=116.0000 C=118.7500 V=5780300
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=106.7834 upper=145.6772 lower=67.8897 band=Band(67.8897,145.6772) 
   fctban(30,1)                                  primed=true  fctban(30,1)=103.0957 upper=148.0792 lower=58.1121 band=Band(58.1121,148.0792) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0005 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.9984 stc(23,50,10,0.50) macd=6.8530 stc(23,50,10,0.50) pf=99.9995 
 
 Bar[ 93] 2020-04-04  O=118.7500 H=120.3150 L=118.5000 C=119.2500 V=4320800
   sma(14)                                       primed=true  sma(14)=110.8307 
@@ -9581,6 +9682,7 @@ Bar[ 93] 2020-04-04  O=118.7500 H=120.3150 L=118.5000 C=119.2500 V=4320800
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=108.5366 upper=149.7881 lower=67.2851 band=Band(67.2851,149.7881) 
   fctban(30,1)                                  primed=true  fctban(30,1)=104.4163 upper=151.7366 lower=57.0960 band=Band(57.0960,151.7366) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0023 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.9992 stc(23,50,10,0.50) macd=7.1706 stc(23,50,10,0.50) pf=99.9997 
 
 Bar[ 94] 2020-04-05  O=119.2500 H=119.3750 L=116.5300 C=117.9400 V=3899100
   sma(14)                                       primed=true  sma(14)=111.9404 
@@ -9676,6 +9778,7 @@ Bar[ 94] 2020-04-05  O=119.2500 H=119.3750 L=116.5300 C=117.9400 V=3899100
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=110.4747 upper=154.4383 lower=66.5111 band=Band(66.5111,154.4383) 
   fctban(30,1)                                  primed=true  fctban(30,1)=105.8402 upper=156.0733 lower=55.6072 band=Band(55.6072,156.0733) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0015 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.9996 stc(23,50,10,0.50) macd=7.3690 stc(23,50,10,0.50) pf=99.9999 
 
 Bar[ 95] 2020-04-06  O=117.9400 H=118.1900 L=116.2500 C=116.4400 V=3221400
   sma(14)                                       primed=true  sma(14)=112.7864 
@@ -9771,6 +9874,7 @@ Bar[ 95] 2020-04-06  O=117.9400 H=118.1900 L=116.2500 C=116.4400 V=3221400
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=113.2988 upper=161.6302 lower=64.9675 band=Band(64.9675,161.6302) 
   fctban(30,1)                                  primed=true  fctban(30,1)=107.2778 upper=159.1348 lower=55.4208 band=Band(55.4208,159.1348) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0019 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.9998 stc(23,50,10,0.50) macd=7.4536 stc(23,50,10,0.50) pf=99.9999 
 
 Bar[ 96] 2020-04-07  O=116.4400 H=116.6900 L=114.5950 C=115.1900 V=3455500
   sma(14)                                       primed=true  sma(14)=113.4339 
@@ -9866,6 +9970,7 @@ Bar[ 96] 2020-04-07  O=116.4400 H=116.6900 L=114.5950 C=115.1900 V=3455500
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=115.5805 upper=167.3234 lower=63.8375 band=Band(63.8375,167.3234) 
   fctban(30,1)                                  primed=true  fctban(30,1)=108.5959 upper=161.3926 lower=55.7991 band=Band(55.7991,161.3926) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0004 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=49.9999 stc(23,50,10,0.50) macd=7.4485 stc(23,50,10,0.50) pf=99.9098 
 
 Bar[ 97] 2020-04-08  O=115.1900 H=115.3450 L=110.8750 C=111.8750 V=4304200
   sma(14)                                       primed=true  sma(14)=113.8536 
@@ -9961,6 +10066,7 @@ Bar[ 97] 2020-04-08  O=115.1900 H=115.3450 L=110.8750 C=111.8750 V=4304200
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=117.2022 upper=170.6581 lower=63.7463 band=Band(63.7463,170.6581) 
   fctban(30,1)                                  primed=true  fctban(30,1)=109.7235 upper=162.9765 lower=56.4705 band=Band(56.4705,162.9765) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0041 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=25.0000 stc(23,50,10,0.50) macd=7.2735 stc(23,50,10,0.50) pf=96.3709 
 
 Bar[ 98] 2020-04-09  O=111.8750 H=113.0000 L=110.5000 C=110.5950 V=4703900
   sma(14)                                       primed=true  sma(14)=114.1771 
@@ -10056,6 +10162,7 @@ Bar[ 98] 2020-04-09  O=111.8750 H=113.0000 L=110.5000 C=110.5950 V=4703900
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=115.4358 upper=162.8923 lower=67.9793 band=Band(67.9793,162.8923) 
   fctban(30,1)                                  primed=true  fctban(30,1)=110.3037 upper=160.9337 lower=59.6737 band=Band(59.6737,160.9337) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0014 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=12.5000 stc(23,50,10,0.50) macd=7.0391 stc(23,50,10,0.50) pf=88.6486 
 
 Bar[ 99] 2020-04-10  O=110.5950 H=118.3150 L=110.7200 C=118.1250 V=8316300
   sma(14)                                       primed=true  sma(14)=115.1414 
@@ -10151,6 +10258,7 @@ Bar[ 99] 2020-04-10  O=110.5950 H=118.3150 L=110.7200 C=118.1250 V=8316300
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=114.4403 upper=157.1545 lower=71.7262 band=Band(71.7262,157.1545) 
   fctban(30,1)                                  primed=true  fctban(30,1)=111.0972 upper=160.3741 lower=61.8203 band=Band(61.8203,160.3741) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0170 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=6.2500 stc(23,50,10,0.50) macd=7.1418 stc(23,50,10,0.50) pf=83.4946 
 
 Bar[100] 2020-04-11  O=118.1250 H=116.8700 L=112.6200 C=116.0000 V=10553900
   sma(14)                                       primed=true  sma(14)=115.6682 
@@ -10246,6 +10354,7 @@ Bar[100] 2020-04-11  O=118.1250 H=116.8700 L=112.6200 C=116.0000 V=10553900
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=114.5378 upper=154.8823 lower=74.1933 band=Band(74.1933,154.8823) 
   fctban(30,1)                                  primed=true  fctban(30,1)=111.3015 upper=153.8506 lower=68.7523 band=Band(68.7523,153.8506) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0038 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=3.1250 stc(23,50,10,0.50) macd=7.1152 stc(23,50,10,0.50) pf=74.1538 
 
 Bar[101] 2020-04-12  O=116.0000 H=116.7500 L=114.1900 C=116.0000 V=6384800
   sma(14)                                       primed=true  sma(14)=116.1457 
@@ -10341,6 +10450,7 @@ Bar[101] 2020-04-12  O=116.0000 H=116.7500 L=114.1900 C=116.0000 V=6384800
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=114.1483 upper=150.5323 lower=77.7644 band=Band(77.7644,150.5323) 
   fctban(30,1)                                  primed=true  fctban(30,1)=111.7623 upper=151.2191 lower=72.3054 band=Band(72.3054,151.2191) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0025 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=1.5625 stc(23,50,10,0.50) macd=7.0686 stc(23,50,10,0.50) pf=55.0237 
 
 Bar[102] 2020-04-13  O=116.0000 H=113.8700 L=111.1900 C=112.0000 V=7163300
   sma(14)                                       primed=true  sma(14)=116.2529 
@@ -10436,6 +10546,7 @@ Bar[102] 2020-04-13  O=116.0000 H=113.8700 L=111.1900 C=112.0000 V=7163300
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=114.0353 upper=145.7630 lower=82.3076 band=Band(82.3076,145.7630) 
   fctban(30,1)                                  primed=true  fctban(30,1)=112.0123 upper=146.1613 lower=77.8633 band=Band(77.8633,146.1613) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0132 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.7812 stc(23,50,10,0.50) macd=6.8279 stc(23,50,10,0.50) pf=27.5118 
 
 Bar[103] 2020-04-14  O=112.0000 H=114.6200 L=109.4400 C=113.7500 V=7007800
   sma(14)                                       primed=true  sma(14)=116.3243 
@@ -10531,6 +10642,7 @@ Bar[103] 2020-04-14  O=112.0000 H=114.6200 L=109.4400 C=113.7500 V=7007800
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=114.4397 upper=142.0876 lower=86.7918 band=Band(86.7918,142.0876) 
   fctban(30,1)                                  primed=true  fctban(30,1)=112.4810 upper=139.4928 lower=85.4693 band=Band(85.4693,139.4928) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0067 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.3906 stc(23,50,10,0.50) macd=6.6708 stc(23,50,10,0.50) pf=13.7559 
 
 Bar[104] 2020-04-15  O=113.7500 H=115.3100 L=111.5600 C=112.9400 V=5114100
   sma(14)                                       primed=true  sma(14)=115.6057 
@@ -10626,6 +10738,7 @@ Bar[104] 2020-04-15  O=113.7500 H=115.3100 L=111.5600 C=112.9400 V=5114100
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=114.3648 upper=136.8098 lower=91.9197 band=Band(91.9197,136.8098) 
   fctban(30,1)                                  primed=true  fctban(30,1)=112.4994 upper=132.7717 lower=92.2271 band=Band(92.2271,132.7717) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0414 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.1953 stc(23,50,10,0.50) macd=6.4750 stc(23,50,10,0.50) pf=6.8780 
 
 Bar[105] 2020-04-16  O=112.9400 H=116.0000 L=112.4400 C=116.0000 V=5263800
   sma(14)                                       primed=true  sma(14)=115.3468 
@@ -10721,6 +10834,7 @@ Bar[105] 2020-04-16  O=112.9400 H=116.0000 L=112.4400 C=116.0000 V=5263800
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=114.0618 upper=133.3671 lower=94.7565 band=Band(94.7565,133.3671) 
   fctban(30,1)                                  primed=true  fctban(30,1)=112.6340 upper=128.3406 lower=96.9275 band=Band(96.9275,128.3406) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0237 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0977 stc(23,50,10,0.50) macd=6.4163 stc(23,50,10,0.50) pf=3.4390 
 
 Bar[106] 2020-04-17  O=116.0000 H=121.6900 L=117.5000 C=120.5000 V=6666100
   sma(14)                                       primed=true  sma(14)=115.4718 
@@ -10816,6 +10930,7 @@ Bar[106] 2020-04-17  O=116.0000 H=121.6900 L=117.5000 C=120.5000 V=6666100
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=114.3417 upper=132.3373 lower=96.3461 band=Band(96.3461,132.3373) 
   fctban(30,1)                                  primed=true  fctban(30,1)=112.9254 upper=126.7081 lower=99.1427 band=Band(99.1427,126.7081) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0227 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=3.0745 stc(23,50,10,0.50) macd=6.5422 stc(23,50,10,0.50) pf=9.0627 
 
 Bar[107] 2020-04-18  O=120.5000 H=119.8700 L=116.0600 C=116.6200 V=7398400
   sma(14)                                       primed=true  sma(14)=115.2839 
@@ -10911,6 +11026,7 @@ Bar[107] 2020-04-18  O=120.5000 H=119.8700 L=116.0600 C=116.6200 V=7398400
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=115.9765 upper=135.0375 lower=96.9154 band=Band(96.9154,135.0375) 
   fctban(30,1)                                  primed=true  fctban(30,1)=112.6933 upper=125.0530 lower=100.3335 band=Band(100.3335,125.0530) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0091 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=3.9660 stc(23,50,10,0.50) macd=6.4605 stc(23,50,10,0.50) pf=7.5779 
 
 Bar[108] 2020-04-19  O=116.6200 H=120.8700 L=116.5600 C=117.0000 V=5575000
   sma(14)                                       primed=true  sma(14)=115.2168 
@@ -11006,6 +11122,7 @@ Bar[108] 2020-04-19  O=116.6200 H=120.8700 L=116.5600 C=117.0000 V=5575000
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=115.1227 upper=132.4375 lower=97.8079 band=Band(97.8079,132.4375) 
   fctban(30,1)                                  primed=true  fctban(30,1)=113.1933 upper=125.0231 lower=101.3634 band=Band(101.3634,125.0231) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0094 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=2.2016 stc(23,50,10,0.50) macd=6.3842 stc(23,50,10,0.50) pf=3.7890 
 
 Bar[109] 2020-04-20  O=117.0000 H=116.7500 L=113.3100 C=115.2500 V=4852300
   sma(14)                                       primed=true  sma(14)=115.1318 
@@ -11101,6 +11218,7 @@ Bar[109] 2020-04-20  O=117.0000 H=116.7500 L=113.3100 C=115.2500 V=4852300
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=115.5622 upper=132.1041 lower=99.0204 band=Band(99.0204,132.1041) 
   fctban(30,1)                                  primed=true  fctban(30,1)=113.6362 upper=125.1270 lower=102.1454 band=Band(102.1454,125.1270) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0041 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=1.1008 stc(23,50,10,0.50) macd=6.2190 stc(23,50,10,0.50) pf=1.8945 
 
 Bar[110] 2020-04-21  O=115.2500 H=116.5000 L=112.5600 C=114.3100 V=4298100
   sma(14)                                       primed=true  sma(14)=115.0689 
@@ -11196,6 +11314,7 @@ Bar[110] 2020-04-21  O=115.2500 H=116.5000 L=112.5600 C=114.3100 V=4298100
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=115.7962 upper=131.0946 lower=100.4979 band=Band(100.4979,131.0946) 
   fctban(30,1)                                  primed=true  fctban(30,1)=113.9712 upper=124.4230 lower=103.5194 band=Band(103.5194,124.4230) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0206 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.5504 stc(23,50,10,0.50) macd=6.0116 stc(23,50,10,0.50) pf=0.9472 
 
 Bar[111] 2020-04-22  O=114.3100 H=116.0000 L=114.0000 C=115.5000 V=4900500
   sma(14)                                       primed=true  sma(14)=115.3279 
@@ -11291,6 +11410,7 @@ Bar[111] 2020-04-22  O=114.3100 H=116.0000 L=114.0000 C=115.5000 V=4900500
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=115.7633 upper=129.6615 lower=101.8652 band=Band(101.8652,129.6615) 
   fctban(30,1)                                  primed=true  fctban(30,1)=114.0222 upper=123.2162 lower=104.8282 band=Band(104.8282,123.2162) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0007 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.2752 stc(23,50,10,0.50) macd=5.8619 stc(23,50,10,0.50) pf=0.4736 
 
 Bar[112] 2020-04-23  O=115.5000 H=118.3100 L=114.7500 C=115.8700 V=4887700
   sma(14)                                       primed=true  sma(14)=115.7046 
@@ -11386,6 +11506,7 @@ Bar[112] 2020-04-23  O=115.5000 H=118.3100 L=114.7500 C=115.8700 V=4887700
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=115.7740 upper=128.7935 lower=102.7545 band=Band(102.7545,128.7935) 
   fctban(30,1)                                  primed=true  fctban(30,1)=114.3470 upper=123.1031 lower=105.5909 band=Band(105.5909,123.1031) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0003 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.1376 stc(23,50,10,0.50) macd=5.7271 stc(23,50,10,0.50) pf=0.2368 
 
 Bar[113] 2020-04-24  O=115.8700 H=121.5000 L=118.8700 C=120.6900 V=6964800
   sma(14)                                       primed=true  sma(14)=115.8879 
@@ -11481,6 +11602,7 @@ Bar[113] 2020-04-24  O=115.8700 H=121.5000 L=118.8700 C=120.6900 V=6964800
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=116.4680 upper=129.1774 lower=103.7586 band=Band(103.7586,129.1774) 
   fctban(30,1)                                  primed=true  fctban(30,1)=114.8367 upper=123.3031 lower=106.3702 band=Band(106.3702,123.3031) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0144 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=25.5600 stc(23,50,10,0.50) macd=5.8024 stc(23,50,10,0.50) pf=4.7365 
 
 Bar[114] 2020-04-25  O=120.6900 H=122.0000 L=119.0000 C=120.1900 V=4679200
   sma(14)                                       primed=true  sma(14)=116.1871 
@@ -11576,6 +11698,7 @@ Bar[114] 2020-04-25  O=120.6900 H=122.0000 L=119.0000 C=120.1900 V=4679200
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=117.1930 upper=129.6062 lower=104.7798 band=Band(104.7798,129.6062) 
   fctban(30,1)                                  primed=true  fctban(30,1)=115.0094 upper=122.7392 lower=107.2795 band=Band(107.2795,122.7392) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0026 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=59.8018 stc(23,50,10,0.50) macd=5.8277 stc(23,50,10,0.50) pf=8.5370 
 
 Bar[115] 2020-04-26  O=120.1900 H=121.4400 L=119.7500 C=120.7500 V=9165000
   sma(14)                                       primed=true  sma(14)=116.5264 
@@ -11671,6 +11794,7 @@ Bar[115] 2020-04-26  O=120.1900 H=121.4400 L=119.7500 C=120.7500 V=9165000
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=117.6680 upper=129.0029 lower=106.3331 band=Band(106.3331,129.0029) 
   fctban(30,1)                                  primed=true  fctban(30,1)=115.4831 upper=122.5170 lower=108.4491 band=Band(108.4491,122.5170) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0440 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=79.9009 stc(23,50,10,0.50) macd=5.8556 stc(23,50,10,0.50) pf=12.1503 
 
 Bar[116] 2020-04-27  O=120.7500 H=125.7500 L=122.6200 C=124.7500 V=6469800
   sma(14)                                       primed=true  sma(14)=117.4371 
@@ -11766,6 +11890,7 @@ Bar[116] 2020-04-27  O=120.7500 H=125.7500 L=122.6200 C=124.7500 V=6469800
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=118.3118 upper=129.7586 lower=106.8651 band=Band(106.8651,129.7586) 
   fctban(30,1)                                  primed=true  fctban(30,1)=115.7727 upper=122.6877 lower=108.8576 band=Band(108.8576,122.6877) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0051 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=89.9504 stc(23,50,10,0.50) macd=6.0375 stc(23,50,10,0.50) pf=27.2385 
 
 Bar[117] 2020-04-28  O=124.7500 H=127.7500 L=123.0000 C=123.3700 V=6792000
   sma(14)                                       primed=true  sma(14)=118.1243 
@@ -11861,6 +11986,7 @@ Bar[117] 2020-04-28  O=124.7500 H=127.7500 L=123.0000 C=123.3700 V=6792000
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=118.1243 upper=128.6808 lower=107.5677 band=Band(107.5677,128.6808) 
   fctban(30,1)                                  primed=true  fctban(30,1)=116.0029 upper=122.5655 lower=109.4402 band=Band(109.4402,122.5655) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0189 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=94.9752 stc(23,50,10,0.50) macd=6.1172 stc(23,50,10,0.50) pf=43.2980 
 
 Bar[118] 2020-04-29  O=123.3700 H=124.1900 L=121.7500 C=122.9400 V=4423800
   sma(14)                                       primed=true  sma(14)=118.8386 
@@ -11956,6 +12082,7 @@ Bar[118] 2020-04-29  O=123.3700 H=124.1900 L=121.7500 C=122.9400 V=4423800
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=117.6277 upper=127.4346 lower=107.8209 band=Band(107.8209,127.4346) 
   fctban(30,1)                                  primed=true  fctban(30,1)=115.9171 upper=122.3116 lower=109.5227 band=Band(109.5227,122.3116) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0042 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=97.4876 stc(23,50,10,0.50) macd=6.1483 stc(23,50,10,0.50) pf=64.4677 
 
 Bar[119] 2020-04-30  O=122.9400 H=124.4400 L=121.5600 C=122.5600 V=5231900
   sma(14)                                       primed=true  sma(14)=119.3071 
@@ -12051,6 +12178,7 @@ Bar[119] 2020-04-30  O=122.9400 H=124.4400 L=121.5600 C=122.5600 V=5231900
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=117.2863 upper=127.1628 lower=107.4098 band=Band(107.4098,127.1628) 
   fctban(30,1)                                  primed=true  fctban(30,1)=116.3884 upper=122.8143 lower=109.9625 band=Band(109.9625,122.8143) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0362 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=98.7438 stc(23,50,10,0.50) macd=6.1389 stc(23,50,10,0.50) pf=81.1159 
 
 Bar[120] 2020-05-01  O=122.5600 H=125.7500 L=123.1200 C=123.1200 V=4565600
   sma(14)                                       primed=true  sma(14)=119.4943 
@@ -12146,6 +12274,7 @@ Bar[120] 2020-05-01  O=122.5600 H=125.7500 L=123.1200 C=123.1200 V=4565600
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=117.7752 upper=127.8901 lower=107.6604 band=Band(107.6604,127.8901) 
   fctban(30,1)                                  primed=true  fctban(30,1)=117.6141 upper=124.3728 lower=110.8554 band=Band(110.8554,124.3728) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0111 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.3719 stc(23,50,10,0.50) macd=6.1352 stc(23,50,10,0.50) pf=89.0067 
 
 Bar[121] 2020-05-02  O=123.1200 H=124.6900 L=122.1900 C=122.5600 V=6235200
   sma(14)                                       primed=true  sma(14)=119.9186 
@@ -12241,6 +12370,7 @@ Bar[121] 2020-05-02  O=123.1200 H=124.6900 L=122.1900 C=122.5600 V=6235200
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=117.9746 upper=128.4371 lower=107.5121 band=Band(107.5121,128.4371) 
   fctban(30,1)                                  primed=true  fctban(30,1)=117.7568 upper=124.8795 lower=110.6340 band=Band(110.6340,124.8795) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0011 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=98.7006 stc(23,50,10,0.50) macd=6.0873 stc(23,50,10,0.50) pf=87.2573 
 
 Bar[122] 2020-05-03  O=122.5600 H=125.3100 L=122.7500 C=124.6200 V=5225900
   sma(14)                                       primed=true  sma(14)=120.4629 
@@ -12336,6 +12466,7 @@ Bar[122] 2020-05-03  O=122.5600 H=125.3100 L=122.7500 C=124.6200 V=5225900
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=118.2404 upper=129.2333 lower=107.2475 band=Band(107.2475,129.2333) 
   fctban(30,1)                                  primed=true  fctban(30,1)=117.9179 upper=125.4245 lower=110.4114 band=Band(110.4114,125.4245) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0060 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.3227 stc(23,50,10,0.50) macd=6.1160 stc(23,50,10,0.50) pf=88.9602 
 
 Bar[123] 2020-05-04  O=124.6200 H=132.0000 L=124.3700 C=129.2500 V=8261400
   sma(14)                                       primed=true  sma(14)=121.4629 
@@ -12431,6 +12562,7 @@ Bar[123] 2020-05-04  O=124.6200 H=132.0000 L=124.3700 C=129.2500 V=8261400
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=119.1539 upper=132.1383 lower=106.1695 band=Band(106.1695,132.1383) 
   fctban(30,1)                                  primed=true  fctban(30,1)=118.2973 upper=128.1834 lower=108.4112 band=Band(108.4112,128.1834) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0477 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.6614 stc(23,50,10,0.50) macd=6.3256 stc(23,50,10,0.50) pf=94.4801 
 
 Bar[124] 2020-05-05  O=129.2500 H=131.3100 L=128.0000 C=131.0000 V=5912500
   sma(14)                                       primed=true  sma(14)=122.6550 
@@ -12526,6 +12658,7 @@ Bar[124] 2020-05-05  O=129.2500 H=131.3100 L=128.0000 C=131.0000 V=5912500
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=119.8061 upper=134.6608 lower=104.9514 band=Band(104.9514,134.6608) 
   fctban(30,1)                                  primed=true  fctban(30,1)=118.8620 upper=130.3284 lower=107.3956 band=Band(107.3956,130.3284) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0182 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.8307 stc(23,50,10,0.50) macd=6.5667 stc(23,50,10,0.50) pf=97.2401 
 
 Bar[125] 2020-05-06  O=131.0000 H=132.2500 L=129.5000 C=132.2500 V=3545600
   sma(14)                                       primed=true  sma(14)=123.8514 
@@ -12621,6 +12754,7 @@ Bar[125] 2020-05-06  O=131.0000 H=132.2500 L=129.5000 C=132.2500 V=3545600
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=121.0018 upper=138.0503 lower=103.9534 band=Band(103.9534,138.0503) 
   fctban(30,1)                                  primed=true  fctban(30,1)=119.9228 upper=133.3851 lower=106.4605 band=Band(106.4605,133.3851) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0124 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.9153 stc(23,50,10,0.50) macd=6.8128 stc(23,50,10,0.50) pf=98.6200 
 
 Bar[126] 2020-05-07  O=132.2500 H=133.8800 L=130.8100 C=131.0000 V=5714500
   sma(14)                                       primed=true  sma(14)=124.9321 
@@ -12716,6 +12850,7 @@ Bar[126] 2020-05-07  O=132.2500 H=133.8800 L=130.8100 C=131.0000 V=5714500
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=121.8227 upper=140.0827 lower=103.5628 band=Band(103.5628,140.0827) 
   fctban(30,1)                                  primed=true  fctban(30,1)=120.3996 upper=134.7410 lower=106.0582 band=Band(106.0582,134.7410) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0074 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.9577 stc(23,50,10,0.50) macd=6.9521 stc(23,50,10,0.50) pf=99.3100 
 
 Bar[127] 2020-05-08  O=131.0000 H=133.5000 L=130.6300 C=132.8100 V=6653900
   sma(14)                                       primed=true  sma(14)=125.7979 
@@ -12811,6 +12946,7 @@ Bar[127] 2020-05-08  O=131.0000 H=133.5000 L=130.6300 C=132.8100 V=6653900
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=122.5868 upper=141.7823 lower=103.3913 band=Band(103.3913,141.7823) 
   fctban(30,1)                                  primed=true  fctban(30,1)=121.2154 upper=137.0144 lower=105.4163 band=Band(105.4163,137.0144) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0034 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.9788 stc(23,50,10,0.50) macd=7.1319 stc(23,50,10,0.50) pf=99.6550 
 
 Bar[128] 2020-05-09  O=132.8100 H=135.5000 L=132.1300 C=134.0000 V=6094500
   sma(14)                                       primed=true  sma(14)=126.7843 
@@ -12906,6 +13042,7 @@ Bar[128] 2020-05-09  O=132.8100 H=135.5000 L=132.1300 C=134.0000 V=6094500
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=123.2005 upper=142.9113 lower=103.4896 band=Band(103.4896,142.9113) 
   fctban(30,1)                                  primed=true  fctban(30,1)=122.0615 upper=138.9682 lower=105.1549 band=Band(105.1549,138.9682) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0226 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.9894 stc(23,50,10,0.50) macd=7.3194 stc(23,50,10,0.50) pf=99.8275 
 
 Bar[129] 2020-05-10  O=134.0000 H=137.4400 L=133.8800 C=137.3800 V=4799200
   sma(14)                                       primed=true  sma(14)=127.9721 
@@ -13001,6 +13138,7 @@ Bar[129] 2020-05-10  O=134.0000 H=137.4400 L=133.8800 C=137.3800 V=4799200
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=124.4843 upper=147.0050 lower=101.9635 band=Band(101.9635,147.0050) 
   fctban(30,1)                                  primed=true  fctban(30,1)=123.6788 upper=146.2974 lower=101.0601 band=Band(101.0601,146.2974) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0231 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.9947 stc(23,50,10,0.50) macd=7.6098 stc(23,50,10,0.50) pf=99.9138 
 
 Bar[130] 2020-05-11  O=137.3800 H=138.6900 L=135.3800 C=137.8100 V=5050800
   sma(14)                                       primed=true  sma(14)=128.9050 
@@ -13096,6 +13234,7 @@ Bar[130] 2020-05-11  O=137.3800 H=138.6900 L=135.3800 C=137.8100 V=5050800
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=128.6280 upper=157.8620 lower=99.3940 band=Band(99.3940,157.8620) 
   fctban(30,1)                                  primed=true  fctban(30,1)=124.4000 upper=148.6629 lower=100.1371 band=Band(100.1371,148.6629) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0028 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.9974 stc(23,50,10,0.50) macd=7.8597 stc(23,50,10,0.50) pf=99.9569 
 
 Bar[131] 2020-05-12  O=137.8100 H=139.1900 L=135.7500 C=137.8800 V=5648900
   sma(14)                                       primed=true  sma(14)=129.9414 
@@ -13191,6 +13330,7 @@ Bar[131] 2020-05-12  O=137.8100 H=139.1900 L=135.7500 C=137.8800 V=5648900
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=131.8691 upper=167.2671 lower=96.4711 band=Band(96.4711,167.2671) 
   fctban(30,1)                                  primed=true  fctban(30,1)=125.2858 upper=151.1789 lower=99.3927 band=Band(99.3927,151.1789) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0137 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.9987 stc(23,50,10,0.50) macd=8.0571 stc(23,50,10,0.50) pf=99.9784 
 
 Bar[132] 2020-05-13  O=137.8800 H=138.5000 L=136.1900 C=137.2500 V=4726300
   sma(14)                                       primed=true  sma(14)=130.9636 
@@ -13286,6 +13426,7 @@ Bar[132] 2020-05-13  O=137.8800 H=138.5000 L=136.1900 C=137.2500 V=4726300
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=135.0475 upper=176.5328 lower=93.5622 band=Band(93.5622,176.5328) 
   fctban(30,1)                                  primed=true  fctban(30,1)=126.1296 upper=153.8923 lower=98.3669 band=Band(98.3669,153.8923) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0031 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.9993 stc(23,50,10,0.50) macd=8.1769 stc(23,50,10,0.50) pf=99.9892 
 
 Bar[133] 2020-05-14  O=137.2500 H=138.1300 L=134.5000 C=136.3100 V=5585600
   sma(14)                                       primed=true  sma(14)=131.9457 
@@ -13381,6 +13522,7 @@ Bar[133] 2020-05-14  O=137.2500 H=138.1300 L=134.5000 C=136.3100 V=5585600
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=136.7717 upper=180.6815 lower=92.8618 band=Band(92.8618,180.6815) 
   fctban(30,1)                                  primed=true  fctban(30,1)=127.0071 upper=154.7462 lower=99.2680 band=Band(99.2680,154.7462) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0004 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.9997 stc(23,50,10,0.50) macd=8.2142 stc(23,50,10,0.50) pf=99.9946 
 
 Bar[134] 2020-05-15  O=136.3100 H=137.5000 L=135.3800 C=136.2500 V=5124800
   sma(14)                                       primed=true  sma(14)=132.8836 
@@ -13476,6 +13618,7 @@ Bar[134] 2020-05-15  O=136.3100 H=137.5000 L=135.3800 C=136.2500 V=5124800
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=137.1000 upper=179.7956 lower=94.4044 band=Band(94.4044,179.7956) 
   fctban(30,1)                                  primed=true  fctban(30,1)=127.9212 upper=155.4982 lower=100.3443 band=Band(100.3443,155.4982) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0001 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.9998 stc(23,50,10,0.50) macd=8.2175 stc(23,50,10,0.50) pf=99.9973 
 
 Bar[135] 2020-05-16  O=136.2500 H=138.8800 L=133.6900 C=134.6300 V=7630200
   sma(14)                                       primed=true  sma(14)=133.7457 
@@ -13571,6 +13714,7 @@ Bar[135] 2020-05-16  O=136.2500 H=138.8800 L=133.6900 C=134.6300 V=7630200
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=136.4640 upper=175.8141 lower=97.1139 band=Band(97.1139,175.8141) 
   fctban(30,1)                                  primed=true  fctban(30,1)=128.7183 upper=156.2853 lower=101.1514 band=Band(101.1514,156.2853) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0129 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=49.9999 stc(23,50,10,0.50) macd=8.1222 stc(23,50,10,0.50) pf=96.2303 
 
 Bar[136] 2020-05-17  O=134.6300 H=132.1300 L=126.0600 C=128.2500 V=14311600
   sma(14)                                       primed=true  sma(14)=134.0050 
@@ -13666,6 +13810,7 @@ Bar[136] 2020-05-17  O=134.6300 H=132.1300 L=126.0600 C=128.2500 V=14311600
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=134.5380 upper=168.4894 lower=100.5866 band=Band(100.5866,168.4894) 
   fctban(30,1)                                  primed=true  fctban(30,1)=129.2342 upper=158.4102 lower=100.0581 band=Band(100.0581,158.4102) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0115 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=25.0000 stc(23,50,10,0.50) macd=7.7301 stc(23,50,10,0.50) pf=75.6685 
 
 Bar[137] 2020-05-18  O=128.2500 H=129.7500 L=126.8700 C=129.0000 V=8793600
   sma(14)                                       primed=true  sma(14)=133.9871 
@@ -13761,6 +13906,7 @@ Bar[137] 2020-05-18  O=128.2500 H=129.7500 L=126.8700 C=129.0000 V=8793600
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=133.6150 upper=164.5523 lower=102.6777 band=Band(102.6777,164.5523) 
   fctban(30,1)                                  primed=true  fctban(30,1)=129.5804 upper=156.4370 lower=102.7239 band=Band(102.7239,156.4370) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0010 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=12.5000 stc(23,50,10,0.50) macd=7.3927 stc(23,50,10,0.50) pf=41.9141 
 
 Bar[138] 2020-05-19  O=129.0000 H=128.5000 L=123.5000 C=123.8700 V=8874200
   sma(14)                                       primed=true  sma(14)=133.4779 
@@ -13856,6 +14002,7 @@ Bar[138] 2020-05-19  O=129.0000 H=128.5000 L=123.5000 C=123.8700 V=8874200
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=133.8755 upper=164.0200 lower=103.7309 band=Band(103.7309,164.0200) 
   fctban(30,1)                                  primed=true  fctban(30,1)=129.7338 upper=155.5757 lower=103.8918 band=Band(103.8918,155.5757) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0144 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=6.2500 stc(23,50,10,0.50) macd=6.8451 stc(23,50,10,0.50) pf=20.9571 
 
 Bar[139] 2020-05-20  O=123.8700 H=125.4400 L=122.6200 C=124.8100 V=6966600
   sma(14)                                       primed=true  sma(14)=132.9464 
@@ -13951,6 +14098,7 @@ Bar[139] 2020-05-20  O=123.8700 H=125.4400 L=122.6200 C=124.8100 V=6966600
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=132.9464 upper=159.9500 lower=105.9429 band=Band(105.9429,159.9500) 
   fctban(30,1)                                  primed=true  fctban(30,1)=129.5368 upper=152.1251 lower=106.9485 band=Band(106.9485,152.1251) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0000 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=3.1250 stc(23,50,10,0.50) macd=6.3818 stc(23,50,10,0.50) pf=10.4785 
 
 Bar[140] 2020-05-21  O=124.8100 H=125.1200 L=122.7500 C=123.0000 V=5525500
   sma(14)                                       primed=true  sma(14)=132.3750 
@@ -14046,6 +14194,7 @@ Bar[140] 2020-05-21  O=124.8100 H=125.1200 L=122.7500 C=123.0000 V=5525500
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=132.2813 upper=156.5862 lower=107.9763 band=Band(107.9763,156.5862) 
   fctban(30,1)                                  primed=true  fctban(30,1)=129.6268 upper=150.6354 lower=108.6182 band=Band(108.6182,150.6354) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0123 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=1.5625 stc(23,50,10,0.50) macd=5.8731 stc(23,50,10,0.50) pf=5.2393 
 
 Bar[141] 2020-05-22  O=123.0000 H=126.5000 L=123.5600 C=126.2500 V=6515500
   sma(14)                                       primed=true  sma(14)=131.9064 
@@ -14141,6 +14290,7 @@ Bar[141] 2020-05-22  O=123.0000 H=126.5000 L=123.5600 C=126.2500 V=6515500
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=131.8750 upper=153.6505 lower=110.0995 band=Band(110.0995,153.6505) 
   fctban(30,1)                                  primed=true  fctban(30,1)=129.6868 upper=148.1412 lower=111.2324 band=Band(111.2324,148.1412) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0138 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.7812 stc(23,50,10,0.50) macd=5.5493 stc(23,50,10,0.50) pf=2.6196 
 
 Bar[142] 2020-05-23  O=126.2500 H=128.6900 L=125.8100 C=128.3800 V=5291900
   sma(14)                                       primed=true  sma(14)=131.5050 
@@ -14236,6 +14386,7 @@ Bar[142] 2020-05-23  O=126.2500 H=128.6900 L=125.8100 C=128.3800 V=5291900
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=131.5690 upper=151.0373 lower=112.1007 band=Band(112.1007,151.0373) 
   fctban(30,1)                                  primed=true  fctban(30,1)=129.6365 upper=145.5203 lower=113.7527 band=Band(113.7527,145.5203) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0333 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.3906 stc(23,50,10,0.50) macd=5.3400 stc(23,50,10,0.50) pf=1.3098 
 
 Bar[143] 2020-05-24  O=128.3800 H=126.6200 L=124.6200 C=125.3700 V=5711700
   sma(14)                                       primed=true  sma(14)=130.6471 
@@ -14331,6 +14482,7 @@ Bar[143] 2020-05-24  O=128.3800 H=126.6200 L=124.6200 C=125.3700 V=5711700
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=131.0960 upper=148.8880 lower=113.3040 band=Band(113.3040,148.8880) 
   fctban(30,1)                                  primed=true  fctban(30,1)=129.4785 upper=143.0654 lower=115.8916 band=Band(115.8916,143.0654) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0101 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.1953 stc(23,50,10,0.50) macd=5.0053 stc(23,50,10,0.50) pf=0.6549 
 
 Bar[144] 2020-05-25  O=125.3700 H=126.6900 L=124.3700 C=125.6900 V=4327700
   sma(14)                                       primed=true  sma(14)=129.7814 
@@ -14426,6 +14578,7 @@ Bar[144] 2020-05-25  O=125.3700 H=126.6900 L=124.3700 C=125.6900 V=4327700
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=127.7727 upper=143.9542 lower=111.5913 band=Band(111.5913,143.9542) 
   fctban(30,1)                                  primed=true  fctban(30,1)=129.3432 upper=141.8993 lower=116.7872 band=Band(116.7872,141.8993) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0062 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0977 stc(23,50,10,0.50) macd=4.7084 stc(23,50,10,0.50) pf=0.3275 
 
 Bar[145] 2020-05-26  O=125.6900 H=126.0000 L=121.8100 C=122.2500 V=4568000
   sma(14)                                       primed=true  sma(14)=128.6650 
@@ -14521,6 +14674,7 @@ Bar[145] 2020-05-26  O=125.6900 H=126.0000 L=121.8100 C=122.2500 V=4568000
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=125.4022 upper=143.9064 lower=106.8981 band=Band(106.8981,143.9064) 
   fctban(30,1)                                  primed=true  fctban(30,1)=129.3032 upper=141.4174 lower=117.1890 band=Band(117.1890,141.4174) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0173 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0488 stc(23,50,10,0.50) macd=4.2797 stc(23,50,10,0.50) pf=0.1637 
 
 Bar[146] 2020-05-27  O=122.2500 H=123.1200 L=118.1900 C=119.3700 V=6859200
   sma(14)                                       primed=true  sma(14)=127.3879 
@@ -14616,6 +14770,7 @@ Bar[146] 2020-05-27  O=122.2500 H=123.1200 L=118.1900 C=119.3700 V=6859200
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=124.3300 upper=145.1517 lower=103.5083 band=Band(103.5083,145.1517) 
   fctban(30,1)                                  primed=true  fctban(30,1)=129.4207 upper=142.9808 lower=115.8607 band=Band(115.8607,142.9808) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0299 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0244 stc(23,50,10,0.50) macd=3.7611 stc(23,50,10,0.50) pf=0.0819 
 
 Bar[147] 2020-05-28  O=119.3700 H=121.8700 L=118.0600 C=118.5000 V=5757500
   sma(14)                                       primed=true  sma(14)=126.1157 
@@ -14711,6 +14866,7 @@ Bar[147] 2020-05-28  O=119.3700 H=121.8700 L=118.0600 C=118.5000 V=5757500
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=123.6871 upper=146.0654 lower=101.3089 band=Band(101.3089,146.0654) 
   fctban(30,1)                                  primed=true  fctban(30,1)=129.2496 upper=143.5635 lower=114.9357 band=Band(114.9357,143.5635) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0083 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0122 stc(23,50,10,0.50) macd=3.2537 stc(23,50,10,0.50) pf=0.0409 
 
 Bar[148] 2020-05-29  O=118.5000 H=124.0000 L=117.5600 C=123.1900 V=7367000
   sma(14)                                       primed=true  sma(14)=125.1829 
@@ -14806,6 +14962,7 @@ Bar[148] 2020-05-29  O=118.5000 H=124.0000 L=117.5600 C=123.1900 V=7367000
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=123.5556 upper=145.9370 lower=101.1742 band=Band(101.1742,145.9370) 
   fctban(30,1)                                  primed=true  fctban(30,1)=129.2730 upper=143.5051 lower=115.0409 band=Band(115.0409,143.5051) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0161 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0061 stc(23,50,10,0.50) macd=3.0031 stc(23,50,10,0.50) pf=0.0205 
 
 Bar[149] 2020-05-30  O=123.1900 H=127.0000 L=121.0000 C=123.5000 V=6144100
   sma(14)                                       primed=true  sma(14)=124.3879 
@@ -14901,6 +15058,7 @@ Bar[149] 2020-05-30  O=123.1900 H=127.0000 L=121.0000 C=123.5000 V=6144100
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=123.5500 upper=145.9378 lower=101.1622 band=Band(101.1622,145.9378) 
   fctban(30,1)                                  primed=true  fctban(30,1)=129.0668 upper=142.3840 lower=115.7496 band=Band(115.7496,142.3840) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0005 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0031 stc(23,50,10,0.50) macd=2.7862 stc(23,50,10,0.50) pf=0.0102 
 
 Bar[150] 2020-05-31  O=123.5000 H=124.4400 L=121.1200 C=122.1900 V=4052700
   sma(14)                                       primed=true  sma(14)=123.9550 
@@ -14996,6 +15154,7 @@ Bar[150] 2020-05-31  O=123.5000 H=124.4400 L=121.1200 C=122.1900 V=4052700
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=123.4264 upper=146.0251 lower=100.8276 band=Band(100.8276,146.0251) 
   fctban(30,1)                                  primed=true  fctban(30,1)=128.9800 upper=142.3923 lower=115.5677 band=Band(115.5677,142.3923) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0024 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0015 stc(23,50,10,0.50) macd=2.5283 stc(23,50,10,0.50) pf=0.0051 
 
 Bar[151] 2020-06-01  O=122.1900 H=122.5000 L=118.9400 C=119.3100 V=5849700
   sma(14)                                       primed=true  sma(14)=123.2629 
@@ -15091,6 +15250,7 @@ Bar[151] 2020-06-01  O=122.1900 H=122.5000 L=118.9400 C=119.3100 V=5849700
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=123.0833 upper=146.3110 lower=99.8557 band=Band(99.8557,146.3110) 
   fctban(30,1)                                  primed=true  fctban(30,1)=128.6250 upper=142.2450 lower=115.0050 band=Band(115.0050,142.2450) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0031 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0008 stc(23,50,10,0.50) macd=2.1659 stc(23,50,10,0.50) pf=0.0026 
 
 Bar[152] 2020-06-02  O=119.3100 H=123.7500 L=119.8100 C=123.3100 V=5544700
   sma(14)                                       primed=true  sma(14)=123.2229 
@@ -15186,6 +15346,7 @@ Bar[152] 2020-06-02  O=119.3100 H=123.7500 L=119.8100 C=123.3100 V=5544700
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=123.1092 upper=146.1627 lower=100.0556 band=Band(100.0556,146.1627) 
   fctban(30,1)                                  primed=true  fctban(30,1)=128.3504 upper=141.9024 lower=114.7983 band=Band(114.7983,141.9024) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0024 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0004 stc(23,50,10,0.50) macd=2.0161 stc(23,50,10,0.50) pf=0.0013 
 
 Bar[153] 2020-06-03  O=123.3100 H=123.8100 L=121.0000 C=121.1200 V=5032200
   sma(14)                                       primed=true  sma(14)=122.9593 
@@ -15281,6 +15442,7 @@ Bar[153] 2020-06-03  O=123.3100 H=123.8100 L=121.0000 C=121.1200 V=5032200
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=123.1319 upper=146.0818 lower=100.1820 band=Band(100.1820,146.0818) 
   fctban(30,1)                                  primed=true  fctban(30,1)=127.9529 upper=141.9746 lower=113.9311 band=Band(113.9311,141.9746) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0016 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0002 stc(23,50,10,0.50) macd=1.7809 stc(23,50,10,0.50) pf=0.0006 
 
 Bar[154] 2020-06-04  O=121.1200 H=124.5000 L=122.0000 C=123.3700 V=4400600
   sma(14)                                       primed=true  sma(14)=122.9857 
@@ -15376,6 +15538,7 @@ Bar[154] 2020-06-04  O=121.1200 H=124.5000 L=122.0000 C=123.3700 V=4400600
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=123.4711 upper=145.4301 lower=101.5121 band=Band(101.5121,145.4301) 
   fctban(30,1)                                  primed=true  fctban(30,1)=127.6804 upper=141.7108 lower=113.6499 band=Band(113.6499,141.7108) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0036 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0001 stc(23,50,10,0.50) macd=1.6672 stc(23,50,10,0.50) pf=0.0003 
 
 Bar[155] 2020-06-05  O=123.3700 H=127.8700 L=124.5000 C=127.3700 V=4894100
   sma(14)                                       primed=true  sma(14)=123.0657 
@@ -15471,6 +15634,7 @@ Bar[155] 2020-06-05  O=123.3700 H=127.8700 L=124.5000 C=127.3700 V=4894100
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=124.4157 upper=144.4063 lower=104.4251 band=Band(104.4251,144.4063) 
   fctban(30,1)                                  primed=true  fctban(30,1)=127.4861 upper=141.2166 lower=113.7555 band=Band(113.7555,141.2166) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0098 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=50.0000 stc(23,50,10,0.50) macd=1.7382 stc(23,50,10,0.50) pf=1.6937 
 
 Bar[156] 2020-06-06  O=127.3700 H=128.5600 L=126.5600 C=128.5000 V=5140000
   sma(14)                                       primed=true  sma(14)=123.0743 
@@ -15566,6 +15730,7 @@ Bar[156] 2020-06-06  O=127.3700 H=128.5600 L=126.5600 C=128.5000 V=5140000
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=124.6014 upper=144.1682 lower=105.0345 band=Band(105.0345,144.1682) 
   fctban(30,1)                                  primed=true  fctban(30,1)=127.5210 upper=140.6993 lower=114.3428 band=Band(114.3428,140.6993) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0023 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=75.0000 stc(23,50,10,0.50) macd=1.8448 stc(23,50,10,0.50) pf=6.4427 
 
 Bar[157] 2020-06-07  O=128.5000 H=129.6300 L=123.5000 C=123.8700 V=6610900
   sma(14)                                       primed=true  sma(14)=122.9671 
@@ -15661,6 +15826,7 @@ Bar[157] 2020-06-07  O=128.5000 H=129.6300 L=123.5000 C=123.8700 V=6610900
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=124.5696 upper=143.5755 lower=105.5636 band=Band(105.5636,143.5755) 
   fctban(30,1)                                  primed=true  fctban(30,1)=127.1717 upper=140.3739 lower=113.9695 band=Band(113.9695,140.3739) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0119 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=80.2682 stc(23,50,10,0.50) macd=1.7284 stc(23,50,10,0.50) pf=5.5109 
 
 Bar[158] 2020-06-08  O=123.8700 H=124.8700 L=121.2500 C=122.9400 V=7585200
   sma(14)                                       primed=true  sma(14)=122.7707 
@@ -15756,6 +15922,7 @@ Bar[158] 2020-06-08  O=123.8700 H=124.8700 L=121.2500 C=122.9400 V=7585200
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=124.5017 upper=142.9704 lower=106.0330 band=Band(106.0330,142.9704) 
   fctban(30,1)                                  primed=true  fctban(30,1)=126.6738 upper=139.1710 lower=114.1765 band=Band(114.1765,139.1710) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0082 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=61.5169 stc(23,50,10,0.50) macd=1.5792 stc(23,50,10,0.50) pf=2.7554 
 
 Bar[159] 2020-06-09  O=122.9400 H=124.3700 L=121.0600 C=121.7500 V=5963100
   sma(14)                                       primed=true  sma(14)=122.7350 
@@ -15851,6 +16018,7 @@ Bar[159] 2020-06-09  O=122.9400 H=124.3700 L=121.0600 C=121.7500 V=5963100
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=123.9650 upper=141.8932 lower=106.0368 band=Band(106.0368,141.8932) 
   fctban(30,1)                                  primed=true  fctban(30,1)=126.1200 upper=138.4415 lower=113.7985 band=Band(113.7985,138.4415) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0021 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=41.4486 stc(23,50,10,0.50) macd=1.3902 stc(23,50,10,0.50) pf=1.3777 
 
 Bar[160] 2020-06-10  O=121.7500 H=124.8700 L=122.3100 C=124.4400 V=6045500
   sma(14)                                       primed=true  sma(14)=123.0971 
@@ -15946,6 +16114,7 @@ Bar[160] 2020-06-10  O=121.7500 H=124.8700 L=122.3100 C=124.4400 V=6045500
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=123.8062 upper=140.3077 lower=107.3048 band=Band(107.3048,140.3077) 
   fctban(30,1)                                  primed=true  fctban(30,1)=125.6566 upper=137.0366 lower=114.2765 band=Band(114.2765,137.0366) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0075 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=26.0682 stc(23,50,10,0.50) macd=1.3378 stc(23,50,10,0.50) pf=0.6889 
 
 Bar[161] 2020-06-11  O=124.4400 H=123.6200 L=121.0000 C=122.0000 V=8443300
   sma(14)                                       primed=true  sma(14)=123.3471 
@@ -16041,6 +16210,7 @@ Bar[161] 2020-06-11  O=124.4400 H=123.6200 L=121.0000 C=122.0000 V=8443300
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=123.7340 upper=138.5621 lower=108.9059 band=Band(108.9059,138.5621) 
   fctban(30,1)                                  primed=true  fctban(30,1)=125.1307 upper=135.3287 lower=114.9327 band=Band(114.9327,135.3287) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0129 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=15.7048 stc(23,50,10,0.50) macd=1.1797 stc(23,50,10,0.50) pf=0.3444 
 
 Bar[162] 2020-06-12  O=122.0000 H=124.0600 L=120.8700 C=122.3700 V=6464700
   sma(14)                                       primed=true  sma(14)=123.2886 
@@ -16136,6 +16306,7 @@ Bar[162] 2020-06-12  O=122.0000 H=124.0600 L=120.8700 C=122.3700 V=6464700
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=123.4688 upper=136.7351 lower=110.2025 band=Band(110.2025,136.7351) 
   fctban(30,1)                                  primed=true  fctban(30,1)=125.0387 upper=133.8447 lower=116.2326 band=Band(116.2326,133.8447) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0101 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=9.1865 stc(23,50,10,0.50) macd=1.0529 stc(23,50,10,0.50) pf=0.1722 
 
 Bar[163] 2020-06-13  O=122.3700 H=125.8700 L=122.0600 C=122.9400 V=6248300
   sma(14)                                       primed=true  sma(14)=123.2486 
@@ -16231,6 +16402,7 @@ Bar[163] 2020-06-13  O=122.3700 H=125.8700 L=122.0600 C=122.9400 V=6248300
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=123.4485 upper=134.8878 lower=112.0091 band=Band(112.0091,134.8878) 
   fctban(30,1)                                  primed=true  fctban(30,1)=124.9710 upper=132.5864 lower=117.3556 band=Band(117.3556,132.5864) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0015 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=5.2591 stc(23,50,10,0.50) macd=0.9629 stc(23,50,10,0.50) pf=0.0861 
 
 Bar[164] 2020-06-14  O=122.9400 H=125.1900 L=122.7500 C=124.0000 V=4357200
   sma(14)                                       primed=true  sma(14)=123.3779 
@@ -16326,6 +16498,7 @@ Bar[164] 2020-06-14  O=122.9400 H=125.1900 L=122.7500 C=124.0000 V=4357200
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=123.4535 upper=132.8216 lower=114.0853 band=Band(114.0853,132.8216) 
   fctban(30,1)                                  primed=true  fctban(30,1)=124.5739 upper=130.9475 lower=118.2003 band=Band(118.2003,130.9475) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0199 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=2.6295 stc(23,50,10,0.50) macd=0.9273 stc(23,50,10,0.50) pf=0.0431 
 
 Bar[165] 2020-06-15  O=124.0000 H=125.6200 L=122.6900 C=123.1900 V=4774700
   sma(14)                                       primed=true  sma(14)=123.6550 
@@ -16421,6 +16594,7 @@ Bar[165] 2020-06-15  O=124.0000 H=125.6200 L=122.6900 C=123.1900 V=4774700
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=123.4437 upper=130.7864 lower=116.1010 band=Band(116.1010,130.7864) 
   fctban(30,1)                                  primed=true  fctban(30,1)=124.5306 upper=129.6435 lower=119.4178 band=Band(119.4178,129.6435) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0795 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=1.3148 stc(23,50,10,0.50) macd=0.8572 stc(23,50,10,0.50) pf=0.0215 
 
 Bar[166] 2020-06-16  O=123.1900 H=126.0000 L=122.8700 C=124.5600 V=6216900
   sma(14)                                       primed=true  sma(14)=123.7443 
@@ -16516,6 +16690,7 @@ Bar[166] 2020-06-16  O=123.1900 H=126.0000 L=122.8700 C=124.5600 V=6216900
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=124.5315 upper=131.4414 lower=117.6216 band=Band(117.6216,131.4414) 
   fctban(30,1)                                  primed=true  fctban(30,1)=126.4146 upper=131.9275 lower=120.9017 band=Band(120.9017,131.9275) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0023 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.6574 stc(23,50,10,0.50) macd=0.8530 stc(23,50,10,0.50) pf=0.0108 
 
 Bar[167] 2020-06-17  O=124.5600 H=128.5000 L=125.5000 C=127.2500 V=6266900
   sma(14)                                       primed=true  sma(14)=124.1821 
@@ -16611,6 +16786,7 @@ Bar[167] 2020-06-17  O=124.5600 H=128.5000 L=125.5000 C=127.2500 V=6266900
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=124.2588 upper=130.7112 lower=117.8064 band=Band(117.8064,130.7112) 
   fctban(30,1)                                  primed=true  fctban(30,1)=126.2415 upper=131.5437 lower=120.9394 band=Band(120.9394,131.5437) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0020 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=50.3287 stc(23,50,10,0.50) macd=0.9653 stc(23,50,10,0.50) pf=7.7338 
 
 Bar[168] 2020-06-18  O=127.2500 H=126.7500 L=124.2500 C=125.8700 V=5584800
   sma(14)                                       primed=true  sma(14)=124.3607 
@@ -16706,6 +16882,7 @@ Bar[168] 2020-06-18  O=127.2500 H=126.7500 L=124.2500 C=125.8700 V=5584800
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=123.9933 upper=130.3783 lower=117.6084 band=Band(117.6084,130.3783) 
   fctban(30,1)                                  primed=true  fctban(30,1)=125.9464 upper=130.9558 lower=120.9370 band=Band(120.9370,130.9558) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0017 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=75.1643 stc(23,50,10,0.50) macd=1.0001 stc(23,50,10,0.50) pf=17.5565 
 
 Bar[169] 2020-06-19  O=125.8700 H=129.7500 L=128.0000 C=128.8600 V=5284500
   sma(14)                                       primed=true  sma(14)=124.4671 
@@ -16801,6 +16978,7 @@ Bar[169] 2020-06-19  O=125.8700 H=129.7500 L=128.0000 C=128.8600 V=5284500
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=124.0118 upper=130.7959 lower=117.2277 band=Band(117.2277,130.7959) 
   fctban(30,1)                                  primed=true  fctban(30,1)=125.7169 upper=130.6828 lower=120.7510 band=Band(120.7510,130.6828) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0038 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=87.5822 stc(23,50,10,0.50) macd=1.1594 stc(23,50,10,0.50) pf=40.3771 
 
 Bar[170] 2020-06-20  O=128.8600 H=132.6900 L=128.3800 C=132.0000 V=7554500
   sma(14)                                       primed=true  sma(14)=124.7171 
@@ -16896,6 +17074,7 @@ Bar[170] 2020-06-20  O=128.8600 H=132.6900 L=128.3800 C=132.0000 V=7554500
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=124.0503 upper=132.1155 lower=115.9852 band=Band(115.9852,132.1155) 
   fctban(30,1)                                  primed=true  fctban(30,1)=124.2468 upper=129.5552 lower=118.9383 band=Band(118.9383,129.5552) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0623 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=93.7911 stc(23,50,10,0.50) macd=1.4345 stc(23,50,10,0.50) pf=70.1885 
 
 Bar[171] 2020-06-21  O=132.0000 H=133.9400 L=130.6900 C=130.7500 V=7209500
   sma(14)                                       primed=true  sma(14)=125.2086 
@@ -16991,6 +17170,7 @@ Bar[171] 2020-06-21  O=132.0000 H=133.9400 L=130.6900 C=130.7500 V=7209500
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=124.0879 upper=132.7735 lower=115.4023 band=Band(115.4023,132.7735) 
   fctban(30,1)                                  primed=true  fctban(30,1)=124.2982 upper=129.9385 lower=118.6579 band=Band(118.6579,129.9385) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0033 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=96.8955 stc(23,50,10,0.50) macd=1.6169 stc(23,50,10,0.50) pf=85.0943 
 
 Bar[172] 2020-06-22  O=130.7500 H=136.5000 L=131.6300 C=134.7500 V=8424800
   sma(14)                                       primed=true  sma(14)=126.0521 
@@ -17086,6 +17266,7 @@ Bar[172] 2020-06-22  O=130.7500 H=136.5000 L=131.6300 C=134.7500 V=8424800
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=124.6885 upper=134.8344 lower=114.5425 band=Band(114.5425,134.8344) 
   fctban(30,1)                                  primed=true  fctban(30,1)=124.4860 upper=131.6171 lower=117.3549 band=Band(117.3549,131.6171) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0385 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=98.4478 stc(23,50,10,0.50) macd=1.9487 stc(23,50,10,0.50) pf=92.5471 
 
 Bar[173] 2020-06-23  O=134.7500 H=137.6900 L=134.3800 C=135.0000 V=5094500
   sma(14)                                       primed=true  sma(14)=126.9986 
@@ -17181,6 +17362,7 @@ Bar[173] 2020-06-23  O=134.7500 H=137.6900 L=134.3800 C=135.0000 V=5094500
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=125.3231 upper=136.9227 lower=113.7235 band=Band(113.7235,136.9227) 
   fctban(30,1)                                  primed=true  fctban(30,1)=124.8252 upper=132.8347 lower=116.8156 band=Band(116.8156,132.8347) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0036 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.2239 stc(23,50,10,0.50) macd=2.2456 stc(23,50,10,0.50) pf=96.2736 
 
 Bar[174] 2020-06-24  O=135.0000 H=135.5600 L=132.0000 C=132.3800 V=4443600
   sma(14)                                       primed=true  sma(14)=127.5657 
@@ -17276,6 +17458,7 @@ Bar[174] 2020-06-24  O=135.0000 H=135.5600 L=132.0000 C=132.3800 V=4443600
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=125.6765 upper=137.8691 lower=113.4840 band=Band(113.4840,137.8691) 
   fctban(30,1)                                  primed=true  fctban(30,1)=125.0300 upper=133.4616 lower=116.5984 band=Band(116.5984,133.4616) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0031 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.6119 stc(23,50,10,0.50) macd=2.3842 stc(23,50,10,0.50) pf=98.1368 
 
 Bar[175] 2020-06-25  O=132.3800 H=133.5600 L=131.9400 C=133.3100 V=4591100
   sma(14)                                       primed=true  sma(14)=128.3736 
@@ -17371,6 +17554,7 @@ Bar[175] 2020-06-25  O=132.3800 H=133.5600 L=131.9400 C=133.3100 V=4591100
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=127.1311 upper=140.7641 lower=113.4982 band=Band(113.4982,140.7641) 
   fctban(30,1)                                  primed=true  fctban(30,1)=125.3987 upper=134.3236 lower=116.4737 band=Band(116.4737,134.3236) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0072 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.8060 stc(23,50,10,0.50) macd=2.5395 stc(23,50,10,0.50) pf=99.0684 
 
 Bar[176] 2020-06-26  O=133.3100 H=135.0000 L=131.9400 C=131.9400 V=5658400
   sma(14)                                       primed=true  sma(14)=129.0571 
@@ -17466,6 +17650,7 @@ Bar[176] 2020-06-26  O=133.3100 H=135.0000 L=131.9400 C=131.9400 V=5658400
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=129.5277 upper=146.0591 lower=112.9963 band=Band(112.9963,146.0591) 
   fctban(30,1)                                  primed=true  fctban(30,1)=125.8177 upper=134.9481 lower=116.6872 band=Band(116.6872,134.9481) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0018 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.9030 stc(23,50,10,0.50) macd=2.6075 stc(23,50,10,0.50) pf=99.5342 
 
 Bar[177] 2020-06-27  O=131.9400 H=132.3800 L=129.5600 C=130.0000 V=6094100
   sma(14)                                       primed=true  sma(14)=129.5614 
@@ -17561,6 +17746,7 @@ Bar[177] 2020-06-27  O=131.9400 H=132.3800 L=129.5600 C=130.0000 V=6094100
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=131.4860 upper=150.8085 lower=112.1635 band=Band(112.1635,150.8085) 
   fctban(30,1)                                  primed=true  fctban(30,1)=126.2010 upper=134.9798 lower=117.4222 band=Band(117.4222,134.9798) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0004 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.4446 stc(23,50,10,0.50) macd=2.5733 stc(23,50,10,0.50) pf=98.7031 
 
 Bar[178] 2020-06-28  O=130.0000 H=131.4400 L=123.7500 C=125.3700 V=14862200
   sma(14)                                       primed=true  sma(14)=129.6593 
@@ -17656,6 +17842,7 @@ Bar[178] 2020-06-28  O=130.0000 H=131.4400 L=123.7500 C=125.3700 V=14862200
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=131.6875 upper=151.0835 lower=112.2915 band=Band(112.2915,151.0835) 
   fctban(30,1)                                  primed=true  fctban(30,1)=126.2737 upper=134.9780 lower=117.5694 band=Band(117.5694,134.9780) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0162 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=91.4840 stc(23,50,10,0.50) macd=2.3305 stc(23,50,10,0.50) pf=89.7871 
 
 Bar[179] 2020-06-29  O=125.3700 H=130.8800 L=126.0000 C=130.1300 V=7544700
   sma(14)                                       primed=true  sma(14)=130.1550 
@@ -17751,6 +17938,7 @@ Bar[179] 2020-06-29  O=125.3700 H=130.8800 L=126.0000 C=130.1300 V=7544700
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=131.1614 upper=148.8302 lower=113.4927 band=Band(113.4927,148.8302) 
   fctban(30,1)                                  primed=true  fctban(30,1)=126.3981 upper=134.7405 lower=118.0556 band=Band(118.0556,134.7405) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0127 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=66.8860 stc(23,50,10,0.50) macd=2.3190 stc(23,50,10,0.50) pf=82.5983 
 
 Bar[180] 2020-06-30  O=130.1300 H=129.6300 L=126.2500 C=127.1200 V=6985600
   sma(14)                                       primed=true  sma(14)=130.3379 
@@ -17846,6 +18034,7 @@ Bar[180] 2020-06-30  O=130.1300 H=129.6300 L=126.2500 C=127.1200 V=6985600
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=130.0357 upper=145.0799 lower=114.9916 band=Band(114.9916,145.0799) 
   fctban(30,1)                                  primed=true  fctban(30,1)=126.4206 upper=134.3394 lower=118.5019 band=Band(118.5019,134.3394) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0005 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=33.4430 stc(23,50,10,0.50) macd=2.1686 stc(23,50,10,0.50) pf=69.1457 
 
 Bar[181] 2020-07-01  O=127.1200 H=127.2500 L=124.3700 C=125.1900 V=8093000
   sma(14)                                       primed=true  sma(14)=130.1907 
@@ -17941,6 +18130,7 @@ Bar[181] 2020-07-01  O=127.1200 H=127.2500 L=124.3700 C=125.1900 V=8093000
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=129.0086 upper=141.7551 lower=116.2621 band=Band(116.2621,141.7551) 
   fctban(30,1)                                  primed=true  fctban(30,1)=126.4734 upper=134.0362 lower=118.9107 band=Band(118.9107,134.0362) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0205 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=16.7215 stc(23,50,10,0.50) macd=1.9438 stc(23,50,10,0.50) pf=34.5728 
 
 Bar[182] 2020-07-02  O=125.1900 H=127.8100 L=121.4400 C=122.0000 V=7590000
   sma(14)                                       primed=true  sma(14)=129.9143 
@@ -18036,6 +18226,7 @@ Bar[182] 2020-07-02  O=125.1900 H=127.8100 L=121.4400 C=122.0000 V=7590000
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=129.9143 upper=143.9213 lower=115.9072 band=Band(115.9072,143.9213) 
   fctban(30,1)                                  primed=true  fctban(30,1)=126.3379 upper=133.5579 lower=119.1179 band=Band(119.1179,133.5579) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0037 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=8.3608 stc(23,50,10,0.50) macd=1.5988 stc(23,50,10,0.50) pf=17.2864 
 
 Bar[183] 2020-07-03  O=122.0000 H=125.0000 L=120.4400 C=125.0000 V=7451300
   sma(14)                                       primed=true  sma(14)=129.6386 
@@ -18131,6 +18322,7 @@ Bar[183] 2020-07-03  O=122.0000 H=125.0000 L=120.4400 C=125.0000 V=7451300
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=128.6668 upper=140.4808 lower=116.8529 band=Band(116.8529,140.4808) 
   fctban(30,1)                                  primed=true  fctban(30,1)=126.2985 upper=133.2932 lower=119.3038 band=Band(119.3038,133.2932) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0135 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=4.1804 stc(23,50,10,0.50) macd=1.4221 stc(23,50,10,0.50) pf=8.6432 
 
 Bar[184] 2020-07-04  O=125.0000 H=126.8100 L=121.3700 C=123.0000 V=7078000
   sma(14)                                       primed=true  sma(14)=128.9957 
@@ -18226,6 +18418,7 @@ Bar[184] 2020-07-04  O=125.0000 H=126.8100 L=121.3700 C=123.0000 V=7078000
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=127.6948 upper=138.6981 lower=116.6914 band=Band(116.6914,138.6981) 
   fctban(30,1)                                  primed=true  fctban(30,1)=126.2043 upper=132.9744 lower=119.4342 band=Band(119.4342,132.9744) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0075 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=2.0902 stc(23,50,10,0.50) macd=1.1735 stc(23,50,10,0.50) pf=4.3216 
 
 Bar[185] 2020-07-05  O=123.0000 H=124.7500 L=121.6900 C=123.5000 V=7105300
   sma(14)                                       primed=true  sma(14)=128.4779 
@@ -18321,6 +18514,7 @@ Bar[185] 2020-07-05  O=123.0000 H=124.7500 L=121.6900 C=123.5000 V=7105300
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=127.5200 upper=138.7174 lower=116.3226 band=Band(116.3226,138.7174) 
   fctban(30,1)                                  primed=true  fctban(30,1)=126.4456 upper=133.3539 lower=119.5373 band=Band(119.5373,133.3539) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0021 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=1.0451 stc(23,50,10,0.50) macd=0.9728 stc(23,50,10,0.50) pf=2.1608 
 
 Bar[186] 2020-07-06  O=123.5000 H=122.8100 L=120.0000 C=120.0600 V=8778800
   sma(14)                                       primed=true  sma(14)=127.4286 
@@ -18416,6 +18610,7 @@ Bar[186] 2020-07-06  O=123.5000 H=122.8100 L=120.0000 C=120.0600 V=8778800
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=127.2216 upper=138.9979 lower=115.4453 band=Band(115.4453,138.9979) 
   fctban(30,1)                                  primed=true  fctban(30,1)=126.6066 upper=134.3707 lower=118.8425 band=Band(118.8425,134.3707) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0322 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.5225 stc(23,50,10,0.50) macd=0.6412 stc(23,50,10,0.50) pf=1.0804 
 
 Bar[187] 2020-07-07  O=120.0600 H=122.2500 L=119.6200 C=121.0000 V=6643900
   sma(14)                                       primed=true  sma(14)=126.4286 
@@ -18511,6 +18706,7 @@ Bar[187] 2020-07-07  O=120.0600 H=122.2500 L=119.6200 C=121.0000 V=6643900
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=127.1668 upper=139.3188 lower=115.0148 band=Band(115.0148,139.3188) 
   fctban(30,1)                                  primed=true  fctban(30,1)=126.4075 upper=134.4323 lower=118.3827 band=Band(118.3827,134.4323) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0000 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.2613 stc(23,50,10,0.50) macd=0.3884 stc(23,50,10,0.50) pf=0.5402 
 
 Bar[188] 2020-07-08  O=121.0000 H=121.0600 L=115.5000 C=117.7500 V=10563900
   sma(14)                                       primed=true  sma(14)=125.3836 
@@ -18606,6 +18802,7 @@ Bar[188] 2020-07-08  O=121.0000 H=121.0600 L=115.5000 C=117.7500 V=10563900
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=126.9118 upper=139.8820 lower=113.9415 band=Band(113.9415,139.8820) 
   fctban(30,1)                                  primed=true  fctban(30,1)=126.2493 upper=135.5555 lower=116.9432 band=Band(116.9432,135.5555) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0249 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.1306 stc(23,50,10,0.50) macd=0.0212 stc(23,50,10,0.50) pf=0.2701 
 
 Bar[189] 2020-07-09  O=117.7500 H=120.0000 L=116.7500 C=119.8700 V=7043100
   sma(14)                                       primed=true  sma(14)=124.4236 
@@ -18701,6 +18898,7 @@ Bar[189] 2020-07-09  O=117.7500 H=120.0000 L=116.7500 C=119.8700 V=7043100
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=123.8454 upper=138.4299 lower=109.2608 band=Band(109.2608,138.4299) 
   fctban(30,1)                                  primed=true  fctban(30,1)=126.1867 upper=135.4303 lower=116.9430 band=Band(116.9430,135.4303) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0021 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0653 stc(23,50,10,0.50) macd=-0.2088 stc(23,50,10,0.50) pf=0.1351 
 
 Bar[190] 2020-07-10  O=119.8700 H=123.2500 L=119.0600 C=122.0000 V=6438900
   sma(14)                                       primed=true  sma(14)=123.7136 
@@ -18796,6 +18994,7 @@ Bar[190] 2020-07-10  O=119.8700 H=123.2500 L=119.0600 C=122.0000 V=6438900
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=121.9370 upper=139.5821 lower=104.2919 band=Band(104.2919,139.5821) 
   fctban(30,1)                                  primed=true  fctban(30,1)=126.1053 upper=135.5113 lower=116.6994 band=Band(116.6994,135.5113) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0011 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0327 stc(23,50,10,0.50) macd=-0.3167 stc(23,50,10,0.50) pf=0.0675 
 
 Bar[191] 2020-07-11  O=122.0000 H=122.7500 L=119.0600 C=119.1900 V=8057700
   sma(14)                                       primed=true  sma(14)=122.9414 
@@ -18891,6 +19090,7 @@ Bar[191] 2020-07-11  O=122.0000 H=122.7500 L=119.0600 C=119.1900 V=8057700
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=121.2633 upper=140.2318 lower=102.2949 band=Band(102.2949,140.2318) 
   fctban(30,1)                                  primed=true  fctban(30,1)=126.0117 upper=135.6699 lower=116.3534 band=Band(116.3534,135.6699) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0081 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0163 stc(23,50,10,0.50) macd=-0.5347 stc(23,50,10,0.50) pf=0.0338 
 
 Bar[192] 2020-07-12  O=119.1900 H=119.1900 L=115.0600 C=116.3700 V=14240000
   sma(14)                                       primed=true  sma(14)=122.2986 
@@ -18986,6 +19186,7 @@ Bar[192] 2020-07-12  O=119.1900 H=119.1900 L=115.0600 C=116.3700 V=14240000
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=119.9675 upper=141.8444 lower=98.0906 band=Band(98.0906,141.8444) 
   fctban(30,1)                                  primed=true  fctban(30,1)=125.9107 upper=136.4165 lower=115.4049 band=Band(115.4049,136.4165) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0099 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0082 stc(23,50,10,0.50) macd=-0.8493 stc(23,50,10,0.50) pf=0.0169 
 
 Bar[193] 2020-07-13  O=116.3700 H=115.0600 L=111.0600 C=113.5000 V=17872300
   sma(14)                                       primed=true  sma(14)=121.1107 
@@ -19081,6 +19282,7 @@ Bar[193] 2020-07-13  O=116.3700 H=115.0600 L=111.0600 C=113.5000 V=17872300
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=118.5257 upper=144.0976 lower=92.9538 band=Band(92.9538,144.0976) 
   fctban(30,1)                                  primed=true  fctban(30,1)=125.6329 upper=138.0820 lower=113.1837 band=Band(113.1837,138.0820) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0260 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0041 stc(23,50,10,0.50) macd=-1.2502 stc(23,50,10,0.50) pf=0.0084 
 
 Bar[194] 2020-07-14  O=113.5000 H=116.6900 L=113.1200 C=114.2500 V=7831100
   sma(14)                                       primed=true  sma(14)=120.1914 
@@ -19176,6 +19378,7 @@ Bar[194] 2020-07-14  O=113.5000 H=116.6900 L=113.1200 C=114.2500 V=7831100
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=118.2211 upper=144.4093 lower=92.0329 band=Band(92.0329,144.4093) 
   fctban(30,1)                                  primed=true  fctban(30,1)=125.2646 upper=138.3077 lower=112.2216 band=Band(112.2216,138.3077) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0002 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0020 stc(23,50,10,0.50) macd=-1.5662 stc(23,50,10,0.50) pf=0.0042 
 
 Bar[195] 2020-07-15  O=114.2500 H=114.8700 L=110.0000 C=110.0000 V=8277700
   sma(14)                                       primed=true  sma(14)=119.1064 
@@ -19271,6 +19474,7 @@ Bar[195] 2020-07-15  O=114.2500 H=114.8700 L=110.0000 C=110.0000 V=8277700
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=118.3742 upper=144.8838 lower=91.8645 band=Band(91.8645,144.8838) 
   fctban(30,1)                                  primed=true  fctban(30,1)=124.6033 upper=140.9525 lower=108.2542 band=Band(108.2542,140.9525) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0238 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0010 stc(23,50,10,0.50) macd=-2.0268 stc(23,50,10,0.50) pf=0.0021 
 
 Bar[196] 2020-07-16  O=110.0000 H=110.8700 L=105.0000 C=105.0600 V=15017800
   sma(14)                                       primed=true  sma(14)=117.8964 
@@ -19366,6 +19570,7 @@ Bar[196] 2020-07-16  O=110.0000 H=110.8700 L=105.0000 C=105.0600 V=15017800
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=117.8964 upper=146.5710 lower=89.2219 band=Band(89.2219,146.5710) 
   fctban(30,1)                                  primed=true  fctban(30,1)=123.1096 upper=144.6100 lower=101.6092 band=Band(101.6092,144.6100) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0313 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0005 stc(23,50,10,0.50) macd=-2.6438 stc(23,50,10,0.50) pf=0.0011 
 
 Bar[197] 2020-07-17  O=105.0600 H=107.2500 L=104.6900 C=107.0000 V=14183300
   sma(14)                                       primed=true  sma(14)=116.6107 
@@ -19461,6 +19666,7 @@ Bar[197] 2020-07-17  O=105.0600 H=107.2500 L=104.6900 C=107.0000 V=14183300
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=117.1700 upper=147.3372 lower=87.0028 band=Band(87.0028,147.3372) 
   fctban(30,1)                                  primed=true  fctban(30,1)=122.4900 upper=145.3246 lower=99.6554 band=Band(99.6554,145.3246) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0015 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0003 stc(23,50,10,0.50) macd=-3.0930 stc(23,50,10,0.50) pf=0.0005 
 
 Bar[198] 2020-07-18  O=107.0000 H=108.8700 L=103.8700 C=107.8700 V=13921100
   sma(14)                                       primed=true  sma(14)=115.5300 
@@ -19556,6 +19762,7 @@ Bar[198] 2020-07-18  O=107.0000 H=108.8700 L=103.8700 C=107.8700 V=13921100
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=114.9169 upper=149.3739 lower=80.4600 band=Band(80.4600,149.3739) 
   fctban(30,1)                                  primed=true  fctban(30,1)=121.4562 upper=145.8659 lower=97.0464 band=Band(97.0464,145.8659) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0056 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0001 stc(23,50,10,0.50) macd=-3.4401 stc(23,50,10,0.50) pf=0.0003 
 
 Bar[199] 2020-07-19  O=107.8700 H=109.0000 L=104.6900 C=107.0000 V=9683000
   sma(14)                                       primed=true  sma(14)=114.3514 
@@ -19651,6 +19858,7 @@ Bar[199] 2020-07-19  O=107.8700 H=109.0000 L=104.6900 C=107.0000 V=9683000
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=112.9191 upper=151.0073 lower=74.8309 band=Band(74.8309,151.0073) 
   fctban(30,1)                                  primed=true  fctban(30,1)=119.8992 upper=146.7929 lower=93.0055 band=Band(93.0055,146.7929) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0062 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0001 stc(23,50,10,0.50) macd=-3.7730 stc(23,50,10,0.50) pf=0.0001 
 
 Bar[200] 2020-07-20  O=107.0000 H=108.5000 L=105.4400 C=107.1200 V=9187300
   sma(14)                                       primed=true  sma(14)=113.4271 
@@ -19746,6 +19954,7 @@ Bar[200] 2020-07-20  O=107.0000 H=108.5000 L=105.4400 C=107.1200 V=9187300
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=110.7360 upper=152.4401 lower=69.0319 band=Band(69.0319,152.4401) 
   fctban(30,1)                                  primed=true  fctban(30,1)=118.8516 upper=147.3857 lower=90.3175 band=Band(90.3175,147.3857) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0019 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0000 stc(23,50,10,0.50) macd=-4.0485 stc(23,50,10,0.50) pf=0.0001 
 
 Bar[201] 2020-07-21  O=107.1200 H=113.0600 L=107.0000 C=107.0000 V=11380500
   sma(14)                                       primed=true  sma(14)=112.4271 
@@ -19841,6 +20050,7 @@ Bar[201] 2020-07-21  O=107.1200 H=113.0600 L=107.0000 C=107.0000 V=11380500
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=108.7556 upper=153.6258 lower=63.8853 band=Band(63.8853,153.6258) 
   fctban(30,1)                                  primed=true  fctban(30,1)=117.8540 upper=147.4536 lower=88.2544 band=Band(88.2544,147.4536) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0102 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0000 stc(23,50,10,0.50) macd=-4.2832 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[202] 2020-07-22  O=107.0000 H=93.0000 L=89.0000 C=91.0000 V=69447300
   sma(14)                                       primed=true  sma(14)=110.5164 
@@ -19936,6 +20146,7 @@ Bar[202] 2020-07-22  O=107.0000 H=93.0000 L=89.0000 C=91.0000 V=69447300
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=104.5786 upper=159.3850 lower=49.7722 band=Band(49.7722,159.3850) 
   fctban(30,1)                                  primed=true  fctban(30,1)=114.7605 upper=166.8451 lower=62.6758 band=Band(62.6758,166.8451) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0298 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0000 stc(23,50,10,0.50) macd=-5.1818 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[203] 2020-07-23  O=91.0000 H=94.6200 L=92.5000 C=93.9400 V=26673600
   sma(14)                                       primed=true  sma(14)=108.6643 
@@ -20031,6 +20242,7 @@ Bar[203] 2020-07-23  O=91.0000 H=94.6200 L=92.5000 C=93.9400 V=26673600
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=103.2488 upper=158.7021 lower=47.7954 band=Band(47.7954,158.7021) 
   fctban(30,1)                                  primed=true  fctban(30,1)=114.4079 upper=157.8952 lower=70.9206 band=Band(70.9206,157.8952) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0080 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0000 stc(23,50,10,0.50) macd=-5.8266 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[204] 2020-07-24  O=93.9400 H=95.1200 L=92.1200 C=93.8700 V=13768400
   sma(14)                                       primed=true  sma(14)=106.6550 
@@ -20126,6 +20338,7 @@ Bar[204] 2020-07-24  O=93.9400 H=95.1200 L=92.1200 C=93.8700 V=13768400
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=104.8008 upper=154.3455 lower=55.2561 band=Band(55.2561,154.3455) 
   fctban(30,1)                                  primed=true  fctban(30,1)=113.0225 upper=157.0770 lower=68.9680 band=Band(68.9680,157.0770) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0007 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0000 stc(23,50,10,0.50) macd=-6.3785 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[205] 2020-07-25  O=93.8700 H=96.0000 L=94.6200 C=95.5000 V=11371600
   sma(14)                                       primed=true  sma(14)=104.9629 
@@ -20221,6 +20434,7 @@ Bar[205] 2020-07-25  O=93.8700 H=96.0000 L=94.6200 C=95.5000 V=11371600
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=104.9629 upper=151.7466 lower=58.1791 band=Band(58.1791,151.7466) 
   fctban(30,1)                                  primed=true  fctban(30,1)=111.7854 upper=156.6437 lower=66.9272 band=Band(66.9272,156.6437) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0066 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0000 stc(23,50,10,0.50) macd=-6.7719 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[206] 2020-07-26  O=95.5000 H=95.5600 L=92.8100 C=93.0000 V=9872200
   sma(14)                                       primed=true  sma(14)=103.2936 
@@ -20316,6 +20530,7 @@ Bar[206] 2020-07-26  O=95.5000 H=95.5600 L=92.8100 C=93.0000 V=9872200
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=105.1044 upper=149.3376 lower=60.8712 band=Band(60.8712,149.3376) 
   fctban(30,1)                                  primed=true  fctban(30,1)=110.5771 upper=154.8698 lower=66.2844 band=Band(66.2844,154.8698) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0099 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0000 stc(23,50,10,0.50) macd=-7.2064 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[207] 2020-07-27  O=93.0000 H=95.3100 L=94.2500 C=94.9400 V=9450500
   sma(14)                                       primed=true  sma(14)=101.9679 
@@ -20411,6 +20626,7 @@ Bar[207] 2020-07-27  O=93.0000 H=95.3100 L=94.2500 C=94.9400 V=9450500
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=101.9679 upper=149.9587 lower=53.9770 band=Band(53.9770,149.9587) 
   fctban(30,1)                                  primed=true  fctban(30,1)=109.3246 upper=151.9119 lower=66.7372 band=Band(66.7372,151.9119) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0066 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0000 stc(23,50,10,0.50) macd=-7.4800 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[208] 2020-07-28  O=94.9400 H=99.0000 L=96.2500 C=98.2500 V=11083300
   sma(14)                                       primed=true  sma(14)=100.8250 
@@ -20506,6 +20722,7 @@ Bar[208] 2020-07-28  O=94.9400 H=99.0000 L=96.2500 C=98.2500 V=11083300
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=100.1192 upper=150.2769 lower=49.9616 band=Band(49.9616,150.2769) 
   fctban(30,1)                                  primed=true  fctban(30,1)=108.2933 upper=152.5834 lower=64.0033 band=Band(64.0033,152.5834) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0038 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0000 stc(23,50,10,0.50) macd=-7.5505 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[209] 2020-07-29  O=98.2500 H=98.8100 L=96.3700 C=96.7500 V=9552800
   sma(14)                                       primed=true  sma(14)=99.8786 
@@ -20601,6 +20818,7 @@ Bar[209] 2020-07-29  O=98.2500 H=98.8100 L=96.3700 C=96.7500 V=9552800
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=98.8533 upper=149.1421 lower=48.5646 band=Band(48.5646,149.1421) 
   fctban(30,1)                                  primed=true  fctban(30,1)=107.1788 upper=151.3256 lower=63.0319 band=Band(63.0319,151.3256) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0116 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0000 stc(23,50,10,0.50) macd=-7.6541 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[210] 2020-07-30  O=96.7500 H=96.8100 L=93.6900 C=94.8100 V=11108400
   sma(14)                                       primed=true  sma(14)=99.1464 
@@ -20696,6 +20914,7 @@ Bar[210] 2020-07-30  O=96.7500 H=96.8100 L=93.6900 C=94.8100 V=11108400
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=97.7650 upper=147.4608 lower=48.0692 band=Band(48.0692,147.4608) 
   fctban(30,1)                                  primed=true  fctban(30,1)=106.1267 upper=147.4273 lower=64.8261 band=Band(64.8261,147.4273) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0107 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0000 stc(23,50,10,0.50) macd=-7.8059 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[211] 2020-07-31  O=94.8100 H=95.9400 L=93.5000 C=94.3700 V=10374200
   sma(14)                                       primed=true  sma(14)=98.2443 
@@ -20791,6 +21010,7 @@ Bar[211] 2020-07-31  O=94.8100 H=95.9400 L=93.5000 C=94.3700 V=10374200
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=98.8280 upper=143.7454 lower=53.9106 band=Band(53.9106,143.7454) 
   fctban(30,1)                                  primed=true  fctban(30,1)=105.6564 upper=143.9715 lower=67.3413 band=Band(67.3413,143.9715) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0052 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0000 stc(23,50,10,0.50) macd=-7.9335 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[212] 2020-08-01  O=94.3700 H=94.4400 L=90.0000 C=91.5600 V=16701900
   sma(14)                                       primed=true  sma(14)=97.0793 
@@ -20886,6 +21106,7 @@ Bar[212] 2020-08-01  O=94.3700 H=94.4400 L=90.0000 C=91.5600 V=16701900
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=98.7671 upper=142.1146 lower=55.4195 band=Band(55.4195,142.1146) 
   fctban(30,1)                                  primed=true  fctban(30,1)=104.4788 upper=144.3893 lower=64.5683 band=Band(64.5683,144.3893) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0005 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0000 stc(23,50,10,0.50) macd=-8.1439 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[213] 2020-08-02  O=91.5600 H=92.9400 L=90.1900 C=90.2500 V=13741900
   sma(14)                                       primed=true  sma(14)=95.8829 
@@ -20981,6 +21202,7 @@ Bar[213] 2020-08-02  O=91.5600 H=92.9400 L=90.1900 C=90.2500 V=13741900
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=98.2939 upper=140.4721 lower=56.1157 band=Band(56.1157,140.4721) 
   fctban(30,1)                                  primed=true  fctban(30,1)=102.6917 upper=143.9939 lower=61.3895 band=Band(61.3895,143.9939) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0026 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0000 stc(23,50,10,0.50) macd=-8.3604 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[214] 2020-08-03  O=90.2500 H=93.9400 L=90.5000 C=93.9400 V=8523600
   sma(14)                                       primed=true  sma(14)=94.9414 
@@ -21076,6 +21298,7 @@ Bar[214] 2020-08-03  O=90.2500 H=93.9400 L=90.5000 C=93.9400 V=8523600
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=98.0647 upper=138.0337 lower=58.0958 band=Band(58.0958,138.0337) 
   fctban(30,1)                                  primed=true  fctban(30,1)=102.3416 upper=140.6670 lower=64.0162 band=Band(64.0162,140.6670) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0078 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=0.0000 stc(23,50,10,0.50) macd=-8.3610 stc(23,50,10,0.50) pf=0.0000 
 
 Bar[215] 2020-08-04  O=93.9400 H=95.5000 L=92.1200 C=93.6200 V=9551900
   sma(14)                                       primed=true  sma(14)=93.9857 
@@ -21171,6 +21394,7 @@ Bar[215] 2020-08-04  O=93.9400 H=95.5000 L=92.1200 C=93.6200 V=9551900
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=97.8425 upper=135.7003 lower=59.9847 band=Band(59.9847,135.7003) 
   fctban(30,1)                                  primed=true  fctban(30,1)=101.2064 upper=137.0031 lower=65.4097 band=Band(65.4097,137.0031) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0018 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=50.0000 stc(23,50,10,0.50) macd=-8.3483 stc(23,50,10,0.50) pf=0.5504 
 
 Bar[216] 2020-08-05  O=93.6200 H=97.0600 L=94.1200 C=97.0000 V=8680500
   sma(14)                                       primed=true  sma(14)=94.4143 
@@ -21266,6 +21490,7 @@ Bar[216] 2020-08-05  O=93.6200 H=97.0600 L=94.1200 C=97.0000 V=8680500
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=97.8024 upper=133.4647 lower=62.1401 band=Band(62.1401,133.4647) 
   fctban(30,1)                                  primed=true  fctban(30,1)=100.3188 upper=134.7395 lower=65.8981 band=Band(65.8981,134.7395) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0063 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=75.0000 stc(23,50,10,0.50) macd=-8.1607 stc(23,50,10,0.50) pf=11.6436 
 
 Bar[217] 2020-08-06  O=97.0000 H=97.5000 L=94.8700 C=95.0000 V=7151700
   sma(14)                                       primed=true  sma(14)=94.4900 
@@ -21361,6 +21586,7 @@ Bar[217] 2020-08-06  O=97.0000 H=97.5000 L=94.8700 C=95.0000 V=7151700
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=97.3233 upper=131.2827 lower=63.3640 band=Band(63.3640,131.2827) 
   fctban(30,1)                                  primed=true  fctban(30,1)=99.4640 upper=131.4319 lower=67.4961 band=Band(67.4961,131.4319) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0034 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=87.5000 stc(23,50,10,0.50) macd=-8.0570 stc(23,50,10,0.50) pf=24.5734 
 
 Bar[218] 2020-08-07  O=95.0000 H=96.2500 L=93.0000 C=95.8700 V=9673100
   sma(14)                                       primed=true  sma(14)=94.6329 
@@ -21456,6 +21682,7 @@ Bar[218] 2020-08-07  O=95.0000 H=96.2500 L=93.0000 C=95.8700 V=9673100
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=96.7933 upper=129.7306 lower=63.8561 band=Band(63.8561,129.7306) 
   fctban(30,1)                                  primed=true  fctban(30,1)=98.7588 upper=130.0634 lower=67.4542 band=Band(67.4542,130.0634) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0030 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=93.7500 stc(23,50,10,0.50) macd=-7.9010 stc(23,50,10,0.50) pf=44.8203 
 
 Bar[219] 2020-08-08  O=95.8700 H=96.3700 L=93.8700 C=94.0600 V=6264700
   sma(14)                                       primed=true  sma(14)=94.5300 
@@ -21551,6 +21778,7 @@ Bar[219] 2020-08-08  O=95.8700 H=96.3700 L=93.8700 C=94.0600 V=6264700
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=96.1357 upper=127.4908 lower=64.7806 band=Band(64.7806,127.4908) 
   fctban(30,1)                                  primed=true  fctban(30,1)=97.9512 upper=127.8937 lower=68.0087 band=Band(68.0087,127.8937) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0008 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=96.8750 stc(23,50,10,0.50) macd=-7.8177 stc(23,50,10,0.50) pf=71.3497 
 
 Bar[220] 2020-08-09  O=94.0600 H=95.0000 L=93.0000 C=94.6200 V=8541600
   sma(14)                                       primed=true  sma(14)=94.6457 
@@ -21646,6 +21874,7 @@ Bar[220] 2020-08-09  O=94.0600 H=95.0000 L=93.0000 C=94.6200 V=8541600
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=95.5462 upper=124.4012 lower=66.6912 band=Band(66.6912,124.4012) 
   fctban(30,1)                                  primed=true  fctban(30,1)=97.3360 upper=124.2676 lower=70.4044 band=Band(70.4044,124.2676) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0127 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=98.4375 stc(23,50,10,0.50) macd=-7.6940 stc(23,50,10,0.50) pf=85.6748 
 
 Bar[221] 2020-08-10  O=94.6200 H=94.8700 L=92.6200 C=93.7500 V=8358000
   sma(14)                                       primed=true  sma(14)=94.5607 
@@ -21741,6 +21970,7 @@ Bar[221] 2020-08-10  O=94.6200 H=94.8700 L=92.6200 C=93.7500 V=8358000
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=94.9095 upper=121.3510 lower=68.4680 band=Band(68.4680,121.3510) 
   fctban(30,1)                                  primed=true  fctban(30,1)=97.1981 upper=119.7082 lower=74.6879 band=Band(74.6879,119.7082) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0151 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.2188 stc(23,50,10,0.50) macd=-7.5983 stc(23,50,10,0.50) pf=92.8374 
 
 Bar[222] 2020-08-11  O=93.7500 H=98.2500 L=93.5600 C=98.0000 V=18720800
   sma(14)                                       primed=true  sma(14)=94.5429 
@@ -21836,6 +22066,7 @@ Bar[222] 2020-08-11  O=93.7500 H=98.2500 L=93.5600 C=98.0000 V=18720800
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=95.0500 upper=118.2097 lower=71.8903 band=Band(71.8903,118.2097) 
   fctban(30,1)                                  primed=true  fctban(30,1)=96.9265 upper=115.8159 lower=78.0372 band=Band(78.0372,115.8159) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0218 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.6094 stc(23,50,10,0.50) macd=-7.3017 stc(23,50,10,0.50) pf=96.4187 
 
 Bar[223] 2020-08-12  O=98.0000 H=105.1200 L=98.3700 C=103.9400 V=19683100
   sma(14)                                       primed=true  sma(14)=95.0564 
@@ -21931,6 +22162,7 @@ Bar[223] 2020-08-12  O=98.0000 H=105.1200 L=98.3700 C=103.9400 V=19683100
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=95.9233 upper=115.9554 lower=75.8913 band=Band(75.8913,115.9554) 
   fctban(30,1)                                  primed=true  fctban(30,1)=97.1863 upper=112.9470 lower=81.4256 band=Band(81.4256,112.9470) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0155 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.8047 stc(23,50,10,0.50) macd=-6.7546 stc(23,50,10,0.50) pf=98.2094 
 
 Bar[224] 2020-08-13  O=103.9400 H=108.4400 L=104.4400 C=107.8700 V=13682500
   sma(14)                                       primed=true  sma(14)=95.9893 
@@ -22026,6 +22258,7 @@ Bar[224] 2020-08-13  O=103.9400 H=108.4400 L=104.4400 C=107.8700 V=13682500
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=96.0976 upper=114.4601 lower=77.7352 band=Band(77.7352,114.4601) 
   fctban(30,1)                                  primed=true  fctban(30,1)=97.5679 upper=111.1954 lower=83.9403 band=Band(83.9403,111.1954) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0412 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.9023 stc(23,50,10,0.50) macd=-6.0773 stc(23,50,10,0.50) pf=99.1047 
 
 Bar[225] 2020-08-14  O=107.8700 H=109.8700 L=106.0000 C=106.0600 V=10668100
   sma(14)                                       primed=true  sma(14)=96.8243 
@@ -22121,6 +22354,7 @@ Bar[225] 2020-08-14  O=107.8700 H=109.8700 L=106.0000 C=106.0600 V=10668100
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=97.2292 upper=113.6946 lower=80.7638 band=Band(80.7638,113.6946) 
   fctban(30,1)                                  primed=true  fctban(30,1)=98.4845 upper=109.7705 lower=87.1986 band=Band(87.1986,109.7705) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0154 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.9512 stc(23,50,10,0.50) macd=-5.5407 stc(23,50,10,0.50) pf=99.5523 
 
 Bar[226] 2020-08-15  O=106.0600 H=105.0000 L=101.8100 C=104.5000 V=9710600
   sma(14)                                       primed=true  sma(14)=97.7486 
@@ -22216,6 +22450,7 @@ Bar[226] 2020-08-15  O=106.0600 H=105.0000 L=101.8100 C=104.5000 V=9710600
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=99.3670 upper=115.8144 lower=82.9196 band=Band(82.9196,115.8144) 
   fctban(30,1)                                  primed=true  fctban(30,1)=98.6725 upper=109.3561 lower=87.9889 band=Band(87.9889,109.3561) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0012 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.9756 stc(23,50,10,0.50) macd=-5.1189 stc(23,50,10,0.50) pf=99.7762 
 
 Bar[227] 2020-08-16  O=104.5000 H=106.0000 L=104.1200 C=105.0000 V=3113100
   sma(14)                                       primed=true  sma(14)=98.8021 
@@ -22311,6 +22546,7 @@ Bar[227] 2020-08-16  O=104.5000 H=106.0000 L=104.1200 C=105.0000 V=3113100
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=101.7175 upper=120.6094 lower=82.8256 band=Band(82.8256,120.6094) 
   fctban(30,1)                                  primed=true  fctban(30,1)=98.3052 upper=108.8325 lower=87.7779 band=Band(87.7779,108.8325) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0009 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.9878 stc(23,50,10,0.50) macd=-4.7086 stc(23,50,10,0.50) pf=99.8881 
 
 Bar[228] 2020-08-17  O=105.0000 H=104.9400 L=103.3700 C=104.1900 V=5682000
   sma(14)                                       primed=true  sma(14)=99.5343 
@@ -22406,6 +22642,7 @@ Bar[228] 2020-08-17  O=105.0000 H=104.9400 L=103.3700 C=104.1900 V=5682000
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=105.2600 upper=130.8497 lower=79.6703 band=Band(79.6703,130.8497) 
   fctban(30,1)                                  primed=true  fctban(30,1)=98.2145 upper=108.4679 lower=87.9611 band=Band(87.9611,108.4679) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0002 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.9939 stc(23,50,10,0.50) macd=-4.3676 stc(23,50,10,0.50) pf=99.9440 
 
 Bar[229] 2020-08-18  O=104.1900 H=104.5000 L=102.1200 C=103.0600 V=5763600
   sma(14)                                       primed=true  sma(14)=100.2086 
@@ -22501,6 +22738,7 @@ Bar[229] 2020-08-18  O=104.1900 H=104.5000 L=102.1200 C=103.0600 V=5763600
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=104.5620 upper=128.5968 lower=80.5272 band=Band(80.5272,128.5968) 
   fctban(30,1)                                  primed=true  fctban(30,1)=98.0594 upper=108.0088 lower=88.1099 band=Band(88.1099,108.0088) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0022 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.9969 stc(23,50,10,0.50) macd=-4.1028 stc(23,50,10,0.50) pf=99.9720 
 
 Bar[230] 2020-08-19  O=103.0600 H=104.4400 L=102.2500 C=103.4200 V=5340000
   sma(14)                                       primed=true  sma(14)=100.6671 
@@ -22596,6 +22834,7 @@ Bar[230] 2020-08-19  O=103.0600 H=104.4400 L=102.2500 C=103.4200 V=5340000
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=104.0340 upper=126.8788 lower=81.1892 band=Band(81.1892,126.8788) 
   fctban(30,1)                                  primed=true  fctban(30,1)=98.2269 upper=107.8348 lower=88.6190 band=Band(88.6190,107.8348) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0003 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.9985 stc(23,50,10,0.50) macd=-3.8403 stc(23,50,10,0.50) pf=99.9860 
 
 Bar[231] 2020-08-20  O=103.4200 H=106.3100 L=103.3700 C=105.2700 V=6220800
   sma(14)                                       primed=true  sma(14)=101.4007 
@@ -22691,6 +22930,7 @@ Bar[231] 2020-08-20  O=103.4200 H=106.3100 L=103.3700 C=105.2700 V=6220800
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=104.1880 upper=127.2592 lower=81.1168 band=Band(81.1168,127.2592) 
   fctban(30,1)                                  primed=true  fctban(30,1)=98.1728 upper=107.6053 lower=88.7403 band=Band(88.7403,107.6053) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0518 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.9992 stc(23,50,10,0.50) macd=-3.5150 stc(23,50,10,0.50) pf=99.9930 
 
 Bar[232] 2020-08-21  O=105.2700 H=112.8700 L=107.9400 C=111.8700 V=14680500
   sma(14)                                       primed=true  sma(14)=102.5436 
@@ -22786,6 +23026,7 @@ Bar[232] 2020-08-21  O=105.2700 H=112.8700 L=107.9400 C=111.8700 V=14680500
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=105.5620 upper=132.2772 lower=78.8468 band=Band(78.8468,132.2772) 
   fctban(30,1)                                  primed=true  fctban(30,1)=98.9219 upper=113.1322 lower=84.7117 band=Band(84.7117,113.1322) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0296 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.9996 stc(23,50,10,0.50) macd=-2.9258 stc(23,50,10,0.50) pf=99.9965 
 
 Bar[233] 2020-08-22  O=111.8700 H=116.5000 L=112.5000 C=116.0000 V=9933000
   sma(14)                                       primed=true  sma(14)=104.1107 
@@ -22881,6 +23122,7 @@ Bar[233] 2020-08-22  O=111.8700 H=116.5000 L=112.5000 C=116.0000 V=9933000
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=107.3017 upper=138.4196 lower=76.1837 band=Band(76.1837,138.4196) 
   fctban(30,1)                                  primed=true  fctban(30,1)=99.7912 upper=117.7314 lower=81.8510 band=Band(81.8510,117.7314) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0239 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.9998 stc(23,50,10,0.50) macd=-2.2152 stc(23,50,10,0.50) pf=99.9983 
 
 Bar[234] 2020-08-23  O=116.0000 H=119.1900 L=115.4400 C=116.6200 V=11329500
   sma(14)                                       primed=true  sma(14)=105.6821 
@@ -22976,6 +23218,7 @@ Bar[234] 2020-08-23  O=116.0000 H=119.1900 L=115.4400 C=116.6200 V=11329500
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=108.1788 upper=140.9077 lower=75.4498 band=Band(75.4498,140.9077) 
   fctban(30,1)                                  primed=true  fctban(30,1)=100.4385 upper=120.0182 lower=80.8588 band=Band(80.8588,120.0182) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0076 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.9999 stc(23,50,10,0.50) macd=-1.5547 stc(23,50,10,0.50) pf=99.9991 
 
 Bar[235] 2020-08-24  O=116.6200 H=121.0000 L=115.5000 C=118.2800 V=8145300
   sma(14)                                       primed=true  sma(14)=107.4343 
@@ -23071,6 +23314,7 @@ Bar[235] 2020-08-24  O=116.6200 H=121.0000 L=115.5000 C=118.2800 V=8145300
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=109.3011 upper=144.5055 lower=74.0967 band=Band(74.0967,144.5055) 
   fctban(30,1)                                  primed=true  fctban(30,1)=101.5248 upper=124.8899 lower=78.1597 band=Band(78.1597,124.8899) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0149 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=100.0000 stc(23,50,10,0.50) macd=-0.8946 stc(23,50,10,0.50) pf=99.9996 
 
 Bar[236] 2020-08-25  O=118.2800 H=122.1200 L=112.2500 C=113.3700 V=16644700
   sma(14)                                       primed=true  sma(14)=108.5321 
@@ -23166,6 +23410,7 @@ Bar[236] 2020-08-25  O=118.2800 H=122.1200 L=112.2500 C=113.3700 V=16644700
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=109.2345 upper=143.0224 lower=75.4467 band=Band(75.4467,143.0224) 
   fctban(30,1)                                  primed=true  fctban(30,1)=102.2848 upper=126.6824 lower=77.8872 band=Band(77.8872,126.6824) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0098 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=100.0000 stc(23,50,10,0.50) macd=-0.5270 stc(23,50,10,0.50) pf=99.9998 
 
 Bar[237] 2020-08-26  O=113.3700 H=111.9400 L=107.5600 C=109.0000 V=12593800
   sma(14)                                       primed=true  sma(14)=108.8936 
@@ -23261,6 +23506,7 @@ Bar[237] 2020-08-26  O=113.3700 H=111.9400 L=107.5600 C=109.0000 V=12593800
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=109.6436 upper=143.1965 lower=76.0908 band=Band(76.0908,143.1965) 
   fctban(30,1)                                  primed=true  fctban(30,1)=102.9824 upper=126.6380 lower=79.3268 band=Band(79.3268,126.6380) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0034 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=100.0000 stc(23,50,10,0.50) macd=-0.3943 stc(23,50,10,0.50) pf=99.9999 
 
 Bar[238] 2020-08-27  O=109.0000 H=112.7500 L=106.5600 C=109.7000 V=7138100
   sma(14)                                       primed=true  sma(14)=109.0243 
@@ -23356,6 +23602,7 @@ Bar[238] 2020-08-27  O=109.0000 H=112.7500 L=106.5600 C=109.7000 V=7138100
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=110.6590 upper=145.9626 lower=75.3554 band=Band(75.3554,145.9626) 
   fctban(30,1)                                  primed=true  fctban(30,1)=103.7604 upper=127.6714 lower=79.8494 band=Band(79.8494,127.6714) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0020 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=100.0000 stc(23,50,10,0.50) macd=-0.2453 stc(23,50,10,0.50) pf=99.9999 
 
 Bar[239] 2020-08-28  O=109.7000 H=110.1900 L=106.8700 C=109.2500 V=7442300
   sma(14)                                       primed=true  sma(14)=109.2521 
@@ -23451,6 +23698,7 @@ Bar[239] 2020-08-28  O=109.7000 H=110.1900 L=106.8700 C=109.2500 V=7442300
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=111.2780 upper=147.1646 lower=75.3914 band=Band(75.3914,147.1646) 
   fctban(30,1)                                  primed=true  fctban(30,1)=104.3728 upper=128.7637 lower=79.9819 band=Band(79.9819,128.7637) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0038 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=100.0000 stc(23,50,10,0.50) macd=-0.1331 stc(23,50,10,0.50) pf=100.0000 
 
 Bar[240] 2020-08-29  O=109.2500 H=107.9400 L=104.5000 C=107.0000 V=9442300
   sma(14)                                       primed=true  sma(14)=109.4307 
@@ -23546,6 +23794,7 @@ Bar[240] 2020-08-29  O=109.2500 H=107.9400 L=104.5000 C=107.0000 V=9442300
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=111.6360 upper=147.2101 lower=76.0619 band=Band(76.0619,147.2101) 
   fctban(30,1)                                  primed=true  fctban(30,1)=104.9080 upper=129.4884 lower=80.3276 band=Band(80.3276,129.4884) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0047 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=98.8317 stc(23,50,10,0.50) macd=-0.1331 stc(23,50,10,0.50) pf=99.9998 
 
 Bar[241] 2020-08-30  O=107.0000 H=109.6900 L=105.7500 C=109.1900 V=7123600
   sma(14)                                       primed=true  sma(14)=109.7300 
@@ -23641,6 +23890,7 @@ Bar[241] 2020-08-30  O=107.0000 H=109.6900 L=105.7500 C=109.1900 V=7123600
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=109.7300 upper=140.0699 lower=79.3901 band=Band(79.3901,140.0699) 
   fctban(30,1)                                  primed=true  fctban(30,1)=105.3956 upper=129.2047 lower=81.5865 band=Band(81.5865,129.2047) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0019 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=98.4398 stc(23,50,10,0.50) macd=-0.0361 stc(23,50,10,0.50) pf=99.9999 
 
 Bar[242] 2020-08-31  O=109.1900 H=111.0600 L=108.6200 C=110.0000 V=7680600
   sma(14)                                       primed=true  sma(14)=110.1450 
@@ -23736,6 +23986,7 @@ Bar[242] 2020-08-31  O=109.1900 H=111.0600 L=108.6200 C=110.0000 V=7680600
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=109.4513 upper=137.7354 lower=81.1671 band=Band(81.1671,137.7354) 
   fctban(30,1)                                  primed=true  fctban(30,1)=105.9956 upper=129.2122 lower=82.7790 band=Band(82.7790,129.2122) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0013 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=98.6329 stc(23,50,10,0.50) macd=0.0852 stc(23,50,10,0.50) pf=100.0000 
 
 Bar[243] 2020-09-01  O=110.0000 H=110.4400 L=107.7500 C=109.2000 V=4839800
   sma(14)                                       primed=true  sma(14)=110.5836 
@@ -23831,6 +24082,7 @@ Bar[243] 2020-09-01  O=110.0000 H=110.4400 L=107.7500 C=109.2000 V=4839800
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=109.1622 upper=134.9604 lower=83.3641 band=Band(83.3641,134.9604) 
   fctban(30,1)                                  primed=true  fctban(30,1)=106.5288 upper=128.4726 lower=84.5850 band=Band(84.5850,128.4726) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0166 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.3164 stc(23,50,10,0.50) macd=0.1565 stc(23,50,10,0.50) pf=100.0000 
 
 Bar[244] 2020-09-02  O=109.2000 H=110.1200 L=108.0600 C=110.1200 V=4775500
   sma(14)                                       primed=true  sma(14)=111.0621 
@@ -23926,6 +24178,7 @@ Bar[244] 2020-09-02  O=109.2000 H=110.1200 L=108.0600 C=110.1200 V=4775500
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=109.2126 upper=133.4129 lower=85.0124 band=Band(85.0124,133.4129) 
   fctban(30,1)                                  primed=true  fctban(30,1)=106.6669 upper=126.2369 lower=87.0970 band=Band(87.0970,126.2369) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0013 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=99.6582 stc(23,50,10,0.50) macd=0.2594 stc(23,50,10,0.50) pf=100.0000 
 
 Bar[245] 2020-09-03  O=110.1200 H=110.3100 L=108.0000 C=108.0000 V=4008800
   sma(14)                                       primed=true  sma(14)=111.2571 
@@ -24021,6 +24274,7 @@ Bar[245] 2020-09-03  O=110.1200 H=110.3100 L=108.0000 C=108.0000 V=4008800
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=109.1520 upper=131.6719 lower=86.6321 band=Band(86.6321,131.6719) 
   fctban(30,1)                                  primed=true  fctban(30,1)=107.2031 upper=125.7487 lower=88.6574 band=Band(88.6574,125.7487) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0033 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=49.8291 stc(23,50,10,0.50) macd=0.2556 stc(23,50,10,0.50) pf=99.7588 
 
 Bar[246] 2020-09-04  O=108.0000 H=110.4400 L=108.1900 C=108.6200 V=4533600
   sma(14)                                       primed=true  sma(14)=111.0250 
@@ -24116,6 +24370,7 @@ Bar[246] 2020-09-04  O=108.0000 H=110.4400 L=108.1900 C=108.6200 V=4533600
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=109.1267 upper=130.7470 lower=87.5063 band=Band(87.5063,130.7470) 
   fctban(30,1)                                  primed=true  fctban(30,1)=107.7415 upper=126.0991 lower=89.3840 band=Band(89.3840,126.0991) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0042 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=49.9158 stc(23,50,10,0.50) macd=0.2787 stc(23,50,10,0.50) pf=99.8794 
 
 Bar[247] 2020-09-05  O=108.6200 H=110.0000 L=108.1200 C=109.7500 V=3741100
   sma(14)                                       primed=true  sma(14)=110.5786 
@@ -24211,6 +24466,7 @@ Bar[247] 2020-09-05  O=108.6200 H=110.0000 L=108.1200 C=109.7500 V=3741100
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=109.3767 upper=129.9246 lower=88.8288 band=Band(88.8288,129.9246) 
   fctban(30,1)                                  primed=true  fctban(30,1)=108.3569 upper=126.1928 lower=90.5210 band=Band(90.5210,126.1928) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0007 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=62.4597 stc(23,50,10,0.50) macd=0.3481 stc(23,50,10,0.50) pf=99.9397 
 
 Bar[248] 2020-09-06  O=109.7500 H=110.7500 L=109.0600 C=109.8100 V=4084800
   sma(14)                                       primed=true  sma(14)=110.0921 
@@ -24306,6 +24562,7 @@ Bar[248] 2020-09-06  O=109.7500 H=110.7500 L=109.0600 C=109.8100 V=4084800
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=109.6057 upper=129.0738 lower=90.1376 band=Band(90.1376,129.0738) 
   fctban(30,1)                                  primed=true  fctban(30,1)=108.8112 upper=125.6865 lower=91.9358 band=Band(91.9358,125.6865) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0043 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=74.9820 stc(23,50,10,0.50) macd=0.4107 stc(23,50,10,0.50) pf=99.9698 
 
 Bar[249] 2020-09-07  O=109.8100 H=110.5000 L=108.7500 C=109.0000 V=2685200
   sma(14)                                       primed=true  sma(14)=109.4293 
@@ -24401,6 +24658,7 @@ Bar[249] 2020-09-07  O=109.8100 H=110.5000 L=108.7500 C=109.0000 V=2685200
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=109.8348 upper=127.6578 lower=92.0118 band=Band(92.0118,127.6578) 
   fctban(30,1)                                  primed=true  fctban(30,1)=109.0058 upper=124.3513 lower=93.6602 band=Band(93.6602,124.3513) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0006 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=84.3683 stc(23,50,10,0.50) macd=0.4287 stc(23,50,10,0.50) pf=99.9849 
 
 Bar[250] 2020-09-08  O=109.0000 H=110.5000 L=108.5600 C=108.7500 V=3438000
   sma(14)                                       primed=true  sma(14)=109.0993 
@@ -24496,6 +24754,7 @@ Bar[250] 2020-09-08  O=109.0000 H=110.5000 L=108.5600 C=108.7500 V=3438000
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=110.1057 upper=126.1922 lower=94.0192 band=Band(94.0192,126.1922) 
   fctban(30,1)                                  primed=true  fctban(30,1)=109.0396 upper=122.3573 lower=95.7220 band=Band(95.7220,122.3573) 
   hurdif(30)                                    primed=true  hurdif(30)=-0.0013 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=90.6240 stc(23,50,10,0.50) macd=0.4322 stc(23,50,10,0.50) pf=99.9925 
 
 Bar[251] 2020-09-09  O=108.7500 H=109.5000 L=106.6200 C=107.8700 V=2870500
   sma(14)                                       primed=true  sma(14)=109.0186 
@@ -24591,4 +24850,5 @@ Bar[251] 2020-09-09  O=108.7500 H=109.5000 L=106.6200 C=107.8700 V=2870500
   fbanha(30,30,2,0.5,0.07)                      primed=true  fbanha(30,30,2,0.5,0.07)=110.3176 upper=123.9930 lower=96.6422 band=Band(96.6422,123.9930) 
   fctban(30,1)                                  primed=true  fctban(30,1)=109.1092 upper=119.9374 lower=98.2811 band=Band(98.2811,119.9374) 
   hurdif(30)                                    primed=true  hurdif(30)=0.0260 
+  stc(23,50,10,0.50)                            primed=true  stc(23,50,10,0.50) stc=45.3120 stc(23,50,10,0.50) macd=0.3950 stc(23,50,10,0.50) pf=94.6376 
 

@@ -618,4 +618,11 @@ def create_indicator(
         from ..jean_philippe_poton.hurst_difference.hurst_difference import HurstDifference
         return HurstDifference(_apply(default_params(), params))
 
+    # ── doug schaff ───────────────────────────────────────────────────────
+
+    if identifier == Identifier.SCHAFF_TREND_CYCLE:
+        from ..doug_schaff.schaff_trend_cycle.params import default_params
+        from ..doug_schaff.schaff_trend_cycle.schaff_trend_cycle import SchaffTrendCycle
+        return SchaffTrendCycle(_apply(default_params(), params))
+
     raise ValueError(f"unsupported indicator: {identifier}")

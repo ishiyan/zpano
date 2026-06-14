@@ -466,6 +466,14 @@ _descriptors: dict[Id, Descriptor] = {
         Id.HURST_DIFFERENCE, "Jean-Philippe Poton", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
         [_o(0, S.SCALAR, R.OSCILLATOR, P.OWN),
          _o(1, S.SCALAR, R.OSCILLATOR, P.OWN)]),
+
+    # ── doug schaff ───────────────────────────────────────────────────────
+
+    Id.SCHAFF_TREND_CYCLE: _d(
+        Id.SCHAFF_TREND_CYCLE, "Doug Schaff", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
+        [_o(0, S.SCALAR, R.BOUNDED_OSCILLATOR, P.OWN),
+         _o(1, S.SCALAR, R.OSCILLATOR, P.OWN),
+         _o(2, S.SCALAR, R.BOUNDED_OSCILLATOR, P.OWN)]),
 }
 
 

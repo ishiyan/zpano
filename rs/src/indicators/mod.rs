@@ -23,3 +23,4 @@ pub mod john_ehlers;
 pub mod arnaud_legoux;
 pub mod manfred_durschner;
 pub mod jean_philippe_poton;
+pub mod doug_schaff;

@@ -123,6 +123,7 @@ _IDENTIFIER_MAP: dict[str, Identifier] = {
     'fractalBandsHybrideAdaptive': Identifier.FRACTAL_BANDS_HYBRIDE_ADAPTIVE,
     'fractionalBands': Identifier.FRACTIONAL_BANDS,
     'hurstDifference': Identifier.HURST_DIFFERENCE,
+    'schaffTrendCycle': Identifier.SCHAFF_TREND_CYCLE,
 }
 
 

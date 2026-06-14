@@ -1747,4 +1747,17 @@ pub static DESCRIPTORS: &[Descriptor] = &[
             OutputDescriptor { kind: 2, shape: Scalar, role: Oscillator, pane: Own },
         ],
     },
+    // ── doug schaff ───────────────────────────────────────────────────────
+    Descriptor {
+        identifier: SchaffTrendCycle,
+        family: "Doug Schaff",
+        adaptivity: Static,
+        input_requirement: ScalarInput,
+        volume_usage: NoVolume,
+        outputs: &[
+            OutputDescriptor { kind: 1, shape: Scalar, role: BoundedOscillator, pane: Own },
+            OutputDescriptor { kind: 2, shape: Scalar, role: Oscillator, pane: Own },
+            OutputDescriptor { kind: 3, shape: Scalar, role: BoundedOscillator, pane: Own },
+        ],
+    },
 ];

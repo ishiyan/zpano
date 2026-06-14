@@ -352,6 +352,11 @@ const (
 	// HurstDifference identifies the Hurst Difference (HURDIF) indicator.
 	HurstDifference
 
+	// ── doug schaff ───────────────────────────────────────────────────────
+
+	// SchaffTrendCycle identifies the Doug Schaff Schaff Trend Cycle (STC) indicator.
+	SchaffTrendCycle
+
 	last
 )
 
@@ -496,6 +501,9 @@ const (
 	fractalBandsHybrideAdaptive          = "fractalBandsHybrideAdaptive"
 	fractionalBands                      = "fractionalBands"
 	hurstDifference                      = "hurstDifference"
+
+	// ── doug schaff ───────────────────────────────────────────────────────
+	schaffTrendCycle = "schaffTrendCycle"
 )
 
 // String implements the Stringer interface.
@@ -712,6 +720,8 @@ func (i Identifier) String() string {
 		return fractionalBands
 	case HurstDifference:
 		return hurstDifference
+	case SchaffTrendCycle:
+		return schaffTrendCycle
 	default:
 		return unknown
 	}
@@ -965,6 +975,8 @@ func (i *Identifier) UnmarshalJSON(data []byte) error {
 		*i = FractionalBands
 	case hurstDifference:
 		*i = HurstDifference
+	case schaffTrendCycle:
+		*i = SchaffTrendCycle
 	default:
 		return fmt.Errorf(errFmt, s)
 	}

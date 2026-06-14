@@ -347,3 +347,8 @@ class Identifier(IntEnum):
 
     # Identifies the Hurst Difference (HURDIF) indicator.
     HURST_DIFFERENCE = 92
+
+    # ── doug schaff ───────────────────────────────────────────────────────
+
+    # Identifies the Doug Schaff Schaff Trend Cycle (STC) indicator.
+    SCHAFF_TREND_CYCLE = 93

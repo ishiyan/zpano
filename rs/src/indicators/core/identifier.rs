@@ -251,6 +251,10 @@ pub enum Identifier {
     FractionalBands = 91,
     /// Identifies the Hurst Difference (HURDIF) indicator.
     HurstDifference = 92,
+
+    // ── doug schaff ───────────────────────────────────────────────────────
+    /// Identifies the Doug Schaff Schaff Trend Cycle (STC) indicator.
+    SchaffTrendCycle = 93,
 }
 
 impl Identifier {
@@ -358,6 +362,7 @@ impl Identifier {
             Self::FractalBandsHybrideAdaptive => "fractalBandsHybrideAdaptive",
             Self::FractionalBands => "fractionalBands",
             Self::HurstDifference => "hurstDifference",
+            Self::SchaffTrendCycle => "schaffTrendCycle",
         }
     }
 
@@ -469,6 +474,7 @@ impl Identifier {
             "fractalBandsHybrideAdaptive" => Some(Self::FractalBandsHybrideAdaptive),
             "fractionalBands" => Some(Self::FractionalBands),
             "hurstDifference" => Some(Self::HurstDifference),
+            "schaffTrendCycle" => Some(Self::SchaffTrendCycle),
             _ => None,
         }
     }

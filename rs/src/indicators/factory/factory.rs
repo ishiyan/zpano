@@ -262,6 +262,9 @@ use crate::indicators::jean_philippe_poton::fractional_bands::{
 use crate::indicators::jean_philippe_poton::hurst_difference::{
     HurstDifference, HurstDifferenceParams,
 };
+use crate::indicators::doug_schaff::schaff_trend_cycle::schaff_trend_cycle::{
+    SchaffTrendCycle, SchaffTrendCycleParams,
+};
 
 /// Create an indicator from its identifier and a JSON-encoded parameter string.
 ///
@@ -1518,6 +1521,15 @@ pub fn create_indicator(
             let mut p = HurstDifferenceParams::default();
             if let Some(v) = get_usize(&params, "period") { p.period = v; }
             Ok(Box::new(HurstDifference::new(&p)?))
+        }
+
+        Identifier::SchaffTrendCycle => {
+            let mut p = SchaffTrendCycleParams::default();
+            if let Some(v) = get_usize(&params, "fast") { p.fast = v; }
+            if let Some(v) = get_usize(&params, "slow") { p.slow = v; }
+            if let Some(v) = get_usize(&params, "tclen") { p.tclen = v; }
+            if let Some(v) = get_f64(&params, "factor") { p.factor = v; }
+            Ok(Box::new(SchaffTrendCycle::new(&p)?))
         }
 
         _ => Err(format!("unsupported indicator: {:?}", identifier)),

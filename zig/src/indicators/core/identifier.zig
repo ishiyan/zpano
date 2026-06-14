@@ -251,6 +251,10 @@ pub const Identifier = enum(u8) {
     /// Identifies the Hurst Difference (HURDIF) indicator.
     hurst_difference = 92,
 
+    // ── doug schaff ───────────────────────────────────────────────────────
+    /// Identifies the Doug Schaff Schaff Trend Cycle (STC) indicator.
+    schaff_trend_cycle = 93,
+
     /// Returns the camelCase string representation matching Go's String().
     pub fn asStr(self: Identifier) []const u8 {
         return switch (self) {
@@ -393,6 +397,7 @@ pub const Identifier = enum(u8) {
             .fractal_bands_hybride_adaptive => "fractalBandsHybrideAdaptive",
             .fractional_bands => "fractionalBands",
             .hurst_difference => "hurstDifference",
+            .schaff_trend_cycle => "schaffTrendCycle",
         };
     }
 
@@ -538,6 +543,7 @@ pub const Identifier = enum(u8) {
             .{ "fractalBandsHybrideAdaptive", Identifier.fractal_bands_hybride_adaptive },
             .{ "fractionalBands", Identifier.fractional_bands },
             .{ "hurstDifference", Identifier.hurst_difference },
+            .{ "schaffTrendCycle", Identifier.schaff_trend_cycle },
         };
 
         inline for (map) |entry| {

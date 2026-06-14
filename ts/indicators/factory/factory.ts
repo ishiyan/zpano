@@ -220,6 +220,8 @@ import { FractionalBands } from '../jean-philippe-poton/fractional-bands/fractio
 import { HurstDifference } from '../jean-philippe-poton/hurst-difference/hurst-difference.js';
 import { defaultParams as defaultFctbanParams } from '../jean-philippe-poton/fractional-bands/params.js';
 import { defaultParams as defaultHurdifParams } from '../jean-philippe-poton/hurst-difference/params.js';
+import { SchaffTrendCycle } from '../doug-schaff/schaff-trend-cycle/schaff-trend-cycle.js';
+import { defaultParams as defaultStcParams } from '../doug-schaff/schaff-trend-cycle/params.js';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -636,6 +638,9 @@ export function createIndicator(identifier: IndicatorIdentifier, params?: Record
 
         case IndicatorIdentifier.HurstDifference:
             return new HurstDifference({ ...defaultHurdifParams(), ...p });
+
+        case IndicatorIdentifier.SchaffTrendCycle:
+            return new SchaffTrendCycle({ ...defaultStcParams(), ...p });
 
         default:
             throw new Error(`Unsupported indicator: ${IndicatorIdentifier[identifier] ?? identifier}`);

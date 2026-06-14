@@ -34,6 +34,7 @@ import (
 	"zpano/indicators/jeanphilippepoton/fractalbandshybrideadaptive"
 	"zpano/indicators/jeanphilippepoton/fractionalbands"
 	"zpano/indicators/jeanphilippepoton/hurstdifference"
+	"zpano/indicators/dougschaff/schafftrendcycle"
 	"zpano/indicators/genequong/moneyflowindex"
 	"zpano/indicators/georgelane/stochastic"
 	"zpano/indicators/geraldappel/movingaverageconvergencedivergence"
@@ -1063,6 +1064,16 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 		}
 
 		return hurstdifference.NewHurstDifference(p)
+
+	// ── doug schaff ───────────────────────────────────────────────────────
+
+	case core.SchaffTrendCycle:
+		p := schafftrendcycle.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return schafftrendcycle.NewSchaffTrendCycle(p)
 
 	default:
 		return nil, fmt.Errorf("unsupported indicator: %s", identifier)
