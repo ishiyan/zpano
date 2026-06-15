@@ -781,7 +781,7 @@ var descriptors = map[Identifier]Descriptor{
 		Identifier: PolynomialForecast, Family: "Don Mak",
 		Adaptivity: Static, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
 		Outputs: []OutputDescriptor{
-			{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Signal, Pane: Price},
+			{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Forecast, Pane: Price},
 		},
 	},
 
@@ -789,7 +789,7 @@ var descriptors = map[Identifier]Descriptor{
 		Identifier: ParabolicVertex, Family: "Don Mak",
 		Adaptivity: Static, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
 		Outputs: []OutputDescriptor{
-			{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Signal, Pane: Own},
+			{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Reversal, Pane: Own},
 		},
 	},
 
@@ -797,8 +797,8 @@ var descriptors = map[Identifier]Descriptor{
 		Identifier: CubicVertex, Family: "Don Mak",
 		Adaptivity: Static, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
 		Outputs: []OutputDescriptor{
-			{Kind: 1 /* BarsToNearTurn */, Shape: shape.Scalar, Role: Signal, Pane: Own},
-			{Kind: 2 /* BarsToFarTurn */, Shape: shape.Scalar, Role: Signal, Pane: Own},
+			{Kind: 1 /* BarsToNearTurn */, Shape: shape.Scalar, Role: Reversal, Pane: Own},
+			{Kind: 2 /* BarsToFarTurn */, Shape: shape.Scalar, Role: Reversal, Pane: Own},
 		},
 	},
 }

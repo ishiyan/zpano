@@ -36,6 +36,10 @@ pub enum Role {
     RegimeFlag = 16,
     /// Correlation-coefficient-style measure.
     Correlation = 17,
+    /// Next-bar (n-step-ahead) price projection in the price domain.
+    Forecast = 18,
+    /// Predicted reversal location, expressed as a signed offset in bars.
+    Reversal = 19,
 }
 
 impl Role {
@@ -58,6 +62,8 @@ impl Role {
             Self::Histogram => "histogram",
             Self::RegimeFlag => "regimeFlag",
             Self::Correlation => "correlation",
+            Self::Forecast => "forecast",
+            Self::Reversal => "reversal",
         }
     }
 }

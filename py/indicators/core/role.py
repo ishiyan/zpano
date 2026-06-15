@@ -23,3 +23,5 @@ class Role(IntEnum):
     HISTOGRAM = 14
     REGIME_FLAG = 15
     CORRELATION = 16
+    FORECAST = 17
+    REVERSAL = 18

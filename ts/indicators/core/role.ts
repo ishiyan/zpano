@@ -49,5 +49,11 @@ export enum Role {
   RegimeFlag,
 
   /** A correlation-coefficient-style measure. */
-  Correlation
+  Correlation,
+
+  /** A next-bar (n-step-ahead) price projection in the price domain. */
+  Forecast,
+
+  /** A predicted reversal location, expressed as a signed offset in bars. */
+  Reversal
 }

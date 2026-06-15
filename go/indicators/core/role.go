@@ -60,6 +60,12 @@ const (
 
 	// Correlation denotes a correlation-coefficient-style measure.
 	Correlation
+
+	// Forecast denotes a next-bar (n-step-ahead) price projection in the price domain.
+	Forecast
+
+	// Reversal denotes a predicted reversal location, expressed as a signed offset in bars.
+	Reversal
 	roleLast
 )
 
@@ -82,6 +88,8 @@ const (
 	roleHistogram         = "histogram"
 	roleRegimeFlag        = "regimeFlag"
 	roleCorrelation       = "correlation"
+	roleForecast          = "forecast"
+	roleReversal          = "reversal"
 )
 
 var errUnknownRole = errors.New("unknown indicator role")
@@ -123,6 +131,10 @@ func (r Role) String() string {
 		return roleRegimeFlag
 	case Correlation:
 		return roleCorrelation
+	case Forecast:
+		return roleForecast
+	case Reversal:
+		return roleReversal
 	default:
 		return roleUnknown
 	}
@@ -190,6 +202,10 @@ func (r *Role) UnmarshalJSON(data []byte) error {
 		*r = RegimeFlag
 	case roleCorrelation:
 		*r = Correlation
+	case roleForecast:
+		*r = Forecast
+	case roleReversal:
+		*r = Reversal
 	default:
 		return fmt.Errorf("cannot unmarshal '%s': %w", s, errUnknownRole)
 	}

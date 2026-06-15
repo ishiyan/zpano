@@ -1289,7 +1289,7 @@ indicator `Metadata()` implementations consume the registry via
 | Primitive           | Go type                 | TS type                 | Purpose |
 |---------------------|-------------------------|-------------------------|---------|
 | `Identifier`        | `core.Identifier`       | `IndicatorIdentifier`   | Unique ID of the indicator. |
-| `Role`              | `core.Role`             | `Role`                  | Semantic role of an **output** (Smoother, Envelope, Overlay, Polyline, Oscillator, BoundedOscillator, Volatility, VolumeFlow, Directional, CyclePeriod, CyclePhase, FractalDimension, Spectrum, Signal, Histogram, RegimeFlag, Correlation). |
+| `Role`              | `core.Role`             | `Role`                  | Semantic role of an **output** (Smoother, Envelope, Overlay, Polyline, Oscillator, BoundedOscillator, Volatility, VolumeFlow, Directional, CyclePeriod, CyclePhase, FractalDimension, Spectrum, Signal, Histogram, RegimeFlag, Correlation, Forecast, Reversal). |
 | `Pane`              | `core.Pane`             | `Pane`                  | Chart pane where an output is drawn: `Price`, `Own`, `OverlayOnParent`. |
 | `Adaptivity`        | `core.Adaptivity`       | `Adaptivity`            | `Static` or `Adaptive` (indicator-level). |
 | `InputRequirement`  | `core.InputRequirement` | `InputRequirement`      | Minimum input data type: `ScalarInput`, `QuoteInput`, `BarInput`, `TradeInput`. |
@@ -1482,6 +1482,8 @@ When adding a new indicator you MUST add its descriptor in **all 5 languages**
 | `Histogram`         | Difference bar between two lines (MACD histogram). |
 | `RegimeFlag`        | Discrete regime indicator (Trend/Cycle mode). |
 | `Correlation`       | Correlation coefficient in [-1, 1]. |
+| `Forecast`          | A next-bar / n-step-ahead **price** projection in the price domain (Polynomial Forecast). Pane: `Price`. |
+| `Reversal`          | A predicted reversal **timing in bars** — a signed turning-point offset, not a price (Parabolic Vertex, Cubic Vertex near/far). Pane: `Own`. |
 
 ### Pane Assignment Guidance
 

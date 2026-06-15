@@ -339,9 +339,9 @@ const descriptors: Map<IndicatorIdentifier, Descriptor> = new Map<IndicatorIdent
   [IndicatorIdentifier.SincWaveletBandpass, desc(IndicatorIdentifier.SincWaveletBandpass, 'Don Mak', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Oscillator, P.Own)])],
   [IndicatorIdentifier.ModifiedExponentialMovingAverage, desc(IndicatorIdentifier.ModifiedExponentialMovingAverage, 'Don Mak', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Smoother, P.Price)])],
   [IndicatorIdentifier.VelocityCorrectedExponentialMovingAverage, desc(IndicatorIdentifier.VelocityCorrectedExponentialMovingAverage, 'Don Mak', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Smoother, P.Price)])],
-  [IndicatorIdentifier.PolynomialForecast, desc(IndicatorIdentifier.PolynomialForecast, 'Don Mak', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Signal, P.Price)])],
-  [IndicatorIdentifier.ParabolicVertex, desc(IndicatorIdentifier.ParabolicVertex, 'Don Mak', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Signal, P.Own)])],
-  [IndicatorIdentifier.CubicVertex, desc(IndicatorIdentifier.CubicVertex, 'Don Mak', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Signal, P.Own), out(1, S.Scalar, R.Signal, P.Own)])],
+  [IndicatorIdentifier.PolynomialForecast, desc(IndicatorIdentifier.PolynomialForecast, 'Don Mak', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Forecast, P.Price)])],
+  [IndicatorIdentifier.ParabolicVertex, desc(IndicatorIdentifier.ParabolicVertex, 'Don Mak', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Reversal, P.Own)])],
+  [IndicatorIdentifier.CubicVertex, desc(IndicatorIdentifier.CubicVertex, 'Don Mak', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Reversal, P.Own), out(1, S.Scalar, R.Reversal, P.Own)])],
 ]);
 
 /**

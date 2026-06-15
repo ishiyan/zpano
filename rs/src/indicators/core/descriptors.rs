@@ -1835,7 +1835,7 @@ pub static DESCRIPTORS: &[Descriptor] = &[
         adaptivity: Static,
         input_requirement: ScalarInput,
         volume_usage: NoVolume,
-        outputs: &[OutputDescriptor { kind: 1, shape: Scalar, role: Signal, pane: Price }],
+        outputs: &[OutputDescriptor { kind: 1, shape: Scalar, role: Forecast, pane: Price }],
     },
     Descriptor {
         identifier: ParabolicVertex,
@@ -1843,7 +1843,7 @@ pub static DESCRIPTORS: &[Descriptor] = &[
         adaptivity: Static,
         input_requirement: ScalarInput,
         volume_usage: NoVolume,
-        outputs: &[OutputDescriptor { kind: 1, shape: Scalar, role: Signal, pane: Own }],
+        outputs: &[OutputDescriptor { kind: 1, shape: Scalar, role: Reversal, pane: Own }],
     },
     Descriptor {
         identifier: CubicVertex,
@@ -1852,8 +1852,8 @@ pub static DESCRIPTORS: &[Descriptor] = &[
         input_requirement: ScalarInput,
         volume_usage: NoVolume,
         outputs: &[
-            OutputDescriptor { kind: 1, shape: Scalar, role: Signal, pane: Own },
-            OutputDescriptor { kind: 2, shape: Scalar, role: Signal, pane: Own },
+            OutputDescriptor { kind: 1, shape: Scalar, role: Reversal, pane: Own },
+            OutputDescriptor { kind: 2, shape: Scalar, role: Reversal, pane: Own },
         ],
     },
 ];

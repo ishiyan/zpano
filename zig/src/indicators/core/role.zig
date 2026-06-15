@@ -34,6 +34,10 @@ pub const Role = enum(u8) {
     regime_flag = 16,
     /// Correlation-coefficient-style measure.
     correlation = 17,
+    /// Next-bar (n-step-ahead) price projection in the price domain.
+    forecast = 18,
+    /// Predicted reversal location, expressed as a signed offset in bars.
+    reversal = 19,
 
     pub fn asStr(self: Role) []const u8 {
         return switch (self) {
@@ -54,6 +58,8 @@ pub const Role = enum(u8) {
             .histogram => "histogram",
             .regime_flag => "regimeFlag",
             .correlation => "correlation",
+            .forecast => "forecast",
+            .reversal => "reversal",
         };
     }
 };

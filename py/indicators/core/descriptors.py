@@ -515,16 +515,16 @@ _descriptors: dict[Id, Descriptor] = {
 
     Id.POLYNOMIAL_FORECAST: _d(
         Id.POLYNOMIAL_FORECAST, "Don Mak", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
-        [_o(0, S.SCALAR, R.SIGNAL, P.PRICE)]),
+        [_o(0, S.SCALAR, R.FORECAST, P.PRICE)]),
 
     Id.PARABOLIC_VERTEX: _d(
         Id.PARABOLIC_VERTEX, "Don Mak", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
-        [_o(0, S.SCALAR, R.SIGNAL, P.OWN)]),
+        [_o(0, S.SCALAR, R.REVERSAL, P.OWN)]),
 
     Id.CUBIC_VERTEX: _d(
         Id.CUBIC_VERTEX, "Don Mak", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
-        [_o(0, S.SCALAR, R.SIGNAL, P.OWN),
-         _o(1, S.SCALAR, R.SIGNAL, P.OWN)]),
+        [_o(0, S.SCALAR, R.REVERSAL, P.OWN),
+         _o(1, S.SCALAR, R.REVERSAL, P.OWN)]),
 }
 
 
