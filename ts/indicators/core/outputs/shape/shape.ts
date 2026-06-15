@@ -11,5 +11,8 @@ export enum Shape {
   Heatmap,
 
   /** Holds an ordered, variable-length sequence of (offset, value) points. */
-  Polyline
+  Polyline,
+
+  /** Holds a variable-length set of levels, each an (value, offset, strength) entry. */
+  Levels
 }

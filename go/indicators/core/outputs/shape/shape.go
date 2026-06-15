@@ -22,6 +22,9 @@ const (
 
 	// Polyline holds a time stamp and an ordered, variable-length sequence of (offset, value) points.
 	Polyline
+
+	// Levels holds a time stamp and a variable-length set of levels, each an (value, offset, strength) entry.
+	Levels
 	last
 )
 
@@ -31,6 +34,7 @@ const (
 	band     = "band"
 	heatmap  = "heatmap"
 	polyline = "polyline"
+	levels   = "levels"
 )
 
 var errUnknownShape = errors.New("unknown indicator output shape")
@@ -46,6 +50,8 @@ func (s Shape) String() string {
 		return heatmap
 	case Polyline:
 		return polyline
+	case Levels:
+		return levels
 	default:
 		return unknown
 	}
@@ -87,6 +93,8 @@ func (s *Shape) UnmarshalJSON(data []byte) error {
 		*s = Heatmap
 	case polyline:
 		*s = Polyline
+	case levels:
+		*s = Levels
 	default:
 		return fmt.Errorf("cannot unmarshal '%s': %w", str, errUnknownShape)
 	}

@@ -40,6 +40,10 @@ pub enum Role {
     Forecast = 18,
     /// Predicted reversal location, expressed as a signed offset in bars.
     Reversal = 19,
+    /// Price level acting as support or resistance.
+    SupportResistance = 20,
+    /// Probability distribution or a derived set of values.
+    Distribution = 21,
 }
 
 impl Role {
@@ -64,6 +68,8 @@ impl Role {
             Self::Correlation => "correlation",
             Self::Forecast => "forecast",
             Self::Reversal => "reversal",
+            Self::SupportResistance => "supportResistance",
+            Self::Distribution => "distribution",
         }
     }
 }

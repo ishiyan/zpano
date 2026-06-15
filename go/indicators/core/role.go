@@ -66,6 +66,12 @@ const (
 
 	// Reversal denotes a predicted reversal location, expressed as a signed offset in bars.
 	Reversal
+
+	// SupportResistance denotes a price level acting as support or resistance.
+	SupportResistance
+
+	// Distribution denotes a probability distribution or a derived set of values.
+	Distribution
 	roleLast
 )
 
@@ -90,6 +96,8 @@ const (
 	roleCorrelation       = "correlation"
 	roleForecast          = "forecast"
 	roleReversal          = "reversal"
+	roleSupportResistance = "supportResistance"
+	roleDistribution      = "distribution"
 )
 
 var errUnknownRole = errors.New("unknown indicator role")
@@ -135,6 +143,10 @@ func (r Role) String() string {
 		return roleForecast
 	case Reversal:
 		return roleReversal
+	case SupportResistance:
+		return roleSupportResistance
+	case Distribution:
+		return roleDistribution
 	default:
 		return roleUnknown
 	}
@@ -206,6 +218,10 @@ func (r *Role) UnmarshalJSON(data []byte) error {
 		*r = Forecast
 	case roleReversal:
 		*r = Reversal
+	case roleSupportResistance:
+		*r = SupportResistance
+	case roleDistribution:
+		*r = Distribution
 	default:
 		return fmt.Errorf("cannot unmarshal '%s': %w", s, errUnknownRole)
 	}

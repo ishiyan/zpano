@@ -17,3 +17,6 @@ class Shape(IntEnum):
 
     # Polyline holds a time stamp and an ordered, variable-length sequence of (offset, value) points.
     POLYLINE = 3
+
+    # Levels holds a time stamp and a variable-length set of (value, offset, strength) entries.
+    LEVELS = 4

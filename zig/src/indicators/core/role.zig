@@ -38,6 +38,10 @@ pub const Role = enum(u8) {
     forecast = 18,
     /// Predicted reversal location, expressed as a signed offset in bars.
     reversal = 19,
+    /// Price level acting as support or resistance.
+    support_resistance = 20,
+    /// Probability distribution or a derived set of values.
+    distribution = 21,
 
     pub fn asStr(self: Role) []const u8 {
         return switch (self) {
@@ -60,6 +64,8 @@ pub const Role = enum(u8) {
             .correlation => "correlation",
             .forecast => "forecast",
             .reversal => "reversal",
+            .support_resistance => "supportResistance",
+            .distribution => "distribution",
         };
     }
 };

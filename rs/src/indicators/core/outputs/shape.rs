@@ -10,6 +10,8 @@ pub enum Shape {
     Heatmap = 3,
     /// Holds a time stamp and an ordered, variable-length sequence of (offset, value) points.
     Polyline = 4,
+    /// Holds a time stamp and a variable-length set of (value, offset, strength) entries.
+    Levels = 5,
 }
 
 impl Shape {
@@ -20,6 +22,7 @@ impl Shape {
             Shape::Band => "band",
             Shape::Heatmap => "heatmap",
             Shape::Polyline => "polyline",
+            Shape::Levels => "levels",
         }
     }
 }

@@ -227,6 +227,13 @@ fn printOutput(stdout: *Io.Writer, meta: *const Metadata, output: *const OutputA
                     try stdout.print("{s}=Polyline({d} points) ", .{ name, p.points_len });
                 }
             },
+            .levels => |l| {
+                if (l.isEmpty()) {
+                    try stdout.print("{s}=Levels(empty) ", .{name});
+                } else {
+                    try stdout.print("{s}=Levels({d} levels) ", .{ name, l.levels_len });
+                }
+            },
         }
     }
 }

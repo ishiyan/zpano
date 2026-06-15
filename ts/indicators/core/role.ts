@@ -55,5 +55,11 @@ export enum Role {
   Forecast,
 
   /** A predicted reversal location, expressed as a signed offset in bars. */
-  Reversal
+  Reversal,
+
+  /** A price level acting as support or resistance. */
+  SupportResistance,
+
+  /** A probability distribution or a derived set of values. */
+  Distribution
 }

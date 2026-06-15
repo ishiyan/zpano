@@ -124,6 +124,15 @@ func printOutput(outputsMeta []outputs.Metadata, output core.Output) {
 			} else {
 				fmt.Printf("%s=Band(%.4f,%.4f) ", name, v.Lower, v.Upper)
 			}
+		case *outputs.Levels:
+			fmt.Printf("%s=Levels[", name)
+			for k, lv := range v.Levels {
+				if k > 0 {
+					fmt.Printf(",")
+				}
+				fmt.Printf("(%.4f,%d,%.4f)", lv.Value, lv.Offset, lv.Strength)
+			}
+			fmt.Printf("] ")
 		default:
 			fmt.Printf("%s=%v ", name, v)
 		}

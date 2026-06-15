@@ -143,7 +143,9 @@ core/
 ```
 
 - **`outputs/`** contains indicator output shapes. An indicator can output a
-  scalar, a band (upper/lower), a heatmap, etc. This folder holds the concrete
+  scalar, a band (upper/lower), a heatmap, a polyline, or a `Levels` set
+  (a variable-length list of `{value, offset, strength}` entries, e.g. support/
+  resistance or quantum price levels), etc. This folder holds the concrete
   types; the taxonomy enum lives in the `outputs/shape/` sub-package as
   `shape.Shape` (Go) / `Shape` (TS).
 - **`frequency-response/`** contains utilities for computing the frequency
@@ -882,7 +884,7 @@ Each output carries:
 | Field         | Description |
 |---------------|-------------|
 | `kind`        | The integer value of the indicator's per-output enum. |
-| `shape`       | The output's data shape (`Scalar`, `Band`, `Heatmap`, `Polyline`). Sourced from the descriptor registry. |
+| `shape`       | The output's data shape (`Scalar`, `Band`, `Heatmap`, `Polyline`, `Levels`). Sourced from the descriptor registry. |
 | `mnemonic`    | Short name for this output. |
 | `description` | Human-readable description of this output. |
 
@@ -1289,7 +1291,7 @@ indicator `Metadata()` implementations consume the registry via
 | Primitive           | Go type                 | TS type                 | Purpose |
 |---------------------|-------------------------|-------------------------|---------|
 | `Identifier`        | `core.Identifier`       | `IndicatorIdentifier`   | Unique ID of the indicator. |
-| `Role`              | `core.Role`             | `Role`                  | Semantic role of an **output** (Smoother, Envelope, Overlay, Polyline, Oscillator, BoundedOscillator, Volatility, VolumeFlow, Directional, CyclePeriod, CyclePhase, FractalDimension, Spectrum, Signal, Histogram, RegimeFlag, Correlation, Forecast, Reversal). |
+| `Role`              | `core.Role`             | `Role`                  | Semantic role of an **output** (Smoother, Envelope, Overlay, Polyline, Oscillator, BoundedOscillator, Volatility, VolumeFlow, Directional, CyclePeriod, CyclePhase, FractalDimension, Spectrum, Signal, Histogram, RegimeFlag, Correlation, Forecast, Reversal, SupportResistance, Distribution). |
 | `Pane`              | `core.Pane`             | `Pane`                  | Chart pane where an output is drawn: `Price`, `Own`, `OverlayOnParent`. |
 | `Adaptivity`        | `core.Adaptivity`       | `Adaptivity`            | `Static` or `Adaptive` (indicator-level). |
 | `InputRequirement`  | `core.InputRequirement` | `InputRequirement`      | Minimum input data type: `ScalarInput`, `QuoteInput`, `BarInput`, `TradeInput`. |
@@ -1484,6 +1486,8 @@ When adding a new indicator you MUST add its descriptor in **all 5 languages**
 | `Correlation`       | Correlation coefficient in [-1, 1]. |
 | `Forecast`          | A next-bar / n-step-ahead **price** projection in the price domain (Polynomial Forecast). Pane: `Price`. |
 | `Reversal`          | A predicted reversal **timing in bars** — a signed turning-point offset, not a price (Parabolic Vertex, Cubic Vertex near/far). Pane: `Own`. |
+| `SupportResistance` | A price level acting as support/resistance — a `Levels`-shaped output of horizontal price lines (support/resistance, pivots, Fibonacci, quantum price levels). Pane: `Price`. |
+| `Distribution`      | A probability distribution or a derived set of values (e.g. a mini-max probability array via `Heatmap`, or a set of multipliers via `Levels`). Pane: `Own`. |
 
 ### Pane Assignment Guidance
 
@@ -1895,6 +1899,7 @@ py/indicators/
 │       ├── band.py          # Band class
 │       ├── heatmap.py       # Heatmap class
 │       └── polyline.py      # Polyline class (Point + Polyline)
+│       └── levels.py        # Levels class (Level + Levels)
 ├── common/
 │   ├── __init__.py          # empty
 │   └── simple_moving_average/

@@ -11,6 +11,7 @@ use zpano::entities::scalar::Scalar;
 use zpano::indicators::core::identifier::Identifier;
 use zpano::indicators::core::indicator::{Indicator, Output};
 use zpano::indicators::core::outputs::band::Band;
+use zpano::indicators::core::outputs::levels::Levels;
 use zpano::indicators::core::outputs::metadata::OutputMetadata;
 use zpano::indicators::factory::{create_indicator, JsonValue};
 
@@ -176,6 +177,15 @@ fn print_output(outputs_meta: &[OutputMetadata], output: &Output) {
             } else {
                 print!("{}=Band({:.4},{:.4}) ", name, b.lower, b.upper);
             }
+        } else if let Some(l) = val.downcast_ref::<Levels>() {
+            print!("{}=Levels[", name);
+            for (k, lv) in l.levels.iter().enumerate() {
+                if k > 0 {
+                    print!(",");
+                }
+                print!("({:.4},{},{:.4})", lv.value, lv.offset, lv.strength);
+            }
+            print!("] ");
         } else {
             print!("{}=? ", name);
         }

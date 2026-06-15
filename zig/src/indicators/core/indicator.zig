@@ -8,6 +8,7 @@ const Scalar = entities.Scalar;
 const band_mod = @import("outputs/band.zig");
 const heatmap_mod = @import("outputs/heatmap.zig");
 const polyline_mod = @import("outputs/polyline.zig");
+const levels_mod = @import("outputs/levels.zig");
 
 /// A single output value from an indicator update.
 pub const OutputValue = union(enum) {
@@ -15,6 +16,7 @@ pub const OutputValue = union(enum) {
     band: band_mod.Band,
     heatmap: heatmap_mod.Heatmap,
     polyline: polyline_mod.Polyline,
+    levels: levels_mod.Levels,
 };
 
 /// Maximum number of outputs per indicator update.

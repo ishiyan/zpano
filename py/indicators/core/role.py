@@ -25,3 +25,5 @@ class Role(IntEnum):
     CORRELATION = 16
     FORECAST = 17
     REVERSAL = 18
+    SUPPORT_RESISTANCE = 19
+    DISTRIBUTION = 20

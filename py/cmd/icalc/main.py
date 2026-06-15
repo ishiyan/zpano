@@ -22,6 +22,7 @@ from py.entities.scalar import Scalar
 from py.indicators.core.identifier import Identifier
 from py.indicators.core.indicator import Indicator
 from py.indicators.core.outputs.band import Band
+from py.indicators.core.outputs.levels import Levels
 from py.indicators.factory.factory import create_indicator
 
 
@@ -209,6 +210,9 @@ def _print_output(outputs_meta: list, output: list) -> None:
                 parts.append(f"{name}=Band(NaN)")
             else:
                 parts.append(f"{name}=Band({val.lower:.4f},{val.upper:.4f})")
+        elif isinstance(val, Levels):
+            entries = ','.join(f"({lv.value:.4f},{lv.offset},{lv.strength:.4f})" for lv in val.levels)
+            parts.append(f"{name}=Levels[{entries}]")
         else:
             parts.append(f"{name}={val}")
 

@@ -389,6 +389,9 @@ pub fn main(init: std.process.Init) !void {
                             else => {},
                         }
                     },
+                    .levels => {
+                        // Levels are not yet rendered in the chart configuration.
+                    },
                 }
             }
         }
