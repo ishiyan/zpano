@@ -277,6 +277,10 @@ pub enum Identifier {
     ParabolicVertex = 102,
     /// Identifies the Don Mak Cubic Vertex (CVTX) indicator.
     CubicVertex = 103,
+    /// Identifies the Raymond Lee Quantum Price Levels (QPL) indicator.
+    QuantumPriceLevels = 104,
+    /// Identifies the Zurab Silagadze Moving Mini-Max (MMM) indicator.
+    MovingMiniMax = 105,
 }
 
 impl Identifier {
@@ -395,6 +399,8 @@ impl Identifier {
             Self::PolynomialForecast => "polynomialForecast",
             Self::ParabolicVertex => "parabolicVertex",
             Self::CubicVertex => "cubicVertex",
+            Self::QuantumPriceLevels => "quantumPriceLevels",
+            Self::MovingMiniMax => "movingMiniMax",
         }
     }
 
@@ -517,6 +523,8 @@ impl Identifier {
             "polynomialForecast" => Some(Self::PolynomialForecast),
             "parabolicVertex" => Some(Self::ParabolicVertex),
             "cubicVertex" => Some(Self::CubicVertex),
+            "quantumPriceLevels" => Some(Self::QuantumPriceLevels),
+            "movingMiniMax" => Some(Self::MovingMiniMax),
             _ => None,
         }
     }

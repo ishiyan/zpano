@@ -241,11 +241,15 @@ import { VelocityCorrectedExponentialMovingAverage } from '../don-mak/velocity-c
 import { PolynomialForecast } from '../don-mak/polynomial-forecast/polynomial-forecast.js';
 import { ParabolicVertex } from '../don-mak/parabolic-vertex/parabolic-vertex.js';
 import { CubicVertex } from '../don-mak/cubic-vertex/cubic-vertex.js';
+import { QuantumPriceLevels } from '../raymond-lee/quantum-price-levels/quantum-price-levels.js';
+import { MovingMiniMax } from '../zurab-silagadze/moving-mini-max/moving-mini-max.js';
 import { defaultParams as defaultMemaParams } from '../don-mak/modified-exponential-moving-average/params.js';
 import { defaultParams as defaultVcemaParams } from '../don-mak/velocity-corrected-exponential-moving-average/params.js';
 import { defaultParams as defaultPofParams } from '../don-mak/polynomial-forecast/params.js';
 import { defaultParams as defaultPvtxParams } from '../don-mak/parabolic-vertex/params.js';
 import { defaultParams as defaultCvtxParams } from '../don-mak/cubic-vertex/params.js';
+import { defaultParams as defaultQplParams } from '../raymond-lee/quantum-price-levels/params.js';
+import { defaultParams as defaultMmmParams } from '../zurab-silagadze/moving-mini-max/params.js';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -695,6 +699,12 @@ export function createIndicator(identifier: IndicatorIdentifier, params?: Record
 
         case IndicatorIdentifier.CubicVertex:
             return new CubicVertex({ ...defaultCvtxParams(), ...p });
+
+        case IndicatorIdentifier.QuantumPriceLevels:
+            return new QuantumPriceLevels({ ...defaultQplParams(), ...p });
+
+        case IndicatorIdentifier.MovingMiniMax:
+            return new MovingMiniMax({ ...defaultMmmParams(), ...p });
 
         default:
             throw new Error(`Unsupported indicator: ${IndicatorIdentifier[identifier] ?? identifier}`);

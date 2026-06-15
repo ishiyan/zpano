@@ -801,4 +801,29 @@ var descriptors = map[Identifier]Descriptor{
 			{Kind: 2 /* BarsToFarTurn */, Shape: shape.Scalar, Role: Reversal, Pane: Own},
 		},
 	},
+
+	QuantumPriceLevels: {
+		Identifier: QuantumPriceLevels, Family: "Raymond Lee",
+		Adaptivity: Static, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{
+			{Kind: 1 /* Lambda */, Shape: shape.Scalar, Role: Oscillator, Pane: Own},
+			{Kind: 2 /* ReturnStdDev */, Shape: shape.Scalar, Role: Volatility, Pane: Own},
+			{Kind: 3 /* NormalizedMultipliers */, Shape: shape.Levels, Role: Distribution, Pane: Own},
+			{Kind: 4 /* Resistances */, Shape: shape.Levels, Role: SupportResistance, Pane: Price},
+			{Kind: 5 /* Supports */, Shape: shape.Levels, Role: SupportResistance, Pane: Price},
+		},
+	},
+
+	MovingMiniMax: {
+		Identifier: MovingMiniMax, Family: "Zurab Silagadze",
+		Adaptivity: Static, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{
+			{Kind: 1 /* Up */, Shape: shape.Scalar, Role: Reversal, Pane: Own},
+			{Kind: 2 /* Down */, Shape: shape.Scalar, Role: Reversal, Pane: Own},
+			{Kind: 3 /* Resistances */, Shape: shape.Levels, Role: SupportResistance, Pane: Price},
+			{Kind: 4 /* Supports */, Shape: shape.Levels, Role: SupportResistance, Pane: Price},
+			{Kind: 5 /* UpDistribution */, Shape: shape.Polyline, Role: Distribution, Pane: Own},
+			{Kind: 6 /* DownDistribution */, Shape: shape.Polyline, Role: Distribution, Pane: Own},
+		},
+	},
 }

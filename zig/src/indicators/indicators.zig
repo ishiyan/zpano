@@ -177,6 +177,8 @@ pub const velocity_corrected_exponential_moving_average = @import("don_mak/veloc
 pub const polynomial_forecast = @import("don_mak/polynomial_forecast/polynomial_forecast.zig");
 pub const parabolic_vertex = @import("don_mak/parabolic_vertex/parabolic_vertex.zig");
 pub const cubic_vertex = @import("don_mak/cubic_vertex/cubic_vertex.zig");
+pub const quantum_price_levels = @import("raymond_lee/quantum_price_levels/quantum_price_levels.zig");
+pub const moving_mini_max = @import("zurab_silagadze/moving_mini_max/moving_mini_max.zig");
 
 pub const hilbert_transformer = @import("john_ehlers/hilbert_transformer/hilbert_transformer.zig");
 pub const homodyne_discriminator = @import("john_ehlers/hilbert_transformer/homodyne_discriminator.zig");
@@ -296,6 +298,8 @@ comptime {
     _ = polynomial_forecast;
     _ = parabolic_vertex;
     _ = cubic_vertex;
+    _ = quantum_price_levels;
+    _ = moving_mini_max;
     _ = frequency_response;
     _ = factory;
     _ = arnaud_legoux_moving_average;

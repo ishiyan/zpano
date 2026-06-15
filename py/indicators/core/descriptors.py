@@ -525,6 +525,23 @@ _descriptors: dict[Id, Descriptor] = {
         Id.CUBIC_VERTEX, "Don Mak", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
         [_o(0, S.SCALAR, R.REVERSAL, P.OWN),
          _o(1, S.SCALAR, R.REVERSAL, P.OWN)]),
+
+    Id.QUANTUM_PRICE_LEVELS: _d(
+        Id.QUANTUM_PRICE_LEVELS, "Raymond Lee", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
+        [_o(0, S.SCALAR, R.OSCILLATOR, P.OWN),
+         _o(1, S.SCALAR, R.VOLATILITY, P.OWN),
+         _o(2, S.LEVELS, R.DISTRIBUTION, P.OWN),
+         _o(3, S.LEVELS, R.SUPPORT_RESISTANCE, P.PRICE),
+         _o(4, S.LEVELS, R.SUPPORT_RESISTANCE, P.PRICE)]),
+
+    Id.MOVING_MINI_MAX: _d(
+        Id.MOVING_MINI_MAX, "Zurab Silagadze", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
+        [_o(0, S.SCALAR, R.REVERSAL, P.OWN),
+         _o(1, S.SCALAR, R.REVERSAL, P.OWN),
+         _o(2, S.LEVELS, R.SUPPORT_RESISTANCE, P.PRICE),
+         _o(3, S.LEVELS, R.SUPPORT_RESISTANCE, P.PRICE),
+         _o(4, S.POLYLINE, R.DISTRIBUTION, P.OWN),
+         _o(5, S.POLYLINE, R.DISTRIBUTION, P.OWN)]),
 }
 
 

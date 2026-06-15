@@ -1856,4 +1856,33 @@ pub static DESCRIPTORS: &[Descriptor] = &[
             OutputDescriptor { kind: 2, shape: Scalar, role: Reversal, pane: Own },
         ],
     },
+    Descriptor {
+        identifier: QuantumPriceLevels,
+        family: "Raymond Lee",
+        adaptivity: Static,
+        input_requirement: ScalarInput,
+        volume_usage: NoVolume,
+        outputs: &[
+            OutputDescriptor { kind: 1, shape: Scalar, role: Oscillator, pane: Own },
+            OutputDescriptor { kind: 2, shape: Scalar, role: Volatility, pane: Own },
+            OutputDescriptor { kind: 3, shape: Levels, role: Distribution, pane: Own },
+            OutputDescriptor { kind: 4, shape: Levels, role: SupportResistance, pane: Price },
+            OutputDescriptor { kind: 5, shape: Levels, role: SupportResistance, pane: Price },
+        ],
+    },
+    Descriptor {
+        identifier: MovingMiniMax,
+        family: "Zurab Silagadze",
+        adaptivity: Static,
+        input_requirement: ScalarInput,
+        volume_usage: NoVolume,
+        outputs: &[
+            OutputDescriptor { kind: 1, shape: Scalar, role: Reversal, pane: Own },
+            OutputDescriptor { kind: 2, shape: Scalar, role: Reversal, pane: Own },
+            OutputDescriptor { kind: 3, shape: Levels, role: SupportResistance, pane: Price },
+            OutputDescriptor { kind: 4, shape: Levels, role: SupportResistance, pane: Price },
+            OutputDescriptor { kind: 5, shape: crate::indicators::core::outputs::shape::Shape::Polyline, role: Distribution, pane: Own },
+            OutputDescriptor { kind: 6, shape: crate::indicators::core::outputs::shape::Shape::Polyline, role: Distribution, pane: Own },
+        ],
+    },
 ];

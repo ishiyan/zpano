@@ -376,4 +376,14 @@ export enum IndicatorIdentifier {
 
     /** Identifies the Don Mak __Cubic Vertex__ (CVTX) indicator. */
     CubicVertex,
+
+    // ── raymond lee ───────────────────────────────────────────────────────
+
+    /** Identifies the Raymond Lee __Quantum Price Levels__ (QPL) indicator. */
+    QuantumPriceLevels,
+
+    // ── zurab silagadze ───────────────────────────────────────────────────
+
+    /** Identifies the Zurab Silagadze __Moving Mini-Max__ (MMM) indicator. */
+    MovingMiniMax,
 }

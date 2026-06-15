@@ -102,5 +102,7 @@
   { "identifier": "velocityCorrectedExponentialMovingAverage", "params": { "period": 6, "degree": 3 } },
   { "identifier": "polynomialForecast", "params": { "degree": 3, "order": 1, "smoothing": 0 } },
   { "identifier": "parabolicVertex", "params": {} },
-  { "identifier": "cubicVertex", "params": {} }
+  { "identifier": "cubicVertex", "params": {} },
+  { "identifier": "quantumPriceLevels", "params": { "lookback": 100 } },
+  { "identifier": "movingMiniMax", "params": { "m": 5, "n": 50, "numExtrema": 3 } }
 ]

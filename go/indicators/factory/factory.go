@@ -94,6 +94,7 @@ import (
 	"zpano/indicators/patrickmulloy/doubleexponentialmovingaverage"
 	"zpano/indicators/patrickmulloy/tripleexponentialmovingaverage"
 	"zpano/indicators/perrykaufman/kaufmanadaptivemovingaverage"
+	"zpano/indicators/raymondlee/quantumpricelevels"
 	"zpano/indicators/timtillson/t2exponentialmovingaverage"
 	"zpano/indicators/timtillson/t3exponentialmovingaverage"
 	"zpano/indicators/tusharchande/aroon"
@@ -112,6 +113,7 @@ import (
 	"zpano/indicators/welleswilder/parabolicstopandreverse"
 	"zpano/indicators/welleswilder/relativestrengthindex"
 	"zpano/indicators/welleswilder/truerange"
+	"zpano/indicators/zurabsilagadze/movingminimax"
 )
 
 // lengthParam is a helper struct for indicators that take a bare int length.
@@ -1166,6 +1168,22 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 		}
 
 		return cubicvertex.NewCubicVertex(p)
+
+	case core.QuantumPriceLevels:
+		p := quantumpricelevels.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return quantumpricelevels.NewQuantumPriceLevels(p)
+
+	case core.MovingMiniMax:
+		p := movingminimax.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return movingminimax.NewMovingMiniMax(p)
 
 	default:
 		return nil, fmt.Errorf("unsupported indicator: %s", identifier)

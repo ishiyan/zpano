@@ -23,6 +23,7 @@ from py.indicators.core.identifier import Identifier
 from py.indicators.core.indicator import Indicator
 from py.indicators.core.outputs.band import Band
 from py.indicators.core.outputs.levels import Levels
+from py.indicators.core.outputs.polyline import Polyline
 from py.indicators.factory.factory import create_indicator
 
 
@@ -135,6 +136,8 @@ _IDENTIFIER_MAP: dict[str, Identifier] = {
     'polynomialForecast': Identifier.POLYNOMIAL_FORECAST,
     'parabolicVertex': Identifier.PARABOLIC_VERTEX,
     'cubicVertex': Identifier.CUBIC_VERTEX,
+    'quantumPriceLevels': Identifier.QUANTUM_PRICE_LEVELS,
+    'movingMiniMax': Identifier.MOVING_MINI_MAX,
 }
 
 
@@ -213,6 +216,8 @@ def _print_output(outputs_meta: list, output: list) -> None:
         elif isinstance(val, Levels):
             entries = ','.join(f"({lv.value:.4f},{lv.offset},{lv.strength:.4f})" for lv in val.levels)
             parts.append(f"{name}=Levels[{entries}]")
+        elif isinstance(val, Polyline):
+            parts.append(f"{name}=Polyline[n={len(val.points)}]")
         else:
             parts.append(f"{name}={val}")
 

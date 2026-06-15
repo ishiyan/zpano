@@ -133,6 +133,8 @@ func printOutput(outputsMeta []outputs.Metadata, output core.Output) {
 				fmt.Printf("(%.4f,%d,%.4f)", lv.Value, lv.Offset, lv.Strength)
 			}
 			fmt.Printf("] ")
+		case *outputs.Polyline:
+			fmt.Printf("%s=Polyline[n=%d] ", name, len(v.Points))
 		default:
 			fmt.Printf("%s=%v ", name, v)
 		}

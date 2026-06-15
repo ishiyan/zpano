@@ -19,6 +19,7 @@ import { type OutputMetadata } from '../../indicators/core/outputs/output-metada
 import { Band } from '../../indicators/core/outputs/band.js';
 import { Heatmap } from '../../indicators/core/outputs/heatmap.js';
 import { Levels } from '../../indicators/core/outputs/levels.js';
+import { Polyline } from '../../indicators/core/outputs/polyline.js';
 import { createIndicator } from '../../indicators/factory/factory.js';
 
 // ---------------------------------------------------------------------------
@@ -64,6 +65,8 @@ function formatOutput(outputsMeta: OutputMetadata[], output: IndicatorOutput): s
         } else if (val instanceof Levels) {
             const entries = val.levels.map((lv) => `(${lv.value.toFixed(4)},${lv.offset},${lv.strength.toFixed(4)})`).join(',');
             parts.push(`${name}=Levels[${entries}]`);
+        } else if (val instanceof Polyline) {
+            parts.push(`${name}=Polyline[n=${val.points.length}]`);
         } else if (val instanceof Scalar) {
             if (Number.isNaN(val.value)) {
                 parts.push(`${name}=NaN`);

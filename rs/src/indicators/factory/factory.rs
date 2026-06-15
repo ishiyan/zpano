@@ -299,6 +299,12 @@ use crate::indicators::don_mak::parabolic_vertex::parabolic_vertex::{
 use crate::indicators::don_mak::cubic_vertex::cubic_vertex::{
     CubicVertex, CubicVertexParams,
 };
+use crate::indicators::raymond_lee::quantum_price_levels::quantum_price_levels::{
+    QuantumPriceLevels, QuantumPriceLevelsParams,
+};
+use crate::indicators::zurab_silagadze::moving_mini_max::moving_mini_max::{
+    MovingMiniMax, MovingMiniMaxParams,
+};
 
 /// Create an indicator from its identifier and a JSON-encoded parameter string.
 ///
@@ -1655,6 +1661,23 @@ pub fn create_indicator(
         Identifier::CubicVertex => {
             let p = CubicVertexParams::default();
             Ok(Box::new(CubicVertex::new(&p)?))
+        }
+
+        Identifier::QuantumPriceLevels => {
+            let mut p = QuantumPriceLevelsParams::default();
+            if let Some(v) = get_usize(&params, "lookback") { p.lookback = v; }
+            if let Some(v) = get_usize(&params, "numLevels") { p.num_levels = v; }
+            if let Some(v) = get_usize(&params, "numBins") { p.num_bins = v; }
+            if let Some(v) = get_f64(&params, "scaleFactor") { p.scale_factor = v; }
+            Ok(Box::new(QuantumPriceLevels::new(&p)?))
+        }
+
+        Identifier::MovingMiniMax => {
+            let mut p = MovingMiniMaxParams::default();
+            if let Some(v) = get_usize(&params, "m") { p.m = v; }
+            if let Some(v) = get_usize(&params, "n") { p.n = v; }
+            if let Some(v) = get_usize(&params, "numExtrema") { p.num_extrema = v; }
+            Ok(Box::new(MovingMiniMax::new(&p)?))
         }
 
         _ => Err(format!("unsupported indicator: {:?}", identifier)),

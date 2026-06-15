@@ -677,4 +677,14 @@ def create_indicator(
         from ..don_mak.cubic_vertex.cubic_vertex import CubicVertex
         return CubicVertex(_apply(default_params(), params))
 
+    if identifier == Identifier.QUANTUM_PRICE_LEVELS:
+        from ..raymond_lee.quantum_price_levels.params import default_params
+        from ..raymond_lee.quantum_price_levels.quantum_price_levels import QuantumPriceLevels
+        return QuantumPriceLevels(_apply(default_params(), params))
+
+    if identifier == Identifier.MOVING_MINI_MAX:
+        from ..zurab_silagadze.moving_mini_max.params import default_params
+        from ..zurab_silagadze.moving_mini_max.moving_mini_max import MovingMiniMax
+        return MovingMiniMax(_apply(default_params(), params))
+
     raise ValueError(f"unsupported indicator: {identifier}")

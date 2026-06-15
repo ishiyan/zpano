@@ -131,6 +131,8 @@ func TestIdentifierString(t *testing.T) {
 		{PolynomialForecast, polynomialForecast},
 		{ParabolicVertex, parabolicVertex},
 		{CubicVertex, cubicVertex},
+		{QuantumPriceLevels, quantumPriceLevels},
+		{MovingMiniMax, movingMiniMax},
 		// ── boundary ──────────────────────────────────────────────────────────
 		{last, unknown},
 		{Identifier(0), unknown},
@@ -274,6 +276,8 @@ func TestIdentifierIsKnown(t *testing.T) {
 		{PolynomialForecast, true},
 		{ParabolicVertex, true},
 		{CubicVertex, true},
+		{QuantumPriceLevels, true},
+		{MovingMiniMax, true},
 		// ── boundary ──────────────────────────────────────────────────────────
 		{last, false},
 		{Identifier(0), false},
@@ -421,6 +425,8 @@ func TestIdentifierMarshalJSON(t *testing.T) {
 		{PolynomialForecast, dqs + polynomialForecast + dqs, true},
 		{ParabolicVertex, dqs + parabolicVertex + dqs, true},
 		{CubicVertex, dqs + cubicVertex + dqs, true},
+		{QuantumPriceLevels, dqs + quantumPriceLevels + dqs, true},
+		{MovingMiniMax, dqs + movingMiniMax + dqs, true},
 		// ── boundary ──────────────────────────────────────────────────────────
 		{last, nilstr, false},
 		{Identifier(9999), nilstr, false},
@@ -581,6 +587,8 @@ func TestIdentifierUnmarshalJSON(t *testing.T) {
 		{PolynomialForecast, dqs + polynomialForecast + dqs, true},
 		{ParabolicVertex, dqs + parabolicVertex + dqs, true},
 		{CubicVertex, dqs + cubicVertex + dqs, true},
+		{QuantumPriceLevels, dqs + quantumPriceLevels + dqs, true},
+		{MovingMiniMax, dqs + movingMiniMax + dqs, true},
 		// ── boundary ──────────────────────────────────────────────────────────
 		{zero, "\"unknown\"", false},
 		{zero, "\"foobar\"", false},

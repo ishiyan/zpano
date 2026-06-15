@@ -171,6 +171,8 @@ const vcema_mod = @import("../don_mak/velocity_corrected_exponential_moving_aver
 const pof_mod = @import("../don_mak/polynomial_forecast/polynomial_forecast.zig");
 const pvtx_mod = @import("../don_mak/parabolic_vertex/parabolic_vertex.zig");
 const cvtx_mod = @import("../don_mak/cubic_vertex/cubic_vertex.zig");
+const qpl_mod = @import("../raymond_lee/quantum_price_levels/quantum_price_levels.zig");
+const mmm_mod = @import("../zurab_silagadze/moving_mini_max/moving_mini_max.zig");
 
 pub const FactoryError = error{
     UnsupportedIndicator,
@@ -1472,6 +1474,23 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
             .quote_component = getQuoteComponent(obj),
             .trade_component = getTradeComponent(obj),
         })),
+        .quantum_price_levels => createWithAllocParams(qpl_mod.QuantumPriceLevels, qpl_mod.QuantumPriceLevelsParams, allocator, obj, .{
+            .lookback = getUsize(obj, "lookback", 2048),
+            .num_levels = getUsize(obj, "numLevels", 21),
+            .num_bins = getUsize(obj, "numBins", 100),
+            .scale_factor = getF64(obj, "scaleFactor", 0.21),
+            .bar_component = getBarComponent(obj),
+            .quote_component = getQuoteComponent(obj),
+            .trade_component = getTradeComponent(obj),
+        }),
+        .moving_mini_max => createWithAllocParams(mmm_mod.MovingMiniMax, mmm_mod.MovingMiniMaxParams, allocator, obj, .{
+            .m = getUsize(obj, "m", 5),
+            .n = getUsize(obj, "n", 50),
+            .num_extrema = getUsize(obj, "numExtrema", 3),
+            .bar_component = getBarComponent(obj),
+            .quote_component = getQuoteComponent(obj),
+            .trade_component = getTradeComponent(obj),
+        }),
     };
 }
 

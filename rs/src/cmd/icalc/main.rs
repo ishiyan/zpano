@@ -12,6 +12,7 @@ use zpano::indicators::core::identifier::Identifier;
 use zpano::indicators::core::indicator::{Indicator, Output};
 use zpano::indicators::core::outputs::band::Band;
 use zpano::indicators::core::outputs::levels::Levels;
+use zpano::indicators::core::outputs::polyline::Polyline;
 use zpano::indicators::core::outputs::metadata::OutputMetadata;
 use zpano::indicators::factory::{create_indicator, JsonValue};
 
@@ -186,6 +187,8 @@ fn print_output(outputs_meta: &[OutputMetadata], output: &Output) {
                 print!("({:.4},{},{:.4})", lv.value, lv.offset, lv.strength);
             }
             print!("] ");
+        } else if let Some(p) = val.downcast_ref::<Polyline>() {
+            print!("{}=Polyline[n={}] ", name, p.points.len());
         } else {
             print!("{}=? ", name);
         }

@@ -19,6 +19,7 @@ func TestDescriptorOutputsWellFormed(t *testing.T) {
 		shape.Band:     true,
 		shape.Heatmap:  true,
 		shape.Polyline: true,
+		shape.Levels:   true,
 	}
 
 	for id, desc := range core.Descriptors() {

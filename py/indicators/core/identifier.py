@@ -384,3 +384,13 @@ class Identifier(IntEnum):
 
     # Identifies the Don Mak Cubic Vertex (CVTX) indicator.
     CUBIC_VERTEX = 103
+
+    # ── raymond lee ───────────────────────────────────────────────────────
+
+    # Identifies the Raymond Lee Quantum Price Levels (QPL) indicator.
+    QUANTUM_PRICE_LEVELS = 104
+
+    # ── zurab silagadze ───────────────────────────────────────────────────
+
+    # Identifies the Zurab Silagadze Moving Mini-Max (MMM) indicator.
+    MOVING_MINI_MAX = 105

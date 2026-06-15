@@ -389,6 +389,16 @@ const (
 	// CubicVertex identifies the Don Mak Cubic Vertex (CVTX) indicator.
 	CubicVertex
 
+	// ── raymond lee ───────────────────────────────────────────────────────
+
+	// QuantumPriceLevels identifies the Raymond Lee Quantum Price Levels (QPL) indicator.
+	QuantumPriceLevels
+
+	// ── zurab silagadze ───────────────────────────────────────────────────
+
+	// MovingMiniMax identifies the Zurab Silagadze Moving Mini-Max (MMM) indicator.
+	MovingMiniMax
+
 	last
 )
 
@@ -548,6 +558,8 @@ const (
 	polynomialForecast                        = "polynomialForecast"
 	parabolicVertex                           = "parabolicVertex"
 	cubicVertex                               = "cubicVertex"
+	quantumPriceLevels                        = "quantumPriceLevels"
+	movingMiniMax                             = "movingMiniMax"
 )
 
 // String implements the Stringer interface.
@@ -786,6 +798,10 @@ func (i Identifier) String() string {
 		return parabolicVertex
 	case CubicVertex:
 		return cubicVertex
+	case QuantumPriceLevels:
+		return quantumPriceLevels
+	case MovingMiniMax:
+		return movingMiniMax
 	default:
 		return unknown
 	}
@@ -1061,6 +1077,10 @@ func (i *Identifier) UnmarshalJSON(data []byte) error {
 		*i = ParabolicVertex
 	case cubicVertex:
 		*i = CubicVertex
+	case quantumPriceLevels:
+		*i = QuantumPriceLevels
+	case movingMiniMax:
+		*i = MovingMiniMax
 	default:
 		return fmt.Errorf(errFmt, s)
 	}
