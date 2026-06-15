@@ -6,3 +6,4 @@ from enum import IntEnum
 class JurikMovingAverageOutput(IntEnum):
     """Output of the Jurik moving average indicator."""
     MOVING_AVERAGE = 0
+    """The calculated value of the Jurik moving average."""

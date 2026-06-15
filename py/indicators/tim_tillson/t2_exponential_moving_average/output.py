@@ -7,3 +7,4 @@ class T2ExponentialMovingAverageOutput(IntEnum):
     """Enumerates the outputs of the T2 exponential moving average indicator."""
 
     VALUE = 0
+    """The calculated value of the T2 exponential moving average."""

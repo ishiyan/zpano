@@ -7,3 +7,4 @@ class AdvanceDeclineOscillatorOutput(IntEnum):
     """Describes the outputs of the Advance-Decline Oscillator."""
 
     ADVANCE_DECLINE_OSCILLATOR = 0
+    """The calculated value of the advance-decline oscillator."""

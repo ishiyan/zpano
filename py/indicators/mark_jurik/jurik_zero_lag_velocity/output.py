@@ -6,3 +6,4 @@ from enum import IntEnum
 class JurikZeroLagVelocityOutput(IntEnum):
     """Output of the Jurik zero lag velocity indicator."""
     VALUE = 0
+    """The main VEL output line."""

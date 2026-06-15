@@ -7,3 +7,4 @@ class MoneyFlowIndexOutput(IntEnum):
     """Enumerates the outputs of the money flow index indicator."""
 
     VALUE = 0
+    """The calculated value of the money flow index."""

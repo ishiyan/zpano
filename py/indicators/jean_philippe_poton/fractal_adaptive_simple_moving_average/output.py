@@ -7,3 +7,4 @@ class FractalAdaptiveSimpleMovingAverageOutput(IntEnum):
     """Enumerates the outputs of the fractal adaptive simple moving average indicator."""
 
     VALUE = 0
+    """The calculated value of the fractal adaptive simple moving average."""

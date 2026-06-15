@@ -7,3 +7,4 @@ class OnBalanceVolumeOutput(IntEnum):
     """Enumerates the outputs of the on-balance volume indicator."""
 
     VALUE = 0
+    """The calculated value of the on-balance volume."""

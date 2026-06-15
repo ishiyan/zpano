@@ -7,6 +7,7 @@ from dataclasses import dataclass
 class JurikDirectionalMovementIndexParams:
     """Parameters for the Jurik directional movement index indicator."""
     length: int = 14
+    """JMA smoothing length (minimum 1)."""
 
 
 def default_params() -> JurikDirectionalMovementIndexParams:

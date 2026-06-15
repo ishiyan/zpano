@@ -7,3 +7,4 @@ class TripleExponentialMovingAverageOutput(IntEnum):
     """Enumerates the outputs of the triple exponential moving average indicator."""
 
     VALUE = 0
+    """The calculated value of the triple exponential moving average."""

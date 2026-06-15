@@ -7,3 +7,4 @@ class VarianceOutput(IntEnum):
     """Enumerates the outputs of the variance indicator."""
 
     VALUE = 0
+    """The calculated value of the variance."""

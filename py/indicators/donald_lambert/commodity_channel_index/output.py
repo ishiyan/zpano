@@ -7,3 +7,4 @@ class CommodityChannelIndexOutput(IntEnum):
     """Enumerates the outputs of the commodity channel index indicator."""
 
     VALUE = 0
+    """The calculated value of the commodity channel index."""

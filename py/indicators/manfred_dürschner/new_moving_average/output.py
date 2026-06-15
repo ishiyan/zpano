@@ -7,3 +7,4 @@ class NewMovingAverageOutput(IntEnum):
     """Enumerates the outputs of the new moving average indicator."""
 
     VALUE = 0
+    """The scalar value of the new moving average."""

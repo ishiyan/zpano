@@ -13,10 +13,34 @@ class VarianceParams:
     """Parameters to create an instance of the variance indicator."""
 
     length: int = 20
+    """Length is the length (the number of time periods, ℓ) of the moving window to calculate the variance.
+
+    The value should be greater than 1.
+    """
+
     is_unbiased: bool = True
+    """Unbiased indicates whether the estimate of the variance is the unbiased sample variance or the population variance.
+
+    When in doubt, use the unbiased sample variance (value is true).
+    """
+
     bar_component: Optional[BarComponent] = None
+    """A component of a bar to use when updating the indicator with a bar sample.
+
+    If not set, the bar component defaults to ClosePrice and is not shown in the indicator mnemonic.
+    """
+
     quote_component: Optional[QuoteComponent] = None
+    """A component of a quote to use when updating the indicator with a quote sample.
+
+    If not set, the quote component defaults to MidPrice and is not shown in the indicator mnemonic.
+    """
+
     trade_component: Optional[TradeComponent] = None
+    """A component of a trade to use when updating the indicator with a trade sample.
+
+    If not set, the trade component defaults to Price and is not shown in the indicator mnemonic.
+    """
 
 
 def default_params() -> VarianceParams:

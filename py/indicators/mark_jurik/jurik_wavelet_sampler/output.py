@@ -6,3 +6,4 @@ from enum import IntEnum
 class JurikWaveletSamplerOutput(IntEnum):
     """Output of the Jurik wavelet sampler indicator."""
     VALUE = 0
+    """The main WAV output line."""

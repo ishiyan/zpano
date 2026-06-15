@@ -7,3 +7,4 @@ class RateOfChangePercentOutput(IntEnum):
     """Enumerates the outputs of the rate of change percent indicator."""
 
     VALUE = 0
+    """The calculated value of the rate of change percent."""

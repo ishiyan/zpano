@@ -7,3 +7,4 @@ class UltimateOscillatorOutput(IntEnum):
     """Describes the outputs of the Ultimate Oscillator."""
 
     ULTIMATE_OSCILLATOR = 0
+    """The Ultimate Oscillator value."""

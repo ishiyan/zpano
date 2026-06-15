@@ -7,3 +7,4 @@ class AdvanceDeclineOutput(IntEnum):
     """Describes the outputs of the Advance-Decline indicator."""
 
     ADVANCE_DECLINE = 0
+    """The calculated value of the advance-decline line."""

@@ -6,3 +6,4 @@ from enum import IntEnum
 class JurikRelativeTrendStrengthIndexOutput(IntEnum):
     """Output of the Jurik relative trend strength index indicator."""
     VALUE = 0
+    """The scalar value of the relative trend strength index."""

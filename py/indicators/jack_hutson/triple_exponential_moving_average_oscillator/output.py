@@ -7,3 +7,4 @@ class TripleExponentialMovingAverageOscillatorOutput(IntEnum):
     """Enumerates the outputs of the TRIX indicator."""
 
     VALUE = 0
+    """The TRIX oscillator value."""

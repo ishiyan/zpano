@@ -6,3 +6,4 @@ from enum import IntEnum
 class JurikTurningPointOscillatorOutput(IntEnum):
     """Output of the Jurik turning point oscillator indicator."""
     VALUE = 0
+    """The main JTPO output line."""

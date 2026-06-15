@@ -7,3 +7,4 @@ class ZeroLagExponentialMovingAverageOutput(IntEnum):
     """Enumerates the outputs of the zero-lag exponential moving average indicator."""
 
     VALUE = 0
+    """The calculated value of the zero-lag exponential moving average."""

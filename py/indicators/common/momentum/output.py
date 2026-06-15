@@ -7,3 +7,4 @@ class MomentumOutput(IntEnum):
     """Enumerates the outputs of the momentum indicator."""
 
     VALUE = 0
+    """The calculated value of the momentum."""

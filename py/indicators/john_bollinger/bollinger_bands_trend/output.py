@@ -7,3 +7,4 @@ class BollingerBandsTrendOutput(IntEnum):
     """Describes the outputs of the Bollinger Bands Trend indicator."""
 
     VALUE = 0
+    """The BBTrend value."""

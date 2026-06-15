@@ -13,13 +13,37 @@ class FractalBandsHybrideAdaptiveParams:
     """Parameters to create an instance of the fractal bands hybride adaptive indicator."""
 
     period: int = 30
+    """Period is the lookback period for the FGDI computation. The value should be greater than 1."""
+
     normal_speed_fallback: int = 30
+    """NormalSpeedFallback is the fallback SMA period when CyclePeriod is unavailable. The value should be greater than 0."""
+
     alpha: float = 2.0
+    """Alpha is the band width multiplier raised to power H. The value should be greater than 0."""
+
     nyquist: float = 0.5
+    """Nyquist multiplier applied to the estimated cycle period. The value should be greater than 0."""
+
     alpha_hp: float = 0.07
+    """High-pass filter alpha for Ehlers CyclePeriod. The value should be between 0 and 1."""
+
     bar_component: Optional[BarComponent] = None
+    """A component of a bar to use when updating the indicator with a bar sample.
+
+    If not set, the bar component defaults to ClosePrice and is not shown in the indicator mnemonic.
+    """
+
     quote_component: Optional[QuoteComponent] = None
+    """A component of a quote to use when updating the indicator with a quote sample.
+
+    If not set, the quote component defaults to MidPrice and is not shown in the indicator mnemonic.
+    """
+
     trade_component: Optional[TradeComponent] = None
+    """A component of a trade to use when updating the indicator with a trade sample.
+
+    If not set, the trade component defaults to Price and is not shown in the indicator mnemonic.
+    """
 
 
 def default_params() -> FractalBandsHybrideAdaptiveParams:

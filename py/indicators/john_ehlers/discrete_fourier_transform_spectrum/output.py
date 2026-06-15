@@ -7,3 +7,4 @@ class Output(IntEnum):
     """Describes the outputs of the indicator."""
 
     VALUE = 0
+    """The discrete Fourier transform spectrum heatmap column."""

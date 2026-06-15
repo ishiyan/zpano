@@ -7,3 +7,4 @@ class Output(IntEnum):
     """Describes the outputs of the indicator."""
 
     VALUE = 0
+    """The autocorrelation indicator heatmap column."""

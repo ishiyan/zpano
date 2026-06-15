@@ -13,8 +13,13 @@ class UltimateOscillatorParams:
     """
 
     length1: int = 7
+    """First time period (default 7). Minimum 2."""
+
     length2: int = 14
+    """Second time period (default 14). Minimum 2."""
+
     length3: int = 28
+    """Third time period (default 28). Minimum 2."""
 
 
 def default_params() -> UltimateOscillatorParams:

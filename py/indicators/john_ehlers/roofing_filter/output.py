@@ -6,3 +6,4 @@ from enum import IntEnum
 class RoofingFilterOutput(IntEnum):
     """Output describes the outputs of the RoofingFilter indicator."""
     VALUE = 0
+    """The calculated value of the roofing filter."""
