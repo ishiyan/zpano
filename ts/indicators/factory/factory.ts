@@ -220,8 +220,32 @@ import { FractionalBands } from '../jean-philippe-poton/fractional-bands/fractio
 import { HurstDifference } from '../jean-philippe-poton/hurst-difference/hurst-difference.js';
 import { defaultParams as defaultFctbanParams } from '../jean-philippe-poton/fractional-bands/params.js';
 import { defaultParams as defaultHurdifParams } from '../jean-philippe-poton/hurst-difference/params.js';
+
+// ── doug schaff ─────────────────────────────────────────────────────────────
 import { SchaffTrendCycle } from '../doug-schaff/schaff-trend-cycle/schaff-trend-cycle.js';
 import { defaultParams as defaultStcParams } from '../doug-schaff/schaff-trend-cycle/params.js';
+
+// ── don mak ─────────────────────────────────────────────────────────────────
+import { AdaptiveExponentialMovingAverage } from '../don-mak/adaptive-exponential-moving-average/adaptive-exponential-moving-average.js';
+import { defaultParams as defaultAemaParams } from '../don-mak/adaptive-exponential-moving-average/params.js';
+import { InstantaneousSineWavePeriod } from '../don-mak/instantaneous-sine-wave-period/instantaneous-sine-wave-period.js';
+import { defaultParams as defaultIswpParams } from '../don-mak/instantaneous-sine-wave-period/params.js';
+import { PolynomialFitDerivative } from '../don-mak/polynomial-fit-derivative/polynomial-fit-derivative.js';
+import { defaultParams as defaultPfdParams } from '../don-mak/polynomial-fit-derivative/params.js';
+import { MexicanHatWavelet } from '../don-mak/mexican-hat-wavelet/mexican-hat-wavelet.js';
+import { defaultParams as defaultMhwParams } from '../don-mak/mexican-hat-wavelet/params.js';
+import { SincWaveletBandpass } from '../don-mak/sinc-wavelet-bandpass/sinc-wavelet-bandpass.js';
+import { defaultParams as defaultSwbParams } from '../don-mak/sinc-wavelet-bandpass/params.js';
+import { ModifiedExponentialMovingAverage } from '../don-mak/modified-exponential-moving-average/modified-exponential-moving-average.js';
+import { VelocityCorrectedExponentialMovingAverage } from '../don-mak/velocity-corrected-exponential-moving-average/velocity-corrected-exponential-moving-average.js';
+import { PolynomialForecast } from '../don-mak/polynomial-forecast/polynomial-forecast.js';
+import { ParabolicVertex } from '../don-mak/parabolic-vertex/parabolic-vertex.js';
+import { CubicVertex } from '../don-mak/cubic-vertex/cubic-vertex.js';
+import { defaultParams as defaultMemaParams } from '../don-mak/modified-exponential-moving-average/params.js';
+import { defaultParams as defaultVcemaParams } from '../don-mak/velocity-corrected-exponential-moving-average/params.js';
+import { defaultParams as defaultPofParams } from '../don-mak/polynomial-forecast/params.js';
+import { defaultParams as defaultPvtxParams } from '../don-mak/parabolic-vertex/params.js';
+import { defaultParams as defaultCvtxParams } from '../don-mak/cubic-vertex/params.js';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -641,6 +665,36 @@ export function createIndicator(identifier: IndicatorIdentifier, params?: Record
 
         case IndicatorIdentifier.SchaffTrendCycle:
             return new SchaffTrendCycle({ ...defaultStcParams(), ...p });
+
+        case IndicatorIdentifier.AdaptiveExponentialMovingAverage:
+            return new AdaptiveExponentialMovingAverage({ ...defaultAemaParams(), ...p });
+
+        case IndicatorIdentifier.InstantaneousSineWavePeriod:
+            return new InstantaneousSineWavePeriod({ ...defaultIswpParams(), ...p });
+
+        case IndicatorIdentifier.PolynomialFitDerivative:
+            return new PolynomialFitDerivative({ ...defaultPfdParams(), ...p });
+
+        case IndicatorIdentifier.MexicanHatWavelet:
+            return new MexicanHatWavelet({ ...defaultMhwParams(), ...p });
+
+        case IndicatorIdentifier.SincWaveletBandpass:
+            return new SincWaveletBandpass({ ...defaultSwbParams(), ...p });
+
+        case IndicatorIdentifier.ModifiedExponentialMovingAverage:
+            return new ModifiedExponentialMovingAverage({ ...defaultMemaParams(), ...p });
+
+        case IndicatorIdentifier.VelocityCorrectedExponentialMovingAverage:
+            return new VelocityCorrectedExponentialMovingAverage({ ...defaultVcemaParams(), ...p });
+
+        case IndicatorIdentifier.PolynomialForecast:
+            return new PolynomialForecast({ ...defaultPofParams(), ...p });
+
+        case IndicatorIdentifier.ParabolicVertex:
+            return new ParabolicVertex({ ...defaultPvtxParams(), ...p });
+
+        case IndicatorIdentifier.CubicVertex:
+            return new CubicVertex({ ...defaultCvtxParams(), ...p });
 
         default:
             throw new Error(`Unsupported indicator: ${IndicatorIdentifier[identifier] ?? identifier}`);

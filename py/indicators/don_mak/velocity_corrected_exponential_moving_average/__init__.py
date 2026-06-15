@@ -1,0 +1,3 @@
+from .velocity_corrected_exponential_moving_average import VelocityCorrectedExponentialMovingAverage
+from .output import VelocityCorrectedExponentialMovingAverageOutput
+from .params import VelocityCorrectedExponentialMovingAverageParams, default_params

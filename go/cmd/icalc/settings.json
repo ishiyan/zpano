@@ -92,5 +92,15 @@
   { "identifier": "fractalBandsHybrideAdaptive", "params": { "period": 30, "nyquist": 0.5, "alpha_hp": 0.07 } },
   { "identifier": "fractionalBands", "params": { "period": 30, "price_scale": 1.0 } },
   { "identifier": "hurstDifference", "params": { "period": 30 } },
-  { "identifier": "schaffTrendCycle", "params": { "fast": 23, "slow": 50, "tclen": 10, "factor": 0.5 } }
+  { "identifier": "schaffTrendCycle", "params": { "fast": 23, "slow": 50, "tclen": 10, "factor": 0.5 } },
+  { "identifier": "adaptiveExponentialMovingAverage", "params": { "alphaMax": 0.5, "alphaMin": 0.05, "omega0": 1.0, "smoothing": 3 } },
+  { "identifier": "instantaneousSineWavePeriod", "params": { "smoothing": 0, "minPeriod": 4.0, "maxPeriod": 50.0, "errorThreshold": 20.0, "dx": 0.01 } },
+  { "identifier": "polynomialFitDerivative", "params": { "degree": 3, "order": 1, "smoothing": 6 } },
+  { "identifier": "mexicanHatWavelet", "params": { "band": 1 } },
+  { "identifier": "sincWaveletBandpass", "params": { "band": 1, "velocity": false } },
+  { "identifier": "modifiedExponentialMovingAverage", "params": { "period": 6, "degree": 3, "skip": 1 } },
+  { "identifier": "velocityCorrectedExponentialMovingAverage", "params": { "period": 6, "degree": 3 } },
+  { "identifier": "polynomialForecast", "params": { "degree": 3, "order": 1, "smoothing": 0 } },
+  { "identifier": "parabolicVertex", "params": {} },
+  { "identifier": "cubicVertex", "params": {} }
 ]

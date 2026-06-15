@@ -255,6 +255,28 @@ pub const Identifier = enum(u8) {
     /// Identifies the Doug Schaff Schaff Trend Cycle (STC) indicator.
     schaff_trend_cycle = 93,
 
+    // ── don mak ───────────────────────────────────────────────────────────
+    /// Identifies the Don Mak Adaptive Exponential Moving Average (AEMA) indicator.
+    adaptive_exponential_moving_average = 94,
+    /// Identifies the Don Mak Instantaneous Sine Wave Period (ISWP) indicator.
+    instantaneous_sine_wave_period = 95,
+    /// Identifies the Don Mak Polynomial Fit Derivative (PFD) indicator.
+    polynomial_fit_derivative = 96,
+    /// Identifies the Don Mak Mexican Hat Wavelet (MHW) indicator.
+    mexican_hat_wavelet = 97,
+    /// Identifies the Don Mak Sinc Wavelet Band-Pass (SWB) indicator.
+    sinc_wavelet_bandpass = 98,
+    /// Identifies the Don Mak Modified Exponential Moving Average (MEMA) indicator.
+    modified_exponential_moving_average = 99,
+    /// Identifies the Don Mak Velocity-Corrected Exponential Moving Average (VCEMA) indicator.
+    velocity_corrected_exponential_moving_average = 100,
+    /// Identifies the Don Mak Polynomial Forecast (POF) indicator.
+    polynomial_forecast = 101,
+    /// Identifies the Don Mak Parabolic Vertex (PVTX) indicator.
+    parabolic_vertex = 102,
+    /// Identifies the Don Mak Cubic Vertex (CVTX) indicator.
+    cubic_vertex = 103,
+
     /// Returns the camelCase string representation matching Go's String().
     pub fn asStr(self: Identifier) []const u8 {
         return switch (self) {
@@ -398,6 +420,16 @@ pub const Identifier = enum(u8) {
             .fractional_bands => "fractionalBands",
             .hurst_difference => "hurstDifference",
             .schaff_trend_cycle => "schaffTrendCycle",
+            .adaptive_exponential_moving_average => "adaptiveExponentialMovingAverage",
+            .instantaneous_sine_wave_period => "instantaneousSineWavePeriod",
+            .polynomial_fit_derivative => "polynomialFitDerivative",
+            .mexican_hat_wavelet => "mexicanHatWavelet",
+            .sinc_wavelet_bandpass => "sincWaveletBandpass",
+            .modified_exponential_moving_average => "modifiedExponentialMovingAverage",
+            .velocity_corrected_exponential_moving_average => "velocityCorrectedExponentialMovingAverage",
+            .polynomial_forecast => "polynomialForecast",
+            .parabolic_vertex => "parabolicVertex",
+            .cubic_vertex => "cubicVertex",
         };
     }
 
@@ -544,6 +576,16 @@ pub const Identifier = enum(u8) {
             .{ "fractionalBands", Identifier.fractional_bands },
             .{ "hurstDifference", Identifier.hurst_difference },
             .{ "schaffTrendCycle", Identifier.schaff_trend_cycle },
+            .{ "adaptiveExponentialMovingAverage", Identifier.adaptive_exponential_moving_average },
+            .{ "instantaneousSineWavePeriod", Identifier.instantaneous_sine_wave_period },
+            .{ "polynomialFitDerivative", Identifier.polynomial_fit_derivative },
+            .{ "mexicanHatWavelet", Identifier.mexican_hat_wavelet },
+            .{ "sincWaveletBandpass", Identifier.sinc_wavelet_bandpass },
+            .{ "modifiedExponentialMovingAverage", Identifier.modified_exponential_moving_average },
+            .{ "velocityCorrectedExponentialMovingAverage", Identifier.velocity_corrected_exponential_moving_average },
+            .{ "polynomialForecast", Identifier.polynomial_forecast },
+            .{ "parabolicVertex", Identifier.parabolic_vertex },
+            .{ "cubicVertex", Identifier.cubic_vertex },
         };
 
         inline for (map) |entry| {

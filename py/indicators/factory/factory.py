@@ -625,4 +625,56 @@ def create_indicator(
         from ..doug_schaff.schaff_trend_cycle.schaff_trend_cycle import SchaffTrendCycle
         return SchaffTrendCycle(_apply(default_params(), params))
 
+    # ── don mak ───────────────────────────────────────────────────────────
+
+    if identifier == Identifier.ADAPTIVE_EXPONENTIAL_MOVING_AVERAGE:
+        from ..don_mak.adaptive_exponential_moving_average.params import default_params
+        from ..don_mak.adaptive_exponential_moving_average.adaptive_exponential_moving_average import AdaptiveExponentialMovingAverage
+        return AdaptiveExponentialMovingAverage(_apply(default_params(), params))
+
+    if identifier == Identifier.INSTANTANEOUS_SINE_WAVE_PERIOD:
+        from ..don_mak.instantaneous_sine_wave_period.params import default_params
+        from ..don_mak.instantaneous_sine_wave_period.instantaneous_sine_wave_period import InstantaneousSineWavePeriod
+        return InstantaneousSineWavePeriod(_apply(default_params(), params))
+
+    if identifier == Identifier.POLYNOMIAL_FIT_DERIVATIVE:
+        from ..don_mak.polynomial_fit_derivative.params import default_params
+        from ..don_mak.polynomial_fit_derivative.polynomial_fit_derivative import PolynomialFitDerivative
+        return PolynomialFitDerivative(_apply(default_params(), params))
+
+    if identifier == Identifier.MEXICAN_HAT_WAVELET:
+        from ..don_mak.mexican_hat_wavelet.params import default_params
+        from ..don_mak.mexican_hat_wavelet.mexican_hat_wavelet import MexicanHatWavelet
+        return MexicanHatWavelet(_apply(default_params(), params))
+
+    if identifier == Identifier.SINC_WAVELET_BANDPASS:
+        from ..don_mak.sinc_wavelet_bandpass.params import default_params
+        from ..don_mak.sinc_wavelet_bandpass.sinc_wavelet_bandpass import SincWaveletBandpass
+        return SincWaveletBandpass(_apply(default_params(), params))
+
+    if identifier == Identifier.MODIFIED_EXPONENTIAL_MOVING_AVERAGE:
+        from ..don_mak.modified_exponential_moving_average.params import default_params
+        from ..don_mak.modified_exponential_moving_average.modified_exponential_moving_average import ModifiedExponentialMovingAverage
+        return ModifiedExponentialMovingAverage(_apply(default_params(), params))
+
+    if identifier == Identifier.VELOCITY_CORRECTED_EXPONENTIAL_MOVING_AVERAGE:
+        from ..don_mak.velocity_corrected_exponential_moving_average.params import default_params
+        from ..don_mak.velocity_corrected_exponential_moving_average.velocity_corrected_exponential_moving_average import VelocityCorrectedExponentialMovingAverage
+        return VelocityCorrectedExponentialMovingAverage(_apply(default_params(), params))
+
+    if identifier == Identifier.POLYNOMIAL_FORECAST:
+        from ..don_mak.polynomial_forecast.params import default_params
+        from ..don_mak.polynomial_forecast.polynomial_forecast import PolynomialForecast
+        return PolynomialForecast(_apply(default_params(), params))
+
+    if identifier == Identifier.PARABOLIC_VERTEX:
+        from ..don_mak.parabolic_vertex.params import default_params
+        from ..don_mak.parabolic_vertex.parabolic_vertex import ParabolicVertex
+        return ParabolicVertex(_apply(default_params(), params))
+
+    if identifier == Identifier.CUBIC_VERTEX:
+        from ..don_mak.cubic_vertex.params import default_params
+        from ..don_mak.cubic_vertex.cubic_vertex import CubicVertex
+        return CubicVertex(_apply(default_params(), params))
+
     raise ValueError(f"unsupported indicator: {identifier}")

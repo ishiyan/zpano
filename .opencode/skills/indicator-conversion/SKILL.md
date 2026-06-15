@@ -1959,19 +1959,56 @@ Map Go/TS params to a Python `@dataclass`. Key mappings:
 
 Always include `default_params()` returning a default instance.
 
+**Document every field with a PEP 257 attribute docstring** (`"""..."""` placed immediately
+after the field), porting the per-field description from the Go `params.go` doc comments / TS
+`params.ts` JSDoc. Use the TS-style description phrasing ("The …") followed by the Go-style
+constraint/default sentence. Do NOT use inline `#` comments or comments above the field.
+Because Python uses the `None` sentinel, phrase component fields as "If not set, the bar
+component defaults to ClosePrice and is not shown in the indicator mnemonic." (MidPrice for
+quote, Price for trade):
+
+```python
+@dataclass
+class SimpleMovingAverageParams:
+    """Parameters to create an instance of the Simple Moving Average indicator."""
+
+    length: int = 20
+    """The number of periods to average.
+
+    The value should be >= 1. The default value is 20.
+    """
+
+    bar_component: Optional[BarComponent] = None
+    """A component of a bar to use when updating the indicator with a bar sample.
+
+    If not set, the bar component defaults to ClosePrice and is not shown in the indicator mnemonic.
+    """
+    # quote_component / trade_component follow the same pattern (MidPrice / Price)
+```
+
+Nested helper enums in `params.py` (e.g. a `Band` `IntEnum`) document each member with the same
+attribute-docstring style. Attribute docstrings are inert at runtime, so they are safe.
+
 For multi-constructor indicators (EMA), create separate dataclass per variant:
 `ExponentialMovingAverageLengthParams` and `ExponentialMovingAverageSmoothingFactorParams`.
 
 ### Step 3: Convert the output enum
 
+Document each member with an attribute docstring carrying the description from the Go/TS output
+enum:
+
 ```python
 from enum import IntEnum
 
 class SimpleMovingAverageOutput(IntEnum):
+    """Describes the outputs of the indicator."""
+
     VALUE = 0
+    """The scalar value of the moving average."""
 ```
 
-Use `UPPER_SNAKE_CASE` members starting at 0 (matching TS, unlike Go's `iota`).
+Use `UPPER_SNAKE_CASE` members starting at 0 (matching TS, unlike Go's `iota`). Multi-output
+indicators document every member the same way.
 
 ### Step 4: Convert the main indicator file
 

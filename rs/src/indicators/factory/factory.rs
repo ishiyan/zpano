@@ -262,8 +262,42 @@ use crate::indicators::jean_philippe_poton::fractional_bands::{
 use crate::indicators::jean_philippe_poton::hurst_difference::{
     HurstDifference, HurstDifferenceParams,
 };
+
+// ── doug schaff ─────────────────────────────────────────────────────────────
 use crate::indicators::doug_schaff::schaff_trend_cycle::schaff_trend_cycle::{
     SchaffTrendCycle, SchaffTrendCycleParams,
+};
+
+// ── don mak ─────────────────────────────────────────────────────────────────
+use crate::indicators::don_mak::adaptive_exponential_moving_average::adaptive_exponential_moving_average::{
+    AdaptiveExponentialMovingAverage, AdaptiveExponentialMovingAverageParams,
+};
+use crate::indicators::don_mak::instantaneous_sine_wave_period::instantaneous_sine_wave_period::{
+    InstantaneousSineWavePeriod, InstantaneousSineWavePeriodParams,
+};
+use crate::indicators::don_mak::polynomial_fit_derivative::polynomial_fit_derivative::{
+    PolynomialFitDerivative, PolynomialFitDerivativeParams,
+};
+use crate::indicators::don_mak::mexican_hat_wavelet::mexican_hat_wavelet::{
+    Band, MexicanHatWavelet, MexicanHatWaveletParams,
+};
+use crate::indicators::don_mak::sinc_wavelet_bandpass::sinc_wavelet_bandpass::{
+    Band as SwbBand, SincWaveletBandpass, SincWaveletBandpassParams,
+};
+use crate::indicators::don_mak::modified_exponential_moving_average::modified_exponential_moving_average::{
+    ModifiedExponentialMovingAverage, ModifiedExponentialMovingAverageParams,
+};
+use crate::indicators::don_mak::velocity_corrected_exponential_moving_average::velocity_corrected_exponential_moving_average::{
+    VelocityCorrectedExponentialMovingAverage, VelocityCorrectedExponentialMovingAverageParams,
+};
+use crate::indicators::don_mak::polynomial_forecast::polynomial_forecast::{
+    PolynomialForecast, PolynomialForecastParams,
+};
+use crate::indicators::don_mak::parabolic_vertex::parabolic_vertex::{
+    ParabolicVertex, ParabolicVertexParams,
+};
+use crate::indicators::don_mak::cubic_vertex::cubic_vertex::{
+    CubicVertex, CubicVertexParams,
 };
 
 /// Create an indicator from its identifier and a JSON-encoded parameter string.
@@ -1530,6 +1564,97 @@ pub fn create_indicator(
             if let Some(v) = get_usize(&params, "tclen") { p.tclen = v; }
             if let Some(v) = get_f64(&params, "factor") { p.factor = v; }
             Ok(Box::new(SchaffTrendCycle::new(&p)?))
+        }
+
+        Identifier::AdaptiveExponentialMovingAverage => {
+            let mut p = AdaptiveExponentialMovingAverageParams::default();
+            if let Some(v) = get_f64(&params, "alphaMax") { p.alpha_max = v; }
+            if let Some(v) = get_f64(&params, "alphaMin") { p.alpha_min = v; }
+            if let Some(v) = get_f64(&params, "omega0") { p.omega0 = v; }
+            if let Some(v) = get_i64(&params, "smoothing") { p.smoothing = v; }
+            Ok(Box::new(AdaptiveExponentialMovingAverage::new(&p)?))
+        }
+
+        Identifier::InstantaneousSineWavePeriod => {
+            let mut p = InstantaneousSineWavePeriodParams::default();
+            if let Some(v) = get_i64(&params, "smoothing") { p.smoothing = v; }
+            if let Some(v) = get_f64(&params, "minPeriod") { p.min_period = v; }
+            if let Some(v) = get_f64(&params, "maxPeriod") { p.max_period = v; }
+            if let Some(v) = get_f64(&params, "errorThreshold") { p.error_threshold = v; }
+            if let Some(v) = get_f64(&params, "dx") { p.dx = v; }
+            Ok(Box::new(InstantaneousSineWavePeriod::new(&p)?))
+        }
+
+        Identifier::PolynomialFitDerivative => {
+            let mut p = PolynomialFitDerivativeParams::default();
+            if let Some(v) = get_usize(&params, "degree") { p.degree = v; }
+            if let Some(v) = get_usize(&params, "order") { p.order = v; }
+            if let Some(v) = get_i64(&params, "smoothing") { p.smoothing = v; }
+            Ok(Box::new(PolynomialFitDerivative::new(&p)?))
+        }
+
+        Identifier::MexicanHatWavelet => {
+            let mut p = MexicanHatWaveletParams::default();
+            if let Some(v) = get_i64(&params, "band") {
+                p.band = match v {
+                    0 => Band::High,
+                    1 => Band::Mid,
+                    2 => Band::Low,
+                    3 => Band::Custom,
+                    _ => Band::Mid,
+                };
+            }
+            if let Some(v) = get_f64(&params, "dilation") { p.dilation = v; }
+            if let Some(v) = get_f64(&params, "period") { p.period = v; }
+            Ok(Box::new(MexicanHatWavelet::new(&p)?))
+        }
+
+        Identifier::SincWaveletBandpass => {
+            let mut p = SincWaveletBandpassParams::default();
+            if let Some(v) = get_i64(&params, "band") {
+                p.band = match v {
+                    0 => SwbBand::High,
+                    1 => SwbBand::Mid,
+                    2 => SwbBand::Low,
+                    3 => SwbBand::Full,
+                    _ => SwbBand::Mid,
+                };
+            }
+            if let Some(v) = get_bool(&params, "velocity") { p.velocity = v; }
+            Ok(Box::new(SincWaveletBandpass::new(&p)?))
+        }
+
+        Identifier::ModifiedExponentialMovingAverage => {
+            let mut p = ModifiedExponentialMovingAverageParams::default();
+            if let Some(v) = get_usize(&params, "period") { p.period = v; }
+            if let Some(v) = get_usize(&params, "degree") { p.degree = v; }
+            if let Some(v) = get_usize(&params, "skip") { p.skip = v; }
+            Ok(Box::new(ModifiedExponentialMovingAverage::new(&p)?))
+        }
+
+        Identifier::VelocityCorrectedExponentialMovingAverage => {
+            let mut p = VelocityCorrectedExponentialMovingAverageParams::default();
+            if let Some(v) = get_usize(&params, "period") { p.period = v; }
+            if let Some(v) = get_usize(&params, "degree") { p.degree = v; }
+            Ok(Box::new(VelocityCorrectedExponentialMovingAverage::new(&p)?))
+        }
+
+        Identifier::PolynomialForecast => {
+            let mut p = PolynomialForecastParams::default();
+            if let Some(v) = get_usize(&params, "degree") { p.degree = v; }
+            if let Some(v) = get_usize(&params, "order") { p.order = v; }
+            if let Some(v) = get_usize(&params, "smoothing") { p.smoothing = v; }
+            Ok(Box::new(PolynomialForecast::new(&p)?))
+        }
+
+        Identifier::ParabolicVertex => {
+            let p = ParabolicVertexParams::default();
+            Ok(Box::new(ParabolicVertex::new(&p)?))
+        }
+
+        Identifier::CubicVertex => {
+            let p = CubicVertexParams::default();
+            Ok(Box::new(CubicVertex::new(&p)?))
         }
 
         _ => Err(format!("unsupported indicator: {:?}", identifier)),

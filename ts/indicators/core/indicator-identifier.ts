@@ -344,4 +344,36 @@ export enum IndicatorIdentifier {
 
     /** Identifies the Doug Schaff __Schaff Trend Cycle__ (STC) indicator. */
     SchaffTrendCycle,
+
+    // ── don mak ───────────────────────────────────────────────────────────
+
+    /** Identifies the Don Mak __Adaptive Exponential Moving Average__ (AEMA) indicator. */
+    AdaptiveExponentialMovingAverage,
+
+    /** Identifies the Don Mak __Instantaneous Sine Wave Period__ (ISWP) indicator. */
+    InstantaneousSineWavePeriod,
+
+    /** Identifies the Don Mak __Polynomial Fit Derivative__ (PFD) indicator. */
+    PolynomialFitDerivative,
+
+    /** Identifies the Don Mak __Mexican Hat Wavelet__ (MHW) indicator. */
+    MexicanHatWavelet,
+
+    /** Identifies the Don Mak __Sinc Wavelet Band-Pass__ (SWB) indicator. */
+    SincWaveletBandpass,
+
+    /** Identifies the Don Mak __Modified Exponential Moving Average__ (MEMA) indicator. */
+    ModifiedExponentialMovingAverage,
+
+    /** Identifies the Don Mak __Velocity-Corrected Exponential Moving Average__ (VCEMA) indicator. */
+    VelocityCorrectedExponentialMovingAverage,
+
+    /** Identifies the Don Mak __Polynomial Forecast__ (POF) indicator. */
+    PolynomialForecast,
+
+    /** Identifies the Don Mak __Parabolic Vertex__ (PVTX) indicator. */
+    ParabolicVertex,
+
+    /** Identifies the Don Mak __Cubic Vertex__ (CVTX) indicator. */
+    CubicVertex,
 }

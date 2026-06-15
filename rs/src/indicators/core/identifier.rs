@@ -255,6 +255,28 @@ pub enum Identifier {
     // ── doug schaff ───────────────────────────────────────────────────────
     /// Identifies the Doug Schaff Schaff Trend Cycle (STC) indicator.
     SchaffTrendCycle = 93,
+
+    // ── don mak ───────────────────────────────────────────────────────────
+    /// Identifies the Don Mak Adaptive Exponential Moving Average (AEMA) indicator.
+    AdaptiveExponentialMovingAverage = 94,
+    /// Identifies the Don Mak Instantaneous Sine Wave Period (ISWP) indicator.
+    InstantaneousSineWavePeriod = 95,
+    /// Identifies the Don Mak Polynomial Fit Derivative (PFD) indicator.
+    PolynomialFitDerivative = 96,
+    /// Identifies the Don Mak Mexican Hat Wavelet (MHW) indicator.
+    MexicanHatWavelet = 97,
+    /// Identifies the Don Mak Sinc Wavelet Band-Pass (SWB) indicator.
+    SincWaveletBandpass = 98,
+    /// Identifies the Don Mak Modified Exponential Moving Average (MEMA) indicator.
+    ModifiedExponentialMovingAverage = 99,
+    /// Identifies the Don Mak Velocity-Corrected Exponential Moving Average (VCEMA) indicator.
+    VelocityCorrectedExponentialMovingAverage = 100,
+    /// Identifies the Don Mak Polynomial Forecast (POF) indicator.
+    PolynomialForecast = 101,
+    /// Identifies the Don Mak Parabolic Vertex (PVTX) indicator.
+    ParabolicVertex = 102,
+    /// Identifies the Don Mak Cubic Vertex (CVTX) indicator.
+    CubicVertex = 103,
 }
 
 impl Identifier {
@@ -363,6 +385,16 @@ impl Identifier {
             Self::FractionalBands => "fractionalBands",
             Self::HurstDifference => "hurstDifference",
             Self::SchaffTrendCycle => "schaffTrendCycle",
+            Self::AdaptiveExponentialMovingAverage => "adaptiveExponentialMovingAverage",
+            Self::InstantaneousSineWavePeriod => "instantaneousSineWavePeriod",
+            Self::PolynomialFitDerivative => "polynomialFitDerivative",
+            Self::MexicanHatWavelet => "mexicanHatWavelet",
+            Self::SincWaveletBandpass => "sincWaveletBandpass",
+            Self::ModifiedExponentialMovingAverage => "modifiedExponentialMovingAverage",
+            Self::VelocityCorrectedExponentialMovingAverage => "velocityCorrectedExponentialMovingAverage",
+            Self::PolynomialForecast => "polynomialForecast",
+            Self::ParabolicVertex => "parabolicVertex",
+            Self::CubicVertex => "cubicVertex",
         }
     }
 
@@ -475,6 +507,16 @@ impl Identifier {
             "fractionalBands" => Some(Self::FractionalBands),
             "hurstDifference" => Some(Self::HurstDifference),
             "schaffTrendCycle" => Some(Self::SchaffTrendCycle),
+            "adaptiveExponentialMovingAverage" => Some(Self::AdaptiveExponentialMovingAverage),
+            "instantaneousSineWavePeriod" => Some(Self::InstantaneousSineWavePeriod),
+            "polynomialFitDerivative" => Some(Self::PolynomialFitDerivative),
+            "mexicanHatWavelet" => Some(Self::MexicanHatWavelet),
+            "sincWaveletBandpass" => Some(Self::SincWaveletBandpass),
+            "modifiedExponentialMovingAverage" => Some(Self::ModifiedExponentialMovingAverage),
+            "velocityCorrectedExponentialMovingAverage" => Some(Self::VelocityCorrectedExponentialMovingAverage),
+            "polynomialForecast" => Some(Self::PolynomialForecast),
+            "parabolicVertex" => Some(Self::ParabolicVertex),
+            "cubicVertex" => Some(Self::CubicVertex),
             _ => None,
         }
     }

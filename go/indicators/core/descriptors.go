@@ -710,4 +710,95 @@ var descriptors = map[Identifier]Descriptor{
 			{Kind: 3 /* PF */, Shape: shape.Scalar, Role: BoundedOscillator, Pane: Own},
 		},
 	},
+
+	// ── don mak ───────────────────────────────────────────────────────────
+
+	AdaptiveExponentialMovingAverage: {
+		Identifier: AdaptiveExponentialMovingAverage, Family: "Don Mak",
+		Adaptivity: Adaptive, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{
+			{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Smoother, Pane: Price},
+			{Kind: 2 /* Omega */, Shape: shape.Scalar, Role: CyclePeriod, Pane: Own},
+			{Kind: 3 /* Alpha */, Shape: shape.Scalar, Role: BoundedOscillator, Pane: Own},
+		},
+	},
+
+	InstantaneousSineWavePeriod: {
+		Identifier: InstantaneousSineWavePeriod, Family: "Don Mak",
+		Adaptivity: Static, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{
+			{Kind: 1 /* Period */, Shape: shape.Scalar, Role: CyclePeriod, Pane: Own},
+			{Kind: 2 /* Omega */, Shape: shape.Scalar, Role: CyclePeriod, Pane: Own},
+			{Kind: 3 /* Velocity */, Shape: shape.Scalar, Role: Oscillator, Pane: Own},
+			{Kind: 4 /* Acceleration */, Shape: shape.Scalar, Role: Oscillator, Pane: Own},
+			{Kind: 5 /* Amplitude */, Shape: shape.Scalar, Role: Oscillator, Pane: Own},
+			{Kind: 6 /* Phase */, Shape: shape.Scalar, Role: CyclePhase, Pane: Own},
+			{Kind: 7 /* DcLevel */, Shape: shape.Scalar, Role: Overlay, Pane: Price},
+		},
+	},
+
+	PolynomialFitDerivative: {
+		Identifier: PolynomialFitDerivative, Family: "Don Mak",
+		Adaptivity: Static, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{
+			{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Oscillator, Pane: Own},
+		},
+	},
+
+	MexicanHatWavelet: {
+		Identifier: MexicanHatWavelet, Family: "Don Mak",
+		Adaptivity: Static, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{
+			{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Oscillator, Pane: Own},
+		},
+	},
+
+	SincWaveletBandpass: {
+		Identifier: SincWaveletBandpass, Family: "Don Mak",
+		Adaptivity: Static, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{
+			{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Oscillator, Pane: Own},
+		},
+	},
+
+	ModifiedExponentialMovingAverage: {
+		Identifier: ModifiedExponentialMovingAverage, Family: "Don Mak",
+		Adaptivity: Static, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{
+			{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Smoother, Pane: Price},
+		},
+	},
+
+	VelocityCorrectedExponentialMovingAverage: {
+		Identifier: VelocityCorrectedExponentialMovingAverage, Family: "Don Mak",
+		Adaptivity: Static, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{
+			{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Smoother, Pane: Price},
+		},
+	},
+
+	PolynomialForecast: {
+		Identifier: PolynomialForecast, Family: "Don Mak",
+		Adaptivity: Static, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{
+			{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Signal, Pane: Price},
+		},
+	},
+
+	ParabolicVertex: {
+		Identifier: ParabolicVertex, Family: "Don Mak",
+		Adaptivity: Static, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{
+			{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Signal, Pane: Own},
+		},
+	},
+
+	CubicVertex: {
+		Identifier: CubicVertex, Family: "Don Mak",
+		Adaptivity: Static, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{
+			{Kind: 1 /* BarsToNearTurn */, Shape: shape.Scalar, Role: Signal, Pane: Own},
+			{Kind: 2 /* BarsToFarTurn */, Shape: shape.Scalar, Role: Signal, Pane: Own},
+		},
+	},
 }

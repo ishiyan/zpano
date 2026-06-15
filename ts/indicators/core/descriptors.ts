@@ -327,7 +327,21 @@ const descriptors: Map<IndicatorIdentifier, Descriptor> = new Map<IndicatorIdent
   [IndicatorIdentifier.HurstDifference, desc(IndicatorIdentifier.HurstDifference, 'Jean-Philippe Poton', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Oscillator, P.Own), out(1, S.Scalar, R.Oscillator, P.Own)])],
 
   // ── doug schaff ───────────────────────────────────────────────────────
+  
   [IndicatorIdentifier.SchaffTrendCycle, desc(IndicatorIdentifier.SchaffTrendCycle, 'Doug Schaff', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.BoundedOscillator, P.Own), out(1, S.Scalar, R.Oscillator, P.Own), out(2, S.Scalar, R.BoundedOscillator, P.Own)])],
+
+  // ── don mak ───────────────────────────────────────────────────────────
+  
+  [IndicatorIdentifier.AdaptiveExponentialMovingAverage, desc(IndicatorIdentifier.AdaptiveExponentialMovingAverage, 'Don Mak', A.Adaptive, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Smoother, P.Price), out(1, S.Scalar, R.CyclePeriod, P.Own), out(2, S.Scalar, R.BoundedOscillator, P.Own)])],
+  [IndicatorIdentifier.InstantaneousSineWavePeriod, desc(IndicatorIdentifier.InstantaneousSineWavePeriod, 'Don Mak', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.CyclePeriod, P.Own), out(1, S.Scalar, R.CyclePeriod, P.Own), out(2, S.Scalar, R.Oscillator, P.Own), out(3, S.Scalar, R.Oscillator, P.Own), out(4, S.Scalar, R.Oscillator, P.Own), out(5, S.Scalar, R.CyclePhase, P.Own), out(6, S.Scalar, R.Overlay, P.Price)])],
+  [IndicatorIdentifier.PolynomialFitDerivative, desc(IndicatorIdentifier.PolynomialFitDerivative, 'Don Mak', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Oscillator, P.Own)])],
+  [IndicatorIdentifier.MexicanHatWavelet, desc(IndicatorIdentifier.MexicanHatWavelet, 'Don Mak', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Oscillator, P.Own)])],
+  [IndicatorIdentifier.SincWaveletBandpass, desc(IndicatorIdentifier.SincWaveletBandpass, 'Don Mak', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Oscillator, P.Own)])],
+  [IndicatorIdentifier.ModifiedExponentialMovingAverage, desc(IndicatorIdentifier.ModifiedExponentialMovingAverage, 'Don Mak', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Smoother, P.Price)])],
+  [IndicatorIdentifier.VelocityCorrectedExponentialMovingAverage, desc(IndicatorIdentifier.VelocityCorrectedExponentialMovingAverage, 'Don Mak', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Smoother, P.Price)])],
+  [IndicatorIdentifier.PolynomialForecast, desc(IndicatorIdentifier.PolynomialForecast, 'Don Mak', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Signal, P.Price)])],
+  [IndicatorIdentifier.ParabolicVertex, desc(IndicatorIdentifier.ParabolicVertex, 'Don Mak', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Signal, P.Own)])],
+  [IndicatorIdentifier.CubicVertex, desc(IndicatorIdentifier.CubicVertex, 'Don Mak', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Signal, P.Own), out(1, S.Scalar, R.Signal, P.Own)])],
 ]);
 
 /**

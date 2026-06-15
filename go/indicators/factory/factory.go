@@ -25,15 +25,16 @@ import (
 	"zpano/indicators/custom/goertzelspectrum"
 	"zpano/indicators/custom/maximumentropyspectrum"
 	"zpano/indicators/donaldlambert/commoditychannelindex"
-	"zpano/indicators/jeanphilippepoton/fractaldimensionindex"
-	fractalgraphdimensionindex "zpano/indicators/jeanphilippepoton/fractalgraphdimensionindex"
-	"zpano/indicators/jeanphilippepoton/fractaladaptivesimplemovingaverage"
-	"zpano/indicators/jeanphilippepoton/fractaladaptivesimplemovingaverage2"
-	"zpano/indicators/jeanphilippepoton/rescaledfractaladaptivesimplemovingaverage"
-	"zpano/indicators/jeanphilippepoton/fractalbands"
-	"zpano/indicators/jeanphilippepoton/fractalbandshybrideadaptive"
-	"zpano/indicators/jeanphilippepoton/fractionalbands"
-	"zpano/indicators/jeanphilippepoton/hurstdifference"
+	"zpano/indicators/donmak/adaptiveexponentialmovingaverage"
+	"zpano/indicators/donmak/cubicvertex"
+	"zpano/indicators/donmak/instantaneoussinewaveperiod"
+	"zpano/indicators/donmak/mexicanhatwavelet"
+	"zpano/indicators/donmak/modifiedexponentialmovingaverage"
+	"zpano/indicators/donmak/parabolicvertex"
+	"zpano/indicators/donmak/polynomialfitderivative"
+	"zpano/indicators/donmak/polynomialforecast"
+	"zpano/indicators/donmak/sincwaveletbandpass"
+	"zpano/indicators/donmak/velocitycorrectedexponentialmovingaverage"
 	"zpano/indicators/dougschaff/schafftrendcycle"
 	"zpano/indicators/genequong/moneyflowindex"
 	"zpano/indicators/georgelane/stochastic"
@@ -41,6 +42,15 @@ import (
 	"zpano/indicators/geraldappel/percentagepriceoscillator"
 	"zpano/indicators/igorlivshin/balanceofpower"
 	"zpano/indicators/jackhutson/tripleexponentialmovingaverageoscillator"
+	"zpano/indicators/jeanphilippepoton/fractaladaptivesimplemovingaverage"
+	"zpano/indicators/jeanphilippepoton/fractaladaptivesimplemovingaverage2"
+	"zpano/indicators/jeanphilippepoton/fractalbands"
+	"zpano/indicators/jeanphilippepoton/fractalbandshybrideadaptive"
+	"zpano/indicators/jeanphilippepoton/fractaldimensionindex"
+	fractalgraphdimensionindex "zpano/indicators/jeanphilippepoton/fractalgraphdimensionindex"
+	"zpano/indicators/jeanphilippepoton/fractionalbands"
+	"zpano/indicators/jeanphilippepoton/hurstdifference"
+	"zpano/indicators/jeanphilippepoton/rescaledfractaladaptivesimplemovingaverage"
 	"zpano/indicators/johnbollinger/bollingerbands"
 	"zpano/indicators/johnbollinger/bollingerbandstrend"
 	"zpano/indicators/johnehlers/autocorrelationindicator"
@@ -1074,6 +1084,88 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 		}
 
 		return schafftrendcycle.NewSchaffTrendCycle(p)
+
+	// ── don mak ───────────────────────────────────────────────────────────
+
+	case core.AdaptiveExponentialMovingAverage:
+		p := adaptiveexponentialmovingaverage.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return adaptiveexponentialmovingaverage.NewAdaptiveExponentialMovingAverage(p)
+
+	case core.InstantaneousSineWavePeriod:
+		p := instantaneoussinewaveperiod.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return instantaneoussinewaveperiod.NewInstantaneousSineWavePeriod(p)
+
+	case core.PolynomialFitDerivative:
+		p := polynomialfitderivative.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return polynomialfitderivative.NewPolynomialFitDerivative(p)
+
+	case core.MexicanHatWavelet:
+		p := mexicanhatwavelet.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return mexicanhatwavelet.NewMexicanHatWavelet(p)
+
+	case core.SincWaveletBandpass:
+		p := sincwaveletbandpass.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return sincwaveletbandpass.NewSincWaveletBandpass(p)
+
+	case core.ModifiedExponentialMovingAverage:
+		p := modifiedexponentialmovingaverage.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return modifiedexponentialmovingaverage.NewModifiedExponentialMovingAverage(p)
+
+	case core.VelocityCorrectedExponentialMovingAverage:
+		p := velocitycorrectedexponentialmovingaverage.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return velocitycorrectedexponentialmovingaverage.NewVelocityCorrectedExponentialMovingAverage(p)
+
+	case core.PolynomialForecast:
+		p := polynomialforecast.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return polynomialforecast.NewPolynomialForecast(p)
+
+	case core.ParabolicVertex:
+		p := parabolicvertex.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return parabolicvertex.NewParabolicVertex(p)
+
+	case core.CubicVertex:
+		p := cubicvertex.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return cubicvertex.NewCubicVertex(p)
 
 	default:
 		return nil, fmt.Errorf("unsupported indicator: %s", identifier)

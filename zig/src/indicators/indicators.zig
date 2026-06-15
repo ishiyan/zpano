@@ -162,6 +162,22 @@ pub const hurst_difference = @import("jean_philippe_poton/hurst_difference/hurst
 
 pub const schaff_trend_cycle = @import("doug_schaff/schaff_trend_cycle/schaff_trend_cycle.zig");
 
+pub const adaptive_exponential_moving_average = @import("don_mak/adaptive_exponential_moving_average/adaptive_exponential_moving_average.zig");
+
+pub const instantaneous_sine_wave_period = @import("don_mak/instantaneous_sine_wave_period/instantaneous_sine_wave_period.zig");
+
+pub const polynomial_fit_derivative = @import("don_mak/polynomial_fit_derivative/polynomial_fit_derivative.zig");
+
+pub const mexican_hat_wavelet = @import("don_mak/mexican_hat_wavelet/mexican_hat_wavelet.zig");
+
+pub const sinc_wavelet_bandpass = @import("don_mak/sinc_wavelet_bandpass/sinc_wavelet_bandpass.zig");
+
+pub const modified_exponential_moving_average = @import("don_mak/modified_exponential_moving_average/modified_exponential_moving_average.zig");
+pub const velocity_corrected_exponential_moving_average = @import("don_mak/velocity_corrected_exponential_moving_average/velocity_corrected_exponential_moving_average.zig");
+pub const polynomial_forecast = @import("don_mak/polynomial_forecast/polynomial_forecast.zig");
+pub const parabolic_vertex = @import("don_mak/parabolic_vertex/parabolic_vertex.zig");
+pub const cubic_vertex = @import("don_mak/cubic_vertex/cubic_vertex.zig");
+
 pub const hilbert_transformer = @import("john_ehlers/hilbert_transformer/hilbert_transformer.zig");
 pub const homodyne_discriminator = @import("john_ehlers/hilbert_transformer/homodyne_discriminator.zig");
 pub const homodyne_discriminator_unrolled = @import("john_ehlers/hilbert_transformer/homodyne_discriminator_unrolled.zig");
@@ -270,6 +286,16 @@ comptime {
     _ = fractional_bands;
     _ = hurst_difference;
     _ = schaff_trend_cycle;
+    _ = adaptive_exponential_moving_average;
+    _ = instantaneous_sine_wave_period;
+    _ = polynomial_fit_derivative;
+    _ = mexican_hat_wavelet;
+    _ = sinc_wavelet_bandpass;
+    _ = modified_exponential_moving_average;
+    _ = velocity_corrected_exponential_moving_average;
+    _ = polynomial_forecast;
+    _ = parabolic_vertex;
+    _ = cubic_vertex;
     _ = frequency_response;
     _ = factory;
     _ = arnaud_legoux_moving_average;

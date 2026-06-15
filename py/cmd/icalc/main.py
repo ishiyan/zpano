@@ -124,6 +124,16 @@ _IDENTIFIER_MAP: dict[str, Identifier] = {
     'fractionalBands': Identifier.FRACTIONAL_BANDS,
     'hurstDifference': Identifier.HURST_DIFFERENCE,
     'schaffTrendCycle': Identifier.SCHAFF_TREND_CYCLE,
+    'adaptiveExponentialMovingAverage': Identifier.ADAPTIVE_EXPONENTIAL_MOVING_AVERAGE,
+    'instantaneousSineWavePeriod': Identifier.INSTANTANEOUS_SINE_WAVE_PERIOD,
+    'polynomialFitDerivative': Identifier.POLYNOMIAL_FIT_DERIVATIVE,
+    'mexicanHatWavelet': Identifier.MEXICAN_HAT_WAVELET,
+    'sincWaveletBandpass': Identifier.SINC_WAVELET_BANDPASS,
+    'modifiedExponentialMovingAverage': Identifier.MODIFIED_EXPONENTIAL_MOVING_AVERAGE,
+    'velocityCorrectedExponentialMovingAverage': Identifier.VELOCITY_CORRECTED_EXPONENTIAL_MOVING_AVERAGE,
+    'polynomialForecast': Identifier.POLYNOMIAL_FORECAST,
+    'parabolicVertex': Identifier.PARABOLIC_VERTEX,
+    'cubicVertex': Identifier.CUBIC_VERTEX,
 }
 
 

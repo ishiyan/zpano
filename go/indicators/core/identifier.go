@@ -357,6 +357,38 @@ const (
 	// SchaffTrendCycle identifies the Doug Schaff Schaff Trend Cycle (STC) indicator.
 	SchaffTrendCycle
 
+	// ── don mak ───────────────────────────────────────────────────────────
+
+	// AdaptiveExponentialMovingAverage identifies the Don Mak Adaptive Exponential Moving Average (AEMA) indicator.
+	AdaptiveExponentialMovingAverage
+
+	// InstantaneousSineWavePeriod identifies the Don Mak Instantaneous Sine Wave Period (ISWP) indicator.
+	InstantaneousSineWavePeriod
+
+	// PolynomialFitDerivative identifies the Don Mak Polynomial Fit Derivative (PFD) indicator.
+	PolynomialFitDerivative
+
+	// MexicanHatWavelet identifies the Don Mak Mexican Hat Wavelet (MHW) indicator.
+	MexicanHatWavelet
+
+	// SincWaveletBandpass identifies the Don Mak Sinc Wavelet Band-Pass (SWB) indicator.
+	SincWaveletBandpass
+
+	// ModifiedExponentialMovingAverage identifies the Don Mak Modified Exponential Moving Average (MEMA) indicator.
+	ModifiedExponentialMovingAverage
+
+	// VelocityCorrectedExponentialMovingAverage identifies the Don Mak Velocity-Corrected Exponential Moving Average (VCEMA) indicator.
+	VelocityCorrectedExponentialMovingAverage
+
+	// PolynomialForecast identifies the Don Mak Polynomial Forecast (POF) indicator.
+	PolynomialForecast
+
+	// ParabolicVertex identifies the Don Mak Parabolic Vertex (PVTX) indicator.
+	ParabolicVertex
+
+	// CubicVertex identifies the Don Mak Cubic Vertex (CVTX) indicator.
+	CubicVertex
+
 	last
 )
 
@@ -492,18 +524,30 @@ const (
 	maximumEntropySpectrum = "maximumEntropySpectrum"
 
 	// ── jean-philippe poton ───────────────────────────────────────────────
-	fractalDimensionIndex          = "fractalDimensionIndex"
-	fractalGraphDimensionIndex     = "fractalGraphDimensionIndex"
-	fractalAdaptiveSimpleMovingAverage  = "fractalAdaptiveSimpleMovingAverage"
-	fractalAdaptiveSimpleMovingAverage2 = "fractalAdaptiveSimpleMovingAverage2"
+	fractalDimensionIndex                      = "fractalDimensionIndex"
+	fractalGraphDimensionIndex                 = "fractalGraphDimensionIndex"
+	fractalAdaptiveSimpleMovingAverage         = "fractalAdaptiveSimpleMovingAverage"
+	fractalAdaptiveSimpleMovingAverage2        = "fractalAdaptiveSimpleMovingAverage2"
 	rescaledFractalAdaptiveSimpleMovingAverage = "rescaledFractalAdaptiveSimpleMovingAverage"
-	fractalBands                         = "fractalBands"
-	fractalBandsHybrideAdaptive          = "fractalBandsHybrideAdaptive"
-	fractionalBands                      = "fractionalBands"
-	hurstDifference                      = "hurstDifference"
+	fractalBands                               = "fractalBands"
+	fractalBandsHybrideAdaptive                = "fractalBandsHybrideAdaptive"
+	fractionalBands                            = "fractionalBands"
+	hurstDifference                            = "hurstDifference"
 
 	// ── doug schaff ───────────────────────────────────────────────────────
 	schaffTrendCycle = "schaffTrendCycle"
+
+	// ── don mak ───────────────────────────────────────────────────────────
+	adaptiveExponentialMovingAverage          = "adaptiveExponentialMovingAverage"
+	instantaneousSineWavePeriod               = "instantaneousSineWavePeriod"
+	polynomialFitDerivative                   = "polynomialFitDerivative"
+	mexicanHatWavelet                         = "mexicanHatWavelet"
+	sincWaveletBandpass                       = "sincWaveletBandpass"
+	modifiedExponentialMovingAverage          = "modifiedExponentialMovingAverage"
+	velocityCorrectedExponentialMovingAverage = "velocityCorrectedExponentialMovingAverage"
+	polynomialForecast                        = "polynomialForecast"
+	parabolicVertex                           = "parabolicVertex"
+	cubicVertex                               = "cubicVertex"
 )
 
 // String implements the Stringer interface.
@@ -722,6 +766,26 @@ func (i Identifier) String() string {
 		return hurstDifference
 	case SchaffTrendCycle:
 		return schaffTrendCycle
+	case AdaptiveExponentialMovingAverage:
+		return adaptiveExponentialMovingAverage
+	case InstantaneousSineWavePeriod:
+		return instantaneousSineWavePeriod
+	case PolynomialFitDerivative:
+		return polynomialFitDerivative
+	case MexicanHatWavelet:
+		return mexicanHatWavelet
+	case SincWaveletBandpass:
+		return sincWaveletBandpass
+	case ModifiedExponentialMovingAverage:
+		return modifiedExponentialMovingAverage
+	case VelocityCorrectedExponentialMovingAverage:
+		return velocityCorrectedExponentialMovingAverage
+	case PolynomialForecast:
+		return polynomialForecast
+	case ParabolicVertex:
+		return parabolicVertex
+	case CubicVertex:
+		return cubicVertex
 	default:
 		return unknown
 	}
@@ -977,6 +1041,26 @@ func (i *Identifier) UnmarshalJSON(data []byte) error {
 		*i = HurstDifference
 	case schaffTrendCycle:
 		*i = SchaffTrendCycle
+	case adaptiveExponentialMovingAverage:
+		*i = AdaptiveExponentialMovingAverage
+	case instantaneousSineWavePeriod:
+		*i = InstantaneousSineWavePeriod
+	case polynomialFitDerivative:
+		*i = PolynomialFitDerivative
+	case mexicanHatWavelet:
+		*i = MexicanHatWavelet
+	case sincWaveletBandpass:
+		*i = SincWaveletBandpass
+	case modifiedExponentialMovingAverage:
+		*i = ModifiedExponentialMovingAverage
+	case velocityCorrectedExponentialMovingAverage:
+		*i = VelocityCorrectedExponentialMovingAverage
+	case polynomialForecast:
+		*i = PolynomialForecast
+	case parabolicVertex:
+		*i = ParabolicVertex
+	case cubicVertex:
+		*i = CubicVertex
 	default:
 		return fmt.Errorf(errFmt, s)
 	}

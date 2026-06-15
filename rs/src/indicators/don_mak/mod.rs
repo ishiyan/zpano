@@ -1,0 +1,10 @@
+pub mod adaptive_exponential_moving_average;
+pub mod instantaneous_sine_wave_period;
+pub mod polynomial_fit_derivative;
+pub mod mexican_hat_wavelet;
+pub mod sinc_wavelet_bandpass;
+pub mod modified_exponential_moving_average;
+pub mod velocity_corrected_exponential_moving_average;
+pub mod polynomial_forecast;
+pub mod parabolic_vertex;
+pub mod cubic_vertex;

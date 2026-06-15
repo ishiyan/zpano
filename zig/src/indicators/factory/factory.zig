@@ -146,7 +146,7 @@ const psar_mod = @import("../welles_wilder/parabolic_stop_and_reverse/parabolic_
 const goertzel_mod = @import("../custom/goertzel_spectrum/goertzel_spectrum.zig");
 const maxent_mod = @import("../custom/maximum_entropy_spectrum/maximum_entropy_spectrum.zig");
 
-// jean-philippe poton
+// jean_philippe_poton
 const fdi_mod = @import("../jean_philippe_poton/fractal_dimension_index/fractal_dimension_index.zig");
 const fgdi_mod = @import("../jean_philippe_poton/fractal_graph_dimension_index/fractal_graph_dimension_index.zig");
 const frasma_mod = @import("../jean_philippe_poton/fractal_adaptive_simple_moving_average/fractal_adaptive_simple_moving_average.zig");
@@ -156,7 +156,21 @@ const fban_mod = @import("../jean_philippe_poton/fractal_bands/fractal_bands.zig
 const fbanha_mod = @import("../jean_philippe_poton/fractal_bands_hybride_adaptive/fractal_bands_hybride_adaptive.zig");
 const fctban_mod = @import("../jean_philippe_poton/fractional_bands/fractional_bands.zig");
 const hurdif_mod = @import("../jean_philippe_poton/hurst_difference/hurst_difference.zig");
+
+// doug_schaff
 const stc_mod = @import("../doug_schaff/schaff_trend_cycle/schaff_trend_cycle.zig");
+
+// don_mak
+const aema_mod = @import("../don_mak/adaptive_exponential_moving_average/adaptive_exponential_moving_average.zig");
+const iswp_mod = @import("../don_mak/instantaneous_sine_wave_period/instantaneous_sine_wave_period.zig");
+const pfd_mod = @import("../don_mak/polynomial_fit_derivative/polynomial_fit_derivative.zig");
+const mhw_mod = @import("../don_mak/mexican_hat_wavelet/mexican_hat_wavelet.zig");
+const swb_mod = @import("../don_mak/sinc_wavelet_bandpass/sinc_wavelet_bandpass.zig");
+const mema_mod = @import("../don_mak/modified_exponential_moving_average/modified_exponential_moving_average.zig");
+const vcema_mod = @import("../don_mak/velocity_corrected_exponential_moving_average/velocity_corrected_exponential_moving_average.zig");
+const pof_mod = @import("../don_mak/polynomial_forecast/polynomial_forecast.zig");
+const pvtx_mod = @import("../don_mak/parabolic_vertex/parabolic_vertex.zig");
+const cvtx_mod = @import("../don_mak/cubic_vertex/cubic_vertex.zig");
 
 pub const FactoryError = error{
     UnsupportedIndicator,
@@ -1370,6 +1384,94 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
             .quote_component = getQuoteComponent(obj),
             .trade_component = getTradeComponent(obj),
         }),
+
+        // ── don mak ────────────────────────────────────────────────────────
+        .adaptive_exponential_moving_average => createWithAllocParams(aema_mod.AdaptiveExponentialMovingAverage, aema_mod.AdaptiveExponentialMovingAverageParams, allocator, obj, .{
+            .alpha_max = getF64(obj, "alphaMax", 0.5),
+            .alpha_min = getF64(obj, "alphaMin", 0.05),
+            .omega0 = getF64(obj, "omega0", 1.0),
+            .smoothing = @as(i64, getInt(obj, "smoothing", 3)),
+            .bar_component = getBarComponent(obj),
+            .quote_component = getQuoteComponent(obj),
+            .trade_component = getTradeComponent(obj),
+        }),
+
+        .instantaneous_sine_wave_period => createWithAllocParams(iswp_mod.InstantaneousSineWavePeriod, iswp_mod.InstantaneousSineWavePeriodParams, allocator, obj, .{
+            .smoothing = @as(i64, getInt(obj, "smoothing", 0)),
+            .min_period = getF64(obj, "minPeriod", 4.0),
+            .max_period = getF64(obj, "maxPeriod", 50.0),
+            .error_threshold = getF64(obj, "errorThreshold", 20.0),
+            .dx = getF64(obj, "dx", 0.01),
+            .bar_component = getBarComponent(obj),
+            .quote_component = getQuoteComponent(obj),
+            .trade_component = getTradeComponent(obj),
+        }),
+
+        .polynomial_fit_derivative => createWithAllocParams(pfd_mod.PolynomialFitDerivative, pfd_mod.PolynomialFitDerivativeParams, allocator, obj, .{
+            .degree = getUsize(obj, "degree", 3),
+            .order = getUsize(obj, "order", 1),
+            .smoothing = @as(i64, getInt(obj, "smoothing", 6)),
+            .bar_component = getBarComponent(obj),
+            .quote_component = getQuoteComponent(obj),
+            .trade_component = getTradeComponent(obj),
+        }),
+
+        .mexican_hat_wavelet => createWithAllocParams(mhw_mod.MexicanHatWavelet, mhw_mod.MexicanHatWaveletParams, allocator, obj, .{
+            .band = band_blk: {
+                const bi = getInt(obj, "band", 1);
+                break :band_blk if (bi >= 0 and bi <= 3) @as(mhw_mod.Band, @enumFromInt(@as(u8, @intCast(bi)))) else mhw_mod.Band.mid;
+            },
+            .dilation = getF64(obj, "dilation", 0.0),
+            .period = getF64(obj, "period", 0.0),
+            .bar_component = getBarComponent(obj),
+            .quote_component = getQuoteComponent(obj),
+            .trade_component = getTradeComponent(obj),
+        }),
+
+        .sinc_wavelet_bandpass => createWithAllocParams(swb_mod.SincWaveletBandpass, swb_mod.SincWaveletBandpassParams, allocator, obj, .{
+            .band = swb_band_blk: {
+                const bi = getInt(obj, "band", 1);
+                break :swb_band_blk if (bi >= 0 and bi <= 3) @as(swb_mod.Band, @enumFromInt(@as(u8, @intCast(bi)))) else swb_mod.Band.mid;
+            },
+            .velocity = getBool(obj, "velocity", false),
+            .bar_component = getBarComponent(obj),
+            .quote_component = getQuoteComponent(obj),
+            .trade_component = getTradeComponent(obj),
+        }),
+
+        .modified_exponential_moving_average => createWithAllocParams(mema_mod.ModifiedExponentialMovingAverage, mema_mod.ModifiedExponentialMovingAverageParams, allocator, obj, .{
+            .period = getUsize(obj, "period", 6),
+            .degree = getUsize(obj, "degree", 3),
+            .skip = getUsize(obj, "skip", 1),
+            .bar_component = getBarComponent(obj),
+            .quote_component = getQuoteComponent(obj),
+            .trade_component = getTradeComponent(obj),
+        }),
+        .velocity_corrected_exponential_moving_average => createWithAllocParams(vcema_mod.VelocityCorrectedExponentialMovingAverage, vcema_mod.VelocityCorrectedExponentialMovingAverageParams, allocator, obj, .{
+            .period = getUsize(obj, "period", 6),
+            .degree = getUsize(obj, "degree", 3),
+            .bar_component = getBarComponent(obj),
+            .quote_component = getQuoteComponent(obj),
+            .trade_component = getTradeComponent(obj),
+        }),
+        .polynomial_forecast => createWithAllocParams(pof_mod.PolynomialForecast, pof_mod.PolynomialForecastParams, allocator, obj, .{
+            .degree = getUsize(obj, "degree", 3),
+            .order = getUsize(obj, "order", 1),
+            .smoothing = getUsize(obj, "smoothing", 0),
+            .bar_component = getBarComponent(obj),
+            .quote_component = getQuoteComponent(obj),
+            .trade_component = getTradeComponent(obj),
+        }),
+        .parabolic_vertex => createWithParams(pvtx_mod.ParabolicVertex, allocator, pvtx_mod.ParabolicVertex.init(.{
+            .bar_component = getBarComponent(obj),
+            .quote_component = getQuoteComponent(obj),
+            .trade_component = getTradeComponent(obj),
+        })),
+        .cubic_vertex => createWithParams(cvtx_mod.CubicVertex, allocator, cvtx_mod.CubicVertex.init(.{
+            .bar_component = getBarComponent(obj),
+            .quote_component = getQuoteComponent(obj),
+            .trade_component = getTradeComponent(obj),
+        })),
     };
 }
 

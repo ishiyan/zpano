@@ -806,6 +806,7 @@ export enum SimpleMovingAverageOutput {
 # Python — simple_moving_average/output.py
 class SimpleMovingAverageOutput(IntEnum):
     VALUE = 0
+    """The scalar value of the moving average."""
 ```
 
 ```zig
@@ -1950,19 +1951,54 @@ lists manually in `update_scalar()`.
 #### Params pattern
 
 Parameters are `@dataclass` classes with defaults. Component fields use `Optional[BarComponent]`
-with `None` meaning "use default". Every params file exports a `default_params()` function:
+with `None` meaning "use default". Every params file exports a `default_params()` function.
+
+**Per-field documentation (PEP 257 attribute docstrings).** Each dataclass field is documented
+with a `"""..."""` attribute docstring placed **immediately after** the field (not an inline `#`
+comment, not a comment above the field). This mirrors the per-field doc comments in the Go
+(`params.go`) and TS (`params.ts`) ports — Go uses a comment line above each field; TS uses a
+JSDoc block; Python uses the equivalent attribute docstring. The text reuses the TS-style
+description phrasing ("The …") followed by the Go-style constraint/default sentence. Because
+Python uses the `None` sentinel (not Go's zero / TS's `undefined`), component-field wording is
+phrased as "If not set, the bar component defaults to ClosePrice and is not shown in the
+indicator mnemonic." (MidPrice for quote, Price for trade):
 
 ```python
 @dataclass
 class SimpleMovingAverageParams:
+    """Parameters to create an instance of the Simple Moving Average indicator."""
+
     length: int = 20
+    """The number of periods to average.
+
+    The value should be >= 1. The default value is 20.
+    """
+
     bar_component: Optional[BarComponent] = None
+    """A component of a bar to use when updating the indicator with a bar sample.
+
+    If not set, the bar component defaults to ClosePrice and is not shown in the indicator mnemonic.
+    """
+
     quote_component: Optional[QuoteComponent] = None
+    """A component of a quote to use when updating the indicator with a quote sample.
+
+    If not set, the quote component defaults to MidPrice and is not shown in the indicator mnemonic.
+    """
+
     trade_component: Optional[TradeComponent] = None
+    """A component of a trade to use when updating the indicator with a trade sample.
+
+    If not set, the trade component defaults to Price and is not shown in the indicator mnemonic.
+    """
 
 def default_params() -> SimpleMovingAverageParams:
     return SimpleMovingAverageParams()
 ```
+
+Nested helper enums in `params.py` (e.g. a `Band` `IntEnum`) document each member with the same
+attribute-docstring style — never an inline `#` comment. Attribute docstrings are inert at
+runtime (the `Enum`/`dataclass` machinery ignores the bare string expression), so they are safe.
 
 Multi-constructor indicators (EMA) have multiple params classes and use `@staticmethod`
 factory methods: `ExponentialMovingAverage.from_length(params)` and
@@ -1974,11 +2010,29 @@ Ehlers indicators with coefficient pre-computation use a `create(params)` static
 #### Output enum pattern
 
 Per-indicator output enums are `IntEnum` starting at 0. Naming uses the long-form
-`<IndicatorName>Output` (same as TypeScript):
+`<IndicatorName>Output` (same as TypeScript). Each member carries a PEP 257 attribute
+docstring (placed immediately after the member, blank line between members), reusing the
+description from the Go/TS output enum:
 
 ```python
 class SimpleMovingAverageOutput(IntEnum):
+    """Describes the outputs of the indicator."""
+
     VALUE = 0
+    """The scalar value of the moving average."""
+```
+
+Multi-output indicators document every member the same way, e.g.:
+
+```python
+class CubicVertexOutput(IntEnum):
+    """Describes the outputs of the indicator."""
+
+    BARS_TO_NEAR_TURN = 0
+    """The number of bars to the more imminent turning point."""
+
+    BARS_TO_FAR_TURN = 1
+    """The number of bars to the more distant turning point."""
 ```
 
 #### Import conventions

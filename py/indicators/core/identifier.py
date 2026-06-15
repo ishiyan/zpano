@@ -352,3 +352,35 @@ class Identifier(IntEnum):
 
     # Identifies the Doug Schaff Schaff Trend Cycle (STC) indicator.
     SCHAFF_TREND_CYCLE = 93
+
+    # ── don mak ───────────────────────────────────────────────────────────
+
+    # Identifies the Don Mak Adaptive Exponential Moving Average (AEMA) indicator.
+    ADAPTIVE_EXPONENTIAL_MOVING_AVERAGE = 94
+
+    # Identifies the Don Mak Instantaneous Sine Wave Period (ISWP) indicator.
+    INSTANTANEOUS_SINE_WAVE_PERIOD = 95
+
+    # Identifies the Don Mak Polynomial Fit Derivative (PFD) indicator.
+    POLYNOMIAL_FIT_DERIVATIVE = 96
+
+    # Identifies the Don Mak Mexican Hat Wavelet (MHW) indicator.
+    MEXICAN_HAT_WAVELET = 97
+
+    # Identifies the Don Mak Sinc Wavelet Band-Pass (SWB) indicator.
+    SINC_WAVELET_BANDPASS = 98
+
+    # Identifies the Don Mak Modified Exponential Moving Average (MEMA) indicator.
+    MODIFIED_EXPONENTIAL_MOVING_AVERAGE = 99
+
+    # Identifies the Don Mak Velocity-Corrected Exponential Moving Average (VCEMA) indicator.
+    VELOCITY_CORRECTED_EXPONENTIAL_MOVING_AVERAGE = 100
+
+    # Identifies the Don Mak Polynomial Forecast (POF) indicator.
+    POLYNOMIAL_FORECAST = 101
+
+    # Identifies the Don Mak Parabolic Vertex (PVTX) indicator.
+    PARABOLIC_VERTEX = 102
+
+    # Identifies the Don Mak Cubic Vertex (CVTX) indicator.
+    CUBIC_VERTEX = 103

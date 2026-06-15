@@ -120,6 +120,17 @@ func TestIdentifierString(t *testing.T) {
 		{MaximumEntropySpectrum, maximumEntropySpectrum},
 		// ── doug schaff ───────────────────────────────────────────────────────
 		{SchaffTrendCycle, schaffTrendCycle},
+		// ── don mak ───────────────────────────────────────────────────────────
+		{AdaptiveExponentialMovingAverage, adaptiveExponentialMovingAverage},
+		{InstantaneousSineWavePeriod, instantaneousSineWavePeriod},
+		{PolynomialFitDerivative, polynomialFitDerivative},
+		{MexicanHatWavelet, mexicanHatWavelet},
+		{SincWaveletBandpass, sincWaveletBandpass},
+		{ModifiedExponentialMovingAverage, modifiedExponentialMovingAverage},
+		{VelocityCorrectedExponentialMovingAverage, velocityCorrectedExponentialMovingAverage},
+		{PolynomialForecast, polynomialForecast},
+		{ParabolicVertex, parabolicVertex},
+		{CubicVertex, cubicVertex},
 		// ── boundary ──────────────────────────────────────────────────────────
 		{last, unknown},
 		{Identifier(0), unknown},
@@ -252,6 +263,17 @@ func TestIdentifierIsKnown(t *testing.T) {
 		{MaximumEntropySpectrum, true},
 		// ── doug schaff ───────────────────────────────────────────────────────
 		{SchaffTrendCycle, true},
+		// ── don mak ───────────────────────────────────────────────────────────
+		{AdaptiveExponentialMovingAverage, true},
+		{InstantaneousSineWavePeriod, true},
+		{PolynomialFitDerivative, true},
+		{MexicanHatWavelet, true},
+		{SincWaveletBandpass, true},
+		{ModifiedExponentialMovingAverage, true},
+		{VelocityCorrectedExponentialMovingAverage, true},
+		{PolynomialForecast, true},
+		{ParabolicVertex, true},
+		{CubicVertex, true},
 		// ── boundary ──────────────────────────────────────────────────────────
 		{last, false},
 		{Identifier(0), false},
@@ -388,6 +410,17 @@ func TestIdentifierMarshalJSON(t *testing.T) {
 		{MaximumEntropySpectrum, dqs + maximumEntropySpectrum + dqs, true},
 		// ── doug schaff ───────────────────────────────────────────────────────
 		{SchaffTrendCycle, dqs + schaffTrendCycle + dqs, true},
+		// ── don mak ───────────────────────────────────────────────────────────
+		{AdaptiveExponentialMovingAverage, dqs + adaptiveExponentialMovingAverage + dqs, true},
+		{InstantaneousSineWavePeriod, dqs + instantaneousSineWavePeriod + dqs, true},
+		{PolynomialFitDerivative, dqs + polynomialFitDerivative + dqs, true},
+		{MexicanHatWavelet, dqs + mexicanHatWavelet + dqs, true},
+		{SincWaveletBandpass, dqs + sincWaveletBandpass + dqs, true},
+		{ModifiedExponentialMovingAverage, dqs + modifiedExponentialMovingAverage + dqs, true},
+		{VelocityCorrectedExponentialMovingAverage, dqs + velocityCorrectedExponentialMovingAverage + dqs, true},
+		{PolynomialForecast, dqs + polynomialForecast + dqs, true},
+		{ParabolicVertex, dqs + parabolicVertex + dqs, true},
+		{CubicVertex, dqs + cubicVertex + dqs, true},
 		// ── boundary ──────────────────────────────────────────────────────────
 		{last, nilstr, false},
 		{Identifier(9999), nilstr, false},
@@ -537,6 +570,17 @@ func TestIdentifierUnmarshalJSON(t *testing.T) {
 		{MaximumEntropySpectrum, dqs + maximumEntropySpectrum + dqs, true},
 		// ── doug schaff ───────────────────────────────────────────────────────
 		{SchaffTrendCycle, dqs + schaffTrendCycle + dqs, true},
+		// ── don mak ───────────────────────────────────────────────────────────
+		{AdaptiveExponentialMovingAverage, dqs + adaptiveExponentialMovingAverage + dqs, true},
+		{InstantaneousSineWavePeriod, dqs + instantaneousSineWavePeriod + dqs, true},
+		{PolynomialFitDerivative, dqs + polynomialFitDerivative + dqs, true},
+		{MexicanHatWavelet, dqs + mexicanHatWavelet + dqs, true},
+		{SincWaveletBandpass, dqs + sincWaveletBandpass + dqs, true},
+		{ModifiedExponentialMovingAverage, dqs + modifiedExponentialMovingAverage + dqs, true},
+		{VelocityCorrectedExponentialMovingAverage, dqs + velocityCorrectedExponentialMovingAverage + dqs, true},
+		{PolynomialForecast, dqs + polynomialForecast + dqs, true},
+		{ParabolicVertex, dqs + parabolicVertex + dqs, true},
+		{CubicVertex, dqs + cubicVertex + dqs, true},
 		// ── boundary ──────────────────────────────────────────────────────────
 		{zero, "\"unknown\"", false},
 		{zero, "\"foobar\"", false},
