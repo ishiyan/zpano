@@ -27,3 +27,4 @@ pub mod doug_schaff;
 pub mod don_mak;
 pub mod raymond_lee;
 pub mod zurab_silagadze;
+pub mod william_blau;

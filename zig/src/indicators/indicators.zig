@@ -180,6 +180,8 @@ pub const cubic_vertex = @import("don_mak/cubic_vertex/cubic_vertex.zig");
 pub const quantum_price_levels = @import("raymond_lee/quantum_price_levels/quantum_price_levels.zig");
 pub const moving_mini_max = @import("zurab_silagadze/moving_mini_max/moving_mini_max.zig");
 
+pub const true_strength_index = @import("william_blau/true_strength_index/true_strength_index.zig");
+
 pub const hilbert_transformer = @import("john_ehlers/hilbert_transformer/hilbert_transformer.zig");
 pub const homodyne_discriminator = @import("john_ehlers/hilbert_transformer/homodyne_discriminator.zig");
 pub const homodyne_discriminator_unrolled = @import("john_ehlers/hilbert_transformer/homodyne_discriminator_unrolled.zig");
@@ -300,6 +302,7 @@ comptime {
     _ = cubic_vertex;
     _ = quantum_price_levels;
     _ = moving_mini_max;
+    _ = true_strength_index;
     _ = frequency_response;
     _ = factory;
     _ = arnaud_legoux_moving_average;

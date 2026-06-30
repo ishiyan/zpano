@@ -399,6 +399,11 @@ const (
 	// MovingMiniMax identifies the Zurab Silagadze Moving Mini-Max (MMM) indicator.
 	MovingMiniMax
 
+	// ── william blau ───────────────────────────────────────────────────────
+
+	// TrueStrengthIndex identifies the William Blau True Strength Index (TSI) indicator.
+	TrueStrengthIndex
+
 	last
 )
 
@@ -560,6 +565,7 @@ const (
 	cubicVertex                               = "cubicVertex"
 	quantumPriceLevels                        = "quantumPriceLevels"
 	movingMiniMax                             = "movingMiniMax"
+	trueStrengthIndex                         = "trueStrengthIndex"
 )
 
 // String implements the Stringer interface.
@@ -802,6 +808,8 @@ func (i Identifier) String() string {
 		return quantumPriceLevels
 	case MovingMiniMax:
 		return movingMiniMax
+	case TrueStrengthIndex:
+		return trueStrengthIndex
 	default:
 		return unknown
 	}
@@ -1081,6 +1089,8 @@ func (i *Identifier) UnmarshalJSON(data []byte) error {
 		*i = QuantumPriceLevels
 	case movingMiniMax:
 		*i = MovingMiniMax
+	case trueStrengthIndex:
+		*i = TrueStrengthIndex
 	default:
 		return fmt.Errorf(errFmt, s)
 	}

@@ -1674,7 +1674,7 @@ pub static DESCRIPTORS: &[Descriptor] = &[
         input_requirement: ScalarInput,
         volume_usage: NoVolume,
         outputs: &[
-            OutputDescriptor { kind: 0, shape: Scalar, role: Smoother, pane: Price },
+            OutputDescriptor { kind: 1, shape: Scalar, role: Smoother, pane: Price },
         ],
     },
     Descriptor {
@@ -1684,7 +1684,7 @@ pub static DESCRIPTORS: &[Descriptor] = &[
         input_requirement: ScalarInput,
         volume_usage: NoVolume,
         outputs: &[
-            OutputDescriptor { kind: 0, shape: Scalar, role: Smoother, pane: Price },
+            OutputDescriptor { kind: 1, shape: Scalar, role: Smoother, pane: Price },
         ],
     },
     Descriptor {
@@ -1694,7 +1694,7 @@ pub static DESCRIPTORS: &[Descriptor] = &[
         input_requirement: ScalarInput,
         volume_usage: NoVolume,
         outputs: &[
-            OutputDescriptor { kind: 0, shape: Scalar, role: Smoother, pane: Price },
+            OutputDescriptor { kind: 1, shape: Scalar, role: Smoother, pane: Price },
         ],
     },
     Descriptor {
@@ -1704,10 +1704,10 @@ pub static DESCRIPTORS: &[Descriptor] = &[
         input_requirement: ScalarInput,
         volume_usage: NoVolume,
         outputs: &[
-            OutputDescriptor { kind: 0, shape: Scalar, role: Smoother, pane: Price },
-            OutputDescriptor { kind: 1, shape: Scalar, role: Envelope, pane: Price },
+            OutputDescriptor { kind: 1, shape: Scalar, role: Smoother, pane: Price },
             OutputDescriptor { kind: 2, shape: Scalar, role: Envelope, pane: Price },
-            OutputDescriptor { kind: 3, shape: Band, role: Envelope, pane: Price },
+            OutputDescriptor { kind: 3, shape: Scalar, role: Envelope, pane: Price },
+            OutputDescriptor { kind: 4, shape: Band, role: Envelope, pane: Price },
         ],
     },
     Descriptor {
@@ -1717,10 +1717,10 @@ pub static DESCRIPTORS: &[Descriptor] = &[
         input_requirement: ScalarInput,
         volume_usage: NoVolume,
         outputs: &[
-            OutputDescriptor { kind: 0, shape: Scalar, role: Smoother, pane: Price },
-            OutputDescriptor { kind: 1, shape: Scalar, role: Envelope, pane: Price },
+            OutputDescriptor { kind: 1, shape: Scalar, role: Smoother, pane: Price },
             OutputDescriptor { kind: 2, shape: Scalar, role: Envelope, pane: Price },
-            OutputDescriptor { kind: 3, shape: Band, role: Envelope, pane: Price },
+            OutputDescriptor { kind: 3, shape: Scalar, role: Envelope, pane: Price },
+            OutputDescriptor { kind: 4, shape: Band, role: Envelope, pane: Price },
         ],
     },
     Descriptor {
@@ -1730,10 +1730,10 @@ pub static DESCRIPTORS: &[Descriptor] = &[
         input_requirement: ScalarInput,
         volume_usage: NoVolume,
         outputs: &[
-            OutputDescriptor { kind: 0, shape: Scalar, role: Smoother, pane: Price },
-            OutputDescriptor { kind: 1, shape: Scalar, role: Envelope, pane: Price },
+            OutputDescriptor { kind: 1, shape: Scalar, role: Smoother, pane: Price },
             OutputDescriptor { kind: 2, shape: Scalar, role: Envelope, pane: Price },
-            OutputDescriptor { kind: 3, shape: Band, role: Envelope, pane: Price },
+            OutputDescriptor { kind: 3, shape: Scalar, role: Envelope, pane: Price },
+            OutputDescriptor { kind: 4, shape: Band, role: Envelope, pane: Price },
         ],
     },
     Descriptor {
@@ -1883,6 +1883,18 @@ pub static DESCRIPTORS: &[Descriptor] = &[
             OutputDescriptor { kind: 4, shape: Levels, role: SupportResistance, pane: Price },
             OutputDescriptor { kind: 5, shape: crate::indicators::core::outputs::shape::Shape::Polyline, role: Distribution, pane: Own },
             OutputDescriptor { kind: 6, shape: crate::indicators::core::outputs::shape::Shape::Polyline, role: Distribution, pane: Own },
+        ],
+    },
+    // ── william blau ───────────────────────────────────────────────────────
+    Descriptor {
+        identifier: TrueStrengthIndex,
+        family: "William Blau",
+        adaptivity: Static,
+        input_requirement: ScalarInput,
+        volume_usage: NoVolume,
+        outputs: &[
+            OutputDescriptor { kind: 1, shape: Scalar, role: BoundedOscillator, pane: Own },
+            OutputDescriptor { kind: 2, shape: Scalar, role: Signal, pane: Own },
         ],
     },
 ];

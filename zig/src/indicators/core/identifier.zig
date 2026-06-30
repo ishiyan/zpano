@@ -280,6 +280,8 @@ pub const Identifier = enum(u8) {
     quantum_price_levels = 104,
     /// Identifies the Zurab Silagadze Moving Mini-Max (MMM) indicator.
     moving_mini_max = 105,
+    /// Identifies the William Blau True Strength Index (TSI) indicator.
+    true_strength_index = 106,
 
     /// Returns the camelCase string representation matching Go's String().
     pub fn asStr(self: Identifier) []const u8 {
@@ -436,6 +438,7 @@ pub const Identifier = enum(u8) {
             .cubic_vertex => "cubicVertex",
             .quantum_price_levels => "quantumPriceLevels",
             .moving_mini_max => "movingMiniMax",
+            .true_strength_index => "trueStrengthIndex",
         };
     }
 
@@ -594,6 +597,7 @@ pub const Identifier = enum(u8) {
             .{ "cubicVertex", Identifier.cubic_vertex },
             .{ "quantumPriceLevels", Identifier.quantum_price_levels },
             .{ "movingMiniMax", Identifier.moving_mini_max },
+            .{ "trueStrengthIndex", Identifier.true_strength_index },
         };
 
         inline for (map) |entry| {

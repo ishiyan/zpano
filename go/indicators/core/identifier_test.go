@@ -133,6 +133,7 @@ func TestIdentifierString(t *testing.T) {
 		{CubicVertex, cubicVertex},
 		{QuantumPriceLevels, quantumPriceLevels},
 		{MovingMiniMax, movingMiniMax},
+		{TrueStrengthIndex, trueStrengthIndex},
 		// ── boundary ──────────────────────────────────────────────────────────
 		{last, unknown},
 		{Identifier(0), unknown},
@@ -278,6 +279,7 @@ func TestIdentifierIsKnown(t *testing.T) {
 		{CubicVertex, true},
 		{QuantumPriceLevels, true},
 		{MovingMiniMax, true},
+		{TrueStrengthIndex, true},
 		// ── boundary ──────────────────────────────────────────────────────────
 		{last, false},
 		{Identifier(0), false},
@@ -427,6 +429,7 @@ func TestIdentifierMarshalJSON(t *testing.T) {
 		{CubicVertex, dqs + cubicVertex + dqs, true},
 		{QuantumPriceLevels, dqs + quantumPriceLevels + dqs, true},
 		{MovingMiniMax, dqs + movingMiniMax + dqs, true},
+		{TrueStrengthIndex, dqs + trueStrengthIndex + dqs, true},
 		// ── boundary ──────────────────────────────────────────────────────────
 		{last, nilstr, false},
 		{Identifier(9999), nilstr, false},
@@ -589,6 +592,7 @@ func TestIdentifierUnmarshalJSON(t *testing.T) {
 		{CubicVertex, dqs + cubicVertex + dqs, true},
 		{QuantumPriceLevels, dqs + quantumPriceLevels + dqs, true},
 		{MovingMiniMax, dqs + movingMiniMax + dqs, true},
+		{TrueStrengthIndex, dqs + trueStrengthIndex + dqs, true},
 		// ── boundary ──────────────────────────────────────────────────────────
 		{zero, "\"unknown\"", false},
 		{zero, "\"foobar\"", false},

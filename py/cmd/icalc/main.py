@@ -138,6 +138,7 @@ _IDENTIFIER_MAP: dict[str, Identifier] = {
     'cubicVertex': Identifier.CUBIC_VERTEX,
     'quantumPriceLevels': Identifier.QUANTUM_PRICE_LEVELS,
     'movingMiniMax': Identifier.MOVING_MINI_MAX,
+    'trueStrengthIndex': Identifier.TRUE_STRENGTH_INDEX,
 }
 
 

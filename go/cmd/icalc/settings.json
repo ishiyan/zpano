@@ -104,5 +104,6 @@
   { "identifier": "parabolicVertex", "params": {} },
   { "identifier": "cubicVertex", "params": {} },
   { "identifier": "quantumPriceLevels", "params": { "lookback": 100 } },
-  { "identifier": "movingMiniMax", "params": { "m": 5, "n": 50, "numExtrema": 3 } }
+  { "identifier": "movingMiniMax", "params": { "m": 5, "n": 50, "numExtrema": 3 } },
+  { "identifier": "trueStrengthIndex", "params": { "q": 2, "r": 20, "s": 5, "u": 3, "ul": 3 } }
 ]

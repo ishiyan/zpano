@@ -39,7 +39,15 @@ describe('ArnaudLegouxMovingAverage', () => {
                 if (Number.isNaN(exp)) {
                     expect(act).toBeNaN();
                 } else {
-                    expect(act).toBeCloseTo(exp, 13);
+                    // Use an absolute tolerance of 1e-13 to match the Go, Rust and
+                    // Zig ALMA tests. Jasmine's toBeCloseTo(exp, 13) only allows
+                    // 5e-14, which is too strict here: the canonical reference data
+                    // is generated with compensated (Neumaier) weight-normalisation
+                    // summation, whereas the streaming implementations use a naive
+                    // running sum. The two differ by up to ~6e-14 at output
+                    // magnitudes around 130, which is well within the project's
+                    // 1e-13 indicator tolerance.
+                    expect(Math.abs(act - exp)).toBeLessThan(1e-13);
                 }
                 expect(alma.isPrimed()).toBe(true);
             }

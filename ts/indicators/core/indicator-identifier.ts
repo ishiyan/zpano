@@ -386,4 +386,9 @@ export enum IndicatorIdentifier {
 
     /** Identifies the Zurab Silagadze __Moving Mini-Max__ (MMM) indicator. */
     MovingMiniMax,
+
+    // ── william blau ───────────────────────────────────────────────────────
+
+    /** Identifies the William Blau __True Strength Index__ (TSI) indicator. */
+    TrueStrengthIndex,
 }

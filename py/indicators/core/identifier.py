@@ -394,3 +394,8 @@ class Identifier(IntEnum):
 
     # Identifies the Zurab Silagadze Moving Mini-Max (MMM) indicator.
     MOVING_MINI_MAX = 105
+
+    # ── william blau ──────────────────────────────────────────────────────
+
+    # Identifies the William Blau True Strength Index (TSI) indicator.
+    TRUE_STRENGTH_INDEX = 106

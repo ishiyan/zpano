@@ -344,6 +344,9 @@ const descriptors: Map<IndicatorIdentifier, Descriptor> = new Map<IndicatorIdent
   [IndicatorIdentifier.CubicVertex, desc(IndicatorIdentifier.CubicVertex, 'Don Mak', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Reversal, P.Own), out(1, S.Scalar, R.Reversal, P.Own)])],
   [IndicatorIdentifier.QuantumPriceLevels, desc(IndicatorIdentifier.QuantumPriceLevels, 'Raymond Lee', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Oscillator, P.Own), out(1, S.Scalar, R.Volatility, P.Own), out(2, S.Levels, R.Distribution, P.Own), out(3, S.Levels, R.SupportResistance, P.Price), out(4, S.Levels, R.SupportResistance, P.Price)])],
   [IndicatorIdentifier.MovingMiniMax, desc(IndicatorIdentifier.MovingMiniMax, 'Zurab Silagadze', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Reversal, P.Own), out(1, S.Scalar, R.Reversal, P.Own), out(2, S.Levels, R.SupportResistance, P.Price), out(3, S.Levels, R.SupportResistance, P.Price), out(4, S.Polyline, R.Distribution, P.Own), out(5, S.Polyline, R.Distribution, P.Own)])],
+
+  // ── william blau ───────────────────────────────────────────────────────
+  [IndicatorIdentifier.TrueStrengthIndex, desc(IndicatorIdentifier.TrueStrengthIndex, 'William Blau', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.BoundedOscillator, P.Own), out(1, S.Scalar, R.Signal, P.Own)])],
 ]);
 
 /**

@@ -648,46 +648,46 @@ var descriptors = map[Identifier]Descriptor{
 	FractalAdaptiveSimpleMovingAverage: {
 		Identifier: FractalAdaptiveSimpleMovingAverage, Family: "Jean-Philippe Poton",
 		Adaptivity: Adaptive, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
-		Outputs: []OutputDescriptor{{Kind: 0 /* Value */, Shape: shape.Scalar, Role: Smoother, Pane: Price}},
+		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Smoother, Pane: Price}},
 	},
 	FractalAdaptiveSimpleMovingAverage2: {
 		Identifier: FractalAdaptiveSimpleMovingAverage2, Family: "Jean-Philippe Poton",
 		Adaptivity: Adaptive, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
-		Outputs: []OutputDescriptor{{Kind: 0 /* Value */, Shape: shape.Scalar, Role: Smoother, Pane: Price}},
+		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Smoother, Pane: Price}},
 	},
 	RescaledFractalAdaptiveSimpleMovingAverage: {
 		Identifier: RescaledFractalAdaptiveSimpleMovingAverage, Family: "Jean-Philippe Poton",
 		Adaptivity: Adaptive, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
-		Outputs: []OutputDescriptor{{Kind: 0 /* Value */, Shape: shape.Scalar, Role: Smoother, Pane: Price}},
+		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Smoother, Pane: Price}},
 	},
 	FractalBands: {
 		Identifier: FractalBands, Family: "Jean-Philippe Poton",
 		Adaptivity: Adaptive, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
 		Outputs: []OutputDescriptor{
-			{Kind: 0 /* Value */, Shape: shape.Scalar, Role: Smoother, Pane: Price},
-			{Kind: 1 /* Upper */, Shape: shape.Scalar, Role: Envelope, Pane: Price},
-			{Kind: 2 /* Lower */, Shape: shape.Scalar, Role: Envelope, Pane: Price},
-			{Kind: 3 /* Band */, Shape: shape.Band, Role: Envelope, Pane: Price},
+			{Kind: 1 /* Frasma2 */, Shape: shape.Scalar, Role: Smoother, Pane: Price},
+			{Kind: 2 /* Upper */, Shape: shape.Scalar, Role: Envelope, Pane: Price},
+			{Kind: 3 /* Lower */, Shape: shape.Scalar, Role: Envelope, Pane: Price},
+			{Kind: 4 /* Band */, Shape: shape.Band, Role: Envelope, Pane: Price},
 		},
 	},
 	FractalBandsHybrideAdaptive: {
 		Identifier: FractalBandsHybrideAdaptive, Family: "Jean-Philippe Poton",
 		Adaptivity: Adaptive, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
 		Outputs: []OutputDescriptor{
-			{Kind: 0 /* Value */, Shape: shape.Scalar, Role: Smoother, Pane: Price},
-			{Kind: 1 /* Upper */, Shape: shape.Scalar, Role: Envelope, Pane: Price},
-			{Kind: 2 /* Lower */, Shape: shape.Scalar, Role: Envelope, Pane: Price},
-			{Kind: 3 /* Band */, Shape: shape.Band, Role: Envelope, Pane: Price},
+			{Kind: 1 /* Frasma2 */, Shape: shape.Scalar, Role: Smoother, Pane: Price},
+			{Kind: 2 /* Upper */, Shape: shape.Scalar, Role: Envelope, Pane: Price},
+			{Kind: 3 /* Lower */, Shape: shape.Scalar, Role: Envelope, Pane: Price},
+			{Kind: 4 /* Band */, Shape: shape.Band, Role: Envelope, Pane: Price},
 		},
 	},
 	FractionalBands: {
 		Identifier: FractionalBands, Family: "Jean-Philippe Poton",
 		Adaptivity: Adaptive, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
 		Outputs: []OutputDescriptor{
-			{Kind: 0 /* Value */, Shape: shape.Scalar, Role: Smoother, Pane: Price},
-			{Kind: 1 /* Upper */, Shape: shape.Scalar, Role: Envelope, Pane: Price},
-			{Kind: 2 /* Lower */, Shape: shape.Scalar, Role: Envelope, Pane: Price},
-			{Kind: 3 /* Band */, Shape: shape.Band, Role: Envelope, Pane: Price},
+			{Kind: 1 /* Frasma2 */, Shape: shape.Scalar, Role: Smoother, Pane: Price},
+			{Kind: 2 /* Upper */, Shape: shape.Scalar, Role: Envelope, Pane: Price},
+			{Kind: 3 /* Lower */, Shape: shape.Scalar, Role: Envelope, Pane: Price},
+			{Kind: 4 /* Band */, Shape: shape.Band, Role: Envelope, Pane: Price},
 		},
 	},
 	HurstDifference: {
@@ -824,6 +824,17 @@ var descriptors = map[Identifier]Descriptor{
 			{Kind: 4 /* Supports */, Shape: shape.Levels, Role: SupportResistance, Pane: Price},
 			{Kind: 5 /* UpDistribution */, Shape: shape.Polyline, Role: Distribution, Pane: Own},
 			{Kind: 6 /* DownDistribution */, Shape: shape.Polyline, Role: Distribution, Pane: Own},
+		},
+	},
+
+	// ── william blau ───────────────────────────────────────────────────────
+
+	TrueStrengthIndex: {
+		Identifier: TrueStrengthIndex, Family: "William Blau",
+		Adaptivity: Static, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{
+			{Kind: 1 /* TSI */, Shape: shape.Scalar, Role: BoundedOscillator, Pane: Own},
+			{Kind: 2 /* Signal */, Shape: shape.Scalar, Role: Signal, Pane: Own},
 		},
 	},
 }

@@ -281,6 +281,8 @@ pub enum Identifier {
     QuantumPriceLevels = 104,
     /// Identifies the Zurab Silagadze Moving Mini-Max (MMM) indicator.
     MovingMiniMax = 105,
+    /// Identifies the William Blau True Strength Index (TSI) indicator.
+    TrueStrengthIndex = 106,
 }
 
 impl Identifier {
@@ -401,6 +403,7 @@ impl Identifier {
             Self::CubicVertex => "cubicVertex",
             Self::QuantumPriceLevels => "quantumPriceLevels",
             Self::MovingMiniMax => "movingMiniMax",
+            Self::TrueStrengthIndex => "trueStrengthIndex",
         }
     }
 
@@ -525,6 +528,7 @@ impl Identifier {
             "cubicVertex" => Some(Self::CubicVertex),
             "quantumPriceLevels" => Some(Self::QuantumPriceLevels),
             "movingMiniMax" => Some(Self::MovingMiniMax),
+            "trueStrengthIndex" => Some(Self::TrueStrengthIndex),
             _ => None,
         }
     }

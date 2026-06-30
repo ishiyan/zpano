@@ -687,4 +687,11 @@ def create_indicator(
         from ..zurab_silagadze.moving_mini_max.moving_mini_max import MovingMiniMax
         return MovingMiniMax(_apply(default_params(), params))
 
+    # ── william blau ──────────────────────────────────────────────────────
+
+    if identifier == Identifier.TRUE_STRENGTH_INDEX:
+        from ..william_blau.true_strength_index.params import default_params
+        from ..william_blau.true_strength_index.true_strength_index import TrueStrengthIndex
+        return TrueStrengthIndex(_apply(default_params(), params))
+
     raise ValueError(f"unsupported indicator: {identifier}")

@@ -113,6 +113,7 @@ import (
 	"zpano/indicators/welleswilder/parabolicstopandreverse"
 	"zpano/indicators/welleswilder/relativestrengthindex"
 	"zpano/indicators/welleswilder/truerange"
+	"zpano/indicators/williamblau/truestrengthindex"
 	"zpano/indicators/zurabsilagadze/movingminimax"
 )
 
@@ -1184,6 +1185,16 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 		}
 
 		return movingminimax.NewMovingMiniMax(p)
+
+	// ── william blau ───────────────────────────────────────────────────────
+
+	case core.TrueStrengthIndex:
+		p := truestrengthindex.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return truestrengthindex.NewTrueStrengthIndex(p)
 
 	default:
 		return nil, fmt.Errorf("unsupported indicator: %s", identifier)

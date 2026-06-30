@@ -542,6 +542,13 @@ _descriptors: dict[Id, Descriptor] = {
          _o(3, S.LEVELS, R.SUPPORT_RESISTANCE, P.PRICE),
          _o(4, S.POLYLINE, R.DISTRIBUTION, P.OWN),
          _o(5, S.POLYLINE, R.DISTRIBUTION, P.OWN)]),
+
+    # ── william blau ──────────────────────────────────────────────────────
+
+    Id.TRUE_STRENGTH_INDEX: _d(
+        Id.TRUE_STRENGTH_INDEX, "William Blau", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
+        [_o(0, S.SCALAR, R.BOUNDED_OSCILLATOR, P.OWN),
+         _o(1, S.SCALAR, R.SIGNAL, P.OWN)]),
 }
 
 

@@ -250,6 +250,8 @@ import { defaultParams as defaultPvtxParams } from '../don-mak/parabolic-vertex/
 import { defaultParams as defaultCvtxParams } from '../don-mak/cubic-vertex/params.js';
 import { defaultParams as defaultQplParams } from '../raymond-lee/quantum-price-levels/params.js';
 import { defaultParams as defaultMmmParams } from '../zurab-silagadze/moving-mini-max/params.js';
+import { TrueStrengthIndex } from '../william-blau/true-strength-index/true-strength-index.js';
+import { defaultParams as defaultTsiParams } from '../william-blau/true-strength-index/params.js';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -705,6 +707,9 @@ export function createIndicator(identifier: IndicatorIdentifier, params?: Record
 
         case IndicatorIdentifier.MovingMiniMax:
             return new MovingMiniMax({ ...defaultMmmParams(), ...p });
+
+        case IndicatorIdentifier.TrueStrengthIndex:
+            return new TrueStrengthIndex({ ...defaultTsiParams(), ...p });
 
         default:
             throw new Error(`Unsupported indicator: ${IndicatorIdentifier[identifier] ?? identifier}`);
