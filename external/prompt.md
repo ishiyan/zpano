@@ -29,12 +29,6 @@ These are:
   - ./py/performance/ratios.py contains my im plementation of some functionality inspired by the sources above
   - ./py/performance/test_performance_ratios.py contains tests with master data created from `braverock` code in R environment (https://www.datacamp.com/datalab/w/28c21593-21e6-47d9-8e72-acebdd3be32c/edit) using readme/performance/performance_analytics.R
 
-In `bacon3` ch5-13.md file there is a `Table 5.27 — Periodic table of risk measures`.
-Please make an overview of functionality I'm missing comparing to this table and plan implementation in 1 phases:
-
-- phase 1: single return series
-- phase 2: multiple return series, i.e. benchmarks and portfolios
-
 Below I collected the list of implemented functions for `stuart`, `ranaroussi`, `braverock` and `my`.
 
 ## `stuart`: stuart.py has the following functions
@@ -278,3 +272,11 @@ martin_ratio()
 gain_to_pain_ratio()
 risk_of_ruin()
 risk_return_ratio()
+
+In `bacon3` ch5-13.md file there is a `Table 5.27 — Periodic table of risk measures`.
+Please make an overview of functionality I'm missing comparing to this table and plan implementation in 1 phases:
+
+- phase 1: single return series
+- phase 2: multiple return series, i.e. benchmarks and portfolios
+
+Write the plan into ./external/to-implement.md
