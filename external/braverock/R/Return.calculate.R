@@ -1,0 +1,120 @@
+#' calculate simple or compound returns from prices
+#' 
+#' calculate simple or compound returns from prices
+#' 
+#' Two requirements should be made clear.  First, the function
+#' \code{Return.calculate} assumes regular price data.  In the example, we
+#' downloaded monthly close prices.  Prices can be for any time scale, such as
+#' daily, weekly, monthly or annual, as long as the data consists of regular
+#' observations.  Irregular observations require time period scaling to be
+#' comparable.  Fortunately, \code{\link[xts]{to.period}} in the \code{xts}
+#' package, or \code{\link[zoo]{aggregate.zoo}} in the \code{zoo} package
+#' support management and conversion of irregular time series to regular time series.
+#' 
+#' Second, if corporate actions, dividends, or other adjustments such as time-
+#' or money-weighting are to be taken into account, those calculations must be
+#' made separately. This is a simple function that assumes fully adjusted close
+#' prices as input.  For the IBM timeseries in the example below, dividends and
+#' corporate actions are not contained in the "close" price series, so we end
+#' up with "price returns" instead of "total returns".  This can lead to
+#' significant underestimation of the return series over longer time periods.
+#' To use adjusted returns, specify \code{quote="AdjClose"} in
+#' \code{\link[tseries]{get.hist.quote}}, which is found in package
+#' \code{tseries}, or use the \code{\link[quantmod]{Ad}} function.
+#' 
+#' We have changed the default arguments and settings for \code{method}
+#' from \code{compound} and \code{simple} to \code{discrete} and \code{log} 
+#' and \code{difference} to avoid confusion between the return type (discrete, log, difference)
+#' and the chaining method (compound or arithmetic/simple).  In most of the rest of \code{PerformanceAnalytics},
+#' compound and simple are used to refer to the \emph{return chaining} method which is used with the returns.
+#' The default for this function is to use discrete returns, because most other package 
+#' functions use compound chaining by default.  
+#' 
+#' Other \code{method} argument formulations also work for clarity and backwards compatibility:
+#' 
+#' \code{method='discrete'} has equivalent arguments \code{simple} and \code{arithmetic}
+#' 
+#' \code{method='log'} has equivalent argument \code{compound} and \code{continuous}
+#' 
+#' \code{method='difference'} has equivalent argument \code{diff} 
+#'     
+#' @aliases CalculateReturns Return.calculate
+#' @param prices data object containing ordered price observations
+#' @param method calculate "discrete" or "log" returns, default discrete(simple)
+#' @author Peter Carl
+#' @seealso \code{\link{Return.cumulative}}
+#' @references Bacon, C. \emph{Practical Portfolio Performance Measurement and
+#' Attribution}. Wiley. 2004. Chapter 2 \cr
+###keywords ts multivariate distribution models
+#' @examples
+#' 
+#'   \dontrun{ # no internet access on CRAN tests
+#'     require(quantmod)
+#'     prices = Cl(getSymbols("IBM", from = "1999-01-01", to = "2007-01-01"))
+#'   }
+#'   \dontshow{
+#'     data(prices)
+#'   }
+#' R.IBM = Return.calculate(xts(prices), method="discrete")
+#' colnames(R.IBM)="IBM"
+#' chart.CumReturns(R.IBM,legend.loc="topleft", main="Cumulative Daily Returns for IBM")
+#' round(R.IBM,2)
+#' @export
+Return.calculate <-
+function(prices, method = c("discrete","log","difference"))
+{ # @ author Peter Carl
+
+    #  Calculate returns from a price stream
+
+    # Required inputs
+
+    # Prices: data object containing ordered price observations
+    # method: "simple", "compound"
+
+    # FUNCTION:
+
+    method = method[1]
+    pr = checkData(prices, method = "xts")
+
+    if(method=="simple" || method=='discrete' || method=="arithmetic"){
+        #Returns = pr/pr[-nrow(pr), ] - 1
+        Returns = pr/lag.xts(pr) - 1
+        xtsAttributes(Returns) <- list(ret_type="discrete")
+        #EB: I think this should be more abstract, to cover "level" (e.g. Price), "difference", "residuals", etc.
+        xtsAttributes(Returns) <- list(coredata_content = "discreteReturn")
+        
+    }
+    if(method=="compound" || method=='log' || method == "continuous") {
+        Returns = diff(log(pr))
+        xtsAttributes(Returns) <- list(ret_type="log")
+        xtsAttributes(Returns) <- list(coredata_content = "logReturn")
+    }
+    if(method=="diff" || method=='difference') {
+      Returns = diff(pr)
+      # xtsAttributes(Returns) <- list(ret_type="diff")
+      xtsAttributes(Returns) <- list(coredata_content = "difference")
+    }
+    
+    #maybe set to pr in the body instead of Returns
+    xtsAttributes(pr)$coredata_content <- xtsAttributes(Returns)$coredata_content
+    reclass(Returns,match.to=pr)
+}
+
+#' @rdname Return.calculate
+#' @export
+CalculateReturns <- 
+function(prices, method = c("discrete","log"))
+{ # @ author Peter Carl
+    Return.calculate(prices=prices, method=method)
+}
+###############################################################################
+# R (https://r-project.org/) Econometrics for Performance and Risk Analysis
+#
+# Copyright (c) 2004-2026 Peter Carl and Brian G. Peterson
+#
+# This R package is distributed under the terms of the GNU Public License (GPL)
+# for full details see the file COPYING
+#
+# $Id$
+#
+###############################################################################

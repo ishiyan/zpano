@@ -1,0 +1,114 @@
+#' Jensen's alpha of the return distribution
+#'
+#' The Jensen's alpha is the intercept of the regression equation in the Capital
+#' Asset Pricing Model and is in effect the exess return adjusted for systematic risk.
+#'
+#' \deqn{\alpha = r_p - r_f - \beta_p * (b - r_f)}{alpha = r_p - r_f - beta_p * (b - r_f)}
+#'
+#' where \eqn{r_f} is the risk free rate, \eqn{\beta_r} is the regression beta,
+#' \eqn{r_p} is the portfolio return and b is the benchmark return
+#'
+#' @aliases SFM.jensenAlpha
+#' @param Ra an xts, vector, matrix, data frame, timeSeries or zoo object of
+#' asset returns
+#' @param Rb return vector of the benchmark asset
+#' @param Rf risk free rate, in same period as your returns
+#' @param \dots any other pass thru parameters
+#' @param method (Optional): string representing linear regression model, "LS" for Least Squares
+#'                    and "Rob" for robust
+#' @param family (Optional):
+#'         If method == "Rob":
+#'           This is a string specifying the name of the family of loss function
+#'           to be used (current valid options are "bisquare", "opt" and "mopt").
+#'           Incomplete entries will be matched to the current valid options.
+#'           Defaults to "mopt".
+#'         Else: the parameter is ignored
+#' @param series (Optional): Boolean to return a time series of Jensen's Alpha instead of a single value. Defaults to FALSE.
+#' @author Matthieu Lestel, Dhairya Jain
+#' @references Carl Bacon, \emph{Practical portfolio performance measurement
+#' and attribution}, second edition 2008 p.72
+#'
+### keywords ts multivariate distribution models
+#' @examples
+#'
+#' data(portfolio_bacon)
+#' print(SFM.jensenAlpha(portfolio_bacon[, 1], portfolio_bacon[, 2])) # expected -0.014
+#'
+#' data(managers)
+#' print(SFM.jensenAlpha(managers["1996", 1], managers["1996", 8]))
+#' print(SFM.jensenAlpha(managers["1996", 1:5], managers["1996", 8]))
+#'
+#' @rdname CAPM.jensenAlpha
+#' @export CAPM.jensenAlpha SFM.jensenAlpha
+
+CAPM.jensenAlpha <- SFM.jensenAlpha <-
+  function(Ra, Rb, Rf = 0, ..., method = "LS", family = "mopt", series = FALSE) {
+    calcul <- FALSE
+    Ra <- checkData(Ra)
+    Rb <- checkData(Rb)
+    if (ncol(Ra) == 1 || is.null(Ra) || is.vector(Ra)) {
+      for (i in (1:length(Ra))) {
+        if (!is.na(Ra[i])) {
+          calcul <- TRUE
+          break
+        }
+      }
+
+      if (calcul) {
+        beta <- CAPM.beta(Ra, Rb, Rf, ..., method = method, family = family)
+        if (series) {
+          # Return time series of alpha
+          xRa <- Return.excess(Ra, Rf)
+          xRb <- Return.excess(Rb, Rf)
+          result <- xRa - beta * xRb
+          colnames(result) <- paste0(colnames(Ra), ".Alpha")
+        } else {
+          period <- Frequency(Ra)
+          # Annualize returns
+          Rp <- (prod(1 + Ra, na.rm = TRUE))^(period / sum(!is.na(Ra))) - 1
+          Rpb <- (prod(1 + Rb, na.rm = TRUE))^(period / sum(!is.na(Rb))) - 1
+
+          # Annualize Rf to matching periodicity
+          if (length(Rf) > 1) {
+            Rpf <- (prod(1 + Rf, na.rm = TRUE))^(period / sum(!is.na(Rf))) - 1
+          } else {
+            Rpf <- (1 + Rf)^period - 1
+          }
+
+          result <- Rp - Rpf - beta * (Rpb - Rpf)
+        }
+      } else {
+        result <- NA
+      }
+      return(result)
+    } else {
+      Ra <- checkData(Ra)
+      result <- sapply(1:ncol(Ra), function(i) {
+        CAPM.jensenAlpha(Ra[, i, drop = FALSE],
+          Rb = Rb, Rf = Rf,
+          method = method, family = family, series = series, ...
+        )
+      })
+      if (series) {
+        result <- do.call(merge, result)
+      } else {
+        result <- matrix(result, nrow = 1)
+        colnames(result) <- colnames(Ra)
+        rownames(result) <- paste("Jensen's Alpha (Risk free = ", round(mean(Rf) * 12 * 100, 2), "%)", sep = "")
+      }
+      return(result)
+    }
+  }
+
+
+###############################################################################
+# R (https://r-project.org/) Econometrics for Performance and Risk Analysis
+#
+# Copyright (c) 2004-2026 Peter Carl and Brian G. Peterson
+#
+# This R package is distributed under the terms of the GNU Public License (GPL)
+# for full details see the file COPYING
+#
+# $Id$
+#
+###############################################################################
