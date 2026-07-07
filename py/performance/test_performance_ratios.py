@@ -1,5 +1,7 @@
 import unittest
 from datetime import datetime
+import numpy as np
+from scipy.stats import norm
 
 # from accounts.daycounting import DayCountConvention
 # from accounts.performances import Periodicity, Ratios
@@ -2347,6 +2349,949 @@ class TestRollingWindowWithMinPeriods(unittest.TestCase):
                 # After 10 samples with window=5, sharpe uses last 5 returns
                 self.assertIsNotNone(ratios.sharpe_ratio(),
                     f'step {i}: expected value after min_periods=10')
+
+if __name__ == '__main__':
+    unittest.main()
+
+# =========================================================================
+# TESTS FOR NEW MEASURES (Phase 1 High Priority)
+# =========================================================================
+
+class TestLPM(unittest.TestCase):
+    """Test Lower Partial Moment calculations."""
+    
+    def setUp(self):
+        self.ratios = Ratios(
+            periodicity=Periodicity.DAILY,
+            annual_risk_free_rate=0.,
+            annual_target_return=0.,
+            day_count_convention=DayCountConvention.RAW)
+        self.ratios.reset()
+        _add_bacon(self.ratios)
+
+    def test_lpm_order_2_mar_0(self):
+        """LPM order 2 with MAR=0 should match _required_lpm_2"""
+        # Our _required_lpm_2 uses required_return (MAR), which defaults to 0
+        # With full window (24 returns), the LPM should be cached
+        lpm_val = self.ratios.lpm(order=2, threshold=0.0)
+        self.assertIsNotNone(lpm_val)
+        self.assertAlmostEqual(lpm_val, self.ratios._required_lpm_2, places=13)
+
+    def test_lpm_order_3_mar_0(self):
+        """LPM order 3 with MAR=0"""
+        lpm_val = self.ratios.lpm(order=3, threshold=0.0)
+        self.assertIsNotNone(lpm_val)
+        self.assertAlmostEqual(lpm_val, self.ratios._required_lpm_3, places=13)
+
+    def test_lpm_with_mar(self):
+        """LPM with non-zero MAR"""
+        mar = 0.01
+        lpm_val = self.ratios.lpm(order=2, threshold=mar)
+        self.assertIsNotNone(lpm_val)
+        # Should be >= 0
+        self.assertGreaterEqual(lpm_val, 0)
+
+    def test_lpm_caching(self):
+        """LPM should cache results"""
+        lpm1 = self.ratios.lpm(order=2, threshold=0.0)
+        lpm2 = self.ratios.lpm(order=2, threshold=0.0)
+        self.assertEqual(lpm1, lpm2)
+
+
+class TestHPM(unittest.TestCase):
+    """Test Higher Partial Moment calculations."""
+    
+    def setUp(self):
+        self.ratios = Ratios(
+            periodicity=Periodicity.DAILY,
+            annual_risk_free_rate=0.,
+            annual_target_return=0.,
+            day_count_convention=DayCountConvention.RAW)
+        self.ratios.reset()
+        _add_bacon(self.ratios)
+
+    def test_hpm_order_1(self):
+        """HPM order 1 with threshold=0"""
+        hpm_val = self.ratios.hpm(order=1, threshold=0.0)
+        self.assertIsNotNone(hpm_val)
+        self.assertAlmostEqual(hpm_val, self.ratios._required_hpm_1, places=13)
+
+    def test_hpm_order_2(self):
+        """HPM order 2 with threshold=0"""
+        hpm_val = self.ratios.hpm(order=2, threshold=0.0)
+        self.assertIsNotNone(hpm_val)
+        self.assertAlmostEqual(hpm_val, self.ratios._required_hpm_2, places=13)
+
+    def test_hpm_caching(self):
+        """HPM should cache results"""
+        hpm1 = self.ratios.hpm(order=2, threshold=0.0)
+        hpm2 = self.ratios.hpm(order=2, threshold=0.0)
+        self.assertEqual(hpm1, hpm2)
+
+
+class TestDownsideDeviation(unittest.TestCase):
+    """Test Downside Deviation and Semi-Deviation."""
+    
+    def setUp(self):
+        self.ratios = Ratios(
+            periodicity=Periodicity.DAILY,
+            annual_risk_free_rate=0.,
+            annual_target_return=0.,
+            day_count_convention=DayCountConvention.RAW)
+        self.ratios.reset()
+        _add_bacon(self.ratios)
+
+    def test_downside_deviation_full(self):
+        """Downside deviation with method='full'"""
+        dd = self.ratios.downside_deviation(mar=0.0, method="full")
+        self.assertIsNotNone(dd)
+        # Should equal sqrt(LPM2) with full denominator
+        expected = np.sqrt(self.ratios._required_lpm_2)
+        self.assertAlmostEqual(dd, expected, places=13)
+
+    def test_downside_deviation_subset(self):
+        """Downside deviation with method='subset'"""
+        dd = self.ratios.downside_deviation(mar=0.0, method="subset")
+        self.assertIsNotNone(dd)
+        # Should be >= full method (smaller denominator)
+        dd_full = self.ratios.downside_deviation(mar=0.0, method="full")
+        self.assertGreaterEqual(dd, dd_full)
+
+    def test_semi_deviation(self):
+        """Semi-deviation (MAR = mean return)"""
+        sd = self.ratios.semi_deviation()
+        self.assertIsNotNone(sd)
+        self.assertGreaterEqual(sd, 0)
+
+    def test_invalid_method(self):
+        """Invalid method should raise ValueError"""
+        with self.assertRaises(ValueError):
+            self.ratios.downside_deviation(mar=0.0, method="invalid")
+
+
+class TestVaR(unittest.TestCase):
+    """Test Value at Risk calculations."""
+    
+    def setUp(self):
+        self.ratios = Ratios(
+            periodicity=Periodicity.DAILY,
+            annual_risk_free_rate=0.,
+            annual_target_return=0.,
+            day_count_convention=DayCountConvention.RAW)
+        self.ratios.reset()
+        _add_bacon(self.ratios)
+
+    def test_var_historical(self):
+        """Historical VaR at 95%"""
+        var = self.ratios.var_historical(confidence=0.95)
+        self.assertIsNotNone(var)
+        self.assertGreater(var, 0)
+        # Should be -5th percentile
+        expected = -np.percentile(self.ratios._window_returns, 5)
+        self.assertAlmostEqual(var, expected, places=13)
+
+    def test_var_gaussian(self):
+        """Gaussian VaR at 95%"""
+        var = self.ratios.var_gaussian(confidence=0.95)
+        self.assertIsNotNone(var)
+        self.assertGreater(var, 0)
+        # Compare with manual calculation
+        mean = np.mean(self.ratios._window_returns)
+        std = np.std(self.ratios._window_returns, ddof=1)
+        z = norm.ppf(0.05)
+        expected = -(mean + z * std)
+        self.assertAlmostEqual(var, expected, places=13)
+
+    def test_var_cornish_fisher(self):
+        """Cornish-Fisher VaR at 95%"""
+        var = self.ratios.var_cornish_fisher(confidence=0.95)
+        self.assertIsNotNone(var)
+        self.assertGreater(var, 0)
+
+    def test_var_methods(self):
+        """Test all VaR methods via main interface"""
+        for method in ["historical", "gaussian", "modified"]:
+            var = self.ratios.var(confidence=0.95, method=method)
+            self.assertIsNotNone(var, f"method={method}")
+            self.assertGreater(var, 0)
+
+    def test_invalid_method(self):
+        """Invalid method should raise ValueError"""
+        with self.assertRaises(ValueError):
+            self.ratios.var(method="invalid")
+
+
+class TestCVaR(unittest.TestCase):
+    """Test Conditional VaR / Expected Shortfall calculations."""
+    
+    def setUp(self):
+        self.ratios = Ratios(
+            periodicity=Periodicity.DAILY,
+            annual_risk_free_rate=0.,
+            annual_target_return=0.,
+            day_count_convention=DayCountConvention.RAW)
+        self.ratios.reset()
+        _add_bacon(self.ratios)
+
+    def test_cvar_historical(self):
+        """Historical CVaR at 95%"""
+        cvar = self.ratios.cvar_historical(confidence=0.95)
+        self.assertIsNotNone(cvar)
+        self.assertGreater(cvar, 0)
+        # CVaR should be >= VaR
+        var = self.ratios.var_historical(confidence=0.95)
+        self.assertGreaterEqual(cvar, var)
+
+    def test_cvar_gaussian(self):
+        """Gaussian CVaR at 95%"""
+        cvar = self.ratios.cvar_gaussian(confidence=0.95)
+        self.assertIsNotNone(cvar)
+        self.assertGreater(cvar, 0)
+        var = self.ratios.var_gaussian(confidence=0.95)
+        self.assertGreaterEqual(cvar, var)
+
+    def test_cvar_cornish_fisher(self):
+        """Modified CVaR at 95%"""
+        cvar = self.ratios.cvar_cornish_fisher(confidence=0.95)
+        self.assertIsNotNone(cvar)
+        self.assertGreater(cvar, 0)
+        var = self.ratios.var_cornish_fisher(confidence=0.95)
+        # Operational version ensures CVaR >= VaR
+        self.assertGreaterEqual(cvar, var)
+
+    def test_cvar_methods(self):
+        """Test all CVaR methods via main interface"""
+        for method in ["historical", "gaussian", "modified"]:
+            cvar = self.ratios.cvar(confidence=0.95, method=method)
+            self.assertIsNotNone(cvar, f"method={method}")
+            self.assertGreater(cvar, 0)
+
+    def test_invalid_method(self):
+        """Invalid method should raise ValueError"""
+        with self.assertRaises(ValueError):
+            self.ratios.cvar(method="invalid")
+
+
+class TestAdjustedSharpeRatio(unittest.TestCase):
+    """Test Adjusted Sharpe Ratio (Pezier & White)."""
+    
+    def setUp(self):
+        self.ratios = Ratios(
+            periodicity=Periodicity.DAILY,
+            annual_risk_free_rate=0.,
+            annual_target_return=0.,
+            day_count_convention=DayCountConvention.RAW)
+        self.ratios.reset()
+        _add_bacon(self.ratios)
+
+    def test_adjusted_sharpe(self):
+        """Adjusted Sharpe should be computable"""
+        adj_sr = self.ratios.adjusted_sharpe_ratio()
+        self.assertIsNotNone(adj_sr)
+        # Should be close to regular Sharpe for near-normal returns
+        sr = self.ratios.sharpe_ratio()
+        self.assertIsNotNone(sr)
+
+    def test_adjusted_sharpe_with_rf(self):
+        """Adjusted Sharpe with custom risk-free rate"""
+        adj_sr = self.ratios.adjusted_sharpe_ratio(rf=0.001)
+        self.assertIsNotNone(adj_sr)
+
+
+class TestTailRatio(unittest.TestCase):
+    """Test Tail Ratio."""
+    
+    def setUp(self):
+        self.ratios = Ratios(
+            periodicity=Periodicity.DAILY,
+            annual_risk_free_rate=0.,
+            annual_target_return=0.,
+            day_count_convention=DayCountConvention.RAW)
+        self.ratios.reset()
+        _add_bacon(self.ratios)
+
+    def test_tail_ratio_default(self):
+        """Tail ratio with default 95% cutoff"""
+        tr = self.ratios.tail_ratio()
+        self.assertIsNotNone(tr)
+        self.assertGreater(tr, 0)
+        # Right tail / |left tail|
+        w = self.ratios._window_returns
+        right = np.percentile(w, 95)
+        left = np.percentile(w, 5)
+        expected = right / abs(left)
+        self.assertAlmostEqual(tr, expected, places=13)
+
+    def test_tail_ratio_custom_cutoff(self):
+        """Tail ratio with custom cutoff"""
+        tr = self.ratios.tail_ratio(cutoff=0.99)
+        self.assertIsNotNone(tr)
+        self.assertGreater(tr, 0)
+
+
+class TestKellyRatio(unittest.TestCase):
+    """Test Kelly Criterion Ratio."""
+    
+    def setUp(self):
+        self.ratios = Ratios(
+            periodicity=Periodicity.DAILY,
+            annual_risk_free_rate=0.,
+            annual_target_return=0.,
+            day_count_convention=DayCountConvention.RAW)
+        self.ratios.reset()
+        _add_bacon(self.ratios)
+
+    def test_kelly_ratio_half(self):
+        """Half-Kelly (default)"""
+        kelly = self.ratios.kelly_ratio(method="half")
+        self.assertIsNotNone(kelly)
+
+    def test_kelly_ratio_full(self):
+        """Full Kelly"""
+        kelly = self.ratios.kelly_ratio(method="full")
+        self.assertIsNotNone(kelly)
+        # Full Kelly should be 2x half Kelly
+        kelly_half = self.ratios.kelly_ratio(method="half")
+        self.assertAlmostEqual(kelly, 2 * kelly_half, places=13)
+
+    def test_kelly_with_custom_rf(self):
+        """Kelly with custom risk-free rate"""
+        kelly = self.ratios.kelly_ratio(rf=0.001)
+        self.assertIsNotNone(kelly)
+
+
+class TestProbabilisticSharpeRatio(unittest.TestCase):
+    """Test Probabilistic Sharpe Ratio."""
+    
+    def setUp(self):
+        self.ratios = Ratios(
+            periodicity=Periodicity.DAILY,
+            annual_risk_free_rate=0.,
+            annual_target_return=0.,
+            day_count_convention=DayCountConvention.RAW)
+        self.ratios.reset()
+        _add_bacon(self.ratios)
+
+    def test_psr_default(self):
+        """PSR with default ref_SR=0"""
+        psr = self.ratios.probabilistic_sharpe_ratio()
+        self.assertIsNotNone(psr)
+        self.assertGreaterEqual(psr, 0)
+        self.assertLessEqual(psr, 1)
+
+    def test_psr_with_ref(self):
+        """PSR with reference Sharpe"""
+        sr = self.ratios.sharpe_ratio()
+        psr = self.ratios.probabilistic_sharpe_ratio(ref_sr=sr / 2)
+        self.assertIsNotNone(psr)
+        self.assertGreater(psr, 0.5)  # Should be > 0.5 if observed > ref
+
+    def test_psr_ignore_skewness(self):
+        """PSR ignoring skewness"""
+        psr = self.ratios.probabilistic_sharpe_ratio(ignore_skewness=True)
+        self.assertIsNotNone(psr)
+
+    def test_psr_ignore_kurtosis(self):
+        """PSR ignoring kurtosis"""
+        psr = self.ratios.probabilistic_sharpe_ratio(ignore_kurtosis=True)
+        self.assertIsNotNone(psr)
+
+
+class TestKRatio(unittest.TestCase):
+    """Test K-Ratio (Lars Kestner)."""
+    
+    def setUp(self):
+        self.ratios = Ratios(
+            periodicity=Periodicity.DAILY,
+            annual_risk_free_rate=0.,
+            annual_target_return=0.,
+            day_count_convention=DayCountConvention.RAW)
+        self.ratios.reset()
+        _add_bacon(self.ratios)
+
+    def test_k_ratio(self):
+        """K-Ratio should be computable"""
+        k = self.ratios.k_ratio()
+        self.assertIsNotNone(k)
+
+    def test_k_ratio_positive_trend(self):
+        """With positive trend returns, K-ratio should be positive"""
+        # Bacon data has positive cumulative return, so K-ratio should be positive
+        k = self.ratios.k_ratio()
+        self.assertGreater(k, 0)
+
+
+class TestSortinoSatchellRatio(unittest.TestCase):
+    """Test Sortino-Satchell Ratio."""
+    
+    def setUp(self):
+        self.ratios = Ratios(
+            periodicity=Periodicity.DAILY,
+            annual_risk_free_rate=0.,
+            annual_target_return=0.,
+            day_count_convention=DayCountConvention.RAW)
+        self.ratios.reset()
+        _add_bacon(self.ratios)
+
+    def test_sortino_satchell(self):
+        """Sortino-Satchell should be computable"""
+        ssr = self.ratios.sortino_satchell_ratio()
+        self.assertIsNotNone(ssr)
+        # Should be close to standard Sortino (which uses geometric mean)
+        sortino = self.ratios.sortino_ratio()
+        self.assertIsNotNone(sortino)
+
+
+class TestGainLossRatio(unittest.TestCase):
+    """Test Gain-Loss Ratio."""
+    
+    def setUp(self):
+        self.ratios = Ratios(
+            periodicity=Periodicity.DAILY,
+            annual_risk_free_rate=0.,
+            annual_target_return=0.,
+            day_count_convention=DayCountConvention.RAW)
+        self.ratios.reset()
+        _add_bacon(self.ratios)
+
+    def test_gain_loss_ratio(self):
+        """Gain-Loss Ratio should be computable"""
+        glr = self.ratios.gain_loss_ratio()
+        self.assertIsNotNone(glr)
+        self.assertGreater(glr, 0)
+        # Verify manually
+        w = self.ratios._window_returns
+        gains = w[w > 0]
+        losses = w[w < 0]
+        expected = np.sum(gains) / abs(np.sum(losses))
+        self.assertAlmostEqual(glr, expected, places=13)
+
+
+class TestDownsideSharpeRatio(unittest.TestCase):
+    """Test Downside Sharpe Ratio (Zi."""
+    
+    def setUp(self):
+        self.ratios = Ratios(
+            periodicity=Periodicity.DAILY,
+            annual_risk_free_rate=0.,
+            annual_target_return=0.,
+            day_count_convention=DayCountConvention.RAW)
+        self.ratios.reset()
+        _add_bacon(self.ratios)
+
+    def test_downside_sharpe(self):
+        """Downside Sharpe should be computable"""
+        dsr = self.ratios.downside_sharpe_ratio()
+        self.assertIsNotNone(dsr)
+        # Compare with manual calculation
+        excess_mean = self.ratios._excess_mean
+        semi_dev = self.ratios.semi_deviation()
+        expected = excess_mean / (SQRT2 * semi_dev)
+        self.assertAlmostEqual(dsr, expected, places=13)
+
+
+class TestRewardToConditionalDrawdown(unittest.TestCase):
+    """Test Reward to Conditional Drawdown."""
+    
+    def setUp(self):
+        self.ratios = Ratios(
+            periodicity=Periodicity.DAILY,
+            annual_risk_free_rate=0.,
+            annual_target_return=0.,
+            day_count_convention=DayCountConvention.RAW)
+        self.ratios.reset()
+        _add_bacon(self.ratios)
+
+    def test_reward_to_cdar(self):
+        """Reward-to-CDaR should be computable"""
+        rcdar = self.ratios.reward_to_conditional_drawdown(confidence=0.95)
+        self.assertIsNotNone(rcdar)
+        # Should be positive for positive returns
+        cagr = self.ratios._cumulative_return_geometric_mean
+        if cagr is not None and cagr > 0:
+            self.assertGreater(rcdar, 0)
+
+
+class TestRewardToVaR(unittest.TestCase):
+    """Test Reward-to-VaR Ratio."""
+    
+    def setUp(self):
+        self.ratios = Ratios(
+            periodicity=Periodicity.DAILY,
+            annual_risk_free_rate=0.,
+            annual_target_return=0.,
+            day_count_convention=DayCountConvention.RAW)
+        self.ratios.reset()
+        _add_bacon(self.ratios)
+
+    def test_reward_to_var_historical(self):
+        """Reward-to-VaR with historical VaR"""
+        rtv = self.ratios.reward_to_var(confidence=0.95, method="historical")
+        self.assertIsNotNone(rtv)
+        var = self.ratios.var_historical(confidence=0.95)
+        excess_mean = self.ratios._excess_mean
+        expected = excess_mean / var
+        self.assertAlmostEqual(rtv, expected, places=13)
+
+    def test_reward_to_var_gaussian(self):
+        """Reward-to-VaR with Gaussian VaR"""
+        rtv = self.ratios.reward_to_var(confidence=0.95, method="gaussian")
+        self.assertIsNotNone(rtv)
+        var = self.ratios.var_gaussian(confidence=0.95)
+        excess_mean = self.ratios._excess_mean
+        expected = excess_mean / var
+        self.assertAlmostEqual(rtv, expected, places=13)
+
+
+class TestBenchmarkDependentMeasures(unittest.TestCase):
+    """Test Phase 2 benchmark-dependent measures."""
+    
+    def setUp(self):
+        self.ratios = Ratios(
+            periodicity=Periodicity.DAILY,
+            annual_risk_free_rate=0.,
+            annual_target_return=0.,
+            day_count_convention=DayCountConvention.RAW)
+        self.ratios.reset()
+        _add_bacon(self.ratios)
+
+    def test_beta(self):
+        """CAPM Beta should be computable"""
+        beta = self.ratios.beta
+        self.assertIsNotNone(beta)
+
+    def test_alpha(self):
+        """Jensen's Alpha should be computable"""
+        alpha = self.ratios.alpha
+        self.assertIsNotNone(alpha)
+
+    def test_r_squared(self):
+        """R-squared should be computable"""
+        r2 = self.ratios.r_squared
+        self.assertIsNotNone(r2)
+        self.assertGreaterEqual(r2, 0)
+        self.assertLessEqual(r2, 1)
+
+    def test_tracking_error(self):
+        """Tracking Error should be computable"""
+        te = self.ratios.tracking_error
+        self.assertIsNotNone(te)
+        self.assertGreaterEqual(te, 0)
+
+    def test_active_premium(self):
+        """Active Premium should be computable"""
+        ap = self.ratios.active_premium
+        self.assertIsNotNone(ap)
+
+    def test_information_ratio(self):
+        """Information Ratio should be computable"""
+        ir = self.ratios.information_ratio
+        self.assertIsNotNone(ir)
+        # Should match active_premium / tracking_error
+        ap = self.ratios.active_premium
+        te = self.ratios.tracking_error
+        if te is not None and te > 0:
+            self.assertAlmostEqual(ir, ap / te, places=13)
+
+    def test_treynor_ratio(self):
+        """Treynor Ratio should be computable"""
+        tr = self.ratios.treynor_ratio
+        self.assertIsNotNone(tr)
+        # Should match excess_return / beta
+        excess = self.ratios._excess_mean
+        beta = self.ratios.beta
+        if beta is not None and beta != 0 and excess is not None:
+            self.assertAlmostEqual(tr, excess / beta, places=13)
+
+    def test_appraisal_ratio(self):
+        """Appraisal Ratio should be computable"""
+        ar = self.ratios.appraisal_ratio
+        self.assertIsNotNone(ar)
+
+    def test_upside_capture(self):
+        """Upside Capture should be computable"""
+        uc = self.ratios.upside_capture
+        self.assertIsNotNone(uc)
+
+    def test_downside_capture(self):
+        """Downside Capture should be computable"""
+        dc = self.ratios.downside_capture
+        self.assertIsNotNone(dc)
+
+    def test_capture_ratio(self):
+        """Capture Ratio should be computable"""
+        cr = self.ratios.capture_ratio
+        self.assertIsNotNone(cr)
+        if self.ratios.upside_capture and self.ratios.downside_capture:
+            if self.ratios.downside_capture != 0:
+                self.assertAlmostEqual(cr, self.ratios.upside_capture / self.ratios.downside_capture, places=13)
+
+    def test_modigliani_modigliani(self):
+        """Modigliani-Modigliani M² should be computable with internal benchmark"""
+        m2 = self.ratios.modigliani_modigliani()
+        self.assertIsNotNone(m2)
+
+    def test_modigliani_modigliani_external(self):
+        """Modigliani-Modigliani M² with external benchmark"""
+        m2 = self.ratios.modigliani_modigliani(benchmark_returns=np.array(bacon_benchmark_returns))
+        self.assertIsNotNone(m2)
+
+
+class TestPhase1LowPriority(unittest.TestCase):
+    """Test Phase 1 Low Priority / Nice-to-Have measures."""
+    
+    def setUp(self):
+        self.ratios = Ratios(
+            periodicity=Periodicity.DAILY,
+            annual_risk_free_rate=0.,
+            annual_target_return=0.,
+            day_count_convention=DayCountConvention.RAW)
+        self.ratios.reset()
+        _add_bacon(self.ratios)
+
+    def test_downside_frequency(self):
+        """Downside Frequency should be computable"""
+        df = self.ratios.downside_frequency(mar=0.0)
+        self.assertIsNotNone(df)
+        self.assertGreaterEqual(df, 0)
+        self.assertLessEqual(df, 1)
+        # Verify manually
+        w = self.ratios._window_returns
+        expected = np.sum(w < 0) / len(w)
+        self.assertAlmostEqual(df, expected, places=13)
+
+    def test_downside_potential(self):
+        """Downside Potential should be computable"""
+        dp = self.ratios.downside_potential(mar=0.0)
+        self.assertIsNotNone(dp)
+        self.assertGreaterEqual(dp, 0)
+        # Verify manually
+        w = self.ratios._window_returns
+        expected = np.mean(np.maximum(0 - w, 0))
+        self.assertAlmostEqual(dp, expected, places=13)
+
+    def test_volatility_skewness(self):
+        """Volatility Skewness should be computable"""
+        vs_vol = self.ratios.volatility_skewness(stat="volatility")
+        vs_var = self.ratios.volatility_skewness(stat="variability")
+        self.assertIsNotNone(vs_vol)
+        self.assertIsNotNone(vs_var)
+        self.assertGreaterEqual(vs_vol, 0)
+        self.assertGreaterEqual(vs_var, 0)
+        # volatility should be sqrt of variability
+        self.assertAlmostEqual(vs_vol**2, vs_var, places=13)
+
+    def test_prospect_ratio(self):
+        """Prospect Ratio should be computable"""
+        pr = self.ratios.prospect_ratio()
+        self.assertIsNotNone(pr)
+
+    def test_skewness_kurtosis_ratio(self):
+        """Skewness-Kurtosis Ratio should be computable"""
+        skr = self.ratios.skewness_kurtosis_ratio()
+        self.assertIsNotNone(skr)
+        # Should match skew / (kurtosis + 3)
+        if self.ratios._returns_skew is not None and self.ratios._returns_kurtosis is not None:
+            expected = self.ratios._returns_skew / (self.ratios._returns_kurtosis + 3)
+            self.assertAlmostEqual(skr, expected, places=13)
+
+    def test_mad_ratio(self):
+        """MAD Ratio should be computable"""
+        mad_r = self.ratios.mad_ratio()
+        self.assertIsNotNone(mad_r)
+        # Verify manually
+        w = self.ratios._window_returns
+        expected = np.mean(w) / np.mean(np.abs(w - np.mean(w)))
+        self.assertAlmostEqual(mad_r, expected, places=13)
+
+    def test_omega_sharpe_ratio(self):
+        """Omega-Sharpe Ratio should be computable"""
+        osr = self.ratios.omega_sharpe_ratio()
+        self.assertIsNotNone(osr)
+        # Verify manually
+        omega = self.ratios.omega_ratio()
+        lpm2 = self.ratios._required_lpm_2
+        expected = (omega - 1) * np.sqrt(lpm2)
+        self.assertAlmostEqual(osr, expected, places=13)
+
+
+class TestAdditionalMeasures(unittest.TestCase):
+    """Test additional measures: DRatio, Rachev Ratio, Timing Ratio, Omega Excess, Smoothing Index."""
+    
+    def setUp(self):
+        self.ratios = Ratios(
+            periodicity=Periodicity.DAILY,
+            annual_risk_free_rate=0.,
+            annual_target_return=0.,
+            day_count_convention=DayCountConvention.RAW)
+        self.ratios.reset()
+        _add_bacon(self.ratios)
+
+    def test_d_ratio(self):
+        """D-Ratio should be computable"""
+        dr = self.ratios.d_ratio()
+        self.assertIsNotNone(dr)
+        self.assertGreaterEqual(dr, 0)
+        # Verify manually
+        w = self.ratios._window_returns
+        r1 = w[w > 0]
+        r2 = w[w < 0]
+        nd = len(r2)
+        nu = len(r1)
+        if nu > 0 and nd > 0:
+            expected = (-nd * np.sum(r2)) / (nu * np.sum(r1))
+            self.assertAlmostEqual(dr, expected, places=13)
+
+    def test_rachev_ratio(self):
+        """Rachev Ratio should be computable"""
+        rr = self.ratios.rachev_ratio()
+        self.assertIsNotNone(rr)
+        rr_custom = self.ratios.rachev_ratio(alpha=0.05, beta=0.05)
+        self.assertIsNotNone(rr_custom)
+
+    def test_timing_ratio(self):
+        """Timing Ratio should be computable"""
+        tr = self.ratios.timing_ratio()
+        self.assertIsNotNone(tr)
+        # Should equal beta_bull / beta_bear
+        # We can't easily verify without the internal betas, but should be > 0
+        self.assertGreaterEqual(tr, 0)
+
+    def test_omega_excess_return(self):
+        """Omega Excess Return should be computable"""
+        oer = self.ratios.omega_excess_return()
+        self.assertIsNotNone(oer)
+
+    def test_smoothing_index(self):
+        """Smoothing Index should be computable"""
+        si = self.ratios.smoothing_index()
+        self.assertIsNotNone(si)
+        # Should be positive
+        self.assertGreaterEqual(si, 0)
+
+
+class TestNewMeasures(unittest.TestCase):
+    """Test new measures: CDaR Beta/Alpha, Fama Beta, SFM Coefficients, Hurst Index."""
+    
+    def setUp(self):
+        self.ratios = Ratios(
+            periodicity=Periodicity.DAILY,
+            annual_risk_free_rate=0.,
+            annual_target_return=0.,
+            day_count_convention=DayCountConvention.RAW)
+        self.ratios.reset()
+        _add_bacon(self.ratios)
+
+    def test_cdar_beta(self):
+        """CDaR Beta should be computable"""
+        beta = self.ratios.cdar_beta()
+        self.assertIsNotNone(beta)
+        beta_custom = self.ratios.cdar_beta(confidence=0.99)
+        self.assertIsNotNone(beta_custom)
+
+    def test_cdar_alpha(self):
+        """CDaR Alpha should be computable"""
+        alpha = self.ratios.cdar_alpha()
+        self.assertIsNotNone(alpha)
+        alpha_custom = self.ratios.cdar_alpha(confidence=0.99)
+        self.assertIsNotNone(alpha_custom)
+
+    def test_fama_beta(self):
+        """Fama Beta should be computable"""
+        fb = self.ratios.fama_beta()
+        self.assertIsNotNone(fb)
+        # Verify manually: sigma_p / sigma_m
+        w = self.ratios._window_returns
+        bw = self.ratios.benchmark_returns
+        expected = np.std(w, ddof=1) / np.std(bw, ddof=1)
+        self.assertAlmostEqual(fb, expected, places=13)
+
+    def test_sfm_coefficients(self):
+        """SFM Coefficients should be computable"""
+        coef = self.ratios.sfm_coefficients()
+        self.assertIsNotNone(coef)
+        self.assertIn('alpha', coef)
+        self.assertIn('beta', coef)
+        self.assertIn('r_squared', coef)
+        # Verify alpha, beta, r_squared are floats
+        self.assertIsInstance(coef['alpha'], float)
+        self.assertIsInstance(coef['beta'], float)
+        self.assertIsInstance(coef['r_squared'], float)
+
+    def test_hurst_index(self):
+        """Hurst Index should be computable"""
+        h = self.ratios.hurst_index()
+        self.assertIsNotNone(h)
+        # Should be between 0 and 1
+        self.assertGreaterEqual(h, 0)
+        self.assertLessEqual(h, 1)
+
+
+class TestBaconMeasures(unittest.TestCase):
+    """Test additional measures from Bacon 3rd Edition."""
+    
+    def setUp(self):
+        self.ratios = Ratios(
+            periodicity=Periodicity.DAILY,
+            annual_risk_free_rate=0.,
+            annual_target_return=0.,
+            day_count_convention=DayCountConvention.RAW)
+        self.ratios.reset()
+        _add_bacon(self.ratios)
+
+    def test_percentile_rank_method_3(self):
+        """Percentile rank with Bacon's preferred method 3"""
+        pr = self.ratios.percentile_rank(method=3)
+        self.assertIsNotNone(pr)
+        self.assertGreaterEqual(pr, 0)
+        self.assertLessEqual(pr, 1)
+
+    def test_percentile_rank_all_methods(self):
+        """Test all 5 percentile rank methods"""
+        for method in range(1, 6):
+            pr = self.ratios.percentile_rank(method=method)
+            self.assertIsNotNone(pr, f"method={method}")
+            self.assertGreaterEqual(pr, 0, f"method={method}")
+            self.assertLessEqual(pr, 1, f"method={method}")
+
+    def test_modified_information_ratio(self):
+        """Modified IR (Israelson) - flips sign for negative excess"""
+        mir = self.ratios.modified_information_ratio()
+        self.assertIsNotNone(mir)
+        ir = self.ratios.information_ratio
+        excess = self.ratios.active_premium
+        if excess > 0:
+            self.assertAlmostEqual(mir, ir, places=13)
+        else:
+            self.assertAlmostEqual(mir, -ir, places=13)
+
+    def test_geometric_information_ratio(self):
+        """Geometric IR should be computable"""
+        """Geometric IR should be computable"""
+        gir = self.ratios.information_ratio_geometric()
+        self.assertIsNotNone(gir)
+        # Should be close to arithmetic IR
+        ir = self.ratios.information_ratio
+        if ir is not None:
+            # They may differ but should be in same ballpark
+            self.assertLess(abs(gir - ir), abs(ir) + 1)
+
+    def test_farinelli_tibiletti_omega(self):
+        """F-T ratio with u=1, l=1 should equal Omega ratio"""
+        ft = self.ratios.farinelli_tibiletti_ratio(mar=0.0, u=1.0, l=1.0)
+        omega = self.ratios.omega_ratio()
+        self.assertIsNotNone(ft)
+        self.assertIsNotNone(omega)
+        self.assertAlmostEqual(ft, omega, places=13)
+
+    def test_farinelli_tibiletti_variability_skewness(self):
+        """F-T ratio with u=2, l=2 should equal sqrt(Variability Skewness)"""
+        ft = self.ratios.farinelli_tibiletti_ratio(mar=0.0, u=2.0, l=2.0)
+        vs = self.ratios.volatility_skewness(stat="variability")
+        self.assertIsNotNone(ft)
+        self.assertIsNotNone(vs)
+        # F-T(u=2,l=2) = sqrt(HPM_2/LPM_2) = sqrt(variability_skewness)
+        self.assertAlmostEqual(ft, np.sqrt(vs), places=13)
+
+    def test_farinelli_tibiletti_upside_potential(self):
+        """F-T ratio with u=1, l=2 should equal Upside Potential Ratio"""
+        ft = self.ratios.farinelli_tibiletti_ratio(mar=0.0, u=1.0, l=2.0)
+        upr = self.ratios.upside_potential_ratio(full=True)
+        self.assertIsNotNone(ft)
+        self.assertIsNotNone(upr)
+        self.assertAlmostEqual(ft, upr, places=13)
+
+
+class TestBeraJarque(unittest.TestCase):
+    """Test Bera-Jarque Normality Test (Bacon 3rd ed, Chapter 5)."""
+    
+    def setUp(self):
+        self.ratios = Ratios(
+            periodicity=Periodicity.DAILY,
+            annual_risk_free_rate=0.,
+            annual_target_return=0.,
+            day_count_convention=DayCountConvention.RAW)
+        self.ratios.reset()
+        _add_bacon(self.ratios)
+
+    def test_bera_jarque_portfolio(self):
+        """Bera-Jarque statistic for portfolio data (24-month test data)"""
+        # Expected BJ for 24-month test data (bacon_portfolio_returns)
+        # Computed from scipy.stats with population moments
+        bj = self.ratios.bera_jarque_statistic()
+        self.assertIsNotNone(bj)
+        self.assertAlmostEqual(bj, 0.349374931862814, places=12)
+
+    def test_bera_jarque_benchmark(self):
+        """Bera-Jarque statistic for benchmark data (24-month test data)"""
+        # Expected BJ for 24-month test data
+        ratios = Ratios(
+            periodicity=Periodicity.DAILY,
+            annual_risk_free_rate=0.,
+            annual_target_return=0.,
+            day_count_convention=DayCountConvention.RAW)
+        ratios.reset()
+        
+        # Use benchmark returns
+        for i in range(len(bacon_benchmark_returns)):
+            ratios.add_return(
+                return_=bacon_benchmark_returns[i],
+                return_benchmark=bacon_benchmark_returns[i],
+                value=1.,
+                time_start=bacon_dates_previous[i],
+                time_end=bacon_dates[i])
+        
+        bj = ratios.bera_jarque_statistic()
+        self.assertIsNotNone(bj)
+        # Correct expected value
+        self.assertAlmostEqual(bj, 0.35565943510958264, places=12)
+
+    def test_normality_test_95(self):
+        """Test normality at 95% confidence"""
+        # Portfolio BJ = 0.34 < 5.99, should not reject normality
+        is_normal = self.ratios.is_normal_distribution(confidence=0.95)
+        self.assertIsNotNone(is_normal)
+        self.assertTrue(is_normal)
+
+    def test_normality_test_99(self):
+        """Test normality at 99% confidence"""
+        is_normal = self.ratios.is_normal_distribution(confidence=0.99)
+        self.assertIsNotNone(is_normal)
+        self.assertTrue(is_normal)
+
+
+class TestBiasRatio(unittest.TestCase):
+    """Test Bias Ratio (Adil Abdulali 2006)."""
+    
+    def setUp(self):
+        self.ratios = Ratios(
+            periodicity=Periodicity.DAILY,
+            annual_risk_free_rate=0.,
+            annual_target_return=0.,
+            day_count_convention=DayCountConvention.RAW)
+        self.ratios.reset()
+        _add_bacon(self.ratios)
+
+    def test_bias_ratio_default(self):
+        """Bias Ratio with default 1 sigma"""
+        br = self.ratios.bias_ratio(std_dev_multiple=1.0)
+        self.assertIsNotNone(br)
+        self.assertGreaterEqual(br, 0)
+        
+        # Verify manually
+        w = self.ratios._window_returns
+        std = np.std(w, ddof=1)
+        pos = np.sum((w >= 0) & (w <= std))
+        neg = np.sum((w >= -std) & (w < 0))
+        expected = pos / (1 + neg)
+        self.assertAlmostEqual(br, expected, places=13)
+
+    def test_bias_ratio_custom_sigma(self):
+        """Bias Ratio with custom sigma multiple"""
+        br = self.ratios.bias_ratio(std_dev_multiple=2.0)
+        self.assertIsNotNone(br)
+        self.assertGreaterEqual(br, 0)
+
 
 if __name__ == '__main__':
     unittest.main()

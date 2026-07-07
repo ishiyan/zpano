@@ -1,33 +1,33 @@
 # Risk/Reward Ratios
 
-In the ./external/performance/ folder I collected downloaded sources inspireing me to write code in py/performance/ .
+In the ./external/ folder I collected downloaded sources inspireing me to write code in py/ .
 These are:
 
-- directory: ./external/performance/stuart/ , short name `stuart`
+- directory: ./external/stuart/ , short name `stuart`
   The article and code [Measures of Risk-adjusted Return](https://web.archive.org/web/20260209060500/http://www.turingfinance.com/computational-investing-with-python-week-one/) from Stuart Gordon Reid's [turingfinance](https://web.archive.org/web/20251113012344/http://www.turingfinance.com/) blog. He also has a [Github gist](https://gist.github.com/StuartGordonReid/67a1ec4fbc8a84c0e856) with another version of his code.
   The markdown version of the article is measures-of-risk-adjusted-return.md and the 3 variants of code are:
-  - ./external/performance/stuart/stuart.py (copied by hand from the article)
-  - ./external/performance/stuart/RiskAdjustedMetrics.py (code form Github gist)
+  - ./external/stuart/stuart.py (copied by hand from the article)
+  - ./external/stuart/RiskAdjustedMetrics.py (code form Github gist)
   I was fascinated with explanation of the topic. Next, I discovered the source from the next bullet.
-- directory: ./external/performance/ranaroussi/ , short name `ranaroussi`
+- directory: ./external/ranaroussi/ , short name `ranaroussi`
   The [quantstats](https://github.com/ranaroussi/quantstats) Git repo by Ran Aroussi. I found it to implement a different set of measures, mainly targeting the trading strategies, which I was interested in.
   The downloaded files are:
-  - ./external/performance/ranaroussi/stats.py (all-in-one code)
-  - ./external/performance/ranaroussi/utils.py (utilities)
+  - ./external/ranaroussi/stats.py (all-in-one code)
+  - ./external/ranaroussi/utils.py (utilities)
   Searching for the most authorative source, I found one in the next bullet.
-- directory: ./external/performance/braverock/ , short name `braverock`
-  The [PerformanceAnalytics](https://github.com/braverock/PerformanceAnalytics) Git repo implements a comprehencive set of measures in R.
+- directory: ./external/braverock/ , short name `braverock`
+  The [PerformanceAnalytics](https://github.com/braverockAnalytics) Git repo implements a comprehencive set of measures in R.
   It is the most complete and scientific-looking from all I could find on the internet.
-  The code is in ./external/performance/braverock/R/ folder , the documentation is in ./external/performance/braverock/man/ folder.
+  The code is in ./external/braverock/R/ folder , the documentation is in ./external/braverock/man/ folder.
   Reading comments in the code, I found that very many of them refer to the book shown in the next bullet.
-- directory: ./external/performance/bacon3/ , short name `bacon3`
-  The startibg point of the downloaded markdown version of the book is ./external/performance/bacon3/toc.md
+- directory: ./external/bacon3/ , short name `bacon3`
+  The startibg point of the downloaded markdown version of the book is ./external/bacon3/toc.md
   > Carl Bacon, *Practical portfolio performance measurement and attribution*,
   > third edition 2023 Wiley
   > ISBN:9781119831945
 - directory: ./py/performance/, short name `my`
-  - ./py/performance/ratios.py contains my im plementation of some functionality inspired by the sources above
-  - ./py/performance/test_performance_ratios.py contains tests with master data created from `braverock` code in R environment (https://www.datacamp.com/datalab/w/28c21593-21e6-47d9-8e72-acebdd3be32c/edit) using readme/performance/performance_analytics.R
+  - ./py/ratios.py contains my im plementation of some functionality inspired by the sources above
+  - ./py/performance/test_performance_ratios.py contains tests with master data created from `braverock` code in R environment (https://www.datacamp.com/datalab/w/28c21593-21e6-47d9-8e72-acebdd3be32c/edit) using readme_analytics.R
 
 Below I collected the list of implemented functions for `stuart`, `ranaroussi`, `braverock` and `my`.
 
@@ -135,7 +135,7 @@ montecarlo_cagr(returns, sims=1000, seed=None) # Distribution of CAGR across Mon
 ## `braverock`: has the following functions
 
 R source file names are in comments, I skipped all `chart.*.R`, `check*.R`, `table*.R` and other utility source files.
-If you see `... # R/CalmarRatio.R ...`, then the file is located in `./external/performance/braverock/R/CalmarRatio.R`
+If you see `... # R/CalmarRatio.R ...`, then the file is located in `./external/braverock/R/CalmarRatio.R`
 
 ActivePremium(Ra, Rb, scale=NA) # R/ActivePremium.R return on an investment's annualized return minus the benchmark's annualized return
 AdjustedSharpeRatio(R, Rf=0) # R/AdjustedSharpeRatio.R was introduced by Pezier and White to adjust for skewness and kurtosis by incorporating a penalty factor for negative skewness and excess kurtosis
@@ -280,3 +280,158 @@ Please make an overview of functionality I'm missing comparing to this table and
 - phase 2: multiple return series, i.e. benchmarks and portfolios
 
 Write the plan into ./external/to-implement.md
+
+
+Now there are only four measures left which are implemented in `braverock`.
+Can we now implement them:
+| **CDaR Alpha/Beta** | Drawdown | ❌ Missing | Braverock: `CDaR.alpha`, `CDaR.beta` |
+  **Fama Beta** | Relative | ❌ Missing | Braverock: `FamaBeta` |
+| **Factor Alpha** | Relative | ❌ Missing | Braverock: `SFM.coefficients` |
+| **Hurst Index** | ❌ Missing | Braverock: `HurstIndex` | Low |
+
+| **Bera–Jarque Statistic** | ❌ Missing | Braverock: — (normality test) | Low |
+| **Farnelli–Tibiletti Ratio** | ❌ Missing | Braverock: — | Low |
+| **Omega–Prospect Ratio** | ❌ Missing | Braverock: — | Low |
+| **Skew-adjusted Prospect Ratio** | ❌ Missing | Braverock: — | Low |
+| **New Prospect Ratio** | ❌ Missing | Braverock: — | Low ||
+| **Skew-adjusted M²** | ❌ Missing | Braverock: — | Low |
+| **Adjusted M²** | ❌ Missing | Braverock: — | Low |
+  **Convexity** | ❌ Missing | Braverock: — | Low |
+| **Active Share** | ❌ Missing | Braverock: — | Phase 2 |
+| **Bias Ratio** | Relative | ❌ Missing | Braverock: — |
+
+In ./external/bacon3/ch5-08.md there is a chapter "### Farinelli–Tibiletti ratio {#s}" whith explanation and formula. Since we don't have code in `Braveroc`, is the information in the book enough to implement it? There are no calculation examples in the book that we can test against.
+
+Now we have only two measures not implemented: Bias Ratio and Active Share.
+When I look at the description of the Active Share in the bacon3 book, it is very specific to portfolio with many positions in it, which we do not support in our code. So we can just drop the Active Share.
+But the Bias Ratio, described in ./external/ch5-10.md under header "### Bias ratio {#c}", has an explanation and quite simple formula.Can we implement it from the book?
+
+Now I need a extensive overview to inventarize for which functions I need to create the master test data from the `Braverock` implementations. Can you create a ./external/implementation-status.md file containing a table with the following columns:
+
+- "bacon3": link to the chapter markdown file of the book as found in the ./external/bacon3/toc.md, e.g. [Adjusted Sharpe ratio](ch5-03.md#g)
+- "braverock": name of the R file where the Braverock code resides, e.g. AdjustedSharpeRatio.R
+- "ratios": name of the method/function/property implemented in ./py/performance/ratios.py, e.g. adjusted_sharpe_ratio
+- "testdata": boolean indicating if we already have tests with master data generated from the Braverock R code.
+  You can find test data generation code in ./external/r-tests/test_results_generation.initial.R
+  Please analyze this file to find out for which Braverock functions and parameter values data was generated
+
+If any of cells has no data, leave it empty.
+
+Can we edit the table with rows where ratios.py implementation exists but `bacon3` or `Braverock` are empry?
+An example is probabilistic_sharpe_ratio which is in ratios.py and in braverock  (ProbSharpeRatio.R) but not in bacon3
+
+In ./external/implementation-status.md file, after the header "## Summary Table", tere is a big table.
+For rows with both `ratios` and `braverock` columns having function/filename and `testdata` column conaining ❌, please suggest the set of values per parameter (in Braverock implementation) so that I can generate data for. Please add each of them as a separate header at the end of the file.
+To find the `braverock` column file: if you see CalmarRatio.R, then the file is located in ./external/braverock/R/CalmarRatio.R
+All `ratios` column functions/properties are located in ./py/performance/ratios.py
+For every parameters proposal you made, generate an R code snippet based on parameter values you proposed and append this snippet to the  ./external/r-tests/test_results_generation.R file.
+Please read the ./external/r-tests/test_results_generation.initial.R for examples of such code snippets.
+For instance,
+```R
+for (l in c(1,2,3,4)) {
+  for(mar in seq(0, 0.3, by=0.05)) {
+    print(paste("L: ", l, "MAR: ", mar))
+    for (i in 1:portfolio_length) {
+      result <- Kappa(portfolio_bacon[1:i, ], MAR=mar, l=l)
+        write.csv(result)
+    }
+  }
+}
+```
+or (note we skip the first value)
+```R
+for (modified in c(FALSE,TRUE)) {
+  for (rf in seq(0.0, 0.1, by=0.02)) {
+    print(paste("modified: ", modified, "Rf: ", rf))
+    # first value (i=1) is always None
+    for (i in 2:portfolio_length) {
+      result <- BurkeRatio(portfolio_bacon[1:i, ], Rf=rf, modified=modified)
+        write.csv(result)
+    }
+  }
+}
+```
+or (note portfolio_bacon has two series, so we can use one of them as a benchmark series)
+```R
+for (i in 1:portfolio_length) {
+  result <- InformationRatio(portfolio_bacon[1:i,1], Rb=portfolio_bacon[1:i,2])
+    write.csv(result)
+}
+for (i in 1:portfolio_length) {
+  result <- InformationRatio(portfolio_bacon[1:i,2], Rb=portfolio_bacon[1:i,1])
+    write.csv(result)
+}
+```
+or
+```R
+for (method in c("excess", "moment", "fisher", "sample", "sample_excess")) {
+  print(paste("method: ", method))
+  for (i in 1:portfolio_length) {
+    result <- kurtosis(portfolio_bacon[1:i, ], method=method)
+    write.csv(result)
+  }
+}
+```
+In every code snippet you create, add comment saying which data frequency the R function expects: daily, monthly or yearly.
+This is needed because original data is monthly. If we need daily or yearly I need to convert it when executing it on [datacamp](https://www.datacamp.com/datalab):
+```R
+################################################################
+# make daily returns from monthly ones
+################################################################
+dates <- as.Date(index(portfolio_bacon))
+#print(paste("dates",dates))
+
+# Generate a sequence of daily dates starting from the first date in the dataset
+start_date <- dates[1]
+end_date <- dates[length(dates)]
+#print(paste("start=",start_date,"end=", end_date))
+daily_dates <- seq.Date(from = start_date, to = end_date, by = "day")
+
+# Ensure the number of daily dates matches the number of rows in the dataset
+if (length(daily_dates) >= nrow(portfolio_bacon)) {
+  daily_dates <- daily_dates[1:nrow(portfolio_bacon)]
+} else {
+  stop("The generated sequence of daily dates is shorter than the number of rows in the dataset.")
+}
+
+index(portfolio_bacon) <- daily_dates
+#head(portfolio_bacon, 100)
+###################################################################
+```
+or
+```R
+################################################################
+# make yearly return dates from the monthly ones,
+# because R code annualizes the returns
+################################################################
+dates <- as.Date(index(portfolio_bacon))
+#print(paste("dates",dates))
+
+# Generate a sequence of yearly dates starting from the first date in the dataset
+start_date <- dates[1]
+end_date <- dates[length(dates)]
+#print(paste("start=",start_date,"end=", end_date))
+yearly_dates <- seq.Date(from = start_date, by = "year", length.out = nrow(portfolio_bacon))
+
+# Ensure the number of yearly dates matches the number of rows in the dataset
+if (length(yearly_dates) > nrow(portfolio_bacon)) {
+  yearly_dates <- yearly_dates[1:nrow(portfolio_bacon)]
+} else if (length(yearly_dates) < nrow(portfolio_bacon)) {
+  stop("Not enough yearly dates to match the number of rows in the dataset.")
+}
+
+index(portfolio_bacon) <- yearly_dates
+portfolio_length <- nrow(portfolio_bacon)
+#head(portfolio_bacon, 100)
+###################################################################
+```
+
+
+I will do it in the [datacamp](https://www.datacamp.com/datalab/w/28c21593-21e6-47d9-8e72-acebdd3be32c/edit) online R environment.
+
+
+
+
+
+
+
