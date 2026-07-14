@@ -47,3 +47,24 @@ pip        26.0.1
 setuptools 82.0.1
 wheel      0.46.3
 ```
+
+## Installing Python on Windows
+
+Install [pyenv-win](https://github.com/pyenv-win/pyenv-win), follow [powershell installation](https://github.com/pyenv-win/pyenv-win/blob/master/docs/installation.md#powershell) docs.
+
+```powershell
+# Run as administrator
+# Accept Y when prompted
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope LocalMachine
+
+Invoke-WebRequest -UseBasicParsing -Uri "https://raw.githubusercontent.com/pyenv-win/pyenv-win/master/pyenv-win/install-pyenv-win.ps1" -OutFile "./install-pyenv-win.ps1"; &"./install-pyenv-win.ps1"
+```
+
+Validate in command prompt: `pyenv --version`
+
+```command
+rem See above for a version to install
+pyenv install -l | findstr 3.14
+pyenv install 3.14.3
+pyenv global 3.14.3
+```
