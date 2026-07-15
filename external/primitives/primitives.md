@@ -125,36 +125,47 @@ For rolling means, Kahan summation is often preferred over naive summation to ma
 
 
 
-In the folder external\primitives\ I have  the primitives.py and test_primitives.py where I try to implement streaming version of simple stats calculation: mean, variance, skewness, kurtosis.
+In the folder external/primitives/ I have  the primitives.py and test_primitives.py where I try to implement streaming version of simple stats calculation: mean, variance, skewness, kurtosis.
 
 I want this calculator also to operate with rolling window, so I made update(x) and revert(x) methods for that.
 I try different approaches to achieve o(1) complexity and numerical stability.
 
-So far I like MomentsKlein and Klein variants, but they give different results compared to each other and to scipy in TestCompareStats.test_bacon():
+So far I like MomentsKBN and KBN variants, but they give different results compared to each other and to scipy in TestCompareStats.test_bacon():
 
-Klein mean: 0.009000000000000001
-MomentsKlein mean: 0.009000000000000001
+KBN mean: 0.009000000000000001
+MomentsKBN mean: 0.009000000000000001
 SciPy mean: 0.009000000000000003
 
-Klein variance: 0.0014989166666666666
-MomentsKlein variance: 0.0015640869565217393
+KBN variance: 0.0014989166666666666
+MomentsKBN variance: 0.0015640869565217393
 SciPy variance: 0.0014989166666666668
 
-Klein skewness: -0.08817174934967528
-MomentsKlein skewness: -0.08256245520856803
+KBN skewness: -0.08817174934967528
+MomentsKBN skewness: -0.08256245520856803
 SciPy skewness: -0.08256245520856835
 
-Klein kurtosis: -0.40766032118608714
-MomentsKlein kurtosis: -0.5675462058921261
+KBN kurtosis: -0.40766032118608714
+MomentsKBN kurtosis: -0.5675462058921261
 SciPy kurtosis: -0.5675462058921252
 
 to run the test, you should be in the root directory of this repo and run
 python -m unittest external.primitives.test_primitives.TestCompareStats
 
 Please analyze both implementations and help me with:
-- adding ddof in MomentsKlein __init__ and fixing calculations to use ddof
-- When mean/variance/skewness/kurtosis from MomentsKlein or Klein are "almost equal" to scipy, why there are some small differences?
-- why variance in MomentsKlein is different from Klein and scipy?
-- why skewness in Klein is different from MomentsKlein and scipy?
-- why kurtosis in Klein is different from MomentsKlein and scipy?
-- which method do you think is better, MomentsKleim or Klein, or maybe something else?
+- adding ddof in MomentsKBN __init__ and fixing calculations to use ddof
+- When mean/variance/skewness/kurtosis from MomentsKBN or KBN are "almost equal" to scipy, why there are some small differences?
+- why variance in MomentsKBN is different from KBN and scipy?
+- why skewness in KBN is different from MomentsKBN and scipy?
+- why kurtosis in KBN is different from MomentsKBN and scipy?
+- which method do you think is better, MomentsKBN or KBN, or maybe something else?
+
+Now let's convert the Python implementation in the py/streaming_kbn/ folder to Go language implementation in the go/streamingkbn/ folder I created.
+According to idiomatic Go, the package namespace will be streamingkbn, and file names will be
+- kleinkbnaccumulator.go, kleinkbnaccumulator_test.go
+- rawmomentskleinkbn.go, rawmomentskleinkbn_test.go
+- centralmomentskleinkbn.go, centralmomentskleinkbn_test.go
+- linearregressionkleinkbn.go, linearregressionkleinkbn_test.go
+Since we don't use numpy and scipy n Go, we may create pre-calculated expected data in Python implementation using it as a master version. In Go, we an replicate existing tests and use hardcoded expected data.
+Please us authentic Go best practices,using .github/instructions/go.onstructions.md and .opencode/skills/modern-go-guidelines/SKILL.md
+Please keep all comments, descriptions and explanations from Python versions into Go versions.
+Please do not port/copy markdown files, we will make them language-independent later.

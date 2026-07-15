@@ -342,6 +342,53 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
+    // --- Streaming KBN library modules ---
+    const klein_kbn_accumulator_mod = b.addModule("klein_kbn_accumulator", .{
+        .root_source_file = b.path("src/streaming_kbn/klein_kbn_accumulator.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+
+    const raw_moments_klein_kbn_mod = b.addModule("raw_moments_klein_kbn", .{
+        .root_source_file = b.path("src/streaming_kbn/raw_moments_klein_kbn.zig"),
+        .target = target,
+        .optimize = optimize,
+        .imports = &.{
+            .{ .name = "klein_kbn_accumulator", .module = klein_kbn_accumulator_mod },
+        },
+    });
+
+    const central_moments_klein_kbn_mod = b.addModule("central_moments_klein_kbn", .{
+        .root_source_file = b.path("src/streaming_kbn/central_moments_klein_kbn.zig"),
+        .target = target,
+        .optimize = optimize,
+        .imports = &.{
+            .{ .name = "klein_kbn_accumulator", .module = klein_kbn_accumulator_mod },
+        },
+    });
+
+    const linear_regression_klein_kbn_mod = b.addModule("linear_regression_klein_kbn", .{
+        .root_source_file = b.path("src/streaming_kbn/linear_regression_klein_kbn.zig"),
+        .target = target,
+        .optimize = optimize,
+        .imports = &.{
+            .{ .name = "klein_kbn_accumulator", .module = klein_kbn_accumulator_mod },
+            .{ .name = "raw_moments_klein_kbn", .module = raw_moments_klein_kbn_mod },
+        },
+    });
+
+    _ = b.addModule("streaming_kbn", .{
+        .root_source_file = b.path("src/streaming_kbn/streaming_kbn.zig"),
+        .target = target,
+        .optimize = optimize,
+        .imports = &.{
+            .{ .name = "klein_kbn_accumulator", .module = klein_kbn_accumulator_mod },
+            .{ .name = "raw_moments_klein_kbn", .module = raw_moments_klein_kbn_mod },
+            .{ .name = "central_moments_klein_kbn", .module = central_moments_klein_kbn_mod },
+            .{ .name = "linear_regression_klein_kbn", .module = linear_regression_klein_kbn_mod },
+        },
+    });
+
     // --- Test modules (separate modules that share the same source files) ---
     const conventions_test_mod = b.createModule(.{
         .root_source_file = b.path("src/daycounting/conventions.zig"),
@@ -586,6 +633,41 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
+    // --- Streaming KBN test modules ---
+    const klein_kbn_accumulator_test_mod = b.createModule(.{
+        .root_source_file = b.path("src/streaming_kbn/klein_kbn_accumulator.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+
+    const raw_moments_klein_kbn_test_mod = b.createModule(.{
+        .root_source_file = b.path("src/streaming_kbn/raw_moments_klein_kbn.zig"),
+        .target = target,
+        .optimize = optimize,
+        .imports = &.{
+            .{ .name = "klein_kbn_accumulator", .module = klein_kbn_accumulator_mod },
+        },
+    });
+
+    const central_moments_klein_kbn_test_mod = b.createModule(.{
+        .root_source_file = b.path("src/streaming_kbn/central_moments_klein_kbn.zig"),
+        .target = target,
+        .optimize = optimize,
+        .imports = &.{
+            .{ .name = "klein_kbn_accumulator", .module = klein_kbn_accumulator_mod },
+        },
+    });
+
+    const linear_regression_klein_kbn_test_mod = b.createModule(.{
+        .root_source_file = b.path("src/streaming_kbn/linear_regression_klein_kbn.zig"),
+        .target = target,
+        .optimize = optimize,
+        .imports = &.{
+            .{ .name = "klein_kbn_accumulator", .module = klein_kbn_accumulator_mod },
+            .{ .name = "raw_moments_klein_kbn", .module = raw_moments_klein_kbn_mod },
+        },
+    });
+
     // --- Tests ---
     const conventions_tests = b.addTest(.{ .root_module = conventions_test_mod, .filters = filters });
     const daycounting_tests = b.addTest(.{ .root_module = daycounting_test_mod, .filters = filters });
@@ -617,6 +699,10 @@ pub fn build(b: *std.Build) void {
     const sig_compose_tests = b.addTest(.{ .root_module = sig_compose_test_mod, .filters = filters });
     const cp_tests = b.addTest(.{ .root_module = cp_test_mod, .filters = filters });
     const signal_ensemble_tests = b.addTest(.{ .root_module = signal_ensemble_test_mod, .filters = filters });
+    const klein_kbn_accumulator_tests = b.addTest(.{ .root_module = klein_kbn_accumulator_test_mod, .filters = filters });
+    const raw_moments_klein_kbn_tests = b.addTest(.{ .root_module = raw_moments_klein_kbn_test_mod, .filters = filters });
+    const central_moments_klein_kbn_tests = b.addTest(.{ .root_module = central_moments_klein_kbn_test_mod, .filters = filters });
+    const linear_regression_klein_kbn_tests = b.addTest(.{ .root_module = linear_regression_klein_kbn_test_mod, .filters = filters });
 
     const run_conventions_tests = b.addRunArtifact(conventions_tests);
     const run_daycounting_tests = b.addRunArtifact(daycounting_tests);
@@ -648,6 +734,10 @@ pub fn build(b: *std.Build) void {
     const run_sig_compose_tests = b.addRunArtifact(sig_compose_tests);
     const run_cp_tests = b.addRunArtifact(cp_tests);
     const run_signal_ensemble_tests = b.addRunArtifact(signal_ensemble_tests);
+    const run_klein_kbn_accumulator_tests = b.addRunArtifact(klein_kbn_accumulator_tests);
+    const run_raw_moments_klein_kbn_tests = b.addRunArtifact(raw_moments_klein_kbn_tests);
+    const run_central_moments_klein_kbn_tests = b.addRunArtifact(central_moments_klein_kbn_tests);
+    const run_linear_regression_klein_kbn_tests = b.addRunArtifact(linear_regression_klein_kbn_tests);
 
     const test_step = b.step("test", "Run all tests");
     test_step.dependOn(&run_conventions_tests.step);
@@ -680,4 +770,8 @@ pub fn build(b: *std.Build) void {
     test_step.dependOn(&run_sig_compose_tests.step);
     test_step.dependOn(&run_cp_tests.step);
     test_step.dependOn(&run_signal_ensemble_tests.step);
+    test_step.dependOn(&run_klein_kbn_accumulator_tests.step);
+    test_step.dependOn(&run_raw_moments_klein_kbn_tests.step);
+    test_step.dependOn(&run_central_moments_klein_kbn_tests.step);
+    test_step.dependOn(&run_linear_regression_klein_kbn_tests.step);
 }

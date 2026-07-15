@@ -1,13 +1,15 @@
 # To run tests, ensure you are in the root directory of the repository and run:
-# python -m unittest external.primitives.test_primitives.TestKleinAccumulator
+# python -m unittest external.primitives.test_primitives.TestCompareStats
 
 import math
 import unittest
 import random
 import numpy as np
-import scipy
+from scipy import stats
 
-from .primitives import KahanWelfordVariance, KleinAccumulator, NaiveSum, Stats2Klein, Variance, RunningVariance, Stats2, Moments, MomentsKlein
+from .primitives import KahanWelfordVariance, Variance, RunningVariance, RawMoments, CentralMoments
+from .raw_moments_klein_kbn import RawMomentsKleinKBN
+from .central_moments_klein_kbn import CentralMomentsKleinKBN
 
 ##########################################################
 # Mean and Variance with update/revert methods
@@ -100,103 +102,6 @@ class TestRollingVariance(unittest.TestCase):
         self.assertAlmostEqual(rv.variance, 841.6666666666666, places=14)
 
 ##########################################################
-# Klein Accumulator
-##########################################################
-
-class TestKleinAccumulator(unittest.TestCase):
-
-    def setUp(self):
-        # https://en.wikipedia.org/wiki/Kahan_summation_algorithm
-        # For many sequences of numbers, both algorithms agree,
-        # but a simple example due to Peters[11] shows how they can differ: summing 
-        # [1.0, +1e100, 1.0, -1e100] in double precision, Kahan's algorithm yields 0.0,
-        # whereas Neumaier's algorithm yields the correct value 2.0.
-        self.peters_data = [1.0, +1e100, 1.0, -1e100]
-
-        # https://github.com/numpy/numpy/issues/8786
-        #  A badly conditioned sum, condition number ~2.188e+14
-        self.numpy_data = [
-            -0.41253261766461263,
-            41287272281118.43,
-            -1.4727977348624173e-14,
-            5670.3302557520055,
-            2.119245229045646e-11,
-            -0.003679264134906428,
-            -6.892634568678797e-14,
-            -0.0006984744181630712,
-            -4054136.048352595,
-            -1003.101760720037,
-            -1.4436349910427172e-17,
-            -41287268231649.57]
-        self.numpy_expected = -0.377392919181026
-        
-    def test_peters(self):
-        naive = NaiveSum()
-        klein = KleinAccumulator()
-        for x in self.peters_data:
-            naive.update(x)
-            klein.update(x)
-        v = naive.value
-        k = klein.value
-        n = np.sum(self.peters_data)
-        m = math.fsum(self.peters_data)
-        print(f'\nExact sum (Peters): 2.0')
-        print(f'fsum: {m} (error: {abs(m - 2.0)})')
-        print(f'NumPy: {n} (error: {abs(n - 2.0)})')
-        print(f'Klein: {k} (error: {abs(k - 2.0)})')
-        print(f'Naive: {v} (error: {abs(v - 2.0)})\n')
-        self.assertAlmostEqual(k, 2.0, places=15, msg=f'Klein sum {k} is not equal to 2.0')
-        #self.assertAlmostEqual(v, 2.0, places=15, msg=f'Naive sum {v} is not equal to 2.0')
-        
-    def test_numpy(self):
-        naive = NaiveSum()
-        klein = KleinAccumulator()
-        for x in self.numpy_data:
-            naive.update(x)
-            klein.update(x)
-        v = naive.value
-        k = klein.value
-        n = np.sum(self.numpy_data)
-        m = math.fsum(self.numpy_data)
-        print(f'\nExact sum: {self.numpy_expected}')
-        print(f'fsum: {m} (error: {abs(m - self.numpy_expected)})')
-        print(f'NumPy: {n} (error: {abs(n - self.numpy_expected)})')
-        print(f'Klein: {k} (error: {abs(k - self.numpy_expected)})')
-        print(f'Naive: {v} (error: {abs(v - self.numpy_expected)})\n')
-        self.assertAlmostEqual(k, self.numpy_expected, places=16, msg=f'Klein sum {k} is not equal to {self.numpy_expected}')
-        #self.assertAlmostEqual(v, self.numpy_expected, places=16, msg=f'Naive sum {v} is not equal to {self.numpy_expected}')
-        
-    def test_better_accuracy_than_naive(self):
-        spread = 1e7
-        naive = NaiveSum()
-        klein = KleinAccumulator()
-
-        rng = np.random.default_rng(seed=42)
-        for x in rng.uniform(size=1000000):
-            x *= spread
-            naive.update(x)
-            klein.update(x)
-
-        rng = np.random.default_rng(seed=42)
-        for x in rng.uniform(size=1000000):
-            x *= spread
-            naive.update(-x)
-            klein.update(-x)
-
-        v = naive.value
-        k = klein.value
-        self.assertTrue(abs(k) <= abs(v), msg=f'Klein sum {k} is not more accurate than naive sum {v}')
-        
-    def test_reset(self):
-        klein = KleinAccumulator()
-        klein.update(1.5)
-        klein.reset()
-        self.assertAlmostEqual(klein.value, 0.0, places=15)
-
-        klein.update(1.5)
-        self.assertAlmostEqual(klein.value, 1.5, places=15)
-
-##########################################################
 # Various versios of stats
 ##########################################################
 
@@ -247,21 +152,21 @@ class TestCompareStats(unittest.TestCase):
 
 
     def test_peters(self):
-        klein = Stats2Klein(ddof=0)
+        kbn = RawMomentsKleinKBN(ddof=0)
         kwv = KahanWelfordVariance(ddof=0)
-        st2 = Stats2(ddof=0)
-        mom = Moments()
+        st2 = RawMoments(ddof=0)
+        mom = CentralMoments(ddof=0)
         var = Variance(ddof=0)
         for x in self.peters_data:
-            klein.update(x)
+            kbn.update(x)
             kwv.update(x)
             st2.update(x)
             mom.update(x)
             var.update(x)
-        k_m = klein.mean
-        k_v = klein.variance
-        k_s = klein.skewness
-        k_k = klein.kurtosis
+        k_m = kbn.mean
+        k_v = kbn.variance
+        k_s = kbn.skewness
+        k_k = kbn.kurtosis
         kwv_m = kwv.mean
         kwv_v = kwv.variance
         st2_m = st2.mean
@@ -276,58 +181,58 @@ class TestCompareStats(unittest.TestCase):
         var_v = var.variance
         np_m = np.mean(self.peters_data)
         np_v = np.var(self.peters_data, ddof=0)
-        sp_m = scipy.stats.tmean(self.peters_data)
-        sp_v = scipy.stats.tvar(self.peters_data, ddof=0)
-        sp_s = scipy.stats.skew(self.peters_data, bias=False)
-        sp_k = scipy.stats.kurtosis(self.peters_data, bias=False)
+        sp_m = stats.tmean(self.peters_data)
+        sp_v = stats.tvar(self.peters_data, ddof=0)
+        sp_s = stats.skew(self.peters_data, bias=False)
+        sp_k = stats.kurtosis(self.peters_data, bias=False)
 
         print(f'\nExact mean (Peters): {self.peters_expected}')
-        print(f'Klein mean: {k_m} (error: {abs(k_m - self.peters_expected)})')
+        print(f'KBN mean: {k_m} (error: {abs(k_m - self.peters_expected)})')
         print(f'Kahan-Welford mean: {kwv_m} (error: {abs(kwv_m - self.peters_expected)})')
-        print(f'Stats2 mean: {st2_m} (error: {abs(st2_m - self.peters_expected)})')
-        print(f'Moments mean: {mom_m} (error: {abs(mom_m - self.peters_expected)})')
+        print(f'RawMoments mean: {st2_m} (error: {abs(st2_m - self.peters_expected)})')
+        print(f'CentralMoments mean: {mom_m} (error: {abs(mom_m - self.peters_expected)})')
         print(f'Variance mean: {var_m} (error: {abs(var_m - self.peters_expected)})')
         print(f'NumPy mean: {np_m} (error: {abs(np_m - self.peters_expected)})')
         print(f'SciPy mean: {sp_m} (error: {abs(sp_m - self.peters_expected)})')
-        print(f'Klein variance: {k_v}')
+        print(f'KBN variance: {k_v}')
         print(f'Kahan-Welford variance: {kwv_v}')
-        print(f'Stats2 variance: {st2_v}')
-        print(f'Moments variance: {mom_v}')
+        print(f'RawMoments variance: {st2_v}')
+        print(f'CentralMoments variance: {mom_v}')
         print(f'Variance variance: {var_v}')
         print(f'NumPy variance: {np_v}')
         print(f'SciPy variance: {sp_v}')
-        print(f'Klein skewness: {k_s}')
-        print(f'Stats2 skewness: {st2_s}')
-        print(f'Moments skewness: {mom_s}')
+        print(f'KBN skewness: {k_s}')
+        print(f'RawMoments skewness: {st2_s}')
+        print(f'CentralMoments skewness: {mom_s}')
         print(f'NumPy skewness: {sp_s}')
         print(f'SciPy skewness: {sp_s}')
-        print(f'Klein kurtosis: {k_k}')
-        print(f'Stats2 kurtosis: {st2_k}')
-        print(f'Moments kurtosis: {mom_k}')
+        print(f'KBN kurtosis: {k_k}')
+        print(f'RawMoments kurtosis: {st2_k}')
+        print(f'CentralMoments kurtosis: {mom_k}')
         print(f'NumPy kurtosis: {sp_k}')
         print(f'SciPy kurtosis: {sp_k}\n')
 
-        self.assertAlmostEqual(k_m, 0.5, places=16, msg=f'Stats2Klein mean {k_m} is not equal to 0.5')
-        #self.assertAlmostEqual(k_v, 1.0, places=16, msg=f'Stats2Klein variance {k_v} is not equal to 1.0')
-        #self.assertAlmostEqual(k_s, 1.0, places=16, msg=f'Stats2Klein skewness {k_s} is not equal to 1.0')
-        #self.assertAlmostEqual(k_k, 1.0, places=16, msg=f'Stats2Klein kurtosis {k_k} is not equal to 1.0')
+        self.assertAlmostEqual(k_m, 0.5, places=16, msg=f'RawMomentsKleinKBN mean {k_m} is not equal to 0.5')
+        #self.assertAlmostEqual(k_v, 1.0, places=16, msg=f'RawMomentsKleinKBN variance {k_v} is not equal to 1.0')
+        #self.assertAlmostEqual(k_s, 1.0, places=16, msg=f'RawMomentsKleinKBN skewness {k_s} is not equal to 1.0')
+        #self.assertAlmostEqual(k_k, 1.0, places=16, msg=f'RawMomentsKleinKBN kurtosis {k_k} is not equal to 1.0')
 
     def test_numpy(self):
-        klein = Stats2Klein(ddof=0)
+        kbn = RawMomentsKleinKBN(ddof=0)
         kwv = KahanWelfordVariance(ddof=0)
-        st2 = Stats2(ddof=0)
-        mom = Moments()
+        st2 = RawMoments(ddof=0)
+        mom = CentralMoments(ddof=0)
         var = Variance(ddof=0)
         for x in self.numpy_data:
-            klein.update(x)
+            kbn.update(x)
             kwv.update(x)
             st2.update(x)
             mom.update(x)
             var.update(x)
-        k_m = klein.mean
-        k_v = klein.variance
-        k_s = klein.skewness
-        k_k = klein.kurtosis
+        k_m = kbn.mean
+        k_v = kbn.variance
+        k_s = kbn.skewness
+        k_k = kbn.kurtosis
         kwv_m = kwv.mean
         kwv_v = kwv.variance
         st2_m = st2.mean
@@ -342,59 +247,59 @@ class TestCompareStats(unittest.TestCase):
         var_v = var.variance
         np_m = np.mean(self.numpy_data)
         np_v = np.var(self.numpy_data, ddof=0)
-        sp_m = scipy.stats.tmean(self.numpy_data)
-        sp_v = scipy.stats.tvar(self.numpy_data, ddof=0)
-        sp_s = scipy.stats.skew(self.numpy_data, bias=False)
-        sp_k = scipy.stats.kurtosis(self.numpy_data, bias=False)
+        sp_m = stats.tmean(self.numpy_data)
+        sp_v = stats.tvar(self.numpy_data, ddof=0)
+        sp_s = stats.skew(self.numpy_data, bias=False)
+        sp_k = stats.kurtosis(self.numpy_data, bias=False)
 
         print(f'\nExact mean (NumPy): {self.numpy_expected}')
-        print(f'Klein mean: {k_m} (error: {abs(k_m - self.numpy_expected)})')
+        print(f'KBN mean: {k_m} (error: {abs(k_m - self.numpy_expected)})')
         print(f'Kahan-Welford mean: {kwv_m} (error: {abs(kwv_m - self.numpy_expected)})')
-        print(f'Stats2 mean: {st2_m} (error: {abs(st2_m - self.numpy_expected)})')
-        print(f'Moments mean: {mom_m} (error: {abs(mom_m - self.numpy_expected)})')
+        print(f'RawMoments mean: {st2_m} (error: {abs(st2_m - self.numpy_expected)})')
+        print(f'CentralMoments mean: {mom_m} (error: {abs(mom_m - self.numpy_expected)})')
         print(f'Variance mean: {var_m} (error: {abs(var_m - self.numpy_expected)})')
         print(f'NumPy mean: {np_m} (error: {abs(np_m - self.numpy_expected)})')
         print(f'SciPy mean: {sp_m} (error: {abs(sp_m - self.numpy_expected)})')
-        print(f'Klein variance: {k_v}')
+        print(f'KBN variance: {k_v}')
         print(f'Kahan-Welford variance: {kwv_v}')
-        print(f'Stats2 variance: {st2_v}')
-        print(f'Moments variance: {mom_v}')
+        print(f'RawMoments variance: {st2_v}')
+        print(f'CentralMoments variance: {mom_v}')
         print(f'Variance variance: {var_v}')
         print(f'NumPy variance: {np_v}')
         print(f'SciPy variance: {sp_v}')
-        print(f'Klein skewness: {k_s}')
-        print(f'Stats2 skewness: {st2_s}')
-        print(f'Moments skewness: {mom_s}')
+        print(f'KBN skewness: {k_s}')
+        print(f'RawMoments skewness: {st2_s}')
+        print(f'CentralMoments skewness: {mom_s}')
         print(f'NumPy skewness: {sp_s}')
         print(f'SciPy skewness: {sp_s}')
-        print(f'Klein kurtosis: {k_k}')
-        print(f'Stats2 kurtosis: {st2_k}')
-        print(f'Moments kurtosis: {mom_k}')
+        print(f'KBN kurtosis: {k_k}')
+        print(f'RawMoments kurtosis: {st2_k}')
+        print(f'CentralMoments kurtosis: {mom_k}')
         print(f'NumPy kurtosis: {sp_k}')
         print(f'SciPy kurtosis: {sp_k}\n')
 
-        self.assertAlmostEqual(k_m, self.numpy_expected, places=16, msg=f'Stats2Klein mean {k_m} is not equal to {self.numpy_expected}')
-        #self.assertAlmostEqual(k_v, 1.0, places=16, msg=f'Stats2Klein variance {k_v} is not equal to 1.0')
-        #self.assertAlmostEqual(k_s, 1.0, places=16, msg=f'Stats2Klein skewness {k_s} is not equal to 1.0')
-        #self.assertAlmostEqual(k_k, 1.0, places=16, msg=f'Stats2Klein kurtosis {k_k} is not equal to 1.0')
+        self.assertAlmostEqual(k_m, self.numpy_expected, places=16, msg=f'RawMomentsKleinKBN mean {k_m} is not equal to {self.numpy_expected}')
+        #self.assertAlmostEqual(k_v, 1.0, places=16, msg=f'RawMomentsKleinKBN variance {k_v} is not equal to 1.0')
+        #self.assertAlmostEqual(k_s, 1.0, places=16, msg=f'RawMomentsKleinKBN skewness {k_s} is not equal to 1.0')
+        #self.assertAlmostEqual(k_k, 1.0, places=16, msg=f'RawMomentsKleinKBN kurtosis {k_k} is not equal to 1.0')
 
 
     def test_bacon(self):
-        klein = Stats2Klein(ddof=0)
-        st2 = Stats2(ddof=0)
-        mom = Moments()
-        mok = MomentsKlein()
+        kbn = RawMomentsKleinKBN(ddof=0)
+        st2 = RawMoments(ddof=0)
+        mom = CentralMoments()
+        mok = CentralMomentsKleinKBN(ddof=0)
         var = Variance(ddof=0)
         for x in self.bacon_data:
-            klein.update(x)
+            kbn.update(x)
             st2.update(x)
             mom.update(x)
             var.update(x)
             mok.update(x)
-        k_m = klein.mean
-        k_v = klein.variance
-        k_s = klein.skewness
-        k_k = klein.kurtosis
+        k_m = kbn.mean
+        k_v = kbn.variance
+        k_s = kbn.skewness
+        k_k = kbn.kurtosis
         st2_m = st2.mean
         st2_v = st2.variance
         st2_s = st2.skewness
@@ -409,32 +314,133 @@ class TestCompareStats(unittest.TestCase):
         mok_k = mok.kurtosis
         var_m = var.mean
         var_v = var.variance
-        sp_m = scipy.stats.tmean(self.bacon_data)
-        sp_v = scipy.stats.tvar(self.bacon_data, ddof=0)
-        sp_s = scipy.stats.skew(self.bacon_data, bias=True)
-        sp_k = scipy.stats.kurtosis(self.bacon_data, bias=True, fisher=True)
+        sp_m = stats.tmean(self.bacon_data)
+        sp_v = stats.tvar(self.bacon_data, ddof=0)
+        sp_s = stats.skew(self.bacon_data, bias=True)
+        sp_k = stats.kurtosis(self.bacon_data, bias=True, fisher=True)
 
         print(f'\nExact kurtosis (Bacon): -0.56754620589212500')
-        print(f'Klein mean: {k_m}')
-        print(f'Stats2 mean: {st2_m}')
-        print(f'Moments mean: {mom_m}')
-        print(f'MomentsKlein mean: {mok_m}')
+        print(f'KBN mean: {k_m}')
+        print(f'RawMoments mean: {st2_m}')
+        print(f'CentralMoments mean: {mom_m}')
+        print(f'CentralMomentsKleinKBN mean: {mok_m}')
         print(f'Variance mean: {var_m}')
         print(f'SciPy mean: {sp_m}')
-        print(f'Klein variance: {k_v}')
-        print(f'Stats2 variance: {st2_v}')
-        print(f'Moments variance: {mom_v}')
-        print(f'MomentsKlein variance: {mok_v}')
+        print(f'KBN variance: {k_v}')
+        print(f'RawMoments variance: {st2_v}')
+        print(f'CentralMoments variance: {mom_v}')
+        print(f'CentralMomentsKleinKBN variance: {mok_v}')
         print(f'Variance variance: {var_v}')
         print(f'SciPy variance: {sp_v}')
-        print(f'Klein skewness: {k_s}')
-        print(f'Stats2 skewness: {st2_s}')
-        print(f'Moments skewness: {mom_s}')
-        print(f'MomentsKlein skewness: {mok_s}')
+        print(f'KBN skewness: {k_s}')
+        print(f'RawMoments skewness: {st2_s}')
+        print(f'CentralMoments skewness: {mom_s}')
+        print(f'CentralMomentsKleinKBN skewness: {mok_s}')
         print(f'SciPy skewness: {sp_s}')
-        print(f'Klein kurtosis: {k_k}')
-        print(f'Stats2 kurtosis: {st2_k}')
-        print(f'Moments kurtosis: {mom_k}')
-        print(f'MomentsKlein kurtosis: {mok_k}')
+        print(f'KBN kurtosis: {k_k}')
+        print(f'RawMoments kurtosis: {st2_k}')
+        print(f'CentralMoments kurtosis: {mom_k}')
+        print(f'CentralMomentsKleinKBN kurtosis: {mok_k}')
         print(f'SciPy kurtosis: {sp_k}\n')
+
+        self.assertAlmostEqual(mok_m, sp_m, places=15)
+        self.assertAlmostEqual(mok_v, sp_v, places=15)
+        self.assertAlmostEqual(mok_s, sp_s, places=14)
+        self.assertAlmostEqual(mok_k, sp_k, places=13)
+
+        self.assertAlmostEqual(k_s, sp_s, places=14)
+        self.assertAlmostEqual(st2_s, sp_s, places=14)
+        self.assertAlmostEqual(k_k, sp_k, places=13)
+        self.assertAlmostEqual(st2_k, sp_k, places=13)
+
+    def test_bacon_bias_false(self):
+        kbn = RawMomentsKleinKBN(ddof=0, bias=False, fisher=True)
+        st2 = RawMoments(ddof=0, bias=False, fisher=True)
+        mom = CentralMoments(ddof=0, bias=False, fisher=True)
+        mok = CentralMomentsKleinKBN(ddof=0, bias=False, fisher=True)
+        for x in self.bacon_data:
+            kbn.update(x)
+            st2.update(x)
+            mom.update(x)
+            mok.update(x)
+        sp_s = stats.skew(self.bacon_data, bias=False)
+        sp_k = stats.kurtosis(self.bacon_data, bias=False, fisher=True)
+
+        self.assertAlmostEqual(kbn.skewness, sp_s, places=14)
+        self.assertAlmostEqual(st2.skewness, sp_s, places=14)
+        self.assertAlmostEqual(mom.skewness, sp_s, places=14)
+        self.assertAlmostEqual(mok.skewness, sp_s, places=14)
+        self.assertAlmostEqual(kbn.kurtosis, sp_k, places=13)
+        self.assertAlmostEqual(st2.kurtosis, sp_k, places=13)
+        self.assertAlmostEqual(mom.kurtosis, sp_k, places=13)
+        self.assertAlmostEqual(mok.kurtosis, sp_k, places=13)
+
+    def test_revert_lifo_simple(self):
+        data = [10.0, 18.0, 5.0]
+        mom_full = CentralMoments(ddof=0)
+        mok_full = CentralMomentsKleinKBN(ddof=0)
+        for x in data:
+            mom_full.update(x)
+            mok_full.update(x)
+
+        mom_first2 = CentralMoments(ddof=0)
+        mok_first2 = CentralMomentsKleinKBN(ddof=0)
+        for x in data[:2]:
+            mom_first2.update(x)
+            mok_first2.update(x)
+
+        mom_full.revert(data[2])
+        mok_full.revert(data[2])
+
+        self.assertAlmostEqual(mom_full.mean, mom_first2.mean, places=15)
+        self.assertAlmostEqual(mom_full.variance, mom_first2.variance, places=15)
+        self.assertAlmostEqual(mom_full.skewness, mom_first2.skewness, places=14)
+        self.assertAlmostEqual(mom_full.kurtosis, mom_first2.kurtosis, places=13)
+
+        self.assertAlmostEqual(mok_full.mean, mok_first2.mean, places=15)
+        self.assertAlmostEqual(mok_full.variance, mok_first2.variance, places=15)
+        self.assertAlmostEqual(mok_full.skewness, mok_first2.skewness, places=14)
+        self.assertAlmostEqual(mok_full.kurtosis, mok_first2.kurtosis, places=13)
+
+    def test_revert_lifo_bacon(self):
+        mom_full = CentralMoments(ddof=0)
+        mom_part = CentralMoments(ddof=0)
+        mok_full = CentralMomentsKleinKBN(ddof=0)
+        mok_part = CentralMomentsKleinKBN(ddof=0)
+        for x in self.bacon_data:
+            mom_full.update(x)
+            mok_full.update(x)
+        for x in self.bacon_data[:-1]:
+            mom_part.update(x)
+            mok_part.update(x)
+
+        mom_full.revert(self.bacon_data[-1])
+        mok_full.revert(self.bacon_data[-1])
+
+        self.assertAlmostEqual(mom_full.mean, mom_part.mean, places=15)
+        self.assertAlmostEqual(mom_full.variance, mom_part.variance, places=15)
+        self.assertAlmostEqual(mom_full.skewness, mom_part.skewness, places=13)
+        self.assertAlmostEqual(mom_full.kurtosis, mom_part.kurtosis, places=12)
+
+        self.assertAlmostEqual(mok_full.mean, mok_part.mean, places=15)
+        self.assertAlmostEqual(mok_full.variance, mok_part.variance, places=15)
+        self.assertAlmostEqual(mok_full.skewness, mok_part.skewness, places=13)
+        self.assertAlmostEqual(mok_full.kurtosis, mok_part.kurtosis, places=12)
+
+    def test_revert_lifo_roundtrip(self):
+        mom = CentralMoments(ddof=0)
+        mok = CentralMomentsKleinKBN(ddof=0)
+        for x in self.bacon_data:
+            mom.update(x)
+            mok.update(x)
+        for x in reversed(self.bacon_data):
+            mom.revert(x)
+            mok.revert(x)
+
+        self.assertEqual(mom.n, 0)
+        self.assertEqual(mom.mean, 0.0)
+        self.assertEqual(mom.variance, 0.0)
+        self.assertEqual(mok.n, 0)
+        self.assertEqual(mok.mean, 0.0)
+        self.assertEqual(mok.variance, 0.0)
 

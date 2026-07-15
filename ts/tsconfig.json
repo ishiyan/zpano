@@ -31,7 +31,8 @@
     "fuzzy/**/*.ts",
     "signals/**/*.ts",
     "candlestick-patterns/**/*.ts",
-    "signal-ensemble/**/*.ts"
+    "signal-ensemble/**/*.ts",
+    "streaming-kbn/**/*.ts"
   ],
   "exclude": [
     "node_modules",

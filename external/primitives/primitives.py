@@ -95,8 +95,51 @@ class RunningVariance:
 ##########################################################
 
 # https://www.johndcook.com/skewness_kurtosis.html
-class Moments:
-    def __init__(self) -> None:
+class CentralMoments:
+    """
+    Streaming mean, variance, skewness, kurtosis via Pébay's online central
+    moment update (O(1) per sample, no compensation).
+
+    Maintains running sums of central moments m₁, m₂, m₃, m₄ as plain floats.
+
+    Parameters
+    ----------
+    ddof : int, default=1
+        Delta degrees of freedom for variance.
+        variance = m₂ / (n - ddof).  ddof=0 gives population, ddof=1 gives sample.
+    bias : bool, default=True
+        If True, compute population standardized moments (m₃/m₂^1.5).
+        If False, apply the Fisher-Pearson adjusted (bias-corrected) factor:
+        skewness_bcf = skewness_pop · √(n·(n-1)) / (n-2)
+    fisher : bool, default=True
+        If True, return excess kurtosis (subtract 3 so Gaussian→0).
+        If False, return raw kurtosis (Gaussian→3).
+        Applied after the bias correction when bias=False.
+
+    Notes
+    -----
+    Skewness (bias=True):
+        g₁ = √n · m₃ / m₂^1.5
+
+    Skewness (bias=False):
+        G₁ = g₁ · √(n·(n-1)) / (n-2)
+
+    Kurtosis (bias=True, fisher=True):
+        g₂ = n · m₄ / m₂²  -  3
+
+    Kurtosis (bias=True, fisher=False):
+        g₂ = n · m₄ / m₂²
+
+    Kurtosis (bias=False, fisher=True):
+        G₂ = ((n²-1) · n·m₄/m₂²  -  3·(n-1)²) / ((n-2)·(n-3))
+
+    Kurtosis (bias=False, fisher=False):
+        G₂ = ((n²-1) · n·m₄/m₂²  -  3·(n-1)²) / ((n-2)·(n-3))  +  3
+    """
+    def __init__(self, ddof=1, bias=True, fisher=True) -> None:
+        self.ddof = ddof
+        self.bias = bias
+        self.fisher = fisher
         self.n = 0
         self.m1 = 0.0
         self.m2 = 0.0
@@ -117,13 +160,62 @@ class Moments:
         self.m2 += term
 
     def revert(self, x) -> None:
-        self.n -= 1
-        if self.n < 0:
+        """
+        LIFO revert: removes the most recently added sample x, restoring
+        the state to exactly what it would be had x never been added.
+
+        Only the most recent sample can be reverted (LIFO stack, not FIFO
+        queue).  For rolling-window FIFO removal use a wrapper that keeps
+        a sample deque and calls reset() + forward replay of the reduced
+        window, or use RawMoments/RawMomentsKleinKBN which support FIFO revert natively.
+
+        Inverse formulas (where nₙ = count before revert, nₒ = nₙ - 1):
+
+            m₁_old = (nₙ · m₁_new − x) / nₒ            [mean undo]
+            δ      = x − m₁_old
+            δₙ     = δ / nₙ
+            δₙ²    = δₙ · δₙ
+            term   = δ · δₙ · nₒ
+
+            m₂_old = m₂_new − term                      [2nd moment undo]
+            m₃_old = m₃_new − (term·δₙ·(nₙ−2) − 3·δₙ·m₂_old)
+                                                        [3rd moment undo]
+            m₄_old = m₄_new − (term·δₙ²·(nₙ²−3nₙ+3)
+                                + 6·δₙ²·m₂_old − 4·δₙ·m₃_old)
+                                                        [4th moment undo]
+        """
+        n_new = self.n
+        if n_new == 0:
             raise ValueError("Cannot go below 0")
-        elif self.n == 0:
+        n_old = n_new - 1
+        if n_old == 0:
+            self.n = 0
             self.m1 = 0.0
-        else:
-            self.m1 -= (1 / self.n) * (x - self.m1)
+            self.m2 = 0.0
+            self.m3 = 0.0
+            self.m4 = 0.0
+            return
+
+        m1_new = self.m1
+        m2_new = self.m2
+        m3_new = self.m3
+        m4_new = self.m4
+
+        m1_old = (n_new * m1_new - x) / n_old
+        delta = x - m1_old
+        delta_n = delta / n_new
+        delta_n2 = delta_n * delta_n
+        term = delta * delta_n * n_old
+
+        m2_old = m2_new - term
+        m3_old = m3_new - (term * delta_n * (n_new - 2) - 3 * delta_n * m2_old)
+        m4_old = m4_new - (term * delta_n2 * (n_new * n_new - 3 * n_new + 3) + 6 * delta_n2 * m2_old - 4 * delta_n * m3_old)
+
+        self.n = n_old
+        self.m1 = m1_old
+        self.m2 = m2_old
+        self.m3 = m3_old
+        self.m4 = m4_old
 
     @property
     def mean(self) -> float:
@@ -131,19 +223,34 @@ class Moments:
 
     @property
     def variance(self) -> float:
-        return self.m2 / (self.n - 1) if self.n > 1 else 0.0
+        N = self.n - self.ddof
+        return self.m2 / N if N > 0 else 0.0
 
     @property
     def standard_deviation(self) -> float:
-        return (self.m2 / (self.n - 1))**0.5 if self.n > 1 else 0.0
+        N = self.n - self.ddof
+        return (self.m2 / N)**0.5 if N > 0 else 0.0
 
     @property
     def skewness(self) -> float:
-        return math.sqrt(self.n) * self.m3 / (self.m2**1.5) if self.n > 2 else 0.0
+        N = self.n
+        if N < 3 or self.m2 <= 0:
+            return 0.0
+        g1 = math.sqrt(N) * self.m3 / (self.m2 ** 1.5)
+        if self.bias:
+            return g1
+        return g1 * math.sqrt(N * (N - 1)) / (N - 2)
 
     @property
     def kurtosis(self) -> float:
-        return self.n *self.m4 / (self.m2*self.m2) - 3.0 if self.n > 3 else 0.0
+        N = self.n
+        if N <= 3 or self.m2 <= 0:
+            return 0.0
+        raw = N * self.m4 / (self.m2 * self.m2)
+        if not self.bias:
+            adj = ((N * N - 1) * raw - 3 * (N - 1) ** 2) / ((N - 2) * (N - 3))
+            return adj if self.fisher else adj + 3.0
+        return raw - 3.0 if self.fisher else raw
 
 ##########################################################
 # Linear regression with update method.
@@ -155,8 +262,8 @@ class Regression:
     def __init__(self) -> None:
         self.n = 0
         self.S_xy = 0.0
-        self.x_moments: Moments = Moments()
-        self.y_moments: Moments = Moments()
+        self.x_moments: CentralMoments = CentralMoments()
+        self.y_moments: CentralMoments = CentralMoments()
 
     def update(self, x, y) -> None:
         n_old = self.n
@@ -230,14 +337,59 @@ class RunningStats1:
 # https://github.com/ajcr/rolling/blob/master/rolling/stats/skew.py
 # https://github.com/ajcr/rolling/blob/master/rolling/stats/kurtosis.py
 
-class Stats2:
-    def __init__(self, ddof=1) -> None:
+class RawMoments:
+    """
+    Streaming mean, variance, skewness, kurtosis via raw power sums (x¹..x⁴)
+    with plain (uncompensated) accumulation.
+
+    Accumulates Σx, Σx², Σx³, Σx⁴ as plain floats, plus a separate
+    Welford-style variance tracker.  Converts raw sums to central moments
+    at query time.  May suffer from catastrophic cancellation for large
+    values — use RawMomentsKleinKBN or CentralMomentsKleinKBN for better numerical stability.
+
+    Parameters
+    ----------
+    ddof : int, default=1
+        Delta degrees of freedom for variance.
+        variance = m₂ / (n - ddof).  ddof=0 gives population, ddof=1 gives sample.
+    bias : bool, default=True
+        If True, compute population standardized moments (m₃/m₂^1.5).
+        If False, apply the Fisher-Pearson adjusted (bias-corrected) factor:
+        skewness_bcf = skewness_pop · √(n·(n-1)) / (n-2)
+    fisher : bool, default=True
+        If True, return excess kurtosis (subtract 3 so Gaussian→0).
+        If False, return raw kurtosis (Gaussian→3).
+        Applied after the bias correction when bias=False.
+
+    Notes
+    -----
+    Skewness (bias=True):
+        g₁ = √n · m₃ / m₂^1.5
+
+    Skewness (bias=False):
+        G₁ = g₁ · √(n·(n-1)) / (n-2)
+
+    Kurtosis (bias=True, fisher=True):
+        g₂ = n · m₄ / m₂²  -  3
+
+    Kurtosis (bias=True, fisher=False):
+        g₂ = n · m₄ / m₂²
+
+    Kurtosis (bias=False, fisher=True):
+        G₂ = ((n²-1) · n·m₄/m₂²  -  3·(n-1)²) / ((n-2)·(n-3))
+
+    Kurtosis (bias=False, fisher=False):
+        G₂ = ((n²-1) · n·m₄/m₂²  -  3·(n-1)²) / ((n-2)·(n-3))  +  3
+    """
+    def __init__(self, ddof=1, bias=True, fisher=True) -> None:
         self.n = 0
         self._x1 = 0.0
         self._x2 = 0.0
         self._x3 = 0.0
         self._x4 = 0.0
         self.ddof = ddof
+        self.bias = bias
+        self.fisher = fisher
         # variance is calculated separately
         # HOW TO COMBINE IT WITH _x1 ... _x4?
         self._mean = 0.0 # mean of values
@@ -308,8 +460,11 @@ class Stats2:
             return float('nan')
         R = math.sqrt(B)
         C = self._x3 / N - A * A * A - 3 * A * B
-        return (math.sqrt(N * (N - 1)) * C) / ((N - 2) * R * R * R)
-       
+        g1 = C / (R * R * R)
+        if self.bias:
+            return g1
+        return g1 * math.sqrt(N * (N - 1)) / (N - 2)
+        
     @property
     def kurtosis(self) -> float:
         N = self.n
@@ -324,8 +479,11 @@ class Stats2:
         C = self._x3 / N - R - 3 * A * B
         R *= A
         D = self._x4 / N - R - 6 * B * A * A - 4 * C * A
-        K = (N * N - 1) * D / (B * B) - 3 * ((N - 1) ** 2)
-        return K / ((N - 2) * (N - 3))
+        raw = D / (B * B)
+        if not self.bias:
+            adj = ((N * N - 1) * raw - 3 * (N - 1) ** 2) / ((N - 2) * (N - 3))
+            return adj if self.fisher else adj + 3.0
+        return raw - 3.0 if self.fisher else raw
 
 # REFERENCE IS BROKEN
 # stackoverflow.com/questions/6446729
@@ -421,243 +579,5 @@ class KahanWelfordVariance:
         N = self.n
         return self._m2 / (N - self.ddof) if N > self.ddof else 0.0
 
-##########################################################
-# Klein variation of the Kahan summation for improved numerical stability.
-# Also referred to as "Kahan-Babuška-Neumaier" compensated sum.
-# https://github.com/kuiperzone/Compensated-Accumulators/tree/master/CompensatedAccumulators
-##########################################################
-
-class NaiveSum:
-    def __init__(self) -> None:
-        self._value = 0.0
-
-    def reset(self) -> None:
-        self._value = 0.0
-
-    def set(self, x) -> None:
-        self._value = x
-
-    def update(self, x) -> None:
-        self._value += x
-    @property
-    def value(self) -> float:
-        return self._value
-
-class KleinAccumulator:
-    def __init__(self) -> None:
-        self._sum = 0.0
-        self._cs = 0.0
-        self._ccs = 0.0
-
-    def reset(self) -> None:
-        self._sum = 0.0
-        self._cs = 0.0
-        self._ccs = 0.0
-
-    def set(self, x) -> None:
-        self._sum = x
-        self._cs = 0.0
-        self._ccs = 0.0
-
-    def update(self, x) -> None:
-        sum = self._sum
-        t = sum + x;
-
-        c = 0.0
-        if math.fabs(sum) >= math.fabs(x):
-            # If sum is bigger, low-order digits of x are lost.
-            c = (sum - t) + x
-        else:
-            # Else low-order digits of sum are lost.
-            c = (x - t) + sum
-        self._sum = t
-
-        cs = self._cs
-        t = cs + c
-        if math.fabs(cs) >= math.fabs(c):
-            cc = (cs - t) + c
-        else:
-            cc = (c - t) + cs
-        self._cs = t
-        self._ccs = cc
-
-    @property
-    def value(self) -> float:
-        return self._sum + self._cs + self._ccs
-
-##########################################################
-# Stats2 with Klein variation of the Kahan summation for improved numerical stability.
-# Also referred to as "Kahan-Babuška-Neumaier" compensated sum.
-# https://github.com/kuiperzone/Compensated-Accumulators/tree/master/CompensatedAccumulators
-##########################################################
-
-class Stats2Klein:
-    """
-    Stats2 with Klein variation of the Kahan summation for improved numerical stability.
-    Also referred to as "Kahan-Babuška-Neumaier" compensated sum.
-    """
-    def __init__(self, ddof=1) -> None:
-        self.n = 0
-        self._x1: KleinAccumulator = KleinAccumulator()
-        self._x2: KleinAccumulator = KleinAccumulator()
-        self._x3: KleinAccumulator = KleinAccumulator()
-        self._x4: KleinAccumulator = KleinAccumulator()
-        self.ddof = ddof
-        # variance is calculated separately
-        # HOW TO COMBINE IT WITH _x1 ... _x4?
-        self._mean: KleinAccumulator = KleinAccumulator()
-        self._s: KleinAccumulator = KleinAccumulator()
-
-    def reset(self) -> None:
-        self.n = 0
-        self._x1.reset()
-        self._x2.reset()
-        self._x3.reset()
-        self._x4.reset()
-        self._mean.reset()
-        self._s.reset()
-
-    def update(self, x) -> None:
-        self.n += 1
-        self._x1.update(x)
-        x2 = x * x
-        self._x2.update(x2)
-        x3 = x2 * x
-        self._x3.update(x3)
-        x4 = x3 * x
-        self._x4.update(x4)
-        # variance
-        N = self.n
-        delta = x - self._mean.value
-        self._mean.update(delta / self.n)
-        self._s.update(delta * (x - self._mean.value))
-
-
-    def revert(self, x) -> None:
-        self.n -= 1
-        self._x1.update(-x)
-        x2 = x * x
-        self._x2.update(-x2)
-        x3 = x2 * x
-        self._x3.update(-x3)
-        x4 = x3 * x
-        self._x4.update(-x4)
-        # mean and variance
-        delta = x - self._mean.value
-        self._mean.update(-delta / self.n)
-        self._s.update(-delta * (x - self._mean.value))
-
-    @property
-    def mean(self) -> float:
-        return self._mean.value
-
-    @property
-    def variance(self) -> float:
-        N = self.n - self.ddof
-        if N <= 0:
-            return float('nan')
-        elif self._s.value < 0:
-            self._s.reset()
-            return float('nan')
-        else:
-            return self._s.value / N
-
-    @property
-    def skewness(self) -> float:
-        N = self.n
-        if N < 3:
-            return float('nan')
-        A = self._x1.value / N
-        B = self._x2.value / N - A * A
-        if B <= 1e-14:
-            return float('nan')
-        R = math.sqrt(B)
-        C = self._x3.value / N - A * A * A - 3 * A * B
-        return (math.sqrt(N * (N - 1)) * C) / ((N - 2) * R * R * R)
-       
-    @property
-    def kurtosis(self) -> float:
-        N = self.n
-        if N <= 3:
-            return float('nan')
-        A = self._x1.value / N
-        R = A * A
-        B = self._x2.value / N - R
-        if B <= 1e-14:
-            return float("nan")
-        R *= A
-        C = self._x3.value / N - R - 3 * A * B
-        R *= A
-        D = self._x4.value / N - R - 6 * B * A * A - 4 * C * A
-        K = (N * N - 1) * D / (B * B) - 3 * ((N - 1) ** 2)
-        return K / ((N - 2) * (N - 3))
-
-
-##########################################################
-# Central moments with Klein variation of the Kahan summation for improved numerical stability.
-# Also referred to as "Kahan-Babuška-Neumaier" compensated sum.
-# https://github.com/kuiperzone/Compensated-Accumulators/tree/master/CompensatedAccumulators
-# https://www.johndcook.com/skewness_kurtosis.html
-# How to implement revert?
-##########################################################
-
-class MomentsKlein:
-    def __init__(self) -> None:
-        self.n = 0
-        self.m1: KleinAccumulator = KleinAccumulator()
-        self.m2: KleinAccumulator = KleinAccumulator()
-        self.m3: KleinAccumulator = KleinAccumulator()
-        self.m4: KleinAccumulator = KleinAccumulator()
-
-    def reset(self) -> None:
-        self.n = 0
-        self.m1.reset()
-        self.m2.reset()
-        self.m3.reset()
-        self.m4.reset()
-
-    def update(self, x) -> None:
-        n_old = self.n
-        n_new = n_old + 1
-        self.n = n_new
-        delta = x - self.m1.value
-        delta_n = delta / n_new
-        delta_n2 = delta_n * delta_n
-        term = delta * delta_n * n_old
-        self.m1.update(delta_n)
-        self.m4.update(term * delta_n2 * (n_new * n_new - 3 * n_new + 3) + 6 * delta_n2 * self.m2.value - 4 * delta_n * self.m3.value)
-        self.m3.update(term * delta_n * (n_new - 2) - 3 * delta_n * self.m2.value)
-        self.m2.update(term)
-
-    def revert(self, x) -> None:
-        self.n -= 1
-        if self.n < 0:
-            raise ValueError("Cannot go below 0")
-        elif self.n == 0:
-            self.m1.reset()
-        else:
-            self.m1.update(-(1 / self.n) * (x - self.m1.value))
-
-    @property
-    def mean(self) -> float:
-        return self.m1.value
-
-    @property
-    def variance(self) -> float:
-        N = self.n
-        return self.m2.value / (N - 1) if N > 1 else 0.0
-
-    @property
-    def standard_deviation(self) -> float:
-        N = self.n
-        return (self.m2.value / (N - 1))**0.5 if N > 1 else 0.0
-
-    @property
-    def skewness(self) -> float:
-        N = self.n
-        return math.sqrt(N) * self.m3.value / (self.m2.value**1.5) if N > 2 else 0.0
-
-    @property
-    def kurtosis(self) -> float:
-        N = self.n
-        return N * self.m4.value / (self.m2.value * self.m2.value) - 3.0 if N > 3 else 0.0
+from .raw_moments_klein_kbn import RawMomentsKleinKBN
+from .central_moments_klein_kbn import CentralMomentsKleinKBN
