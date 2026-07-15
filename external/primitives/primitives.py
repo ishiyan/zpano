@@ -420,3 +420,244 @@ class KahanWelfordVariance:
     def variance(self) -> float:
         N = self.n
         return self._m2 / (N - self.ddof) if N > self.ddof else 0.0
+
+##########################################################
+# Klein variation of the Kahan summation for improved numerical stability.
+# Also referred to as "Kahan-Babuška-Neumaier" compensated sum.
+# https://github.com/kuiperzone/Compensated-Accumulators/tree/master/CompensatedAccumulators
+##########################################################
+
+class NaiveSum:
+    def __init__(self) -> None:
+        self._value = 0.0
+
+    def reset(self) -> None:
+        self._value = 0.0
+
+    def set(self, x) -> None:
+        self._value = x
+
+    def update(self, x) -> None:
+        self._value += x
+    @property
+    def value(self) -> float:
+        return self._value
+
+class KleinAccumulator:
+    def __init__(self) -> None:
+        self._sum = 0.0
+        self._cs = 0.0
+        self._ccs = 0.0
+
+    def reset(self) -> None:
+        self._sum = 0.0
+        self._cs = 0.0
+        self._ccs = 0.0
+
+    def set(self, x) -> None:
+        self._sum = x
+        self._cs = 0.0
+        self._ccs = 0.0
+
+    def update(self, x) -> None:
+        sum = self._sum
+        t = sum + x;
+
+        c = 0.0
+        if math.fabs(sum) >= math.fabs(x):
+            # If sum is bigger, low-order digits of x are lost.
+            c = (sum - t) + x
+        else:
+            # Else low-order digits of sum are lost.
+            c = (x - t) + sum
+        self._sum = t
+
+        cs = self._cs
+        t = cs + c
+        if math.fabs(cs) >= math.fabs(c):
+            cc = (cs - t) + c
+        else:
+            cc = (c - t) + cs
+        self._cs = t
+        self._ccs = cc
+
+    @property
+    def value(self) -> float:
+        return self._sum + self._cs + self._ccs
+
+##########################################################
+# Stats2 with Klein variation of the Kahan summation for improved numerical stability.
+# Also referred to as "Kahan-Babuška-Neumaier" compensated sum.
+# https://github.com/kuiperzone/Compensated-Accumulators/tree/master/CompensatedAccumulators
+##########################################################
+
+class Stats2Klein:
+    """
+    Stats2 with Klein variation of the Kahan summation for improved numerical stability.
+    Also referred to as "Kahan-Babuška-Neumaier" compensated sum.
+    """
+    def __init__(self, ddof=1) -> None:
+        self.n = 0
+        self._x1: KleinAccumulator = KleinAccumulator()
+        self._x2: KleinAccumulator = KleinAccumulator()
+        self._x3: KleinAccumulator = KleinAccumulator()
+        self._x4: KleinAccumulator = KleinAccumulator()
+        self.ddof = ddof
+        # variance is calculated separately
+        # HOW TO COMBINE IT WITH _x1 ... _x4?
+        self._mean: KleinAccumulator = KleinAccumulator()
+        self._s: KleinAccumulator = KleinAccumulator()
+
+    def reset(self) -> None:
+        self.n = 0
+        self._x1.reset()
+        self._x2.reset()
+        self._x3.reset()
+        self._x4.reset()
+        self._mean.reset()
+        self._s.reset()
+
+    def update(self, x) -> None:
+        self.n += 1
+        self._x1.update(x)
+        x2 = x * x
+        self._x2.update(x2)
+        x3 = x2 * x
+        self._x3.update(x3)
+        x4 = x3 * x
+        self._x4.update(x4)
+        # variance
+        N = self.n
+        delta = x - self._mean.value
+        self._mean.update(delta / self.n)
+        self._s.update(delta * (x - self._mean.value))
+
+
+    def revert(self, x) -> None:
+        self.n -= 1
+        self._x1.update(-x)
+        x2 = x * x
+        self._x2.update(-x2)
+        x3 = x2 * x
+        self._x3.update(-x3)
+        x4 = x3 * x
+        self._x4.update(-x4)
+        # mean and variance
+        delta = x - self._mean.value
+        self._mean.update(-delta / self.n)
+        self._s.update(-delta * (x - self._mean.value))
+
+    @property
+    def mean(self) -> float:
+        return self._mean.value
+
+    @property
+    def variance(self) -> float:
+        N = self.n - self.ddof
+        if N <= 0:
+            return float('nan')
+        elif self._s.value < 0:
+            self._s.reset()
+            return float('nan')
+        else:
+            return self._s.value / N
+
+    @property
+    def skewness(self) -> float:
+        N = self.n
+        if N < 3:
+            return float('nan')
+        A = self._x1.value / N
+        B = self._x2.value / N - A * A
+        if B <= 1e-14:
+            return float('nan')
+        R = math.sqrt(B)
+        C = self._x3.value / N - A * A * A - 3 * A * B
+        return (math.sqrt(N * (N - 1)) * C) / ((N - 2) * R * R * R)
+       
+    @property
+    def kurtosis(self) -> float:
+        N = self.n
+        if N <= 3:
+            return float('nan')
+        A = self._x1.value / N
+        R = A * A
+        B = self._x2.value / N - R
+        if B <= 1e-14:
+            return float("nan")
+        R *= A
+        C = self._x3.value / N - R - 3 * A * B
+        R *= A
+        D = self._x4.value / N - R - 6 * B * A * A - 4 * C * A
+        K = (N * N - 1) * D / (B * B) - 3 * ((N - 1) ** 2)
+        return K / ((N - 2) * (N - 3))
+
+
+##########################################################
+# Central moments with Klein variation of the Kahan summation for improved numerical stability.
+# Also referred to as "Kahan-Babuška-Neumaier" compensated sum.
+# https://github.com/kuiperzone/Compensated-Accumulators/tree/master/CompensatedAccumulators
+# https://www.johndcook.com/skewness_kurtosis.html
+# How to implement revert?
+##########################################################
+
+class MomentsKlein:
+    def __init__(self) -> None:
+        self.n = 0
+        self.m1: KleinAccumulator = KleinAccumulator()
+        self.m2: KleinAccumulator = KleinAccumulator()
+        self.m3: KleinAccumulator = KleinAccumulator()
+        self.m4: KleinAccumulator = KleinAccumulator()
+
+    def reset(self) -> None:
+        self.n = 0
+        self.m1.reset()
+        self.m2.reset()
+        self.m3.reset()
+        self.m4.reset()
+
+    def update(self, x) -> None:
+        n_old = self.n
+        n_new = n_old + 1
+        self.n = n_new
+        delta = x - self.m1.value
+        delta_n = delta / n_new
+        delta_n2 = delta_n * delta_n
+        term = delta * delta_n * n_old
+        self.m1.update(delta_n)
+        self.m4.update(term * delta_n2 * (n_new * n_new - 3 * n_new + 3) + 6 * delta_n2 * self.m2.value - 4 * delta_n * self.m3.value)
+        self.m3.update(term * delta_n * (n_new - 2) - 3 * delta_n * self.m2.value)
+        self.m2.update(term)
+
+    def revert(self, x) -> None:
+        self.n -= 1
+        if self.n < 0:
+            raise ValueError("Cannot go below 0")
+        elif self.n == 0:
+            self.m1.reset()
+        else:
+            self.m1.update(-(1 / self.n) * (x - self.m1.value))
+
+    @property
+    def mean(self) -> float:
+        return self.m1.value
+
+    @property
+    def variance(self) -> float:
+        N = self.n
+        return self.m2.value / (N - 1) if N > 1 else 0.0
+
+    @property
+    def standard_deviation(self) -> float:
+        N = self.n
+        return (self.m2.value / (N - 1))**0.5 if N > 1 else 0.0
+
+    @property
+    def skewness(self) -> float:
+        N = self.n
+        return math.sqrt(N) * self.m3.value / (self.m2.value**1.5) if N > 2 else 0.0
+
+    @property
+    def kurtosis(self) -> float:
+        N = self.n
+        return N * self.m4.value / (self.m2.value * self.m2.value) - 3.0 if N > 3 else 0.0
