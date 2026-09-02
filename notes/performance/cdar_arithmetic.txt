@@ -1,0 +1,201 @@
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class _DrawdownEpisode:
+    """A single high-water-mark drawdown episode."""
+    depth: float
+    from_idx: int
+    """The first underwater observation index"""
+    trough_idx: int
+    """The deepest observation index"""
+    to_idx: int
+    """
+    Recovery observation index if recovered, otherwise
+    the last observation index in the input
+    """
+    recovered: bool
+    """
+    If episode is recovered.
+        true: to_idx is genuinely the recovery observation
+        false: t_idx is simply the end of the available data
+    """
+
+
+    def cdar_beta(self, confidence: float = 0.95, geometric: bool = True) -> float:
+        """
+        Conditional Drawdown Beta (CDaR Beta).
+    
+        Measures the sensitivity of portfolio returns to the benchmark's
+        worst drawdown episodes.
+    
+        The implementation follows the legacy PerformanceAnalytics
+        ``CDaR.beta`` definition:
+    
+        1. Identify discrete benchmark drawdown episodes using geometric
+           drawdown chaining.
+        2. Select the worst ``1 - confidence`` fraction of drawdown episodes.
+        3. For each selected episode, calculate the portfolio return from
+           the beginning of the drawdown through its trough.
+        4. Aggregate those portfolio returns geometrically or arithmetically,
+           according to ``geometric``.
+        5. Divide their sum by the number of selected drawdowns times the
+           benchmark CDD quantile.
+    
+        Note
+        ----
+        This follows the behavior of the supplied PerformanceAnalytics R
+        implementation. In particular, ``findDrawdowns()`` is called without
+        the ``geometric`` argument, so benchmark drawdown identification is
+        always geometric. Also, the legacy ``CDD()`` implementation returns
+        the drawdown quantile rather than the conditional mean despite its
+        documentation describing CDD as a conditional measure.
+    
+        Args:
+            confidence:
+                Confidence level for the drawdown tail. For example, ``0.95``
+                selects drawdowns at or below the 5th percentile.
+            geometric:
+                If ``True``, portfolio returns within each selected drawdown
+                episode are compounded. If ``False``, they are summed
+                arithmetically.
+    
+        Returns:
+            CDaR Beta, or ``math.nan`` when it cannot be calculated.
+        """
+        n = self._returns_kbn.n
+        w = self._returns
+        bw = self._returns_benchmark
+        if w is None or bw is None or n < 2:
+            return math.nan
+
+        w_list = list(w)
+        bw_list = list(bw)    
+        if len(w_list) != len(bw_list):
+            return math.nan
+
+        episodes = _find_drawdown_episodes(bw_list)
+        drawdown_returns = [episode.depth for episode in episodes]
+        if not drawdown_returns:
+            return math.nan
+
+        q_quantile = percentile(drawdown_returns, 1.0 - confidence)
+        if  q_quantile == 0.0:
+            return math.nan
+
+        tail = [episode for episode in episodes if episode.depth <= q_quantile]
+        tail_count = len(tail)
+        if not tail or tail_count == 0:
+            return math.nan
+
+        sum_port_returns = 0.0
+        for episode in tail:
+            start = episode.from_idx
+            end = episode.trough_idx + 1
+            if geometric:
+                port_return = math.prod(1.0 + r for r in w_list[start:end]) - 1.0
+            else:
+                port_return = sum(w_list[start:end])
+            sum_port_returns += port_return
+
+        return sum_port_returns / (tail_count * q_quantile)
+
+    def cdar_alpha(self, confidence: float = 0.95, geometric: bool = True) -> float:
+        """
+        Conditional Drawdown Alpha (CDaR Alpha).
+    
+        Measures the difference between the portfolio's annualized return
+        and the annualized return predicted by its Conditional Drawdown Beta
+        relative to the benchmark.
+    
+        CDaR Alpha is analogous to CAPM alpha, but the beta is estimated
+        using the portfolio's performance during the benchmark's worst
+        drawdown periods.
+    
+        The implementation follows the PerformanceAnalytics ``CDaR.alpha``
+        definition.
+    
+        Args:
+            confidence:
+                Confidence level for the benchmark drawdown tail. For example,
+                ``0.95`` selects the worst 5% of benchmark drawdown episodes.
+            geometric:
+                If ``True``, use geometric chaining for the annualized return
+                calculation. If ``False``, use arithmetic annualization.
+    
+        Returns:
+            Annualized CDaR Alpha, or ``math.nan`` when it cannot be calculated.
+        """
+        beta = self.cdar_beta(confidence=confidence, geometric=geometric)    
+        if math.isnan(beta):
+            return math.nan
+    
+        period = self.periods_per_annum
+    
+        # PerformanceAnalytics::CDaR.alpha uses:
+        #
+        #   Rm_expected_annualized = (1 + mean(Rm))^12 - 1
+        #   R_expected_annualized  = (1 + mean(R))^12 - 1
+        #
+        # for geometric = TRUE, and:
+        #
+        #   mean(R) * 12
+        #
+        # for geometric = FALSE.
+        #
+        # Note that the R implementation assumes monthly input data and
+        # hard-codes 12 rather than using a general annualization scale.
+    
+        rp_mean = self._returns_kbn.mean
+        rm_mean = self._benchmark_returns_kbn.mean
+    
+        if geometric:
+            rp_annual = (1.0 + rp_mean) ** period - 1.0
+            rm_annual = (1.0 + rm_mean) ** period - 1.0
+        else:
+            rp_annual = rp_mean * period
+            rm_annual = rm_mean * period
+    
+        return rp_annual - beta * rm_annual
+
+
+===============================================
+
+
+class TestCDaRBeta(unittest.TestCase):
+    """
+    Reference values were generated by ./reference_data_generation/CDaR.beta.R
+    using PerformanceAnalytics
+    https://github.com/braverock/PerformanceAnalytics/blob/master/R/CDaR.beta.R.
+    """
+    def test_conformance_to_R(self):
+        for p, expected in CDaR_beta.EXPECTED_VALUES_BY_P_GEOMETRIC.items():
+            actual = run_stream_method("cdar_beta", confidence=p, geometric=True)
+            assertSeriesEqual(self, actual, expected, delta=0.3529,
+                              prefix=f'CDaR beta geometric p {p}')
+        for p, expected in CDaR_beta.EXPECTED_VALUES_BY_P_ARITHMETIC.items():
+            actual = run_stream_method("cdar_beta", confidence=p, geometric=False)
+            assertSeriesEqual(self, actual, expected, delta=0.3658,
+                              prefix=f'CDaR beta arithmetic p {p}')
+
+class TestCDaRAlpha(unittest.TestCase):
+    """
+    Reference values were generated by ./reference_data_generation/CDaR.alpha.R
+    using PerformanceAnalytics
+    https://github.com/braverock/PerformanceAnalytics/blob/master/R/CDaR.alpha.R.
+    """
+    def test_conformance_to_R(self):
+        """
+        PerformanceAnalytics has a bug using hardcoded period of 12 when annualizing the means.
+        Our implementation uses ``self.periods_per_annum`` instead.
+        So we have to use monthly dates to match the reference data.
+        """
+        for p, expected in CDaR_alpha.EXPECTED_VALUES_BY_P_GEOMETRIC.items():
+            actual = run_stream_method("cdar_alpha", confidence=p, geometric=True,
+                dates_previous=bacon_dates_previous_monthly, dates=bacon_dates_monthly, monthly=True)
+            assertSeriesEqual(self, actual, expected, delta=0.04,
+                              prefix=f'CDaR alpha geometric p {p}')
+        for p, expected in CDaR_alpha.EXPECTED_VALUES_BY_P_ARITHMETIC.items():
+            actual = run_stream_method("cdar_alpha", confidence=p, geometric=False,
+                dates_previous=bacon_dates_previous_monthly, dates=bacon_dates_monthly, monthly=True)
+            assertSeriesEqual(self, actual, expected, delta=0.0369,
+                              prefix=f'CDaR alpha arithmetic p {p}')

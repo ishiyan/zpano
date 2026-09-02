@@ -57,7 +57,7 @@ class RawMomentsKleinKBN:
         G₂ = ((n²-1) · n·m₄/m₂²  -  3·(n-1)²) / ((n-2)·(n-3))  +  3
     """
     def __init__(self, ddof=1, bias=True, fisher=True) -> None:
-        self.n = 0
+        self._n = 0
         self._x1: KleinKBNAccumulator = KleinKBNAccumulator()
         self._x2: KleinKBNAccumulator = KleinKBNAccumulator()
         self._x3: KleinKBNAccumulator = KleinKBNAccumulator()
@@ -70,7 +70,7 @@ class RawMomentsKleinKBN:
         self._s: KleinKBNAccumulator = KleinKBNAccumulator()
 
     def reset(self) -> None:
-        self.n = 0
+        self._n = 0
         self._x1.reset()
         self._x2.reset()
         self._x3.reset()
@@ -79,7 +79,7 @@ class RawMomentsKleinKBN:
         self._s.reset()
 
     def update(self, x) -> None:
-        self.n += 1
+        self._n += 1
         self._x1.update(x)
         x2 = x * x
         self._x2.update(x2)
@@ -88,14 +88,14 @@ class RawMomentsKleinKBN:
         x4 = x3 * x
         self._x4.update(x4)
         # variance
-        N = self.n
+        N = self._n
         delta = x - self._mean.value
-        self._mean.update(delta / self.n)
+        self._mean.update(delta / self._n)
         self._s.update(delta * (x - self._mean.value))
 
 
     def revert(self, x) -> None:
-        self.n -= 1
+        self._n -= 1
         self._x1.revert(x)
         x2 = x * x
         self._x2.revert(x2)
@@ -105,8 +105,22 @@ class RawMomentsKleinKBN:
         self._x4.revert(x4)
         # mean and variance
         delta = x - self._mean.value
-        self._mean.revert(delta / self.n)
+        self._mean.revert(delta / self._n)
         self._s.revert(delta * (x - self._mean.value))
+
+    def _variance(self, ddof: int) -> float:
+        n = self._n - ddof
+        if n <= 0:
+            return math.nan
+        elif self._s.value < 0:
+            self._s.reset()
+            return math.nan
+        else:
+            return self._s.value / n
+
+    def _standard_deviation(self, ddof: int) -> float:
+        n = self._n - ddof
+        return (self._s.value / n)**0.5 if n > 0 else math.nan
 
     @property
     def mean(self) -> float:
@@ -114,52 +128,300 @@ class RawMomentsKleinKBN:
 
     @property
     def variance(self) -> float:
-        N = self.n - self.ddof
-        if N <= 0:
-            return float('nan')
-        elif self._s.value < 0:
-            self._s.reset()
-            return float('nan')
-        else:
-            return self._s.value / N
+        return self._variance(self.ddof)
+
+    @property
+    def variance_ddof_0(self) -> float:
+        return self._variance(0)
+
+    @property
+    def variance_ddof_1(self) -> float:
+        return self._variance(1)
 
     @property
     def standard_deviation(self) -> float:
-        N = self.n - self.ddof
-        return (self._s.value / N)**0.5 if N > 0 else float('nan')
+        return self._standard_deviation(self.ddof)
+
+    @property
+    def standard_deviation_ddof_0(self) -> float:
+        return self._standard_deviation(0)
+
+    @property
+    def standard_deviation_ddof_1(self) -> float:
+        return self._standard_deviation(1)
+
+    @property
+    def _g1(self) -> float:
+        """
+        Calculates central moments $\\mu_k$ from the raw moments $\\mu_k^{'}=E[X^k]$
+
+        When calculated, returns
+
+        $$g_1=frac{\\mu_3}{\\mu_2^{3/2}}$$
+        """
+        n = self._n
+        if n < 2:
+            return math.nan
+        # Conversion from raw moments to central moments
+        # $\mu_1=\frac{\mu_1^'}{n}$, 1st central moment (mean)
+        mu1 = self._x1.value / n
+        # $\mu_1^2$
+        r = mu1 * mu1
+        # $\mu_2=\frac{\mu_2^'}{n}-\mu_1^2$, 2nd central moment (population variance)
+        mu2 = self._x2.value / n - r
+        if mu2 <= 1e-14:
+            return math.nan
+        # $\mu_3=\frac{\mu_3^'}{n}-\mu_1^3-3\mu_1 \cdot \mu_2$, 3rd central moment
+        mu3 = self._x3.value / n - r * mu1 - 3 * mu1 * mu2
+        # $g_1=]frac{\mu_3}{\mu_2^{3/2}}$
+        return mu3 / (mu2 * math.sqrt(mu2))
+
+    @property
+    def skewness_moment(self) -> float:
+        """
+        The 'moment' skewness is calculated as
+
+        $$g_1=\\frac{\\mu_3}{\\mu_2^{3/2}}$$
+        """
+        # bias=True, 'moment', $g_1=\frac{\mu_3}{\mu_2^{3/2}}$
+        return self._g1
+
+    @property
+    def skewness_fisher(self) -> float:
+        """
+        The 'fisher' skewness is calculated as
+
+        $$g_1\\cdot \\frac{\\sqrt{n(n-1)}}{n-2}$$
+
+        where
+
+        $$g_1=\\frac{\\mu_3}{\\mu_2^{3/2}}$$
+        """
+        # bias=False, 'fisher', $g_1\cdot \frac{\sqrt{n(n-1)}}{n-2}$
+        g1 = self._g1
+        if math.isnan(g1):
+            return math.nan
+        n = self._n
+        return math.nan if n == 2 else g1 * math.sqrt(n * (n - 1)) / (n - 2)
+
+    @property
+    def skewness_sample(self) -> float:
+        """
+        The 'sample' skewness is calculated as
+
+        $$g_1\\cdot \\frac{n^2}{(n-1)(n-2)}$$
+
+        where
+
+        $$g_1=\\frac{\\mu_3}{\\mu_2^{3/2}}$$
+        """
+        g1 = self._g1
+        if math.isnan(g1):
+            return math.nan
+        n = self._n
+        # $g_1\cdot \frac{n^2}{(n-1)(n-2)}$
+        return math.nan if n < 3 else g1 * (n*n) / ((n-1)*(n-2))
 
     @property
     def skewness(self) -> float:
-        N = self.n
-        if N < 3:
-            return float('nan')
-        A = self._x1.value / N
-        B = self._x2.value / N - A * A
-        if B <= 1e-14:
-            return float('nan')
-        R = math.sqrt(B)
-        C = self._x3.value / N - A * A * A - 3 * A * B
-        g1 = C / (R * R * R)
-        if self.bias:
-            return g1
-        return g1 * math.sqrt(N * (N - 1)) / (N - 2)
+        """
+        The scalculation method depends on `bias` parameter:
+
+        - bias=True: 'moment' method is calculated as
+          $$g_1$$
+        - bias=False: 'fisher' method is calculated as
+          $$g_1\\cdot \\frac{\\sqrt{n(n-1)}}{n-2}$$
+
+        where
+
+        $$g_1=\\frac{\\mu_3}{\\mu_2^{3/2}}$$
+
+        There is a third method, 'sample', which is implemented as a separate
+        `skewness_sample` property because it doesn't depend on the `bias` parameter.
+        """
+        return self.skewness_moment if self.bias else self.skewness_fisher
+
+    @property
+    def _b2(self) -> float:
+        """
+        Calculates central moments $\\mu_k$ from the raw moments $\\mu_k^{'}=E[X^k]$
+
+        When calculated, returns
+
+        $$\\beta_2=\\frac{\\mu_4}{\\mu_2^2}$$
+        """
+        n = self._n
+        if n < 2:
+            return math.nan
+        # Conversion from raw moments to central moments
+        # $\mu_1=\frac{\mu_1^'}{n}$, 1st central moment (mean)
+        mu1 = self._x1.value / n
+        # $\mu_1^2$
+        r = mu1 * mu1
+         # $\mu_2=\frac{\mu_2^'}{n}-\mu_1^2$, 2nd central moment (population variance)
+        mu2 = self._x2.value / n - r
+        if mu2 <= 1e-14:
+            return math.nan
+        # $\mu_1^3$
+        r *= mu1
+        # $\mu_3=\frac{\mu_3^'}{n}-\mu_1^3-3\mu_1 \cdot \mu_2$, 3rd central moment
+        mu3 = self._x3.value / n - r - 3 * mu1 * mu2
+        # $\mu_1^4$
+        r *= mu1
+        # $\mu_4=\frac{\mu_4^'}{n}-\mu_1^4-6\mu_1^2\mu_2-4\mu_3\mu_1$, 4th central moment
+        mu4 = self._x4.value / n - r - 6 * mu2 * mu1 * mu1 - 4 * mu3 * mu1
+        # $\beta_2=\frac{\mu_4}{\mu_2^2}$, population moment kurtosis (bias=True, fisher=False)
+        return mu4 / (mu2 * mu2)
+
+    @property
+    def kurtosis_moment(self) -> float:
+        """
+        The 'moment' biased Pearson (population) kurtosis is calculated as
+
+        $$\\beta_2=\\frac{\\mu_4}{\\mu_2^2}$$
+        """
+        # bias=True, fisher=False,'moment', $\beta_2=\frac{\mu_4}{\mu_2^2}$
+        return self._b2
+
+    @property
+    def kurtosis_excess(self) -> float:
+        """
+        The 'excess' biased excess kurtosis is calculated as
+
+        $$\\beta_2-3$$
+
+        where
+
+        $$\\beta_2=\\frac{\\mu_4}{\\mu_2^2}$$
+        """
+        # bias=True, fisher=True,'excess', $\beta_2-3=\frac{\mu_4}{\mu_2^2}-3$
+        b2 = self._b2
+        if math.isnan(b2):
+            return math.nan
+        return b2 - 3
+
+    @property
+    def kurtosis_sample_excess(self) -> float:
+        """
+        The 'sample excess' unbiased excess kurtosis is calculated as
+
+        $$\\frac{(n^2-1)\\beta_2-3(n - 1)^2}{(n - 2)(n - 3)}$$
+
+        where
+
+        $$\\beta_2=\\frac{\\mu_4}{\\mu_2^2}$$
+        """
+        # bias=False, fisher=True,'sample excess', unbiased excess kurtosis, $\frac{(n^2-1)\beta_2-3(n - 1)^2}{(n - 2)(n - 3)}$
+        b2 = self._b2
+        if math.isnan(b2):
+            return math.nan
+        n = self._n
+        if n <= 3:
+            return math.nan
+        return ((n * n - 1) * b2 - 3 * (n - 1) ** 2) / ((n - 2) * (n - 3))
+
+    @property
+    def kurtosis_sample_corrected(self) -> float:
+        """
+        The 'sample' unbiased Pearson kurtosis is calculated as
+
+        $$\\frac{(n^2 - 1)\\beta_2}{(n-2)(n-3)}$$
+
+        where
+
+        $$\\beta_2=\\frac{\\mu_4}{\\mu_2^2}$$
+
+        This variant is compatible with `PerformanceAnalytics` R package implementation.
+        There is another version of the calculation which is calculated as the 'sample excess' kurtosis plus 3,
+
+        $$\\frac{(n^2-1)\\beta_2-3(n - 1)^2}{(n - 2)(n - 3)}+3$$
+
+        This version differs by
+
+        $$\frac{9n-15}{(n-2)(n-3)}$$
+
+        from the R package version mentioned above.
+        The difference is approximately $0.44$ for $n=24$.
+        """
+        # bias=False, fisher=False -> 'sample', unbiased Pearson kurtosis, $\frac{(n^2 - 1)\beta_2}{(n-2)(n-3)}$
+        b2 = self._b2
+        if math.isnan(b2):
+            return math.nan
+        n = self._n
+        if n <= 3:
+            return math.nan
+        return b2 * (n*n - 1) / ((n-2)*(n-3))
+
+    @property
+    def kurtosis_sample(self) -> float:
+        """
+        The 'sample' unbiased Pearson kurtosis is calculated as the 'sample excess' kurtosis plus 3,
+
+        $$\\frac{(n^2-1)\\beta_2-3(n - 1)^2}{(n - 2)(n - 3)}+3$$
+
+        where
+
+        $$\\beta_2=\\frac{\\mu_4}{\\mu_2^2}$$
+
+        There is another version of the calculation which is compatible with `PerformanceAnalytics` R package implementation,
+
+        $$\\frac{(n^2 - 1)\\beta_2}{(n-2)(n-3)}$$
+
+        This version differs by
+
+        $$\frac{9n-15}{(n-2)(n-3)}$$
+
+        from the R package version mentioned above.
+        The difference is approximately $0.44$ for $n=24$.
+        """
+        # bias=False, fisher=False -> 'sample', unbiased Pearson kurtosis, $\frac{(n^2-1)\beta_2-3(n - 1)^2}{(n - 2)(n - 3)}+3$
+        b2 = self._b2
+        if math.isnan(b2):
+            return math.nan
+        n = self._n
+        if n <= 3:
+            return math.nan
+        return ((n * n - 1) * b2 - 3 * (n - 1) ** 2) / ((n - 2) * (n - 3)) + 3
 
     @property
     def kurtosis(self) -> float:
-        N = self.n
-        if N < 4:
-            return float('nan')
-        A = self._x1.value / N
-        R = A * A
-        B = self._x2.value / N - R
-        if B <= 1e-14:
-            return float("nan")
-        R *= A
-        C = self._x3.value / N - R - 3 * A * B
-        R *= A
-        D = self._x4.value / N - R - 6 * B * A * A - 4 * C * A
-        raw = D / (B * B)
-        if not self.bias:
-            adj = ((N * N - 1) * raw - 3 * (N - 1) ** 2) / ((N - 2) * (N - 3))
-            return adj if self.fisher else adj + 3.0
-        return raw - 3.0 if self.fisher else raw
+        if self.bias: # Biased estimator
+            return self.kurtosis_excess if self.fisher else self.kurtosis_moment
+        else: # Unbiased estimator
+            return self.kurtosis_sample_excess if self.fisher else self.kurtosis_sample_corrected
+
+    @property
+    def x1_sum(self) -> float:
+        return self._x1.value
+
+    @property
+    def x2_sum(self) -> float:
+        return self._x2.value
+
+    @property
+    def x3_sum(self) -> float:
+        return self._x3.value
+
+    @property
+    def x4_sum(self) -> float:
+        return self._x4.value
+
+    @property
+    def x1(self) -> float:
+        return self._x1.value / self._n if self._n > 0 else math.nan
+
+    @property
+    def x2(self) -> float:
+        return self._x2.value / self._n if self._n > 0 else math.nan
+
+    @property
+    def x3(self) -> float:
+        return self._x3.value / self._n if self._n > 0 else math.nan
+
+    @property
+    def x4(self) -> float:
+        return self._x4.value / self._n if self._n > 0 else math.nan
+
+    @property
+    def n(self) -> int:
+        return self._n

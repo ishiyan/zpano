@@ -71,7 +71,7 @@ class KleinKBNAccumulator:
 
     def update(self, x) -> None:
         sum = self._sum
-        t = sum + x;
+        t = sum + x
 
         c = 0.0
         if math.fabs(sum) >= math.fabs(x):

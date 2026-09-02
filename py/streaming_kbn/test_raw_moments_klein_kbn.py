@@ -5,6 +5,9 @@ from scipy import stats
 
 from .raw_moments_klein_kbn import RawMomentsKleinKBN
 
+# https://github.com/medo64/Medo/blob/main/tests/Tests.Medo/Math/WelfordVariance.cs
+# https://github.com/andrewuhl/RollingWindow/blob/master/src/RollingWindow.cpp
+# https://github.com/ajcr/rolling/blob/master/rolling/similarity.py
 
 class TestRawMomentsKleinKBN(unittest.TestCase):
 

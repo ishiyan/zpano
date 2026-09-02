@@ -1,0 +1,609 @@
+
+    @property
+    def jensen_alpha(self) -> float:
+        """
+        Jensen's Alpha (per observation period).
+    
+        Measures the portfolio's geometric return in excess of the return
+        predicted by the single-factor model:
+    
+            Jensen Alpha = R_p - (R_f + Beta * (R_b - R_f))
+    
+        where:
+    
+            R_p   = portfolio geometric mean return per observation period
+            R_b   = benchmark geometric mean return per observation period
+            R_f   = risk-free rate per observation period
+            Beta  = SFM beta
+    
+        Unlike ``sfm_alpha``, which is the intercept of an arithmetic
+        regression of excess returns, Jensen's Alpha uses geometrically
+        compounded portfolio and benchmark returns.
+    
+        The result is expressed in the same return period as the input
+        observations. For example, with hourly observations the result is
+        an hourly Jensen's Alpha; with daily observations it is a daily
+        Jensen's Alpha.
+    
+        The risk-free rate is configured when the ``PerformanceMeasures`` instance is
+        constructed.
+    
+        Returns:
+            Jensen's Alpha per observation period.
+        """
+        rf = self.risk_free_rate
+        mean = self._cumulative_return.geometric_mean_return
+        mean_b = self._benchmark_cumulative_return.geometric_mean_return
+        return mean - (rf +  self.sfm_beta * (mean_b - rf))
+
+    @property
+    def jensen_alpha_annualized(self) -> float:
+        """
+        Annualized Jensen's Alpha.
+    
+        Measures the portfolio's annualized geometric return in excess of
+        the annualized return predicted by the single-factor model:
+    
+            Jensen Alpha = R_p,ann
+                           - (R_f,ann + Beta * (R_b,ann - R_f,ann))
+        where:
+    
+            R_p,ann  = annualized portfolio geometric return
+            R_b,ann  = annualized benchmark geometric return
+            R_f,ann  = annualized risk-free rate
+            Beta     = SFM beta
+    
+        Jensen's Alpha is calculated from geometrically compounded returns,
+        rather than from the arithmetic mean of periodic returns.
+    
+        The result is expressed as an annualized return, regardless of the
+        frequency of the input observations. Annualization uses the
+        ``periods_per_annum`` configured for the ``PerformanceMeasures`` instance.
+    
+        The risk-free rate is configured when the ``PerformanceMeasures`` instance is
+        constructed.
+    
+        Returns:
+            Annualized Jensen's Alpha.
+        """
+        rf = self._annual_risk_free_rate
+        mean = self._cumulative_return.annualized_geometric_mean_return( \
+            periods_per_year=self.periods_per_annum)
+        mean_b = self._benchmark_cumulative_return.annualized_geometric_mean_return( \
+            periods_per_year=self.periods_per_annum)
+        return mean - (rf +  self.sfm_beta * (mean_b - rf))
+
+=============================================
+
+class TestJensenAlpha(unittest.TestCase):
+    def test_matches_performance_analytics_output(self):
+        for rf, expected in rd.jensen_alpha.EXPECTED_VALUES_BY_RF_PERFAN.items():
+            actual = run_stream_property("jensen_alpha",
+                 annual_risk_free_rate=rf)
+            assertSeriesEqual(self, actual, expected, places=14,
+                              prefix=f'Jensen alpha (yearly, Rf {rf})')
+        for rf, expected in rd.jensen_alpha.EXPECTED_VALUES_BY_RF_PERFAN.items():
+            annual_rf = (1 + rf) ** 252 - 1
+            actual = run_stream_property("jensen_alpha", daily=True,
+                 annual_risk_free_rate=annual_rf)
+            assertSeriesEqual(self, actual, expected, places=14,
+                              prefix=f'Jensen alpha (daily, Rf {rf})')
+
+class TestJensenAlphaAnnualized(unittest.TestCase):
+    def test_matches_performance_analytics_output(self):
+        for rf, expected in rd.jensen_alpha.EXPECTED_VALUES_BY_RF_DAILY_PERFAN.items():
+            annual_rf = (1 + rf) ** 252 - 1
+            actual = run_stream_property("jensen_alpha_annualized", daily=True,
+                 annual_risk_free_rate=annual_rf)
+            assertSeriesEqual(self, actual, expected, delta=9e-10 if rf < 0.1 else 9e14,
+                    prefix=f'Jensen alpha annualized (daily, Rf {rf})')
+        for rf, expected in rd.jensen_alpha.EXPECTED_VALUES_BY_RF_MONTHLY_PERFAN.items():
+            annual_rf = (1 + rf) ** 12 - 1
+            actual = run_stream_property("jensen_alpha_annualized", monthly=True,
+                 annual_risk_free_rate=annual_rf)
+            assertSeriesEqual(self, actual, expected, places=12,
+                prefix=f'Jensen alpha annualized (monthly, Rf {rf})')
+        for rf, expected in rd.jensen_alpha.EXPECTED_VALUES_BY_RF_YEARLY_PERFAN.items():
+            actual = run_stream_property("jensen_alpha_annualized",
+                 annual_risk_free_rate=rf)
+            assertSeriesEqual(self, actual, expected, places=14,
+                prefix=f'Jensen alpha annualized (yearly, Rf {rf})')
+
+=============================================
+
+    @property
+    def tracking_error(self) -> float:
+        """
+        Tracking Error.
+    
+        Measures the volatility of the portfolio's active returns relative
+        to the benchmark:
+    
+            Tracking Error = std(R_P - R_B)
+    
+        where ``std`` is the sample standard deviation (``ddof=1``).
+    
+        Tracking Error measures the variability of the portfolio's active
+        performance. A lower value indicates that the portfolio's returns
+        tend to track the benchmark more closely.
+    
+        This property is expressed per observation and is not annualized.
+        Use ``tracking_error_annualized`` for annualized Tracking Error.
+    
+        Returns:
+            The standard deviation of active returns.
+        """
+        return self._active_returns_kbn.standard_deviation
+
+    @property
+    def tracking_error_annualized(self) -> float:
+        """
+        Annualized Tracking Error.
+    
+        Annualizes the standard deviation of portfolio active returns:
+    
+            Tracking Error_ann = Tracking Error * sqrt(periods_per_annum)
+    
+        ``periods_per_annum`` specifies the number of return observations
+        per year.
+    
+        Returns:
+            Annualized Tracking Error.
+        """
+        return self.tracking_error * math.sqrt(self.periods_per_annum)
+
+    @property
+    def active_premium(self) -> float:
+        """
+        Active Premium.
+    
+        Measures the difference between the portfolio and benchmark
+        geometric mean returns:
+
+            Active Premium = G_P - G_B
+
+        where ``G_P`` and ``G_B`` are the geometric mean returns per
+        observation.
+
+        A positive value indicates that the portfolio has a higher
+        geometric mean return than the benchmark.
+
+        This property is expressed per observation and is not annualized.
+        Use ``active_premium_annualized`` for the annualized measure.
+
+        Returns:
+            The difference between portfolio and benchmark geometric mean
+            returns.
+        """
+        return self._cumulative_return.geometric_mean_return - \
+            self._benchmark_cumulative_return.geometric_mean_return
+
+    @property
+    def active_premium_arithmetic(self) -> float:
+        """
+        Arithmetic mean active return.
+    
+        Measures the portfolio's average active return relative to the
+        benchmark:
+    
+            Active Premium = mean(R_P - R_B)
+    
+        where:
+    
+            R_P = portfolio return
+            R_B = benchmark return
+    
+        Equivalently:
+    
+            Active Premium = mean(R_P) - mean(R_B)
+    
+        A positive value indicates that the portfolio outperformed the
+        benchmark on average, while a negative value indicates
+        underperformance.
+    
+        This property is expressed per return observation and is not
+        annualized. Use ``active_premium_annualized`` for the annualized
+        geometric active premium.
+    
+        Returns:
+            The arithmetic mean of the portfolio's active returns.
+        """
+        return self._active_returns_kbn.mean
+
+    @property
+    def active_premium_annualized(self) -> float:
+        """
+        Annualized Active Premium.
+    
+        Measures the difference between the portfolio and benchmark
+        annualized geometric returns:
+    
+            Active Premium_ann = G_P,ann - G_B,ann
+    
+        where ``G_P,ann`` and ``G_B,ann`` are the annualized geometric
+        returns of the portfolio and benchmark. The portfolio and benchmark
+        returns are annualized separately before taking their difference.
+    
+        A positive value indicates that the portfolio outperformed the
+        benchmark on an annualized geometric-return basis.
+    
+        Returns:
+            The annualized active premium.
+        """
+        mean = self._cumulative_return.annualized_geometric_mean_return( \
+            periods_per_year=self.periods_per_annum)
+        mean_b = self._benchmark_cumulative_return.annualized_geometric_mean_return( \
+            periods_per_year=self.periods_per_annum)
+        return mean - mean_b
+
+    @property
+    def information_ratio(self) -> float:
+        """
+        Information Ratio.
+    
+        Measures active return relative to the volatility of active returns:
+    
+            Information Ratio = Active Premium / Tracking Error
+    
+        Here, Active Premium is the difference between portfolio and
+        benchmark geometric mean returns, while Tracking Error is the
+        standard deviation of active returns.
+    
+        A higher positive value indicates greater active return relative
+        to the variability of active performance.
+    
+        This property is expressed per observation and is not annualized.
+        Use ``information_ratio_annualized`` for the annualized measure.
+    
+        Returns:
+            The Information Ratio, or ``math.nan`` if Tracking Error is zero.
+        """
+        te = self.tracking_error
+        return self.active_premium / te if te != 0 else math.nan
+
+    @property
+    def information_ratio_annualized(self) -> float:
+        """
+        Annualized Information Ratio.
+    
+        Measures annualized active return relative to annualized Tracking
+        Error:
+    
+            Information Ratio_ann =
+                Active Premium_ann / Tracking Error_ann
+    
+        Returns:
+            The annualized Information Ratio, or ``math.nan`` if annualized
+            Tracking Error is zero.
+        """
+        te = self.tracking_error_annualized
+        return self.active_premium_annualized / te if te != 0 else math.nan
+
+    def information_ratio_modified(self) -> float:
+        """
+        Modified Information Ratio (Israelson 2005).
+        
+        Addresses the issue that standard IR rewards higher tracking error
+        when excess return is negative.
+        
+        Formula: MIR = IR if excess > 0 else -IR
+        """
+        # Active premium = mean(Rp - Rb)
+        excess = self._active_returns_kbn.mean
+        ir = self.information_ratio
+        if math.isnan(excess) or math.isnan(ir):
+            return math.nan
+        return ir if excess > 0 else -ir
+
+    def information_ratio_geometric(self) -> float:
+        """
+        Geometric Information Ratio (Bacon 3rd ed, Chapter 5).
+        
+        Uses geometric mean of active returns instead of arithmetic.
+        IR_G = geometric_active_return / tracking_error
+        
+        Returns:
+            Geometric IR or None
+        """
+        te = self.tracking_error
+        if te is None or te == 0:
+            return None
+        return self._active_returns_cumulative.geometric_mean_return / te
+
+    @property
+    def systematic_risk(self) -> float:
+        """
+        Systematic Risk.
+            SYR = std_dev(benchmark_excess_return) * beta
+        """
+        return self._benchmark_excess_returns_kbn.standard_deviation_ddof_1 * self.sfm_beta
+
+    @property
+    def systematic_risk_annualized(self) -> float:
+        """
+        Systematic Risk.
+            SYR_ann = std_dev(benchmark_excess_return) * sqrt(periods per annum) * beta
+        """
+        return self.systematic_risk * math.sqrt(self.periods_per_annum)
+
+    @property
+    def treynor_ratio(self) -> float:
+        """
+        Treynor Ratio.
+    
+        Measures geometric excess return per unit of systematic risk:
+    
+            Treynor Ratio = G(R_P - R_f) / beta
+    
+        where ``G(R_P - R_f)`` is the geometric mean of the portfolio's
+        per-period excess returns and ``beta`` is the portfolio's SFM beta
+        relative to the benchmark.
+    
+        Unlike the Sharpe ratio, which uses total volatility as the risk
+        measure, the Treynor Ratio uses systematic risk represented by beta.
+    
+        This property is expressed per observation and is not annualized.
+        Use ``treynor_ratio_annualized`` for the annualized measure.
+    
+        Returns:
+            The Treynor Ratio, or ``math.nan`` if beta is zero.
+        """
+        beta = self.sfm_beta
+        return self._cumulative_excess_return.geometric_mean_return / beta if beta != 0 else math.nan
+
+    @property
+    def treynor_ratio_annualized(self) -> float:
+        """
+        Annualized Treynor Ratio.
+    
+        Measures annualized geometric excess return per unit of systematic
+        risk:
+    
+            Treynor Ratio_ann = G_ann(R_P - R_f) / beta
+    
+        where ``G_ann(R_P - R_f)`` is the annualized geometric return of
+        the portfolio's per-period excess returns and ``beta`` is the
+        portfolio's SFM beta relative to the benchmark.
+    
+        Returns:
+            The annualized Treynor Ratio, or ``math.nan`` if beta is zero.
+        """
+        beta = self.sfm_beta
+        if beta == 0:
+            return math.nan
+        return self._cumulative_excess_return.annualized_geometric_mean_return( \
+            periods_per_year=self.periods_per_annum) / beta
+
+    @property
+    def treynor_ratio_modified(self) -> float:
+        """
+        Modified Treynor Ratio.
+            MTR = geom_mean(excess_return) / systematic_risk
+        """
+        sr = self.systematic_risk
+        return self._cumulative_excess_return.geometric_mean_return / sr if sr != 0 else math.nan
+
+    @property
+    def treynor_ratio_modified_annualized(self) -> float:
+        """
+        Modified Treynor Ratio.
+            MTR_ann = geom_mean_ann(excess_return) / systematic_risk_ann
+        """
+        sr = self.systematic_risk_annualized
+        if sr == 0:
+            return math.nan
+
+        return self._cumulative_excess_return.annualized_geometric_mean_return( \
+            periods_per_year=self.periods_per_annum) / sr
+
+======================================================
+
+class TestTrackingError(unittest.TestCase):
+    def test_matches_performance_analytics_output(self):
+        expected = rd.tracking_error.EXPECTED_VALUES_ANNUAL_PERFAN
+        actual = run_stream_property("tracking_error")
+        assertSeriesEqual(self, actual, expected, places=15,
+                        prefix="tracking error (yearly)")
+        actual = run_stream_property("tracking_error", daily=True,)
+        assertSeriesEqual(self, actual, expected, places=15,
+                        prefix="tracking error (daily)")
+
+class TestTrackingErrorAnnualized(unittest.TestCase):
+    def test_matches_performance_analytics_output(self):
+        expected = rd.tracking_error.EXPECTED_VALUES_DAILY_PERFAN
+        actual = run_stream_property("tracking_error_annualized", daily=True)
+        assertSeriesEqual(self, actual, expected, places=15,
+                        prefix="tracking error annualized (daily)")
+        expected = rd.tracking_error.EXPECTED_VALUES_MONTHLY_PERFAN
+        actual = run_stream_property("tracking_error_annualized", monthly=True)
+        assertSeriesEqual(self, actual, expected, places=15,
+                        prefix="tracking error annualized (monthly)")
+        expected = rd.tracking_error.EXPECTED_VALUES_ANNUAL_PERFAN
+        actual = run_stream_property("tracking_error_annualized")
+        assertSeriesEqual(self, actual, expected, places=15,
+                        prefix="tracking error annualized (yearly)")
+
+class TestActivePremium(unittest.TestCase):
+    def test_matches_performance_analytics_output(self):
+        expected = rd.active_premium.EXPECTED_VALUES_ANNUAL_PERFAN
+        actual = run_stream_property("active_premium")
+        assertSeriesEqual(self, actual, expected, places=15, skip=1,
+                        prefix="active premium geometric (yearly)")
+        actual = run_stream_property("active_premium", daily=True)
+        assertSeriesEqual(self, actual, expected, places=15, skip=1,
+                        prefix="active premium geometric (daily)")
+
+class TestActivePremiumArithmetic(unittest.TestCase):
+    def test_matches_performance_analytics_output(self):
+        expected = rd.active_premium.EXPECTED_VALUES_ANNUAL_PERFAN
+        actual = run_stream_property("active_premium_arithmetic")
+        assertSeriesEqual(self, actual, expected, delta=5.18e-5, skip=1,
+                        prefix="active premium_arithmetic")
+
+class TestActivePremiumAnnualized(unittest.TestCase):
+    def test_matches_performance_analytics_output(self):
+        expected = rd.active_premium.EXPECTED_VALUES_DAILY_PERFAN
+        actual = run_stream_property("active_premium_annualized", daily=True)
+        # Note we skip first element because PerformanceAnalytics code
+        # uses it to determine periodicity.
+        assertSeriesEqual(self, actual, expected, places=11, skip=1,
+                        prefix="active premium annualized (daily)")
+        expected = rd.active_premium.EXPECTED_VALUES_MONTHLY_PERFAN
+        actual = run_stream_property("active_premium_annualized", monthly=True)
+        assertSeriesEqual(self, actual, expected, places=14, skip=1,
+                        prefix="active premium annualized (monthly)")
+        expected = rd.active_premium.EXPECTED_VALUES_ANNUAL_PERFAN
+        actual = run_stream_property("active_premium_annualized")
+        assertSeriesEqual(self, actual, expected, places=15, skip=1,
+                        prefix="active premium annualized (yearly)")
+
+class TestInformationRatio(unittest.TestCase):
+    def test_matches_performance_analytics_output(self):
+        expected = rd.information_ratio.EXPECTED_VALUES_ANNUAL_PERFAN
+        actual = run_stream_property("information_ratio")
+        assertSeriesEqual(self, actual, expected, places=13, skip=2,
+                        prefix="information ratio (yearly)")
+        expected = rd.information_ratio.EXPECTED_VALUES_ANNUAL_PERFAN
+        actual = run_stream_property("information_ratio", monthly=True)
+        assertSeriesEqual(self, actual, expected, places=13, skip=2,
+                        prefix="information ratio (monthly)")
+        expected = rd.information_ratio.EXPECTED_VALUES_ANNUAL_PERFAN
+        actual = run_stream_property("information_ratio", daily=True)
+        assertSeriesEqual(self, actual, expected, places=13, skip=2,
+                        prefix="information ratio (daily)")
+
+class TestInformationRatioAnnualized(unittest.TestCase):
+    def test_matches_performance_analytics_output(self):
+        expected = rd.information_ratio.EXPECTED_VALUES_DAILY_PERFAN
+        actual = run_stream_property("information_ratio_annualized", daily=True)
+        assertSeriesEqual(self, actual, expected, places=10, skip=2,
+                        prefix="information ratio annualized (daily)")
+        expected = rd.information_ratio.EXPECTED_VALUES_MONTHLY_PERFAN
+        actual = run_stream_property("information_ratio_annualized", monthly=True)
+        assertSeriesEqual(self, actual, expected, places=12, skip=2,
+                        prefix="information ratio annualized (monthly)")
+        expected = rd.information_ratio.EXPECTED_VALUES_ANNUAL_PERFAN
+        actual = run_stream_property("information_ratio_annualized")
+        assertSeriesEqual(self, actual, expected, places=13, skip=2,
+                        prefix="information ratio annualized (yearly)")
+
+class TestSystematicRisk(unittest.TestCase):
+    def test_matches_performance_analytics_output(self):
+        for rf, expected in rd.systematic_risk.EXPECTED_VALUES_BY_RF_ANNUAL_PERFAN.items():
+            actual = run_stream_property("systematic_risk",
+                 annual_risk_free_rate=rf)
+            assertSeriesEqual(self, actual, expected, places=15,
+                              prefix=f'systematic_risk (yearly, Rf {rf})')
+        for rf, expected in rd.systematic_risk.EXPECTED_VALUES_BY_RF_ANNUAL_PERFAN.items():
+            annual_rf = (1 + rf) ** 12 - 1
+            actual = run_stream_property("systematic_risk", monthly=True,
+                 annual_risk_free_rate=annual_rf)
+            assertSeriesEqual(self, actual, expected, places=15,
+                              prefix=f'systematic_risk (monthly, Rf {rf})')
+        for rf, expected in rd.systematic_risk.EXPECTED_VALUES_BY_RF_ANNUAL_PERFAN.items():
+            annual_rf = (1 + rf) ** 252 - 1
+            actual = run_stream_property("systematic_risk", daily=True,
+                 annual_risk_free_rate=annual_rf)
+            assertSeriesEqual(self, actual, expected, places=15,
+                              prefix=f'systematic_risk (daily, Rf {rf})')
+
+class TestSystematicRiskAnnualized(unittest.TestCase):
+    def test_matches_performance_analytics_output(self):
+        for rf, expected in rd.systematic_risk.EXPECTED_VALUES_BY_RF_DAILY_PERFAN.items():
+            annual_rf = (1 + rf) ** 252 - 1
+            actual = run_stream_property("systematic_risk_annualized", daily=True,
+                 annual_risk_free_rate=annual_rf)
+            assertSeriesEqual(self, actual, expected, places=14,
+                              prefix=f'systematic risk annualized (daily, Rf {rf})')
+        for rf, expected in rd.systematic_risk.EXPECTED_VALUES_BY_RF_MONTHLY_PERFAN.items():
+            annual_rf = (1 + rf) ** 12 - 1
+            actual = run_stream_property("systematic_risk_annualized", monthly=True,
+                annual_risk_free_rate=annual_rf)
+            assertSeriesEqual(self, actual, expected, places=15,
+                              prefix=f'systematic risk annualized (monthly, Rf {rf})')
+        for rf, expected in rd.systematic_risk.EXPECTED_VALUES_BY_RF_ANNUAL_PERFAN.items():
+            actual = run_stream_property("systematic_risk_annualized",
+                annual_risk_free_rate=rf)
+            assertSeriesEqual(self, actual, expected, places=15,
+                              prefix=f'systematic risk annualized (yearly, Rf {rf})')
+
+class TestTreynorRatio(unittest.TestCase):
+    def test_matches_performance_analytics_output(self):
+        for rf, expected in rd.treynor_ratio.EXPECTED_VALUES_BY_RF_ANNUAL_PERFAN.items():
+            annual_rf = (1 + rf) ** 252 - 1
+            actual = run_stream_property("treynor_ratio", daily=1,
+                 annual_risk_free_rate=annual_rf)
+            assertSeriesEqual(self, actual, expected, places=14,
+                              prefix=f'treynor ratio (daily, Rf {rf})')
+        for rf, expected in rd.treynor_ratio.EXPECTED_VALUES_BY_RF_ANNUAL_PERFAN.items():
+            annual_rf = (1 + rf) ** 12 - 1
+            actual = run_stream_property("treynor_ratio", monthly=1,
+                 annual_risk_free_rate=annual_rf)
+            assertSeriesEqual(self, actual, expected, places=14,
+                              prefix=f'treynor ratio (monthly, Rf {rf})')
+        for rf, expected in rd.treynor_ratio.EXPECTED_VALUES_BY_RF_ANNUAL_PERFAN.items():
+            actual = run_stream_property("treynor_ratio",
+                 annual_risk_free_rate=rf)
+            assertSeriesEqual(self, actual, expected, places=14,
+                              prefix=f'treynor ratio (yearly, Rf {rf})')
+
+class TestTreynorRatioAnnualized(unittest.TestCase):
+    def test_matches_performance_analytics_output(self):
+        for rf, expected in rd.treynor_ratio.EXPECTED_VALUES_BY_RF_DAILY_PERFAN.items():
+            annual_rf = (1 + rf) ** 252 - 1
+            actual = run_stream_property("treynor_ratio_annualized", daily=True,
+                 annual_risk_free_rate=annual_rf)
+            assertSeriesEqual(self, actual, expected, places=10,
+                              prefix=f'treynor ratio annualized (daily, Rf {rf})')
+        for rf, expected in rd.treynor_ratio.EXPECTED_VALUES_BY_RF_MONTHLY_PERFAN.items():
+            annual_rf = (1 + rf) ** 12 - 1
+            actual = run_stream_property("treynor_ratio_annualized", monthly=True,
+                 annual_risk_free_rate=annual_rf)
+            assertSeriesEqual(self, actual, expected, places=13,
+                            prefix=f'treynor ratio annualized (monthly, Rf {rf})')
+        for rf, expected in rd.treynor_ratio.EXPECTED_VALUES_BY_RF_ANNUAL_PERFAN.items():
+            actual = run_stream_property("treynor_ratio_annualized",
+                 annual_risk_free_rate=rf)
+            assertSeriesEqual(self, actual, expected, places=14,
+                            prefix=f'treynor ratio annualized (yearly, Rf {rf})')
+
+class TestTreynorRatioModified(unittest.TestCase):
+    def test_matches_performance_analytics_output(self):
+        for rf, expected in rd.treynor_ratio_modified.EXPECTED_VALUES_BY_RF_ANNUAL_PERFAN.items():
+            annual_rf = (1 + rf) ** 252 - 1
+            actual = run_stream_property("treynor_ratio_modified", daily=True,
+                 annual_risk_free_rate=annual_rf)
+            assertSeriesEqual(self, actual, expected, places=13 if rf < 0.3 else 12,
+                              prefix=f'treynor ratio modified (daily, Rf {rf})')
+        for rf, expected in rd.treynor_ratio_modified.EXPECTED_VALUES_BY_RF_MONTHLY_PERFAN.items():
+            annual_rf = (1 + rf) ** 12 - 1
+            actual = run_stream_property("treynor_ratio_modified", nonthly=True,
+                 annual_risk_free_rate=annual_rf)
+            assertSeriesEqual(self, actual, expected, places=13 if rf < 0.3 else 12,
+                              prefix=f'treynor ratio modified (monthly, Rf {rf})')
+        for rf, expected in rd.treynor_ratio_modified.EXPECTED_VALUES_BY_RF_ANNUAL_PERFAN.items():
+            actual = run_stream_property("treynor_ratio_modified",
+                 annual_risk_free_rate=rf)
+            assertSeriesEqual(self, actual, expected, places=13 if rf < 0.3 else 12,
+                              prefix=f'treynor ratio modified (yearly, Rf {rf})')
+
+class TestTreynorRatioModifiedAnnualized(unittest.TestCase):
+    def test_matches_performance_analytics_output(self):
+        for rf, expected in rd.treynor_ratio_modified.EXPECTED_VALUES_BY_RF_DAILY_PERFAN.items():
+            annual_rf = (1 + rf) ** 252 - 1
+            actual = run_stream_property("treynor_ratio_modified_annualized", daily=True,
+                 annual_risk_free_rate=annual_rf)
+            assertSeriesEqual(self, actual, expected, places=10,
+                              prefix=f'treynor ratio modified annualized (daily, Rf {rf})')
+        for rf, expected in rd.treynor_ratio_modified.EXPECTED_VALUES_BY_RF_MONTHLY_PERFAN.items():
+            annual_rf = (1 + rf) ** 12 - 1
+            actual = run_stream_property("treynor_ratio_modified_annualized", monthly=True,
+                annual_risk_free_rate=annual_rf)
+            assertSeriesEqual(self, actual, expected, places=12,
+                            prefix=f'treynor ratio modified annualized (monthly, Rf {rf})')
+        for rf, expected in rd.treynor_ratio_modified.EXPECTED_VALUES_BY_RF_ANNUAL_PERFAN.items():
+            actual = run_stream_property("treynor_ratio_modified_annualized",
+                annual_risk_free_rate=rf)
+            assertSeriesEqual(self, actual, expected, places=12,
+                            prefix=f'treynor ratio modified annualized (yearly, Rf {rf})')
+

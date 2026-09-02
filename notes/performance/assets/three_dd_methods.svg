@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="900" viewBox="0 0 1800 900">
+<defs><style>
+.title{font:700 24px Arial;fill:white}.h{font:700 20px Arial}.b{font:16px Arial}.f{font:italic 21px Georgia}
+.panel{fill:white;stroke-width:2}.axis{stroke:#222;stroke-width:2}.line{fill:none;stroke:#2856a6;stroke-width:3}.peak{fill:none;stroke:#555;stroke-width:2;stroke-dasharray:5 5}.box{fill:#fafafa;stroke-width:1.5}
+</style></defs>
+<rect width="1800" height="900" fill="white"/>
+
+<!-- 1 -->
+<rect x="20" y="20" width="570" height="860" rx="16" class="panel" stroke="#2856a6"/>
+<rect x="20" y="20" width="570" height="55" rx="12" fill="#2856a6"/>
+<text x="42" y="56" class="title">1. CUMULATIVE PEAK-TO-VALLEY</text>
+<text x="42" y="108" class="b">Cumulative wealth relative to its running peak.</text>
+<text x="42" y="145" class="h" fill="#2856a6">Definition</text>
+<text x="42" y="178" class="f">Wₜ = ∏ᵢ₌₁ᵗ(1+rᵢ),   Hₜ = max Wᵢ</text>
+<rect x="85" y="198" width="440" height="62" rx="10" class="box" stroke="#2856a6"/>
+<text x="115" y="238" class="f">Dᶜᵘᵐₜ = Wₜ/Hₜ − 1 ≤ 0</text>
+<text x="42" y="295" class="b">Maximum drawdown: MDD = minₜ Dᶜᵘᵐₜ</text>
+<text x="42" y="323" class="b">Signed: min_drawdowns_cumulative = MDD</text>
+<text x="42" y="351" class="b">Magnitude: worst_drawdowns_cumulative = |MDD|</text>
+<line x1="75" y1="520" x2="540" y2="520" class="axis"/><line x1="75" y1="390" x2="75" y2="520" class="axis"/>
+<polyline points="100,455 175,410 250,432 325,470 400,420 475,456 525,500" class="line"/>
+<polyline points="100,410 175,410 250,410 325,410 400,410 475,410 525,420" class="peak"/>
+<g fill="#2856a6"><circle cx="100" cy="455" r="5"/><circle cx="175" cy="410" r="5"/><circle cx="250" cy="432" r="5"/><circle cx="325" cy="470" r="5"/><circle cx="400" cy="420" r="5"/><circle cx="475" cy="456" r="5"/><circle cx="525" cy="500" r="5"/></g>
+<text x="220" y="455" class="b" fill="#b22">−6.90%</text><text x="470" y="490" class="b" fill="#b22">−6.88%</text>
+<text x="42" y="570" class="h" fill="#2856a6">Common example</text>
+<text x="42" y="602" class="b">Returns: +10%, −5%, −2%, +8%, −3%, −4%</text>
+<text x="42" y="634" class="b">Drawdown: 0%, −5%, −6.90%, 0%, −3%, −6.88%</text>
+<rect x="70" y="680" width="470" height="95" rx="10" class="box" stroke="#2856a6"/>
+<text x="100" y="720" class="f">MDD = −6.90%</text><text x="100" y="755" class="f">|MDD| = 6.90%</text>
+<text x="42" y="825" class="b">Use: Calmar and Sterling ratios.</text>
+
+<!-- 2 -->
+<rect x="615" y="20" width="570" height="860" rx="16" class="panel" stroke="#2f7d32"/>
+<rect x="615" y="20" width="570" height="55" rx="12" fill="#2f7d32"/>
+<text x="637" y="56" class="title">2. HIGH-WATER-MARK</text>
+<text x="637" y="108" class="b">Drawdown below the running high-water mark at every t.</text>
+<text x="637" y="145" class="h" fill="#2f7d32">Definition</text>
+<text x="637" y="178" class="f">Hₜ = max Wᵢ,   Dᴴᵂᴹₜ = Wₜ/Hₜ − 1 ≤ 0</text>
+<line x1="670" y1="520" x2="1135" y2="520" class="axis"/><line x1="670" y1="390" x2="670" y2="520" class="axis"/>
+<polyline points="695,455 770,410 845,432 920,470 995,420 1070,456 1120,500" class="line"/>
+<polyline points="695,455 770,410 845,410 920,410 995,420 1070,420 1120,420" class="peak" stroke="#2f7d32"/>
+<g fill="#2856a6"><circle cx="695" cy="455" r="5"/><circle cx="770" cy="410" r="5"/><circle cx="845" cy="432" r="5"/><circle cx="920" cy="470" r="5"/><circle cx="995" cy="420" r="5"/><circle cx="1070" cy="456" r="5"/><circle cx="1120" cy="500" r="5"/></g>
+<text x="637" y="570" class="h" fill="#2f7d32">Complete HWM series</text>
+<text x="637" y="605" class="f">[0, −5%, −6.90%, 0, −3%, −6.88%]</text>
+<rect x="650" y="650" width="235" height="120" rx="10" class="box" stroke="#2f7d32"/>
+<text x="670" y="688" class="h" fill="#2f7d32">Pain Index</text><text x="670" y="728" class="f">−(1/n)ΣDᴴᵂᴹₜ</text><text x="670" y="755" class="b">mean drawdown magnitude</text>
+<rect x="900" y="650" width="235" height="120" rx="10" class="box" stroke="#2f7d32"/>
+<text x="920" y="688" class="h" fill="#2f7d32">Ulcer Index</text><text x="920" y="728" class="f">√[(1/n)Σ(Dᴴᵂᴹₜ)²]</text><text x="920" y="755" class="b">weights deep losses more</text>
+<text x="637" y="825" class="b">Use: Pain, Pain Ratio, Ulcer, Martin Ratio.</text>
+
+<!-- 3 -->
+<rect x="1210" y="20" width="570" height="860" rx="16" class="panel" stroke="#6a35a8"/>
+<rect x="1210" y="20" width="570" height="55" rx="12" fill="#6a35a8"/>
+<text x="1232" y="56" class="title">3. CONTINUOUS LOSING-RUN</text>
+<text x="1232" y="108" class="b">One compounded drawdown for each uninterrupted negative run.</text>
+<text x="1232" y="145" class="h" fill="#6a35a8">Definition</text>
+<text x="1232" y="178" class="f">DDʳᵘⁿⱼ = ∏ᵢ₌ₐᵇ(1+rᵢ) − 1 ≤ 0</text>
+<line x1="1260" y1="355" x2="1735" y2="355" class="axis"/>
+<rect x="1290" y="300" width="32" height="55" fill="#4f9d55"/><rect x="1360" y="355" width="32" height="28" fill="#c94b4b"/><rect x="1430" y="355" width="32" height="15" fill="#c94b4b"/><rect x="1540" y="315" width="32" height="40" fill="#4f9d55"/><rect x="1610" y="355" width="32" height="18" fill="#c94b4b"/><rect x="1680" y="355" width="32" height="25" fill="#c94b4b"/>
+<text x="1350" y="415" class="b">−5%</text><text x="1422" y="398" class="b">−2%</text><text x="1602" y="405" class="b">−3%</text><text x="1672" y="412" class="b">−4%</text>
+<text x="1360" y="445" class="b" fill="#6a35a8">Run 1</text><text x="1620" y="470" class="b" fill="#6a35a8">Run 2</text>
+<rect x="1250" y="500" width="490" height="135" rx="10" class="box" stroke="#6a35a8"/>
+<text x="1275" y="535" class="h" fill="#6a35a8">Same example</text>
+<text x="1275" y="568" class="b">Run 1: (1−.05)(1−.02)−1 = −6.90%</text>
+<text x="1275" y="600" class="b">Run 2: (1−.03)(1−.04)−1 = −6.88%</text>
+<rect x="1250" y="675" width="490" height="95" rx="10" class="box" stroke="#6a35a8"/>
+<text x="1275" y="712" class="h" fill="#6a35a8">Burke denominator</text>
+<text x="1275" y="750" class="f">√ Σⱼ(DDʳᵘⁿⱼ)²</text>
+<text x="1250" y="825" class="f">Burke = (R−Rᶠ) / √Σ(DDʳᵘⁿⱼ)²</text>
+</svg>
