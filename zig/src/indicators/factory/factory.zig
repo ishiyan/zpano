@@ -175,6 +175,7 @@ const qpl_mod = @import("../raymond_lee/quantum_price_levels/quantum_price_level
 const mmm_mod = @import("../zurab_silagadze/moving_mini_max/moving_mini_max.zig");
 const tsi_mod = @import("../william_blau/true_strength_index/true_strength_index.zig");
 const ergodic_mod = @import("../william_blau/ergodic_oscillator/ergodic_oscillator.zig");
+const mdi_mod = @import("../william_blau/mean_deviation_index/mean_deviation_index.zig");
 
 pub const FactoryError = error{
     UnsupportedIndicator,
@@ -1515,6 +1516,15 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
             .quote_component = getQuoteComponent(obj),
             .trade_component = getTradeComponent(obj),
         }),
+        .mean_deviation_index => createWithParams(mdi_mod.MeanDeviationIndex, allocator, mdi_mod.MeanDeviationIndex.init(.{
+            .r = getUsize(obj, "r", 20),
+            .s = getUsize(obj, "s", 5),
+            .u = getUsize(obj, "u", 3),
+            .ul = getUsize(obj, "ul", 3),
+            .bar_component = getBarComponent(obj),
+            .quote_component = getQuoteComponent(obj),
+            .trade_component = getTradeComponent(obj),
+        })),
     };
 }
 

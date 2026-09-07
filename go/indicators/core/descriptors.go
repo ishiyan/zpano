@@ -846,4 +846,13 @@ var descriptors = map[Identifier]Descriptor{
 			{Kind: 2 /* Signal */, Shape: shape.Scalar, Role: Signal, Pane: Own},
 		},
 	},
+
+	MeanDeviationIndex: {
+		Identifier: MeanDeviationIndex, Family: "William Blau",
+		Adaptivity: Static, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{
+			{Kind: 1 /* MDI */, Shape: shape.Scalar, Role: Oscillator, Pane: Own},
+			{Kind: 2 /* Signal */, Shape: shape.Scalar, Role: Signal, Pane: Own},
+		},
+	},
 }

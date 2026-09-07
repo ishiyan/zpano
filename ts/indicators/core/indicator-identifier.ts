@@ -394,4 +394,7 @@ export enum IndicatorIdentifier {
 
     /** Identifies the William Blau __Ergodic Oscillator__ (ERGODIC) indicator. */
     ErgodicOscillator,
+
+    /** Identifies the William Blau __Mean Deviation Index__ (MDI) indicator. */
+    MeanDeviationIndex,
 }

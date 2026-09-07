@@ -114,6 +114,7 @@ import (
 	"zpano/indicators/welleswilder/relativestrengthindex"
 	"zpano/indicators/welleswilder/truerange"
 	"zpano/indicators/williamblau/ergodicoscillator"
+	"zpano/indicators/williamblau/meandeviationindex"
 	"zpano/indicators/williamblau/truestrengthindex"
 	"zpano/indicators/zurabsilagadze/movingminimax"
 )
@@ -1204,6 +1205,14 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 		}
 
 		return ergodicoscillator.NewErgodicOscillator(p)
+
+	case core.MeanDeviationIndex:
+		p := meandeviationindex.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return meandeviationindex.NewMeanDeviationIndex(p)
 
 	default:
 		return nil, fmt.Errorf("unsupported indicator: %s", identifier)

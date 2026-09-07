@@ -407,6 +407,9 @@ const (
 	// ErgodicOscillator identifies the William Blau Ergodic Oscillator (ERGODIC) indicator.
 	ErgodicOscillator
 
+	// MeanDeviationIndex identifies the William Blau Mean Deviation Index (MDI) indicator.
+	MeanDeviationIndex
+
 	last
 )
 
@@ -570,6 +573,7 @@ const (
 	movingMiniMax                             = "movingMiniMax"
 	trueStrengthIndex                         = "trueStrengthIndex"
 	ergodicOscillator                         = "ergodicOscillator"
+	meanDeviationIndex                        = "meanDeviationIndex"
 )
 
 // String implements the Stringer interface.
@@ -816,6 +820,8 @@ func (i Identifier) String() string {
 		return trueStrengthIndex
 	case ErgodicOscillator:
 		return ergodicOscillator
+	case MeanDeviationIndex:
+		return meanDeviationIndex
 	default:
 		return unknown
 	}
@@ -1099,6 +1105,8 @@ func (i *Identifier) UnmarshalJSON(data []byte) error {
 		*i = TrueStrengthIndex
 	case ergodicOscillator:
 		*i = ErgodicOscillator
+	case meanDeviationIndex:
+		*i = MeanDeviationIndex
 	default:
 		return fmt.Errorf(errFmt, s)
 	}

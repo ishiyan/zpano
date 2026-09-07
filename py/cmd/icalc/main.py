@@ -140,6 +140,7 @@ _IDENTIFIER_MAP: dict[str, Identifier] = {
     'movingMiniMax': Identifier.MOVING_MINI_MAX,
     'trueStrengthIndex': Identifier.TRUE_STRENGTH_INDEX,
     'ergodicOscillator': Identifier.ERGODIC_OSCILLATOR,
+    'meanDeviationIndex': Identifier.MEAN_DEVIATION_INDEX,
 }
 
 

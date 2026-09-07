@@ -135,6 +135,7 @@ func TestIdentifierString(t *testing.T) {
 		{MovingMiniMax, movingMiniMax},
 		{TrueStrengthIndex, trueStrengthIndex},
 		{ErgodicOscillator, ergodicOscillator},
+		{MeanDeviationIndex, meanDeviationIndex},
 		// ── boundary ──────────────────────────────────────────────────────────
 		{last, unknown},
 		{Identifier(0), unknown},
@@ -282,6 +283,7 @@ func TestIdentifierIsKnown(t *testing.T) {
 		{MovingMiniMax, true},
 		{TrueStrengthIndex, true},
 		{ErgodicOscillator, true},
+		{MeanDeviationIndex, true},
 		// ── boundary ──────────────────────────────────────────────────────────
 		{last, false},
 		{Identifier(0), false},
@@ -433,6 +435,7 @@ func TestIdentifierMarshalJSON(t *testing.T) {
 		{MovingMiniMax, dqs + movingMiniMax + dqs, true},
 		{TrueStrengthIndex, dqs + trueStrengthIndex + dqs, true},
 		{ErgodicOscillator, dqs + ergodicOscillator + dqs, true},
+		{MeanDeviationIndex, dqs + meanDeviationIndex + dqs, true},
 		// ── boundary ──────────────────────────────────────────────────────────
 		{last, nilstr, false},
 		{Identifier(9999), nilstr, false},
@@ -597,6 +600,7 @@ func TestIdentifierUnmarshalJSON(t *testing.T) {
 		{MovingMiniMax, dqs + movingMiniMax + dqs, true},
 		{TrueStrengthIndex, dqs + trueStrengthIndex + dqs, true},
 		{ErgodicOscillator, dqs + ergodicOscillator + dqs, true},
+		{MeanDeviationIndex, dqs + meanDeviationIndex + dqs, true},
 		// ── boundary ──────────────────────────────────────────────────────────
 		{zero, "\"unknown\"", false},
 		{zero, "\"foobar\"", false},

@@ -311,6 +311,9 @@ use crate::indicators::william_blau::true_strength_index::true_strength_index::{
 use crate::indicators::william_blau::ergodic_oscillator::ergodic_oscillator::{
     ErgodicOscillator, ErgodicOscillatorParams,
 };
+use crate::indicators::william_blau::mean_deviation_index::mean_deviation_index::{
+    MeanDeviationIndex, MeanDeviationIndexParams,
+};
 
 /// Create an indicator from its identifier and a JSON-encoded parameter string.
 ///
@@ -1705,6 +1708,15 @@ pub fn create_indicator(
             if let Some(v) = get_usize(&params, "u") { p.u = v; }
             if let Some(v) = get_usize(&params, "ul") { p.ul = v; }
             Ok(Box::new(ErgodicOscillator::new(&p)?))
+        }
+
+        Identifier::MeanDeviationIndex => {
+            let mut p = MeanDeviationIndexParams::default();
+            if let Some(v) = get_usize(&params, "r") { p.r = v; }
+            if let Some(v) = get_usize(&params, "s") { p.s = v; }
+            if let Some(v) = get_usize(&params, "u") { p.u = v; }
+            if let Some(v) = get_usize(&params, "ul") { p.ul = v; }
+            Ok(Box::new(MeanDeviationIndex::new(&p)?))
         }
 
         _ => Err(format!("unsupported indicator: {:?}", identifier)),

@@ -285,6 +285,8 @@ pub enum Identifier {
     TrueStrengthIndex = 106,
     /// Identifies the William Blau Ergodic Oscillator (ERGODIC) indicator.
     ErgodicOscillator = 107,
+    /// Identifies the William Blau Mean Deviation Index (MDI) indicator.
+    MeanDeviationIndex = 108,
 }
 
 impl Identifier {
@@ -407,6 +409,7 @@ impl Identifier {
             Self::MovingMiniMax => "movingMiniMax",
             Self::TrueStrengthIndex => "trueStrengthIndex",
             Self::ErgodicOscillator => "ergodicOscillator",
+            Self::MeanDeviationIndex => "meanDeviationIndex",
         }
     }
 
@@ -533,6 +536,7 @@ impl Identifier {
             "movingMiniMax" => Some(Self::MovingMiniMax),
             "trueStrengthIndex" => Some(Self::TrueStrengthIndex),
             "ergodicOscillator" => Some(Self::ErgodicOscillator),
+            "meanDeviationIndex" => Some(Self::MeanDeviationIndex),
             _ => None,
         }
     }

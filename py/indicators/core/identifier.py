@@ -402,3 +402,6 @@ class Identifier(IntEnum):
 
     # Identifies the William Blau Ergodic Oscillator (ERGODIC) indicator.
     ERGODIC_OSCILLATOR = 107
+
+    # Identifies the William Blau Mean Deviation Index (MDI) indicator.
+    MEAN_DEVIATION_INDEX = 108

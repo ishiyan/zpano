@@ -699,4 +699,9 @@ def create_indicator(
         from ..william_blau.ergodic_oscillator.ergodic_oscillator import ErgodicOscillator
         return ErgodicOscillator(_apply(default_params(), params))
 
+    if identifier == Identifier.MEAN_DEVIATION_INDEX:
+        from ..william_blau.mean_deviation_index.params import default_params
+        from ..william_blau.mean_deviation_index.mean_deviation_index import MeanDeviationIndex
+        return MeanDeviationIndex(_apply(default_params(), params))
+
     raise ValueError(f"unsupported indicator: {identifier}")

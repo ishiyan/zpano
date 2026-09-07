@@ -553,6 +553,10 @@ _descriptors: dict[Id, Descriptor] = {
         Id.ERGODIC_OSCILLATOR, "William Blau", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
         [_o(0, S.SCALAR, R.BOUNDED_OSCILLATOR, P.OWN),
          _o(1, S.SCALAR, R.SIGNAL, P.OWN)]),
+    Id.MEAN_DEVIATION_INDEX: _d(
+        Id.MEAN_DEVIATION_INDEX, "William Blau", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
+        [_o(0, S.SCALAR, R.OSCILLATOR, P.OWN),
+         _o(1, S.SCALAR, R.SIGNAL, P.OWN)]),
 }
 
 

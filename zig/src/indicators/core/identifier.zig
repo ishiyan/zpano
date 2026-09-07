@@ -284,6 +284,8 @@ pub const Identifier = enum(u8) {
     true_strength_index = 106,
     /// Identifies the William Blau Ergodic Oscillator (ERGODIC) indicator.
     ergodic_oscillator = 107,
+    /// Identifies the William Blau Mean Deviation Index (MDI) indicator.
+    mean_deviation_index = 108,
 
     /// Returns the camelCase string representation matching Go's String().
     pub fn asStr(self: Identifier) []const u8 {
@@ -442,6 +444,7 @@ pub const Identifier = enum(u8) {
             .moving_mini_max => "movingMiniMax",
             .true_strength_index => "trueStrengthIndex",
             .ergodic_oscillator => "ergodicOscillator",
+            .mean_deviation_index => "meanDeviationIndex",
         };
     }
 
@@ -602,6 +605,7 @@ pub const Identifier = enum(u8) {
             .{ "movingMiniMax", Identifier.moving_mini_max },
             .{ "trueStrengthIndex", Identifier.true_strength_index },
             .{ "ergodicOscillator", Identifier.ergodic_oscillator },
+            .{ "meanDeviationIndex", Identifier.mean_deviation_index },
         };
 
         inline for (map) |entry| {

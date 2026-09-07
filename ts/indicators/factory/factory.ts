@@ -254,6 +254,8 @@ import { TrueStrengthIndex } from '../william-blau/true-strength-index/true-stre
 import { defaultParams as defaultTsiParams } from '../william-blau/true-strength-index/params.js';
 import { ErgodicOscillator } from '../william-blau/ergodic-oscillator/ergodic-oscillator.js';
 import { defaultParams as defaultErgodicParams } from '../william-blau/ergodic-oscillator/params.js';
+import { MeanDeviationIndex } from '../william-blau/mean-deviation-index/mean-deviation-index.js';
+import { defaultParams as defaultMdiParams } from '../william-blau/mean-deviation-index/params.js';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -715,6 +717,9 @@ export function createIndicator(identifier: IndicatorIdentifier, params?: Record
 
         case IndicatorIdentifier.ErgodicOscillator:
             return new ErgodicOscillator({ ...defaultErgodicParams(), ...p });
+
+        case IndicatorIdentifier.MeanDeviationIndex:
+            return new MeanDeviationIndex({ ...defaultMdiParams(), ...p });
 
         default:
             throw new Error(`Unsupported indicator: ${IndicatorIdentifier[identifier] ?? identifier}`);
