@@ -308,6 +308,9 @@ use crate::indicators::zurab_silagadze::moving_mini_max::moving_mini_max::{
 use crate::indicators::william_blau::true_strength_index::true_strength_index::{
     TrueStrengthIndex, TrueStrengthIndexParams,
 };
+use crate::indicators::william_blau::ergodic_oscillator::ergodic_oscillator::{
+    ErgodicOscillator, ErgodicOscillatorParams,
+};
 
 /// Create an indicator from its identifier and a JSON-encoded parameter string.
 ///
@@ -1692,6 +1695,16 @@ pub fn create_indicator(
             if let Some(v) = get_usize(&params, "u") { p.u = v; }
             if let Some(v) = get_usize(&params, "ul") { p.ul = v; }
             Ok(Box::new(TrueStrengthIndex::new(&p)?))
+        }
+
+        Identifier::ErgodicOscillator => {
+            let mut p = ErgodicOscillatorParams::default();
+            if let Some(v) = get_usize(&params, "q") { p.q = v; }
+            if let Some(v) = get_usize(&params, "r") { p.r = v; }
+            if let Some(v) = get_usize(&params, "s") { p.s = v; }
+            if let Some(v) = get_usize(&params, "u") { p.u = v; }
+            if let Some(v) = get_usize(&params, "ul") { p.ul = v; }
+            Ok(Box::new(ErgodicOscillator::new(&p)?))
         }
 
         _ => Err(format!("unsupported indicator: {:?}", identifier)),

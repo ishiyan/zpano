@@ -694,4 +694,9 @@ def create_indicator(
         from ..william_blau.true_strength_index.true_strength_index import TrueStrengthIndex
         return TrueStrengthIndex(_apply(default_params(), params))
 
+    if identifier == Identifier.ERGODIC_OSCILLATOR:
+        from ..william_blau.ergodic_oscillator.params import default_params
+        from ..william_blau.ergodic_oscillator.ergodic_oscillator import ErgodicOscillator
+        return ErgodicOscillator(_apply(default_params(), params))
+
     raise ValueError(f"unsupported indicator: {identifier}")

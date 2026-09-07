@@ -139,6 +139,7 @@ _IDENTIFIER_MAP: dict[str, Identifier] = {
     'quantumPriceLevels': Identifier.QUANTUM_PRICE_LEVELS,
     'movingMiniMax': Identifier.MOVING_MINI_MAX,
     'trueStrengthIndex': Identifier.TRUE_STRENGTH_INDEX,
+    'ergodicOscillator': Identifier.ERGODIC_OSCILLATOR,
 }
 
 

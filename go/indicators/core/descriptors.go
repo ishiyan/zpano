@@ -837,4 +837,13 @@ var descriptors = map[Identifier]Descriptor{
 			{Kind: 2 /* Signal */, Shape: shape.Scalar, Role: Signal, Pane: Own},
 		},
 	},
+
+	ErgodicOscillator: {
+		Identifier: ErgodicOscillator, Family: "William Blau",
+		Adaptivity: Static, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{
+			{Kind: 1 /* Ergodic */, Shape: shape.Scalar, Role: BoundedOscillator, Pane: Own},
+			{Kind: 2 /* Signal */, Shape: shape.Scalar, Role: Signal, Pane: Own},
+		},
+	},
 }

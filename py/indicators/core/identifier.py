@@ -399,3 +399,6 @@ class Identifier(IntEnum):
 
     # Identifies the William Blau True Strength Index (TSI) indicator.
     TRUE_STRENGTH_INDEX = 106
+
+    # Identifies the William Blau Ergodic Oscillator (ERGODIC) indicator.
+    ERGODIC_OSCILLATOR = 107

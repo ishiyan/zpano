@@ -404,6 +404,9 @@ const (
 	// TrueStrengthIndex identifies the William Blau True Strength Index (TSI) indicator.
 	TrueStrengthIndex
 
+	// ErgodicOscillator identifies the William Blau Ergodic Oscillator (ERGODIC) indicator.
+	ErgodicOscillator
+
 	last
 )
 
@@ -566,6 +569,7 @@ const (
 	quantumPriceLevels                        = "quantumPriceLevels"
 	movingMiniMax                             = "movingMiniMax"
 	trueStrengthIndex                         = "trueStrengthIndex"
+	ergodicOscillator                         = "ergodicOscillator"
 )
 
 // String implements the Stringer interface.
@@ -810,6 +814,8 @@ func (i Identifier) String() string {
 		return movingMiniMax
 	case TrueStrengthIndex:
 		return trueStrengthIndex
+	case ErgodicOscillator:
+		return ergodicOscillator
 	default:
 		return unknown
 	}
@@ -1091,6 +1097,8 @@ func (i *Identifier) UnmarshalJSON(data []byte) error {
 		*i = MovingMiniMax
 	case trueStrengthIndex:
 		*i = TrueStrengthIndex
+	case ergodicOscillator:
+		*i = ErgodicOscillator
 	default:
 		return fmt.Errorf(errFmt, s)
 	}

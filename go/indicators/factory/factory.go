@@ -113,6 +113,7 @@ import (
 	"zpano/indicators/welleswilder/parabolicstopandreverse"
 	"zpano/indicators/welleswilder/relativestrengthindex"
 	"zpano/indicators/welleswilder/truerange"
+	"zpano/indicators/williamblau/ergodicoscillator"
 	"zpano/indicators/williamblau/truestrengthindex"
 	"zpano/indicators/zurabsilagadze/movingminimax"
 )
@@ -1195,6 +1196,14 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 		}
 
 		return truestrengthindex.NewTrueStrengthIndex(p)
+
+	case core.ErgodicOscillator:
+		p := ergodicoscillator.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return ergodicoscillator.NewErgodicOscillator(p)
 
 	default:
 		return nil, fmt.Errorf("unsupported indicator: %s", identifier)

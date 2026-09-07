@@ -252,6 +252,8 @@ import { defaultParams as defaultQplParams } from '../raymond-lee/quantum-price-
 import { defaultParams as defaultMmmParams } from '../zurab-silagadze/moving-mini-max/params.js';
 import { TrueStrengthIndex } from '../william-blau/true-strength-index/true-strength-index.js';
 import { defaultParams as defaultTsiParams } from '../william-blau/true-strength-index/params.js';
+import { ErgodicOscillator } from '../william-blau/ergodic-oscillator/ergodic-oscillator.js';
+import { defaultParams as defaultErgodicParams } from '../william-blau/ergodic-oscillator/params.js';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -710,6 +712,9 @@ export function createIndicator(identifier: IndicatorIdentifier, params?: Record
 
         case IndicatorIdentifier.TrueStrengthIndex:
             return new TrueStrengthIndex({ ...defaultTsiParams(), ...p });
+
+        case IndicatorIdentifier.ErgodicOscillator:
+            return new ErgodicOscillator({ ...defaultErgodicParams(), ...p });
 
         default:
             throw new Error(`Unsupported indicator: ${IndicatorIdentifier[identifier] ?? identifier}`);

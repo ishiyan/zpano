@@ -287,4 +287,5 @@ pub const descriptors = [_]Descriptor{
 
     // ── william blau ───────────────────────────────────────────────────────
     .{ .identifier = .true_strength_index, .family = "William Blau", .adaptivity = .static_, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{ .{ .kind = 1, .shape = .scalar, .role = .bounded_oscillator, .pane = .own }, .{ .kind = 2, .shape = .scalar, .role = .signal, .pane = .own } } },
+    .{ .identifier = .ergodic_oscillator, .family = "William Blau", .adaptivity = .static_, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{ .{ .kind = 1, .shape = .scalar, .role = .bounded_oscillator, .pane = .own }, .{ .kind = 2, .shape = .scalar, .role = .signal, .pane = .own } } },
 };

@@ -174,6 +174,7 @@ const cvtx_mod = @import("../don_mak/cubic_vertex/cubic_vertex.zig");
 const qpl_mod = @import("../raymond_lee/quantum_price_levels/quantum_price_levels.zig");
 const mmm_mod = @import("../zurab_silagadze/moving_mini_max/moving_mini_max.zig");
 const tsi_mod = @import("../william_blau/true_strength_index/true_strength_index.zig");
+const ergodic_mod = @import("../william_blau/ergodic_oscillator/ergodic_oscillator.zig");
 
 pub const FactoryError = error{
     UnsupportedIndicator,
@@ -1495,6 +1496,16 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
 
         // ── william blau ───────────────────────────────────────────────────
         .true_strength_index => createWithAllocParams(tsi_mod.TrueStrengthIndex, tsi_mod.TrueStrengthIndexParams, allocator, obj, .{
+            .q = getUsize(obj, "q", 2),
+            .r = getUsize(obj, "r", 20),
+            .s = getUsize(obj, "s", 5),
+            .u = getUsize(obj, "u", 3),
+            .ul = getUsize(obj, "ul", 3),
+            .bar_component = getBarComponent(obj),
+            .quote_component = getQuoteComponent(obj),
+            .trade_component = getTradeComponent(obj),
+        }),
+        .ergodic_oscillator => createWithAllocParams(ergodic_mod.ErgodicOscillator, ergodic_mod.ErgodicOscillatorParams, allocator, obj, .{
             .q = getUsize(obj, "q", 2),
             .r = getUsize(obj, "r", 20),
             .s = getUsize(obj, "s", 5),

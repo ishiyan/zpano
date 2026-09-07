@@ -283,6 +283,8 @@ pub enum Identifier {
     MovingMiniMax = 105,
     /// Identifies the William Blau True Strength Index (TSI) indicator.
     TrueStrengthIndex = 106,
+    /// Identifies the William Blau Ergodic Oscillator (ERGODIC) indicator.
+    ErgodicOscillator = 107,
 }
 
 impl Identifier {
@@ -404,6 +406,7 @@ impl Identifier {
             Self::QuantumPriceLevels => "quantumPriceLevels",
             Self::MovingMiniMax => "movingMiniMax",
             Self::TrueStrengthIndex => "trueStrengthIndex",
+            Self::ErgodicOscillator => "ergodicOscillator",
         }
     }
 
@@ -529,6 +532,7 @@ impl Identifier {
             "quantumPriceLevels" => Some(Self::QuantumPriceLevels),
             "movingMiniMax" => Some(Self::MovingMiniMax),
             "trueStrengthIndex" => Some(Self::TrueStrengthIndex),
+            "ergodicOscillator" => Some(Self::ErgodicOscillator),
             _ => None,
         }
     }

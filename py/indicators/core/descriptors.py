@@ -549,6 +549,10 @@ _descriptors: dict[Id, Descriptor] = {
         Id.TRUE_STRENGTH_INDEX, "William Blau", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
         [_o(0, S.SCALAR, R.BOUNDED_OSCILLATOR, P.OWN),
          _o(1, S.SCALAR, R.SIGNAL, P.OWN)]),
+    Id.ERGODIC_OSCILLATOR: _d(
+        Id.ERGODIC_OSCILLATOR, "William Blau", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
+        [_o(0, S.SCALAR, R.BOUNDED_OSCILLATOR, P.OWN),
+         _o(1, S.SCALAR, R.SIGNAL, P.OWN)]),
 }
 
 

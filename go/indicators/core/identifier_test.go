@@ -134,6 +134,7 @@ func TestIdentifierString(t *testing.T) {
 		{QuantumPriceLevels, quantumPriceLevels},
 		{MovingMiniMax, movingMiniMax},
 		{TrueStrengthIndex, trueStrengthIndex},
+		{ErgodicOscillator, ergodicOscillator},
 		// ── boundary ──────────────────────────────────────────────────────────
 		{last, unknown},
 		{Identifier(0), unknown},
@@ -280,6 +281,7 @@ func TestIdentifierIsKnown(t *testing.T) {
 		{QuantumPriceLevels, true},
 		{MovingMiniMax, true},
 		{TrueStrengthIndex, true},
+		{ErgodicOscillator, true},
 		// ── boundary ──────────────────────────────────────────────────────────
 		{last, false},
 		{Identifier(0), false},
@@ -430,6 +432,7 @@ func TestIdentifierMarshalJSON(t *testing.T) {
 		{QuantumPriceLevels, dqs + quantumPriceLevels + dqs, true},
 		{MovingMiniMax, dqs + movingMiniMax + dqs, true},
 		{TrueStrengthIndex, dqs + trueStrengthIndex + dqs, true},
+		{ErgodicOscillator, dqs + ergodicOscillator + dqs, true},
 		// ── boundary ──────────────────────────────────────────────────────────
 		{last, nilstr, false},
 		{Identifier(9999), nilstr, false},
@@ -593,6 +596,7 @@ func TestIdentifierUnmarshalJSON(t *testing.T) {
 		{QuantumPriceLevels, dqs + quantumPriceLevels + dqs, true},
 		{MovingMiniMax, dqs + movingMiniMax + dqs, true},
 		{TrueStrengthIndex, dqs + trueStrengthIndex + dqs, true},
+		{ErgodicOscillator, dqs + ergodicOscillator + dqs, true},
 		// ── boundary ──────────────────────────────────────────────────────────
 		{zero, "\"unknown\"", false},
 		{zero, "\"foobar\"", false},

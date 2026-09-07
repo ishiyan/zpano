@@ -347,6 +347,7 @@ const descriptors: Map<IndicatorIdentifier, Descriptor> = new Map<IndicatorIdent
 
   // ── william blau ───────────────────────────────────────────────────────
   [IndicatorIdentifier.TrueStrengthIndex, desc(IndicatorIdentifier.TrueStrengthIndex, 'William Blau', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.BoundedOscillator, P.Own), out(1, S.Scalar, R.Signal, P.Own)])],
+  [IndicatorIdentifier.ErgodicOscillator, desc(IndicatorIdentifier.ErgodicOscillator, 'William Blau', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.BoundedOscillator, P.Own), out(1, S.Scalar, R.Signal, P.Own)])],
 ]);
 
 /**
