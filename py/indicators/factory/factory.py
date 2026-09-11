@@ -704,4 +704,9 @@ def create_indicator(
         from ..william_blau.mean_deviation_index.mean_deviation_index import MeanDeviationIndex
         return MeanDeviationIndex(_apply(default_params(), params))
 
+    if identifier == Identifier.MACD_INDEX:
+        from ..william_blau.macd_index.params import default_params
+        from ..william_blau.macd_index.macd_index import MacdIndex
+        return MacdIndex(_apply(default_params(), params))
+
     raise ValueError(f"unsupported indicator: {identifier}")

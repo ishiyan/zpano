@@ -410,6 +410,9 @@ const (
 	// MeanDeviationIndex identifies the William Blau Mean Deviation Index (MDI) indicator.
 	MeanDeviationIndex
 
+	// MacdIndex identifies the William Blau MACD Index (MACDI) indicator.
+	MacdIndex
+
 	last
 )
 
@@ -574,6 +577,7 @@ const (
 	trueStrengthIndex                         = "trueStrengthIndex"
 	ergodicOscillator                         = "ergodicOscillator"
 	meanDeviationIndex                        = "meanDeviationIndex"
+	macdIndex                                 = "macdIndex"
 )
 
 // String implements the Stringer interface.
@@ -822,6 +826,8 @@ func (i Identifier) String() string {
 		return ergodicOscillator
 	case MeanDeviationIndex:
 		return meanDeviationIndex
+	case MacdIndex:
+		return macdIndex
 	default:
 		return unknown
 	}
@@ -1107,6 +1113,8 @@ func (i *Identifier) UnmarshalJSON(data []byte) error {
 		*i = ErgodicOscillator
 	case meanDeviationIndex:
 		*i = MeanDeviationIndex
+	case macdIndex:
+		*i = MacdIndex
 	default:
 		return fmt.Errorf(errFmt, s)
 	}

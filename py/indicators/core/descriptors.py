@@ -557,6 +557,10 @@ _descriptors: dict[Id, Descriptor] = {
         Id.MEAN_DEVIATION_INDEX, "William Blau", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
         [_o(0, S.SCALAR, R.OSCILLATOR, P.OWN),
          _o(1, S.SCALAR, R.SIGNAL, P.OWN)]),
+    Id.MACD_INDEX: _d(
+        Id.MACD_INDEX, "William Blau", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
+        [_o(0, S.SCALAR, R.OSCILLATOR, P.OWN),
+         _o(1, S.SCALAR, R.SIGNAL, P.OWN)]),
 }
 
 

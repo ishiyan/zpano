@@ -1919,4 +1919,15 @@ pub static DESCRIPTORS: &[Descriptor] = &[
             OutputDescriptor { kind: 2, shape: Scalar, role: Signal, pane: Own },
         ],
     },
+    Descriptor {
+        identifier: MacdIndex,
+        family: "William Blau",
+        adaptivity: Static,
+        input_requirement: ScalarInput,
+        volume_usage: NoVolume,
+        outputs: &[
+            OutputDescriptor { kind: 1, shape: Scalar, role: Oscillator, pane: Own },
+            OutputDescriptor { kind: 2, shape: Scalar, role: Signal, pane: Own },
+        ],
+    },
 ];

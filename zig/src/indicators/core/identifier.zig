@@ -286,6 +286,8 @@ pub const Identifier = enum(u8) {
     ergodic_oscillator = 107,
     /// Identifies the William Blau Mean Deviation Index (MDI) indicator.
     mean_deviation_index = 108,
+    /// Identifies the William Blau MACD Index (MACDI) indicator.
+    macd_index = 109,
 
     /// Returns the camelCase string representation matching Go's String().
     pub fn asStr(self: Identifier) []const u8 {
@@ -445,6 +447,7 @@ pub const Identifier = enum(u8) {
             .true_strength_index => "trueStrengthIndex",
             .ergodic_oscillator => "ergodicOscillator",
             .mean_deviation_index => "meanDeviationIndex",
+            .macd_index => "macdIndex",
         };
     }
 
@@ -606,6 +609,7 @@ pub const Identifier = enum(u8) {
             .{ "trueStrengthIndex", Identifier.true_strength_index },
             .{ "ergodicOscillator", Identifier.ergodic_oscillator },
             .{ "meanDeviationIndex", Identifier.mean_deviation_index },
+            .{ "macdIndex", Identifier.macd_index },
         };
 
         inline for (map) |entry| {

@@ -256,6 +256,8 @@ import { ErgodicOscillator } from '../william-blau/ergodic-oscillator/ergodic-os
 import { defaultParams as defaultErgodicParams } from '../william-blau/ergodic-oscillator/params.js';
 import { MeanDeviationIndex } from '../william-blau/mean-deviation-index/mean-deviation-index.js';
 import { defaultParams as defaultMdiParams } from '../william-blau/mean-deviation-index/params.js';
+import { MacdIndex } from '../william-blau/macd-index/macd-index.js';
+import { defaultParams as defaultMacdiParams } from '../william-blau/macd-index/params.js';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -720,6 +722,9 @@ export function createIndicator(identifier: IndicatorIdentifier, params?: Record
 
         case IndicatorIdentifier.MeanDeviationIndex:
             return new MeanDeviationIndex({ ...defaultMdiParams(), ...p });
+
+        case IndicatorIdentifier.MacdIndex:
+            return new MacdIndex({ ...defaultMacdiParams(), ...p });
 
         default:
             throw new Error(`Unsupported indicator: ${IndicatorIdentifier[identifier] ?? identifier}`);

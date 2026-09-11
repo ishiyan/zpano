@@ -107,5 +107,6 @@
   { "identifier": "movingMiniMax", "params": { "m": 5, "n": 50, "numExtrema": 3 } },
   { "identifier": "trueStrengthIndex", "params": { "q": 2, "r": 20, "s": 5, "u": 3, "ul": 3 } },
   { "identifier": "ergodicOscillator", "params": { "q": 2, "r": 20, "s": 5, "u": 3, "ul": 3 } },
-  { "identifier": "meanDeviationIndex", "params": { "r": 20, "s": 5, "u": 3, "ul": 3 } }
+  { "identifier": "meanDeviationIndex", "params": { "r": 20, "s": 5, "u": 3, "ul": 3 } },
+  { "identifier": "macdIndex", "params": { "r": 20, "s": 5, "u": 3, "ul": 3 } }
 ]

@@ -183,6 +183,7 @@ pub const moving_mini_max = @import("zurab_silagadze/moving_mini_max/moving_mini
 pub const true_strength_index = @import("william_blau/true_strength_index/true_strength_index.zig");
 pub const ergodic_oscillator = @import("william_blau/ergodic_oscillator/ergodic_oscillator.zig");
 pub const mean_deviation_index = @import("william_blau/mean_deviation_index/mean_deviation_index.zig");
+pub const macd_index = @import("william_blau/macd_index/macd_index.zig");
 
 pub const hilbert_transformer = @import("john_ehlers/hilbert_transformer/hilbert_transformer.zig");
 pub const homodyne_discriminator = @import("john_ehlers/hilbert_transformer/homodyne_discriminator.zig");
@@ -307,6 +308,7 @@ comptime {
     _ = true_strength_index;
     _ = ergodic_oscillator;
     _ = mean_deviation_index;
+    _ = macd_index;
     _ = frequency_response;
     _ = factory;
     _ = arnaud_legoux_moving_average;

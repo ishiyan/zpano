@@ -287,6 +287,8 @@ pub enum Identifier {
     ErgodicOscillator = 107,
     /// Identifies the William Blau Mean Deviation Index (MDI) indicator.
     MeanDeviationIndex = 108,
+    /// Identifies the William Blau MACD Index (MACDI) indicator.
+    MacdIndex = 109,
 }
 
 impl Identifier {
@@ -410,6 +412,7 @@ impl Identifier {
             Self::TrueStrengthIndex => "trueStrengthIndex",
             Self::ErgodicOscillator => "ergodicOscillator",
             Self::MeanDeviationIndex => "meanDeviationIndex",
+            Self::MacdIndex => "macdIndex",
         }
     }
 
@@ -537,6 +540,7 @@ impl Identifier {
             "trueStrengthIndex" => Some(Self::TrueStrengthIndex),
             "ergodicOscillator" => Some(Self::ErgodicOscillator),
             "meanDeviationIndex" => Some(Self::MeanDeviationIndex),
+            "macdIndex" => Some(Self::MacdIndex),
             _ => None,
         }
     }

@@ -397,4 +397,7 @@ export enum IndicatorIdentifier {
 
     /** Identifies the William Blau __Mean Deviation Index__ (MDI) indicator. */
     MeanDeviationIndex,
+
+    /** Identifies the William Blau __MACD Index__ (MACDI) indicator. */
+    MacdIndex,
 }

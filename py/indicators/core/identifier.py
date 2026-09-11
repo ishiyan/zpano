@@ -405,3 +405,6 @@ class Identifier(IntEnum):
 
     # Identifies the William Blau Mean Deviation Index (MDI) indicator.
     MEAN_DEVIATION_INDEX = 108
+
+    # Identifies the William Blau MACD Index (MACDI) indicator.
+    MACD_INDEX = 109
