@@ -400,4 +400,7 @@ export enum IndicatorIdentifier {
 
     /** Identifies the William Blau __MACD Index__ (MACDI) indicator. */
     MacdIndex,
+
+    /** Identifies the William Blau __Double-Smoothed Momenta__ (DM) indicator. */
+    DoubleSmoothedMomenta,
 }

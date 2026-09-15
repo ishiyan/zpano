@@ -137,6 +137,7 @@ func TestIdentifierString(t *testing.T) {
 		{ErgodicOscillator, ergodicOscillator},
 		{MeanDeviationIndex, meanDeviationIndex},
 		{MacdIndex, macdIndex},
+		{DoubleSmoothedMomenta, doubleSmoothedMomenta},
 		// ── boundary ──────────────────────────────────────────────────────────
 		{last, unknown},
 		{Identifier(0), unknown},
@@ -286,6 +287,7 @@ func TestIdentifierIsKnown(t *testing.T) {
 		{ErgodicOscillator, true},
 		{MeanDeviationIndex, true},
 		{MacdIndex, true},
+		{DoubleSmoothedMomenta, true},
 		// ── boundary ──────────────────────────────────────────────────────────
 		{last, false},
 		{Identifier(0), false},
@@ -439,6 +441,7 @@ func TestIdentifierMarshalJSON(t *testing.T) {
 		{ErgodicOscillator, dqs + ergodicOscillator + dqs, true},
 		{MeanDeviationIndex, dqs + meanDeviationIndex + dqs, true},
 		{MacdIndex, dqs + macdIndex + dqs, true},
+		{DoubleSmoothedMomenta, dqs + doubleSmoothedMomenta + dqs, true},
 		// ── boundary ──────────────────────────────────────────────────────────
 		{last, nilstr, false},
 		{Identifier(9999), nilstr, false},
@@ -605,6 +608,7 @@ func TestIdentifierUnmarshalJSON(t *testing.T) {
 		{ErgodicOscillator, dqs + ergodicOscillator + dqs, true},
 		{MeanDeviationIndex, dqs + meanDeviationIndex + dqs, true},
 		{MacdIndex, dqs + macdIndex + dqs, true},
+		{DoubleSmoothedMomenta, dqs + doubleSmoothedMomenta + dqs, true},
 		// ── boundary ──────────────────────────────────────────────────────────
 		{zero, "\"unknown\"", false},
 		{zero, "\"foobar\"", false},

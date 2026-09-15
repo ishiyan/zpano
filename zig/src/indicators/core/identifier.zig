@@ -288,6 +288,8 @@ pub const Identifier = enum(u8) {
     mean_deviation_index = 108,
     /// Identifies the William Blau MACD Index (MACDI) indicator.
     macd_index = 109,
+    /// Identifies the William Blau Double-Smoothed Momenta (DM) indicator.
+    double_smoothed_momenta = 110,
 
     /// Returns the camelCase string representation matching Go's String().
     pub fn asStr(self: Identifier) []const u8 {
@@ -448,6 +450,7 @@ pub const Identifier = enum(u8) {
             .ergodic_oscillator => "ergodicOscillator",
             .mean_deviation_index => "meanDeviationIndex",
             .macd_index => "macdIndex",
+            .double_smoothed_momenta => "doubleSmoothedMomenta",
         };
     }
 
@@ -610,6 +613,7 @@ pub const Identifier = enum(u8) {
             .{ "ergodicOscillator", Identifier.ergodic_oscillator },
             .{ "meanDeviationIndex", Identifier.mean_deviation_index },
             .{ "macdIndex", Identifier.macd_index },
+            .{ "doubleSmoothedMomenta", Identifier.double_smoothed_momenta },
         };
 
         inline for (map) |entry| {

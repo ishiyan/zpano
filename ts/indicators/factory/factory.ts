@@ -258,6 +258,8 @@ import { MeanDeviationIndex } from '../william-blau/mean-deviation-index/mean-de
 import { defaultParams as defaultMdiParams } from '../william-blau/mean-deviation-index/params.js';
 import { MacdIndex } from '../william-blau/macd-index/macd-index.js';
 import { defaultParams as defaultMacdiParams } from '../william-blau/macd-index/params.js';
+import { DoubleSmoothedMomenta } from '../william-blau/double-smoothed-momenta/double-smoothed-momenta.js';
+import { defaultParams as defaultDmParams } from '../william-blau/double-smoothed-momenta/params.js';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -725,6 +727,9 @@ export function createIndicator(identifier: IndicatorIdentifier, params?: Record
 
         case IndicatorIdentifier.MacdIndex:
             return new MacdIndex({ ...defaultMacdiParams(), ...p });
+
+        case IndicatorIdentifier.DoubleSmoothedMomenta:
+            return new DoubleSmoothedMomenta({ ...defaultDmParams(), ...p });
 
         default:
             throw new Error(`Unsupported indicator: ${IndicatorIdentifier[identifier] ?? identifier}`);

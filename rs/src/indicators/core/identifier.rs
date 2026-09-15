@@ -289,6 +289,8 @@ pub enum Identifier {
     MeanDeviationIndex = 108,
     /// Identifies the William Blau MACD Index (MACDI) indicator.
     MacdIndex = 109,
+    /// Identifies the William Blau Double-Smoothed Momenta (DM) indicator.
+    DoubleSmoothedMomenta = 110,
 }
 
 impl Identifier {
@@ -413,6 +415,7 @@ impl Identifier {
             Self::ErgodicOscillator => "ergodicOscillator",
             Self::MeanDeviationIndex => "meanDeviationIndex",
             Self::MacdIndex => "macdIndex",
+            Self::DoubleSmoothedMomenta => "doubleSmoothedMomenta",
         }
     }
 
@@ -541,6 +544,7 @@ impl Identifier {
             "ergodicOscillator" => Some(Self::ErgodicOscillator),
             "meanDeviationIndex" => Some(Self::MeanDeviationIndex),
             "macdIndex" => Some(Self::MacdIndex),
+            "doubleSmoothedMomenta" => Some(Self::DoubleSmoothedMomenta),
             _ => None,
         }
     }

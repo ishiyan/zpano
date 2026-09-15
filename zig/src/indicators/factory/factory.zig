@@ -177,6 +177,7 @@ const tsi_mod = @import("../william_blau/true_strength_index/true_strength_index
 const ergodic_mod = @import("../william_blau/ergodic_oscillator/ergodic_oscillator.zig");
 const mdi_mod = @import("../william_blau/mean_deviation_index/mean_deviation_index.zig");
 const macdi_mod = @import("../william_blau/macd_index/macd_index.zig");
+const dm_mod = @import("../william_blau/double_smoothed_momenta/double_smoothed_momenta.zig");
 
 pub const FactoryError = error{
     UnsupportedIndicator,
@@ -1535,6 +1536,14 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
             .quote_component = getQuoteComponent(obj),
             .trade_component = getTradeComponent(obj),
         })),
+        .double_smoothed_momenta => createWithAllocParams(dm_mod.DoubleSmoothedMomenta, dm_mod.DoubleSmoothedMomentaParams, allocator, obj, .{
+            .a = getUsize(obj, "a", 2),
+            .y = getUsize(obj, "y", 2),
+            .z = getUsize(obj, "z", 14),
+            .bar_component = getBarComponent(obj),
+            .quote_component = getQuoteComponent(obj),
+            .trade_component = getTradeComponent(obj),
+        }),
     };
 }
 

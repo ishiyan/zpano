@@ -408,3 +408,6 @@ class Identifier(IntEnum):
 
     # Identifies the William Blau MACD Index (MACDI) indicator.
     MACD_INDEX = 109
+
+    # Identifies the William Blau Double-Smoothed Momenta (DM) indicator.
+    DOUBLE_SMOOTHED_MOMENTA = 110

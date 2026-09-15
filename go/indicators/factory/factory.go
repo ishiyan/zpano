@@ -113,6 +113,7 @@ import (
 	"zpano/indicators/welleswilder/parabolicstopandreverse"
 	"zpano/indicators/welleswilder/relativestrengthindex"
 	"zpano/indicators/welleswilder/truerange"
+	"zpano/indicators/williamblau/doublesmoothedmomenta"
 	"zpano/indicators/williamblau/ergodicoscillator"
 	"zpano/indicators/williamblau/macdindex"
 	"zpano/indicators/williamblau/meandeviationindex"
@@ -1222,6 +1223,14 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 		}
 
 		return macdindex.NewMacdIndex(p)
+
+	case core.DoubleSmoothedMomenta:
+		p := doublesmoothedmomenta.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return doublesmoothedmomenta.NewDoubleSmoothedMomenta(p)
 
 	default:
 		return nil, fmt.Errorf("unsupported indicator: %s", identifier)

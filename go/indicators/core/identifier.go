@@ -413,6 +413,9 @@ const (
 	// MacdIndex identifies the William Blau MACD Index (MACDI) indicator.
 	MacdIndex
 
+	// DoubleSmoothedMomenta identifies the William Blau Double-Smoothed Momenta (DM) indicator.
+	DoubleSmoothedMomenta
+
 	last
 )
 
@@ -578,6 +581,7 @@ const (
 	ergodicOscillator                         = "ergodicOscillator"
 	meanDeviationIndex                        = "meanDeviationIndex"
 	macdIndex                                 = "macdIndex"
+	doubleSmoothedMomenta                     = "doubleSmoothedMomenta"
 )
 
 // String implements the Stringer interface.
@@ -828,6 +832,8 @@ func (i Identifier) String() string {
 		return meanDeviationIndex
 	case MacdIndex:
 		return macdIndex
+	case DoubleSmoothedMomenta:
+		return doubleSmoothedMomenta
 	default:
 		return unknown
 	}
@@ -1115,6 +1121,8 @@ func (i *Identifier) UnmarshalJSON(data []byte) error {
 		*i = MeanDeviationIndex
 	case macdIndex:
 		*i = MacdIndex
+	case doubleSmoothedMomenta:
+		*i = DoubleSmoothedMomenta
 	default:
 		return fmt.Errorf(errFmt, s)
 	}

@@ -709,4 +709,9 @@ def create_indicator(
         from ..william_blau.macd_index.macd_index import MacdIndex
         return MacdIndex(_apply(default_params(), params))
 
+    if identifier == Identifier.DOUBLE_SMOOTHED_MOMENTA:
+        from ..william_blau.double_smoothed_momenta.params import default_params
+        from ..william_blau.double_smoothed_momenta.double_smoothed_momenta import DoubleSmoothedMomenta
+        return DoubleSmoothedMomenta(_apply(default_params(), params))
+
     raise ValueError(f"unsupported indicator: {identifier}")

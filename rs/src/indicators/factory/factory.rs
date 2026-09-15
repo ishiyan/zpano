@@ -317,6 +317,9 @@ use crate::indicators::william_blau::mean_deviation_index::mean_deviation_index:
 use crate::indicators::william_blau::macd_index::macd_index::{
     MacdIndex, MacdIndexParams,
 };
+use crate::indicators::william_blau::double_smoothed_momenta::double_smoothed_momenta::{
+    DoubleSmoothedMomenta, DoubleSmoothedMomentaParams,
+};
 
 /// Create an indicator from its identifier and a JSON-encoded parameter string.
 ///
@@ -1729,6 +1732,14 @@ pub fn create_indicator(
             if let Some(v) = get_usize(&params, "u") { p.u = v; }
             if let Some(v) = get_usize(&params, "ul") { p.ul = v; }
             Ok(Box::new(MacdIndex::new(&p)?))
+        }
+
+        Identifier::DoubleSmoothedMomenta => {
+            let mut p = DoubleSmoothedMomentaParams::default();
+            if let Some(v) = get_usize(&params, "a") { p.a = v; }
+            if let Some(v) = get_usize(&params, "y") { p.y = v; }
+            if let Some(v) = get_usize(&params, "z") { p.z = v; }
+            Ok(Box::new(DoubleSmoothedMomenta::new(&p)?))
         }
 
         _ => Err(format!("unsupported indicator: {:?}", identifier)),
