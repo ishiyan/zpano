@@ -80,7 +80,7 @@ class TestCoronaTrendVigorNaN(unittest.TestCase):
     def test_nan_input(self):
         x = CoronaTrendVigor(Params())
         t = datetime.datetime(2021, 4, 1)
-        h, tv = x.update(float('nan'), t)
+        h, tv = x.update(math.nan, t)
         self.assertTrue(h.is_empty())
         self.assertTrue(math.isnan(tv))
         self.assertFalse(x.is_primed())

@@ -116,27 +116,27 @@ class RawMomentsKleinKBN:
     def variance(self) -> float:
         N = self.n - self.ddof
         if N <= 0:
-            return float('nan')
+            return math.nan
         elif self._s.value < 0:
             self._s.reset()
-            return float('nan')
+            return math.nan
         else:
             return self._s.value / N
 
     @property
     def standard_deviation(self) -> float:
         N = self.n - self.ddof
-        return (self._s.value / N)**0.5 if N > 0 else float('nan')
+        return (self._s.value / N)**0.5 if N > 0 else math.nan
 
     @property
     def skewness(self) -> float:
         N = self.n
         if N < 3:
-            return float('nan')
+            return math.nan
         A = self._x1.value / N
         B = self._x2.value / N - A * A
         if B <= 1e-14:
-            return float('nan')
+            return math.nan
         R = math.sqrt(B)
         C = self._x3.value / N - A * A * A - 3 * A * B
         g1 = C / (R * R * R)
@@ -148,12 +148,12 @@ class RawMomentsKleinKBN:
     def kurtosis(self) -> float:
         N = self.n
         if N < 4:
-            return float('nan')
+            return math.nan
         A = self._x1.value / N
         R = A * A
         B = self._x2.value / N - R
         if B <= 1e-14:
-            return float("nan")
+            return math.nan
         R *= A
         C = self._x3.value / N - R - 3 * A * B
         R *= A

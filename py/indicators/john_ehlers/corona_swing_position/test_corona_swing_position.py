@@ -80,7 +80,7 @@ class TestCoronaSwingPositionNaN(unittest.TestCase):
     def test_nan_input(self):
         x = CoronaSwingPosition(Params())
         t = datetime.datetime(2021, 4, 1)
-        h, sp = x.update(float('nan'), t)
+        h, sp = x.update(math.nan, t)
         self.assertTrue(h.is_empty())
         self.assertTrue(math.isnan(sp))
         self.assertFalse(x.is_primed())

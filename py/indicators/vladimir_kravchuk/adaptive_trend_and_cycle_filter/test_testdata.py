@@ -1,3 +1,5 @@
+import math
+
 TOLERANCE = 1e-10
 
 INPUT = [
@@ -29,7 +31,7 @@ INPUT = [
     109.5300, 108.0600,
 ]
 
-N = float('nan')
+N = math.nan
 
 SNAPSHOTS = [
     (0, N, N, N, N, N, N, N, N),

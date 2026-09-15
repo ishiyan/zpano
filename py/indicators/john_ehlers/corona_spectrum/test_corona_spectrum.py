@@ -75,7 +75,7 @@ class TestCoronaSpectrumNaN(unittest.TestCase):
     def test_nan_input(self):
         x = CoronaSpectrum(Params())
         t = datetime.datetime(2021, 4, 1)
-        h, dc, dcm = x.update(float('nan'), t)
+        h, dc, dcm = x.update(math.nan, t)
         self.assertTrue(h.is_empty())
         self.assertTrue(math.isnan(dc))
         self.assertTrue(math.isnan(dcm))

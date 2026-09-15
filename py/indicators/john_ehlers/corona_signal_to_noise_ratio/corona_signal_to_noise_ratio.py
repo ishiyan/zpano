@@ -93,7 +93,7 @@ class CoronaSignalToNoiseRatio:
         self._avg_sample_previous = 0.0
         self._signal_previous = 0.0
         self._noise_previous = 0.0
-        self._signal_to_noise_ratio = float('nan')
+        self._signal_to_noise_ratio = math.nan
         self._is_started = False
 
         comp_mn = component_triple_mnemonic(bc, qc, tc)
@@ -123,7 +123,7 @@ class CoronaSignalToNoiseRatio:
         if math.isnan(sample):
             return (Heatmap.empty(t, self._min_parameter_value,
                                   self._max_parameter_value, self._parameter_resolution),
-                    float('nan'))
+                    math.nan)
 
         primed = self._corona.update(sample)
 
@@ -133,7 +133,7 @@ class CoronaSignalToNoiseRatio:
             self._is_started = True
             return (Heatmap.empty(t, self._min_parameter_value,
                                   self._max_parameter_value, self._parameter_resolution),
-                    float('nan'))
+                    math.nan)
 
         max_amp_sq = self._corona.maximal_amplitude_squared
 
@@ -206,7 +206,7 @@ class CoronaSignalToNoiseRatio:
         if not primed:
             return (Heatmap.empty(t, self._min_parameter_value,
                                   self._max_parameter_value, self._parameter_resolution),
-                    float('nan'))
+                    math.nan)
 
         values = list(self._raster)
         value_min = min(values)

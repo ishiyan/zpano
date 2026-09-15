@@ -82,7 +82,7 @@ class KleinKBNSummator:
     def mean(self) -> float:
         n = self._n
         if n <= 0:
-            return float('nan')
+            return math.nan
         return self._sum.value / n
     
     @property

@@ -106,13 +106,13 @@ class CoronaSpectrum:
         if math.isnan(sample):
             return (Heatmap.empty(t, self._min_parameter_value,
                                   self._max_parameter_value, self._parameter_resolution),
-                    float('nan'), float('nan'))
+                    math.nan, math.nan)
 
         primed = self._corona.update(sample)
         if not primed:
             return (Heatmap.empty(t, self._min_parameter_value,
                                   self._max_parameter_value, self._parameter_resolution),
-                    float('nan'), float('nan'))
+                    math.nan, math.nan)
 
         bank = self._corona.filter_bank
         values = [0.0] * len(bank)

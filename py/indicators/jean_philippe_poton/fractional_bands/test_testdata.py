@@ -32,7 +32,7 @@ INPUT_CLOSE = [
 # Fractional Bands frasma2: period=5, price_scale=1.0
 # 252 values, 15-digit precision, NaN for unprimed
 EXPECTED_FRASMA2_P5_S1 = [
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), 94.080999999999989, 93.683749999999989, 92.799999999999997, 92.745000000000005,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, 94.080999999999989, 93.683749999999989, 92.799999999999997, 92.745000000000005,
     92.838000000000008, 93.781999999999996, 94.931999999999988, 94.844000000000008, 93.647857142857134, 94.260833333333338, 93.099166666666676, 92.562857142857155, 92.445625000000007, 92.556500000000000,
     90.258125000000007, 89.333333333333329, 87.663749999999993, 85.944999999999993, 85.455999999999989, 83.163749999999993, 83.418999999999997, 84.313000000000002, 84.656666666666666, 84.884285714285724,
     85.490000000000009, 85.445625000000007, 86.677500000000009, 86.681999999999988, 87.188125000000014, 86.891249999999999, 86.882777777777775, 86.969999999999985, 86.244999999999990, 85.325999999999993,
@@ -63,7 +63,7 @@ EXPECTED_FRASMA2_P5_S1 = [
 # Fractional Bands upper: period=5, price_scale=1.0
 # 252 values, 15-digit precision, NaN for unprimed
 EXPECTED_UPPER_P5_S1 = [
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), 95.867377257935246, 95.694647385441414, 95.798014266673363, 95.400378885386758,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, 95.867377257935246, 95.694647385441414, 95.798014266673363, 95.400378885386758,
     96.437859008906742, 98.493185194236474, 101.025851131913555, 102.028497332663932, 98.398960506424515, 99.611722313847466, 98.655402229374204, 96.443569212921147, 95.638211966559609, 95.645532514480763,
     92.548377835650427, 91.917347998505889, 93.096739629262999, 92.259092448225644, 90.048770601025225, 88.288848452828390, 85.815866419307028, 90.137036429879444, 89.368940081603824, 89.065783385031764,
     88.774859023910153, 88.426248348902149, 88.369567529234544, 89.245778042936223, 89.679973740515720, 89.217480390750268, 89.155416042361736, 89.720853867184076, 89.455351664353159, 87.933386304831558,
@@ -94,7 +94,7 @@ EXPECTED_UPPER_P5_S1 = [
 # Fractional Bands lower: period=5, price_scale=1.0
 # 252 values, 15-digit precision, NaN for unprimed
 EXPECTED_LOWER_P5_S1 = [
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), 92.294622742064732, 91.672852614558565, 89.801985733326632, 90.089621114613252,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, 92.294622742064732, 91.672852614558565, 89.801985733326632, 90.089621114613252,
     89.238140991093275, 89.070814805763519, 88.838148868086421, 87.659502667336085, 88.896753779289753, 88.909944352819210, 87.542931103959148, 88.682145072793162, 89.253038033440404, 89.467467485519236,
     87.967872164349586, 86.749318668160768, 82.230760370736988, 79.630907551774342, 80.863229398974752, 78.038651547171597, 81.022133580692966, 78.488963570120561, 79.944393251729508, 80.702788043539684,
     82.205140976089865, 82.465001651097865, 84.985432470765474, 84.118221957063753, 84.696276259484307, 84.565019609249731, 84.610139513193815, 84.219146132815894, 83.034648335646821, 82.718613695168429,
@@ -125,8 +125,8 @@ EXPECTED_LOWER_P5_S1 = [
 # Fractional Bands frasma2: period=10, price_scale=1.0
 # 252 values, 15-digit precision, NaN for unprimed
 EXPECTED_FRASMA2_P10_S1 = [
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), 94.011818181818171, 94.344000000000008, 93.822000000000003, 93.745384615384623, 93.625384615384618, 93.117499999999993, 92.827307692307684, 92.602083333333326, 92.362499999999997,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, 94.011818181818171, 94.344000000000008, 93.822000000000003, 93.745384615384623, 93.625384615384618, 93.117499999999993, 92.827307692307684, 92.602083333333326, 92.362499999999997,
     92.176363636363646, 91.403636363636366, 89.399444444444441, 88.510555555555555, 88.009500000000003, 86.611111111111114, 86.066111111111113, 85.802222222222227, 85.859499999999997, 86.372500000000002,
     85.841250000000002, 85.612083333333331, 85.398750000000007, 85.577272727272742, 85.818333333333342, 86.141250000000014, 86.134705882352947, 86.098928571428587, 86.688333333333347, 86.240416666666661,
     85.966818181818184, 85.876000000000005, 86.213499999999996, 86.260500000000008, 86.483888888888885, 86.921111111111102, 87.650555555555556, 88.185000000000002, 88.976666666666659, 89.128999999999991,
@@ -156,8 +156,8 @@ EXPECTED_FRASMA2_P10_S1 = [
 # Fractional Bands upper: period=10, price_scale=1.0
 # 252 values, 15-digit precision, NaN for unprimed
 EXPECTED_UPPER_P10_S1 = [
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), 97.708073674166940, 99.124699737984642, 99.351635738590957, 98.306717868814516, 98.143640998796172, 98.263953089468473, 97.793393350757967, 97.736444423147319, 97.632291624544848,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, 97.708073674166940, 99.124699737984642, 99.351635738590957, 98.306717868814516, 98.143640998796172, 98.263953089468473, 97.793393350757967, 97.736444423147319, 97.632291624544848,
     98.075383533957165, 96.981106239016370, 93.861391914951128, 94.681911287911092, 94.658000703703365, 94.513601659178249, 93.947761903819455, 93.013517437284492, 91.296320791301227, 90.829562384130270,
     89.850061032829288, 89.461828881099578, 89.277598103558546, 89.707587291953047, 89.726353104738919, 89.255835937876398, 88.800686377810493, 88.599185813896369, 89.419119436764490, 89.279171618059877,
     89.482144549463300, 89.470379919629238, 90.248351993917183, 90.405970227561937, 91.959900769081443, 93.114251177737827, 94.761528910722490, 95.522877226042453, 95.489303500270879, 94.321878423804051,
@@ -187,8 +187,8 @@ EXPECTED_UPPER_P10_S1 = [
 # Fractional Bands lower: period=10, price_scale=1.0
 # 252 values, 15-digit precision, NaN for unprimed
 EXPECTED_LOWER_P10_S1 = [
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), 90.315562689469402, 89.563300262015375, 88.292364261409048, 89.184051361954729, 89.107128231973064, 87.971046910531513, 87.861222033857402, 87.467722243519333, 87.092708375455146,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, 90.315562689469402, 89.563300262015375, 88.292364261409048, 89.184051361954729, 89.107128231973064, 87.971046910531513, 87.861222033857402, 87.467722243519333, 87.092708375455146,
     86.277343738770128, 85.826166488256362, 84.937496973937755, 82.339199823200019, 81.360999296296640, 78.708620563043979, 78.184460318402770, 78.590927007159962, 80.422679208698767, 81.915437615869735,
     81.832438967170717, 81.762337785567084, 81.519901896441468, 81.446958162592438, 81.910313561927765, 83.026664062123629, 83.468725386895400, 83.598671328960805, 83.957547229902204, 83.201661715273445,
     82.451491814173067, 82.281620080370772, 82.178648006082810, 82.115029772438078, 81.007877008696326, 80.727971044484377, 80.539582200388622, 80.847122773957551, 82.464029833062440, 83.936121576195930,
@@ -218,9 +218,9 @@ EXPECTED_LOWER_P10_S1 = [
 # Fractional Bands frasma2: period=20, price_scale=1.0
 # 252 values, 15-digit precision, NaN for unprimed
 EXPECTED_FRASMA2_P20_S1 = [
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), 92.446363636363628, 91.895499999999998, 91.159736842105261, 90.574210526315795, 89.833611111111111, 89.507222222222225, 89.493684210526325, 89.172894736842110, 88.653157894736850,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, 92.446363636363628, 91.895499999999998, 91.159736842105261, 90.574210526315795, 89.833611111111111, 89.507222222222225, 89.493684210526325, 89.172894736842110, 88.653157894736850,
     88.021578947368425, 87.422894736842110, 87.209210526315800, 87.420000000000002, 87.353095238095250, 87.156666666666680, 87.141136363636377, 86.780227272727288, 86.554545454545462, 86.438043478260880,
     86.310416666666683, 86.150208333333353, 86.048749999999998, 86.030625000000001, 86.138636363636380, 86.490909090909113, 86.706086956521759, 87.329761904761924, 87.413095238095252, 87.609523809523822,
     87.741904761904763, 87.911666666666676, 87.776190476190479, 87.665952380952390, 87.366904761904763, 87.205500000000001, 87.131666666666675, 87.213250000000002, 87.450749999999999, 87.537857142857149,
@@ -249,9 +249,9 @@ EXPECTED_FRASMA2_P20_S1 = [
 # Fractional Bands upper: period=20, price_scale=1.0
 # 252 values, 15-digit precision, NaN for unprimed
 EXPECTED_UPPER_P20_S1 = [
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), 97.751268423711295, 98.671985929184387, 99.178787291342843, 99.241119540288423, 100.069025935651638, 100.047109592590076, 99.465805724396162, 98.866301732553580, 98.236392031701641,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, 97.751268423711295, 98.671985929184387, 99.178787291342843, 99.241119540288423, 100.069025935651638, 100.047109592590076, 99.465805724396162, 98.866301732553580, 98.236392031701641,
     97.563191321991965, 95.871178651783126, 93.603550589858870, 93.099323275464940, 92.682608469183407, 92.035751017618850, 91.840441994136398, 91.379616043033195, 90.777762002074795, 90.288329363130316,
     90.126953710265454, 89.879329847621406, 89.913958181381886, 89.874196982201653, 90.613758702258380, 90.815619471804212, 91.107793198200412, 91.919225011465272, 92.272677330931273, 92.443988728144319,
     92.536219349602220, 92.739913038247664, 92.852844256345008, 92.876921413381922, 93.121729769130781, 93.151024304771084, 92.902481115852524, 93.037340119380247, 93.172456225284179, 92.850146078263805,
@@ -280,9 +280,9 @@ EXPECTED_UPPER_P20_S1 = [
 # Fractional Bands lower: period=20, price_scale=1.0
 # 252 values, 15-digit precision, NaN for unprimed
 EXPECTED_LOWER_P20_S1 = [
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), 87.141458849015962, 85.119014070815609, 83.140686392867678, 81.907301512343167, 79.598196286570584, 78.967334851854375, 79.521562696656488, 79.479487741130640, 79.069923757772060,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, 87.141458849015962, 85.119014070815609, 83.140686392867678, 81.907301512343167, 79.598196286570584, 78.967334851854375, 79.521562696656488, 79.479487741130640, 79.069923757772060,
     78.479966572744885, 78.974610821901095, 80.814870462772731, 81.740676724535064, 82.023582007007093, 82.277582315714511, 82.441830733136356, 82.180838502421381, 82.331328907016129, 82.587757593391444,
     82.493879623067912, 82.421086819045300, 82.183541818618110, 82.187053017798348, 81.663514025014379, 82.166198710014015, 82.304380714843106, 82.740298798058575, 82.553513145259231, 82.775058890903324,
     82.947590174207306, 83.083420295085688, 82.699536696035949, 82.454983348522859, 81.612079754678746, 81.259975695228917, 81.360852217480826, 81.389159880619758, 81.729043774715819, 82.225568207450493,
@@ -311,9 +311,9 @@ EXPECTED_LOWER_P20_S1 = [
 # Fractional Bands frasma2: period=30, price_scale=1.0
 # 252 values, 15-digit precision, NaN for unprimed
 EXPECTED_FRASMA2_P30_S1 = [
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
     90.218000000000004, 89.809482758620689, 89.489482758620696, 89.323620689655158, 89.295166666666645, 89.036833333333334, 88.846333333333320, 88.583833333333317, 88.379666666666665, 87.816206896551734,
     87.337758620689655, 86.782857142857168, 86.865862068965541, 87.702272727272728, 87.515757575757576, 87.280909090909091, 87.328333333333347, 87.267727272727271, 87.377499999999998, 87.309411764705899,
     87.305735294117653, 87.290147058823550, 86.989242424242434, 86.886617647058841, 86.719411764705910, 86.634852941176504, 86.635138888888918, 86.754411764705921, 87.082272727272766, 87.146911764705933,
@@ -342,9 +342,9 @@ EXPECTED_FRASMA2_P30_S1 = [
 # Fractional Bands upper: period=30, price_scale=1.0
 # 252 values, 15-digit precision, NaN for unprimed
 EXPECTED_UPPER_P30_S1 = [
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
     99.199427396180099, 98.920993855064410, 98.434180511873976, 97.967377482044753, 97.615957964909711, 97.177969317091225, 96.958275400092958, 96.685952067761548, 96.652273194405566, 96.240917386773802,
     95.621240326346935, 94.216580534151689, 92.681012574935806, 92.903844932311173, 92.689348582150771, 92.207041160466645, 92.314573408513638, 92.209508328527619, 92.287003670537871, 92.184102687198148,
     92.244822357696194, 92.212353088615131, 92.043952357434947, 91.765366569899513, 91.660863875131739, 91.420684047248102, 91.141896506363949, 91.361243155257938, 91.816610074573944, 91.789512862738349,
@@ -373,9 +373,9 @@ EXPECTED_UPPER_P30_S1 = [
 # Fractional Bands lower: period=30, price_scale=1.0
 # 252 values, 15-digit precision, NaN for unprimed
 EXPECTED_LOWER_P30_S1 = [
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
     81.236572603819909, 80.697971662176968, 80.544785005367416, 80.679863897265562, 80.974375368423580, 80.895697349575443, 80.734391266573681, 80.481714598905086, 80.107060138927764, 79.391496406329665,
     79.054276915032375, 79.349133751562647, 81.050711562995275, 82.500700522234283, 82.342166569364380, 82.354777021351538, 82.342093258153056, 82.325946216926923, 82.467996329462125, 82.434720842213650,
     82.366648230539113, 82.367941029031968, 81.934532491049922, 82.007868724218170, 81.777959654280082, 81.849021835104907, 82.128381271413886, 82.147580374153904, 82.347935379971588, 82.504310666673518,
@@ -404,11 +404,11 @@ EXPECTED_LOWER_P30_S1 = [
 # Fractional Bands frasma2: period=50, price_scale=1.0
 # 252 values, 15-digit precision, NaN for unprimed
 EXPECTED_FRASMA2_P50_S1 = [
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
     89.320980392156841, 89.268333333333302, 89.061764705882325, 88.954807692307668, 88.605294117647034, 88.428235294117627, 88.252352941176468, 88.212692307692294, 88.053333333333299, 88.033039215686259,
     87.794300000000007, 87.619300000000010, 87.488700000000023, 88.377155172413779, 88.313070175438568, 88.295714285714283, 88.078909090909093, 87.955636363636387, 87.957909090909126, 87.934090909090926,
     87.862454545454568, 87.790363636363637, 87.681818181818187, 87.559090909090912, 87.487545454545440, 88.081020408163269, 88.316900000000004, 88.904888888888905, 89.301818181818192, 89.656931818181818,
@@ -435,11 +435,11 @@ EXPECTED_FRASMA2_P50_S1 = [
 # Fractional Bands upper: period=50, price_scale=1.0
 # 252 values, 15-digit precision, NaN for unprimed
 EXPECTED_UPPER_P50_S1 = [
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
     96.952354732738016, 96.842030455538790, 96.615440928223023, 96.282878083839279, 95.987798469991588, 95.688687667854083, 95.453658937798323, 95.304548615756417, 95.197138734827902, 95.056103989659434,
     94.584525285558485, 93.887966274650509, 93.124584543821243, 93.495120456413645, 93.599636463671260, 93.663208379547370, 93.622207319348135, 93.535982417357005, 93.520445715330823, 93.490606849376576,
     93.456303808834448, 93.412714969733315, 93.320436325005332, 93.122952665235573, 92.948396383749227, 94.595136746287864, 95.476460959428366, 99.029656558126703, 101.261174702293303, 102.476772012143471,
@@ -466,11 +466,11 @@ EXPECTED_UPPER_P50_S1 = [
 # Fractional Bands lower: period=50, price_scale=1.0
 # 252 values, 15-digit precision, NaN for unprimed
 EXPECTED_LOWER_P50_S1 = [
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
     81.689606051575666, 81.694636211127815, 81.508088483541627, 81.626737300776057, 81.222789765302480, 81.167782920381171, 81.051046944554614, 81.120835999628170, 80.909527931838696, 81.009974441713084,
     81.004074714441529, 81.350633725349510, 81.852815456178803, 83.259189888413914, 83.026503887205877, 82.928220191881195, 82.535610862470051, 82.375290309915769, 82.395372466487430, 82.377574968805277,
     82.268605282074688, 82.168012302993958, 82.043200038631042, 81.995229152946251, 82.026694525341654, 81.566904070038674, 81.157339040571642, 78.780121219651107, 77.342461661343080, 76.837091624220164,
@@ -497,14 +497,14 @@ EXPECTED_LOWER_P50_S1 = [
 # Fractional Bands frasma2: period=80, price_scale=1.0
 # 252 values, 15-digit precision, NaN for unprimed
 EXPECTED_FRASMA2_P80_S1 = [
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
     89.826455696202473, 89.889935897435848, 90.048205128205083, 90.194038461538426, 90.367564102564060, 90.519807692307651, 90.573466666666647, 90.717666666666659, 90.992567567567548, 91.317847222222198,
     92.259166666666658, 92.667611940298499, 93.225447761194019, 93.813106060606046, 94.291363636363627, 94.748787878787866, 95.202424242424229, 95.577424242424229, 95.952878787878774, 96.394621212121180,
     96.687238805970125, 97.098134328358199, 97.473134328358199, 97.875149253731323, 98.294029850746242, 98.768805970149216, 99.088382352941139, 99.569926470588214, 100.064411764705852, 100.501911764705852,
@@ -528,14 +528,14 @@ EXPECTED_FRASMA2_P80_S1 = [
 # Fractional Bands upper: period=80, price_scale=1.0
 # 252 values, 15-digit precision, NaN for unprimed
 EXPECTED_UPPER_P80_S1 = [
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
     100.352968427766669, 101.048361830924506, 101.737875138996031, 102.361797680663742, 103.118542375057046, 103.702292141909282, 105.441842647270477, 106.326039278985306, 108.050404574309013, 110.471996367726305,
     118.833152172747816, 119.935760509440016, 121.914740458593030, 125.606707124270187, 127.760266770387659, 129.672403804256049, 131.711332854052614, 132.663060577333169, 133.489451485676796, 135.300940151586332,
     135.006060467566613, 135.927879478727846, 137.227375769278979, 137.425300564278587, 137.846300668583979, 138.938676074451081, 138.809164118386491, 140.016023776939392, 140.768469257386585, 141.501239483939798,
@@ -559,14 +559,14 @@ EXPECTED_UPPER_P80_S1 = [
 # Fractional Bands lower: period=80, price_scale=1.0
 # 252 values, 15-digit precision, NaN for unprimed
 EXPECTED_LOWER_P80_S1 = [
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
     79.299942964638277, 78.731509963947190, 78.358535117414135, 78.026279242413111, 77.616585830071074, 77.337323242706020, 75.705090686062817, 75.109294054348013, 73.934730560826083, 72.163698076718092,
     65.685181160585500, 65.399463371156983, 64.536155063795007, 62.019504996941905, 60.822460502339588, 59.825171953319682, 58.693515630795851, 58.491787907515281, 58.416306090080752, 57.488302272656021,
     58.368417144373652, 58.268389177988560, 57.718892887437420, 58.324997943184066, 58.741759032908519, 58.598935865847352, 59.367600587495780, 59.123829164237030, 59.360354272025127, 59.502584045471892,
@@ -590,9 +590,9 @@ EXPECTED_LOWER_P80_S1 = [
 # Fractional Bands frasma2: period=30, price_scale=100.0
 # 252 values, 15-digit precision, NaN for unprimed
 EXPECTED_FRASMA2_P30_S100 = [
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
     90.218000000000004, 89.809482758620689, 89.489482758620696, 89.323620689655158, 89.295166666666645, 89.036833333333334, 88.846333333333320, 88.583833333333317, 88.379666666666665, 87.816206896551734,
     87.337758620689655, 86.782857142857168, 86.865862068965541, 87.702272727272728, 87.515757575757576, 87.280909090909091, 87.328333333333347, 87.267727272727271, 87.377499999999998, 87.309411764705899,
     87.305735294117653, 87.290147058823550, 86.989242424242434, 86.886617647058841, 86.719411764705910, 86.634852941176504, 86.635138888888918, 86.754411764705921, 87.082272727272766, 87.146911764705933,
@@ -621,9 +621,9 @@ EXPECTED_FRASMA2_P30_S100 = [
 # Fractional Bands upper: period=30, price_scale=100.0
 # 252 values, 15-digit precision, NaN for unprimed
 EXPECTED_UPPER_P30_S100 = [
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
     99.803698407789327, 100.350392731325471, 99.377059149080452, 98.703663394700840, 97.773077522113596, 97.408100062767389, 97.329498109961548, 97.068093530500988, 97.191509784559855, 97.234662665406006,
     97.718288761029939, 96.280969681877082, 94.063408816589018, 91.143038378569003, 91.049251696797640, 90.668647302637766, 90.480053460076547, 90.335860422335372, 90.402981341923208, 90.167165355048766,
     90.331950260884184, 90.209610623544279, 90.366182379980287, 89.743934717942537, 89.580315321297604, 89.577208088894025, 88.799637009950587, 89.454318114305750, 90.229825850600264, 89.843398461643361,
@@ -652,9 +652,9 @@ EXPECTED_UPPER_P30_S100 = [
 # Fractional Bands lower: period=30, price_scale=100.0
 # 252 values, 15-digit precision, NaN for unprimed
 EXPECTED_LOWER_P30_S100 = [
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
     80.632301592210709, 79.268572785915907, 79.601906368160925, 79.943577984609490, 80.817255811219695, 80.665566603899293, 80.363168556705062, 80.099573136165645, 79.567823548773490, 78.397751127697461,
     76.957228480349357, 77.284744603837268, 79.668315321342064, 84.261507075976439, 83.982263454717526, 83.893170879180431, 84.176613206590133, 84.199594123119184, 84.352018658076801, 84.451658174363018,
     84.279520327351122, 84.370683494102821, 83.612302468504581, 84.029300576175160, 83.858508208114216, 83.692497793458983, 84.470640767827263, 84.054505415106107, 83.934719603945254, 84.450425067768506,
@@ -683,9 +683,9 @@ EXPECTED_LOWER_P30_S100 = [
 # Fractional Bands frasma2: period=30, price_scale=10000.0
 # 252 values, 15-digit precision, NaN for unprimed
 EXPECTED_FRASMA2_P30_S10000 = [
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
     90.218000000000004, 89.809482758620689, 89.489482758620696, 89.323620689655158, 89.295166666666645, 89.036833333333334, 88.846333333333320, 88.583833333333317, 88.379666666666665, 87.816206896551734,
     87.337758620689655, 86.782857142857168, 86.865862068965541, 87.702272727272728, 87.515757575757576, 87.280909090909091, 87.328333333333347, 87.267727272727271, 87.377499999999998, 87.309411764705899,
     87.305735294117653, 87.290147058823550, 86.989242424242434, 86.886617647058841, 86.719411764705910, 86.634852941176504, 86.635138888888918, 86.754411764705921, 87.082272727272766, 87.146911764705933,
@@ -714,9 +714,9 @@ EXPECTED_FRASMA2_P30_S10000 = [
 # Fractional Bands upper: period=30, price_scale=10000.0
 # 252 values, 15-digit precision, NaN for unprimed
 EXPECTED_UPPER_P30_S10000 = [
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
     100.448624811839423, 102.004033352542947, 100.419328525809362, 99.502667053609684, 97.933163931191444, 97.644736062773049, 97.717708897307560, 97.468258932697651, 97.765895647097182, 98.345626177228539,
     100.346226535928835, 98.918651959965274, 95.774432729525188, 89.978290015982608, 89.929087251024868, 89.610682233235210, 89.320483652521304, 89.172595359239352, 89.241952695138252, 88.984749896490925,
     89.159919459570787, 89.021742090430322, 89.245301350546896, 88.560050933478024, 88.375760744158754, 88.443828983878149, 87.674700479224541, 88.336734554196155, 89.174876176795905, 88.713068398288357,
@@ -745,9 +745,9 @@ EXPECTED_UPPER_P30_S10000 = [
 # Fractional Bands lower: period=30, price_scale=10000.0
 # 252 values, 15-digit precision, NaN for unprimed
 EXPECTED_LOWER_P30_S10000 = [
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
     79.987375188160570, 77.614932164698416, 78.559636991432029, 79.144574325700631, 80.657169402141861, 80.428930603893619, 79.974957769359065, 79.699407733968968, 78.993437686236149, 77.286787615874928,
     74.329290705450489, 74.647062325749076, 77.957291408405894, 85.426255438562862, 85.102427900490298, 84.951135948582987, 85.336183014145391, 85.362859186215189, 85.513047304861743, 85.634073632920888,
     85.451551128664505, 85.558552027216791, 84.733183497937972, 85.213184360639659, 85.063062785253067, 84.825876898474860, 85.595577298553309, 85.172088975215701, 84.989669277749613, 85.580755131123524,

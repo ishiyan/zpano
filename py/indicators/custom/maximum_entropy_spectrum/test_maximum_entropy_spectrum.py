@@ -77,7 +77,7 @@ class TestMaximumEntropySpectrumPriming(unittest.TestCase):
 class TestMaximumEntropySpectrumNaN(unittest.TestCase):
     def test_nan_input(self):
         x = MaximumEntropySpectrum(Params())
-        h = x.update(float('nan'), _test_time())
+        h = x.update(math.nan, _test_time())
         self.assertTrue(h.is_empty())
         self.assertFalse(x.is_primed())
 

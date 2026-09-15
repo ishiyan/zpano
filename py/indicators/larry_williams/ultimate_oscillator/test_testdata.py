@@ -1,3 +1,5 @@
+import math
+
 TEST_INPUT_HIGH = [
     93.25, 94.94, 96.375, 96.19, 96.0, 94.72, 95.0, 93.72, 92.47, 92.75,
     96.25, 99.625, 99.125, 92.75, 91.315, 93.25, 93.405, 90.655, 91.97, 92.25,
@@ -86,10 +88,10 @@ TEST_INPUT_CLOSE = [
 ]
 
 TEST_EXPECTED = [
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
-    float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'), float('nan'),
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
+    math.nan, math.nan, math.nan, math.nan, math.nan, math.nan, math.nan,
     47.17133589361280, 46.28022136074180, 48.01724235826960, 50.09466825659920,
     51.24383365739430, 53.60819219318410, 45.55472411785440, 43.34638442312430,
     52.43499735707820, 53.78314415384080, 52.08348619631010, 52.82729212476130,

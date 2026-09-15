@@ -81,7 +81,7 @@ class TestCoronaNaN(unittest.TestCase):
         dc_before = c.dominant_cycle
         dcm_before = c.dominant_cycle_median
 
-        result = c.update(float('nan'))
+        result = c.update(math.nan)
         self.assertTrue(result)
         self.assertEqual(c.dominant_cycle, dc_before)
         self.assertEqual(c.dominant_cycle_median, dcm_before)

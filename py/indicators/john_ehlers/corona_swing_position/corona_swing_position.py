@@ -104,7 +104,7 @@ class CoronaSwingPosition:
         self._sample_previous2 = 0.0
         self._band_pass_previous = 0.0
         self._band_pass_previous2 = 0.0
-        self._swing_position = float('nan')
+        self._swing_position = math.nan
         self._is_started = False
 
         comp_mn = component_triple_mnemonic(bc, qc, tc)
@@ -133,7 +133,7 @@ class CoronaSwingPosition:
         if math.isnan(sample):
             return (Heatmap.empty(t, self._min_parameter_value,
                                   self._max_parameter_value, self._parameter_resolution),
-                    float('nan'))
+                    math.nan)
 
         primed = self._corona.update(sample)
 
@@ -142,7 +142,7 @@ class CoronaSwingPosition:
             self._is_started = True
             return (Heatmap.empty(t, self._min_parameter_value,
                                   self._max_parameter_value, self._parameter_resolution),
-                    float('nan'))
+                    math.nan)
 
         # Bandpass filter at the dominant cycle median period.
         dcm = self._corona.dominant_cycle_median
@@ -227,7 +227,7 @@ class CoronaSwingPosition:
         if not primed:
             return (Heatmap.empty(t, self._min_parameter_value,
                                   self._max_parameter_value, self._parameter_resolution),
-                    float('nan'))
+                    math.nan)
 
         values = list(self._raster)
         value_min = min(values)

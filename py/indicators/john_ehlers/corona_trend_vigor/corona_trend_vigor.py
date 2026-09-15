@@ -97,7 +97,7 @@ class CoronaTrendVigor:
         self._band_pass_previous = 0.0
         self._band_pass_previous2 = 0.0
         self._ratio_previous = 0.0
-        self._trend_vigor = float('nan')
+        self._trend_vigor = math.nan
 
         comp_mn = component_triple_mnemonic(bc, qc, tc)
         self.mnemonic = f"ctv({cfg_raster_len}, {cfg_max_raster:g}, " \
@@ -125,7 +125,7 @@ class CoronaTrendVigor:
         if math.isnan(sample):
             return (Heatmap.empty(t, self._min_parameter_value,
                                   self._max_parameter_value, self._parameter_resolution),
-                    float('nan'))
+                    math.nan)
 
         primed = self._corona.update(sample)
         self._sample_count += 1
@@ -137,7 +137,7 @@ class CoronaTrendVigor:
             self._sample_buffer[buf_last] = sample
             return (Heatmap.empty(t, self._min_parameter_value,
                                   self._max_parameter_value, self._parameter_resolution),
-                    float('nan'))
+                    math.nan)
 
         # Bandpass filter at the dominant cycle median period.
         dcm = self._corona.dominant_cycle_median
@@ -246,7 +246,7 @@ class CoronaTrendVigor:
         if not primed:
             return (Heatmap.empty(t, self._min_parameter_value,
                                   self._max_parameter_value, self._parameter_resolution),
-                    float('nan'))
+                    math.nan)
 
         values = list(self._raster)
         value_min = min(values)

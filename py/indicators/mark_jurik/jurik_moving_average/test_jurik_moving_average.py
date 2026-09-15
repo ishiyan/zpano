@@ -31,7 +31,7 @@ from .test_testdata import (
 
 TOLERANCE = 1e-13
 
-N = float('nan')
+N = math.nan
 LEN_PRIMED = 30  # First 30 values (indices 0-29) are NaN
 
 TEST_CASES = [

@@ -88,7 +88,7 @@ class TestCoronaSignalToNoiseRatioNaN(unittest.TestCase):
     def test_nan_input(self):
         x = CoronaSignalToNoiseRatio(Params())
         t = datetime.datetime(2021, 4, 1)
-        h, snr = x.update(float('nan'), float('nan'), float('nan'), t)
+        h, snr = x.update(math.nan, math.nan, math.nan, t)
         self.assertTrue(h.is_empty())
         self.assertTrue(math.isnan(snr))
         self.assertFalse(x.is_primed())

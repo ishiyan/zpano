@@ -156,18 +156,18 @@ class CentralMomentsKleinKBN:
     @property
     def variance(self) -> float:
         N = self.n - self.ddof
-        return self.m2.value / N if N > 0 else float('nan')
+        return self.m2.value / N if N > 0 else math.nan
 
     @property
     def standard_deviation(self) -> float:
         N = self.n - self.ddof
-        return (self.m2.value / N)**0.5 if N > 0 else float('nan')
+        return (self.m2.value / N)**0.5 if N > 0 else math.nan
 
     @property
     def skewness(self) -> float:
         N = self.n
         if N < 3 or self.m2.value <= 0:
-            return float('nan')
+            return math.nan
         g1 = math.sqrt(N) * self.m3.value / (self.m2.value ** 1.5)
         if self.bias:
             return g1
@@ -177,7 +177,7 @@ class CentralMomentsKleinKBN:
     def kurtosis(self) -> float:
         N = self.n
         if N <= 3 or self.m2.value <= 0:
-            return float('nan')
+            return math.nan
         raw = N * self.m4.value / (self.m2.value * self.m2.value)
         if not self.bias:
             adj = ((N * N - 1) * raw - 3 * (N - 1) ** 2) / ((N - 2) * (N - 3))

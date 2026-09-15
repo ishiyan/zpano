@@ -53,9 +53,9 @@ class TestDirectionalMovementIndex(unittest.TestCase):
 
     def test_nan_passthrough(self):
         dx = DirectionalMovementIndex(DirectionalMovementIndexParams(14))
-        self.assertTrue(math.isnan(dx.update(float('nan'), 1, 1)))
-        self.assertTrue(math.isnan(dx.update(1, float('nan'), 1)))
-        self.assertTrue(math.isnan(dx.update(1, 1, float('nan'))))
+        self.assertTrue(math.isnan(dx.update(math.nan, 1, 1)))
+        self.assertTrue(math.isnan(dx.update(1, math.nan, 1)))
+        self.assertTrue(math.isnan(dx.update(1, 1, math.nan)))
 
     def test_metadata(self):
         dx = DirectionalMovementIndex(DirectionalMovementIndexParams(14))

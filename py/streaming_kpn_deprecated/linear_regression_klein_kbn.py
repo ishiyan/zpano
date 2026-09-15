@@ -1,3 +1,5 @@
+import math
+
 from .klein_kbn_accumulator import KleinKBNAccumulator
 from .raw_moments_klein_kbn import RawMomentsKleinKBN
 
@@ -40,9 +42,9 @@ class LinearRegressionKleinKBN:
     def slope(self) -> float:
         n = self.n
         if n < 2:
-            return float('nan')
+            return math.nan
         S_xx = self._x_moments.variance * n
-        return self._s_xy.value / S_xx if S_xx != 0 else float('nan')
+        return self._s_xy.value / S_xx if S_xx != 0 else math.nan
 
     @property
     def intercept(self) -> float:
@@ -52,6 +54,6 @@ class LinearRegressionKleinKBN:
     def correlation(self) -> float:
         n = self.n
         if n < 2:
-            return float('nan')
+            return math.nan
         t = self._x_moments.standard_deviation * self._y_moments.standard_deviation
-        return self._s_xy.value / (t * n) if t != 0 else float('nan')
+        return self._s_xy.value / (t * n) if t != 0 else math.nan
