@@ -260,6 +260,8 @@ import { MacdIndex } from '../william-blau/macd-index/macd-index.js';
 import { defaultParams as defaultMacdiParams } from '../william-blau/macd-index/params.js';
 import { DoubleSmoothedMomenta } from '../william-blau/double-smoothed-momenta/double-smoothed-momenta.js';
 import { defaultParams as defaultDmParams } from '../william-blau/double-smoothed-momenta/params.js';
+import { CandlestickMomentumIndex } from '../william-blau/candlestick-momentum-index/candlestick-momentum-index.js';
+import { defaultParams as defaultCmiParams } from '../william-blau/candlestick-momentum-index/params.js';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -730,6 +732,9 @@ export function createIndicator(identifier: IndicatorIdentifier, params?: Record
 
         case IndicatorIdentifier.DoubleSmoothedMomenta:
             return new DoubleSmoothedMomenta({ ...defaultDmParams(), ...p });
+
+        case IndicatorIdentifier.CandlestickMomentumIndex:
+            return new CandlestickMomentumIndex({ ...defaultCmiParams(), ...p });
 
         default:
             throw new Error(`Unsupported indicator: ${IndicatorIdentifier[identifier] ?? identifier}`);

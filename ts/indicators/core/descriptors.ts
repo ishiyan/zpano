@@ -351,6 +351,7 @@ const descriptors: Map<IndicatorIdentifier, Descriptor> = new Map<IndicatorIdent
   [IndicatorIdentifier.MeanDeviationIndex, desc(IndicatorIdentifier.MeanDeviationIndex, 'William Blau', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Oscillator, P.Own), out(1, S.Scalar, R.Signal, P.Own)])],
   [IndicatorIdentifier.MacdIndex, desc(IndicatorIdentifier.MacdIndex, 'William Blau', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Oscillator, P.Own), out(1, S.Scalar, R.Signal, P.Own)])],
   [IndicatorIdentifier.DoubleSmoothedMomenta, desc(IndicatorIdentifier.DoubleSmoothedMomenta, 'William Blau', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.BoundedOscillator, P.Own)])],
+  [IndicatorIdentifier.CandlestickMomentumIndex, desc(IndicatorIdentifier.CandlestickMomentumIndex, 'William Blau', A.Static, I.BarInput, V.NoVolume, [out(0, S.Scalar, R.BoundedOscillator, P.Own), out(1, S.Scalar, R.Signal, P.Own)])],
 ]);
 
 /**

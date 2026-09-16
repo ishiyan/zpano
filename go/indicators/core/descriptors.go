@@ -872,4 +872,13 @@ var descriptors = map[Identifier]Descriptor{
 			{Kind: 1 /* Value */, Shape: shape.Scalar, Role: BoundedOscillator, Pane: Own},
 		},
 	},
+
+	CandlestickMomentumIndex: {
+		Identifier: CandlestickMomentumIndex, Family: "William Blau",
+		Adaptivity: Static, InputRequirement: BarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{
+			{Kind: 1 /* CMI */, Shape: shape.Scalar, Role: BoundedOscillator, Pane: Own},
+			{Kind: 2 /* Signal */, Shape: shape.Scalar, Role: Signal, Pane: Own},
+		},
+	},
 }

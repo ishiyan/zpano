@@ -320,6 +320,9 @@ use crate::indicators::william_blau::macd_index::macd_index::{
 use crate::indicators::william_blau::double_smoothed_momenta::double_smoothed_momenta::{
     DoubleSmoothedMomenta, DoubleSmoothedMomentaParams,
 };
+use crate::indicators::william_blau::candlestick_momentum_index::candlestick_momentum_index::{
+    CandlestickMomentumIndex, CandlestickMomentumIndexParams,
+};
 
 /// Create an indicator from its identifier and a JSON-encoded parameter string.
 ///
@@ -1740,6 +1743,15 @@ pub fn create_indicator(
             if let Some(v) = get_usize(&params, "y") { p.y = v; }
             if let Some(v) = get_usize(&params, "z") { p.z = v; }
             Ok(Box::new(DoubleSmoothedMomenta::new(&p)?))
+        }
+
+        Identifier::CandlestickMomentumIndex => {
+            let mut p = CandlestickMomentumIndexParams::default();
+            if let Some(v) = get_usize(&params, "r") { p.r = v; }
+            if let Some(v) = get_usize(&params, "s") { p.s = v; }
+            if let Some(v) = get_usize(&params, "u") { p.u = v; }
+            if let Some(v) = get_usize(&params, "ul") { p.ul = v; }
+            Ok(Box::new(CandlestickMomentumIndex::new(&p)?))
         }
 
         _ => Err(format!("unsupported indicator: {:?}", identifier)),

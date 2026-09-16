@@ -290,6 +290,8 @@ pub const Identifier = enum(u8) {
     macd_index = 109,
     /// Identifies the William Blau Double-Smoothed Momenta (DM) indicator.
     double_smoothed_momenta = 110,
+    /// Identifies the William Blau Candlestick Momentum Index (CMI) indicator.
+    candlestick_momentum_index = 111,
 
     /// Returns the camelCase string representation matching Go's String().
     pub fn asStr(self: Identifier) []const u8 {
@@ -451,6 +453,7 @@ pub const Identifier = enum(u8) {
             .mean_deviation_index => "meanDeviationIndex",
             .macd_index => "macdIndex",
             .double_smoothed_momenta => "doubleSmoothedMomenta",
+            .candlestick_momentum_index => "candlestickMomentumIndex",
         };
     }
 
@@ -614,6 +617,7 @@ pub const Identifier = enum(u8) {
             .{ "meanDeviationIndex", Identifier.mean_deviation_index },
             .{ "macdIndex", Identifier.macd_index },
             .{ "doubleSmoothedMomenta", Identifier.double_smoothed_momenta },
+            .{ "candlestickMomentumIndex", Identifier.candlestick_momentum_index },
         };
 
         inline for (map) |entry| {

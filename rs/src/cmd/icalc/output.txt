@@ -3025,6 +3025,33 @@
       ]
     }
 
+[111] cmi(20,5,3,3)
+  Identifier:  candlestickMomentumIndex
+  Description: Candlestick Momentum Index cmi(20,5,3,3)
+  Outputs (2):
+    [0] kind=1 shape=scalar mnemonic="cmi(20,5,3,3) cmi" description="Candlestick Momentum Index cmi(20,5,3,3) CMI"
+    [1] kind=2 shape=scalar mnemonic="cmi(20,5,3,3) signal" description="Candlestick Momentum Index cmi(20,5,3,3) signal"
+  Full metadata JSON:
+  {
+      "identifier": 111,
+      "mnemonic": "cmi(20,5,3,3)",
+      "description": "Candlestick Momentum Index cmi(20,5,3,3)",
+      "outputs": [
+        {
+          "kind": 1,
+          "shape": 1,
+          "mnemonic": "cmi(20,5,3,3) cmi",
+          "description": "Candlestick Momentum Index cmi(20,5,3,3) CMI"
+        },
+        {
+          "kind": 2,
+          "shape": 1,
+          "mnemonic": "cmi(20,5,3,3) signal",
+          "description": "Candlestick Momentum Index cmi(20,5,3,3) signal"
+        }
+      ]
+    }
+
 
 === Bar Data & Indicator Outputs ===
 
@@ -3140,6 +3167,7 @@ Bar[  0] 2020-01-02  O=91.5000 H=93.2500 L=90.7500 C=91.5000 V=4077500
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=0.0000 mdi(20,5,3) signal=0.0000 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=0.0000 macdi(20,5,3) signal=0.0000 
   dm(2,2,14)                                    primed=false dm(2,2,14)=NaN 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=0.0000 cmi(20,5,3,3) signal=0.0000 
 
 Bar[  1] 2020-01-03  O=91.5000 H=94.9400 L=91.4050 C=94.8150 V=4955900
   sma(14)                                       primed=false sma(14)=NaN 
@@ -3253,6 +3281,7 @@ Bar[  1] 2020-01-03  O=91.5000 H=94.9400 L=91.4050 C=94.8150 V=4955900
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=0.4999 mdi(20,5,3) signal=0.2499 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=0.3946 macdi(20,5,3) signal=0.1973 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=100.0000 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=100.0000 cmi(20,5,3,3) signal=50.0000 
 
 Bar[  2] 2020-01-04  O=94.8150 H=96.3750 L=94.2500 C=94.3750 V=4775300
   sma(14)                                       primed=false sma(14)=NaN 
@@ -3366,6 +3395,7 @@ Bar[  2] 2020-01-04  O=94.8150 H=96.3750 L=94.2500 C=94.3750 V=4775300
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=0.9691 mdi(20,5,3) signal=0.6095 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=0.7651 macdi(20,5,3) signal=0.4812 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=98.7216 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=87.9564 cmi(20,5,3,3) signal=68.9782 
 
 Bar[  3] 2020-01-05  O=94.3750 H=96.1900 L=93.5000 C=95.0950 V=4155300
   sma(14)                                       primed=false sma(14)=NaN 
@@ -3479,6 +3509,7 @@ Bar[  3] 2020-01-05  O=94.3750 H=96.1900 L=93.5000 C=95.0950 V=4155300
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=1.4218 mdi(20,5,3) signal=1.0156 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=1.1224 macdi(20,5,3) signal=0.8018 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=98.3103 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=83.7987 cmi(20,5,3,3) signal=76.3885 
 
 Bar[  4] 2020-01-06  O=95.0950 H=96.0000 L=92.8150 C=93.7800 V=4593100
   sma(14)                                       primed=false sma(14)=NaN 
@@ -3592,6 +3623,7 @@ Bar[  4] 2020-01-06  O=95.0950 H=96.0000 L=92.8150 C=93.7800 V=4593100
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=1.5515 mdi(20,5,3) signal=1.2836 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=1.2249 macdi(20,5,3) signal=1.0134 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=93.6908 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=66.4979 cmi(20,5,3,3) signal=71.4432 
 
 Bar[  5] 2020-01-07  O=93.7800 H=94.7200 L=93.5000 C=94.6250 V=3631300
   sma(14)                                       primed=false sma(14)=NaN 
@@ -3705,6 +3737,7 @@ Bar[  5] 2020-01-07  O=93.7800 H=94.7200 L=93.5000 C=94.6250 V=3631300
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=1.6589 mdi(20,5,3) signal=1.4712 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=1.3097 macdi(20,5,3) signal=1.1615 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=92.3163 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=56.4960 cmi(20,5,3,3) signal=63.9696 
 
 Bar[  6] 2020-01-08  O=94.6250 H=95.0000 L=92.0000 C=92.5300 V=3382800
   sma(14)                                       primed=false sma(14)=NaN 
@@ -3818,6 +3851,7 @@ Bar[  6] 2020-01-08  O=94.6250 H=95.0000 L=92.0000 C=92.5300 V=3382800
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=1.3943 mdi(20,5,3) signal=1.4328 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=1.1008 macdi(20,5,3) signal=1.1311 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=84.2852 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=37.9973 cmi(20,5,3,3) signal=50.9834 
 
 Bar[  7] 2020-01-09  O=92.5300 H=93.7200 L=89.7500 C=92.7500 V=4954200
   sma(14)                                       primed=false sma(14)=NaN 
@@ -3931,6 +3965,7 @@ Bar[  7] 2020-01-09  O=92.5300 H=93.7200 L=89.7500 C=92.7500 V=4954200
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=1.0852 mdi(20,5,3) signal=1.2590 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=0.8568 macdi(20,5,3) signal=0.9939 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=81.7864 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=25.4771 cmi(20,5,3,3) signal=38.2303 
 
 Bar[  8] 2020-01-10  O=92.7500 H=92.4700 L=89.4400 C=90.3150 V=4500000
   sma(14)                                       primed=false sma(14)=NaN 
@@ -4044,6 +4079,7 @@ Bar[  8] 2020-01-10  O=92.7500 H=92.4700 L=89.4400 C=90.3150 V=4500000
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=0.4446 mdi(20,5,3) signal=0.8518 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=0.3510 macdi(20,5,3) signal=0.6725 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=72.2813 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=8.9276 cmi(20,5,3,3) signal=23.5790 
 
 Bar[  9] 2020-01-11  O=90.3150 H=92.7500 L=90.6250 C=92.4700 V=3397500
   sma(14)                                       primed=false sma(14)=NaN 
@@ -4157,6 +4193,7 @@ Bar[  9] 2020-01-11  O=90.3150 H=92.7500 L=90.6250 C=92.4700 V=3397500
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=0.1591 mdi(20,5,3) signal=0.5054 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=0.1256 macdi(20,5,3) signal=0.3990 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=72.1097 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=2.7288 cmi(20,5,3,3) signal=13.1539 
 
 Bar[ 10] 2020-01-12  O=92.4700 H=96.2500 L=92.7500 C=96.1250 V=4204500
   sma(14)                                       primed=false sma(14)=NaN 
@@ -4270,6 +4307,7 @@ Bar[ 10] 2020-01-12  O=92.4700 H=96.2500 L=92.7500 C=96.1250 V=4204500
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=0.5906 mdi(20,5,3) signal=0.5480 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=0.4662 macdi(20,5,3) signal=0.4326 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=76.2156 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=8.4397 cmi(20,5,3,3) signal=10.7968 
 
 Bar[ 11] 2020-01-13  O=96.1250 H=99.6250 L=96.3150 C=97.2500 V=6321400
   sma(14)                                       primed=false sma(14)=NaN 
@@ -4383,6 +4421,7 @@ Bar[ 11] 2020-01-13  O=96.1250 H=99.6250 L=96.3150 C=97.2500 V=6321400
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=1.3060 mdi(20,5,3) signal=0.9270 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=1.0311 macdi(20,5,3) signal=0.7319 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=78.4669 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=16.1883 cmi(20,5,3,3) signal=13.4925 
 
 Bar[ 12] 2020-01-14  O=97.2500 H=99.1250 L=96.0300 C=98.5000 V=10203600
   sma(14)                                       primed=false sma(14)=NaN 
@@ -4496,6 +4535,7 @@ Bar[ 12] 2020-01-14  O=97.2500 H=99.1250 L=96.0300 C=98.5000 V=10203600
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=2.1216 mdi(20,5,3) signal=1.5243 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=1.6750 macdi(20,5,3) signal=1.2034 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=80.3383 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=23.7311 cmi(20,5,3,3) signal=18.6118 
 
 Bar[ 13] 2020-01-15  O=98.5000 H=92.7500 L=88.8150 C=89.8750 V=19043900
   sma(14)                                       primed=true  sma(14)=93.8575 
@@ -4609,6 +4649,7 @@ Bar[ 13] 2020-01-15  O=98.5000 H=92.7500 L=88.8150 C=89.8750 V=19043900
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=1.4583 mdi(20,5,3) signal=1.4913 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=1.1513 macdi(20,5,3) signal=1.1774 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=57.0512 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=13.5980 cmi(20,5,3,3) signal=16.1049 
 
 Bar[ 14] 2020-01-16  O=89.8750 H=91.3150 L=86.7500 C=91.0000 V=11692000
   sma(14)                                       primed=true  sma(14)=93.8218 
@@ -4722,6 +4763,7 @@ Bar[ 14] 2020-01-16  O=89.8750 H=91.3150 L=86.7500 C=91.0000 V=11692000
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=0.6377 mdi(20,5,3) signal=1.0645 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=0.5034 macdi(20,5,3) signal=0.8404 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=53.4690 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=5.1422 cmi(20,5,3,3) signal=10.6235 
 
 Bar[ 15] 2020-01-17  O=91.0000 H=93.2500 L=90.9400 C=92.8150 V=9553300
   sma(14)                                       primed=true  sma(14)=93.6789 
@@ -4835,6 +4877,7 @@ Bar[ 15] 2020-01-17  O=91.0000 H=93.2500 L=90.9400 C=92.8150 V=9553300
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=0.2090 mdi(20,5,3) signal=0.6368 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=0.1650 macdi(20,5,3) signal=0.5027 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=55.3501 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=1.5187 cmi(20,5,3,3) signal=6.0711 
 
 Bar[ 16] 2020-01-18  O=92.8150 H=93.4050 L=88.9050 C=89.1550 V=8920300
   sma(14)                                       primed=true  sma(14)=93.3061 
@@ -4948,6 +4991,7 @@ Bar[ 16] 2020-01-18  O=92.8150 H=93.4050 L=88.9050 C=89.1550 V=8920300
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-0.5648 mdi(20,5,3) signal=0.0360 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-0.4459 macdi(20,5,3) signal=0.0284 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=49.0749 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-3.7477 cmi(20,5,3,3) signal=1.1617 
 
 Bar[ 17] 2020-01-19  O=89.1550 H=90.6550 L=88.7800 C=89.3450 V=5970900
   sma(14)                                       primed=true  sma(14)=92.8954 
@@ -5061,6 +5105,7 @@ Bar[ 17] 2020-01-19  O=89.1550 H=90.6550 L=88.7800 C=89.3450 V=5970900
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-1.2393 mdi(20,5,3) signal=-0.6017 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-0.9784 macdi(20,5,3) signal=-0.4750 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=47.5277 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-7.8080 cmi(20,5,3,3) signal=-3.3231 
 
 Bar[ 18] 2020-01-20  O=89.3450 H=91.9700 L=89.2500 C=91.6250 V=5062300
   sma(14)                                       primed=true  sma(14)=92.7414 
@@ -5174,6 +5219,7 @@ Bar[ 18] 2020-01-20  O=89.3450 H=91.9700 L=89.2500 C=91.6250 V=5062300
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-1.3758 mdi(20,5,3) signal=-0.9888 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-1.0862 macdi(20,5,3) signal=-0.7806 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=51.5066 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-8.3683 cmi(20,5,3,3) signal=-5.8457 
 
 Bar[ 19] 2020-01-21  O=91.6250 H=92.2500 L=89.7500 C=89.8750 V=3705600
   sma(14)                                       primed=true  sma(14)=92.4021 
@@ -5287,6 +5333,7 @@ Bar[ 19] 2020-01-21  O=91.6250 H=92.2500 L=89.7500 C=89.8750 V=3705600
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-1.5629 mdi(20,5,3) signal=-1.2758 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-1.2339 macdi(20,5,3) signal=-1.0072 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=49.2457 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-9.2917 cmi(20,5,3,3) signal=-7.5687 
 
 Bar[ 20] 2020-01-22  O=89.8750 H=90.3450 L=87.5000 C=88.3750 V=5865600
   sma(14)                                       primed=true  sma(14)=92.1054 
@@ -5400,6 +5447,7 @@ Bar[ 20] 2020-01-22  O=89.8750 H=90.3450 L=87.5000 C=88.3750 V=5865600
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-1.9265 mdi(20,5,3) signal=-1.6012 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-1.5209 macdi(20,5,3) signal=-1.2641 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=45.5668 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-11.3186 cmi(20,5,3,3) signal=-9.4437 
 
 Bar[ 21] 2020-01-23  O=88.3750 H=88.5000 L=86.5300 C=87.6250 V=5603000
   sma(14)                                       primed=true  sma(14)=91.7393 
@@ -5513,6 +5561,7 @@ Bar[ 21] 2020-01-23  O=88.3750 H=88.5000 L=86.5300 C=87.6250 V=5603000
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-2.3480 mdi(20,5,3) signal=-1.9746 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-1.8537 macdi(20,5,3) signal=-1.5589 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=42.8930 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-13.8384 cmi(20,5,3,3) signal=-11.6410 
 
 Bar[ 22] 2020-01-24  O=87.6250 H=88.2500 L=84.6250 C=84.7800 V=5811900
   sma(14)                                       primed=true  sma(14)=91.3439 
@@ -5626,6 +5675,7 @@ Bar[ 22] 2020-01-24  O=87.6250 H=88.2500 L=84.6250 C=84.7800 V=5811900
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-3.0883 mdi(20,5,3) signal=-2.5314 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-2.4381 macdi(20,5,3) signal=-1.9985 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=36.8460 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-18.1579 cmi(20,5,3,3) signal=-14.8995 
 
 Bar[ 23] 2020-01-25  O=84.7800 H=85.5000 L=82.2800 C=83.0000 V=8483800
   sma(14)                                       primed=true  sma(14)=90.6675 
@@ -5739,6 +5789,7 @@ Bar[ 23] 2020-01-25  O=84.7800 H=85.5000 L=82.2800 C=83.0000 V=8483800
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-3.9855 mdi(20,5,3) signal=-3.2585 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-3.1465 macdi(20,5,3) signal=-2.5725 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=32.2702 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-23.3523 cmi(20,5,3,3) signal=-19.1259 
 
 Bar[ 24] 2020-01-26  O=83.0000 H=84.4400 L=81.5650 C=83.5000 V=5995200
   sma(14)                                       primed=true  sma(14)=89.7657 
@@ -5852,6 +5903,7 @@ Bar[ 24] 2020-01-26  O=83.0000 H=84.4400 L=81.5650 C=83.5000 V=5995200
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-4.5992 mdi(20,5,3) signal=-3.9288 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-3.6309 macdi(20,5,3) signal=-3.1017 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=32.4094 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-27.1764 cmi(20,5,3,3) signal=-23.1511 
 
 Bar[ 25] 2020-01-27  O=83.5000 H=84.7500 L=80.8750 C=81.3750 V=5408800
   sma(14)                                       primed=true  sma(14)=88.6318 
@@ -5965,6 +6017,7 @@ Bar[ 25] 2020-01-27  O=83.5000 H=84.7500 L=80.8750 C=81.3750 V=5408800
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-5.2432 mdi(20,5,3) signal=-4.5860 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-4.1394 macdi(20,5,3) signal=-3.6205 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=29.2145 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-31.2073 cmi(20,5,3,3) signal=-27.1792 
 
 Bar[ 26] 2020-01-28  O=81.3750 H=84.4400 L=81.2500 C=84.4400 V=5430500
   sma(14)                                       primed=true  sma(14)=87.6275 
@@ -6078,6 +6131,7 @@ Bar[ 26] 2020-01-28  O=81.3750 H=84.4400 L=81.2500 C=84.4400 V=5430500
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-5.2130 mdi(20,5,3) signal=-4.8995 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-4.1155 macdi(20,5,3) signal=-3.8680 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=38.0268 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-30.8330 cmi(20,5,3,3) signal=-29.0061 
 
 Bar[ 27] 2020-01-29  O=84.4400 H=89.4050 L=84.0650 C=89.2500 V=6283800
   sma(14)                                       primed=true  sma(14)=87.5829 
@@ -6191,6 +6245,7 @@ Bar[ 27] 2020-01-29  O=84.4400 H=89.4050 L=84.0650 C=89.2500 V=6283800
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-4.1779 mdi(20,5,3) signal=-4.5387 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-3.2983 macdi(20,5,3) signal=-3.5832 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=51.8364 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-23.8514 cmi(20,5,3,3) signal=-26.4288 
 
 Bar[ 28] 2020-01-30  O=89.2500 H=88.1250 L=85.5950 C=86.3750 V=5834800
   sma(14)                                       primed=true  sma(14)=87.2525 
@@ -6304,6 +6359,7 @@ Bar[ 28] 2020-01-30  O=89.2500 H=88.1250 L=85.5950 C=86.3750 V=5834800
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-3.4287 mdi(20,5,3) signal=-3.9837 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-2.7069 macdi(20,5,3) signal=-3.1450 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=49.6232 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-18.7340 cmi(20,5,3,3) signal=-22.5814 
 
 Bar[ 29] 2020-01-31  O=86.3750 H=89.1250 L=85.9700 C=86.2500 V=4515500
   sma(14)                                       primed=true  sma(14)=86.7836 
@@ -6417,6 +6473,7 @@ Bar[ 29] 2020-01-31  O=86.3750 H=89.1250 L=85.9700 C=86.2500 V=4515500
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-2.8907 mdi(20,5,3) signal=-3.4372 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-2.2822 macdi(20,5,3) signal=-2.7136 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=48.7293 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-15.4576 cmi(20,5,3,3) signal=-19.0195 
 
 Bar[ 30] 2020-02-01  O=86.2500 H=87.1550 L=84.4050 C=85.2500 V=4493300
   sma(14)                                       primed=true  sma(14)=86.5046 
@@ -6530,6 +6587,7 @@ Bar[ 30] 2020-02-01  O=86.2500 H=87.1550 L=84.4050 C=85.2500 V=4493300
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-2.6366 mdi(20,5,3) signal=-3.0369 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-2.0816 macdi(20,5,3) signal=-2.3976 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=46.3499 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-14.0607 cmi(20,5,3,3) signal=-16.5401 
 
 Bar[ 31] 2020-02-02  O=85.2500 H=87.2500 L=85.0950 C=87.1250 V=4346100
   sma(14)                                       primed=true  sma(14)=86.3461 
@@ -6643,6 +6701,7 @@ Bar[ 31] 2020-02-02  O=85.2500 H=87.2500 L=85.0950 C=87.1250 V=4346100
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-2.1980 mdi(20,5,3) signal=-2.6175 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-1.7353 macdi(20,5,3) signal=-2.0664 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=50.0197 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-11.7719 cmi(20,5,3,3) signal=-14.1560 
 
 Bar[ 32] 2020-02-03  O=87.1250 H=87.3750 L=85.5000 C=85.8150 V=3700300
   sma(14)                                       primed=true  sma(14)=85.9311 
@@ -6756,6 +6815,7 @@ Bar[ 32] 2020-02-03  O=87.1250 H=87.3750 L=85.5000 C=85.8150 V=3700300
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-1.9604 mdi(20,5,3) signal=-2.2889 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-1.5477 macdi(20,5,3) signal=-1.8071 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=48.1507 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-10.6136 cmi(20,5,3,3) signal=-12.3848 
 
 Bar[ 33] 2020-02-04  O=85.8150 H=88.9700 L=85.5300 C=88.9700 V=4600200
   sma(14)                                       primed=true  sma(14)=85.8664 
@@ -6869,6 +6929,7 @@ Bar[ 33] 2020-02-04  O=85.8150 H=88.9700 L=85.5300 C=88.9700 V=4600200
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-1.3274 mdi(20,5,3) signal=-1.8082 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-1.0480 macdi(20,5,3) signal=-1.4275 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=54.8071 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-7.1914 cmi(20,5,3,3) signal=-9.7881 
 
 Bar[ 34] 2020-02-05  O=88.9700 H=90.0000 L=87.8750 C=88.4700 V=4557200
   sma(14)                                       primed=true  sma(14)=85.8732 
@@ -6982,6 +7043,7 @@ Bar[ 34] 2020-02-05  O=88.9700 H=90.0000 L=87.8750 C=88.4700 V=4557200
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-0.7652 mdi(20,5,3) signal=-1.2867 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-0.6041 macdi(20,5,3) signal=-1.0158 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=55.4808 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-4.1840 cmi(20,5,3,3) signal=-6.9861 
 
 Bar[ 35] 2020-02-06  O=88.4700 H=89.8450 L=86.5650 C=86.8750 V=4323600
   sma(14)                                       primed=true  sma(14)=85.8196 
@@ -7095,6 +7157,7 @@ Bar[ 35] 2020-02-06  O=88.4700 H=89.8450 L=86.5650 C=86.8750 V=4323600
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-0.5732 mdi(20,5,3) signal=-0.9299 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-0.4525 macdi(20,5,3) signal=-0.7342 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=51.4420 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-3.1740 cmi(20,5,3,3) signal=-5.0800 
 
 Bar[ 36] 2020-02-07  O=86.8750 H=86.9700 L=84.6550 C=86.8150 V=5237500
   sma(14)                                       primed=true  sma(14)=85.9650 
@@ -7208,6 +7271,7 @@ Bar[ 36] 2020-02-07  O=86.8750 H=86.9700 L=84.6550 C=86.8150 V=5237500
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-0.5339 mdi(20,5,3) signal=-0.7319 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-0.4215 macdi(20,5,3) signal=-0.5778 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=49.9465 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-3.0367 cmi(20,5,3,3) signal=-4.0584 
 
 Bar[ 37] 2020-02-08  O=86.8150 H=85.9400 L=83.2500 C=84.8750 V=7404100
   sma(14)                                       primed=true  sma(14)=86.0989 
@@ -7321,6 +7385,7 @@ Bar[ 37] 2020-02-08  O=86.8150 H=85.9400 L=83.2500 C=84.8750 V=7404100
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-0.8331 mdi(20,5,3) signal=-0.7825 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-0.6577 macdi(20,5,3) signal=-0.6178 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=44.2298 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-4.8594 cmi(20,5,3,3) signal=-4.4589 
 
 Bar[ 38] 2020-02-09  O=84.8750 H=84.7500 L=82.5650 C=84.1900 V=4798400
   sma(14)                                       primed=true  sma(14)=86.1482 
@@ -7434,6 +7499,7 @@ Bar[ 38] 2020-02-09  O=84.8750 H=84.7500 L=82.5650 C=84.1900 V=4798400
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-1.2604 mdi(20,5,3) signal=-1.0214 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-0.9951 macdi(20,5,3) signal=-0.8064 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=40.7159 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-7.5721 cmi(20,5,3,3) signal=-6.0155 
 
 Bar[ 39] 2020-02-10  O=84.1900 H=85.4700 L=83.4400 C=83.8750 V=4372800
   sma(14)                                       primed=true  sma(14)=86.3268 
@@ -7547,6 +7613,7 @@ Bar[ 39] 2020-02-10  O=84.1900 H=85.4700 L=83.4400 C=83.8750 V=4372800
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-1.6622 mdi(20,5,3) signal=-1.3418 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-1.3123 macdi(20,5,3) signal=-1.0594 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=38.7306 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-10.3776 cmi(20,5,3,3) signal=-8.1965 
 
 Bar[ 40] 2020-02-11  O=83.8750 H=84.4700 L=82.5300 C=83.3750 V=3872300
   sma(14)                                       primed=true  sma(14)=86.2507 
@@ -7660,6 +7727,7 @@ Bar[ 40] 2020-02-11  O=83.8750 H=84.4700 L=82.5300 C=83.3750 V=3872300
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-2.0193 mdi(20,5,3) signal=-1.6806 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-1.5942 macdi(20,5,3) signal=-1.3268 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=36.7136 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-13.1923 cmi(20,5,3,3) signal=-10.6944 
 
 Bar[ 41] 2020-02-12  O=83.3750 H=88.5000 L=85.0650 C=85.5000 V=10750800
   sma(14)                                       primed=true  sma(14)=85.9829 
@@ -7773,6 +7841,7 @@ Bar[ 41] 2020-02-12  O=83.3750 H=88.5000 L=85.0650 C=85.5000 V=10750800
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-1.9339 mdi(20,5,3) signal=-1.8072 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-1.5267 macdi(20,5,3) signal=-1.4268 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=45.0569 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-13.0662 cmi(20,5,3,3) signal=-11.8803 
 
 Bar[ 42] 2020-02-13  O=85.5000 H=89.4700 L=86.8750 C=89.1900 V=5804800
   sma(14)                                       primed=true  sma(14)=86.1839 
@@ -7886,6 +7955,7 @@ Bar[ 42] 2020-02-13  O=85.5000 H=89.4700 L=86.8750 C=89.1900 V=5804800
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-1.1462 mdi(20,5,3) signal=-1.4767 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-0.9049 macdi(20,5,3) signal=-1.1658 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=58.6578 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-7.7517 cmi(20,5,3,3) signal=-9.8160 
 
 Bar[ 43] 2020-02-14  O=89.1900 H=90.0000 L=88.5300 C=89.4400 V=3785500
   sma(14)                                       primed=true  sma(14)=86.4118 
@@ -7999,6 +8069,7 @@ Bar[ 43] 2020-02-14  O=89.1900 H=90.0000 L=88.5300 C=89.4400 V=3785500
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-0.2596 mdi(20,5,3) signal=-0.8681 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-0.2049 macdi(20,5,3) signal=-0.6854 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=62.7580 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-1.7627 cmi(20,5,3,3) signal=-5.7893 
 
 Bar[ 44] 2020-02-15  O=89.4400 H=92.4400 L=89.2800 C=91.0950 V=5014800
   sma(14)                                       primed=true  sma(14)=86.8293 
@@ -8112,6 +8183,7 @@ Bar[ 44] 2020-02-15  O=89.4400 H=92.4400 L=89.2800 C=91.0950 V=5014800
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=0.7206 mdi(20,5,3) signal=-0.0738 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=0.5689 macdi(20,5,3) signal=-0.0583 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=67.6354 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=4.9081 cmi(20,5,3,3) signal=-0.4406 
 
 Bar[ 45] 2020-02-16  O=91.0950 H=91.4400 L=90.1250 C=90.7500 V=3507700
   sma(14)                                       primed=true  sma(14)=87.0882 
@@ -8225,6 +8297,7 @@ Bar[ 45] 2020-02-16  O=91.0950 H=91.4400 L=90.1250 C=90.7500 V=3507700
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=1.4554 mdi(20,5,3) signal=0.6908 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=1.1490 macdi(20,5,3) signal=0.5454 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=67.6659 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=10.0587 cmi(20,5,3,3) signal=4.8090 
 
 Bar[ 46] 2020-02-17  O=90.7500 H=92.9700 L=90.7500 C=91.4400 V=4298800
   sma(14)                                       primed=true  sma(14)=87.4900 
@@ -8338,6 +8411,7 @@ Bar[ 46] 2020-02-17  O=90.7500 H=92.9700 L=90.7500 C=91.4400 V=4298800
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=2.0397 mdi(20,5,3) signal=1.3653 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=1.6103 macdi(20,5,3) signal=1.0778 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=69.1958 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=14.4391 cmi(20,5,3,3) signal=9.6241 
 
 Bar[ 47] 2020-02-18  O=91.4400 H=91.7200 L=89.0000 C=89.0000 V=4842500
   sma(14)                                       primed=true  sma(14)=87.4921 
@@ -8451,6 +8525,7 @@ Bar[ 47] 2020-02-18  O=91.4400 H=91.7200 L=89.0000 C=89.0000 V=4842500
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=2.0532 mdi(20,5,3) signal=1.7092 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=1.6209 macdi(20,5,3) signal=1.3494 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=58.7609 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=14.7057 cmi(20,5,3,3) signal=12.1649 
 
 Bar[ 48] 2020-02-19  O=89.0000 H=91.1550 L=88.5650 C=91.0000 V=3952200
   sma(14)                                       primed=true  sma(14)=87.6729 
@@ -8564,6 +8639,7 @@ Bar[ 48] 2020-02-19  O=89.0000 H=91.1550 L=88.5650 C=91.0000 V=3952200
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=2.1605 mdi(20,5,3) signal=1.9349 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=1.7057 macdi(20,5,3) signal=1.5275 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=61.0950 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=15.4701 cmi(20,5,3,3) signal=13.8175 
 
 Bar[ 49] 2020-02-20  O=91.0000 H=91.7500 L=90.0950 C=90.5000 V=3304700
   sma(14)                                       primed=true  sma(14)=87.9318 
@@ -8677,6 +8753,7 @@ Bar[ 49] 2020-02-20  O=91.0000 H=91.7500 L=90.0950 C=90.5000 V=3304700
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=2.1635 mdi(20,5,3) signal=2.0492 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=1.7081 macdi(20,5,3) signal=1.6178 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=59.8131 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=15.5944 cmi(20,5,3,3) signal=14.7060 
 
 Bar[ 50] 2020-02-21  O=90.5000 H=90.0000 L=89.0000 C=89.0300 V=3462000
   sma(14)                                       primed=true  sma(14)=88.0900 
@@ -8790,6 +8867,7 @@ Bar[ 50] 2020-02-21  O=90.5000 H=90.0000 L=89.0000 C=89.0300 V=3462000
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=1.8784 mdi(20,5,3) signal=1.9638 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=1.4830 macdi(20,5,3) signal=1.5504 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=53.7658 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=13.6375 cmi(20,5,3,3) signal=14.1717 
 
 Bar[ 51] 2020-02-22  O=89.0300 H=88.8750 L=86.4700 C=88.8150 V=7253900
   sma(14)                                       primed=true  sma(14)=88.3714 
@@ -8903,6 +8981,7 @@ Bar[ 51] 2020-02-22  O=89.0300 H=88.8750 L=86.4700 C=88.8150 V=7253900
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=1.5053 mdi(20,5,3) signal=1.7345 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=1.1884 macdi(20,5,3) signal=1.3694 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=51.0506 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=11.1444 cmi(20,5,3,3) signal=12.6581 
 
 Bar[ 52] 2020-02-23  O=88.8150 H=89.0000 L=84.0000 C=84.2800 V=9753100
   sma(14)                                       primed=true  sma(14)=88.3779 
@@ -9016,6 +9095,7 @@ Bar[ 52] 2020-02-23  O=88.8150 H=89.0000 L=84.0000 C=84.2800 V=9753100
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=0.4778 mdi(20,5,3) signal=1.1061 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=0.3772 macdi(20,5,3) signal=0.8733 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=36.9242 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=3.4833 cmi(20,5,3,3) signal=8.0707 
 
 Bar[ 53] 2020-02-24  O=84.2800 H=85.2500 L=83.3150 C=83.5000 V=5953000
   sma(14)                                       primed=true  sma(14)=88.3511 
@@ -9129,6 +9209,7 @@ Bar[ 53] 2020-02-24  O=84.2800 H=85.2500 L=83.3150 C=83.5000 V=5953000
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-0.6521 mdi(20,5,3) signal=0.2270 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-0.5148 macdi(20,5,3) signal=0.1792 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=31.8886 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-4.6833 cmi(20,5,3,3) signal=1.6937 
 
 Bar[ 54] 2020-02-25  O=83.5000 H=83.8150 L=82.0000 C=82.6900 V=5011700
   sma(14)                                       primed=true  sma(14)=88.3021 
@@ -9242,6 +9323,7 @@ Bar[ 54] 2020-02-25  O=83.5000 H=83.8150 L=82.0000 C=82.6900 V=5011700
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-1.6825 mdi(20,5,3) signal=-0.7277 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-1.3283 macdi(20,5,3) signal=-0.5745 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=28.8270 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-12.0282 cmi(20,5,3,3) signal=-5.1673 
 
 Bar[ 55] 2020-02-26  O=82.6900 H=85.2500 L=83.2500 C=84.7500 V=5910800
   sma(14)                                       primed=true  sma(14)=88.2486 
@@ -9355,6 +9437,7 @@ Bar[ 55] 2020-02-26  O=82.6900 H=85.2500 L=83.2500 C=84.7500 V=5910800
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-2.1248 mdi(20,5,3) signal=-1.4263 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-1.6774 macdi(20,5,3) signal=-1.1260 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=36.5441 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-15.0869 cmi(20,5,3,3) signal=-10.1271 
 
 Bar[ 56] 2020-02-27  O=84.7500 H=86.6250 L=84.7500 C=85.6550 V=4916900
   sma(14)                                       primed=true  sma(14)=87.9961 
@@ -9468,6 +9551,7 @@ Bar[ 56] 2020-02-27  O=84.7500 H=86.6250 L=84.7500 C=85.6550 V=4916900
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-2.1247 mdi(20,5,3) signal=-1.7755 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-1.6774 macdi(20,5,3) signal=-1.4017 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=42.2674 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-15.0891 cmi(20,5,3,3) signal=-12.6081 
 
 Bar[ 57] 2020-02-28  O=85.6550 H=87.9400 L=85.2800 C=86.1900 V=4135000
   sma(14)                                       primed=true  sma(14)=87.7639 
@@ -9581,6 +9665,7 @@ Bar[ 57] 2020-02-28  O=85.6550 H=87.9400 L=85.2800 C=86.1900 V=4135000
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-1.8768 mdi(20,5,3) signal=-1.8262 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-1.4817 macdi(20,5,3) signal=-1.4417 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=46.0904 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-13.4960 cmi(20,5,3,3) signal=-13.0520 
 
 Bar[ 58] 2020-02-29  O=86.1900 H=89.3750 L=87.1900 C=88.9400 V=4054200
   sma(14)                                       primed=true  sma(14)=87.6100 
@@ -9694,6 +9779,7 @@ Bar[ 58] 2020-02-29  O=86.1900 H=89.3750 L=87.1900 C=88.9400 V=4054200
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-1.1629 mdi(20,5,3) signal=-1.4945 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-0.9181 macdi(20,5,3) signal=-1.1799 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=56.1785 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-8.3590 cmi(20,5,3,3) signal=-10.7055 
 
 Bar[ 59] 2020-03-01  O=88.9400 H=90.6250 L=88.4400 C=89.2800 V=3735300
   sma(14)                                       primed=true  sma(14)=87.5050 
@@ -9807,6 +9893,7 @@ Bar[ 59] 2020-03-01  O=88.9400 H=90.6250 L=88.4400 C=89.2800 V=3735300
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-0.3916 mdi(20,5,3) signal=-0.9431 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-0.3092 macdi(20,5,3) signal=-0.7445 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=59.9967 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-2.8378 cmi(20,5,3,3) signal=-6.7717 
 
 Bar[ 60] 2020-03-02  O=89.2800 H=90.7500 L=88.2500 C=88.6250 V=2921900
   sma(14)                                       primed=true  sma(14)=87.3039 
@@ -9920,6 +10007,7 @@ Bar[ 60] 2020-03-02  O=89.2800 H=90.7500 L=88.2500 C=88.6250 V=2921900
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=0.1391 mdi(20,5,3) signal=-0.4020 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=0.1098 macdi(20,5,3) signal=-0.3174 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=58.5626 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=1.0259 cmi(20,5,3,3) signal=-2.8729 
 
 Bar[ 61] 2020-03-03  O=88.6250 H=88.8450 L=87.3450 C=88.5000 V=2658400
   sma(14)                                       primed=true  sma(14)=87.2682 
@@ -10033,6 +10121,7 @@ Bar[ 61] 2020-03-03  O=88.6250 H=88.8450 L=87.3450 C=88.5000 V=2658400
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=0.4625 mdi(20,5,3) signal=0.0302 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=0.3651 macdi(20,5,3) signal=0.0239 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=57.5193 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=3.5221 cmi(20,5,3,3) signal=0.3246 
 
 Bar[ 62] 2020-03-04  O=88.5000 H=91.9700 L=89.2800 C=91.9700 V=4624400
   sma(14)                                       primed=true  sma(14)=87.3375 
@@ -10146,6 +10235,7 @@ Bar[ 62] 2020-03-04  O=88.5000 H=91.9700 L=89.2800 C=91.9700 V=4624400
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=1.1700 mdi(20,5,3) signal=0.6001 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=0.9236 macdi(20,5,3) signal=0.4738 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=66.9789 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=8.9621 cmi(20,5,3,3) signal=4.6434 
 
 Bar[ 63] 2020-03-05  O=91.9700 H=93.3750 L=91.0950 C=91.5000 V=4372200
   sma(14)                                       primed=true  sma(14)=87.4089 
@@ -10259,6 +10349,7 @@ Bar[ 63] 2020-03-05  O=91.9700 H=93.3750 L=91.0950 C=91.5000 V=4372200
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=1.7522 mdi(20,5,3) signal=1.1762 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=1.3833 macdi(20,5,3) signal=0.9285 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=67.2978 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=13.5160 cmi(20,5,3,3) signal=9.0797 
 
 Bar[ 64] 2020-03-06  O=91.5000 H=93.8150 L=89.5300 C=93.2500 V=5831600
   sma(14)                                       primed=true  sma(14)=87.7104 
@@ -10372,6 +10463,7 @@ Bar[ 64] 2020-03-06  O=91.5000 H=93.8150 L=89.5300 C=93.2500 V=5831600
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=2.4080 mdi(20,5,3) signal=1.7921 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=1.9011 macdi(20,5,3) signal=1.4148 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=71.1747 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=18.5992 cmi(20,5,3,3) signal=13.8394 
 
 Bar[ 65] 2020-03-07  O=93.2500 H=94.0300 L=91.1550 C=93.5000 V=4268600
   sma(14)                                       primed=true  sma(14)=88.0450 
@@ -10485,6 +10577,7 @@ Bar[ 65] 2020-03-07  O=93.2500 H=94.0300 L=91.1550 C=93.5000 V=4268600
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=2.9450 mdi(20,5,3) signal=2.3685 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=2.3250 macdi(20,5,3) signal=1.8699 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=72.8569 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=23.0296 cmi(20,5,3,3) signal=18.4345 
 
 Bar[ 66] 2020-03-08  O=93.5000 H=94.0300 L=92.0000 C=93.1550 V=3059200
   sma(14)                                       primed=true  sma(14)=88.6789 
@@ -10598,6 +10691,7 @@ Bar[ 66] 2020-03-08  O=93.5000 H=94.0300 L=92.0000 C=93.1550 V=3059200
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=3.2322 mdi(20,5,3) signal=2.8004 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=2.5518 macdi(20,5,3) signal=2.2108 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=71.4809 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=25.9224 cmi(20,5,3,3) signal=22.1785 
 
 Bar[ 67] 2020-03-09  O=93.1550 H=91.8150 L=90.5300 C=91.7200 V=4495500
   sma(14)                                       primed=true  sma(14)=89.2661 
@@ -10711,6 +10805,7 @@ Bar[ 67] 2020-03-09  O=93.1550 H=91.8150 L=90.5300 C=91.7200 V=4495500
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=3.1149 mdi(20,5,3) signal=2.9577 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=2.4592 macdi(20,5,3) signal=2.3350 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=63.0722 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=25.5561 cmi(20,5,3,3) signal=23.8673 
 
 Bar[ 68] 2020-03-10  O=91.7200 H=92.0000 L=89.9700 C=90.0000 V=3425000
   sma(14)                                       primed=true  sma(14)=89.7882 
@@ -10824,6 +10919,7 @@ Bar[ 68] 2020-03-10  O=91.7200 H=92.0000 L=89.9700 C=90.0000 V=3425000
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=2.5920 mdi(20,5,3) signal=2.7748 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=2.0463 macdi(20,5,3) signal=2.1906 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=52.6527 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=21.5173 cmi(20,5,3,3) signal=22.6923 
 
 Bar[ 69] 2020-03-11  O=90.0000 H=91.9400 L=88.8150 C=89.6900 V=3630800
   sma(14)                                       primed=true  sma(14)=90.1411 
@@ -10937,6 +11033,7 @@ Bar[ 69] 2020-03-11  O=90.0000 H=91.9400 L=88.8150 C=89.6900 V=3630800
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=1.9708 mdi(20,5,3) signal=2.3728 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=1.5559 macdi(20,5,3) signal=1.8733 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=48.3191 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=16.6582 cmi(20,5,3,3) signal=19.6752 
 
 Bar[ 70] 2020-03-12  O=89.6900 H=89.7500 L=86.7500 C=88.8750 V=4168100
   sma(14)                                       primed=true  sma(14)=90.3711 
@@ -11050,6 +11147,7 @@ Bar[ 70] 2020-03-12  O=89.6900 H=89.7500 L=86.7500 C=88.8750 V=4168100
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=1.2990 mdi(20,5,3) signal=1.8359 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=1.0255 macdi(20,5,3) signal=1.4494 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=43.7063 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=11.2221 cmi(20,5,3,3) signal=15.4487 
 
 Bar[ 71] 2020-03-13  O=88.8750 H=88.7500 L=85.0650 C=85.1900 V=5966900
   sma(14)                                       primed=true  sma(14)=90.2996 
@@ -11163,6 +11261,7 @@ Bar[ 71] 2020-03-13  O=88.8750 H=88.7500 L=85.0650 C=85.1900 V=5966900
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=0.1795 mdi(20,5,3) signal=1.0077 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=0.1417 macdi(20,5,3) signal=0.7956 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=31.5421 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=1.5301 cmi(20,5,3,3) signal=8.4894 
 
 Bar[ 72] 2020-03-14  O=85.1900 H=86.1550 L=82.0300 C=83.3750 V=7692800
   sma(14)                                       primed=true  sma(14)=89.9021 
@@ -11276,6 +11375,7 @@ Bar[ 72] 2020-03-14  O=85.1900 H=86.1550 L=82.0300 C=83.3750 V=7692800
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-1.1116 mdi(20,5,3) signal=-0.0519 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-0.8775 macdi(20,5,3) signal=-0.0410 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=25.2314 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-9.2083 cmi(20,5,3,3) signal=-0.3595 
 
 Bar[ 73] 2020-03-15  O=83.3750 H=84.8750 L=81.5000 C=84.8750 V=7362500
   sma(14)                                       primed=true  sma(14)=89.5875 
@@ -11389,6 +11489,7 @@ Bar[ 73] 2020-03-15  O=83.3750 H=84.8750 L=81.5000 C=84.8750 V=7362500
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-1.9339 mdi(20,5,3) signal=-0.9929 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-1.5268 macdi(20,5,3) signal=-0.7839 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=30.4759 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-15.5654 cmi(20,5,3,3) signal=-7.9624 
 
 Bar[ 74] 2020-03-16  O=84.8750 H=85.9400 L=82.5650 C=85.9400 V=6581300
   sma(14)                                       primed=true  sma(14)=89.3957 
@@ -11502,6 +11603,7 @@ Bar[ 74] 2020-03-16  O=84.8750 H=85.9400 L=82.5650 C=85.9400 V=6581300
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-2.2474 mdi(20,5,3) signal=-1.6202 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-1.7743 macdi(20,5,3) signal=-1.2791 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=36.5885 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-17.7375 cmi(20,5,3,3) signal=-12.8500 
 
 Bar[ 75] 2020-03-17  O=85.9400 H=99.3750 L=96.3450 C=97.2500 V=19587700
   sma(14)                                       primed=true  sma(14)=90.0207 
@@ -11615,6 +11717,7 @@ Bar[ 75] 2020-03-17  O=85.9400 H=99.3750 L=96.3450 C=97.2500 V=19587700
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-0.5991 mdi(20,5,3) signal=-1.1096 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-0.4730 macdi(20,5,3) signal=-0.8760 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=65.4426 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-4.1792 cmi(20,5,3,3) signal=-8.5146 
 
 Bar[ 76] 2020-03-18  O=97.2500 H=103.2800 L=96.4700 C=99.8750 V=10378600
   sma(14)                                       primed=true  sma(14)=90.5854 
@@ -11728,6 +11831,7 @@ Bar[ 76] 2020-03-18  O=97.2500 H=103.2800 L=96.4700 C=99.8750 V=10378600
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=1.6930 mdi(20,5,3) signal=0.2917 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=1.3366 macdi(20,5,3) signal=0.2303 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=73.1782 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=10.4247 cmi(20,5,3,3) signal=0.9550 
 
 Bar[ 77] 2020-03-19  O=99.8750 H=105.3750 L=101.1550 C=104.9400 V=9334700
   sma(14)                                       primed=true  sma(14)=91.5454 
@@ -11841,6 +11945,7 @@ Bar[ 77] 2020-03-19  O=99.8750 H=105.3750 L=101.1550 C=104.9400 V=9334700
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=4.4250 mdi(20,5,3) signal=2.3583 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=3.4934 macdi(20,5,3) signal=1.8618 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=79.1519 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=24.1605 cmi(20,5,3,3) signal=12.5578 
 
 Bar[ 78] 2020-03-20  O=104.9400 H=107.6250 L=104.2500 C=106.0000 V=10467200
   sma(14)                                       primed=true  sma(14)=92.4561 
@@ -11954,6 +12059,7 @@ Bar[ 78] 2020-03-20  O=104.9400 H=107.6250 L=104.2500 C=106.0000 V=10467200
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=6.7938 mdi(20,5,3) signal=4.5761 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=5.3635 macdi(20,5,3) signal=3.6127 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=81.4376 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=34.1991 cmi(20,5,3,3) signal=23.3784 
 
 Bar[ 79] 2020-03-21  O=106.0000 H=105.2500 L=101.7500 C=102.5000 V=5671400
   sma(14)                                       primed=true  sma(14)=93.0989 
@@ -12067,6 +12173,7 @@ Bar[ 79] 2020-03-21  O=106.0000 H=105.2500 L=101.7500 C=102.5000 V=5671400
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=7.9099 mdi(20,5,3) signal=6.2430 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=6.2446 macdi(20,5,3) signal=4.9287 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=73.2057 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=37.4200 cmi(20,5,3,3) signal=30.3992 
 
 Bar[ 80] 2020-03-22  O=102.5000 H=104.5000 L=101.7200 C=102.4050 V=5645000
   sma(14)                                       primed=true  sma(14)=93.7596 
@@ -12180,6 +12287,7 @@ Bar[ 80] 2020-03-22  O=102.5000 H=104.5000 L=101.7200 C=102.4050 V=5645000
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=8.2691 mdi(20,5,3) signal=7.2560 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=6.5282 macdi(20,5,3) signal=5.7285 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=70.4155 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=38.0486 cmi(20,5,3,3) signal=34.2239 
 
 Bar[ 81] 2020-03-23  O=102.4050 H=105.5000 L=101.7200 C=104.5950 V=4518600
   sma(14)                                       primed=true  sma(14)=94.6793 
@@ -12293,6 +12401,7 @@ Bar[ 81] 2020-03-23  O=102.4050 H=105.5000 L=101.7200 C=104.5950 V=4518600
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=8.5221 mdi(20,5,3) signal=7.8891 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=6.7280 macdi(20,5,3) signal=6.2282 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=71.7965 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=38.7696 cmi(20,5,3,3) signal=36.4967 
 
 Bar[ 82] 2020-03-24  O=104.5950 H=106.1250 L=103.1550 C=106.1250 V=4519500
   sma(14)                                       primed=true  sma(14)=95.8311 
@@ -12406,6 +12515,7 @@ Bar[ 82] 2020-03-24  O=104.5950 H=106.1250 L=103.1550 C=106.1250 V=4519500
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=8.7843 mdi(20,5,3) signal=8.3367 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=6.9349 macdi(20,5,3) signal=6.5816 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=73.8365 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=40.0125 cmi(20,5,3,3) signal=38.2546 
 
 Bar[ 83] 2020-03-25  O=106.1250 H=107.9400 L=105.6900 C=106.0000 V=5569700
   sma(14)                                       primed=true  sma(14)=96.9961 
@@ -12519,6 +12629,7 @@ Bar[ 83] 2020-03-25  O=106.1250 H=107.9400 L=105.6900 C=106.0000 V=5569700
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=8.8347 mdi(20,5,3) signal=8.5857 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=6.9748 macdi(20,5,3) signal=6.7782 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=74.1417 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=41.0551 cmi(20,5,3,3) signal=39.6548 
 
 Bar[ 84] 2020-03-26  O=106.0000 H=106.2500 L=103.6550 C=106.0650 V=4239700
   sma(14)                                       primed=true  sma(14)=98.2239 
@@ -12632,6 +12743,7 @@ Bar[ 84] 2020-03-26  O=106.0000 H=106.2500 L=103.6550 C=106.0650 V=4239700
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=8.6801 mdi(20,5,3) signal=8.6329 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=6.8527 macdi(20,5,3) signal=6.8155 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=74.3311 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=41.8858 cmi(20,5,3,3) signal=40.7703 
 
 Bar[ 85] 2020-03-27  O=106.0650 H=107.0000 L=104.0000 C=104.6250 V=4175300
   sma(14)                                       primed=true  sma(14)=99.6121 
@@ -12745,6 +12857,7 @@ Bar[ 85] 2020-03-27  O=106.0650 H=107.0000 L=104.0000 C=104.6250 V=4175300
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=8.1419 mdi(20,5,3) signal=8.3874 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=6.4278 macdi(20,5,3) signal=6.6216 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=69.0751 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=40.9609 cmi(20,5,3,3) signal=40.8656 
 
 Bar[ 86] 2020-03-28  O=104.6250 H=108.7500 L=105.5300 C=108.6250 V=4995300
   sma(14)                                       primed=true  sma(14)=101.4157 
@@ -12858,6 +12971,7 @@ Bar[ 86] 2020-03-28  O=104.6250 H=108.7500 L=105.5300 C=108.6250 V=4995300
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=8.0772 mdi(20,5,3) signal=8.2323 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=6.3767 macdi(20,5,3) signal=6.4992 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=73.2298 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=41.4537 cmi(20,5,3,3) signal=41.1597 
 
 Bar[ 87] 2020-03-29  O=108.6250 H=110.9400 L=108.5300 C=109.3150 V=4776600
   sma(14)                                       primed=true  sma(14)=103.1614 
@@ -12971,6 +13085,7 @@ Bar[ 87] 2020-03-29  O=108.6250 H=110.9400 L=108.5300 C=109.3150 V=4776600
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=8.1450 mdi(20,5,3) signal=8.1887 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=6.4303 macdi(20,5,3) signal=6.4647 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=75.2376 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=42.6258 cmi(20,5,3,3) signal=41.8927 
 
 Bar[ 88] 2020-03-30  O=109.3150 H=110.9400 L=108.7500 C=110.5000 V=4190000
   sma(14)                                       primed=true  sma(14)=104.9157 
@@ -13084,6 +13199,7 @@ Bar[ 88] 2020-03-30  O=109.3150 H=110.9400 L=108.7500 C=110.5000 V=4190000
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=8.2877 mdi(20,5,3) signal=8.2382 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=6.5429 macdi(20,5,3) signal=6.5038 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=77.3093 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=44.3372 cmi(20,5,3,3) signal=43.1150 
 
 Bar[ 89] 2020-03-31  O=110.5000 H=114.2200 L=107.7500 C=112.7500 V=6035300
   sma(14)                                       primed=true  sma(14)=106.0229 
@@ -13197,6 +13313,7 @@ Bar[ 89] 2020-03-31  O=110.5000 H=114.2200 L=107.7500 C=112.7500 V=6035300
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=8.6301 mdi(20,5,3) signal=8.4341 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=6.8132 macdi(20,5,3) signal=6.6585 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=80.4206 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=46.9117 cmi(20,5,3,3) signal=45.0133 
 
 Bar[ 90] 2020-04-01  O=112.7500 H=123.0000 L=117.0000 C=123.0000 V=12168900
   sma(14)                                       primed=true  sma(14)=107.6746 
@@ -13310,6 +13427,7 @@ Bar[ 90] 2020-04-01  O=112.7500 H=123.0000 L=117.0000 C=123.0000 V=12168900
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=10.3680 mdi(20,5,3) signal=9.4011 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=8.1853 macdi(20,5,3) signal=7.4219 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=87.9776 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=53.2958 cmi(20,5,3,3) signal=49.1545 
 
 Bar[ 91] 2020-04-02  O=123.0000 H=121.7500 L=118.0000 C=119.6250 V=9040800
   sma(14)                                       primed=true  sma(14)=108.7236 
@@ -13423,6 +13541,7 @@ Bar[ 91] 2020-04-02  O=123.0000 H=121.7500 L=118.0000 C=119.6250 V=9040800
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=11.4809 mdi(20,5,3) signal=10.4410 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=9.0639 macdi(20,5,3) signal=8.2429 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=80.1510 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=54.9517 cmi(20,5,3,3) signal=52.0531 
 
 Bar[ 92] 2020-04-03  O=119.6250 H=119.8150 L=116.0000 C=118.7500 V=5780300
   sma(14)                                       primed=true  sma(14)=109.6343 
@@ -13536,6 +13655,7 @@ Bar[ 92] 2020-04-03  O=119.6250 H=119.8150 L=116.0000 C=118.7500 V=5780300
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=11.8526 mdi(20,5,3) signal=11.1468 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=9.3573 macdi(20,5,3) signal=8.8001 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=75.7997 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=54.0260 cmi(20,5,3,3) signal=53.0396 
 
 Bar[ 93] 2020-04-04  O=118.7500 H=120.3150 L=118.5000 C=119.2500 V=4320800
   sma(14)                                       primed=true  sma(14)=110.8307 
@@ -13649,6 +13769,7 @@ Bar[ 93] 2020-04-04  O=118.7500 H=120.3150 L=118.5000 C=119.2500 V=4320800
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=11.8084 mdi(20,5,3) signal=11.4776 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=9.3224 macdi(20,5,3) signal=9.0613 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=74.8064 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=52.7886 cmi(20,5,3,3) signal=52.9141 
 
 Bar[ 94] 2020-04-05  O=119.2500 H=119.3750 L=116.5300 C=117.9400 V=3899100
   sma(14)                                       primed=true  sma(14)=111.9404 
@@ -13762,6 +13883,7 @@ Bar[ 94] 2020-04-05  O=119.2500 H=119.3750 L=116.5300 C=117.9400 V=3899100
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=11.2633 mdi(20,5,3) signal=11.3705 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=8.8921 macdi(20,5,3) signal=8.9767 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=70.7894 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=50.3625 cmi(20,5,3,3) signal=51.6383 
 
 Bar[ 95] 2020-04-06  O=117.9400 H=118.1900 L=116.2500 C=116.4400 V=3221400
   sma(14)                                       primed=true  sma(14)=112.7864 
@@ -13875,6 +13997,7 @@ Bar[ 95] 2020-04-06  O=117.9400 H=118.1900 L=116.2500 C=116.4400 V=3221400
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=10.2789 mdi(20,5,3) signal=10.8247 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=8.1149 macdi(20,5,3) signal=8.5458 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=65.2554 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=46.5099 cmi(20,5,3,3) signal=49.0741 
 
 Bar[ 96] 2020-04-07  O=116.4400 H=116.6900 L=114.5950 C=115.1900 V=3455500
   sma(14)                                       primed=true  sma(14)=113.4339 
@@ -13988,6 +14111,7 @@ Bar[ 96] 2020-04-07  O=116.4400 H=116.6900 L=114.5950 C=115.1900 V=3455500
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=9.0214 mdi(20,5,3) signal=9.9230 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=7.1221 macdi(20,5,3) signal=7.8340 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=60.0357 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=41.6640 cmi(20,5,3,3) signal=45.3690 
 
 Bar[ 97] 2020-04-08  O=115.1900 H=115.3450 L=110.8750 C=111.8750 V=4304200
   sma(14)                                       primed=true  sma(14)=113.8536 
@@ -14101,6 +14225,7 @@ Bar[ 97] 2020-04-08  O=115.1900 H=115.3450 L=110.8750 C=111.8750 V=4304200
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=7.3078 mdi(20,5,3) signal=8.6154 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=5.7693 macdi(20,5,3) signal=6.8016 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=50.3925 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=34.1462 cmi(20,5,3,3) signal=39.7576 
 
 Bar[ 98] 2020-04-09  O=111.8750 H=113.0000 L=110.5000 C=110.5950 V=4703900
   sma(14)                                       primed=true  sma(14)=114.1771 
@@ -14214,6 +14339,7 @@ Bar[ 98] 2020-04-09  O=111.8750 H=113.0000 L=110.5000 C=110.5950 V=4703900
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=5.5149 mdi(20,5,3) signal=7.0652 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=4.3539 macdi(20,5,3) signal=5.5778 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=44.9222 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=26.1162 cmi(20,5,3,3) signal=32.9369 
 
 Bar[ 99] 2020-04-10  O=110.5950 H=118.3150 L=110.7200 C=118.1250 V=8316300
   sma(14)                                       primed=true  sma(14)=115.1414 
@@ -14327,6 +14453,7 @@ Bar[ 99] 2020-04-10  O=110.5950 H=118.3150 L=110.7200 C=118.1250 V=8316300
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=5.1302 mdi(20,5,3) signal=6.0977 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=4.0502 macdi(20,5,3) signal=4.8140 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=57.8342 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=23.6598 cmi(20,5,3,3) signal=28.2984 
 
 Bar[100] 2020-04-11  O=118.1250 H=116.8700 L=112.6200 C=116.0000 V=10553900
   sma(14)                                       primed=true  sma(14)=115.6682 
@@ -14440,6 +14567,7 @@ Bar[100] 2020-04-11  O=118.1250 H=116.8700 L=112.6200 C=116.0000 V=10553900
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=4.8508 mdi(20,5,3) signal=5.4743 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=3.8296 macdi(20,5,3) signal=4.3218 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=56.7153 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=21.6928 cmi(20,5,3,3) signal=24.9956 
 
 Bar[101] 2020-04-12  O=116.0000 H=116.7500 L=114.1900 C=116.0000 V=6384800
   sma(14)                                       primed=true  sma(14)=116.1457 
@@ -14553,6 +14681,7 @@ Bar[101] 2020-04-12  O=116.0000 H=116.7500 L=114.1900 C=116.0000 V=6384800
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=4.5860 mdi(20,5,3) signal=5.0301 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=3.6205 macdi(20,5,3) signal=3.9712 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=56.3765 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=20.3165 cmi(20,5,3,3) signal=22.6560 
 
 Bar[102] 2020-04-13  O=116.0000 H=113.8700 L=111.1900 C=112.0000 V=7163300
   sma(14)                                       primed=true  sma(14)=116.2529 
@@ -14666,6 +14795,7 @@ Bar[102] 2020-04-13  O=116.0000 H=113.8700 L=111.1900 C=112.0000 V=7163300
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=3.7064 mdi(20,5,3) signal=4.3683 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=2.9261 macdi(20,5,3) signal=3.4486 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=48.3938 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=16.2254 cmi(20,5,3,3) signal=19.4407 
 
 Bar[103] 2020-04-14  O=112.0000 H=114.6200 L=109.4400 C=113.7500 V=7007800
   sma(14)                                       primed=true  sma(14)=116.3243 
@@ -14779,6 +14909,7 @@ Bar[103] 2020-04-14  O=112.0000 H=114.6200 L=109.4400 C=113.7500 V=7007800
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=3.0349 mdi(20,5,3) signal=3.7016 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=2.3960 macdi(20,5,3) signal=2.9223 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=49.3293 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=13.2098 cmi(20,5,3,3) signal=16.3252 
 
 Bar[104] 2020-04-15  O=113.7500 H=115.3100 L=111.5600 C=112.9400 V=5114100
   sma(14)                                       primed=true  sma(14)=115.6057 
@@ -14892,6 +15023,7 @@ Bar[104] 2020-04-15  O=113.7500 H=115.3100 L=111.5600 C=112.9400 V=5114100
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=2.3997 mdi(20,5,3) signal=3.0507 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=1.8945 macdi(20,5,3) signal=2.4084 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=48.1006 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=10.5282 cmi(20,5,3,3) signal=13.4267 
 
 Bar[105] 2020-04-16  O=112.9400 H=116.0000 L=112.4400 C=116.0000 V=5263800
   sma(14)                                       primed=true  sma(14)=115.3468 
@@ -15005,6 +15137,7 @@ Bar[105] 2020-04-16  O=112.9400 H=116.0000 L=112.4400 C=116.0000 V=5263800
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=2.3350 mdi(20,5,3) signal=2.6928 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=1.8434 macdi(20,5,3) signal=2.1259 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=53.7343 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=10.3061 cmi(20,5,3,3) signal=11.8664 
 
 Bar[106] 2020-04-17  O=116.0000 H=121.6900 L=117.5000 C=120.5000 V=6666100
   sma(14)                                       primed=true  sma(14)=115.4718 
@@ -15118,6 +15251,7 @@ Bar[106] 2020-04-17  O=116.0000 H=121.6900 L=117.5000 C=120.5000 V=6666100
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=3.0977 mdi(20,5,3) signal=2.8952 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=2.4455 macdi(20,5,3) signal=2.2857 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=62.4972 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=13.5381 cmi(20,5,3,3) signal=12.7022 
 
 Bar[107] 2020-04-18  O=120.5000 H=119.8700 L=116.0600 C=116.6200 V=7398400
   sma(14)                                       primed=true  sma(14)=115.2839 
@@ -15231,6 +15365,7 @@ Bar[107] 2020-04-18  O=120.5000 H=119.8700 L=116.0600 C=116.6200 V=7398400
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=3.3122 mdi(20,5,3) signal=3.1037 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=2.6149 macdi(20,5,3) signal=2.4503 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=56.7590 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=14.1616 cmi(20,5,3,3) signal=13.4319 
 
 Bar[108] 2020-04-19  O=116.6200 H=120.8700 L=116.5600 C=117.0000 V=5575000
   sma(14)                                       primed=true  sma(14)=115.2168 
@@ -15344,6 +15479,7 @@ Bar[108] 2020-04-19  O=116.6200 H=120.8700 L=116.5600 C=117.0000 V=5575000
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=3.3201 mdi(20,5,3) signal=3.2119 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=2.6212 macdi(20,5,3) signal=2.5357 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=55.6828 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=14.0931 cmi(20,5,3,3) signal=13.7625 
 
 Bar[109] 2020-04-20  O=117.0000 H=116.7500 L=113.3100 C=115.2500 V=4852300
   sma(14)                                       primed=true  sma(14)=115.1318 
@@ -15457,6 +15593,7 @@ Bar[109] 2020-04-20  O=117.0000 H=116.7500 L=113.3100 C=115.2500 V=4852300
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=2.9475 mdi(20,5,3) signal=3.0797 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=2.3270 macdi(20,5,3) signal=2.4314 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=51.7946 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=12.5531 cmi(20,5,3,3) signal=13.1578 
 
 Bar[110] 2020-04-21  O=115.2500 H=116.5000 L=112.5600 C=114.3100 V=4298100
   sma(14)                                       primed=true  sma(14)=115.0689 
@@ -15570,6 +15707,7 @@ Bar[110] 2020-04-21  O=115.2500 H=116.5000 L=112.5600 C=114.3100 V=4298100
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=2.3514 mdi(20,5,3) signal=2.7156 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=1.8564 macdi(20,5,3) signal=2.1439 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=48.6301 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=10.1736 cmi(20,5,3,3) signal=11.6657 
 
 Bar[111] 2020-04-22  O=114.3100 H=116.0000 L=114.0000 C=115.5000 V=4900500
   sma(14)                                       primed=true  sma(14)=115.3279 
@@ -15683,6 +15821,7 @@ Bar[111] 2020-04-22  O=114.3100 H=116.0000 L=114.0000 C=115.5000 V=4900500
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=1.9578 mdi(20,5,3) signal=2.3367 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=1.5456 macdi(20,5,3) signal=1.8448 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=50.1302 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=8.6821 cmi(20,5,3,3) signal=10.1739 
 
 Bar[112] 2020-04-23  O=115.5000 H=118.3100 L=114.7500 C=115.8700 V=4887700
   sma(14)                                       primed=true  sma(14)=115.7046 
@@ -15796,6 +15935,7 @@ Bar[112] 2020-04-23  O=115.5000 H=118.3100 L=114.7500 C=115.8700 V=4887700
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=1.7343 mdi(20,5,3) signal=2.0355 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=1.3692 macdi(20,5,3) signal=1.6070 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=51.4888 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=7.9752 cmi(20,5,3,3) signal=9.0745 
 
 Bar[113] 2020-04-24  O=115.8700 H=121.5000 L=118.8700 C=120.6900 V=6964800
   sma(14)                                       primed=true  sma(14)=115.8879 
@@ -15909,6 +16049,7 @@ Bar[113] 2020-04-24  O=115.8700 H=121.5000 L=118.8700 C=120.6900 V=6964800
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=2.3093 mdi(20,5,3) signal=2.1724 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=1.8231 macdi(20,5,3) signal=1.7151 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=61.6260 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=10.7791 cmi(20,5,3,3) signal=9.9268 
 
 Bar[114] 2020-04-25  O=120.6900 H=122.0000 L=119.0000 C=120.1900 V=4679200
   sma(14)                                       primed=true  sma(14)=116.1871 
@@ -16022,6 +16163,7 @@ Bar[114] 2020-04-25  O=120.6900 H=122.0000 L=119.0000 C=120.1900 V=4679200
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=2.8898 mdi(20,5,3) signal=2.5311 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=2.2815 macdi(20,5,3) signal=1.9983 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=63.0556 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=13.7278 cmi(20,5,3,3) signal=11.8273 
 
 Bar[115] 2020-04-26  O=120.1900 H=121.4400 L=119.7500 C=120.7500 V=9165000
   sma(14)                                       primed=true  sma(14)=116.5264 
@@ -16135,6 +16277,7 @@ Bar[115] 2020-04-26  O=120.1900 H=121.4400 L=119.7500 C=120.7500 V=9165000
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=3.3862 mdi(20,5,3) signal=2.9587 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=2.6733 macdi(20,5,3) signal=2.3358 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=64.4962 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=16.5237 cmi(20,5,3,3) signal=14.1755 
 
 Bar[116] 2020-04-27  O=120.7500 H=125.7500 L=122.6200 C=124.7500 V=6469800
   sma(14)                                       primed=true  sma(14)=117.4371 
@@ -16248,6 +16391,7 @@ Bar[116] 2020-04-27  O=120.7500 H=125.7500 L=122.6200 C=124.7500 V=6469800
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=4.3003 mdi(20,5,3) signal=3.6295 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=3.3950 macdi(20,5,3) signal=2.8654 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=71.1333 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=21.2078 cmi(20,5,3,3) signal=17.6916 
 
 Bar[117] 2020-04-28  O=124.7500 H=127.7500 L=123.0000 C=123.3700 V=6792000
   sma(14)                                       primed=true  sma(14)=118.1243 
@@ -16361,6 +16505,7 @@ Bar[117] 2020-04-28  O=124.7500 H=127.7500 L=123.0000 C=123.3700 V=6792000
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=4.8681 mdi(20,5,3) signal=4.2488 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=3.8432 macdi(20,5,3) signal=3.3543 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=68.5976 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=24.2238 cmi(20,5,3,3) signal=20.9577 
 
 Bar[118] 2020-04-29  O=123.3700 H=124.1900 L=121.7500 C=122.9400 V=4423800
   sma(14)                                       primed=true  sma(14)=118.8386 
@@ -16474,6 +16619,7 @@ Bar[118] 2020-04-29  O=123.3700 H=124.1900 L=121.7500 C=122.9400 V=4423800
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=5.0677 mdi(20,5,3) signal=4.6582 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=4.0008 macdi(20,5,3) signal=3.6776 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=66.3977 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=25.7099 cmi(20,5,3,3) signal=23.3338 
 
 Bar[119] 2020-04-30  O=122.9400 H=124.4400 L=121.5600 C=122.5600 V=5231900
   sma(14)                                       primed=true  sma(14)=119.3071 
@@ -16587,6 +16733,7 @@ Bar[119] 2020-04-30  O=122.9400 H=124.4400 L=121.5600 C=122.5600 V=5231900
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=4.9757 mdi(20,5,3) signal=4.8170 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=3.9282 macdi(20,5,3) signal=3.8029 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=64.3180 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=26.0632 cmi(20,5,3,3) signal=24.6985 
 
 Bar[120] 2020-05-01  O=122.5600 H=125.7500 L=123.1200 C=123.1200 V=4565600
   sma(14)                                       primed=true  sma(14)=119.4943 
@@ -16700,6 +16847,7 @@ Bar[120] 2020-05-01  O=122.5600 H=125.7500 L=123.1200 C=123.1200 V=4565600
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=4.8210 mdi(20,5,3) signal=4.8190 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=3.8061 macdi(20,5,3) signal=3.8045 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=64.7419 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=26.3235 cmi(20,5,3,3) signal=25.5110 
 
 Bar[121] 2020-05-02  O=123.1200 H=124.6900 L=122.1900 C=122.5600 V=6235200
   sma(14)                                       primed=true  sma(14)=119.9186 
@@ -16813,6 +16961,7 @@ Bar[121] 2020-05-02  O=123.1200 H=124.6900 L=122.1900 C=122.5600 V=6235200
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=4.5195 mdi(20,5,3) signal=4.6693 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=3.5681 macdi(20,5,3) signal=3.6863 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=62.6056 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=25.8988 cmi(20,5,3,3) signal=25.7049 
 
 Bar[122] 2020-05-03  O=122.5600 H=125.3100 L=122.7500 C=124.6200 V=5225900
   sma(14)                                       primed=true  sma(14)=120.4629 
@@ -16926,6 +17075,7 @@ Bar[122] 2020-05-03  O=122.5600 H=125.3100 L=122.7500 C=124.6200 V=5225900
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=4.4773 mdi(20,5,3) signal=4.5733 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=3.5347 macdi(20,5,3) signal=3.6105 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=66.7245 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=26.6831 cmi(20,5,3,3) signal=26.1940 
 
 Bar[123] 2020-05-04  O=124.6200 H=132.0000 L=124.3700 C=129.2500 V=8261400
   sma(14)                                       primed=true  sma(14)=121.4629 
@@ -17039,6 +17189,7 @@ Bar[123] 2020-05-04  O=124.6200 H=132.0000 L=124.3700 C=129.2500 V=8261400
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=5.1494 mdi(20,5,3) signal=4.8614 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=4.0653 macdi(20,5,3) signal=3.8379 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=75.6560 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=30.7573 cmi(20,5,3,3) signal=28.4756 
 
 Bar[124] 2020-05-05  O=129.2500 H=131.3100 L=128.0000 C=131.0000 V=5912500
   sma(14)                                       primed=true  sma(14)=122.6550 
@@ -17152,6 +17303,7 @@ Bar[124] 2020-05-05  O=129.2500 H=131.3100 L=128.0000 C=131.0000 V=5912500
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=6.0751 mdi(20,5,3) signal=5.4682 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=4.7961 macdi(20,5,3) signal=4.3170 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=79.7938 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=35.9433 cmi(20,5,3,3) signal=32.2095 
 
 Bar[125] 2020-05-06  O=131.0000 H=132.2500 L=129.5000 C=132.2500 V=3545600
   sma(14)                                       primed=true  sma(14)=123.8514 
@@ -17265,6 +17417,7 @@ Bar[125] 2020-05-06  O=131.0000 H=132.2500 L=129.5000 C=132.2500 V=3545600
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=6.9710 mdi(20,5,3) signal=6.2196 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=5.5034 macdi(20,5,3) signal=4.9102 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=82.2069 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=40.9883 cmi(20,5,3,3) signal=36.5989 
 
 Bar[126] 2020-05-07  O=132.2500 H=133.8800 L=130.8100 C=131.0000 V=5714500
   sma(14)                                       primed=true  sma(14)=124.9321 
@@ -17378,6 +17531,7 @@ Bar[126] 2020-05-07  O=132.2500 H=133.8800 L=130.8100 C=131.0000 V=5714500
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=7.3667 mdi(20,5,3) signal=6.7931 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=5.8158 macdi(20,5,3) signal=5.3630 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=77.6518 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=43.3539 cmi(20,5,3,3) signal=39.9764 
 
 Bar[127] 2020-05-08  O=131.0000 H=133.5000 L=130.6300 C=132.8100 V=6653900
   sma(14)                                       primed=true  sma(14)=125.7979 
@@ -17491,6 +17645,7 @@ Bar[127] 2020-05-08  O=131.0000 H=133.5000 L=130.6300 C=132.8100 V=6653900
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=7.6828 mdi(20,5,3) signal=7.2380 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=6.0654 macdi(20,5,3) signal=5.7142 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=78.3780 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=45.3346 cmi(20,5,3,3) signal=42.6555 
 
 Bar[128] 2020-05-09  O=132.8100 H=135.5000 L=132.1300 C=134.0000 V=6094500
   sma(14)                                       primed=true  sma(14)=126.7843 
@@ -17604,6 +17759,7 @@ Bar[128] 2020-05-09  O=132.8100 H=135.5000 L=132.1300 C=134.0000 V=6094500
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=7.9647 mdi(20,5,3) signal=7.6013 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=6.2879 macdi(20,5,3) signal=6.0011 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=79.9642 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=47.3722 cmi(20,5,3,3) signal=45.0139 
 
 Bar[129] 2020-05-10  O=134.0000 H=137.4400 L=133.8800 C=137.3800 V=4799200
   sma(14)                                       primed=true  sma(14)=127.9721 
@@ -17717,6 +17873,7 @@ Bar[129] 2020-05-10  O=134.0000 H=137.4400 L=133.8800 C=137.3800 V=4799200
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=8.5591 mdi(20,5,3) signal=8.0802 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=6.7572 macdi(20,5,3) signal=6.3791 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=83.7294 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=50.5744 cmi(20,5,3,3) signal=47.7941 
 
 Bar[130] 2020-05-11  O=137.3800 H=138.6900 L=135.3800 C=137.8100 V=5050800
   sma(14)                                       primed=true  sma(14)=128.9050 
@@ -17830,6 +17987,7 @@ Bar[130] 2020-05-11  O=137.3800 H=138.6900 L=135.3800 C=137.8100 V=5050800
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=9.0493 mdi(20,5,3) signal=8.5648 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=7.1442 macdi(20,5,3) signal=6.7617 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=85.1429 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=53.6074 cmi(20,5,3,3) signal=50.7008 
 
 Bar[131] 2020-05-12  O=137.8100 H=139.1900 L=135.7500 C=137.8800 V=5648900
   sma(14)                                       primed=true  sma(14)=129.9414 
@@ -17943,6 +18101,7 @@ Bar[131] 2020-05-12  O=137.8100 H=139.1900 L=135.7500 C=137.8800 V=5648900
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=9.2700 mdi(20,5,3) signal=8.9174 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=7.3185 macdi(20,5,3) signal=7.0401 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=85.6774 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=56.0353 cmi(20,5,3,3) signal=53.3680 
 
 Bar[132] 2020-05-13  O=137.8800 H=138.5000 L=136.1900 C=137.2500 V=4726300
   sma(14)                                       primed=true  sma(14)=130.9636 
@@ -18056,6 +18215,7 @@ Bar[132] 2020-05-13  O=137.8800 H=138.5000 L=136.1900 C=137.2500 V=4726300
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=9.1200 mdi(20,5,3) signal=9.0187 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=7.2000 macdi(20,5,3) signal=7.1200 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=82.4924 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=56.9233 cmi(20,5,3,3) signal=55.1456 
 
 Bar[133] 2020-05-14  O=137.2500 H=138.1300 L=134.5000 C=136.3100 V=5585600
   sma(14)                                       primed=true  sma(14)=131.9457 
@@ -18169,6 +18329,7 @@ Bar[133] 2020-05-14  O=137.2500 H=138.1300 L=134.5000 C=136.3100 V=5585600
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=8.6038 mdi(20,5,3) signal=8.8113 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=6.7925 macdi(20,5,3) signal=6.9563 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=76.2898 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=55.7111 cmi(20,5,3,3) signal=55.4284 
 
 Bar[134] 2020-05-15  O=136.3100 H=137.5000 L=135.3800 C=136.2500 V=5124800
   sma(14)                                       primed=true  sma(14)=132.8836 
@@ -18282,6 +18443,7 @@ Bar[134] 2020-05-15  O=136.3100 H=137.5000 L=135.3800 C=136.2500 V=5124800
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=7.9422 mdi(20,5,3) signal=8.3768 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=6.2702 macdi(20,5,3) signal=6.6132 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=73.8355 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=53.8948 cmi(20,5,3,3) signal=54.6616 
 
 Bar[135] 2020-05-16  O=136.2500 H=138.8800 L=133.6900 C=134.6300 V=7630200
   sma(14)                                       primed=true  sma(14)=133.7457 
@@ -18395,6 +18557,7 @@ Bar[135] 2020-05-16  O=136.2500 H=138.8800 L=133.6900 C=134.6300 V=7630200
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=7.0082 mdi(20,5,3) signal=7.6925 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=5.5328 macdi(20,5,3) signal=6.0730 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=64.1967 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=49.5196 cmi(20,5,3,3) signal=52.0906 
 
 Bar[136] 2020-05-17  O=134.6300 H=132.1300 L=126.0600 C=128.2500 V=14311600
   sma(14)                                       primed=true  sma(14)=134.0050 
@@ -18508,6 +18671,7 @@ Bar[136] 2020-05-17  O=134.6300 H=132.1300 L=126.0600 C=128.2500 V=14311600
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=5.1188 mdi(20,5,3) signal=6.4056 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=4.0411 macdi(20,5,3) signal=5.0571 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=40.2629 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=35.3806 cmi(20,5,3,3) signal=43.7356 
 
 Bar[137] 2020-05-18  O=128.2500 H=129.7500 L=126.8700 C=129.0000 V=8793600
   sma(14)                                       primed=true  sma(14)=133.9871 
@@ -18621,6 +18785,7 @@ Bar[137] 2020-05-18  O=128.2500 H=129.7500 L=126.8700 C=129.0000 V=8793600
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=3.3780 mdi(20,5,3) signal=4.8918 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=2.6669 macdi(20,5,3) signal=3.8620 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=37.7370 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=22.7163 cmi(20,5,3,3) signal=33.2260 
 
 Bar[138] 2020-05-19  O=129.0000 H=128.5000 L=123.5000 C=123.8700 V=8874200
   sma(14)                                       primed=true  sma(14)=133.4779 
@@ -18734,6 +18899,7 @@ Bar[138] 2020-05-19  O=129.0000 H=128.5000 L=123.5000 C=123.8700 V=8874200
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=1.2279 mdi(20,5,3) signal=3.0599 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=0.9694 macdi(20,5,3) signal=2.4157 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=28.6705 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=7.7958 cmi(20,5,3,3) signal=20.5109 
 
 Bar[139] 2020-05-20  O=123.8700 H=125.4400 L=122.6200 C=124.8100 V=6966600
   sma(14)                                       primed=true  sma(14)=132.9464 
@@ -18847,6 +19013,7 @@ Bar[139] 2020-05-20  O=123.8700 H=125.4400 L=122.6200 C=124.8100 V=6966600
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-0.4627 mdi(20,5,3) signal=1.2986 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-0.3653 macdi(20,5,3) signal=1.0252 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=29.3974 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-2.8080 cmi(20,5,3,3) signal=8.8515 
 
 Bar[140] 2020-05-21  O=124.8100 H=125.1200 L=122.7500 C=123.0000 V=5525500
   sma(14)                                       primed=true  sma(14)=132.3750 
@@ -18960,6 +19127,7 @@ Bar[140] 2020-05-21  O=124.8100 H=125.1200 L=122.7500 C=123.0000 V=5525500
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-1.9180 mdi(20,5,3) signal=-0.3097 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-1.5142 macdi(20,5,3) signal=-0.2445 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=27.2523 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-11.2727 cmi(20,5,3,3) signal=-1.2106 
 
 Bar[141] 2020-05-22  O=123.0000 H=126.5000 L=123.5600 C=126.2500 V=6515500
   sma(14)                                       primed=true  sma(14)=131.9064 
@@ -19073,6 +19241,7 @@ Bar[141] 2020-05-22  O=123.0000 H=126.5000 L=123.5600 C=126.2500 V=6515500
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-2.4700 mdi(20,5,3) signal=-1.3899 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-1.9500 macdi(20,5,3) signal=-1.0973 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=36.6146 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-14.0349 cmi(20,5,3,3) signal=-7.6228 
 
 Bar[142] 2020-05-23  O=126.2500 H=128.6900 L=125.8100 C=128.3800 V=5291900
   sma(14)                                       primed=true  sma(14)=131.5050 
@@ -19186,6 +19355,7 @@ Bar[142] 2020-05-23  O=126.2500 H=128.6900 L=125.8100 C=128.3800 V=5291900
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-2.2709 mdi(20,5,3) signal=-1.8304 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-1.7928 macdi(20,5,3) signal=-1.4450 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=44.7481 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-12.5364 cmi(20,5,3,3) signal=-10.0796 
 
 Bar[143] 2020-05-24  O=128.3800 H=126.6200 L=124.6200 C=125.3700 V=5711700
   sma(14)                                       primed=true  sma(14)=130.6471 
@@ -19299,6 +19469,7 @@ Bar[143] 2020-05-24  O=128.3800 H=126.6200 L=124.6200 C=125.3700 V=5711700
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-2.3057 mdi(20,5,3) signal=-2.0680 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-1.8203 macdi(20,5,3) signal=-1.6327 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=41.6016 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-12.3535 cmi(20,5,3,3) signal=-11.2165 
 
 Bar[144] 2020-05-25  O=125.3700 H=126.6900 L=124.3700 C=125.6900 V=4327700
   sma(14)                                       primed=true  sma(14)=129.7814 
@@ -19412,6 +19583,7 @@ Bar[144] 2020-05-25  O=125.3700 H=126.6900 L=124.3700 C=125.6900 V=4327700
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-2.3188 mdi(20,5,3) signal=-2.1934 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-1.8307 macdi(20,5,3) signal=-1.7317 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=41.4641 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-12.2952 cmi(20,5,3,3) signal=-11.7559 
 
 Bar[145] 2020-05-26  O=125.6900 H=126.0000 L=121.8100 C=122.2500 V=4568000
   sma(14)                                       primed=true  sma(14)=128.6650 
@@ -19525,6 +19697,7 @@ Bar[145] 2020-05-26  O=125.6900 H=126.0000 L=121.8100 C=122.2500 V=4568000
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-2.8045 mdi(20,5,3) signal=-2.4990 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-2.2141 macdi(20,5,3) signal=-1.9729 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=35.5611 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-14.6640 cmi(20,5,3,3) signal=-13.2099 
 
 Bar[146] 2020-05-27  O=122.2500 H=123.1200 L=118.1900 C=119.3700 V=6859200
   sma(14)                                       primed=true  sma(14)=127.3879 
@@ -19638,6 +19811,7 @@ Bar[146] 2020-05-27  O=122.2500 H=123.1200 L=118.1900 C=119.3700 V=6859200
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-3.7184 mdi(20,5,3) signal=-3.1087 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-2.9356 macdi(20,5,3) signal=-2.4542 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=29.9338 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-19.0827 cmi(20,5,3,3) signal=-16.1463 
 
 Bar[147] 2020-05-28  O=119.3700 H=121.8700 L=118.0600 C=118.5000 V=5757500
   sma(14)                                       primed=true  sma(14)=126.1157 
@@ -19751,6 +19925,7 @@ Bar[147] 2020-05-28  O=119.3700 H=121.8700 L=118.0600 C=118.5000 V=5757500
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-4.6377 mdi(20,5,3) signal=-3.8732 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-3.6614 macdi(20,5,3) signal=-3.0578 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=27.2239 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-23.6385 cmi(20,5,3,3) signal=-19.8924 
 
 Bar[148] 2020-05-29  O=118.5000 H=124.0000 L=117.5600 C=123.1900 V=7367000
   sma(14)                                       primed=true  sma(14)=125.1829 
@@ -19864,6 +20039,7 @@ Bar[148] 2020-05-29  O=118.5000 H=124.0000 L=117.5600 C=123.1900 V=7367000
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-4.5809 mdi(20,5,3) signal=-4.2270 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-3.6165 macdi(20,5,3) signal=-3.3371 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=39.3894 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-22.8451 cmi(20,5,3,3) signal=-21.3688 
 
 Bar[149] 2020-05-30  O=123.1900 H=127.0000 L=121.0000 C=123.5000 V=6144100
   sma(14)                                       primed=true  sma(14)=124.3879 
@@ -19977,6 +20153,7 @@ Bar[149] 2020-05-30  O=123.1900 H=127.0000 L=121.0000 C=123.5000 V=6144100
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-4.1224 mdi(20,5,3) signal=-4.1747 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-3.2545 macdi(20,5,3) signal=-3.2958 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=43.5390 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-20.3973 cmi(20,5,3,3) signal=-20.8830 
 
 Bar[150] 2020-05-31  O=123.5000 H=124.4400 L=121.1200 C=122.1900 V=4052700
   sma(14)                                       primed=true  sma(14)=123.9550 
@@ -20090,6 +20267,7 @@ Bar[150] 2020-05-31  O=123.5000 H=124.4400 L=121.1200 C=122.1900 V=4052700
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-3.7731 mdi(20,5,3) signal=-3.9739 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-2.9787 macdi(20,5,3) signal=-3.1373 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=42.4697 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-18.7445 cmi(20,5,3,3) signal=-19.8138 
 
 Bar[151] 2020-06-01  O=122.1900 H=122.5000 L=118.9400 C=119.3100 V=5849700
   sma(14)                                       primed=true  sma(14)=123.2629 
@@ -20203,6 +20381,7 @@ Bar[151] 2020-06-01  O=122.1900 H=122.5000 L=118.9400 C=119.3100 V=5849700
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-3.9060 mdi(20,5,3) signal=-3.9399 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-3.0837 macdi(20,5,3) signal=-3.1105 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=37.0743 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-19.4255 cmi(20,5,3,3) signal=-19.6196 
 
 Bar[152] 2020-06-02  O=119.3100 H=123.7500 L=119.8100 C=123.3100 V=5544700
   sma(14)                                       primed=true  sma(14)=123.2229 
@@ -20316,6 +20495,7 @@ Bar[152] 2020-06-02  O=119.3100 H=123.7500 L=119.8100 C=123.3100 V=5544700
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-3.4906 mdi(20,5,3) signal=-3.7153 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-2.7557 macdi(20,5,3) signal=-2.9331 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=45.3104 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-17.1171 cmi(20,5,3,3) signal=-18.3684 
 
 Bar[153] 2020-06-03  O=123.3100 H=123.8100 L=121.0000 C=121.1200 V=5032200
   sma(14)                                       primed=true  sma(14)=122.9593 
@@ -20429,6 +20609,7 @@ Bar[153] 2020-06-03  O=123.3100 H=123.8100 L=121.0000 C=121.1200 V=5032200
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-3.2738 mdi(20,5,3) signal=-3.4945 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-2.5845 macdi(20,5,3) signal=-2.7588 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=43.7309 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-15.8033 cmi(20,5,3,3) signal=-17.0859 
 
 Bar[154] 2020-06-04  O=121.1200 H=124.5000 L=122.0000 C=123.3700 V=4400600
   sma(14)                                       primed=true  sma(14)=122.9857 
@@ -20542,6 +20723,7 @@ Bar[154] 2020-06-04  O=121.1200 H=124.5000 L=122.0000 C=123.3700 V=4400600
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-2.7720 mdi(20,5,3) signal=-3.1333 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-2.1884 macdi(20,5,3) signal=-2.4736 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=48.0536 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-13.2054 cmi(20,5,3,3) signal=-15.1456 
 
 Bar[155] 2020-06-05  O=123.3700 H=127.8700 L=124.5000 C=127.3700 V=4894100
   sma(14)                                       primed=true  sma(14)=123.0657 
@@ -20655,6 +20837,7 @@ Bar[155] 2020-06-05  O=123.3700 H=127.8700 L=124.5000 C=127.3700 V=4894100
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-1.6446 mdi(20,5,3) signal=-2.3889 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-1.2984 macdi(20,5,3) signal=-1.8860 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=56.6012 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-7.6624 cmi(20,5,3,3) signal=-11.4040 
 
 Bar[156] 2020-06-06  O=127.3700 H=128.5600 L=126.5600 C=128.5000 V=5140000
   sma(14)                                       primed=true  sma(14)=123.0743 
@@ -20768,6 +20951,7 @@ Bar[156] 2020-06-06  O=127.3700 H=128.5600 L=126.5600 C=128.5000 V=5140000
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-0.3737 mdi(20,5,3) signal=-1.3813 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-0.2950 macdi(20,5,3) signal=-1.0905 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=60.8002 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-1.7202 cmi(20,5,3,3) signal=-6.5621 
 
 Bar[157] 2020-06-07  O=128.5000 H=129.6300 L=123.5000 C=123.8700 V=6610900
   sma(14)                                       primed=true  sma(14)=122.9671 
@@ -20881,6 +21065,7 @@ Bar[157] 2020-06-07  O=128.5000 H=129.6300 L=123.5000 C=123.8700 V=6610900
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-0.0240 mdi(20,5,3) signal=-0.7027 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-0.0190 macdi(20,5,3) signal=-0.5547 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=52.3388 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-0.1082 cmi(20,5,3,3) signal=-3.3352 
 
 Bar[158] 2020-06-08  O=123.8700 H=124.8700 L=121.2500 C=122.9400 V=7585200
   sma(14)                                       primed=true  sma(14)=122.7707 
@@ -20994,6 +21179,7 @@ Bar[158] 2020-06-08  O=123.8700 H=124.8700 L=121.2500 C=122.9400 V=7585200
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-0.1670 mdi(20,5,3) signal=-0.4348 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-0.1318 macdi(20,5,3) signal=-0.3433 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=48.2365 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-0.7435 cmi(20,5,3,3) signal=-2.0393 
 
 Bar[159] 2020-06-09  O=122.9400 H=124.3700 L=121.0600 C=121.7500 V=5963100
   sma(14)                                       primed=true  sma(14)=122.7350 
@@ -21107,6 +21293,7 @@ Bar[159] 2020-06-09  O=122.9400 H=124.3700 L=121.0600 C=121.7500 V=5963100
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-0.6047 mdi(20,5,3) signal=-0.5198 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-0.4774 macdi(20,5,3) signal=-0.4103 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=44.7623 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-2.6990 cmi(20,5,3,3) signal=-2.3691 
 
 Bar[160] 2020-06-10  O=121.7500 H=124.8700 L=122.3100 C=124.4400 V=6045500
   sma(14)                                       primed=true  sma(14)=123.0971 
@@ -21220,6 +21407,7 @@ Bar[160] 2020-06-10  O=121.7500 H=124.8700 L=122.3100 C=124.4400 V=6045500
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-0.6223 mdi(20,5,3) signal=-0.5710 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-0.4913 macdi(20,5,3) signal=-0.4508 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=49.3289 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-2.7883 cmi(20,5,3,3) signal=-2.5787 
 
 Bar[161] 2020-06-11  O=124.4400 H=123.6200 L=121.0000 C=122.0000 V=8443300
   sma(14)                                       primed=true  sma(14)=123.3471 
@@ -21333,6 +21521,7 @@ Bar[161] 2020-06-11  O=124.4400 H=123.6200 L=121.0000 C=122.0000 V=8443300
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-0.8674 mdi(20,5,3) signal=-0.7192 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-0.6848 macdi(20,5,3) signal=-0.5678 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=46.0955 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-3.8979 cmi(20,5,3,3) signal=-3.2383 
 
 Bar[162] 2020-06-12  O=122.0000 H=124.0600 L=120.8700 C=122.3700 V=6464700
   sma(14)                                       primed=true  sma(14)=123.2886 
@@ -21446,6 +21635,7 @@ Bar[162] 2020-06-12  O=122.0000 H=124.0600 L=120.8700 C=122.3700 V=6464700
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-1.0591 mdi(20,5,3) signal=-0.8892 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-0.8361 macdi(20,5,3) signal=-0.7020 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=45.9043 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-4.8334 cmi(20,5,3,3) signal=-4.0358 
 
 Bar[163] 2020-06-13  O=122.3700 H=125.8700 L=122.0600 C=122.9400 V=6248300
   sma(14)                                       primed=true  sma(14)=123.2486 
@@ -21559,6 +21749,7 @@ Bar[163] 2020-06-13  O=122.3700 H=125.8700 L=122.0600 C=122.9400 V=6248300
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-1.0908 mdi(20,5,3) signal=-0.9900 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-0.8612 macdi(20,5,3) signal=-0.7816 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=47.2226 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-5.1214 cmi(20,5,3,3) signal=-4.5786 
 
 Bar[164] 2020-06-14  O=122.9400 H=125.1900 L=122.7500 C=124.0000 V=4357200
   sma(14)                                       primed=true  sma(14)=123.3779 
@@ -21672,6 +21863,7 @@ Bar[164] 2020-06-14  O=122.9400 H=125.1900 L=122.7500 C=124.0000 V=4357200
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-0.8904 mdi(20,5,3) signal=-0.9402 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-0.7029 macdi(20,5,3) signal=-0.7422 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=50.3696 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-4.3311 cmi(20,5,3,3) signal=-4.4549 
 
 Bar[165] 2020-06-15  O=124.0000 H=125.6200 L=122.6900 C=123.1900 V=4774700
   sma(14)                                       primed=true  sma(14)=123.6550 
@@ -21785,6 +21977,7 @@ Bar[165] 2020-06-15  O=124.0000 H=125.6200 L=122.6900 C=123.1900 V=4774700
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-0.7708 mdi(20,5,3) signal=-0.8555 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-0.6086 macdi(20,5,3) signal=-0.6754 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=49.3029 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-3.9066 cmi(20,5,3,3) signal=-4.1808 
 
 Bar[166] 2020-06-16  O=123.1900 H=126.0000 L=122.8700 C=124.5600 V=6216900
   sma(14)                                       primed=true  sma(14)=123.7443 
@@ -21898,6 +22091,7 @@ Bar[166] 2020-06-16  O=123.1900 H=126.0000 L=122.8700 C=124.5600 V=6216900
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-0.4825 mdi(20,5,3) signal=-0.6690 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-0.3809 macdi(20,5,3) signal=-0.5282 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=52.7143 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-2.5462 cmi(20,5,3,3) signal=-3.3635 
 
 Bar[167] 2020-06-17  O=124.5600 H=128.5000 L=125.5000 C=127.2500 V=6266900
   sma(14)                                       primed=true  sma(14)=124.1821 
@@ -22011,6 +22205,7 @@ Bar[167] 2020-06-17  O=124.5600 H=128.5000 L=125.5000 C=127.2500 V=6266900
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=0.2082 mdi(20,5,3) signal=-0.2304 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=0.1644 macdi(20,5,3) signal=-0.1819 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=60.2838 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=1.1284 cmi(20,5,3,3) signal=-1.1175 
 
 Bar[168] 2020-06-18  O=127.2500 H=126.7500 L=124.2500 C=125.8700 V=5584800
   sma(14)                                       primed=true  sma(14)=124.3607 
@@ -22124,6 +22319,7 @@ Bar[168] 2020-06-18  O=127.2500 H=126.7500 L=124.2500 C=125.8700 V=5584800
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=0.6609 mdi(20,5,3) signal=0.2153 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=0.5218 macdi(20,5,3) signal=0.1700 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=58.0579 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=3.6582 cmi(20,5,3,3) signal=1.2703 
 
 Bar[169] 2020-06-19  O=125.8700 H=129.7500 L=128.0000 C=128.8600 V=5284500
   sma(14)                                       primed=true  sma(14)=124.4671 
@@ -22237,6 +22433,7 @@ Bar[169] 2020-06-19  O=125.8700 H=129.7500 L=128.0000 C=128.8600 V=5284500
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=1.3852 mdi(20,5,3) signal=0.8002 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=1.0936 macdi(20,5,3) signal=0.6318 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=63.5786 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=7.7131 cmi(20,5,3,3) signal=4.4917 
 
 Bar[170] 2020-06-20  O=128.8600 H=132.6900 L=128.3800 C=132.0000 V=7554500
   sma(14)                                       primed=true  sma(14)=124.7171 
@@ -22350,6 +22547,7 @@ Bar[170] 2020-06-20  O=128.8600 H=132.6900 L=128.3800 C=132.0000 V=7554500
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=2.4877 mdi(20,5,3) signal=1.6440 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=1.9640 macdi(20,5,3) signal=1.2979 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=70.1253 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=13.7086 cmi(20,5,3,3) signal=9.1002 
 
 Bar[171] 2020-06-21  O=132.0000 H=133.9400 L=130.6900 C=130.7500 V=7209500
   sma(14)                                       primed=true  sma(14)=125.2086 
@@ -22463,6 +22661,7 @@ Bar[171] 2020-06-21  O=132.0000 H=133.9400 L=130.6900 C=130.7500 V=7209500
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=3.2400 mdi(20,5,3) signal=2.4420 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=2.5579 macdi(20,5,3) signal=1.9279 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=67.8918 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=17.7203 cmi(20,5,3,3) signal=13.4102 
 
 Bar[172] 2020-06-22  O=130.7500 H=136.5000 L=131.6300 C=134.7500 V=8424800
   sma(14)                                       primed=true  sma(14)=126.0521 
@@ -22576,6 +22775,7 @@ Bar[172] 2020-06-22  O=130.7500 H=136.5000 L=131.6300 C=134.7500 V=8424800
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=4.2773 mdi(20,5,3) signal=3.3596 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=3.3768 macdi(20,5,3) signal=2.6523 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=72.6674 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=22.8857 cmi(20,5,3,3) signal=18.1480 
 
 Bar[173] 2020-06-23  O=134.7500 H=137.6900 L=134.3800 C=135.0000 V=5094500
   sma(14)                                       primed=true  sma(14)=126.9986 
@@ -22689,6 +22889,7 @@ Bar[173] 2020-06-23  O=134.7500 H=137.6900 L=134.3800 C=135.0000 V=5094500
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=5.1480 mdi(20,5,3) signal=4.2538 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=4.0642 macdi(20,5,3) signal=3.3583 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=74.3076 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=27.3389 cmi(20,5,3,3) signal=22.7434 
 
 Bar[174] 2020-06-24  O=135.0000 H=135.5600 L=132.0000 C=132.3800 V=4443600
   sma(14)                                       primed=true  sma(14)=127.5657 
@@ -22802,6 +23003,7 @@ Bar[174] 2020-06-24  O=135.0000 H=135.5600 L=132.0000 C=132.3800 V=4443600
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=5.3051 mdi(20,5,3) signal=4.7794 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=4.1882 macdi(20,5,3) signal=3.7732 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=66.2779 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=27.9849 cmi(20,5,3,3) signal=25.3642 
 
 Bar[175] 2020-06-25  O=132.3800 H=133.5600 L=131.9400 C=133.3100 V=4591100
   sma(14)                                       primed=true  sma(14)=128.3736 
@@ -22915,6 +23117,7 @@ Bar[175] 2020-06-25  O=132.3800 H=133.5600 L=131.9400 C=133.3100 V=4591100
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=5.2694 mdi(20,5,3) signal=5.0244 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=4.1600 macdi(20,5,3) signal=3.9666 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=65.3119 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=27.8925 cmi(20,5,3,3) signal=26.6283 
 
 Bar[176] 2020-06-26  O=133.3100 H=135.0000 L=131.9400 C=131.9400 V=5658400
   sma(14)                                       primed=true  sma(14)=129.0571 
@@ -23028,6 +23231,7 @@ Bar[176] 2020-06-26  O=133.3100 H=135.0000 L=131.9400 C=131.9400 V=5658400
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=4.8929 mdi(20,5,3) signal=4.9587 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=3.8628 macdi(20,5,3) signal=3.9147 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=60.7339 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=26.1803 cmi(20,5,3,3) signal=26.4043 
 
 Bar[177] 2020-06-27  O=131.9400 H=132.3800 L=129.5600 C=130.0000 V=6094100
   sma(14)                                       primed=true  sma(14)=129.5614 
@@ -23141,6 +23345,7 @@ Bar[177] 2020-06-27  O=131.9400 H=132.3800 L=129.5600 C=130.0000 V=6094100
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=4.1241 mdi(20,5,3) signal=4.5414 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=3.2559 macdi(20,5,3) signal=3.5853 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=53.6714 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=22.3111 cmi(20,5,3,3) signal=24.3577 
 
 Bar[178] 2020-06-28  O=130.0000 H=131.4400 L=123.7500 C=125.3700 V=14862200
   sma(14)                                       primed=true  sma(14)=129.6593 
@@ -23254,6 +23459,7 @@ Bar[178] 2020-06-28  O=130.0000 H=131.4400 L=123.7500 C=125.3700 V=14862200
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=2.6382 mdi(20,5,3) signal=3.5898 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=2.0828 macdi(20,5,3) signal=2.8340 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=41.2795 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=14.0867 cmi(20,5,3,3) signal=19.2222 
 
 Bar[179] 2020-06-29  O=125.3700 H=130.8800 L=126.0000 C=130.1300 V=7544700
   sma(14)                                       primed=true  sma(14)=130.1550 
@@ -23367,6 +23573,7 @@ Bar[179] 2020-06-29  O=125.3700 H=130.8800 L=126.0000 C=130.1300 V=7544700
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=1.9302 mdi(20,5,3) signal=2.7600 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=1.5239 macdi(20,5,3) signal=2.1789 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=48.8892 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=9.9113 cmi(20,5,3,3) signal=14.5668 
 
 Bar[180] 2020-06-30  O=130.1300 H=129.6300 L=126.2500 C=127.1200 V=6985600
   sma(14)                                       primed=true  sma(14)=130.3379 
@@ -23480,6 +23687,7 @@ Bar[180] 2020-06-30  O=130.1300 H=129.6300 L=126.2500 C=127.1200 V=6985600
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=1.1241 mdi(20,5,3) signal=1.9420 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=0.8874 macdi(20,5,3) signal=1.5332 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=45.5474 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=5.5215 cmi(20,5,3,3) signal=10.0441 
 
 Bar[181] 2020-07-01  O=127.1200 H=127.2500 L=124.3700 C=125.1900 V=8093000
   sma(14)                                       primed=true  sma(14)=130.1907 
@@ -23593,6 +23801,7 @@ Bar[181] 2020-07-01  O=127.1200 H=127.2500 L=124.3700 C=125.1900 V=8093000
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=0.1522 mdi(20,5,3) signal=1.0471 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=0.1202 macdi(20,5,3) signal=0.8267 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=41.5399 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=0.7227 cmi(20,5,3,3) signal=5.3834 
 
 Bar[182] 2020-07-02  O=125.1900 H=127.8100 L=121.4400 C=122.0000 V=7590000
   sma(14)                                       primed=true  sma(14)=129.9143 
@@ -23706,6 +23915,7 @@ Bar[182] 2020-07-02  O=125.1900 H=127.8100 L=121.4400 C=122.0000 V=7590000
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-1.1448 mdi(20,5,3) signal=-0.0489 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-0.9038 macdi(20,5,3) signal=-0.0386 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=35.8400 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-5.2742 cmi(20,5,3,3) signal=0.0546 
 
 Bar[183] 2020-07-03  O=122.0000 H=125.0000 L=120.4400 C=125.0000 V=7451300
   sma(14)                                       primed=true  sma(14)=129.6386 
@@ -23819,6 +24029,7 @@ Bar[183] 2020-07-03  O=122.0000 H=125.0000 L=120.4400 C=125.0000 V=7451300
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-1.7915 mdi(20,5,3) signal=-0.9202 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-1.4143 macdi(20,5,3) signal=-0.7264 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=40.7530 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-8.0323 cmi(20,5,3,3) signal=-3.9888 
 
 Bar[184] 2020-07-04  O=125.0000 H=126.8100 L=121.3700 C=123.0000 V=7078000
   sma(14)                                       primed=true  sma(14)=128.9957 
@@ -23932,6 +24143,7 @@ Bar[184] 2020-07-04  O=125.0000 H=126.8100 L=121.3700 C=123.0000 V=7078000
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-2.3765 mdi(20,5,3) signal=-1.6483 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-1.8762 macdi(20,5,3) signal=-1.3013 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=39.3731 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-10.4667 cmi(20,5,3,3) signal=-7.2278 
 
 Bar[185] 2020-07-05  O=123.0000 H=124.7500 L=121.6900 C=123.5000 V=7105300
   sma(14)                                       primed=true  sma(14)=128.4779 
@@ -24045,6 +24257,7 @@ Bar[185] 2020-07-05  O=123.0000 H=124.7500 L=121.6900 C=123.5000 V=7105300
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-2.7045 mdi(20,5,3) signal=-2.1764 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-2.1351 macdi(20,5,3) signal=-1.7182 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=40.0592 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-11.9259 cmi(20,5,3,3) signal=-9.5769 
 
 Bar[186] 2020-07-06  O=123.5000 H=122.8100 L=120.0000 C=120.0600 V=8778800
   sma(14)                                       primed=true  sma(14)=127.4286 
@@ -24158,6 +24371,7 @@ Bar[186] 2020-07-06  O=123.5000 H=122.8100 L=120.0000 C=120.0600 V=8778800
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-3.3605 mdi(20,5,3) signal=-2.7685 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-2.6530 macdi(20,5,3) signal=-2.1856 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=35.2336 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-14.8139 cmi(20,5,3,3) signal=-12.1954 
 
 Bar[187] 2020-07-07  O=120.0600 H=122.2500 L=119.6200 C=121.0000 V=6643900
   sma(14)                                       primed=true  sma(14)=126.4286 
@@ -24271,6 +24485,7 @@ Bar[187] 2020-07-07  O=120.0600 H=122.2500 L=119.6200 C=121.0000 V=6643900
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-3.7798 mdi(20,5,3) signal=-3.2741 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-2.9840 macdi(20,5,3) signal=-2.5848 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=36.1303 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-16.8117 cmi(20,5,3,3) signal=-14.5036 
 
 Bar[188] 2020-07-08  O=121.0000 H=121.0600 L=115.5000 C=117.7500 V=10563900
   sma(14)                                       primed=true  sma(14)=125.3836 
@@ -24384,6 +24599,7 @@ Bar[188] 2020-07-08  O=121.0000 H=121.0600 L=115.5000 C=117.7500 V=10563900
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-4.4679 mdi(20,5,3) signal=-3.8710 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-3.5273 macdi(20,5,3) signal=-3.0560 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=31.9706 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-19.9510 cmi(20,5,3,3) signal=-17.2273 
 
 Bar[189] 2020-07-09  O=117.7500 H=120.0000 L=116.7500 C=119.8700 V=7043100
   sma(14)                                       primed=true  sma(14)=124.4236 
@@ -24497,6 +24713,7 @@ Bar[189] 2020-07-09  O=117.7500 H=120.0000 L=116.7500 C=119.8700 V=7043100
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-4.6990 mdi(20,5,3) signal=-4.2850 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-3.7097 macdi(20,5,3) signal=-3.3829 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=36.2438 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-21.0500 cmi(20,5,3,3) signal=-19.1387 
 
 Bar[190] 2020-07-10  O=119.8700 H=123.2500 L=119.0600 C=122.0000 V=6438900
   sma(14)                                       primed=true  sma(14)=123.7136 
@@ -24610,6 +24827,7 @@ Bar[190] 2020-07-10  O=119.8700 H=123.2500 L=119.0600 C=122.0000 V=6438900
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-4.3470 mdi(20,5,3) signal=-4.3160 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-3.4318 macdi(20,5,3) signal=-3.4074 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=42.6768 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-19.5467 cmi(20,5,3,3) signal=-19.3427 
 
 Bar[191] 2020-07-11  O=122.0000 H=122.7500 L=119.0600 C=119.1900 V=8057700
   sma(14)                                       primed=true  sma(14)=122.9414 
@@ -24723,6 +24941,7 @@ Bar[191] 2020-07-11  O=122.0000 H=122.7500 L=119.0600 C=119.1900 V=8057700
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-4.2493 mdi(20,5,3) signal=-4.2826 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-3.3547 macdi(20,5,3) signal=-3.3810 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=40.0171 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-19.1065 cmi(20,5,3,3) signal=-19.2246 
 
 Bar[192] 2020-07-12  O=119.1900 H=119.1900 L=115.0600 C=116.3700 V=14240000
   sma(14)                                       primed=true  sma(14)=122.2986 
@@ -24836,6 +25055,7 @@ Bar[192] 2020-07-12  O=119.1900 H=119.1900 L=115.0600 C=116.3700 V=14240000
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-4.6070 mdi(20,5,3) signal=-4.4448 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-3.6371 macdi(20,5,3) signal=-3.5091 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=35.1252 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-20.6235 cmi(20,5,3,3) signal=-19.9240 
 
 Bar[193] 2020-07-13  O=116.3700 H=115.0600 L=111.0600 C=113.5000 V=17872300
   sma(14)                                       primed=true  sma(14)=121.1107 
@@ -24949,6 +25169,7 @@ Bar[193] 2020-07-13  O=116.3700 H=115.0600 L=111.0600 C=113.5000 V=17872300
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-5.3851 mdi(20,5,3) signal=-4.9149 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-4.2514 macdi(20,5,3) signal=-3.8802 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=30.1468 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-23.9084 cmi(20,5,3,3) signal=-21.9162 
 
 Bar[194] 2020-07-14  O=113.5000 H=116.6900 L=113.1200 C=114.2500 V=7831100
   sma(14)                                       primed=true  sma(14)=120.1914 
@@ -25062,6 +25283,7 @@ Bar[194] 2020-07-14  O=113.5000 H=116.6900 L=113.1200 C=114.2500 V=7831100
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-5.9246 mdi(20,5,3) signal=-5.4198 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-4.6773 macdi(20,5,3) signal=-4.2788 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=30.6530 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-26.3891 cmi(20,5,3,3) signal=-24.1527 
 
 Bar[195] 2020-07-15  O=114.2500 H=114.8700 L=110.0000 C=110.0000 V=8277700
   sma(14)                                       primed=true  sma(14)=119.1064 
@@ -25175,6 +25397,7 @@ Bar[195] 2020-07-15  O=114.2500 H=114.8700 L=110.0000 C=110.0000 V=8277700
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-6.8234 mdi(20,5,3) signal=-6.1216 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-5.3869 macdi(20,5,3) signal=-4.8328 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=26.1018 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-30.1916 cmi(20,5,3,3) signal=-27.1722 
 
 Bar[196] 2020-07-16  O=110.0000 H=110.8700 L=105.0000 C=105.0600 V=15017800
   sma(14)                                       primed=true  sma(14)=117.8964 
@@ -25288,6 +25511,7 @@ Bar[196] 2020-07-16  O=110.0000 H=110.8700 L=105.0000 C=105.0600 V=15017800
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-8.2746 mdi(20,5,3) signal=-7.1981 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-6.5326 macdi(20,5,3) signal=-5.6827 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=20.7649 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-35.7110 cmi(20,5,3,3) signal=-31.4416 
 
 Bar[197] 2020-07-17  O=105.0600 H=107.2500 L=104.6900 C=107.0000 V=14183300
   sma(14)                                       primed=true  sma(14)=116.6107 
@@ -25401,6 +25625,7 @@ Bar[197] 2020-07-17  O=105.0600 H=107.2500 L=104.6900 C=107.0000 V=14183300
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-9.1575 mdi(20,5,3) signal=-8.1778 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-7.2296 macdi(20,5,3) signal=-6.4562 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=24.3810 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-38.6864 cmi(20,5,3,3) signal=-35.0640 
 
 Bar[198] 2020-07-18  O=107.0000 H=108.8700 L=103.8700 C=107.8700 V=13921100
   sma(14)                                       primed=true  sma(14)=115.5300 
@@ -25514,6 +25739,7 @@ Bar[198] 2020-07-18  O=107.0000 H=108.8700 L=103.8700 C=107.8700 V=13921100
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-9.4033 mdi(20,5,3) signal=-8.7905 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-7.4237 macdi(20,5,3) signal=-6.9399 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=27.7713 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-39.5125 cmi(20,5,3,3) signal=-37.2882 
 
 Bar[199] 2020-07-19  O=107.8700 H=109.0000 L=104.6900 C=107.0000 V=9683000
   sma(14)                                       primed=true  sma(14)=114.3514 
@@ -25627,6 +25853,7 @@ Bar[199] 2020-07-19  O=107.8700 H=109.0000 L=104.6900 C=107.0000 V=9683000
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-9.3862 mdi(20,5,3) signal=-9.0884 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-7.4102 macdi(20,5,3) signal=-7.1750 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=27.9926 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-39.8748 cmi(20,5,3,3) signal=-38.5815 
 
 Bar[200] 2020-07-20  O=107.0000 H=108.5000 L=105.4400 C=107.1200 V=9187300
   sma(14)                                       primed=true  sma(14)=113.4271 
@@ -25740,6 +25967,7 @@ Bar[200] 2020-07-20  O=107.0000 H=108.5000 L=105.4400 C=107.1200 V=9187300
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-9.1264 mdi(20,5,3) signal=-9.1074 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-7.2051 macdi(20,5,3) signal=-7.1900 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=28.4345 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-39.9169 cmi(20,5,3,3) signal=-39.2492 
 
 Bar[201] 2020-07-21  O=107.1200 H=113.0600 L=107.0000 C=107.0000 V=11380500
   sma(14)                                       primed=true  sma(14)=112.4271 
@@ -25853,6 +26081,7 @@ Bar[201] 2020-07-21  O=107.1200 H=113.0600 L=107.0000 C=107.0000 V=11380500
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-8.7223 mdi(20,5,3) signal=-8.9148 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-6.8860 macdi(20,5,3) signal=-7.0380 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=28.4338 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-39.8967 cmi(20,5,3,3) signal=-39.5730 
 
 Bar[202] 2020-07-22  O=107.0000 H=93.0000 L=89.0000 C=91.0000 V=69447300
   sma(14)                                       primed=true  sma(14)=110.5164 
@@ -25966,6 +26195,7 @@ Bar[202] 2020-07-22  O=107.0000 H=93.0000 L=89.0000 C=91.0000 V=69447300
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-10.6355 mdi(20,5,3) signal=-9.7752 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-8.3965 macdi(20,5,3) signal=-7.7173 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=15.1433 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-46.1553 cmi(20,5,3,3) signal=-42.8641 
 
 Bar[203] 2020-07-23  O=91.0000 H=94.6200 L=92.5000 C=93.9400 V=26673600
   sma(14)                                       primed=true  sma(14)=108.6643 
@@ -26079,6 +26309,7 @@ Bar[203] 2020-07-23  O=91.0000 H=94.6200 L=92.5000 C=93.9400 V=26673600
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-12.2255 mdi(20,5,3) signal=-11.0004 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-9.6517 macdi(20,5,3) signal=-8.6845 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=19.5989 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-49.4834 cmi(20,5,3,3) signal=-46.1738 
 
 Bar[204] 2020-07-24  O=93.9400 H=95.1200 L=92.1200 C=93.8700 V=13768400
   sma(14)                                       primed=true  sma(14)=106.6550 
@@ -26192,6 +26423,7 @@ Bar[204] 2020-07-24  O=93.9400 H=95.1200 L=92.1200 C=93.8700 V=13768400
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-13.1938 mdi(20,5,3) signal=-12.0971 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-10.4162 macdi(20,5,3) signal=-9.5503 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=20.7929 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-51.1840 cmi(20,5,3,3) signal=-48.6789 
 
 Bar[205] 2020-07-25  O=93.8700 H=96.0000 L=94.6200 C=95.5000 V=11371600
   sma(14)                                       primed=true  sma(14)=104.9629 
@@ -26305,6 +26537,7 @@ Bar[205] 2020-07-25  O=93.8700 H=96.0000 L=94.6200 C=95.5000 V=11371600
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-13.3119 mdi(20,5,3) signal=-12.7045 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-10.5094 macdi(20,5,3) signal=-10.0298 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=25.0298 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-50.6607 cmi(20,5,3,3) signal=-49.6698 
 
 Bar[206] 2020-07-26  O=95.5000 H=95.5600 L=92.8100 C=93.0000 V=9872200
   sma(14)                                       primed=true  sma(14)=103.2936 
@@ -26418,6 +26651,7 @@ Bar[206] 2020-07-26  O=95.5000 H=95.5600 L=92.8100 C=93.0000 V=9872200
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-13.3139 mdi(20,5,3) signal=-13.0092 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-10.5110 macdi(20,5,3) signal=-10.2704 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=24.4500 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-50.3240 cmi(20,5,3,3) signal=-49.9969 
 
 Bar[207] 2020-07-27  O=93.0000 H=95.3100 L=94.2500 C=94.9400 V=9450500
   sma(14)                                       primed=true  sma(14)=101.9679 
@@ -26531,6 +26765,7 @@ Bar[207] 2020-07-27  O=93.0000 H=95.3100 L=94.2500 C=94.9400 V=9450500
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-12.7767 mdi(20,5,3) signal=-12.8929 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-10.0868 macdi(20,5,3) signal=-10.1786 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=28.9703 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-48.4442 cmi(20,5,3,3) signal=-49.2205 
 
 Bar[208] 2020-07-28  O=94.9400 H=99.0000 L=96.2500 C=98.2500 V=11083300
   sma(14)                                       primed=true  sma(14)=100.8250 
@@ -26644,6 +26879,7 @@ Bar[208] 2020-07-28  O=94.9400 H=99.0000 L=96.2500 C=98.2500 V=11083300
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-11.4900 mdi(20,5,3) signal=-12.1914 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-9.0710 macdi(20,5,3) signal=-9.6248 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=37.8203 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-43.6704 cmi(20,5,3,3) signal=-46.4455 
 
 Bar[209] 2020-07-29  O=98.2500 H=98.8100 L=96.3700 C=96.7500 V=9552800
   sma(14)                                       primed=true  sma(14)=99.8786 
@@ -26757,6 +26993,7 @@ Bar[209] 2020-07-29  O=98.2500 H=98.8100 L=96.3700 C=96.7500 V=9552800
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-10.2968 mdi(20,5,3) signal=-11.2441 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-8.1290 macdi(20,5,3) signal=-8.8769 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=38.5837 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-39.4888 cmi(20,5,3,3) signal=-42.9671 
 
 Bar[210] 2020-07-30  O=96.7500 H=96.8100 L=93.6900 C=94.8100 V=11108400
   sma(14)                                       primed=true  sma(14)=99.1464 
@@ -26870,6 +27107,7 @@ Bar[210] 2020-07-30  O=96.7500 H=96.8100 L=93.6900 C=94.8100 V=11108400
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-9.5165 mdi(20,5,3) signal=-10.3803 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-7.5131 macdi(20,5,3) signal=-8.1950 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=36.2428 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-37.0051 cmi(20,5,3,3) signal=-39.9861 
 
 Bar[211] 2020-07-31  O=94.8100 H=95.9400 L=93.5000 C=94.3700 V=10374200
   sma(14)                                       primed=true  sma(14)=98.2443 
@@ -26983,6 +27221,7 @@ Bar[211] 2020-07-31  O=94.8100 H=95.9400 L=93.5000 C=94.3700 V=10374200
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-8.9434 mdi(20,5,3) signal=-9.6618 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-7.0605 macdi(20,5,3) signal=-7.6278 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=34.8758 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-35.6929 cmi(20,5,3,3) signal=-37.8395 
 
 Bar[212] 2020-08-01  O=94.3700 H=94.4400 L=90.0000 C=91.5600 V=16701900
   sma(14)                                       primed=true  sma(14)=97.0793 
@@ -27096,6 +27335,7 @@ Bar[212] 2020-08-01  O=94.3700 H=94.4400 L=90.0000 C=91.5600 V=16701900
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-8.8372 mdi(20,5,3) signal=-9.2495 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-6.9767 macdi(20,5,3) signal=-7.3023 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=30.7146 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-36.1109 cmi(20,5,3,3) signal=-36.9752 
 
 Bar[213] 2020-08-02  O=91.5600 H=92.9400 L=90.1900 C=90.2500 V=13741900
   sma(14)                                       primed=true  sma(14)=95.8829 
@@ -27209,6 +27449,7 @@ Bar[213] 2020-08-02  O=91.5600 H=92.9400 L=90.1900 C=90.2500 V=13741900
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-8.9519 mdi(20,5,3) signal=-9.1007 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-7.0673 macdi(20,5,3) signal=-7.1848 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=27.8508 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-37.5410 cmi(20,5,3,3) signal=-37.2581 
 
 Bar[214] 2020-08-03  O=90.2500 H=93.9400 L=90.5000 C=93.9400 V=8523600
   sma(14)                                       primed=true  sma(14)=94.9414 
@@ -27322,6 +27563,7 @@ Bar[214] 2020-08-03  O=90.2500 H=93.9400 L=90.5000 C=93.9400 V=8523600
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-8.4102 mdi(20,5,3) signal=-8.7554 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-6.6396 macdi(20,5,3) signal=-6.9122 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=37.1347 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-35.7600 cmi(20,5,3,3) signal=-36.5090 
 
 Bar[215] 2020-08-04  O=93.9400 H=95.5000 L=92.1200 C=93.6200 V=9551900
   sma(14)                                       primed=true  sma(14)=93.9857 
@@ -27435,6 +27677,7 @@ Bar[215] 2020-08-04  O=93.9400 H=95.5000 L=92.1200 C=93.6200 V=9551900
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-7.7012 mdi(20,5,3) signal=-8.2283 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-6.0799 macdi(20,5,3) signal=-6.4961 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=39.3957 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-33.4453 cmi(20,5,3,3) signal=-34.9772 
 
 Bar[216] 2020-08-05  O=93.6200 H=97.0600 L=94.1200 C=97.0000 V=8680500
   sma(14)                                       primed=true  sma(14)=94.4143 
@@ -27548,6 +27791,7 @@ Bar[216] 2020-08-05  O=93.6200 H=97.0600 L=94.1200 C=97.0000 V=8680500
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-6.4619 mdi(20,5,3) signal=-7.3451 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-5.1015 macdi(20,5,3) signal=-5.7988 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=48.1585 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-28.4236 cmi(20,5,3,3) signal=-31.7004 
 
 Bar[217] 2020-08-06  O=97.0000 H=97.5000 L=94.8700 C=95.0000 V=7151700
   sma(14)                                       primed=true  sma(14)=94.4900 
@@ -27661,6 +27905,7 @@ Bar[217] 2020-08-06  O=97.0000 H=97.5000 L=94.8700 C=95.0000 V=7151700
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-5.5272 mdi(20,5,3) signal=-6.4362 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-4.3636 macdi(20,5,3) signal=-5.0812 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=46.8162 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-24.5589 cmi(20,5,3,3) signal=-28.1296 
 
 Bar[218] 2020-08-07  O=95.0000 H=96.2500 L=93.0000 C=95.8700 V=9673100
   sma(14)                                       primed=true  sma(14)=94.6329 
@@ -27774,6 +28019,7 @@ Bar[218] 2020-08-07  O=95.0000 H=96.2500 L=93.0000 C=95.8700 V=9673100
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-4.6657 mdi(20,5,3) signal=-5.5509 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-3.6835 macdi(20,5,3) signal=-4.3823 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=48.3413 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-21.0932 cmi(20,5,3,3) signal=-24.6114 
 
 Bar[219] 2020-08-08  O=95.8700 H=96.3700 L=93.8700 C=94.0600 V=6264700
   sma(14)                                       primed=true  sma(14)=94.5300 
@@ -27887,6 +28133,7 @@ Bar[219] 2020-08-08  O=95.8700 H=96.3700 L=93.8700 C=94.0600 V=6264700
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-4.2098 mdi(20,5,3) signal=-4.8804 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-3.3235 macdi(20,5,3) signal=-3.8529 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=45.0473 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-19.4088 cmi(20,5,3,3) signal=-22.0101 
 
 Bar[220] 2020-08-09  O=94.0600 H=95.0000 L=93.0000 C=94.6200 V=8541600
   sma(14)                                       primed=true  sma(14)=94.6457 
@@ -28000,6 +28247,7 @@ Bar[220] 2020-08-09  O=94.0600 H=95.0000 L=93.0000 C=94.6200 V=8541600
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-3.8227 mdi(20,5,3) signal=-4.3515 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-3.0179 macdi(20,5,3) signal=-3.4354 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=45.4214 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-18.1340 cmi(20,5,3,3) signal=-20.0721 
 
 Bar[221] 2020-08-10  O=94.6200 H=94.8700 L=92.6200 C=93.7500 V=8358000
   sma(14)                                       primed=true  sma(14)=94.5607 
@@ -28113,6 +28361,7 @@ Bar[221] 2020-08-10  O=94.6200 H=94.8700 L=92.6200 C=93.7500 V=8358000
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-3.6097 mdi(20,5,3) signal=-3.9806 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-2.8498 macdi(20,5,3) signal=-3.1426 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=43.5654 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-17.7445 cmi(20,5,3,3) signal=-18.9083 
 
 Bar[222] 2020-08-11  O=93.7500 H=98.2500 L=93.5600 C=98.0000 V=18720800
   sma(14)                                       primed=true  sma(14)=94.5429 
@@ -28226,6 +28475,7 @@ Bar[222] 2020-08-11  O=93.7500 H=98.2500 L=93.5600 C=98.0000 V=18720800
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-2.7967 mdi(20,5,3) signal=-3.3887 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-2.2080 macdi(20,5,3) signal=-2.6753 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=53.9556 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-13.9538 cmi(20,5,3,3) signal=-16.4310 
 
 Bar[223] 2020-08-12  O=98.0000 H=105.1200 L=98.3700 C=103.9400 V=19683100
   sma(14)                                       primed=true  sma(14)=95.0564 
@@ -28339,6 +28589,7 @@ Bar[223] 2020-08-12  O=98.0000 H=105.1200 L=98.3700 C=103.9400 V=19683100
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=-1.0369 mdi(20,5,3) signal=-2.2128 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=-0.8186 macdi(20,5,3) signal=-1.7470 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=66.5113 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=-5.0540 cmi(20,5,3,3) signal=-10.7425 
 
 Bar[224] 2020-08-13  O=103.9400 H=108.4400 L=104.4400 C=107.8700 V=13682500
   sma(14)                                       primed=true  sma(14)=95.9893 
@@ -28452,6 +28703,7 @@ Bar[224] 2020-08-13  O=103.9400 H=108.4400 L=104.4400 C=107.8700 V=13682500
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=1.2404 mdi(20,5,3) signal=-0.4862 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=0.9793 macdi(20,5,3) signal=-0.3838 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=73.6889 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=5.7991 cmi(20,5,3,3) signal=-2.4717 
 
 Bar[225] 2020-08-14  O=107.8700 H=109.8700 L=106.0000 C=106.0600 V=10668100
   sma(14)                                       primed=true  sma(14)=96.8243 
@@ -28565,6 +28817,7 @@ Bar[225] 2020-08-14  O=107.8700 H=109.8700 L=106.0000 C=106.0600 V=10668100
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=2.8932 mdi(20,5,3) signal=1.2035 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=2.2841 macdi(20,5,3) signal=0.9501 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=71.0312 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=13.0741 cmi(20,5,3,3) signal=5.3012 
 
 Bar[226] 2020-08-15  O=106.0600 H=105.0000 L=101.8100 C=104.5000 V=9710600
   sma(14)                                       primed=true  sma(14)=97.7486 
@@ -28678,6 +28931,7 @@ Bar[226] 2020-08-15  O=106.0600 H=105.0000 L=101.8100 C=104.5000 V=9710600
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=3.7223 mdi(20,5,3) signal=2.4629 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=2.9387 macdi(20,5,3) signal=1.9444 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=66.3366 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=16.5040 cmi(20,5,3,3) signal=10.9026 
 
 Bar[227] 2020-08-16  O=104.5000 H=106.0000 L=104.1200 C=105.0000 V=3113100
   sma(14)                                       primed=true  sma(14)=98.8021 
@@ -28791,6 +29045,7 @@ Bar[227] 2020-08-16  O=104.5000 H=106.0000 L=104.1200 C=105.0000 V=3113100
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=4.1417 mdi(20,5,3) signal=3.3023 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=3.2697 macdi(20,5,3) signal=2.6071 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=65.4498 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=18.3990 cmi(20,5,3,3) signal=14.6508 
 
 Bar[228] 2020-08-17  O=105.0000 H=104.9400 L=103.3700 C=104.1900 V=5682000
   sma(14)                                       primed=true  sma(14)=99.5343 
@@ -28904,6 +29159,7 @@ Bar[228] 2020-08-17  O=105.0000 H=104.9400 L=103.3700 C=104.1900 V=5682000
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=4.1597 mdi(20,5,3) signal=3.7310 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=3.2840 macdi(20,5,3) signal=2.9455 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=62.9277 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=18.8227 cmi(20,5,3,3) signal=16.7367 
 
 Bar[229] 2020-08-18  O=104.1900 H=104.5000 L=102.1200 C=103.0600 V=5763600
   sma(14)                                       primed=true  sma(14)=100.2086 
@@ -29017,6 +29273,7 @@ Bar[229] 2020-08-18  O=104.1900 H=104.5000 L=102.1200 C=103.0600 V=5763600
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=3.8164 mdi(20,5,3) signal=3.7737 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=3.0129 macdi(20,5,3) signal=2.9792 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=58.8832 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=17.7627 cmi(20,5,3,3) signal=17.2497 
 
 Bar[230] 2020-08-19  O=103.0600 H=104.4400 L=102.2500 C=103.4200 V=5340000
   sma(14)                                       primed=true  sma(14)=100.6671 
@@ -29130,6 +29387,7 @@ Bar[230] 2020-08-19  O=103.0600 H=104.4400 L=102.2500 C=103.4200 V=5340000
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=3.4314 mdi(20,5,3) signal=3.6025 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=2.7090 macdi(20,5,3) signal=2.8441 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=58.2329 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=16.6128 cmi(20,5,3,3) signal=16.9312 
 
 Bar[231] 2020-08-20  O=103.4200 H=106.3100 L=103.3700 C=105.2700 V=6220800
   sma(14)                                       primed=true  sma(14)=101.4007 
@@ -29243,6 +29501,7 @@ Bar[231] 2020-08-20  O=103.4200 H=106.3100 L=103.3700 C=105.2700 V=6220800
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=3.3408 mdi(20,5,3) signal=3.4717 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=2.6375 macdi(20,5,3) signal=2.7408 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=61.9535 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=16.7977 cmi(20,5,3,3) signal=16.8645 
 
 Bar[232] 2020-08-21  O=105.2700 H=112.8700 L=107.9400 C=111.8700 V=14680500
   sma(14)                                       primed=true  sma(14)=102.5436 
@@ -29356,6 +29615,7 @@ Bar[232] 2020-08-21  O=105.2700 H=112.8700 L=107.9400 C=111.8700 V=14680500
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=4.3007 mdi(20,5,3) signal=3.8862 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=3.3953 macdi(20,5,3) signal=3.0680 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=73.1626 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=21.5195 cmi(20,5,3,3) signal=19.1920 
 
 Bar[233] 2020-08-22  O=111.8700 H=116.5000 L=112.5000 C=116.0000 V=9933000
   sma(14)                                       primed=true  sma(14)=104.1107 
@@ -29469,6 +29729,7 @@ Bar[233] 2020-08-22  O=111.8700 H=116.5000 L=112.5000 C=116.0000 V=9933000
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=5.9261 mdi(20,5,3) signal=4.9061 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=4.6785 macdi(20,5,3) signal=3.8733 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=79.4691 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=28.7305 cmi(20,5,3,3) signal=23.9613 
 
 Bar[234] 2020-08-23  O=116.0000 H=119.1900 L=115.4400 C=116.6200 V=11329500
   sma(14)                                       primed=true  sma(14)=105.6821 
@@ -29582,6 +29843,7 @@ Bar[234] 2020-08-23  O=116.0000 H=119.1900 L=115.4400 C=116.6200 V=11329500
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=7.4034 mdi(20,5,3) signal=6.1548 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=5.8448 macdi(20,5,3) signal=4.8590 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=81.6000 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=35.1520 cmi(20,5,3,3) signal=29.5566 
 
 Bar[235] 2020-08-24  O=116.6200 H=121.0000 L=115.5000 C=118.2800 V=8145300
   sma(14)                                       primed=true  sma(14)=107.4343 
@@ -29695,6 +29957,7 @@ Bar[235] 2020-08-24  O=116.6200 H=121.0000 L=115.5000 C=118.2800 V=8145300
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=8.6523 mdi(20,5,3) signal=7.4036 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=6.8308 macdi(20,5,3) signal=5.8449 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=83.4433 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=40.7047 cmi(20,5,3,3) signal=35.1307 
 
 Bar[236] 2020-08-25  O=118.2800 H=122.1200 L=112.2500 C=113.3700 V=16644700
   sma(14)                                       primed=true  sma(14)=108.5321 
@@ -29808,6 +30071,7 @@ Bar[236] 2020-08-25  O=118.2800 H=122.1200 L=112.2500 C=113.3700 V=16644700
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=8.6869 mdi(20,5,3) signal=8.0453 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=6.8581 macdi(20,5,3) signal=6.3515 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=69.3917 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=39.9578 cmi(20,5,3,3) signal=37.5442 
 
 Bar[237] 2020-08-26  O=113.3700 H=111.9400 L=107.5600 C=109.0000 V=12593800
   sma(14)                                       primed=true  sma(14)=108.8936 
@@ -29921,6 +30185,7 @@ Bar[237] 2020-08-26  O=113.3700 H=111.9400 L=107.5600 C=109.0000 V=12593800
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=7.5511 mdi(20,5,3) signal=7.7982 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=5.9614 macdi(20,5,3) signal=6.1565 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=56.0952 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=33.5281 cmi(20,5,3,3) signal=35.5362 
 
 Bar[238] 2020-08-27  O=109.0000 H=112.7500 L=106.5600 C=109.7000 V=7138100
   sma(14)                                       primed=true  sma(14)=109.0243 
@@ -30034,6 +30299,7 @@ Bar[238] 2020-08-27  O=109.0000 H=112.7500 L=106.5600 C=109.7000 V=7138100
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=6.2913 mdi(20,5,3) signal=7.0448 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=4.9668 macdi(20,5,3) signal=5.5617 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=53.4630 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=27.3854 cmi(20,5,3,3) signal=31.4608 
 
 Bar[239] 2020-08-28  O=109.7000 H=110.1900 L=106.8700 C=109.2500 V=7442300
   sma(14)                                       primed=true  sma(14)=109.2521 
@@ -30147,6 +30413,7 @@ Bar[239] 2020-08-28  O=109.7000 H=110.1900 L=106.8700 C=109.2500 V=7442300
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=5.0964 mdi(20,5,3) signal=6.0706 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=4.0235 macdi(20,5,3) signal=4.7926 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=51.6983 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=22.2242 cmi(20,5,3,3) signal=26.8425 
 
 Bar[240] 2020-08-29  O=109.2500 H=107.9400 L=104.5000 C=107.0000 V=9442300
   sma(14)                                       primed=true  sma(14)=109.4307 
@@ -30260,6 +30527,7 @@ Bar[240] 2020-08-29  O=109.2500 H=107.9400 L=104.5000 C=107.0000 V=9442300
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=3.7570 mdi(20,5,3) signal=4.9138 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=2.9660 macdi(20,5,3) signal=3.8793 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=46.6455 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=16.5316 cmi(20,5,3,3) signal=21.6870 
 
 Bar[241] 2020-08-30  O=107.0000 H=109.6900 L=105.7500 C=109.1900 V=7123600
   sma(14)                                       primed=true  sma(14)=109.7300 
@@ -30373,6 +30641,7 @@ Bar[241] 2020-08-30  O=107.0000 H=109.6900 L=105.7500 C=109.1900 V=7123600
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=2.9315 mdi(20,5,3) signal=3.9227 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=2.3144 macdi(20,5,3) signal=3.0968 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=49.6766 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=13.0382 cmi(20,5,3,3) signal=17.3626 
 
 Bar[242] 2020-08-31  O=109.1900 H=111.0600 L=108.6200 C=110.0000 V=7680600
   sma(14)                                       primed=true  sma(14)=110.1450 
@@ -30486,6 +30755,7 @@ Bar[242] 2020-08-31  O=109.1900 H=111.0600 L=108.6200 C=110.0000 V=7680600
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=2.5136 mdi(20,5,3) signal=3.2181 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=1.9844 macdi(20,5,3) signal=2.5406 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=52.3187 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=11.4004 cmi(20,5,3,3) signal=14.3815 
 
 Bar[243] 2020-09-01  O=110.0000 H=110.4400 L=107.7500 C=109.2000 V=4839800
   sma(14)                                       primed=true  sma(14)=110.5836 
@@ -30599,6 +30869,7 @@ Bar[243] 2020-09-01  O=110.0000 H=110.4400 L=107.7500 C=109.2000 V=4839800
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=2.1476 mdi(20,5,3) signal=2.6829 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=1.6955 macdi(20,5,3) signal=2.1181 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=51.3162 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=10.0270 cmi(20,5,3,3) signal=12.2042 
 
 Bar[244] 2020-09-02  O=109.2000 H=110.1200 L=108.0600 C=110.1200 V=4775500
   sma(14)                                       primed=true  sma(14)=111.0621 
@@ -30712,6 +30983,7 @@ Bar[244] 2020-09-02  O=109.2000 H=110.1200 L=108.0600 C=110.1200 V=4775500
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=1.9803 mdi(20,5,3) signal=2.3316 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=1.5634 macdi(20,5,3) signal=1.8407 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=53.1459 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=9.5838 cmi(20,5,3,3) signal=10.8940 
 
 Bar[245] 2020-09-03  O=110.1200 H=110.3100 L=108.0000 C=108.0000 V=4008800
   sma(14)                                       primed=true  sma(14)=111.2571 
@@ -30825,6 +31097,7 @@ Bar[245] 2020-09-03  O=110.1200 H=110.3100 L=108.0000 C=108.0000 V=4008800
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=1.5577 mdi(20,5,3) signal=1.9447 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=1.2298 macdi(20,5,3) signal=1.5353 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=48.2238 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=7.7792 cmi(20,5,3,3) signal=9.3366 
 
 Bar[246] 2020-09-04  O=108.0000 H=110.4400 L=108.1900 C=108.6200 V=4533600
   sma(14)                                       primed=true  sma(14)=111.0250 
@@ -30938,6 +31211,7 @@ Bar[246] 2020-09-04  O=108.0000 H=110.4400 L=108.1900 C=108.6200 V=4533600
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=1.2174 mdi(20,5,3) signal=1.5811 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=0.9611 macdi(20,5,3) signal=1.2482 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=48.3643 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=6.2973 cmi(20,5,3,3) signal=7.8170 
 
 Bar[247] 2020-09-05  O=108.6200 H=110.0000 L=108.1200 C=109.7500 V=3741100
   sma(14)                                       primed=true  sma(14)=110.5786 
@@ -31051,6 +31325,7 @@ Bar[247] 2020-09-05  O=108.6200 H=110.0000 L=108.1200 C=109.7500 V=3741100
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=1.1260 mdi(20,5,3) signal=1.3535 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=0.8889 macdi(20,5,3) signal=1.0686 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=51.5971 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=6.0416 cmi(20,5,3,3) signal=6.9293 
 
 Bar[248] 2020-09-06  O=109.7500 H=110.7500 L=109.0600 C=109.8100 V=4084800
   sma(14)                                       primed=true  sma(14)=110.0921 
@@ -31164,6 +31439,7 @@ Bar[248] 2020-09-06  O=109.7500 H=110.7500 L=109.0600 C=109.8100 V=4084800
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=1.1203 mdi(20,5,3) signal=1.2369 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=0.8845 macdi(20,5,3) signal=0.9765 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=52.8652 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=6.2931 cmi(20,5,3,3) signal=6.6112 
 
 Bar[249] 2020-09-07  O=109.8100 H=110.5000 L=108.7500 C=109.0000 V=2685200
   sma(14)                                       primed=true  sma(14)=109.4293 
@@ -31277,6 +31553,7 @@ Bar[249] 2020-09-07  O=109.8100 H=110.5000 L=108.7500 C=109.0000 V=2685200
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=1.0018 mdi(20,5,3) signal=1.1194 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=0.7909 macdi(20,5,3) signal=0.8837 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=50.5019 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=5.9125 cmi(20,5,3,3) signal=6.2618 
 
 Bar[250] 2020-09-08  O=109.0000 H=110.5000 L=108.5600 C=108.7500 V=3438000
   sma(14)                                       primed=true  sma(14)=109.0993 
@@ -31390,6 +31667,7 @@ Bar[250] 2020-09-08  O=109.0000 H=110.5000 L=108.5600 C=108.7500 V=3438000
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=0.8211 mdi(20,5,3) signal=0.9702 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=0.6482 macdi(20,5,3) signal=0.7660 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=48.7762 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=5.1217 cmi(20,5,3,3) signal=5.6918 
 
 Bar[251] 2020-09-09  O=108.7500 H=109.5000 L=106.6200 C=107.8700 V=2870500
   sma(14)                                       primed=true  sma(14)=109.0186 
@@ -31503,4 +31781,5 @@ Bar[251] 2020-09-09  O=108.7500 H=109.5000 L=106.6200 C=107.8700 V=2870500
   mdi(20,5,3)                                   primed=true  mdi(20,5,3) mdi=0.5146 mdi(20,5,3) signal=0.7424 
   macdi(20,5,3)                                 primed=true  macdi(20,5,3) macdi=0.4063 macdi(20,5,3) signal=0.5861 
   dm(2,2,14)                                    primed=true  dm(2,2,14)=44.9069 
+  cmi(20,5,3,3)                                 primed=true  cmi(20,5,3,3) cmi=3.3907 cmi(20,5,3,3) signal=4.5413 
 

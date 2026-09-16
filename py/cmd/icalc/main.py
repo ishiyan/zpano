@@ -143,6 +143,7 @@ _IDENTIFIER_MAP: dict[str, Identifier] = {
     'meanDeviationIndex': Identifier.MEAN_DEVIATION_INDEX,
     'macdIndex': Identifier.MACD_INDEX,
     'doubleSmoothedMomenta': Identifier.DOUBLE_SMOOTHED_MOMENTA,
+    'candlestickMomentumIndex': Identifier.CANDLESTICK_MOMENTUM_INDEX,
 }
 
 

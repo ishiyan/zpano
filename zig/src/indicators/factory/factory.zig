@@ -178,6 +178,7 @@ const ergodic_mod = @import("../william_blau/ergodic_oscillator/ergodic_oscillat
 const mdi_mod = @import("../william_blau/mean_deviation_index/mean_deviation_index.zig");
 const macdi_mod = @import("../william_blau/macd_index/macd_index.zig");
 const dm_mod = @import("../william_blau/double_smoothed_momenta/double_smoothed_momenta.zig");
+const cmi_mod = @import("../william_blau/candlestick_momentum_index/candlestick_momentum_index.zig");
 
 pub const FactoryError = error{
     UnsupportedIndicator,
@@ -1544,6 +1545,12 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
             .quote_component = getQuoteComponent(obj),
             .trade_component = getTradeComponent(obj),
         }),
+        .candlestick_momentum_index => createWithParams(cmi_mod.CandlestickMomentumIndex, allocator, cmi_mod.CandlestickMomentumIndex.init(.{
+            .r = getUsize(obj, "r", 20),
+            .s = getUsize(obj, "s", 5),
+            .u = getUsize(obj, "u", 3),
+            .ul = getUsize(obj, "ul", 3),
+        })),
     };
 }
 

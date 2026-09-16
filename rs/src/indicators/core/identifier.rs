@@ -291,6 +291,8 @@ pub enum Identifier {
     MacdIndex = 109,
     /// Identifies the William Blau Double-Smoothed Momenta (DM) indicator.
     DoubleSmoothedMomenta = 110,
+    /// Identifies the William Blau Candlestick Momentum Index (CMI) indicator.
+    CandlestickMomentumIndex = 111,
 }
 
 impl Identifier {
@@ -416,6 +418,7 @@ impl Identifier {
             Self::MeanDeviationIndex => "meanDeviationIndex",
             Self::MacdIndex => "macdIndex",
             Self::DoubleSmoothedMomenta => "doubleSmoothedMomenta",
+            Self::CandlestickMomentumIndex => "candlestickMomentumIndex",
         }
     }
 
@@ -545,6 +548,7 @@ impl Identifier {
             "meanDeviationIndex" => Some(Self::MeanDeviationIndex),
             "macdIndex" => Some(Self::MacdIndex),
             "doubleSmoothedMomenta" => Some(Self::DoubleSmoothedMomenta),
+            "candlestickMomentumIndex" => Some(Self::CandlestickMomentumIndex),
             _ => None,
         }
     }

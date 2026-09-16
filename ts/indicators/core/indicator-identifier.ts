@@ -403,4 +403,7 @@ export enum IndicatorIdentifier {
 
     /** Identifies the William Blau __Double-Smoothed Momenta__ (DM) indicator. */
     DoubleSmoothedMomenta,
+
+    /** Identifies the William Blau __Candlestick Momentum Index__ (CMI) indicator. */
+    CandlestickMomentumIndex,
 }

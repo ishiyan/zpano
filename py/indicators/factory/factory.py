@@ -714,4 +714,9 @@ def create_indicator(
         from ..william_blau.double_smoothed_momenta.double_smoothed_momenta import DoubleSmoothedMomenta
         return DoubleSmoothedMomenta(_apply(default_params(), params))
 
+    if identifier == Identifier.CANDLESTICK_MOMENTUM_INDEX:
+        from ..william_blau.candlestick_momentum_index.params import default_params
+        from ..william_blau.candlestick_momentum_index.candlestick_momentum_index import CandlestickMomentumIndex
+        return CandlestickMomentumIndex(_apply(default_params(), params))
+
     raise ValueError(f"unsupported indicator: {identifier}")

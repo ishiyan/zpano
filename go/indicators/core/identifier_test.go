@@ -138,6 +138,7 @@ func TestIdentifierString(t *testing.T) {
 		{MeanDeviationIndex, meanDeviationIndex},
 		{MacdIndex, macdIndex},
 		{DoubleSmoothedMomenta, doubleSmoothedMomenta},
+		{CandlestickMomentumIndex, candlestickMomentumIndex},
 		// ── boundary ──────────────────────────────────────────────────────────
 		{last, unknown},
 		{Identifier(0), unknown},
@@ -288,6 +289,7 @@ func TestIdentifierIsKnown(t *testing.T) {
 		{MeanDeviationIndex, true},
 		{MacdIndex, true},
 		{DoubleSmoothedMomenta, true},
+		{CandlestickMomentumIndex, true},
 		// ── boundary ──────────────────────────────────────────────────────────
 		{last, false},
 		{Identifier(0), false},
@@ -442,6 +444,7 @@ func TestIdentifierMarshalJSON(t *testing.T) {
 		{MeanDeviationIndex, dqs + meanDeviationIndex + dqs, true},
 		{MacdIndex, dqs + macdIndex + dqs, true},
 		{DoubleSmoothedMomenta, dqs + doubleSmoothedMomenta + dqs, true},
+		{CandlestickMomentumIndex, dqs + candlestickMomentumIndex + dqs, true},
 		// ── boundary ──────────────────────────────────────────────────────────
 		{last, nilstr, false},
 		{Identifier(9999), nilstr, false},
@@ -609,6 +612,7 @@ func TestIdentifierUnmarshalJSON(t *testing.T) {
 		{MeanDeviationIndex, dqs + meanDeviationIndex + dqs, true},
 		{MacdIndex, dqs + macdIndex + dqs, true},
 		{DoubleSmoothedMomenta, dqs + doubleSmoothedMomenta + dqs, true},
+		{CandlestickMomentumIndex, dqs + candlestickMomentumIndex + dqs, true},
 		// ── boundary ──────────────────────────────────────────────────────────
 		{zero, "\"unknown\"", false},
 		{zero, "\"foobar\"", false},

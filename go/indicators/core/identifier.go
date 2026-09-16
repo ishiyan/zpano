@@ -416,6 +416,9 @@ const (
 	// DoubleSmoothedMomenta identifies the William Blau Double-Smoothed Momenta (DM) indicator.
 	DoubleSmoothedMomenta
 
+	// CandlestickMomentumIndex identifies the William Blau Candlestick Momentum Index (CMI) indicator.
+	CandlestickMomentumIndex
+
 	last
 )
 
@@ -582,6 +585,7 @@ const (
 	meanDeviationIndex                        = "meanDeviationIndex"
 	macdIndex                                 = "macdIndex"
 	doubleSmoothedMomenta                     = "doubleSmoothedMomenta"
+	candlestickMomentumIndex                  = "candlestickMomentumIndex"
 )
 
 // String implements the Stringer interface.
@@ -834,6 +838,8 @@ func (i Identifier) String() string {
 		return macdIndex
 	case DoubleSmoothedMomenta:
 		return doubleSmoothedMomenta
+	case CandlestickMomentumIndex:
+		return candlestickMomentumIndex
 	default:
 		return unknown
 	}
@@ -1123,6 +1129,8 @@ func (i *Identifier) UnmarshalJSON(data []byte) error {
 		*i = MacdIndex
 	case doubleSmoothedMomenta:
 		*i = DoubleSmoothedMomenta
+	case candlestickMomentumIndex:
+		*i = CandlestickMomentumIndex
 	default:
 		return fmt.Errorf(errFmt, s)
 	}
