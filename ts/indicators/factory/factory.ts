@@ -262,6 +262,8 @@ import { DoubleSmoothedMomenta } from '../william-blau/double-smoothed-momenta/d
 import { defaultParams as defaultDmParams } from '../william-blau/double-smoothed-momenta/params.js';
 import { CandlestickMomentumIndex } from '../william-blau/candlestick-momentum-index/candlestick-momentum-index.js';
 import { defaultParams as defaultCmiParams } from '../william-blau/candlestick-momentum-index/params.js';
+import { CandlestickStrengthIndex } from '../william-blau/candlestick-strength-index/candlestick-strength-index.js';
+import { defaultParams as defaultCsiParams } from '../william-blau/candlestick-strength-index/params.js';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -735,6 +737,9 @@ export function createIndicator(identifier: IndicatorIdentifier, params?: Record
 
         case IndicatorIdentifier.CandlestickMomentumIndex:
             return new CandlestickMomentumIndex({ ...defaultCmiParams(), ...p });
+
+        case IndicatorIdentifier.CandlestickStrengthIndex:
+            return new CandlestickStrengthIndex({ ...defaultCsiParams(), ...p });
 
         default:
             throw new Error(`Unsupported indicator: ${IndicatorIdentifier[identifier] ?? identifier}`);

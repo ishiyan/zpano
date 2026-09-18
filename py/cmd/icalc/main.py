@@ -144,6 +144,7 @@ _IDENTIFIER_MAP: dict[str, Identifier] = {
     'macdIndex': Identifier.MACD_INDEX,
     'doubleSmoothedMomenta': Identifier.DOUBLE_SMOOTHED_MOMENTA,
     'candlestickMomentumIndex': Identifier.CANDLESTICK_MOMENTUM_INDEX,
+    'candlestickStrengthIndex': Identifier.CANDLESTICK_STRENGTH_INDEX,
 }
 
 

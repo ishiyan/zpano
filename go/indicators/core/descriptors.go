@@ -881,4 +881,13 @@ var descriptors = map[Identifier]Descriptor{
 			{Kind: 2 /* Signal */, Shape: shape.Scalar, Role: Signal, Pane: Own},
 		},
 	},
+
+	CandlestickStrengthIndex: {
+		Identifier: CandlestickStrengthIndex, Family: "William Blau",
+		Adaptivity: Static, InputRequirement: BarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{
+			{Kind: 1 /* CSI */, Shape: shape.Scalar, Role: BoundedOscillator, Pane: Own},
+			{Kind: 2 /* Signal */, Shape: shape.Scalar, Role: Signal, Pane: Own},
+		},
+	},
 }

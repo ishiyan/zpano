@@ -293,6 +293,8 @@ pub enum Identifier {
     DoubleSmoothedMomenta = 110,
     /// Identifies the William Blau Candlestick Momentum Index (CMI) indicator.
     CandlestickMomentumIndex = 111,
+    /// Identifies the William Blau Candlestick Strength Index (CSI) indicator.
+    CandlestickStrengthIndex = 112,
 }
 
 impl Identifier {
@@ -419,6 +421,7 @@ impl Identifier {
             Self::MacdIndex => "macdIndex",
             Self::DoubleSmoothedMomenta => "doubleSmoothedMomenta",
             Self::CandlestickMomentumIndex => "candlestickMomentumIndex",
+            Self::CandlestickStrengthIndex => "candlestickStrengthIndex",
         }
     }
 
@@ -549,6 +552,7 @@ impl Identifier {
             "macdIndex" => Some(Self::MacdIndex),
             "doubleSmoothedMomenta" => Some(Self::DoubleSmoothedMomenta),
             "candlestickMomentumIndex" => Some(Self::CandlestickMomentumIndex),
+            "candlestickStrengthIndex" => Some(Self::CandlestickStrengthIndex),
             _ => None,
         }
     }

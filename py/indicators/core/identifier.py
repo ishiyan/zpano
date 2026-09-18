@@ -414,3 +414,6 @@ class Identifier(IntEnum):
 
     # Identifies the William Blau Candlestick Momentum Index (CMI) indicator.
     CANDLESTICK_MOMENTUM_INDEX = 111
+
+    # Identifies the William Blau Candlestick Strength Index (CSI) indicator.
+    CANDLESTICK_STRENGTH_INDEX = 112

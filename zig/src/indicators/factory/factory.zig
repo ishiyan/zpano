@@ -179,6 +179,7 @@ const mdi_mod = @import("../william_blau/mean_deviation_index/mean_deviation_ind
 const macdi_mod = @import("../william_blau/macd_index/macd_index.zig");
 const dm_mod = @import("../william_blau/double_smoothed_momenta/double_smoothed_momenta.zig");
 const cmi_mod = @import("../william_blau/candlestick_momentum_index/candlestick_momentum_index.zig");
+const csi_mod = @import("../william_blau/candlestick_strength_index/candlestick_strength_index.zig");
 
 pub const FactoryError = error{
     UnsupportedIndicator,
@@ -1546,6 +1547,12 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
             .trade_component = getTradeComponent(obj),
         }),
         .candlestick_momentum_index => createWithParams(cmi_mod.CandlestickMomentumIndex, allocator, cmi_mod.CandlestickMomentumIndex.init(.{
+            .r = getUsize(obj, "r", 20),
+            .s = getUsize(obj, "s", 5),
+            .u = getUsize(obj, "u", 3),
+            .ul = getUsize(obj, "ul", 3),
+        })),
+        .candlestick_strength_index => createWithParams(csi_mod.CandlestickStrengthIndex, allocator, csi_mod.CandlestickStrengthIndex.init(.{
             .r = getUsize(obj, "r", 20),
             .s = getUsize(obj, "s", 5),
             .u = getUsize(obj, "u", 3),

@@ -568,6 +568,10 @@ _descriptors: dict[Id, Descriptor] = {
         Id.CANDLESTICK_MOMENTUM_INDEX, "William Blau", A.STATIC, I.BAR_INPUT, V.NO_VOLUME,
         [_o(0, S.SCALAR, R.BOUNDED_OSCILLATOR, P.OWN),
          _o(1, S.SCALAR, R.SIGNAL, P.OWN)]),
+    Id.CANDLESTICK_STRENGTH_INDEX: _d(
+        Id.CANDLESTICK_STRENGTH_INDEX, "William Blau", A.STATIC, I.BAR_INPUT, V.NO_VOLUME,
+        [_o(0, S.SCALAR, R.BOUNDED_OSCILLATOR, P.OWN),
+         _o(1, S.SCALAR, R.SIGNAL, P.OWN)]),
 }
 
 

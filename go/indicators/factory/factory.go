@@ -114,6 +114,7 @@ import (
 	"zpano/indicators/welleswilder/relativestrengthindex"
 	"zpano/indicators/welleswilder/truerange"
 	"zpano/indicators/williamblau/candlestickmomentumindex"
+	"zpano/indicators/williamblau/candlestickstrengthindex"
 	"zpano/indicators/williamblau/doublesmoothedmomenta"
 	"zpano/indicators/williamblau/ergodicoscillator"
 	"zpano/indicators/williamblau/macdindex"
@@ -1240,6 +1241,14 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 		}
 
 		return candlestickmomentumindex.NewCandlestickMomentumIndex(p)
+
+	case core.CandlestickStrengthIndex:
+		p := candlestickstrengthindex.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return candlestickstrengthindex.NewCandlestickStrengthIndex(p)
 
 	default:
 		return nil, fmt.Errorf("unsupported indicator: %s", identifier)

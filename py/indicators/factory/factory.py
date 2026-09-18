@@ -719,4 +719,9 @@ def create_indicator(
         from ..william_blau.candlestick_momentum_index.candlestick_momentum_index import CandlestickMomentumIndex
         return CandlestickMomentumIndex(_apply(default_params(), params))
 
+    if identifier == Identifier.CANDLESTICK_STRENGTH_INDEX:
+        from ..william_blau.candlestick_strength_index.params import default_params
+        from ..william_blau.candlestick_strength_index.candlestick_strength_index import CandlestickStrengthIndex
+        return CandlestickStrengthIndex(_apply(default_params(), params))
+
     raise ValueError(f"unsupported indicator: {identifier}")

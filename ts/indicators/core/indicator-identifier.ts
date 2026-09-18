@@ -406,4 +406,7 @@ export enum IndicatorIdentifier {
 
     /** Identifies the William Blau __Candlestick Momentum Index__ (CMI) indicator. */
     CandlestickMomentumIndex,
+
+    /** Identifies the William Blau __Candlestick Strength Index__ (CSI) indicator. */
+    CandlestickStrengthIndex,
 }

@@ -186,6 +186,7 @@ pub const mean_deviation_index = @import("william_blau/mean_deviation_index/mean
 pub const macd_index = @import("william_blau/macd_index/macd_index.zig");
 pub const double_smoothed_momenta = @import("william_blau/double_smoothed_momenta/double_smoothed_momenta.zig");
 pub const candlestick_momentum_index = @import("william_blau/candlestick_momentum_index/candlestick_momentum_index.zig");
+pub const candlestick_strength_index = @import("william_blau/candlestick_strength_index/candlestick_strength_index.zig");
 
 pub const hilbert_transformer = @import("john_ehlers/hilbert_transformer/hilbert_transformer.zig");
 pub const homodyne_discriminator = @import("john_ehlers/hilbert_transformer/homodyne_discriminator.zig");
@@ -313,6 +314,7 @@ comptime {
     _ = macd_index;
     _ = double_smoothed_momenta;
     _ = candlestick_momentum_index;
+    _ = candlestick_strength_index;
     _ = frequency_response;
     _ = factory;
     _ = arnaud_legoux_moving_average;

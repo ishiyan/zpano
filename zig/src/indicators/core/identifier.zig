@@ -292,6 +292,8 @@ pub const Identifier = enum(u8) {
     double_smoothed_momenta = 110,
     /// Identifies the William Blau Candlestick Momentum Index (CMI) indicator.
     candlestick_momentum_index = 111,
+    /// Identifies the William Blau Candlestick Strength Index (CSI) indicator.
+    candlestick_strength_index = 112,
 
     /// Returns the camelCase string representation matching Go's String().
     pub fn asStr(self: Identifier) []const u8 {
@@ -454,6 +456,7 @@ pub const Identifier = enum(u8) {
             .macd_index => "macdIndex",
             .double_smoothed_momenta => "doubleSmoothedMomenta",
             .candlestick_momentum_index => "candlestickMomentumIndex",
+            .candlestick_strength_index => "candlestickStrengthIndex",
         };
     }
 
@@ -618,6 +621,7 @@ pub const Identifier = enum(u8) {
             .{ "macdIndex", Identifier.macd_index },
             .{ "doubleSmoothedMomenta", Identifier.double_smoothed_momenta },
             .{ "candlestickMomentumIndex", Identifier.candlestick_momentum_index },
+            .{ "candlestickStrengthIndex", Identifier.candlestick_strength_index },
         };
 
         inline for (map) |entry| {
