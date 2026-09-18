@@ -11,7 +11,6 @@
 ///
 /// Returns:
 ///     Continuous float in [-100, +100].
-
 const cp = @import("../candlestick_patterns.zig");
 const operators = @import("fuzzy").operators;
 
@@ -20,7 +19,7 @@ const CriterionState = cp.CriterionState;
 const realBodyLen = cp.realBodyLen;
 
 pub fn haramiCross(self: *const CandlestickPatterns) f64 {
-            if (!self.enough(2, &[_]*const CriterionState{&self.long_body, &self.doji_body})) return 0.0;
+    if (!self.enough(2, &[_]*const CriterionState{ &self.long_body, &self.doji_body })) return 0.0;
 
     const b1 = self.bar(2);
     const b2 = self.bar(1);
@@ -36,7 +35,7 @@ pub fn haramiCross(self: *const CandlestickPatterns) f64 {
     const mu_enc_upper = self.muGeRaw(@max(b1.o, b1.c), @max(b2.o, b2.c), eq_width);
     const mu_enc_lower = self.muLtRaw(@min(b1.o, b1.c), @min(b2.o, b2.c), eq_width);
 
-    const confidence = operators.tProductAll(&.{mu_long1, mu_doji2, mu_enc_upper, mu_enc_lower});
+    const confidence = operators.tProductAll(&.{ mu_long1, mu_doji2, mu_enc_upper, mu_enc_lower });
     const direction: f64 = if (b1.c < b1.o) 1.0 else -1.0;
     return direction * confidence * 100.0;
 }

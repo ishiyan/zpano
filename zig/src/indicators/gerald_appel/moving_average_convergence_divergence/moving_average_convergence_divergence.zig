@@ -1,7 +1,6 @@
 const std = @import("std");
 const math = std.math;
 
-
 const entities = @import("entities");
 const Bar = entities.Bar;
 const Quote = entities.Quote;
@@ -403,7 +402,6 @@ pub const MovingAverageConvergenceDivergence = struct {
 
 const testing = std.testing;
 const testdata = @import("testdata.zig");
-
 
 test "MACD default params full validation" {
     const allocator = testing.allocator;

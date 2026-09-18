@@ -17,16 +17,15 @@
 /// Returns:
 ///     +100.0/-100.0 for initial detection, +200.0/-200.0 for confirmation,
 ///     0.0 for no pattern.
-
 const cp = @import("../candlestick_patterns.zig");
 
 const CandlestickPatterns = cp.CandlestickPatterns;
 const CriterionState = cp.CriterionState;
 
 pub fn patternHikkake(self: *const CandlestickPatterns) f64 {
-            // Check if there's a newer hikkake at this position
-            // Check if confirmation already happened
-            if (!self.enough(3, &[_]*const CriterionState{})) return 0.0;
+    // Check if there's a newer hikkake at this position
+    // Check if confirmation already happened
+    if (!self.enough(3, &[_]*const CriterionState{})) return 0.0;
 
     // Check for new hikkake pattern at current bar.
     const b1 = self.bar(3);
@@ -86,8 +85,7 @@ pub fn patternHikkake(self: *const CandlestickPatterns) f64 {
                 const ga = self.bar(gb + 2);
                 const gbo = self.bar(gb + 1);
                 const gc = self.bar(gb);
-                if (gbo.h < ga.h and gbo.l > ga.l and ((gc.h < gbo.h and gc.l < gbo.l) or (gc.h > gbo.h and gc.l > gbo.l)))
-                {
+                if (gbo.h < ga.h and gbo.l > ga.l and ((gc.h < gbo.h and gc.l < gbo.l) or (gc.h > gbo.h and gc.l > gbo.l))) {
                     superseded = true;
                     break;
                 }

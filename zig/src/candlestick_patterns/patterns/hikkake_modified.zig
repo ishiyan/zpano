@@ -5,7 +5,6 @@
 // If we passed the 3-bar window, reset.
 // If pattern was just detected this bar (takes priority over confirmation)
 /// keep ``_hikmod_pattern_result`` and ``_hikmod_pattern_idx`` across bars.
-
 const cp = @import("../candlestick_patterns.zig");
 
 const CandlestickPatterns = cp.CandlestickPatterns;

@@ -93,4 +93,3 @@ pub fn testInputClose() [252]f64 {
         108.75,  107.87,
     };
 }
-

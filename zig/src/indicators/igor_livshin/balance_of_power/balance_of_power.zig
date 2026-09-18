@@ -1,7 +1,6 @@
 const std = @import("std");
 const math = std.math;
 
-
 const entities = @import("entities");
 const Bar = entities.Bar;
 const Quote = entities.Quote;
@@ -173,7 +172,6 @@ pub const BalanceOfPower = struct {
 
 const testing = std.testing;
 const testdata = @import("testdata.zig");
-
 
 fn roundTo(v: f64, comptime digits: comptime_int) f64 {
     const p = comptime std.math.pow(f64, 10.0, @as(f64, @floatFromInt(digits)));

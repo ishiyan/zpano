@@ -12,7 +12,6 @@
 ///
 /// Returns:
 ///     Continuous float in [-100, 0].  Always bearish.
-
 const cp = @import("../candlestick_patterns.zig");
 
 const CandlestickPatterns = cp.CandlestickPatterns;
@@ -23,7 +22,7 @@ const isWhite = cp.isWhite;
 const realBodyLen = cp.realBodyLen;
 
 pub fn twoCrows(self: *const CandlestickPatterns) f64 {
-            if (!self.enough(3, &[_]*const CriterionState{&self.long_body})) return 0.0;
+    if (!self.enough(3, &[_]*const CriterionState{&self.long_body})) return 0.0;
 
     const b1 = self.bar(3);
     const b2 = self.bar(2);

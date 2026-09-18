@@ -1,7 +1,6 @@
 const std = @import("std");
 const math = std.math;
 
-
 const entities = @import("entities");
 const Bar = entities.Bar;
 const Quote = entities.Quote;
@@ -311,7 +310,6 @@ pub const LinearRegression = struct {
 
 const testing = std.testing;
 const testdata = @import("testdata.zig");
-
 
 fn createLinreg(allocator: std.mem.Allocator, length: usize) !LinearRegression {
     var lr = try LinearRegression.init(allocator, .{ .length = length });

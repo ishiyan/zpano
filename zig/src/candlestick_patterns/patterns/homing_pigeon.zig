@@ -12,7 +12,6 @@
 ///
 /// Returns:
 ///     Continuous float in [0, 100].  Always bullish.
-
 const cp = @import("../candlestick_patterns.zig");
 const operators = @import("fuzzy").operators;
 
@@ -22,7 +21,7 @@ const isBlack = cp.isBlack;
 const realBodyLen = cp.realBodyLen;
 
 pub fn homingPigeon(self: *const CandlestickPatterns) f64 {
-            if (!self.enough(2, &[_]*const CriterionState{&self.long_body, &self.short_body})) return 0.0;
+    if (!self.enough(2, &[_]*const CriterionState{ &self.long_body, &self.short_body })) return 0.0;
 
     const b1 = self.bar(2);
     const b2 = self.bar(1);
@@ -40,6 +39,6 @@ pub fn homingPigeon(self: *const CandlestickPatterns) f64 {
     const mu_enc_upper = self.muLtRaw(b2.o, b1.o, eq_width);
     const mu_enc_lower = self.muGtRaw(b2.c, b1.c, eq_width);
 
-    const confidence = operators.tProductAll(&.{mu_long1, mu_short2, mu_enc_upper, mu_enc_lower});
+    const confidence = operators.tProductAll(&.{ mu_long1, mu_short2, mu_enc_upper, mu_enc_lower });
     return confidence * 100.0;
 }

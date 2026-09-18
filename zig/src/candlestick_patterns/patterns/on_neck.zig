@@ -12,7 +12,6 @@
 ///
 /// Returns:
 ///     Continuous float in [-100, 0].  Always bearish.
-
 const cp = @import("../candlestick_patterns.zig");
 const operators = @import("fuzzy").operators;
 
@@ -23,7 +22,7 @@ const isWhite = cp.isWhite;
 const realBodyLen = cp.realBodyLen;
 
 pub fn onNeck(self: *const CandlestickPatterns) f64 {
-            if (!self.enough(2, &[_]*const CriterionState{&self.long_body, &self.equal})) return 0.0;
+    if (!self.enough(2, &[_]*const CriterionState{ &self.long_body, &self.equal })) return 0.0;
 
     const b1 = self.bar(2);
     const b2 = self.bar(1);
@@ -39,7 +38,7 @@ pub fn onNeck(self: *const CandlestickPatterns) f64 {
     // Model as mu_less(abs_diff, eq_avg) — crossover at eq boundary.
     const mu_near_low = self.muLessCs(@abs(b2.c - b1.l), &self.equal, 2);
 
-    const confidence = operators.tProductAll(&.{mu_long1, mu_near_low});
+    const confidence = operators.tProductAll(&.{ mu_long1, mu_near_low });
 
     return -1.0 * confidence * 100.0;
 }

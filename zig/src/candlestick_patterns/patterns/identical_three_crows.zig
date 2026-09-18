@@ -13,7 +13,6 @@
 ///
 /// Returns:
 ///     Continuous float in [-100, 0].  Always bearish.
-
 const cp = @import("../candlestick_patterns.zig");
 const operators = @import("fuzzy").operators;
 
@@ -23,7 +22,7 @@ const isBlack = cp.isBlack;
 const lowerShadow = cp.lowerShadow;
 
 pub fn identicalThreeCrows(self: *const CandlestickPatterns) f64 {
-            if (!self.enough(3, &[_]*const CriterionState{&self.equal, &self.very_short_shadow})) return 0.0;
+    if (!self.enough(3, &[_]*const CriterionState{ &self.equal, &self.very_short_shadow })) return 0.0;
 
     const b1 = self.bar(3);
     const b2 = self.bar(2);
@@ -41,6 +40,6 @@ pub fn identicalThreeCrows(self: *const CandlestickPatterns) f64 {
     const mu_eq2 = self.muLessCs(@abs(b2.o - b1.c), &self.equal, 3);
     const mu_eq3 = self.muLessCs(@abs(b3.o - b2.c), &self.equal, 2);
 
-    const confidence = operators.tProductAll(&.{mu_ls1, mu_ls2, mu_ls3, mu_eq2, mu_eq3});
+    const confidence = operators.tProductAll(&.{ mu_ls1, mu_ls2, mu_ls3, mu_eq2, mu_eq3 });
     return -confidence * 100.0;
 }

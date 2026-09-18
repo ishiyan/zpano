@@ -1,7 +1,6 @@
 const std = @import("std");
 const math = std.math;
 
-
 const entities = @import("entities");
 const Bar = entities.Bar;
 const Quote = entities.Quote;
@@ -320,7 +319,6 @@ pub const CoronaSpectrum = struct {
             .{ .mnemonic = mn, .description = desc },
             .{ .mnemonic = self.mnemonicDC(), .description = self.descriptionDC() },
             .{ .mnemonic = self.mnemonicDCM(), .description = self.descriptionDCM() },
-
         };
         build_metadata_mod.buildMetadata(out, .corona_spectrum, mn, desc, &texts);
     }
@@ -339,7 +337,6 @@ pub const CoronaSpectrum = struct {
 // --- Tests ---
 const testing = std.testing;
 const testdata = @import("testdata.zig");
-
 
 const tolerance = 1e-4;
 

@@ -1,7 +1,6 @@
 const std = @import("std");
 const math = std.math;
 
-
 const entities = @import("entities");
 const Bar = entities.Bar;
 const Quote = entities.Quote;
@@ -332,7 +331,6 @@ pub const TripleExponentialMovingAverage = struct {
 
 const testing = std.testing;
 const testdata = @import("testdata.zig");
-
 
 fn createTemaLength(length: usize, first_is_average: bool) !TripleExponentialMovingAverage {
     var tema = try TripleExponentialMovingAverage.initLength(.{

@@ -8,7 +8,6 @@
 ///
 /// Returns:
 ///     Continuous float in [0, 100].  Higher = stronger hammer signal.
-
 const cp = @import("../candlestick_patterns.zig");
 const operators = @import("fuzzy").operators;
 
@@ -19,7 +18,7 @@ const realBodyLen = cp.realBodyLen;
 const upperShadow = cp.upperShadow;
 
 pub fn patternHammer(self: *const CandlestickPatterns) f64 {
-            if (!self.enough(2, &[_]*const CriterionState{&self.short_body, &self.long_shadow, &self.very_short_shadow, &self.near})) return 0.0;
+    if (!self.enough(2, &[_]*const CriterionState{ &self.short_body, &self.long_shadow, &self.very_short_shadow, &self.near })) return 0.0;
 
     const b1 = self.bar(2);
     const b2 = self.bar(1);
@@ -32,6 +31,6 @@ pub fn patternHammer(self: *const CandlestickPatterns) f64 {
     const mu_short_us = self.muLessCs(upperShadow(b2.o, b2.h, b2.c), &self.very_short_shadow, 1);
     const mu_near_low = self.muLtRaw(@min(b2.o, b2.c), b1.l + near_avg, near_width);
 
-    const confidence = operators.tProductAll(&.{mu_short, mu_long_ls, mu_short_us, mu_near_low});
+    const confidence = operators.tProductAll(&.{ mu_short, mu_long_ls, mu_short_us, mu_near_low });
     return confidence * 100.0;
 }

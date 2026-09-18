@@ -275,9 +275,9 @@ test "jwav index=12 default" {
     const eps = 1e-13;
 
     const expected_cols = [12]*const fn () [252]f64{
-        &testdata.expectedWAVCol0, &testdata.expectedWAVCol1, &testdata.expectedWAVCol2,
-        &testdata.expectedWAVCol3, &testdata.expectedWAVCol4, &testdata.expectedWAVCol5,
-        &testdata.expectedWAVCol6, &testdata.expectedWAVCol7, &testdata.expectedWAVCol8,
+        &testdata.expectedWAVCol0, &testdata.expectedWAVCol1,  &testdata.expectedWAVCol2,
+        &testdata.expectedWAVCol3, &testdata.expectedWAVCol4,  &testdata.expectedWAVCol5,
+        &testdata.expectedWAVCol6, &testdata.expectedWAVCol7,  &testdata.expectedWAVCol8,
         &testdata.expectedWAVCol9, &testdata.expectedWAVCol10, &testdata.expectedWAVCol11,
     };
 
@@ -347,10 +347,10 @@ test "jwav index=16" {
     const eps = 1e-13;
 
     const expected_cols = [16]*const fn () [252]f64{
-        &testdata.expectedIndex16Col0, &testdata.expectedIndex16Col1, &testdata.expectedIndex16Col2,
-        &testdata.expectedIndex16Col3, &testdata.expectedIndex16Col4, &testdata.expectedIndex16Col5,
-        &testdata.expectedIndex16Col6, &testdata.expectedIndex16Col7, &testdata.expectedIndex16Col8,
-        &testdata.expectedIndex16Col9, &testdata.expectedIndex16Col10, &testdata.expectedIndex16Col11,
+        &testdata.expectedIndex16Col0,  &testdata.expectedIndex16Col1,  &testdata.expectedIndex16Col2,
+        &testdata.expectedIndex16Col3,  &testdata.expectedIndex16Col4,  &testdata.expectedIndex16Col5,
+        &testdata.expectedIndex16Col6,  &testdata.expectedIndex16Col7,  &testdata.expectedIndex16Col8,
+        &testdata.expectedIndex16Col9,  &testdata.expectedIndex16Col10, &testdata.expectedIndex16Col11,
         &testdata.expectedIndex16Col12, &testdata.expectedIndex16Col13, &testdata.expectedIndex16Col14,
         &testdata.expectedIndex16Col15,
     };

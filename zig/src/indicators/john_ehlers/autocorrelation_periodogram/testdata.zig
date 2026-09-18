@@ -92,4 +92,3 @@ pub const acp_snapshots = [_]AcpSnap{
         },
     },
 };
-

@@ -17,7 +17,6 @@
 ///
 /// Returns:
 ///     Continuous float in [-100, +100].
-
 const cp = @import("../candlestick_patterns.zig");
 const operators = @import("fuzzy").operators;
 
@@ -28,7 +27,7 @@ const realBodyLen = cp.realBodyLen;
 const upperShadow = cp.upperShadow;
 
 pub fn separatingLines(self: *const CandlestickPatterns) f64 {
-            if (!self.enough(2, &[_]*const CriterionState{&self.long_body, &self.very_short_shadow, &self.equal})) return 0.0;
+    if (!self.enough(2, &[_]*const CriterionState{ &self.long_body, &self.very_short_shadow, &self.equal })) return 0.0;
 
     const b1 = self.bar(2);
     const b2 = self.bar(1);
@@ -51,7 +50,7 @@ pub fn separatingLines(self: *const CandlestickPatterns) f64 {
     var bull_signal: f64 = 0.0;
     if (color2 == 1) {
         const mu_vs = self.muLessCs(lowerShadow(b2.o, b2.l, b2.c), &self.very_short_shadow, 1);
-        const conf = operators.tProductAll(&.{mu_eq, mu_long, mu_vs});
+        const conf = operators.tProductAll(&.{ mu_eq, mu_long, mu_vs });
         bull_signal = conf * 100.0;
     }
 
@@ -59,7 +58,7 @@ pub fn separatingLines(self: *const CandlestickPatterns) f64 {
     var bear_signal: f64 = 0.0;
     if (color2 == -1) {
         const mu_vs = self.muLessCs(upperShadow(b2.o, b2.h, b2.c), &self.very_short_shadow, 1);
-        const conf = operators.tProductAll(&.{mu_eq, mu_long, mu_vs});
+        const conf = operators.tProductAll(&.{ mu_eq, mu_long, mu_vs });
         bear_signal = -conf * 100.0;
     }
 

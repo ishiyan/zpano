@@ -42,16 +42,32 @@ fn almostEqual(a: f64, b: f64, epsilon: f64) bool {
     return @abs(a - b) < epsilon;
 }
 
-test "clear cross above" { try std.testing.expect(almostEqual(muCrossesAbove(25.0, 35.0, 30.0, 0.0, .sigmoid), 1.0, 1e-10)); }
-test "no cross both above" { try std.testing.expect(almostEqual(muCrossesAbove(35.0, 40.0, 30.0, 0.0, .sigmoid), 0.0, 1e-10)); }
-test "no cross both below" { try std.testing.expect(almostEqual(muCrossesAbove(25.0, 28.0, 30.0, 0.0, .sigmoid), 0.0, 1e-10)); }
-test "at threshold" { try std.testing.expect(almostEqual(muCrossesAbove(30.0, 30.0, 30.0, 0.0, .sigmoid), 0.25, 1e-10)); }
-test "clear cross below" { try std.testing.expect(almostEqual(muCrossesBelow(35.0, 25.0, 30.0, 0.0, .sigmoid), 1.0, 1e-10)); }
+test "clear cross above" {
+    try std.testing.expect(almostEqual(muCrossesAbove(25.0, 35.0, 30.0, 0.0, .sigmoid), 1.0, 1e-10));
+}
+test "no cross both above" {
+    try std.testing.expect(almostEqual(muCrossesAbove(35.0, 40.0, 30.0, 0.0, .sigmoid), 0.0, 1e-10));
+}
+test "no cross both below" {
+    try std.testing.expect(almostEqual(muCrossesAbove(25.0, 28.0, 30.0, 0.0, .sigmoid), 0.0, 1e-10));
+}
+test "at threshold" {
+    try std.testing.expect(almostEqual(muCrossesAbove(30.0, 30.0, 30.0, 0.0, .sigmoid), 0.25, 1e-10));
+}
+test "clear cross below" {
+    try std.testing.expect(almostEqual(muCrossesBelow(35.0, 25.0, 30.0, 0.0, .sigmoid), 1.0, 1e-10));
+}
 test "symmetry" {
     const cb = muCrossesBelow(35.0, 25.0, 30.0, 2.0, .sigmoid);
     const ca = muCrossesAbove(25.0, 35.0, 30.0, 2.0, .sigmoid);
     try std.testing.expect(almostEqual(cb, ca, 1e-10));
 }
-test "golden cross" { try std.testing.expect(almostEqual(muLineCrossesAbove(49.0, 51.0, 50.0, 50.0, 0.0, .sigmoid), 1.0, 1e-10)); }
-test "no line cross" { try std.testing.expect(almostEqual(muLineCrossesAbove(52.0, 53.0, 50.0, 50.0, 0.0, .sigmoid), 0.0, 1e-10)); }
-test "death cross" { try std.testing.expect(almostEqual(muLineCrossesBelow(51.0, 49.0, 50.0, 50.0, 0.0, .sigmoid), 1.0, 1e-10)); }
+test "golden cross" {
+    try std.testing.expect(almostEqual(muLineCrossesAbove(49.0, 51.0, 50.0, 50.0, 0.0, .sigmoid), 1.0, 1e-10));
+}
+test "no line cross" {
+    try std.testing.expect(almostEqual(muLineCrossesAbove(52.0, 53.0, 50.0, 50.0, 0.0, .sigmoid), 0.0, 1e-10));
+}
+test "death cross" {
+    try std.testing.expect(almostEqual(muLineCrossesBelow(51.0, 49.0, 50.0, 50.0, 0.0, .sigmoid), 1.0, 1e-10));
+}

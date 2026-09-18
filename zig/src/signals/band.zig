@@ -34,12 +34,24 @@ fn almostEqual(a: f64, b: f64, epsilon: f64) bool {
     return @abs(a - b) < epsilon;
 }
 
-test "above well above" { try std.testing.expect(almostEqual(muAboveBand(110.0, 100.0, 5.0, .sigmoid), 1.0, 0.01)); }
-test "above at band" { try std.testing.expect(almostEqual(muAboveBand(100.0, 100.0, 5.0, .sigmoid), 0.5, 1e-10)); }
-test "below well below" { try std.testing.expect(almostEqual(muBelowBand(85.0, 90.0, 5.0, .sigmoid), 1.0, 0.01)); }
-test "between centered" { try std.testing.expect(muBetweenBands(100.0, 90.0, 110.0, .sigmoid) > 0.8); }
-test "between at upper" { try std.testing.expect(muBetweenBands(110.0, 90.0, 110.0, .sigmoid) < 0.6); }
-test "between outside" { try std.testing.expect(muBetweenBands(130.0, 90.0, 110.0, .sigmoid) < 0.1); }
+test "above well above" {
+    try std.testing.expect(almostEqual(muAboveBand(110.0, 100.0, 5.0, .sigmoid), 1.0, 0.01));
+}
+test "above at band" {
+    try std.testing.expect(almostEqual(muAboveBand(100.0, 100.0, 5.0, .sigmoid), 0.5, 1e-10));
+}
+test "below well below" {
+    try std.testing.expect(almostEqual(muBelowBand(85.0, 90.0, 5.0, .sigmoid), 1.0, 0.01));
+}
+test "between centered" {
+    try std.testing.expect(muBetweenBands(100.0, 90.0, 110.0, .sigmoid) > 0.8);
+}
+test "between at upper" {
+    try std.testing.expect(muBetweenBands(110.0, 90.0, 110.0, .sigmoid) < 0.6);
+}
+test "between outside" {
+    try std.testing.expect(muBetweenBands(130.0, 90.0, 110.0, .sigmoid) < 0.1);
+}
 test "between degenerate" {
     try std.testing.expectEqual(@as(f64, 0.0), muBetweenBands(100.0, 110.0, 90.0, .sigmoid));
     try std.testing.expectEqual(@as(f64, 0.0), muBetweenBands(100.0, 100.0, 100.0, .sigmoid));

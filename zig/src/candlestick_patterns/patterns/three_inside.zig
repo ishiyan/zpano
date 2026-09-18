@@ -17,7 +17,6 @@
 ///
 /// Returns:
 ///     Continuous float in [-100, +100].
-
 const cp = @import("../candlestick_patterns.zig");
 const operators = @import("fuzzy").operators;
 
@@ -28,7 +27,7 @@ const isWhite = cp.isWhite;
 const realBodyLen = cp.realBodyLen;
 
 pub fn threeInside(self: *const CandlestickPatterns) f64 {
-            if (!self.enough(3, &[_]*const CriterionState{&self.long_body, &self.short_body})) return 0.0;
+    if (!self.enough(3, &[_]*const CriterionState{ &self.long_body, &self.short_body })) return 0.0;
 
     const b1 = self.bar(3);
     const b2 = self.bar(2);
@@ -50,7 +49,7 @@ pub fn threeInside(self: *const CandlestickPatterns) f64 {
         const rb1 = realBodyLen(b1.o, b1.c);
         const width = if (rb1 > 0.0) self.fuzz_ratio * rb1 else 0.0;
         const mu_close_above = self.muGtRaw(b3.c, b1.o, width);
-        const conf = operators.tProductAll(&.{mu_long1, mu_short2, mu_enc_upper, mu_enc_lower, mu_close_above});
+        const conf = operators.tProductAll(&.{ mu_long1, mu_short2, mu_enc_upper, mu_enc_lower, mu_close_above });
         bull_signal = conf * 100.0;
     }
 
@@ -60,7 +59,7 @@ pub fn threeInside(self: *const CandlestickPatterns) f64 {
         const rb1 = realBodyLen(b1.o, b1.c);
         const width = if (rb1 > 0.0) self.fuzz_ratio * rb1 else 0.0;
         const mu_close_below = self.muLtRaw(b3.c, b1.o, width);
-        const conf = operators.tProductAll(&.{mu_long1, mu_short2, mu_enc_upper, mu_enc_lower, mu_close_below});
+        const conf = operators.tProductAll(&.{ mu_long1, mu_short2, mu_enc_upper, mu_enc_lower, mu_close_below });
         bear_signal = -conf * 100.0;
     }
 

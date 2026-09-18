@@ -11,4 +11,3 @@ pub fn testInput() [51]f64 {
         67.96,
     };
 }
-

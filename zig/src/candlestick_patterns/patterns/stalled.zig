@@ -11,7 +11,6 @@
 ///
 /// Returns:
 ///     Continuous float in [-100, 0].  Always bearish.
-
 const cp = @import("../candlestick_patterns.zig");
 const operators = @import("fuzzy").operators;
 
@@ -22,7 +21,7 @@ const realBodyLen = cp.realBodyLen;
 const upperShadow = cp.upperShadow;
 
 pub fn stalled(self: *const CandlestickPatterns) f64 {
-            if (!self.enough(3, &[_]*const CriterionState{&self.long_body, &self.short_body, &self.very_short_shadow, &self.near})) return 0.0;
+    if (!self.enough(3, &[_]*const CriterionState{ &self.long_body, &self.short_body, &self.very_short_shadow, &self.near })) return 0.0;
 
     const b1 = self.bar(3);
     const b2 = self.bar(2);
@@ -54,7 +53,7 @@ pub fn stalled(self: *const CandlestickPatterns) f64 {
     const near2_width = if (near2 > 0.0) self.fuzz_ratio * near2 else 0.0;
     const mu_o3_shoulder = self.muGeRaw(b3.o, b2.c - rb3 - near2, near2_width);
 
-    const confidence = operators.tProductAll(&.{mu_long1, mu_long2, mu_us2, mu_o2_near, mu_short3, mu_o3_shoulder});
+    const confidence = operators.tProductAll(&.{ mu_long1, mu_long2, mu_us2, mu_o2_near, mu_short3, mu_o3_shoulder });
 
     return -1.0 * confidence * 100.0;
 }

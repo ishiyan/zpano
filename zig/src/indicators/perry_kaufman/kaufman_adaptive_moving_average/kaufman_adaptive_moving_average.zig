@@ -1,7 +1,6 @@
 const std = @import("std");
 const math = std.math;
 
-
 const entities = @import("entities");
 const Bar = entities.Bar;
 const Quote = entities.Quote;
@@ -336,7 +335,6 @@ pub const KaufmanAdaptiveMovingAverage = struct {
 
 const testing = std.testing;
 const testdata = @import("testdata.zig");
-
 
 fn createKamaLength(allocator: std.mem.Allocator, er_len: u32, fastest: u32, slowest: u32) !KaufmanAdaptiveMovingAverage {
     var kama = try KaufmanAdaptiveMovingAverage.initLength(allocator, .{

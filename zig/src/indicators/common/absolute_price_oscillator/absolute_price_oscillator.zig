@@ -1,7 +1,6 @@
 const std = @import("std");
 const math = std.math;
 
-
 const entities = @import("entities");
 const Bar = entities.Bar;
 const Quote = entities.Quote;
@@ -293,7 +292,6 @@ pub const AbsolutePriceOscillator = struct {
 
 const testing = std.testing;
 const testdata = @import("testdata.zig");
-
 
 fn createApo(allocator: std.mem.Allocator, fast: usize, slow: usize, ma_type: MovingAverageType, first_is_avg: bool) !AbsolutePriceOscillator {
     var apo = try AbsolutePriceOscillator.init(allocator, .{

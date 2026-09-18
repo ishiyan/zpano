@@ -32,7 +32,6 @@ pub fn testInput() [252]f64 {
     };
 }
 
-
 pub fn expectedLen20PhaseMin100() [252]f64 {
     return .{
         math.nan(f64),       math.nan(f64),       math.nan(f64),       math.nan(f64),       math.nan(f64),       math.nan(f64),

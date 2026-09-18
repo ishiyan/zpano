@@ -12,7 +12,6 @@
 ///
 /// Returns:
 ///     Continuous float in [0, 100].  Always bullish.
-
 const cp = @import("../candlestick_patterns.zig");
 
 const CandlestickPatterns = cp.CandlestickPatterns;
@@ -22,7 +21,7 @@ const isWhite = cp.isWhite;
 const upperShadow = cp.upperShadow;
 
 pub fn ladderBottom(self: *const CandlestickPatterns) f64 {
-            if (!self.enough(5, &[_]*const CriterionState{&self.very_short_shadow})) return 0.0;
+    if (!self.enough(5, &[_]*const CriterionState{&self.very_short_shadow})) return 0.0;
 
     const b1 = self.bar(5);
     const b2 = self.bar(4);

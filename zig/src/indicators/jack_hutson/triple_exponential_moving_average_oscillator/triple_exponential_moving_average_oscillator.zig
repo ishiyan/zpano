@@ -1,7 +1,6 @@
 const std = @import("std");
 const math = std.math;
 
-
 const entities = @import("entities");
 const Bar = entities.Bar;
 const Quote = entities.Quote;
@@ -244,7 +243,6 @@ pub const TripleExponentialMovingAverageOscillator = struct {
 
 const testing = std.testing;
 const testdata = @import("testdata.zig");
-
 
 fn createTrix(length: usize) !TripleExponentialMovingAverageOscillator {
     var trix = try TripleExponentialMovingAverageOscillator.init(.{ .length = length });

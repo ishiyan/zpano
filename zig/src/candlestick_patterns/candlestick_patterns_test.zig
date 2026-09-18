@@ -108,64 +108,186 @@ fn runPatternTest(
     }
 }
 
-test "abandoned_baby" { try runPatternTest("abandoned_baby", CandlestickPatterns.abandonedBaby, &td_abandoned_baby.test_data, &.{185}); }
-test "advance_block" { try runPatternTest("advance_block", CandlestickPatterns.advanceBlock, &td_advance_block.test_data, &.{ 6, 14, 117, 126, 151 }); }
-test "belt_hold" { try runPatternTest("belt_hold", CandlestickPatterns.beltHold, &td_belt_hold.test_data, &.{}); }
-test "breakaway" { try runPatternTest("breakaway", CandlestickPatterns.breakaway, &td_breakaway.test_data, &.{21}); }
-test "closing_marubozu" { try runPatternTest("closing_marubozu", CandlestickPatterns.closingMarubozu, &td_closing_marubozu.test_data, &.{}); }
-test "concealing_baby_swallow" { try runPatternTest("concealing_baby_swallow", CandlestickPatterns.concealingBabySwallow, &td_concealing_baby_swallow.test_data, &.{28}); }
-test "counterattack" { try runPatternTest("counterattack", CandlestickPatterns.counterattack, &td_counterattack.test_data, &.{61}); }
-test "dark_cloud_cover" { try runPatternTest("dark_cloud_cover", CandlestickPatterns.darkCloudCover, &td_dark_cloud_cover.test_data, &.{}); }
-test "doji" { try runPatternTest("doji", CandlestickPatterns.patternDoji, &td_doji.test_data, &.{}); }
-test "doji_star" { try runPatternTest("doji_star", CandlestickPatterns.dojiStar, &td_doji_star.test_data, &.{}); }
-test "dragonfly_doji" { try runPatternTest("dragonfly_doji", CandlestickPatterns.dragonflyDoji, &td_dragonfly_doji.test_data, &.{}); }
-test "engulfing" { try runPatternTest("engulfing", CandlestickPatterns.patternEngulfing, &td_engulfing.test_data, &.{}); }
-test "evening_doji_star" { try runPatternTest("evening_doji_star", CandlestickPatterns.eveningDojiStar, &td_evening_doji_star.test_data, &.{}); }
-test "evening_star" { try runPatternTest("evening_star", CandlestickPatterns.eveningStar, &td_evening_star.test_data, &.{}); }
-test "gravestone_doji" { try runPatternTest("gravestone_doji", CandlestickPatterns.gravestoneDoji, &td_gravestone_doji.test_data, &.{137}); }
-test "hammer" { try runPatternTest("hammer", CandlestickPatterns.patternHammer, &td_hammer.test_data, &.{ 8, 79 }); }
-test "hanging_man" { try runPatternTest("hanging_man", CandlestickPatterns.hangingMan, &td_hanging_man.test_data, &.{ 9, 53, 158 }); }
-test "harami" { try runPatternTest("harami", CandlestickPatterns.patternHarami, &td_harami.test_data, &.{ 4, 8, 28, 103, 110, 111, 123, 130, 131, 148, 151, 188 }); }
-test "harami_cross" { try runPatternTest("harami_cross", CandlestickPatterns.haramiCross, &td_harami_cross.test_data, &.{ 1, 21, 32, 35, 68, 74, 84, 89, 97, 121, 143, 146, 147, 166, 184 }); }
-test "high_wave" { try runPatternTest("high_wave", CandlestickPatterns.highWave, &td_high_wave.test_data, &.{ 27, 83, 99, 161 }); }
-test "hikkake" { try runPatternTest("hikkake", CandlestickPatterns.patternHikkake, &td_hikkake.test_data, &.{}); }
-test "hikkake_modified" { try runPatternTest("hikkake_modified", CandlestickPatterns.hikkakeModified, &td_hikkake_modified.test_data, &.{}); }
-test "homing_pigeon" { try runPatternTest("homing_pigeon", CandlestickPatterns.homingPigeon, &td_homing_pigeon.test_data, &.{}); }
-test "identical_three_crows" { try runPatternTest("identical_three_crows", CandlestickPatterns.identicalThreeCrows, &td_identical_three_crows.test_data, &.{}); }
-test "in_neck" { try runPatternTest("in_neck", CandlestickPatterns.inNeck, &td_in_neck.test_data, &.{}); }
-test "inverted_hammer" { try runPatternTest("inverted_hammer", CandlestickPatterns.invertedHammer, &td_inverted_hammer.test_data, &.{}); }
-test "kicking" { try runPatternTest("kicking", CandlestickPatterns.patternKicking, &td_kicking.test_data, &.{}); }
-test "kicking_by_length" { try runPatternTest("kicking_by_length", CandlestickPatterns.patternKickingByLength, &td_kicking_by_length.test_data, &.{}); }
-test "ladder_bottom" { try runPatternTest("ladder_bottom", CandlestickPatterns.ladderBottom, &td_ladder_bottom.test_data, &.{}); }
-test "long_legged_doji" { try runPatternTest("long_legged_doji", CandlestickPatterns.longLeggedDoji, &td_long_legged_doji.test_data, &.{ 92, 103 }); }
-test "long_line" { try runPatternTest("long_line", CandlestickPatterns.longLine, &td_long_line.test_data, &.{}); }
-test "marubozu" { try runPatternTest("marubozu", CandlestickPatterns.patternMarubozu, &td_marubozu.test_data, &.{19}); }
-test "mat_hold" { try runPatternTest("mat_hold", CandlestickPatterns.matHold, &td_mat_hold.test_data, &.{}); }
-test "matching_low" { try runPatternTest("matching_low", CandlestickPatterns.matchingLow, &td_matching_low.test_data, &.{}); }
-test "morning_doji_star" { try runPatternTest("morning_doji_star", CandlestickPatterns.morningDojiStar, &td_morning_doji_star.test_data, &.{}); }
-test "morning_star" { try runPatternTest("morning_star", CandlestickPatterns.morningStar, &td_morning_star.test_data, &.{}); }
-test "on_neck" { try runPatternTest("on_neck", CandlestickPatterns.onNeck, &td_on_neck.test_data, &.{}); }
-test "piercing" { try runPatternTest("piercing", CandlestickPatterns.patternPiercing, &td_piercing.test_data, &.{93}); }
-test "rickshaw_man" { try runPatternTest("rickshaw_man", CandlestickPatterns.rickshawMan, &td_rickshaw_man.test_data, &.{ 69, 193 }); }
-test "rising_falling_three_methods" { try runPatternTest("rising_falling_three_methods", CandlestickPatterns.risingFallingThreeMethods, &td_rising_falling_three_methods.test_data, &.{ 76, 180 }); }
-test "separating_lines" { try runPatternTest("separating_lines", CandlestickPatterns.separatingLines, &td_separating_lines.test_data, &.{ 70, 112 }); }
-test "shooting_star" { try runPatternTest("shooting_star", CandlestickPatterns.shootingStar, &td_shooting_star.test_data, &.{ 22, 90 }); }
-test "short_line" { try runPatternTest("short_line", CandlestickPatterns.shortLine, &td_short_line.test_data, &.{}); }
-test "spinning_top" { try runPatternTest("spinning_top", CandlestickPatterns.spinningTop, &td_spinning_top.test_data, &.{ 1, 4, 116, 171 }); }
-test "stalled" { try runPatternTest("stalled", CandlestickPatterns.stalled, &td_stalled.test_data, &.{ 5, 180, 198 }); }
-test "stick_sandwich" { try runPatternTest("stick_sandwich", CandlestickPatterns.stickSandwich, &td_stick_sandwich.test_data, &.{}); }
-test "takuri" { try runPatternTest("takuri", CandlestickPatterns.patternTakuri, &td_takuri.test_data, &.{ 72, 154 }); }
-test "tasuki_gap" { try runPatternTest("tasuki_gap", CandlestickPatterns.tasukiGap, &td_tasuki_gap.test_data, &.{161}); }
-test "three_black_crows" { try runPatternTest("three_black_crows", CandlestickPatterns.threeBlackCrows, &td_three_black_crows.test_data, &.{}); }
-test "three_inside" { try runPatternTest("three_inside", CandlestickPatterns.threeInside, &td_three_inside.test_data, &.{}); }
-test "three_line_strike" { try runPatternTest("three_line_strike", CandlestickPatterns.threeLineStrike, &td_three_line_strike.test_data, &.{}); }
-test "three_outside" { try runPatternTest("three_outside", CandlestickPatterns.threeOutside, &td_three_outside.test_data, &.{}); }
-test "three_stars_in_the_south" { try runPatternTest("three_stars_in_the_south", CandlestickPatterns.threeStarsInTheSouth, &td_three_stars_in_the_south.test_data, &.{21}); }
-test "three_white_soldiers" { try runPatternTest("three_white_soldiers", CandlestickPatterns.threeWhiteSoldiers, &td_three_white_soldiers.test_data, &.{}); }
-test "thrusting" { try runPatternTest("thrusting", CandlestickPatterns.patternThrusting, &td_thrusting.test_data, &.{ 1, 34, 93 }); }
-test "tristar" { try runPatternTest("tristar", CandlestickPatterns.patternTristar, &td_tristar.test_data, &.{ 2, 44, 50, 51, 53, 66, 77, 88, 98, 130, 138, 142, 149, 156, 173, 180, 182, 183, 186 }); }
-test "two_crows" { try runPatternTest("two_crows", CandlestickPatterns.twoCrows, &td_two_crows.test_data, &.{}); }
-test "unique_three_river" { try runPatternTest("unique_three_river", CandlestickPatterns.uniqueThreeRiver, &td_unique_three_river.test_data, &.{}); }
-test "up_down_gap_side_by_side_white_lines" { try runPatternTest("up_down_gap_side_by_side_white_lines", CandlestickPatterns.upDownGapSideBySideWhiteLines, &td_up_down_gap.test_data, &.{ 34, 35, 36, 37, 38, 39 }); }
-test "upside_gap_two_crows" { try runPatternTest("upside_gap_two_crows", CandlestickPatterns.upsideGapTwoCrows, &td_upside_gap_two_crows.test_data, &.{}); }
-test "x_side_gap_three_methods" { try runPatternTest("x_side_gap_three_methods", CandlestickPatterns.xSideGapThreeMethods, &td_x_side_gap_three_methods.test_data, &.{}); }
+test "abandoned_baby" {
+    try runPatternTest("abandoned_baby", CandlestickPatterns.abandonedBaby, &td_abandoned_baby.test_data, &.{185});
+}
+test "advance_block" {
+    try runPatternTest("advance_block", CandlestickPatterns.advanceBlock, &td_advance_block.test_data, &.{ 6, 14, 117, 126, 151 });
+}
+test "belt_hold" {
+    try runPatternTest("belt_hold", CandlestickPatterns.beltHold, &td_belt_hold.test_data, &.{});
+}
+test "breakaway" {
+    try runPatternTest("breakaway", CandlestickPatterns.breakaway, &td_breakaway.test_data, &.{21});
+}
+test "closing_marubozu" {
+    try runPatternTest("closing_marubozu", CandlestickPatterns.closingMarubozu, &td_closing_marubozu.test_data, &.{});
+}
+test "concealing_baby_swallow" {
+    try runPatternTest("concealing_baby_swallow", CandlestickPatterns.concealingBabySwallow, &td_concealing_baby_swallow.test_data, &.{28});
+}
+test "counterattack" {
+    try runPatternTest("counterattack", CandlestickPatterns.counterattack, &td_counterattack.test_data, &.{61});
+}
+test "dark_cloud_cover" {
+    try runPatternTest("dark_cloud_cover", CandlestickPatterns.darkCloudCover, &td_dark_cloud_cover.test_data, &.{});
+}
+test "doji" {
+    try runPatternTest("doji", CandlestickPatterns.patternDoji, &td_doji.test_data, &.{});
+}
+test "doji_star" {
+    try runPatternTest("doji_star", CandlestickPatterns.dojiStar, &td_doji_star.test_data, &.{});
+}
+test "dragonfly_doji" {
+    try runPatternTest("dragonfly_doji", CandlestickPatterns.dragonflyDoji, &td_dragonfly_doji.test_data, &.{});
+}
+test "engulfing" {
+    try runPatternTest("engulfing", CandlestickPatterns.patternEngulfing, &td_engulfing.test_data, &.{});
+}
+test "evening_doji_star" {
+    try runPatternTest("evening_doji_star", CandlestickPatterns.eveningDojiStar, &td_evening_doji_star.test_data, &.{});
+}
+test "evening_star" {
+    try runPatternTest("evening_star", CandlestickPatterns.eveningStar, &td_evening_star.test_data, &.{});
+}
+test "gravestone_doji" {
+    try runPatternTest("gravestone_doji", CandlestickPatterns.gravestoneDoji, &td_gravestone_doji.test_data, &.{137});
+}
+test "hammer" {
+    try runPatternTest("hammer", CandlestickPatterns.patternHammer, &td_hammer.test_data, &.{ 8, 79 });
+}
+test "hanging_man" {
+    try runPatternTest("hanging_man", CandlestickPatterns.hangingMan, &td_hanging_man.test_data, &.{ 9, 53, 158 });
+}
+test "harami" {
+    try runPatternTest("harami", CandlestickPatterns.patternHarami, &td_harami.test_data, &.{ 4, 8, 28, 103, 110, 111, 123, 130, 131, 148, 151, 188 });
+}
+test "harami_cross" {
+    try runPatternTest("harami_cross", CandlestickPatterns.haramiCross, &td_harami_cross.test_data, &.{ 1, 21, 32, 35, 68, 74, 84, 89, 97, 121, 143, 146, 147, 166, 184 });
+}
+test "high_wave" {
+    try runPatternTest("high_wave", CandlestickPatterns.highWave, &td_high_wave.test_data, &.{ 27, 83, 99, 161 });
+}
+test "hikkake" {
+    try runPatternTest("hikkake", CandlestickPatterns.patternHikkake, &td_hikkake.test_data, &.{});
+}
+test "hikkake_modified" {
+    try runPatternTest("hikkake_modified", CandlestickPatterns.hikkakeModified, &td_hikkake_modified.test_data, &.{});
+}
+test "homing_pigeon" {
+    try runPatternTest("homing_pigeon", CandlestickPatterns.homingPigeon, &td_homing_pigeon.test_data, &.{});
+}
+test "identical_three_crows" {
+    try runPatternTest("identical_three_crows", CandlestickPatterns.identicalThreeCrows, &td_identical_three_crows.test_data, &.{});
+}
+test "in_neck" {
+    try runPatternTest("in_neck", CandlestickPatterns.inNeck, &td_in_neck.test_data, &.{});
+}
+test "inverted_hammer" {
+    try runPatternTest("inverted_hammer", CandlestickPatterns.invertedHammer, &td_inverted_hammer.test_data, &.{});
+}
+test "kicking" {
+    try runPatternTest("kicking", CandlestickPatterns.patternKicking, &td_kicking.test_data, &.{});
+}
+test "kicking_by_length" {
+    try runPatternTest("kicking_by_length", CandlestickPatterns.patternKickingByLength, &td_kicking_by_length.test_data, &.{});
+}
+test "ladder_bottom" {
+    try runPatternTest("ladder_bottom", CandlestickPatterns.ladderBottom, &td_ladder_bottom.test_data, &.{});
+}
+test "long_legged_doji" {
+    try runPatternTest("long_legged_doji", CandlestickPatterns.longLeggedDoji, &td_long_legged_doji.test_data, &.{ 92, 103 });
+}
+test "long_line" {
+    try runPatternTest("long_line", CandlestickPatterns.longLine, &td_long_line.test_data, &.{});
+}
+test "marubozu" {
+    try runPatternTest("marubozu", CandlestickPatterns.patternMarubozu, &td_marubozu.test_data, &.{19});
+}
+test "mat_hold" {
+    try runPatternTest("mat_hold", CandlestickPatterns.matHold, &td_mat_hold.test_data, &.{});
+}
+test "matching_low" {
+    try runPatternTest("matching_low", CandlestickPatterns.matchingLow, &td_matching_low.test_data, &.{});
+}
+test "morning_doji_star" {
+    try runPatternTest("morning_doji_star", CandlestickPatterns.morningDojiStar, &td_morning_doji_star.test_data, &.{});
+}
+test "morning_star" {
+    try runPatternTest("morning_star", CandlestickPatterns.morningStar, &td_morning_star.test_data, &.{});
+}
+test "on_neck" {
+    try runPatternTest("on_neck", CandlestickPatterns.onNeck, &td_on_neck.test_data, &.{});
+}
+test "piercing" {
+    try runPatternTest("piercing", CandlestickPatterns.patternPiercing, &td_piercing.test_data, &.{93});
+}
+test "rickshaw_man" {
+    try runPatternTest("rickshaw_man", CandlestickPatterns.rickshawMan, &td_rickshaw_man.test_data, &.{ 69, 193 });
+}
+test "rising_falling_three_methods" {
+    try runPatternTest("rising_falling_three_methods", CandlestickPatterns.risingFallingThreeMethods, &td_rising_falling_three_methods.test_data, &.{ 76, 180 });
+}
+test "separating_lines" {
+    try runPatternTest("separating_lines", CandlestickPatterns.separatingLines, &td_separating_lines.test_data, &.{ 70, 112 });
+}
+test "shooting_star" {
+    try runPatternTest("shooting_star", CandlestickPatterns.shootingStar, &td_shooting_star.test_data, &.{ 22, 90 });
+}
+test "short_line" {
+    try runPatternTest("short_line", CandlestickPatterns.shortLine, &td_short_line.test_data, &.{});
+}
+test "spinning_top" {
+    try runPatternTest("spinning_top", CandlestickPatterns.spinningTop, &td_spinning_top.test_data, &.{ 1, 4, 116, 171 });
+}
+test "stalled" {
+    try runPatternTest("stalled", CandlestickPatterns.stalled, &td_stalled.test_data, &.{ 5, 180, 198 });
+}
+test "stick_sandwich" {
+    try runPatternTest("stick_sandwich", CandlestickPatterns.stickSandwich, &td_stick_sandwich.test_data, &.{});
+}
+test "takuri" {
+    try runPatternTest("takuri", CandlestickPatterns.patternTakuri, &td_takuri.test_data, &.{ 72, 154 });
+}
+test "tasuki_gap" {
+    try runPatternTest("tasuki_gap", CandlestickPatterns.tasukiGap, &td_tasuki_gap.test_data, &.{161});
+}
+test "three_black_crows" {
+    try runPatternTest("three_black_crows", CandlestickPatterns.threeBlackCrows, &td_three_black_crows.test_data, &.{});
+}
+test "three_inside" {
+    try runPatternTest("three_inside", CandlestickPatterns.threeInside, &td_three_inside.test_data, &.{});
+}
+test "three_line_strike" {
+    try runPatternTest("three_line_strike", CandlestickPatterns.threeLineStrike, &td_three_line_strike.test_data, &.{});
+}
+test "three_outside" {
+    try runPatternTest("three_outside", CandlestickPatterns.threeOutside, &td_three_outside.test_data, &.{});
+}
+test "three_stars_in_the_south" {
+    try runPatternTest("three_stars_in_the_south", CandlestickPatterns.threeStarsInTheSouth, &td_three_stars_in_the_south.test_data, &.{21});
+}
+test "three_white_soldiers" {
+    try runPatternTest("three_white_soldiers", CandlestickPatterns.threeWhiteSoldiers, &td_three_white_soldiers.test_data, &.{});
+}
+test "thrusting" {
+    try runPatternTest("thrusting", CandlestickPatterns.patternThrusting, &td_thrusting.test_data, &.{ 1, 34, 93 });
+}
+test "tristar" {
+    try runPatternTest("tristar", CandlestickPatterns.patternTristar, &td_tristar.test_data, &.{ 2, 44, 50, 51, 53, 66, 77, 88, 98, 130, 138, 142, 149, 156, 173, 180, 182, 183, 186 });
+}
+test "two_crows" {
+    try runPatternTest("two_crows", CandlestickPatterns.twoCrows, &td_two_crows.test_data, &.{});
+}
+test "unique_three_river" {
+    try runPatternTest("unique_three_river", CandlestickPatterns.uniqueThreeRiver, &td_unique_three_river.test_data, &.{});
+}
+test "up_down_gap_side_by_side_white_lines" {
+    try runPatternTest("up_down_gap_side_by_side_white_lines", CandlestickPatterns.upDownGapSideBySideWhiteLines, &td_up_down_gap.test_data, &.{ 34, 35, 36, 37, 38, 39 });
+}
+test "upside_gap_two_crows" {
+    try runPatternTest("upside_gap_two_crows", CandlestickPatterns.upsideGapTwoCrows, &td_upside_gap_two_crows.test_data, &.{});
+}
+test "x_side_gap_three_methods" {
+    try runPatternTest("x_side_gap_three_methods", CandlestickPatterns.xSideGapThreeMethods, &td_x_side_gap_three_methods.test_data, &.{});
+}

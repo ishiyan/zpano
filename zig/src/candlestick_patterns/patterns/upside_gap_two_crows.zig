@@ -13,7 +13,6 @@
 ///
 /// Returns:
 ///     Continuous float in [-100, 0].  Always bearish.
-
 const cp = @import("../candlestick_patterns.zig");
 const operators = @import("fuzzy").operators;
 
@@ -25,7 +24,7 @@ const isWhite = cp.isWhite;
 const realBodyLen = cp.realBodyLen;
 
 pub fn upsideGapTwoCrows(self: *const CandlestickPatterns) f64 {
-            if (!self.enough(3, &[_]*const CriterionState{&self.long_body, &self.short_body})) return 0.0;
+    if (!self.enough(3, &[_]*const CriterionState{ &self.long_body, &self.short_body })) return 0.0;
 
     const b1 = self.bar(3);
     const b2 = self.bar(2);
@@ -46,7 +45,7 @@ pub fn upsideGapTwoCrows(self: *const CandlestickPatterns) f64 {
     // Fuzzy: second candle is short.
     const mu_short2 = self.muLessCs(realBodyLen(b2.o, b2.c), &self.short_body, 2);
 
-    const confidence = operators.tProductAll(&.{mu_long1, mu_short2});
+    const confidence = operators.tProductAll(&.{ mu_long1, mu_short2 });
 
     return -confidence * 100.0;
 }

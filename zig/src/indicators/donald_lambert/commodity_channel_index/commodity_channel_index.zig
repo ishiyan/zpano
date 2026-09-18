@@ -1,7 +1,6 @@
 const std = @import("std");
 const math = std.math;
 
-
 const entities = @import("entities");
 const Bar = entities.Bar;
 const Quote = entities.Quote;
@@ -277,7 +276,6 @@ pub const CommodityChannelIndex = struct {
 
 const testing = std.testing;
 const testdata = @import("testdata.zig");
-
 
 fn createCci(allocator: std.mem.Allocator, length: usize) !CommodityChannelIndex {
     var cci = try CommodityChannelIndex.init(allocator, .{ .length = length });

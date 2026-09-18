@@ -1,7 +1,6 @@
 const std = @import("std");
 const math = std.math;
 
-
 const entities = @import("entities");
 const Bar = entities.Bar;
 const Quote = entities.Quote;
@@ -247,7 +246,6 @@ pub const SimpleMovingAverage = struct {
 
 const testing = std.testing;
 const testdata = @import("testdata.zig");
-
 
 fn expected3() [51]f64 {
     return .{

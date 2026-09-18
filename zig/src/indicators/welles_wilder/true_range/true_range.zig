@@ -1,7 +1,6 @@
 const std = @import("std");
 const math = std.math;
 
-
 const entities = @import("entities");
 const Bar = entities.Bar;
 const Quote = entities.Quote;
@@ -173,7 +172,6 @@ pub const TrueRange = struct {
 
 const testing = std.testing;
 const testdata = @import("testdata.zig");
-
 
 fn almostEqual(a: f64, b: f64, tolerance: f64) bool {
     if (math.isNan(a) and math.isNan(b)) return true;

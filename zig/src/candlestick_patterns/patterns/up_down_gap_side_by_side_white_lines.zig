@@ -13,7 +13,6 @@
 ///
 /// Returns:
 ///     Continuous float in [-100, +100].
-
 const cp = @import("../candlestick_patterns.zig");
 const operators = @import("fuzzy").operators;
 
@@ -25,7 +24,7 @@ const isWhite = cp.isWhite;
 const realBodyLen = cp.realBodyLen;
 
 pub fn upDownGapSideBySideWhiteLines(self: *const CandlestickPatterns) f64 {
-            if (!self.enough(3, &[_]*const CriterionState{&self.near, &self.equal})) return 0.0;
+    if (!self.enough(3, &[_]*const CriterionState{ &self.near, &self.equal })) return 0.0;
 
     const b1 = self.bar(3);
     const b2 = self.bar(2);
@@ -48,7 +47,7 @@ pub fn upDownGapSideBySideWhiteLines(self: *const CandlestickPatterns) f64 {
     const mu_near_size = self.muLessCs(@abs(rb2 - rb3), &self.near, 2);
     const mu_equal_open = self.muLessCs(@abs(b3.o - b2.o), &self.equal, 2);
 
-    const conf = operators.tProductAll(&.{mu_near_size, mu_equal_open});
+    const conf = operators.tProductAll(&.{ mu_near_size, mu_equal_open });
 
     if (gap_up) {
         return conf * 100.0;

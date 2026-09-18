@@ -11,7 +11,6 @@
 ///
 /// Returns:
 ///     Continuous float in [-100, +100].  Sign from 2nd candle direction.
-
 const cp = @import("../candlestick_patterns.zig");
 const operators = @import("fuzzy").operators;
 
@@ -19,7 +18,7 @@ const CandlestickPatterns = cp.CandlestickPatterns;
 const CriterionState = cp.CriterionState;
 
 pub fn patternEngulfing(self: *const CandlestickPatterns) f64 {
-            if (!self.enough(2, &[_]*const CriterionState{})) return 0.0;
+    if (!self.enough(2, &[_]*const CriterionState{})) return 0.0;
 
     const b1 = self.bar(2);
     const b2 = self.bar(1);
@@ -43,7 +42,7 @@ pub fn patternEngulfing(self: *const CandlestickPatterns) f64 {
     const mu_upper = self.muGeRaw(upper2, upper1, eq_width);
     const mu_lower = self.muLtRaw(lower2, lower1, eq_width);
 
-    const confidence = operators.tProductAll(&.{mu_upper, mu_lower});
+    const confidence = operators.tProductAll(&.{ mu_upper, mu_lower });
     const direction: f64 = if (b2.c < b2.o) -1.0 else 1.0;
     return direction * confidence * 100.0;
 }

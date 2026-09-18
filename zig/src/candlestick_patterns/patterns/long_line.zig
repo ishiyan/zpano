@@ -13,7 +13,6 @@
 ///
 /// Returns:
 ///     Continuous float in [-100, +100].
-
 const cp = @import("../candlestick_patterns.zig");
 const operators = @import("fuzzy").operators;
 
@@ -25,7 +24,7 @@ const realBodyLen = cp.realBodyLen;
 const upperShadow = cp.upperShadow;
 
 pub fn longLine(self: *const CandlestickPatterns) f64 {
-            if (!self.enough(1, &[_]*const CriterionState{&self.long_body, &self.short_shadow})) return 0.0;
+    if (!self.enough(1, &[_]*const CriterionState{ &self.long_body, &self.short_shadow })) return 0.0;
 
     const b = self.bar(1);
     // Fuzzy: long body, short shadows.
@@ -33,7 +32,7 @@ pub fn longLine(self: *const CandlestickPatterns) f64 {
     const mu_us = self.muLessCs(upperShadow(b.o, b.h, b.c), &self.short_shadow, 1);
     const mu_ls = self.muLessCs(lowerShadow(b.o, b.l, b.c), &self.short_shadow, 1);
 
-    const confidence = operators.tProductAll(&.{mu_long, mu_us, mu_ls});
+    const confidence = operators.tProductAll(&.{ mu_long, mu_us, mu_ls });
     const direction: i32 = if (!isWhite(b.o, b.c)) -1 else 1;
     return @as(f64, @floatFromInt(direction)) * confidence * 100.0;
 }

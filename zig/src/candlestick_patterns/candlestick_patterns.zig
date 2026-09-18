@@ -513,9 +513,6 @@ pub const CandlestickPatterns = struct {
         return patterns.x_side_gap_three_methods.xSideGapThreeMethods(self);
     }
 
-
-
-
     /// hikkakeModifiedUpdate is called from update() to track stateful hikkake_modified pattern.
     fn hikkakeModifiedUpdate(self: *Self) void {
         if (self.count < 4) return;
@@ -572,7 +569,6 @@ pub const CandlestickPatterns = struct {
             self.hikmod_pattern_idx = 0;
         }
     }
-
 
     // Dispatch
 

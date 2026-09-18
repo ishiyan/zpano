@@ -76,7 +76,10 @@ pub const CriterionState = struct {
     pub fn avg(self: *const CriterionState, shift: usize, o: f64, h: f64, l: f64, c: f64) f64 {
         return self.criterion.averageValueFromTotal(
             self.totalAt(shift),
-            o, h, l, c,
+            o,
+            h,
+            l,
+            c,
         );
     }
 };

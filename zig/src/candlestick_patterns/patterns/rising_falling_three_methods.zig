@@ -11,7 +11,6 @@
 ///
 /// Returns:
 ///     Continuous float in [-100, +100].
-
 const cp = @import("../candlestick_patterns.zig");
 const operators = @import("fuzzy").operators;
 
@@ -21,7 +20,7 @@ const isWhite = cp.isWhite;
 const realBodyLen = cp.realBodyLen;
 
 pub fn risingFallingThreeMethods(self: *const CandlestickPatterns) f64 {
-            if (!self.enough(5, &[_]*const CriterionState{&self.long_body, &self.short_body})) return 0.0;
+    if (!self.enough(5, &[_]*const CriterionState{ &self.long_body, &self.short_body })) return 0.0;
 
     const b1 = self.bar(5);
     const b2 = self.bar(4);
@@ -61,6 +60,6 @@ pub fn risingFallingThreeMethods(self: *const CandlestickPatterns) f64 {
     // 5th closes above (below) the 1st close -- crisp.
     if (!(b5.c * color1 > b1.c * color1)) return 0.0;
 
-    const conf = operators.tProductAll(&.{mu_long1, mu_short2, mu_short3, mu_short4, mu_long5});
+    const conf = operators.tProductAll(&.{ mu_long1, mu_short2, mu_short3, mu_short4, mu_long5 });
     return color1 * conf * 100.0;
 }

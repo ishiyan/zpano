@@ -7,7 +7,6 @@
 ///
 /// Returns:
 ///     Continuous float in [-100, 0].  Always bearish.
-
 const cp = @import("../candlestick_patterns.zig");
 const operators = @import("fuzzy").operators;
 
@@ -18,7 +17,7 @@ const realBodyLen = cp.realBodyLen;
 const upperShadow = cp.upperShadow;
 
 pub fn advanceBlock(self: *const CandlestickPatterns) f64 {
-            if (!self.enough(3, &[_]*const CriterionState{&self.long_body, &self.short_shadow, &self.long_shadow, &self.near, &self.far})) return 0.0;
+    if (!self.enough(3, &[_]*const CriterionState{ &self.long_body, &self.short_shadow, &self.long_shadow, &self.near, &self.far })) return 0.0;
 
     // Fuzzy: first candle short upper shadow.
     const b1 = self.bar(3);
@@ -60,7 +59,7 @@ pub fn advanceBlock(self: *const CandlestickPatterns) f64 {
     // Branch 1: 2 far smaller than 1 AND 3 not longer than 2
     const mu_b1a = self.muLtRaw(rb2, rb1 - far2, far2_width);
     const mu_b1b = self.muLtRaw(rb3, rb2 + near1, near1_width);
-    const branch1 = operators.tProductAll(&.{mu_b1a, mu_b1b});
+    const branch1 = operators.tProductAll(&.{ mu_b1a, mu_b1b });
 
     // Branch 2: 3 far smaller than 2
     const branch2 = self.muLtRaw(rb3, rb2 - far1, far1_width);
@@ -72,16 +71,16 @@ pub fn advanceBlock(self: *const CandlestickPatterns) f64 {
     const mu_b3b = self.muLtRaw(rb2, rb1, rb2_width);
     const mu_b3_us3 = self.muGreaterCs(upperShadow(b3.o, b3.h, b3.c), &self.short_shadow, 1);
     const mu_b3_us2 = self.muGreaterCs(upperShadow(b2.o, b2.h, b2.c), &self.short_shadow, 2);
-    const branch3 = operators.tProductAll(&.{mu_b3a, mu_b3b, @max(mu_b3_us3, mu_b3_us2)});
+    const branch3 = operators.tProductAll(&.{ mu_b3a, mu_b3b, @max(mu_b3_us3, mu_b3_us2) });
 
     // Branch 4: 3 < 2 AND 3 has long upper shadow
     const mu_b4a = self.muLtRaw(rb3, rb2, rb3_width);
     const mu_b4b = self.muGreaterCs(upperShadow(b3.o, b3.h, b3.c), &self.long_shadow, 1);
-    const branch4 = operators.tProductAll(&.{mu_b4a, mu_b4b});
+    const branch4 = operators.tProductAll(&.{ mu_b4a, mu_b4b });
 
     const weakness = @max(@max(branch1, branch2), @max(branch3, branch4));
 
-    const confidence = operators.tProductAll(&.{mu_o2_near, mu_o3_near, mu_long1, mu_us1, weakness});
+    const confidence = operators.tProductAll(&.{ mu_o2_near, mu_o3_near, mu_long1, mu_us1, weakness });
 
     return -confidence * 100.0;
 }

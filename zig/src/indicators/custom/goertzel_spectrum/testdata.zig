@@ -105,4 +105,3 @@ pub const goertzel_snapshots = [_]GsSnap{
         },
     },
 };
-

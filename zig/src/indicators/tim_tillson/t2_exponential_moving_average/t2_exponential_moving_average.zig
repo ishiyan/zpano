@@ -1,7 +1,6 @@
 const std = @import("std");
 const math = std.math;
 
-
 const entities = @import("entities");
 const Bar = entities.Bar;
 const Quote = entities.Quote;
@@ -378,7 +377,6 @@ pub const T2ExponentialMovingAverage = struct {
 
 const testing = std.testing;
 const testdata = @import("testdata.zig");
-
 
 // Expected data from test_T2.xls, T2(5, 0.7) — firstIsAverage = true.
 fn createT2Length(length: usize, first_is_average: bool, volume: f64) !T2ExponentialMovingAverage {

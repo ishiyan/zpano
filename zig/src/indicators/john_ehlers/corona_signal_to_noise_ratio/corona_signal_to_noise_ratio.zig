@@ -1,7 +1,6 @@
 const std = @import("std");
 const math = std.math;
 
-
 const entities = @import("entities");
 const Bar = entities.Bar;
 const Quote = entities.Quote;
@@ -459,7 +458,6 @@ pub const CoronaSignalToNoiseRatio = struct {
 // --- Tests ---
 const testing = std.testing;
 const testdata = @import("testdata.zig");
-
 
 const tolerance = 1e-4;
 

@@ -12,7 +12,6 @@
 ///
 /// Returns:
 ///     Continuous float in [-100, +100].
-
 const cp = @import("../candlestick_patterns.zig");
 const operators = @import("fuzzy").operators;
 
@@ -25,7 +24,7 @@ const realBodyLen = cp.realBodyLen;
 const upperShadow = cp.upperShadow;
 
 pub fn patternKicking(self: *const CandlestickPatterns) f64 {
-            if (!self.enough(2, &[_]*const CriterionState{&self.very_short_shadow, &self.long_body})) return 0.0;
+    if (!self.enough(2, &[_]*const CriterionState{ &self.very_short_shadow, &self.long_body })) return 0.0;
 
     const b1 = self.bar(2);
     const b2 = self.bar(1);
@@ -45,6 +44,6 @@ pub fn patternKicking(self: *const CandlestickPatterns) f64 {
     const mu_vs_us2 = self.muLessCs(upperShadow(b2.o, b2.h, b2.c), &self.very_short_shadow, 1);
     const mu_vs_ls2 = self.muLessCs(lowerShadow(b2.o, b2.l, b2.c), &self.very_short_shadow, 1);
 
-    const confidence = operators.tProductAll(&.{mu_long1, mu_vs_us1, mu_vs_ls1, mu_long2, mu_vs_us2, mu_vs_ls2});
+    const confidence = operators.tProductAll(&.{ mu_long1, mu_vs_us1, mu_vs_ls1, mu_long2, mu_vs_us2, mu_vs_ls2 });
     return @as(f64, @floatFromInt(color2)) * confidence * 100.0;
 }

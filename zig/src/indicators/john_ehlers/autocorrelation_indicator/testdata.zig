@@ -92,4 +92,3 @@ pub const aci_snapshots = [_]AciSnap{
         },
     },
 };
-

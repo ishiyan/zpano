@@ -6,7 +6,6 @@
 ///
 /// Returns:
 ///     Continuous float in [0, 100].  Higher = stronger signal.
-
 const cp = @import("../candlestick_patterns.zig");
 const operators = @import("fuzzy").operators;
 
@@ -17,7 +16,7 @@ const realBodyLen = cp.realBodyLen;
 const upperShadow = cp.upperShadow;
 
 pub fn longLeggedDoji(self: *const CandlestickPatterns) f64 {
-            if (!self.enough(1, &[_]*const CriterionState{&self.doji_body, &self.long_shadow})) return 0.0;
+    if (!self.enough(1, &[_]*const CriterionState{ &self.doji_body, &self.long_shadow })) return 0.0;
 
     const b = self.bar(1);
     const mu_doji = self.muLessCs(realBodyLen(b.o, b.c), &self.doji_body, 1);
@@ -25,6 +24,6 @@ pub fn longLeggedDoji(self: *const CandlestickPatterns) f64 {
     const mu_long_ls = self.muGreaterCs(lowerShadow(b.o, b.l, b.c), &self.long_shadow, 1);
     const mu_any_long = operators.sMax(mu_long_us, mu_long_ls);
 
-    const confidence = operators.tProductAll(&.{mu_doji, mu_any_long});
+    const confidence = operators.tProductAll(&.{ mu_doji, mu_any_long });
     return confidence * 100.0;
 }

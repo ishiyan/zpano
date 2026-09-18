@@ -104,4 +104,3 @@ pub const cbps_snapshots = [_]CbpsSnap{
         },
     },
 };
-

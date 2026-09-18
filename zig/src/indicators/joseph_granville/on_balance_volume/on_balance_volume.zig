@@ -1,7 +1,6 @@
 const std = @import("std");
 const math = std.math;
 
-
 const entities = @import("entities");
 const Bar = entities.Bar;
 const Quote = entities.Quote;
@@ -213,7 +212,6 @@ pub const OnBalanceVolume = struct {
 
 const testing = std.testing;
 const testdata = @import("testdata.zig");
-
 
 fn createObv() OnBalanceVolume {
     var obv = OnBalanceVolume.init(.{});

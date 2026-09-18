@@ -1,7 +1,6 @@
 const std = @import("std");
 const math = std.math;
 
-
 const entities = @import("entities");
 const Bar = entities.Bar;
 const Quote = entities.Quote;
@@ -470,7 +469,6 @@ pub const CoronaTrendVigor = struct {
         const texts = [_]build_metadata_mod.OutputText{
             .{ .mnemonic = mn, .description = desc },
             .{ .mnemonic = self.mnemonicTV(), .description = self.descriptionTV() },
-
         };
         build_metadata_mod.buildMetadata(out, .corona_trend_vigor, mn, desc, &texts);
     }
@@ -489,7 +487,6 @@ pub const CoronaTrendVigor = struct {
 // --- Tests ---
 const testing = std.testing;
 const testdata = @import("testdata.zig");
-
 
 const tolerance = 1e-4;
 

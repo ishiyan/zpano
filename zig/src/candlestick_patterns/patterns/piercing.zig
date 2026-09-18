@@ -7,7 +7,6 @@
 ///
 /// Returns:
 ///     Continuous float in [0, 100].  Higher = stronger signal.
-
 const cp = @import("../candlestick_patterns.zig");
 const operators = @import("fuzzy").operators;
 
@@ -18,7 +17,7 @@ const isWhite = cp.isWhite;
 const realBodyLen = cp.realBodyLen;
 
 pub fn patternPiercing(self: *const CandlestickPatterns) f64 {
-            if (!self.enough(2, &[_]*const CriterionState{&self.long_body})) return 0.0;
+    if (!self.enough(2, &[_]*const CriterionState{&self.long_body})) return 0.0;
 
     const b1 = self.bar(2);
     const b2 = self.bar(1);
@@ -40,6 +39,6 @@ pub fn patternPiercing(self: *const CandlestickPatterns) f64 {
     const mu_pen = self.muGtRaw(b2.c, pen_threshold, pen_width);
     const mu_below_open1 = self.muLtRaw(b2.c, b1.o, eq_width);
 
-    const confidence = operators.tProductAll(&.{mu_long1, mu_long2, mu_open_below, mu_pen, mu_below_open1});
+    const confidence = operators.tProductAll(&.{ mu_long1, mu_long2, mu_open_below, mu_pen, mu_below_open1 });
     return confidence * 100.0;
 }

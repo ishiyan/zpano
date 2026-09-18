@@ -11,7 +11,6 @@
 ///
 /// Returns:
 ///     Continuous float in [-100, +100].
-
 const cp = @import("../candlestick_patterns.zig");
 const operators = @import("fuzzy").operators;
 
@@ -23,7 +22,7 @@ const isRealBodyGapUp = cp.isRealBodyGapUp;
 const realBodyLen = cp.realBodyLen;
 
 pub fn patternTristar(self: *const CandlestickPatterns) f64 {
-            if (!self.enough(3, &[_]*const CriterionState{&self.doji_body})) return 0.0;
+    if (!self.enough(3, &[_]*const CriterionState{&self.doji_body})) return 0.0;
 
     const b1 = self.bar(3);
     const b2 = self.bar(2);
@@ -35,16 +34,14 @@ pub fn patternTristar(self: *const CandlestickPatterns) f64 {
     const mu_doji3 = self.muLessCs(realBodyLen(b3.o, b3.c), &self.doji_body, 1);
 
     // Bearish: second gaps up, third is not higher than second -- crisp direction checks.
-    if (isRealBodyGapUp(b1.o, b1.c, b2.o, b2.c) and @max(b3.o, b3.c) < @max(b2.o, b2.c))
-    {
-        const conf = operators.tProductAll(&.{mu_doji1, mu_doji2, mu_doji3});
+    if (isRealBodyGapUp(b1.o, b1.c, b2.o, b2.c) and @max(b3.o, b3.c) < @max(b2.o, b2.c)) {
+        const conf = operators.tProductAll(&.{ mu_doji1, mu_doji2, mu_doji3 });
         return -conf * 100.0;
     }
 
     // Bullish: second gaps down, third is not lower than second.
-    if (isRealBodyGapDown(b1.o, b1.c, b2.o, b2.c) and @min(b3.o, b3.c) > @min(b2.o, b2.c))
-    {
-        const conf = operators.tProductAll(&.{mu_doji1, mu_doji2, mu_doji3});
+    if (isRealBodyGapDown(b1.o, b1.c, b2.o, b2.c) and @min(b3.o, b3.c) > @min(b2.o, b2.c)) {
+        const conf = operators.tProductAll(&.{ mu_doji1, mu_doji2, mu_doji3 });
         return conf * 100.0;
     }
 

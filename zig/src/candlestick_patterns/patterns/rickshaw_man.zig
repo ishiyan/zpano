@@ -7,7 +7,6 @@
 ///
 /// Returns:
 ///     Continuous float in [0, 100].  Higher = stronger signal.
-
 const cp = @import("../candlestick_patterns.zig");
 const operators = @import("fuzzy").operators;
 
@@ -18,7 +17,7 @@ const realBodyLen = cp.realBodyLen;
 const upperShadow = cp.upperShadow;
 
 pub fn rickshawMan(self: *const CandlestickPatterns) f64 {
-            if (!self.enough(1, &[_]*const CriterionState{&self.doji_body, &self.long_shadow, &self.near})) return 0.0;
+    if (!self.enough(1, &[_]*const CriterionState{ &self.doji_body, &self.long_shadow, &self.near })) return 0.0;
 
     const b = self.bar(1);
 
@@ -33,6 +32,6 @@ pub fn rickshawMan(self: *const CandlestickPatterns) f64 {
     const mu_near_mid_lo = self.muLtRaw(@min(b.o, b.c), midpoint + near_avg, near_width);
     const mu_near_mid_hi = self.muGeRaw(@max(b.o, b.c), midpoint - near_avg, near_width);
 
-    const confidence = operators.tProductAll(&.{mu_doji, mu_long_us, mu_long_ls, mu_near_mid_lo, mu_near_mid_hi});
+    const confidence = operators.tProductAll(&.{ mu_doji, mu_long_us, mu_long_ls, mu_near_mid_lo, mu_near_mid_hi });
     return confidence * 100.0;
 }

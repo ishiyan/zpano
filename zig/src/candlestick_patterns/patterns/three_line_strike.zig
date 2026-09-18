@@ -10,7 +10,6 @@
 ///
 /// Returns:
 ///     Continuous float in [-100, +100].
-
 const cp = @import("../candlestick_patterns.zig");
 const operators = @import("fuzzy").operators;
 
@@ -19,7 +18,7 @@ const CriterionState = cp.CriterionState;
 const isWhite = cp.isWhite;
 
 pub fn threeLineStrike(self: *const CandlestickPatterns) f64 {
-            if (!self.enough(4, &[_]*const CriterionState{&self.near})) return 0.0;
+    if (!self.enough(4, &[_]*const CriterionState{&self.near})) return 0.0;
 
     const b1 = self.bar(4);
     const b2 = self.bar(3);
@@ -57,7 +56,7 @@ pub fn threeLineStrike(self: *const CandlestickPatterns) f64 {
         const width = if (rb1 > 0.0) self.fuzz_ratio * rb1 else 0.0;
         const mu_o4_above = self.muGtRaw(b4.o, b3.c, width);
         const mu_c4_below = self.muLtRaw(b4.c, b1.o, width);
-        const conf = operators.tProductAll(&.{mu_o2_ge, mu_o2_le, mu_o3_ge, mu_o3_le, mu_o4_above, mu_c4_below});
+        const conf = operators.tProductAll(&.{ mu_o2_ge, mu_o2_le, mu_o3_ge, mu_o3_le, mu_o4_above, mu_c4_below });
         bull_signal = conf * 100.0;
     }
 
@@ -68,7 +67,7 @@ pub fn threeLineStrike(self: *const CandlestickPatterns) f64 {
         const width = if (rb1 > 0.0) self.fuzz_ratio * rb1 else 0.0;
         const mu_o4_below = self.muLtRaw(b4.o, b3.c, width);
         const mu_c4_above = self.muGtRaw(b4.c, b1.o, width);
-        const conf = operators.tProductAll(&.{mu_o2_ge, mu_o2_le, mu_o3_ge, mu_o3_le, mu_o4_below, mu_c4_above});
+        const conf = operators.tProductAll(&.{ mu_o2_ge, mu_o2_le, mu_o3_ge, mu_o3_le, mu_o4_below, mu_c4_above });
         bear_signal = -conf * 100.0;
     }
 

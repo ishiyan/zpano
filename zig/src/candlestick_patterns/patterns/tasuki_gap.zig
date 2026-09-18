@@ -18,7 +18,6 @@
 ///
 /// Returns:
 ///     Continuous float in [-100, +100].
-
 const cp = @import("../candlestick_patterns.zig");
 const operators = @import("fuzzy").operators;
 
@@ -31,7 +30,7 @@ const isWhite = cp.isWhite;
 const realBodyLen = cp.realBodyLen;
 
 pub fn tasukiGap(self: *const CandlestickPatterns) f64 {
-            if (!self.enough(3, &[_]*const CriterionState{&self.near})) return 0.0;
+    if (!self.enough(3, &[_]*const CriterionState{&self.near})) return 0.0;
 
     const b1 = self.bar(3);
     const b2 = self.bar(2);
@@ -39,8 +38,7 @@ pub fn tasukiGap(self: *const CandlestickPatterns) f64 {
 
     // Upside Tasuki Gap (bullish).
     var bull_signal: f64 = 0.0;
-    if (isRealBodyGapUp(b1.o, b1.c, b2.o, b2.c) and isWhite(b2.o, b2.c) and isBlack(b3.o, b3.c))
-    {
+    if (isRealBodyGapUp(b1.o, b1.c, b2.o, b2.c) and isWhite(b2.o, b2.c) and isBlack(b3.o, b3.c)) {
         const rb2 = realBodyLen(b2.o, b2.c);
         const rb3 = realBodyLen(b3.o, b3.c);
         const width = if (rb2 > 0.0) self.fuzz_ratio * rb2 else 0.0;
@@ -54,14 +52,13 @@ pub fn tasukiGap(self: *const CandlestickPatterns) f64 {
         const mu_c3_gt_top1 = self.muGtRaw(b3.c, body1_top, width);
         // near-equal bodies
         const mu_near = self.muLessCs(@abs(rb2 - rb3), &self.near, 2);
-        const conf = operators.tProductAll(&.{mu_o3_lt_c2, mu_o3_gt_o2, mu_c3_lt_o2, mu_c3_gt_top1, mu_near});
+        const conf = operators.tProductAll(&.{ mu_o3_lt_c2, mu_o3_gt_o2, mu_c3_lt_o2, mu_c3_gt_top1, mu_near });
         bull_signal = conf * 100.0;
     }
 
     // Downside Tasuki Gap (bearish).
     var bear_signal: f64 = 0.0;
-    if (isRealBodyGapDown(b1.o, b1.c, b2.o, b2.c) and isBlack(b2.o, b2.c) and isWhite(b3.o, b3.c))
-    {
+    if (isRealBodyGapDown(b1.o, b1.c, b2.o, b2.c) and isBlack(b2.o, b2.c) and isWhite(b3.o, b3.c)) {
         const rb2 = realBodyLen(b2.o, b2.c);
         const rb3 = realBodyLen(b3.o, b3.c);
         const width = if (rb2 > 0.0) self.fuzz_ratio * rb2 else 0.0;
@@ -75,7 +72,7 @@ pub fn tasukiGap(self: *const CandlestickPatterns) f64 {
         const mu_c3_lt_bot1 = self.muLtRaw(b3.c, body1_bot, width);
         // near-equal bodies
         const mu_near = self.muLessCs(@abs(rb2 - rb3), &self.near, 2);
-        const conf = operators.tProductAll(&.{mu_o3_lt_o2, mu_o3_gt_c2, mu_c3_gt_o2, mu_c3_lt_bot1, mu_near});
+        const conf = operators.tProductAll(&.{ mu_o3_lt_o2, mu_o3_gt_c2, mu_c3_gt_o2, mu_c3_lt_bot1, mu_near });
         bear_signal = -conf * 100.0;
     }
 

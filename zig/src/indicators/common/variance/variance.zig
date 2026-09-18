@@ -1,7 +1,6 @@
 const std = @import("std");
 const math = std.math;
 
-
 const entities = @import("entities");
 const Bar = entities.Bar;
 const Quote = entities.Quote;
@@ -291,7 +290,6 @@ pub const Variance = struct {
 
 const testing = std.testing;
 const testdata = @import("testdata.zig");
-
 
 fn createVariance(allocator: std.mem.Allocator, length: usize, unbiased: bool) !Variance {
     var v = try Variance.init(allocator, .{ .length = length, .is_unbiased = unbiased });

@@ -11,7 +11,6 @@
 ///
 /// Returns:
 ///     Continuous float in [0, 100].  Always bullish.
-
 const cp = @import("../candlestick_patterns.zig");
 const operators = @import("fuzzy").operators;
 
@@ -22,7 +21,7 @@ const realBodyLen = cp.realBodyLen;
 const upperShadow = cp.upperShadow;
 
 pub fn threeWhiteSoldiers(self: *const CandlestickPatterns) f64 {
-            if (!self.enough(3, &[_]*const CriterionState{&self.short_body, &self.very_short_shadow, &self.near, &self.far})) return 0.0;
+    if (!self.enough(3, &[_]*const CriterionState{ &self.short_body, &self.very_short_shadow, &self.near, &self.far })) return 0.0;
 
     const b1 = self.bar(3);
     const b2 = self.bar(2);
@@ -64,7 +63,16 @@ pub fn threeWhiteSoldiers(self: *const CandlestickPatterns) f64 {
     // Fuzzy: third candle is not short.
     const mu_not_short3 = self.muGreaterCs(rb3, &self.short_body, 1);
 
-    const confidence = operators.tProductAll(&.{ mu_us1, mu_us2, mu_us3, mu_o2_near, mu_o3_near, mu_not_far2, mu_not_far3, mu_not_short3, });
+    const confidence = operators.tProductAll(&.{
+        mu_us1,
+        mu_us2,
+        mu_us3,
+        mu_o2_near,
+        mu_o3_near,
+        mu_not_far2,
+        mu_not_far3,
+        mu_not_short3,
+    });
 
     return confidence * 100.0;
 }

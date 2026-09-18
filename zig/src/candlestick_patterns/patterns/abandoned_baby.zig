@@ -12,7 +12,6 @@
 ///
 /// Returns:
 ///     Continuous float in [-100, +100].
-
 const cp = @import("../candlestick_patterns.zig");
 const operators = @import("fuzzy").operators;
 
@@ -27,7 +26,7 @@ const realBodyLen = cp.realBodyLen;
 const abandoned_baby_penetration_factor = 0.3;
 
 pub fn abandonedBaby(self: *const CandlestickPatterns) f64 {
-            if (!self.enough(3, &[_]*const CriterionState{&self.long_body, &self.doji_body, &self.short_body})) return 0.0;
+    if (!self.enough(3, &[_]*const CriterionState{ &self.long_body, &self.doji_body, &self.short_body })) return 0.0;
 
     const b1 = self.bar(3);
     const b2 = self.bar(2);
@@ -48,7 +47,7 @@ pub fn abandonedBaby(self: *const CandlestickPatterns) f64 {
             const pen_threshold = b1.c - rb1 * penetration;
             const pen_width = if (rb1 > 0.0) self.fuzz_ratio * rb1 else 0.0;
             const mu_pen = self.muLtRaw(b3.c, pen_threshold, pen_width);
-            const conf_bear = operators.tProductAll(&.{mu_long1, mu_doji2, mu_short3, mu_pen});
+            const conf_bear = operators.tProductAll(&.{ mu_long1, mu_doji2, mu_short3, mu_pen });
             bear_signal = -conf_bear * 100.0;
         }
     }
@@ -61,7 +60,7 @@ pub fn abandonedBaby(self: *const CandlestickPatterns) f64 {
             const pen_threshold = b1.c + rb1 * penetration;
             const pen_width = if (rb1 > 0.0) self.fuzz_ratio * rb1 else 0.0;
             const mu_pen = self.muGtRaw(b3.c, pen_threshold, pen_width);
-            const conf_bull = operators.tProductAll(&.{mu_long1, mu_doji2, mu_short3, mu_pen});
+            const conf_bull = operators.tProductAll(&.{ mu_long1, mu_doji2, mu_short3, mu_pen });
             bull_signal = conf_bull * 100.0;
         }
     }

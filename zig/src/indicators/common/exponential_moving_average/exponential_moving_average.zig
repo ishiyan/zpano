@@ -1,7 +1,6 @@
 const std = @import("std");
 const math = std.math;
 
-
 const entities = @import("entities");
 const Bar = entities.Bar;
 const Quote = entities.Quote;
@@ -275,7 +274,6 @@ pub const ExponentialMovingAverage = struct {
 
 const testing = std.testing;
 const testdata = @import("testdata.zig");
-
 
 fn createEmaLength(length: usize, first_is_average: bool) !ExponentialMovingAverage {
     var ema = try ExponentialMovingAverage.initLength(.{

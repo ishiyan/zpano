@@ -14,7 +14,6 @@
 ///
 /// Returns:
 ///     Continuous float in [-100, 0].  Always bearish.
-
 const cp = @import("../candlestick_patterns.zig");
 const operators = @import("fuzzy").operators;
 
@@ -25,7 +24,7 @@ const isWhite = cp.isWhite;
 const realBodyLen = cp.realBodyLen;
 
 pub fn patternThrusting(self: *const CandlestickPatterns) f64 {
-            if (!self.enough(2, &[_]*const CriterionState{&self.long_body, &self.equal})) return 0.0;
+    if (!self.enough(2, &[_]*const CriterionState{ &self.long_body, &self.equal })) return 0.0;
 
     const b1 = self.bar(2);
     const b2 = self.bar(1);
@@ -48,7 +47,7 @@ pub fn patternThrusting(self: *const CandlestickPatterns) f64 {
     const mid_width = if (rb1 > 0.0) self.fuzz_ratio * rb1 * 0.5 else 0.0;
     const mu_below_mid = self.muLtRaw(b2.c, mid, mid_width);
 
-    const confidence = operators.tProductAll(&.{mu_long1, mu_above_close, mu_below_mid});
+    const confidence = operators.tProductAll(&.{ mu_long1, mu_above_close, mu_below_mid });
 
     return -1.0 * confidence * 100.0;
 }

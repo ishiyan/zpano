@@ -13,7 +13,6 @@
 ///
 /// Returns:
 ///     Continuous float in [0, 100].  Always bullish.
-
 const cp = @import("../candlestick_patterns.zig");
 const operators = @import("fuzzy").operators;
 
@@ -28,7 +27,7 @@ const realBodyLen = cp.realBodyLen;
 const mat_hold_penetration_factor = 0.5;
 
 pub fn matHold(self: *const CandlestickPatterns) f64 {
-            if (!self.enough(5, &[_]*const CriterionState{&self.long_body, &self.short_body})) return 0.0;
+    if (!self.enough(5, &[_]*const CriterionState{ &self.long_body, &self.short_body })) return 0.0;
 
     const b1 = self.bar(5);
     const b2 = self.bar(4);
@@ -54,6 +53,6 @@ pub fn matHold(self: *const CandlestickPatterns) f64 {
     const mu_short3 = self.muLessCs(realBodyLen(b3.o, b3.c), &self.short_body, 3);
     const mu_short4 = self.muLessCs(realBodyLen(b4.o, b4.c), &self.short_body, 2);
 
-    const confidence = operators.tProductAll(&.{mu_long1, mu_short2, mu_short3, mu_short4});
+    const confidence = operators.tProductAll(&.{ mu_long1, mu_short2, mu_short3, mu_short4 });
     return confidence * 100.0;
 }

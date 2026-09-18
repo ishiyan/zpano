@@ -1,7 +1,6 @@
 const std = @import("std");
 const math = std.math;
 
-
 const entities = @import("entities");
 const Bar = entities.Bar;
 const Quote = entities.Quote;
@@ -236,7 +235,6 @@ pub const RateOfChangeRatio = struct {
 
 const testing = std.testing;
 const testdata = @import("testdata.zig");
-
 
 fn createRocr(allocator: std.mem.Allocator, length: usize, hundred_scale: bool) !RateOfChangeRatio {
     var rocr = try RateOfChangeRatio.init(allocator, .{ .length = length, .hundred_scale = hundred_scale });

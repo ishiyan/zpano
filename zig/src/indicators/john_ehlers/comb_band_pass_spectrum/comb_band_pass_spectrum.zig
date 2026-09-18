@@ -1,7 +1,6 @@
 const std = @import("std");
 const math = std.math;
 
-
 const entities = @import("entities");
 const Bar = entities.Bar;
 const Quote = entities.Quote;
@@ -517,7 +516,6 @@ pub const CombBandPassSpectrum = struct {
         const desc = self.description();
         const texts = [_]build_metadata_mod.OutputText{
             .{ .mnemonic = mn, .description = desc },
-
         };
         build_metadata_mod.buildMetadata(out, .comb_band_pass_spectrum, mn, desc, &texts);
     }
@@ -536,7 +534,6 @@ pub const CombBandPassSpectrum = struct {
 // --- Tests ---
 const testing = std.testing;
 const testdata = @import("testdata.zig");
-
 
 fn almostEqual(a: f64, b: f64, epsilon: f64) bool {
     return @abs(a - b) <= epsilon;

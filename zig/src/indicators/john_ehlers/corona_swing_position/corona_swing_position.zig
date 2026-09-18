@@ -1,7 +1,6 @@
 const std = @import("std");
 const math = std.math;
 
-
 const entities = @import("entities");
 const Bar = entities.Bar;
 const Quote = entities.Quote;
@@ -456,7 +455,6 @@ pub const CoronaSwingPosition = struct {
         const texts = [_]build_metadata_mod.OutputText{
             .{ .mnemonic = mn, .description = desc },
             .{ .mnemonic = self.mnemonicSP(), .description = self.descriptionSP() },
-
         };
         build_metadata_mod.buildMetadata(out, .corona_swing_position, mn, desc, &texts);
     }
@@ -475,7 +473,6 @@ pub const CoronaSwingPosition = struct {
 // --- Tests ---
 const testing = std.testing;
 const testdata = @import("testdata.zig");
-
 
 const tolerance = 1e-4;
 

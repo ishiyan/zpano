@@ -191,4 +191,3 @@ pub fn testSamplePercentBandExpected() [252]f64 {
         0.370508258750670000000, 0.281787886245806000000,
     };
 }
-

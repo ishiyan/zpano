@@ -10,7 +10,6 @@
 ///
 /// Returns:
 ///     Continuous float in [0, 100].  Always bullish.
-
 const cp = @import("../candlestick_patterns.zig");
 
 const CandlestickPatterns = cp.CandlestickPatterns;
@@ -18,7 +17,7 @@ const CriterionState = cp.CriterionState;
 const isBlack = cp.isBlack;
 
 pub fn matchingLow(self: *const CandlestickPatterns) f64 {
-            if (!self.enough(2, &[_]*const CriterionState{&self.equal})) return 0.0;
+    if (!self.enough(2, &[_]*const CriterionState{&self.equal})) return 0.0;
 
     const b1 = self.bar(2);
     const b2 = self.bar(1);

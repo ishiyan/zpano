@@ -1,7 +1,6 @@
 const std = @import("std");
 const math = std.math;
 
-
 const entities = @import("entities");
 const Bar = entities.Bar;
 const Quote = entities.Quote;
@@ -447,7 +446,6 @@ pub const MesaAdaptiveMovingAverage = struct {
 
 const testing = std.testing;
 const testdata = @import("testdata.zig");
-
 
 fn almostEqual(a: f64, b: f64, epsilon: f64) bool {
     if (math.isNan(a) and math.isNan(b)) return true;

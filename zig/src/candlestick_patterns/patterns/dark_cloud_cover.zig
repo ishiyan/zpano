@@ -7,7 +7,6 @@
 ///
 /// Returns:
 ///     Continuous float in [-100, 0].  More negative = stronger signal.
-
 const cp = @import("../candlestick_patterns.zig");
 const operators = @import("fuzzy").operators;
 
@@ -20,7 +19,7 @@ const realBodyLen = cp.realBodyLen;
 const dark_cloud_cover_penetration_factor = 0.5;
 
 pub fn darkCloudCover(self: *const CandlestickPatterns) f64 {
-            if (!self.enough(2, &[_]*const CriterionState{&self.long_body})) return 0.0;
+    if (!self.enough(2, &[_]*const CriterionState{&self.long_body})) return 0.0;
 
     const b1 = self.bar(2);
     const b2 = self.bar(1);
@@ -42,6 +41,6 @@ pub fn darkCloudCover(self: *const CandlestickPatterns) f64 {
     const mu_pen = self.muLtRaw(b2.c, pen_threshold, pen_width);
     const mu_above_open1 = self.muGtRaw(b2.c, b1.o, eq_width);
 
-    const confidence = operators.tProductAll(&.{mu_long, mu_open_above, mu_pen, mu_above_open1});
+    const confidence = operators.tProductAll(&.{ mu_long, mu_open_above, mu_pen, mu_above_open1 });
     return -confidence * 100.0;
 }

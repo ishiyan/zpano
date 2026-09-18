@@ -1,6 +1,5 @@
 const indicator_mod = @import("indicator.zig");
 
-
 const entities = @import("entities");
 const Bar = entities.Bar;
 const Quote = entities.Quote;

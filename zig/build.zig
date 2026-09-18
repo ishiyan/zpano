@@ -774,4 +774,12 @@ pub fn build(b: *std.Build) void {
     test_step.dependOn(&run_raw_moments_klein_kbn_tests.step);
     test_step.dependOn(&run_central_moments_klein_kbn_tests.step);
     test_step.dependOn(&run_linear_regression_klein_kbn_tests.step);
+
+    const fmt_check = b.addFmt(.{
+        .paths = &.{ "src", "build.zig" },
+        .check = true,
+    });
+
+    const fmt_check_step = b.step("fmt-check", "Check source formatting with zig fmt");
+    fmt_check_step.dependOn(&fmt_check.step);
 }

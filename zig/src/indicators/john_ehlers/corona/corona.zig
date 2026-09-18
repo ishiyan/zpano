@@ -397,7 +397,6 @@ fn verifyParameters(p: *const Params) Error!void {
 const testing = std.testing;
 const testdata = @import("testdata.zig");
 
-
 test "Corona default smoke" {
     var c = try Corona.init(testing.allocator, null);
     defer c.deinit();

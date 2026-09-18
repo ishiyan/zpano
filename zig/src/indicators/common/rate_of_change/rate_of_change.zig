@@ -1,7 +1,6 @@
 const std = @import("std");
 const math = std.math;
 
-
 const entities = @import("entities");
 const Bar = entities.Bar;
 const Quote = entities.Quote;
@@ -229,7 +228,6 @@ pub const RateOfChange = struct {
 
 const testing = std.testing;
 const testdata = @import("testdata.zig");
-
 
 fn createRoc(allocator: std.mem.Allocator, length: usize) !RateOfChange {
     var roc = try RateOfChange.init(allocator, .{ .length = length });

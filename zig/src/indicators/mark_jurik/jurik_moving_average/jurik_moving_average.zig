@@ -616,7 +616,6 @@ fn runJmaTest(length: u32, phase: i32, expected: [252]f64) !void {
     try testing.expect(math.isNan(jma.update(math.nan(f64))));
 }
 
-
 test "jurik moving average length 20 phase -30" {
     try runJmaTest(20, -30, testdata.expectedLen20PhaseMin30());
 }

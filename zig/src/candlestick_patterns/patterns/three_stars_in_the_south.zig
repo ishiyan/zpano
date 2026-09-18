@@ -18,7 +18,6 @@
 ///
 /// Returns:
 ///     Continuous float in [0, 100].  Always bullish.
-
 const cp = @import("../candlestick_patterns.zig");
 const operators = @import("fuzzy").operators;
 
@@ -30,7 +29,7 @@ const realBodyLen = cp.realBodyLen;
 const upperShadow = cp.upperShadow;
 
 pub fn threeStarsInTheSouth(self: *const CandlestickPatterns) f64 {
-            if (!self.enough(3, &[_]*const CriterionState{&self.long_body, &self.short_body, &self.long_shadow, &self.very_short_shadow})) return 0.0;
+    if (!self.enough(3, &[_]*const CriterionState{ &self.long_body, &self.short_body, &self.long_shadow, &self.very_short_shadow })) return 0.0;
 
     const b1 = self.bar(3);
     const b2 = self.bar(2);
@@ -64,7 +63,7 @@ pub fn threeStarsInTheSouth(self: *const CandlestickPatterns) f64 {
     const mu_vs_us3 = self.muLessCs(upperShadow(b3.o, b3.h, b3.c), &self.very_short_shadow, 1);
     const mu_vs_ls3 = self.muLessCs(lowerShadow(b3.o, b3.l, b3.c), &self.very_short_shadow, 1);
 
-    const confidence = operators.tProductAll(&.{mu_long1, mu_ls1, mu_short3, mu_vs_us3, mu_vs_ls3});
+    const confidence = operators.tProductAll(&.{ mu_long1, mu_ls1, mu_short3, mu_vs_us3, mu_vs_ls3 });
 
     return confidence * 100.0;
 }

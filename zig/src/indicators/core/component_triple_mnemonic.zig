@@ -1,6 +1,4 @@
-
 /// Builds a mnemonic suffix from bar, quote and trade components.
-
 const entities = @import("entities");
 const bar_component = entities.bar_component;
 const quote_component = entities.quote_component;

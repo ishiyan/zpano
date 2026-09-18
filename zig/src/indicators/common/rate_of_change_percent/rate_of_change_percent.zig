@@ -1,7 +1,6 @@
 const std = @import("std");
 const math = std.math;
 
-
 const entities = @import("entities");
 const Bar = entities.Bar;
 const Quote = entities.Quote;
@@ -226,7 +225,6 @@ pub const RateOfChangePercent = struct {
 
 const testing = std.testing;
 const testdata = @import("testdata.zig");
-
 
 fn createRocp(allocator: std.mem.Allocator, length: usize) !RateOfChangePercent {
     var rocp = try RateOfChangePercent.init(allocator, .{ .length = length });

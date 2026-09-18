@@ -463,7 +463,10 @@ fn checkSeries(actual: []const f64, expected: []const f64) !void {
 fn runLast(allocator: std.mem.Allocator, inputs: []const f64, lookback_in: usize, num_levels: usize, num_bins: usize, scale_factor: f64) !QuantumPriceLevels {
     const lookback = if (lookback_in == 0) inputs.len - 1 else lookback_in;
     var qpl = try QuantumPriceLevels.init(allocator, .{
-        .lookback = lookback, .num_levels = num_levels, .num_bins = num_bins, .scale_factor = scale_factor,
+        .lookback = lookback,
+        .num_levels = num_levels,
+        .num_bins = num_bins,
+        .scale_factor = scale_factor,
     });
     for (inputs) |p| _ = qpl.updateValues(p);
     return qpl;

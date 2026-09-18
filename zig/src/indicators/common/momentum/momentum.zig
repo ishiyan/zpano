@@ -1,7 +1,6 @@
 const std = @import("std");
 const math = std.math;
 
-
 const entities = @import("entities");
 const Bar = entities.Bar;
 const Quote = entities.Quote;
@@ -240,7 +239,6 @@ pub const Momentum = struct {
 
 const testing = std.testing;
 const testdata = @import("testdata.zig");
-
 
 fn createMomentum(allocator: std.mem.Allocator, length: usize) !Momentum {
     var mom = try Momentum.init(allocator, .{ .length = length });

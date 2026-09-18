@@ -28,11 +28,21 @@ fn almostEqual(a: f64, b: f64, epsilon: f64) bool {
     return @abs(a - b) < epsilon;
 }
 
-test "clear turn positive" { try std.testing.expect(almostEqual(muTurnsPositive(-5.0, 5.0, 0.0, .sigmoid), 1.0, 1e-10)); }
-test "stays positive" { try std.testing.expect(almostEqual(muTurnsPositive(3.0, 5.0, 0.0, .sigmoid), 0.0, 1e-10)); }
-test "stays negative" { try std.testing.expect(almostEqual(muTurnsPositive(-5.0, -3.0, 0.0, .sigmoid), 0.0, 1e-10)); }
-test "from zero" { try std.testing.expect(almostEqual(muTurnsPositive(0.0, 5.0, 0.0, .sigmoid), 0.5, 1e-10)); }
-test "clear turn negative" { try std.testing.expect(almostEqual(muTurnsNegative(5.0, -5.0, 0.0, .sigmoid), 1.0, 1e-10)); }
+test "clear turn positive" {
+    try std.testing.expect(almostEqual(muTurnsPositive(-5.0, 5.0, 0.0, .sigmoid), 1.0, 1e-10));
+}
+test "stays positive" {
+    try std.testing.expect(almostEqual(muTurnsPositive(3.0, 5.0, 0.0, .sigmoid), 0.0, 1e-10));
+}
+test "stays negative" {
+    try std.testing.expect(almostEqual(muTurnsPositive(-5.0, -3.0, 0.0, .sigmoid), 0.0, 1e-10));
+}
+test "from zero" {
+    try std.testing.expect(almostEqual(muTurnsPositive(0.0, 5.0, 0.0, .sigmoid), 0.5, 1e-10));
+}
+test "clear turn negative" {
+    try std.testing.expect(almostEqual(muTurnsNegative(5.0, -5.0, 0.0, .sigmoid), 1.0, 1e-10));
+}
 test "symmetry" {
     const tn = muTurnsNegative(3.0, -3.0, 1.0, .sigmoid);
     const tp = muTurnsPositive(-3.0, 3.0, 1.0, .sigmoid);
