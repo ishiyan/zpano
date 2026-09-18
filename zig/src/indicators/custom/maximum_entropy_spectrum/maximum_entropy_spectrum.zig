@@ -599,6 +599,9 @@ test "MaximumEntropySpectrum NaN input" {
 
     const h = x.updateSample(math.nan(f64), 0);
     try testing.expect(h.isEmpty());
+    try testing.expectEqual(@as(f64, 2), h.parameter_first);
+    try testing.expectEqual(@as(f64, 59), h.parameter_last);
+    try testing.expectEqual(@as(f64, 1), h.parameter_resolution);
     try testing.expect(!x.isPrimed());
 }
 

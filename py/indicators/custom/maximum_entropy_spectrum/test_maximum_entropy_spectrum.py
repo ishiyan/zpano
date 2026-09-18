@@ -2,6 +2,7 @@
 
 import unittest
 import datetime
+import math
 
 from py.indicators.custom.maximum_entropy_spectrum.maximum_entropy_spectrum import MaximumEntropySpectrum
 from py.indicators.custom.maximum_entropy_spectrum.params import Params, default_params
@@ -79,6 +80,9 @@ class TestMaximumEntropySpectrumNaN(unittest.TestCase):
         x = MaximumEntropySpectrum(Params())
         h = x.update(math.nan, _test_time())
         self.assertTrue(h.is_empty())
+        self.assertEqual(h.parameter_first, 2)
+        self.assertEqual(h.parameter_last, 59)
+        self.assertEqual(h.parameter_resolution, 1)
         self.assertFalse(x.is_primed())
 
 

@@ -105,8 +105,24 @@ func TestMaximumEntropySpectrumNaNInput(t *testing.T) {
 
 	h := x.Update(math.NaN(), testMesTime())
 
-	if h == nil || !h.IsEmpty() {
+	if h == nil {
+		t.Fatal("expected a non-nil heatmap for NaN input, got nil")
+	}
+
+	if !h.IsEmpty() {
 		t.Errorf("expected empty heatmap for NaN input, got %v", h)
+	}
+
+	if h.ParameterFirst != 2 {
+		t.Errorf("ParameterFirst: expected 2, got %v", h.ParameterFirst)
+	}
+
+	if h.ParameterLast != 59 {
+		t.Errorf("ParameterLast: expected 59, got %v", h.ParameterLast)
+	}
+
+	if h.ParameterResolution != 1 {
+		t.Errorf("ParameterResolution: expected 1, got %v", h.ParameterResolution)
 	}
 
 	if x.IsPrimed() {

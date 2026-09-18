@@ -653,6 +653,9 @@ mod tests {
 
         let h = x.update(f64::NAN, test_mes_time());
         assert!(h.is_empty());
+        assert_eq!(h.parameter_first, 2.0);
+        assert_eq!(h.parameter_last, 59.0);
+        assert_eq!(h.parameter_resolution, 1.0);
         assert!(!x.is_primed());
     }
 
