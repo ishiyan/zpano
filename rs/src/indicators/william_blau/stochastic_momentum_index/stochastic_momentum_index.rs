@@ -1,0 +1,613 @@
+use crate::entities::bar::Bar;
+use crate::entities::quote::Quote;
+use crate::entities::scalar::Scalar;
+use crate::entities::trade::Trade;
+use crate::indicators::core::build_metadata::{build_metadata, OutputText};
+use crate::indicators::core::identifier::Identifier;
+use crate::indicators::core::indicator::{Indicator, Output};
+use crate::indicators::core::metadata::Metadata;
+
+// ---------------------------------------------------------------------------
+// Params
+// ---------------------------------------------------------------------------
+
+/// Parameters to create an instance of the Stochastic Momentum Index indicator.
+///
+/// The field names `q`, `r`, `s`, `u` and `ul` are the canonical symbols from William
+/// Blau's *Momentum, Direction, and Divergence* (Wiley, 1995), chapter 3.
+///
+/// The indicator consumes the high, low and close prices of a bar, so it has no
+/// configurable price-component fields.
+pub struct StochasticMomentumIndexParams {
+    /// Stochastic look-back period (bars for the highest high and lowest low). Must be > 0. Default 5.
+    pub q: usize,
+    /// Period of the 1st (innermost) EMA, applied to the stochastic momentum and the half-range. Must be > 0. Default 20.
+    pub r: usize,
+    /// Period of the 2nd EMA in the cascade. Must be > 0. Default 5.
+    pub s: usize,
+    /// Period of the 3rd (outermost) EMA in the cascade. Must be > 0. Default 3.
+    pub u: usize,
+    /// Period of the signal-line EMA (second output). Must be > 0. Default 3.
+    pub ul: usize,
+}
+
+impl Default for StochasticMomentumIndexParams {
+    fn default() -> Self {
+        Self {
+            q: 5,
+            r: 20,
+            s: 5,
+            u: 3,
+            ul: 3,
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Output
+// ---------------------------------------------------------------------------
+
+/// Enumerates the outputs of the Stochastic Momentum Index indicator.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u8)]
+pub enum StochasticMomentumIndexOutput {
+    /// The Stochastic Momentum Index oscillator value (range [-100, +100]).
+    Smi = 1,
+    /// The signal-line value: the ul-period EMA of the oscillator.
+    Signal = 2,
+}
+
+// ---------------------------------------------------------------------------
+// Inlined Blau EMA
+// ---------------------------------------------------------------------------
+
+/// Stateful streaming EMA: alpha = 2/(period+1), seeds e0 = x0.
+///
+/// Inlined verbatim from the Blau exponential moving average so the indicator is a
+/// standalone porting unit. Do NOT change its numerics.
+///
+/// period == 1 -> alpha == 1 -> pure passthrough (output == input).
+struct Ema {
+    alpha: f64,
+    prev: f64,
+    primed: bool,
+}
+
+impl Ema {
+    fn new(period: usize) -> Self {
+        Self {
+            alpha: 2.0 / (period as f64 + 1.0),
+            prev: 0.0,
+            primed: false,
+        }
+    }
+
+    fn update(&mut self, x: f64) -> f64 {
+        if !self.primed {
+            self.prev = x;
+            self.primed = true;
+            return self.prev;
+        }
+        self.prev = self.alpha * x + (1.0 - self.alpha) * self.prev;
+        self.prev
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Indicator
+// ---------------------------------------------------------------------------
+
+/// William Blau's Stochastic Momentum Index (SMI).
+///
+/// A double-/triple-smoothed stochastic oscillator bounded to [-100, +100],
+/// paired with an EMA signal line (the Ergodic form, Blau ch.3.4):
+///
+///   smi_k    = 100 * TEMA(sm, r, s, u) / TEMA(hr, r, s, u)   (the oscillator)
+///   signal_k = EMA(smi, ul)_k                                (ul-period EMA)
+///
+/// where, over the last q bars, HH_k is the highest high and LL_k is the lowest low,
+/// sm_k = close_k - 0.5*(HH_k + LL_k) is the distance of the close from the range
+/// midpoint, hr_k = 0.5*(HH_k - LL_k) >= 0 is the half-range, and
+/// TEMA(x, r, s, u) = EMA(EMA(EMA(x, r), s), u).
+///
+/// Where the ordinary stochastic measures where the close sits inside the recent
+/// high-low range, the SMI measures the close relative to the midpoint of that range.
+/// Because |sm| <= hr on every bar, the ratio is bounded to [-100, +100]. With q = 1 it
+/// is Blau's one-day stochastic (sentiment indicator). The inputs are the high, low and
+/// close prices.
+///
+/// The indicator produces two outputs:
+///   - SMI: the oscillator, range [-100, +100];
+///   - Signal: the ul-period EMA of the oscillator (Blau's Ergodic signal line).
+///
+/// Priming convention (book / EasyLanguage): sm and hr become valid once q bars of
+/// high/low exist, i.e. at bar q-1. All six cascade stages seed there together, so
+/// both outputs are NaN for bars 0..q-2 and finite from bar q-1; for q = 1 there is
+/// no NaN warm-up. Division guard: denominator <= 0 -> oscillator 0.0.
+pub struct StochasticMomentumIndex {
+    q: usize,
+    highs: Vec<f64>,
+    lows: Vec<f64>,
+    window_count: usize,
+    window_index: usize,
+    num_r: Ema,
+    num_s: Ema,
+    num_u: Ema,
+    den_r: Ema,
+    den_s: Ema,
+    den_u: Ema,
+    signal_ema: Ema,
+    primed: bool,
+    mnemonic: String,
+}
+
+impl StochasticMomentumIndex {
+    /// Creates a new Stochastic Momentum Index from the given parameters.
+    pub fn new(params: &StochasticMomentumIndexParams) -> Result<Self, String> {
+        let invalid = "invalid stochastic momentum index parameters";
+
+        let mut q = params.q;
+        if q == 0 {
+            q = 5;
+        }
+        let mut r = params.r;
+        if r == 0 {
+            r = 20;
+        }
+        let mut s = params.s;
+        if s == 0 {
+            s = 5;
+        }
+        let mut u = params.u;
+        if u == 0 {
+            u = 3;
+        }
+        let mut ul = params.ul;
+        if ul == 0 {
+            ul = 3;
+        }
+
+        if q < 1 {
+            return Err(format!("{}: q should be greater than 0", invalid));
+        }
+        if r < 1 {
+            return Err(format!("{}: r should be greater than 0", invalid));
+        }
+        if s < 1 {
+            return Err(format!("{}: s should be greater than 0", invalid));
+        }
+        if u < 1 {
+            return Err(format!("{}: u should be greater than 0", invalid));
+        }
+        if ul < 1 {
+            return Err(format!("{}: ul should be greater than 0", invalid));
+        }
+
+        let mnemonic = format!("smi({},{},{},{},{})", q, r, s, u, ul);
+
+        Ok(Self {
+            q,
+            highs: vec![0.0; q],
+            lows: vec![0.0; q],
+            window_count: 0,
+            window_index: 0,
+            num_r: Ema::new(r),
+            num_s: Ema::new(s),
+            num_u: Ema::new(u),
+            den_r: Ema::new(r),
+            den_s: Ema::new(s),
+            den_u: Ema::new(u),
+            signal_ema: Ema::new(ul),
+            primed: false,
+            mnemonic,
+        })
+    }
+
+    /// Returns true if the indicator has produced at least one valid output.
+    pub fn is_primed(&self) -> bool {
+        self.primed
+    }
+
+    /// Core update taking one bar's high, low and close, returning (smi, signal).
+    /// Both are NaN until q bars have been seen.
+    pub fn update(&mut self, high: f64, low: f64, close: f64) -> (f64, f64) {
+        self.highs[self.window_index] = high;
+        self.lows[self.window_index] = low;
+        self.window_index = (self.window_index + 1) % self.q;
+
+        if self.window_count < self.q {
+            self.window_count += 1;
+        }
+
+        // Need q bars of high/low before the stochastic is defined. Until then
+        // neither output exists -- do NOT advance the EMA cascades.
+        if self.window_count < self.q {
+            return (f64::NAN, f64::NAN);
+        }
+
+        // Rolling extremes over the last q bars.
+        let mut hh = self.highs[0];
+        let mut ll = self.lows[0];
+        for i in 1..self.q {
+            hh = hh.max(self.highs[i]);
+            ll = ll.min(self.lows[i]);
+        }
+
+        // Stochastic momentum (signed) and half-range (non-negative).
+        let sm = close - 0.5 * (hh + ll);
+        let hr = 0.5 * (hh - ll);
+
+        // Numerator cascade: TEMA(sm, r, s, u).
+        let n = self.num_u.update(self.num_s.update(self.num_r.update(sm)));
+        // Denominator cascade: TEMA(hr, r, s, u).
+        let d = self.den_u.update(self.den_s.update(self.den_r.update(hr)));
+
+        // Division guard: flat window so far -> oscillator 0.0.
+        let smi = if d > 0.0 { 100.0 * n / d } else { 0.0 };
+
+        // Signal line = EMA(smi, ul); seeds on the first finite oscillator value.
+        let signal = self.signal_ema.update(smi);
+        self.primed = true;
+
+        (smi, signal)
+    }
+
+    /// Updates the indicator and wraps the two outputs.
+    fn update_entity(&mut self, time: i64, high: f64, low: f64, close: f64) -> Output {
+        let (smi, signal) = self.update(high, low, close);
+        vec![
+            Box::new(Scalar { time, value: smi }),
+            Box::new(Scalar {
+                time,
+                value: signal,
+            }),
+        ]
+    }
+}
+
+impl Indicator for StochasticMomentumIndex {
+    fn is_primed(&self) -> bool {
+        self.primed
+    }
+
+    fn metadata(&self) -> Metadata {
+        let desc = format!("Stochastic Momentum Index {}", self.mnemonic);
+        build_metadata(
+            Identifier::StochasticMomentumIndex,
+            &self.mnemonic,
+            &desc,
+            &[
+                OutputText {
+                    mnemonic: format!("{} smi", self.mnemonic),
+                    description: format!("{} SMI", desc),
+                },
+                OutputText {
+                    mnemonic: format!("{} signal", self.mnemonic),
+                    description: format!("{} signal", desc),
+                },
+            ],
+        )
+    }
+
+    /// A scalar carries a single value, used as the high, the low and the close.
+    fn update_scalar(&mut self, sample: &Scalar) -> Output {
+        let v = sample.value;
+        self.update_entity(sample.time, v, v, v)
+    }
+
+    fn update_bar(&mut self, sample: &Bar) -> Output {
+        self.update_entity(sample.time, sample.high, sample.low, sample.close)
+    }
+
+    /// A quote maps the mid price to the high, the low and the close.
+    fn update_quote(&mut self, sample: &Quote) -> Output {
+        let v = (sample.bid_price + sample.ask_price) / 2.0;
+        self.update_entity(sample.time, v, v, v)
+    }
+
+    /// A trade carries a single price, used as the high, the low and the close.
+    fn update_trade(&mut self, sample: &Trade) -> Output {
+        let v = sample.price;
+        self.update_entity(sample.time, v, v, v)
+    }
+}
+
+// ===========================================================================
+// Tests
+// ===========================================================================
+
+#[cfg(test)]
+mod tests {
+    use super::super::testdata;
+    use super::*;
+
+    const TOLERANCE: f64 = 1e-9;
+
+    // Signal-line EMA period used for every expected signal array.
+    const UL: usize = 3;
+
+    fn check(name: &str, i: usize, exp: f64, act: f64) {
+        if exp.is_nan() {
+            assert!(act.is_nan(), "{}[{}]: expected NaN, got {}", name, i, act);
+            return;
+        }
+        assert!(
+            (act - exp).abs() <= TOLERANCE,
+            "{}[{}]: expected {}, got {}",
+            name,
+            i,
+            exp,
+            act
+        );
+    }
+
+    fn passthrough(q: usize) -> StochasticMomentumIndex {
+        StochasticMomentumIndex::new(&StochasticMomentumIndexParams {
+            q,
+            r: 1,
+            s: 1,
+            u: 1,
+            ul: 1,
+        })
+        .unwrap()
+    }
+
+    fn scalar_value(out: &Output, i: usize) -> f64 {
+        out[i].downcast_ref::<Scalar>().unwrap().value
+    }
+
+    struct Combo {
+        q: usize,
+        r: usize,
+        s: usize,
+        u: usize,
+        smi: Vec<f64>,
+        signal: Vec<f64>,
+    }
+
+    #[test]
+    fn test_reference_data_all_combos() {
+        let combos = vec![
+            Combo { q: 5, r: 20, s: 5, u: 3, smi: testdata::expected_q5_r20_s5_u3(), signal: testdata::expected_q5_r20_s5_u3_sig_ul3() },
+            Combo { q: 13, r: 25, s: 2, u: 1, smi: testdata::expected_q13_r25_s2_u1(), signal: testdata::expected_q13_r25_s2_u1_sig_ul3() },
+            Combo { q: 2, r: 20, s: 20, u: 1, smi: testdata::expected_q2_r20_s20_u1(), signal: testdata::expected_q2_r20_s20_u1_sig_ul3() },
+            Combo { q: 13, r: 25, s: 2, u: 3, smi: testdata::expected_q13_r25_s2_u3(), signal: testdata::expected_q13_r25_s2_u3_sig_ul3() },
+            Combo { q: 5, r: 20, s: 5, u: 1, smi: testdata::expected_q5_r20_s5_u1(), signal: testdata::expected_q5_r20_s5_u1_sig_ul3() },
+            Combo { q: 8, r: 5, s: 3, u: 1, smi: testdata::expected_q8_r5_s3_u1(), signal: testdata::expected_q8_r5_s3_u1_sig_ul3() },
+            Combo { q: 21, r: 13, s: 4, u: 1, smi: testdata::expected_q21_r13_s4_u1(), signal: testdata::expected_q21_r13_s4_u1_sig_ul3() },
+            Combo { q: 1, r: 20, s: 5, u: 3, smi: testdata::expected_q1_r20_s5_u3(), signal: testdata::expected_q1_r20_s5_u3_sig_ul3() },
+            Combo { q: 1, r: 40, s: 20, u: 1, smi: testdata::expected_q1_r40_s20_u1(), signal: testdata::expected_q1_r40_s20_u1_sig_ul3() },
+            Combo { q: 1, r: 100, s: 20, u: 1, smi: testdata::expected_q1_r100_s20_u1(), signal: testdata::expected_q1_r100_s20_u1_sig_ul3() },
+            Combo { q: 1, r: 1, s: 1, u: 1, smi: testdata::expected_q1_r1_s1_u1(), signal: testdata::expected_q1_r1_s1_u1_sig_ul3() },
+            Combo { q: 5, r: 1, s: 1, u: 1, smi: testdata::expected_q5_r1_s1_u1(), signal: testdata::expected_q5_r1_s1_u1_sig_ul3() },
+            Combo { q: 3, r: 10, s: 10, u: 1, smi: testdata::expected_q3_r10_s10_u1(), signal: testdata::expected_q3_r10_s10_u1_sig_ul3() },
+            Combo { q: 34, r: 5, s: 5, u: 1, smi: testdata::expected_q34_r5_s5_u1(), signal: testdata::expected_q34_r5_s5_u1_sig_ul3() },
+            Combo { q: 2, r: 2, s: 2, u: 2, smi: testdata::expected_q2_r2_s2_u2(), signal: testdata::expected_q2_r2_s2_u2_sig_ul3() },
+            Combo { q: 50, r: 20, s: 5, u: 3, smi: testdata::expected_q50_r20_s5_u3(), signal: testdata::expected_q50_r20_s5_u3_sig_ul3() },
+        ];
+
+        let input = testdata::testdata::test_input();
+        let high = testdata::testdata::test_high();
+        let low = testdata::testdata::test_low();
+
+        for combo in &combos {
+            let mut ind = StochasticMomentumIndex::new(&StochasticMomentumIndexParams {
+                q: combo.q,
+                r: combo.r,
+                s: combo.s,
+                u: combo.u,
+                ul: UL,
+            })
+            .unwrap();
+
+            for i in 0..input.len() {
+                let (smi, signal) = ind.update(high[i], low[i], input[i]);
+                check("smi", i, combo.smi[i], smi);
+                check("signal", i, combo.signal[i], signal);
+            }
+        }
+    }
+
+    #[test]
+    fn test_passthrough() {
+        let mut ind = passthrough(1);
+
+        // Close at high.
+        assert_eq!(ind.update(12.0, 10.0, 12.0), (100.0, 100.0));
+        // Close at low.
+        assert_eq!(ind.update(12.0, 10.0, 10.0), (-100.0, -100.0));
+        // Exact midpoint.
+        assert_eq!(ind.update(12.0, 10.0, 11.0), (0.0, 0.0));
+        // Flat window -> division guard.
+        assert_eq!(ind.update(11.0, 11.0, 11.0), (0.0, 0.0));
+    }
+
+    #[test]
+    fn test_is_primed_from_bar_q_minus_one() {
+        let input = testdata::testdata::test_input();
+        let high = testdata::testdata::test_high();
+        let low = testdata::testdata::test_low();
+        let q = 5;
+
+        let mut ind = StochasticMomentumIndex::new(&StochasticMomentumIndexParams {
+            q,
+            ..Default::default()
+        })
+        .unwrap();
+        assert!(!StochasticMomentumIndex::is_primed(&ind));
+
+        for i in 0..q - 1 {
+            let (smi, signal) = ind.update(high[i], low[i], input[i]);
+            assert!(!StochasticMomentumIndex::is_primed(&ind), "[{}] primed too early", i);
+            assert!(smi.is_nan());
+            assert!(signal.is_nan());
+        }
+
+        for i in q - 1..input.len() {
+            ind.update(high[i], low[i], input[i]);
+            assert!(StochasticMomentumIndex::is_primed(&ind), "[{}] not primed", i);
+        }
+    }
+
+    #[test]
+    fn test_is_primed_after_first_bar_when_q_is_one() {
+        let input = testdata::testdata::test_input();
+        let high = testdata::testdata::test_high();
+        let low = testdata::testdata::test_low();
+
+        let mut ind = StochasticMomentumIndex::new(&StochasticMomentumIndexParams {
+            q: 1,
+            ..Default::default()
+        })
+        .unwrap();
+        assert!(!StochasticMomentumIndex::is_primed(&ind));
+
+        ind.update(high[0], low[0], input[0]);
+        assert!(StochasticMomentumIndex::is_primed(&ind));
+    }
+
+    #[test]
+    fn test_mnemonic() {
+        let ind =
+            StochasticMomentumIndex::new(&StochasticMomentumIndexParams::default()).unwrap();
+        assert_eq!(ind.metadata().mnemonic, "smi(5,20,5,3,3)");
+        assert_eq!(
+            ind.metadata().description,
+            "Stochastic Momentum Index smi(5,20,5,3,3)"
+        );
+
+        let ind2 = StochasticMomentumIndex::new(&StochasticMomentumIndexParams {
+            q: 13,
+            r: 25,
+            s: 2,
+            u: 1,
+            ul: 7,
+        })
+        .unwrap();
+        assert_eq!(ind2.metadata().mnemonic, "smi(13,25,2,1,7)");
+    }
+
+    #[test]
+    fn test_metadata() {
+        let ind =
+            StochasticMomentumIndex::new(&StochasticMomentumIndexParams::default()).unwrap();
+        let meta = ind.metadata();
+        assert_eq!(meta.identifier, Identifier::StochasticMomentumIndex);
+        assert_eq!(meta.outputs.len(), 2);
+        assert_eq!(
+            meta.outputs[0].kind,
+            StochasticMomentumIndexOutput::Smi as i32
+        );
+        assert_eq!(
+            meta.outputs[1].kind,
+            StochasticMomentumIndexOutput::Signal as i32
+        );
+        assert_eq!(meta.outputs[0].mnemonic, "smi(5,20,5,3,3) smi");
+        assert_eq!(meta.outputs[1].mnemonic, "smi(5,20,5,3,3) signal");
+    }
+
+    #[test]
+    fn test_zero_params_resolve_to_defaults() {
+        // Zero means "use default", so an all-zero params value is valid.
+        let ind = StochasticMomentumIndex::new(&StochasticMomentumIndexParams {
+            q: 0,
+            r: 0,
+            s: 0,
+            u: 0,
+            ul: 0,
+        })
+        .unwrap();
+        assert_eq!(ind.metadata().mnemonic, "smi(5,20,5,3,3)");
+    }
+
+    #[test]
+    fn test_update_bar_ordering() {
+        let input = testdata::testdata::test_input();
+        let high = testdata::testdata::test_high();
+        let low = testdata::testdata::test_low();
+        let exp_smi = testdata::expected_q5_r20_s5_u3();
+        let exp_signal = testdata::expected_q5_r20_s5_u3_sig_ul3();
+
+        let mut ind =
+            StochasticMomentumIndex::new(&StochasticMomentumIndexParams::default()).unwrap();
+
+        let mut out: Output = Vec::new();
+        for i in 0..input.len() {
+            out = ind.update_bar(&Bar {
+                time: 0,
+                open: 0.0,
+                high: high[i],
+                low: low[i],
+                close: input[i],
+                volume: 0.0,
+            });
+        }
+
+        let last = input.len() - 1;
+        assert_eq!(out.len(), 2);
+        check("smi", last, exp_smi[last], scalar_value(&out, 0));
+        check("signal", last, exp_signal[last], scalar_value(&out, 1));
+    }
+
+    #[test]
+    fn test_update_scalar_uses_value_as_high_low_and_close() {
+        let mut ind = passthrough(2);
+
+        let first = ind.update_scalar(&Scalar {
+            time: 0,
+            value: 10.0,
+        });
+        assert!(scalar_value(&first, 0).is_nan());
+        assert!(scalar_value(&first, 1).is_nan());
+
+        // Close at the 2-bar high.
+        let out = ind.update_scalar(&Scalar {
+            time: 0,
+            value: 12.0,
+        });
+        assert_eq!(scalar_value(&out, 0), 100.0);
+        assert_eq!(scalar_value(&out, 1), 100.0);
+    }
+
+    #[test]
+    fn test_update_quote_uses_mid_price_as_high_low_and_close() {
+        let mut ind = passthrough(2);
+
+        ind.update_quote(&Quote {
+            time: 0,
+            bid_price: 12.0,
+            ask_price: 14.0,
+            bid_size: 1.0,
+            ask_size: 1.0,
+        });
+
+        // Mid 11 is at the 2-bar low.
+        let out = ind.update_quote(&Quote {
+            time: 0,
+            bid_price: 10.0,
+            ask_price: 12.0,
+            bid_size: 1.0,
+            ask_size: 1.0,
+        });
+        assert_eq!(scalar_value(&out, 0), -100.0);
+        assert_eq!(scalar_value(&out, 1), -100.0);
+    }
+
+    #[test]
+    fn test_update_trade_uses_price_as_high_low_and_close() {
+        let mut ind = passthrough(2);
+
+        ind.update_trade(&Trade {
+            time: 0,
+            price: 10.0,
+            volume: 1.0,
+        });
+        let out = ind.update_trade(&Trade {
+            time: 0,
+            price: 12.0,
+            volume: 1.0,
+        });
+        assert_eq!(scalar_value(&out, 0), 100.0);
+        assert_eq!(scalar_value(&out, 1), 100.0);
+    }
+}

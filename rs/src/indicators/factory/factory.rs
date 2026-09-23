@@ -326,6 +326,9 @@ use crate::indicators::william_blau::candlestick_momentum_index::candlestick_mom
 use crate::indicators::william_blau::candlestick_strength_index::candlestick_strength_index::{
     CandlestickStrengthIndex, CandlestickStrengthIndexParams,
 };
+use crate::indicators::william_blau::stochastic_momentum_index::stochastic_momentum_index::{
+    StochasticMomentumIndex, StochasticMomentumIndexParams,
+};
 
 /// Create an indicator from its identifier and a JSON-encoded parameter string.
 ///
@@ -1764,6 +1767,16 @@ pub fn create_indicator(
             if let Some(v) = get_usize(&params, "u") { p.u = v; }
             if let Some(v) = get_usize(&params, "ul") { p.ul = v; }
             Ok(Box::new(CandlestickStrengthIndex::new(&p)?))
+        }
+
+        Identifier::StochasticMomentumIndex => {
+            let mut p = StochasticMomentumIndexParams::default();
+            if let Some(v) = get_usize(&params, "q") { p.q = v; }
+            if let Some(v) = get_usize(&params, "r") { p.r = v; }
+            if let Some(v) = get_usize(&params, "s") { p.s = v; }
+            if let Some(v) = get_usize(&params, "u") { p.u = v; }
+            if let Some(v) = get_usize(&params, "ul") { p.ul = v; }
+            Ok(Box::new(StochasticMomentumIndex::new(&p)?))
         }
 
         _ => Err(format!("unsupported indicator: {:?}", identifier)),

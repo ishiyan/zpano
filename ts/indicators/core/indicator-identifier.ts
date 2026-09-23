@@ -409,4 +409,7 @@ export enum IndicatorIdentifier {
 
     /** Identifies the William Blau __Candlestick Strength Index__ (CSI) indicator. */
     CandlestickStrengthIndex,
+
+    /** Identifies the William Blau __Stochastic Momentum Index__ (SMI) indicator. */
+    StochasticMomentumIndex,
 }

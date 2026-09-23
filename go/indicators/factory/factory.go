@@ -119,6 +119,7 @@ import (
 	"zpano/indicators/williamblau/ergodicoscillator"
 	"zpano/indicators/williamblau/macdindex"
 	"zpano/indicators/williamblau/meandeviationindex"
+	"zpano/indicators/williamblau/stochasticmomentumindex"
 	"zpano/indicators/williamblau/truestrengthindex"
 	"zpano/indicators/zurabsilagadze/movingminimax"
 )
@@ -1249,6 +1250,14 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 		}
 
 		return candlestickstrengthindex.NewCandlestickStrengthIndex(p)
+
+	case core.StochasticMomentumIndex:
+		p := stochasticmomentumindex.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return stochasticmomentumindex.NewStochasticMomentumIndex(p)
 
 	default:
 		return nil, fmt.Errorf("unsupported indicator: %s", identifier)
