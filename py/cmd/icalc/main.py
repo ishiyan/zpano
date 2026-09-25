@@ -146,6 +146,7 @@ _IDENTIFIER_MAP: dict[str, Identifier] = {
     'candlestickMomentumIndex': Identifier.CANDLESTICK_MOMENTUM_INDEX,
     'candlestickStrengthIndex': Identifier.CANDLESTICK_STRENGTH_INDEX,
     'stochasticMomentumIndex': Identifier.STOCHASTIC_MOMENTUM_INDEX,
+    'doubleSmoothedStochastic': Identifier.DOUBLE_SMOOTHED_STOCHASTIC,
 }
 
 

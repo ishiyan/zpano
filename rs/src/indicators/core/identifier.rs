@@ -297,6 +297,8 @@ pub enum Identifier {
     CandlestickStrengthIndex = 112,
     /// Identifies the William Blau Stochastic Momentum Index (SMI) indicator.
     StochasticMomentumIndex = 113,
+    /// Identifies the William Blau Double Smoothed Stochastic (DSS) indicator.
+    DoubleSmoothedStochastic = 114,
 }
 
 impl Identifier {
@@ -425,6 +427,7 @@ impl Identifier {
             Self::CandlestickMomentumIndex => "candlestickMomentumIndex",
             Self::CandlestickStrengthIndex => "candlestickStrengthIndex",
             Self::StochasticMomentumIndex => "stochasticMomentumIndex",
+            Self::DoubleSmoothedStochastic => "doubleSmoothedStochastic",
         }
     }
 
@@ -557,6 +560,7 @@ impl Identifier {
             "candlestickMomentumIndex" => Some(Self::CandlestickMomentumIndex),
             "candlestickStrengthIndex" => Some(Self::CandlestickStrengthIndex),
             "stochasticMomentumIndex" => Some(Self::StochasticMomentumIndex),
+            "doubleSmoothedStochastic" => Some(Self::DoubleSmoothedStochastic),
             _ => None,
         }
     }

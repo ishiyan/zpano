@@ -412,4 +412,7 @@ export enum IndicatorIdentifier {
 
     /** Identifies the William Blau __Stochastic Momentum Index__ (SMI) indicator. */
     StochasticMomentumIndex,
+
+    /** Identifies the William Blau __Double Smoothed Stochastic__ (DSS) indicator. */
+    DoubleSmoothedStochastic,
 }

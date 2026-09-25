@@ -425,6 +425,9 @@ const (
 	// StochasticMomentumIndex identifies the William Blau Stochastic Momentum Index (SMI) indicator.
 	StochasticMomentumIndex
 
+	// DoubleSmoothedStochastic identifies the William Blau Double Smoothed Stochastic (DSS) indicator.
+	DoubleSmoothedStochastic
+
 	last
 )
 
@@ -594,6 +597,7 @@ const (
 	candlestickMomentumIndex                  = "candlestickMomentumIndex"
 	candlestickStrengthIndex                  = "candlestickStrengthIndex"
 	stochasticMomentumIndex                   = "stochasticMomentumIndex"
+	doubleSmoothedStochastic                  = "doubleSmoothedStochastic"
 )
 
 // String implements the Stringer interface.
@@ -852,6 +856,8 @@ func (i Identifier) String() string {
 		return candlestickStrengthIndex
 	case StochasticMomentumIndex:
 		return stochasticMomentumIndex
+	case DoubleSmoothedStochastic:
+		return doubleSmoothedStochastic
 	default:
 		return unknown
 	}
@@ -1147,6 +1153,8 @@ func (i *Identifier) UnmarshalJSON(data []byte) error {
 		*i = CandlestickStrengthIndex
 	case stochasticMomentumIndex:
 		*i = StochasticMomentumIndex
+	case doubleSmoothedStochastic:
+		*i = DoubleSmoothedStochastic
 	default:
 		return fmt.Errorf(errFmt, s)
 	}

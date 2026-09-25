@@ -576,6 +576,10 @@ _descriptors: dict[Id, Descriptor] = {
         Id.STOCHASTIC_MOMENTUM_INDEX, "William Blau", A.STATIC, I.BAR_INPUT, V.NO_VOLUME,
         [_o(0, S.SCALAR, R.BOUNDED_OSCILLATOR, P.OWN),
          _o(1, S.SCALAR, R.SIGNAL, P.OWN)]),
+    Id.DOUBLE_SMOOTHED_STOCHASTIC: _d(
+        Id.DOUBLE_SMOOTHED_STOCHASTIC, "William Blau", A.STATIC, I.BAR_INPUT, V.NO_VOLUME,
+        [_o(0, S.SCALAR, R.BOUNDED_OSCILLATOR, P.OWN),
+         _o(1, S.SCALAR, R.SIGNAL, P.OWN)]),
 }
 
 

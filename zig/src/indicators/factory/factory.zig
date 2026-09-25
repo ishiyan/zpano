@@ -181,6 +181,7 @@ const dm_mod = @import("../william_blau/double_smoothed_momenta/double_smoothed_
 const cmi_mod = @import("../william_blau/candlestick_momentum_index/candlestick_momentum_index.zig");
 const csi_mod = @import("../william_blau/candlestick_strength_index/candlestick_strength_index.zig");
 const smi_mod = @import("../william_blau/stochastic_momentum_index/stochastic_momentum_index.zig");
+const dss_mod = @import("../william_blau/double_smoothed_stochastic/double_smoothed_stochastic.zig");
 
 pub const FactoryError = error{
     UnsupportedIndicator,
@@ -1565,6 +1566,12 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
             .s = getUsize(obj, "s", 5),
             .u = getUsize(obj, "u", 3),
             .ul = getUsize(obj, "ul", 3),
+        }),
+        .double_smoothed_stochastic => createWithAllocParams(dss_mod.DoubleSmoothedStochastic, dss_mod.DoubleSmoothedStochasticParams, allocator, obj, .{
+            .q = getUsize(obj, "q", 5),
+            .r = getUsize(obj, "r", 7),
+            .s = getUsize(obj, "s", 3),
+            .g = getUsize(obj, "g", 3),
         }),
     };
 }

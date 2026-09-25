@@ -6,3 +6,4 @@ pub mod double_smoothed_momenta;
 pub mod candlestick_momentum_index;
 pub mod candlestick_strength_index;
 pub mod stochastic_momentum_index;
+pub mod double_smoothed_stochastic;

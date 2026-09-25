@@ -420,3 +420,6 @@ class Identifier(IntEnum):
 
     # Identifies the William Blau Stochastic Momentum Index (SMI) indicator.
     STOCHASTIC_MOMENTUM_INDEX = 113
+
+    # Identifies the William Blau Double Smoothed Stochastic (DSS) indicator.
+    DOUBLE_SMOOTHED_STOCHASTIC = 114

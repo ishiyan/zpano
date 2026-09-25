@@ -141,6 +141,7 @@ func TestIdentifierString(t *testing.T) {
 		{CandlestickMomentumIndex, candlestickMomentumIndex},
 		{CandlestickStrengthIndex, candlestickStrengthIndex},
 		{StochasticMomentumIndex, stochasticMomentumIndex},
+		{DoubleSmoothedStochastic, doubleSmoothedStochastic},
 		// ── boundary ──────────────────────────────────────────────────────────
 		{last, unknown},
 		{Identifier(0), unknown},
@@ -294,6 +295,7 @@ func TestIdentifierIsKnown(t *testing.T) {
 		{CandlestickMomentumIndex, true},
 		{CandlestickStrengthIndex, true},
 		{StochasticMomentumIndex, true},
+		{DoubleSmoothedStochastic, true},
 		// ── boundary ──────────────────────────────────────────────────────────
 		{last, false},
 		{Identifier(0), false},
@@ -451,6 +453,7 @@ func TestIdentifierMarshalJSON(t *testing.T) {
 		{CandlestickMomentumIndex, dqs + candlestickMomentumIndex + dqs, true},
 		{CandlestickStrengthIndex, dqs + candlestickStrengthIndex + dqs, true},
 		{StochasticMomentumIndex, dqs + stochasticMomentumIndex + dqs, true},
+		{DoubleSmoothedStochastic, dqs + doubleSmoothedStochastic + dqs, true},
 		// ── boundary ──────────────────────────────────────────────────────────
 		{last, nilstr, false},
 		{Identifier(9999), nilstr, false},
@@ -621,6 +624,7 @@ func TestIdentifierUnmarshalJSON(t *testing.T) {
 		{CandlestickMomentumIndex, dqs + candlestickMomentumIndex + dqs, true},
 		{CandlestickStrengthIndex, dqs + candlestickStrengthIndex + dqs, true},
 		{StochasticMomentumIndex, dqs + stochasticMomentumIndex + dqs, true},
+		{DoubleSmoothedStochastic, dqs + doubleSmoothedStochastic + dqs, true},
 		// ── boundary ──────────────────────────────────────────────────────────
 		{zero, "\"unknown\"", false},
 		{zero, "\"foobar\"", false},

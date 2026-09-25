@@ -729,4 +729,9 @@ def create_indicator(
         from ..william_blau.stochastic_momentum_index.stochastic_momentum_index import StochasticMomentumIndex
         return StochasticMomentumIndex(_apply(default_params(), params))
 
+    if identifier == Identifier.DOUBLE_SMOOTHED_STOCHASTIC:
+        from ..william_blau.double_smoothed_stochastic.params import default_params
+        from ..william_blau.double_smoothed_stochastic.double_smoothed_stochastic import DoubleSmoothedStochastic
+        return DoubleSmoothedStochastic(_apply(default_params(), params))
+
     raise ValueError(f"unsupported indicator: {identifier}")
