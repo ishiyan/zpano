@@ -48,6 +48,8 @@ pub const JurikTurningPointOscillator = struct {
 
     mnemonic_buf: [96]u8,
     mnemonic_len: usize,
+    description_buf: [160]u8,
+    description_len: usize,
 
     pub fn init(params: JurikTurningPointOscillatorParams) !JurikTurningPointOscillator {
         const length = params.length;
@@ -68,12 +70,16 @@ pub const JurikTurningPointOscillator = struct {
         }) catch unreachable;
         const mnemonic_len = mnemonic.len;
 
+        var description_buf: [160]u8 = undefined;
+        const description = std.fmt.bufPrint(&description_buf, "Jurik turning point oscillator {s}", .{mnemonic}) catch unreachable;
+        const description_len = description.len;
+
         const n: f64 = @floatFromInt(length);
 
         return .{
             .line = LineIndicator.new(
                 mnemonic_buf[0..mnemonic_len],
-                "Jurik turning point oscillator ",
+                description_buf[0..description_len],
                 params.bar_component,
                 params.quote_component,
                 params.trade_component,
@@ -87,11 +93,14 @@ pub const JurikTurningPointOscillator = struct {
             .mid = (n + 1.0) / 2.0,
             .mnemonic_buf = mnemonic_buf,
             .mnemonic_len = mnemonic_len,
+            .description_buf = description_buf,
+            .description_len = description_len,
         };
     }
 
     pub fn fixSlices(self: *JurikTurningPointOscillator) void {
         self.line.mnemonic = self.mnemonic_buf[0..self.mnemonic_len];
+        self.line.description = self.description_buf[0..self.description_len];
     }
 
     pub fn update(self: *JurikTurningPointOscillator, sample: f64) f64 {
@@ -331,4 +340,15 @@ test "jtpo length 60" {
 }
 test "jtpo length 80" {
     try runTpoTest(80, testdata.expectedLen80());
+}
+
+test "jtpo metadata description" {
+    var ind = JurikTurningPointOscillator.init(.{ .length = 14 }) catch unreachable;
+    ind.fixSlices();
+
+    var m: Metadata = undefined;
+    ind.getMetadata(&m);
+
+    try testing.expectEqualStrings("Jurik turning point oscillator jtpo(14)", m.description);
+    try testing.expectEqualStrings("Jurik turning point oscillator jtpo(14)", m.outputs_buf[0].description);
 }

@@ -332,6 +332,9 @@ use crate::indicators::william_blau::stochastic_momentum_index::stochastic_momen
 use crate::indicators::william_blau::double_smoothed_stochastic::double_smoothed_stochastic::{
     DoubleSmoothedStochastic, DoubleSmoothedStochasticParams,
 };
+use crate::indicators::william_blau::directional_trend_index::directional_trend_index::{
+    DirectionalTrendIndex, DirectionalTrendIndexParams,
+};
 
 /// Create an indicator from its identifier and a JSON-encoded parameter string.
 ///
@@ -1789,6 +1792,16 @@ pub fn create_indicator(
             if let Some(v) = get_usize(&params, "s") { p.s = v; }
             if let Some(v) = get_usize(&params, "g") { p.g = v; }
             Ok(Box::new(DoubleSmoothedStochastic::new(&p)?))
+        }
+
+        Identifier::DirectionalTrendIndex => {
+            let mut p = DirectionalTrendIndexParams::default();
+            if let Some(v) = get_usize(&params, "q") { p.q = v; }
+            if let Some(v) = get_usize(&params, "r") { p.r = v; }
+            if let Some(v) = get_usize(&params, "s") { p.s = v; }
+            if let Some(v) = get_usize(&params, "u") { p.u = v; }
+            if let Some(v) = get_usize(&params, "ul") { p.ul = v; }
+            Ok(Box::new(DirectionalTrendIndex::new(&p)?))
         }
 
         _ => Err(format!("unsupported indicator: {:?}", identifier)),

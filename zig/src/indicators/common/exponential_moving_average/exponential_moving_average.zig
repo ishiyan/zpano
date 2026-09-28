@@ -276,26 +276,25 @@ const testing = std.testing;
 const testdata = @import("testdata.zig");
 
 fn createEmaLength(length: usize, first_is_average: bool) !ExponentialMovingAverage {
-    var ema = try ExponentialMovingAverage.initLength(.{
+    const ema = try ExponentialMovingAverage.initLength(.{
         .length = length,
         .first_is_average = first_is_average,
     });
-    ema.fixSlices();
     return ema;
 }
 
 fn createEmaAlpha(alpha: f64, first_is_average: bool) !ExponentialMovingAverage {
-    var ema = try ExponentialMovingAverage.initSmoothingFactor(.{
+    const ema = try ExponentialMovingAverage.initSmoothingFactor(.{
         .smoothing_factor = alpha,
         .first_is_average = first_is_average,
     });
-    ema.fixSlices();
     return ema;
 }
 
 test "ema update length 2 firstIsAverage true" {
     const input = testdata.testInput();
     var ema = try createEmaLength(2, true);
+    ema.fixSlices();
 
     // Index 0: NaN
     try testing.expect(math.isNan(ema.update(input[0])));
@@ -314,6 +313,7 @@ test "ema update length 2 firstIsAverage true" {
 test "ema update length 10 firstIsAverage true" {
     const input = testdata.testInput();
     var ema = try createEmaLength(10, true);
+    ema.fixSlices();
 
     for (0..9) |i| {
         try testing.expect(math.isNan(ema.update(input[i])));
@@ -321,6 +321,7 @@ test "ema update length 10 firstIsAverage true" {
 
     var results: [252]f64 = undefined;
     var ema2 = try createEmaLength(10, true);
+    ema2.fixSlices();
     for (0..252) |i| {
         results[i] = ema2.update(input[i]);
     }
@@ -335,6 +336,7 @@ test "ema update length 10 firstIsAverage true" {
 test "ema update length 2 firstIsAverage false (Metastock)" {
     const input = testdata.testInput();
     var ema = try createEmaLength(2, false);
+    ema.fixSlices();
 
     // Index 0: NaN (count < length for length=2)
     try testing.expect(math.isNan(ema.update(input[0])));
@@ -352,6 +354,7 @@ test "ema update length 2 firstIsAverage false (Metastock)" {
 test "ema update length 10 firstIsAverage false (Metastock)" {
     const input = testdata.testInput();
     var ema = try createEmaLength(10, false);
+    ema.fixSlices();
 
     for (0..9) |i| {
         try testing.expect(math.isNan(ema.update(input[i])));
@@ -359,6 +362,7 @@ test "ema update length 10 firstIsAverage false (Metastock)" {
 
     var results: [252]f64 = undefined;
     var ema2 = try createEmaLength(10, false);
+    ema2.fixSlices();
     for (0..252) |i| {
         results[i] = ema2.update(input[i]);
     }
@@ -374,6 +378,7 @@ test "ema update length 10 firstIsAverage false (Metastock)" {
 test "ema is primed length 10" {
     const input = testdata.testInput();
     var ema = try createEmaLength(10, true);
+    ema.fixSlices();
 
     try testing.expect(!ema.isPrimed());
     for (0..9) |i| {
@@ -386,6 +391,7 @@ test "ema is primed length 10" {
 
 test "ema metadata length" {
     var ema = try createEmaLength(10, true);
+    ema.fixSlices();
     var m: Metadata = undefined;
     ema.getMetadata(&m);
 
@@ -397,6 +403,7 @@ test "ema metadata length" {
 test "ema metadata alpha" {
     const alpha: f64 = 2.0 / 11.0;
     var ema = try createEmaAlpha(alpha, false);
+    ema.fixSlices();
     var m: Metadata = undefined;
     ema.getMetadata(&m);
 
@@ -414,6 +421,7 @@ test "ema update entity" {
     // scalar
     {
         var ema = try createEmaLength(2, false);
+        ema.fixSlices();
         _ = ema.update(0.0);
         _ = ema.update(0.0);
         const out = ema.updateScalar(&.{ .time = time, .value = inp });
@@ -426,6 +434,7 @@ test "ema update entity" {
     // bar
     {
         var ema = try createEmaLength(2, false);
+        ema.fixSlices();
         _ = ema.update(0.0);
         _ = ema.update(0.0);
         const bar = Bar{ .time = time, .open = 0, .high = 0, .low = 0, .close = inp, .volume = 0 };

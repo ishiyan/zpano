@@ -299,6 +299,8 @@ pub enum Identifier {
     StochasticMomentumIndex = 113,
     /// Identifies the William Blau Double Smoothed Stochastic (DSS) indicator.
     DoubleSmoothedStochastic = 114,
+    /// Identifies the William Blau Directional Trend Index (DTI) indicator.
+    DirectionalTrendIndex = 115,
 }
 
 impl Identifier {
@@ -428,6 +430,7 @@ impl Identifier {
             Self::CandlestickStrengthIndex => "candlestickStrengthIndex",
             Self::StochasticMomentumIndex => "stochasticMomentumIndex",
             Self::DoubleSmoothedStochastic => "doubleSmoothedStochastic",
+            Self::DirectionalTrendIndex => "directionalTrendIndex",
         }
     }
 
@@ -561,6 +564,7 @@ impl Identifier {
             "candlestickStrengthIndex" => Some(Self::CandlestickStrengthIndex),
             "stochasticMomentumIndex" => Some(Self::StochasticMomentumIndex),
             "doubleSmoothedStochastic" => Some(Self::DoubleSmoothedStochastic),
+            "directionalTrendIndex" => Some(Self::DirectionalTrendIndex),
             _ => None,
         }
     }

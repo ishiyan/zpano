@@ -196,6 +196,8 @@ pub const JurikAdaptiveZeroLagVelocity = struct {
 
     mnemonic_buf: [128]u8,
     mnemonic_len: usize,
+    description_buf: [160]u8,
+    description_len: usize,
 
     pub fn init(params: JurikAdaptiveZeroLagVelocityParams) !JurikAdaptiveZeroLagVelocity {
         const lo_length = params.lo_length;
@@ -220,10 +222,14 @@ pub const JurikAdaptiveZeroLagVelocity = struct {
         }) catch unreachable;
         const mnemonic_len = mnemonic.len;
 
+        var description_buf: [160]u8 = undefined;
+        const description = std.fmt.bufPrint(&description_buf, "Jurik adaptive zero lag velocity {s}", .{mnemonic}) catch unreachable;
+        const description_len = description.len;
+
         return .{
             .line = LineIndicator.new(
                 mnemonic_buf[0..mnemonic_len],
-                "Jurik adaptive zero lag velocity ",
+                description_buf[0..description_len],
                 params.bar_component,
                 params.quote_component,
                 params.trade_component,
@@ -239,11 +245,14 @@ pub const JurikAdaptiveZeroLagVelocity = struct {
             .smooth = VelSmooth.init(period),
             .mnemonic_buf = mnemonic_buf,
             .mnemonic_len = mnemonic_len,
+            .description_buf = description_buf,
+            .description_len = description_len,
         };
     }
 
     pub fn fixSlices(self: *JurikAdaptiveZeroLagVelocity) void {
         self.line.mnemonic = self.mnemonic_buf[0..self.mnemonic_len];
+        self.line.description = self.description_buf[0..self.description_len];
     }
 
     fn computeAdaptiveDepth(self: *JurikAdaptiveZeroLagVelocity, bar: u32) f64 {
@@ -501,4 +510,15 @@ test "javel period=10.0" {
 }
 test "javel period=30.0" {
     try runJavelTest(5, 30, 1.0, 30.0, testdata.expectedPeriod300());
+}
+
+test "3.00) metadata description" {
+    var ind = JurikAdaptiveZeroLagVelocity.init(.{ .lo_length = 5, .hi_length = 30, .sensitivity = 1.0, .period = 3.0 }) catch unreachable;
+    ind.fixSlices();
+
+    var m: Metadata = undefined;
+    ind.getMetadata(&m);
+
+    try testing.expectEqualStrings("Jurik adaptive zero lag velocity javel(5, 30, 1.00, 3.00)", m.description);
+    try testing.expectEqualStrings("Jurik adaptive zero lag velocity javel(5, 30, 1.00, 3.00)", m.outputs_buf[0].description);
 }

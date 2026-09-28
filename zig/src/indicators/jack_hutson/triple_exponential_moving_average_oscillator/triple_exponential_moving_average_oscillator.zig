@@ -245,8 +245,7 @@ const testing = std.testing;
 const testdata = @import("testdata.zig");
 
 fn createTrix(length: usize) !TripleExponentialMovingAverageOscillator {
-    var trix = try TripleExponentialMovingAverageOscillator.init(.{ .length = length });
-    trix.fixSlices();
+    const trix = try TripleExponentialMovingAverageOscillator.init(.{ .length = length });
     return trix;
 }
 
@@ -260,6 +259,7 @@ test "trix values" {
     const expected = testdata.testExpected();
 
     var trix = try createTrix(5);
+    trix.fixSlices();
 
     for (closes, expected, 0..) |c, exp, i| {
         const result = trix.update(c);
@@ -278,6 +278,7 @@ test "trix is primed" {
     const closes = testdata.testCloses();
 
     var trix = try createTrix(5);
+    trix.fixSlices();
 
     // Lookback = 3*(5-1) + 1 = 13. First primed at index 13.
     for (0..13) |i| {
@@ -310,12 +311,14 @@ test "trix invalid params" {
 
 test "trix NaN" {
     var trix = try createTrix(5);
+    trix.fixSlices();
     const result = trix.update(math.nan(f64));
     try testing.expect(math.isNan(result));
 }
 
 test "trix update entity" {
     var trix = try createTrix(5);
+    trix.fixSlices();
     const time: i64 = 1617235200;
 
     const bar = Bar{ .time = time, .open = 0, .high = 0, .low = 0, .close = 100.0, .volume = 0 };

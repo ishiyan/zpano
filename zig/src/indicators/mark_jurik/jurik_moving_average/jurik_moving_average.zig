@@ -83,6 +83,8 @@ pub const JurikMovingAverage = struct {
 
     mnemonic_buf: [96]u8,
     mnemonic_len: usize,
+    description_buf: [160]u8,
+    description_len: usize,
 
     pub fn init(params: JurikMovingAverageParams) !JurikMovingAverage {
         const length = params.length;
@@ -103,6 +105,10 @@ pub const JurikMovingAverage = struct {
             length, phase, triple,
         }) catch unreachable;
         const mnemonic_len = mnemonic.len;
+
+        var description_buf: [160]u8 = undefined;
+        const description = std.fmt.bufPrint(&description_buf, "Jurik moving average {s}", .{mnemonic}) catch unreachable;
+        const description_len = description.len;
 
         const epsilon: f64 = 1e-10;
         const two: f64 = 2.0;
@@ -138,7 +144,7 @@ pub const JurikMovingAverage = struct {
         return .{
             .line = LineIndicator.new(
                 mnemonic_buf[0..mnemonic_len],
-                "Jurik moving average ",
+                description_buf[0..description_len],
                 params.bar_component,
                 params.quote_component,
                 params.trade_component,
@@ -180,11 +186,14 @@ pub const JurikMovingAverage = struct {
             .v3 = v3_val,
             .mnemonic_buf = mnemonic_buf,
             .mnemonic_len = mnemonic_len,
+            .description_buf = description_buf,
+            .description_len = description_len,
         };
     }
 
     pub fn fixSlices(self: *JurikMovingAverage) void {
         self.line.mnemonic = self.mnemonic_buf[0..self.mnemonic_len];
+        self.line.description = self.description_buf[0..self.description_len];
     }
 
     pub fn update(self: *JurikMovingAverage, sample: f64) f64 {
@@ -581,16 +590,16 @@ fn almostEqual(a: f64, b: f64, epsilon: f64) bool {
 }
 
 fn createJma(length: u32, phase: i32) JurikMovingAverage {
-    var jma = JurikMovingAverage.init(.{
+    const jma = JurikMovingAverage.init(.{
         .length = length,
         .phase = phase,
     }) catch unreachable;
-    jma.fixSlices();
     return jma;
 }
 
 fn runJmaTest(length: u32, phase: i32, expected: [252]f64) !void {
     var jma = createJma(length, phase);
+    jma.fixSlices();
     const input = testInput();
     const eps = 1e-13;
 
@@ -666,6 +675,7 @@ test "jurik moving average length 10 phase 1" {
 
 test "jurik moving average is primed" {
     var jma = createJma(10, 30);
+    jma.fixSlices();
     const input = testInput();
 
     try testing.expect(!jma.isPrimed());
@@ -681,6 +691,7 @@ test "jurik moving average is primed" {
 
 test "jurik moving average metadata" {
     var jma = createJma(10, 30);
+    jma.fixSlices();
 
     var m: Metadata = undefined;
     jma.getMetadata(&m);
@@ -689,10 +700,13 @@ test "jurik moving average metadata" {
     try testing.expectEqual(@as(usize, 1), m.outputs_len);
     try testing.expectEqual(@as(i32, 1), m.outputs_buf[0].kind);
     try testing.expectEqualStrings("jma(10, 30)", m.mnemonic);
+    try testing.expectEqualStrings("Jurik moving average jma(10, 30)", m.description);
+    try testing.expectEqualStrings("Jurik moving average jma(10, 30)", m.outputs_buf[0].description);
 }
 
 test "jurik moving average update scalar" {
     var jma = createJma(10, 30);
+    jma.fixSlices();
 
     for (0..30) |_| {
         _ = jma.update(3.0);
@@ -707,6 +721,7 @@ test "jurik moving average update scalar" {
 
 test "jurik moving average update bar" {
     var jma = createJma(10, 30);
+    jma.fixSlices();
 
     for (0..30) |_| {
         _ = jma.update(3.0);

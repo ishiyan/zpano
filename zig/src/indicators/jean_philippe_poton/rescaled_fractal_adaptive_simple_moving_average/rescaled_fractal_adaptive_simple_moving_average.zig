@@ -373,14 +373,14 @@ const testing = std.testing;
 const testdata = @import("testdata.zig");
 
 fn createRsfrasma(allocator: std.mem.Allocator, period: usize, normal_speed: usize, price_scale: f64) !RescaledFractalAdaptiveSimpleMovingAverage {
-    var f = try RescaledFractalAdaptiveSimpleMovingAverage.init(allocator, .{ .period = period, .normal_speed = normal_speed, .price_scale = price_scale });
-    f.fixSlices();
+    const f = try RescaledFractalAdaptiveSimpleMovingAverage.init(allocator, .{ .period = period, .normal_speed = normal_speed, .price_scale = price_scale });
     return f;
 }
 
 fn runTest(allocator: std.mem.Allocator, period: usize, normal_speed: usize, price_scale: f64, exp: [252]f64) !void {
     const input = testdata.testInput();
     var f = try createRsfrasma(allocator, period, normal_speed, price_scale);
+    f.fixSlices();
     defer f.deinit();
 
     for (0..252) |i| {
@@ -428,6 +428,7 @@ test "rsfrasma update p32 s10000" {
 test "rsfrasma is primed" {
     const input = testdata.testInput();
     var f = try createRsfrasma(testing.allocator, 64, 30, 1.0);
+    f.fixSlices();
     defer f.deinit();
 
     for (0..64) |i| {
@@ -440,6 +441,7 @@ test "rsfrasma is primed" {
 
 test "rsfrasma nan passthrough" {
     var f = try createRsfrasma(testing.allocator, 4, 30, 1.0);
+    f.fixSlices();
     defer f.deinit();
     try testing.expect(math.isNan(f.update(math.nan(f64))));
 }

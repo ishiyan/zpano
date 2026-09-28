@@ -278,14 +278,12 @@ const testing = std.testing;
 const testdata = @import("testdata.zig");
 
 fn createCci(allocator: std.mem.Allocator, length: usize) !CommodityChannelIndex {
-    var cci = try CommodityChannelIndex.init(allocator, .{ .length = length });
-    cci.fixSlices();
+    const cci = try CommodityChannelIndex.init(allocator, .{ .length = length });
     return cci;
 }
 
 fn createCciWithInverse(allocator: std.mem.Allocator, length: usize, inverse: f64) !CommodityChannelIndex {
-    var cci = try CommodityChannelIndex.init(allocator, .{ .length = length, .inverse_scaling_factor = inverse });
-    cci.fixSlices();
+    const cci = try CommodityChannelIndex.init(allocator, .{ .length = length, .inverse_scaling_factor = inverse });
     return cci;
 }
 
@@ -299,6 +297,7 @@ test "cci length 11" {
     const input = testdata.testInput();
 
     var cci = try createCci(testing.allocator, 11);
+    cci.fixSlices();
     defer cci.deinit();
 
     // First 10 values should be NaN.
@@ -332,6 +331,7 @@ test "cci length 2" {
     const input = testdata.testInput();
 
     var cci = try createCci(testing.allocator, 2);
+    cci.fixSlices();
     defer cci.deinit();
 
     // First value should be NaN.
@@ -354,6 +354,7 @@ test "cci length 2" {
 
 test "cci is primed" {
     var cci = try createCci(testing.allocator, 5);
+    cci.fixSlices();
     defer cci.deinit();
 
     try testing.expect(!cci.isPrimed());
@@ -372,6 +373,7 @@ test "cci is primed" {
 
 test "cci NaN" {
     var cci = try createCci(testing.allocator, 5);
+    cci.fixSlices();
     defer cci.deinit();
 
     const v = cci.update(math.nan(f64));
@@ -397,6 +399,7 @@ test "cci update entity" {
     const input = testdata.testInput();
 
     var cci = try createCci(testing.allocator, 11);
+    cci.fixSlices();
     defer cci.deinit();
 
     const time: i64 = 1617235200;
@@ -424,6 +427,7 @@ test "cci invalid params" {
 
 test "cci custom scaling factor" {
     var cci = try createCciWithInverse(testing.allocator, 5, 0.03);
+    cci.fixSlices();
     defer cci.deinit();
 
     for (1..6) |i| {

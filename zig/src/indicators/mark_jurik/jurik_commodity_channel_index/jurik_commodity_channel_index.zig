@@ -53,6 +53,8 @@ pub const JurikCommodityChannelIndex = struct {
 
     mnemonic_buf: [96]u8,
     mnemonic_len: usize,
+    description_buf: [160]u8,
+    description_len: usize,
 
     pub fn init(params: JurikCommodityChannelIndexParams) !JurikCommodityChannelIndex {
         const length = params.length;
@@ -72,13 +74,17 @@ pub const JurikCommodityChannelIndex = struct {
         }) catch unreachable;
         const mnemonic_len = mnemonic.len;
 
+        var description_buf: [160]u8 = undefined;
+        const description = std.fmt.bufPrint(&description_buf, "Jurik commodity channel index {s}", .{mnemonic}) catch unreachable;
+        const description_len = description.len;
+
         const fast_jma = jma_mod.JurikMovingAverage.init(.{ .length = 4, .phase = 0 }) catch return error.InvalidLength;
         const slow_jma = jma_mod.JurikMovingAverage.init(.{ .length = length, .phase = 0 }) catch return error.InvalidLength;
 
         return .{
             .line = LineIndicator.new(
                 mnemonic_buf[0..mnemonic_len],
-                "Jurik commodity channel index ",
+                description_buf[0..description_len],
                 params.bar_component,
                 params.quote_component,
                 params.trade_component,
@@ -92,11 +98,14 @@ pub const JurikCommodityChannelIndex = struct {
             .diff_buf_size = 3 * length,
             .mnemonic_buf = mnemonic_buf,
             .mnemonic_len = mnemonic_len,
+            .description_buf = description_buf,
+            .description_len = description_len,
         };
     }
 
     pub fn fixSlices(self: *JurikCommodityChannelIndex) void {
         self.line.mnemonic = self.mnemonic_buf[0..self.mnemonic_len];
+        self.line.description = self.description_buf[0..self.description_len];
     }
 
     pub fn update(self: *JurikCommodityChannelIndex, sample: f64) f64 {
@@ -286,4 +295,15 @@ test "jccx length 80" {
 }
 test "jccx length 100" {
     try runJccxTest(100, testdata.expectedLen100());
+}
+
+test "jccx metadata description" {
+    var ind = JurikCommodityChannelIndex.init(.{ .length = 20 }) catch unreachable;
+    ind.fixSlices();
+
+    var m: Metadata = undefined;
+    ind.getMetadata(&m);
+
+    try testing.expectEqualStrings("Jurik commodity channel index jccx(20)", m.description);
+    try testing.expectEqualStrings("Jurik commodity channel index jccx(20)", m.outputs_buf[0].description);
 }

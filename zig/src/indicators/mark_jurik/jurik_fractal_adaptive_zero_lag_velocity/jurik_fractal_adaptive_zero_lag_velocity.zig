@@ -427,6 +427,8 @@ pub const JurikFractalAdaptiveZeroLagVelocity = struct {
 
     mnemonic_buf: [128]u8,
     mnemonic_len: usize,
+    description_buf: [160]u8,
+    description_len: usize,
 
     pub fn init(params: JurikFractalAdaptiveZeroLagVelocityParams) !JurikFractalAdaptiveZeroLagVelocity {
         const lo_depth = params.lo_depth;
@@ -452,10 +454,14 @@ pub const JurikFractalAdaptiveZeroLagVelocity = struct {
         }) catch unreachable;
         const mnemonic_len = mnemonic.len;
 
+        var description_buf: [160]u8 = undefined;
+        const description = std.fmt.bufPrint(&description_buf, "Jurik fractal adaptive zero lag velocity {s}", .{mnemonic}) catch unreachable;
+        const description_len = description.len;
+
         return .{
             .line = LineIndicator.new(
                 mnemonic_buf[0..mnemonic_len],
-                "Jurik fractal adaptive zero lag velocity ",
+                description_buf[0..description_len],
                 params.bar_component,
                 params.quote_component,
                 params.trade_component,
@@ -471,11 +477,14 @@ pub const JurikFractalAdaptiveZeroLagVelocity = struct {
             .smooth_inst = VelSmooth.init(3.0),
             .mnemonic_buf = mnemonic_buf,
             .mnemonic_len = mnemonic_len,
+            .description_buf = description_buf,
+            .description_len = description_len,
         };
     }
 
     pub fn fixSlices(self: *JurikFractalAdaptiveZeroLagVelocity) void {
         self.line.mnemonic = self.mnemonic_buf[0..self.mnemonic_len];
+        self.line.description = self.description_buf[0..self.description_len];
     }
 
     pub fn update(self: *JurikFractalAdaptiveZeroLagVelocity, sample: f64) f64 {
@@ -721,4 +730,15 @@ test "jvelcfb smooth=20" {
 }
 test "jvelcfb smooth=40" {
     try runJvelcfbTest(5, 30, 1, 40, testdata.expectedSmooth40());
+}
+
+test "10) metadata description" {
+    var ind = JurikFractalAdaptiveZeroLagVelocity.init(.{ .lo_depth = 5, .hi_depth = 30, .fractal_type = 1, .smooth = 10 }) catch unreachable;
+    ind.fixSlices();
+
+    var m: Metadata = undefined;
+    ind.getMetadata(&m);
+
+    try testing.expectEqualStrings("Jurik fractal adaptive zero lag velocity jvelcfb(5, 30, 1, 10)", m.description);
+    try testing.expectEqualStrings("Jurik fractal adaptive zero lag velocity jvelcfb(5, 30, 1, 10)", m.outputs_buf[0].description);
 }

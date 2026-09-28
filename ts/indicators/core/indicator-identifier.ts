@@ -415,4 +415,7 @@ export enum IndicatorIdentifier {
 
     /** Identifies the William Blau __Double Smoothed Stochastic__ (DSS) indicator. */
     DoubleSmoothedStochastic,
+
+    /** Identifies the William Blau __Directional Trend Index__ (DTI) indicator. */
+    DirectionalTrendIndex,
 }

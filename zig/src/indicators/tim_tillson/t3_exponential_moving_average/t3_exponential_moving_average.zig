@@ -441,22 +441,20 @@ const testdata = @import("testdata.zig");
 
 // Expected data from test_T3.xls, T3(5, 0.7) — firstIsAverage = true.
 fn createT3Length(length: usize, first_is_average: bool, volume: f64) !T3ExponentialMovingAverage {
-    var t3 = try T3ExponentialMovingAverage.initLength(.{
+    const t3 = try T3ExponentialMovingAverage.initLength(.{
         .length = length,
         .volume_factor = volume,
         .first_is_average = first_is_average,
     });
-    t3.fixSlices();
     return t3;
 }
 
 fn createT3Alpha(alpha: f64, first_is_average: bool, volume: f64) !T3ExponentialMovingAverage {
-    var t3 = try T3ExponentialMovingAverage.initSmoothingFactor(.{
+    const t3 = try T3ExponentialMovingAverage.initSmoothingFactor(.{
         .smoothing_factor = alpha,
         .volume_factor = volume,
         .first_is_average = first_is_average,
     });
-    t3.fixSlices();
     return t3;
 }
 
@@ -464,6 +462,7 @@ test "t3 update length 5 firstIsAverage true (t3.xls)" {
     const input = testdata.testInput();
     const exp = testdata.testExpected();
     var t3 = try createT3Length(5, true, 0.7);
+    t3.fixSlices();
     const lprimed = 6 * 5 - 6;
 
     for (0..lprimed) |i| {
@@ -481,6 +480,7 @@ test "t3 update length 5 firstIsAverage true (t3.xls)" {
 test "t3 update length 5 firstIsAverage false (Metastock)" {
     const input = testdata.testInput();
     var t3 = try createT3Length(5, false, 0.7);
+    t3.fixSlices();
     const lprimed = 6 * 5 - 6;
 
     for (0..lprimed) |i| {
@@ -510,6 +510,7 @@ test "t3 isPrimed length 5" {
     // firstIsAverage = true
     {
         var t3 = try createT3Length(l, true, 0.7);
+        t3.fixSlices();
         try testing.expect(!t3.isPrimed());
         for (0..lprimed) |i| {
             _ = t3.update(input[i]);
@@ -524,6 +525,7 @@ test "t3 isPrimed length 5" {
     // firstIsAverage = false
     {
         var t3 = try createT3Length(l, false, 0.7);
+        t3.fixSlices();
         try testing.expect(!t3.isPrimed());
         for (0..lprimed) |i| {
             _ = t3.update(input[i]);
@@ -538,6 +540,7 @@ test "t3 isPrimed length 5" {
 
 test "t3 metadata length" {
     var t3 = try createT3Length(10, true, 0.3333);
+    t3.fixSlices();
     var m: Metadata = undefined;
     t3.getMetadata(&m);
 
@@ -549,6 +552,7 @@ test "t3 metadata length" {
 test "t3 metadata alpha" {
     const alpha: f64 = 2.0 / 11.0;
     var t3 = try createT3Alpha(alpha, false, 0.3333333);
+    t3.fixSlices();
     var m: Metadata = undefined;
     t3.getMetadata(&m);
 
@@ -568,6 +572,7 @@ test "t3 update entity" {
     // scalar
     {
         var t3 = try createT3Length(l, false, 0.7);
+        t3.fixSlices();
         for (0..lprimed) |_| {
             _ = t3.update(0.0);
         }
@@ -581,6 +586,7 @@ test "t3 update entity" {
     // bar
     {
         var t3 = try createT3Length(l, true, 0.7);
+        t3.fixSlices();
         for (0..lprimed) |_| {
             _ = t3.update(0.0);
         }

@@ -302,8 +302,7 @@ const testing = std.testing;
 const testdata = @import("testdata.zig");
 
 fn createCorrel(allocator: std.mem.Allocator, length: usize) !PearsonsCorrelationCoefficient {
-    var c = try PearsonsCorrelationCoefficient.init(allocator, .{ .length = length });
-    c.fixSlices();
+    const c = try PearsonsCorrelationCoefficient.init(allocator, .{ .length = length });
     return c;
 }
 
@@ -316,6 +315,7 @@ test "pearsons correlation coefficient talib spot checks period=20" {
     const low = testdata.testLowInput();
 
     var c = try createCorrel(testing.allocator, 20);
+    c.fixSlices();
     defer c.deinit();
 
     // First 18 values should be NaN (lookback = 19, primed at index 19).
@@ -349,6 +349,7 @@ test "pearsons correlation coefficient excel verification period=20" {
     const eps: f64 = 1e-10;
 
     var c = try createCorrel(testing.allocator, 20);
+    c.fixSlices();
     defer c.deinit();
 
     for (0..252) |i| {
@@ -370,6 +371,7 @@ test "pearsons correlation coefficient is primed length=1" {
     const low = testdata.testLowInput();
 
     var c = try createCorrel(testing.allocator, 1);
+    c.fixSlices();
     defer c.deinit();
 
     try testing.expect(!c.isPrimed());
@@ -382,6 +384,7 @@ test "pearsons correlation coefficient is primed length=2" {
     const low = testdata.testLowInput();
 
     var c = try createCorrel(testing.allocator, 2);
+    c.fixSlices();
     defer c.deinit();
 
     try testing.expect(!c.isPrimed());
@@ -396,6 +399,7 @@ test "pearsons correlation coefficient is primed length=20" {
     const low = testdata.testLowInput();
 
     var c = try createCorrel(testing.allocator, 20);
+    c.fixSlices();
     defer c.deinit();
 
     try testing.expect(!c.isPrimed());
@@ -409,6 +413,7 @@ test "pearsons correlation coefficient is primed length=20" {
 
 test "pearsons correlation coefficient metadata" {
     var c = try createCorrel(testing.allocator, 20);
+    c.fixSlices();
     defer c.deinit();
     var m: Metadata = undefined;
     c.getMetadata(&m);
@@ -437,6 +442,7 @@ test "pearsons correlation coefficient mnemonic with components" {
 
 test "pearsons correlation coefficient update entity bar" {
     var c = try createCorrel(testing.allocator, 2);
+    c.fixSlices();
     defer c.deinit();
 
     // Feed one pair via updatePair, then one bar.
@@ -455,6 +461,7 @@ test "pearsons correlation coefficient update entity scalar" {
     const time: i64 = 1617235200;
 
     var c = try createCorrel(testing.allocator, 2);
+    c.fixSlices();
     defer c.deinit();
 
     _ = c.update(inp);
@@ -472,6 +479,7 @@ test "pearsons correlation coefficient update entity quote" {
     const time: i64 = 1617235200;
 
     var c = try createCorrel(testing.allocator, 2);
+    c.fixSlices();
     defer c.deinit();
 
     _ = c.update(inp);
@@ -487,6 +495,7 @@ test "pearsons correlation coefficient update entity trade" {
     const time: i64 = 1617235200;
 
     var c = try createCorrel(testing.allocator, 2);
+    c.fixSlices();
     defer c.deinit();
 
     _ = c.update(inp);

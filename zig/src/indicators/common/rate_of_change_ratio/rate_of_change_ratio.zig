@@ -237,14 +237,14 @@ const testing = std.testing;
 const testdata = @import("testdata.zig");
 
 fn createRocr(allocator: std.mem.Allocator, length: usize, hundred_scale: bool) !RateOfChangeRatio {
-    var rocr = try RateOfChangeRatio.init(allocator, .{ .length = length, .hundred_scale = hundred_scale });
-    rocr.fixSlices();
+    const rocr = try RateOfChangeRatio.init(allocator, .{ .length = length, .hundred_scale = hundred_scale });
     return rocr;
 }
 
 test "rocr update length 14" {
     const input = testdata.testInput();
     var rocr = try createRocr(testing.allocator, 14, false);
+    rocr.fixSlices();
     defer rocr.deinit();
 
     for (0..13) |i| {
@@ -265,6 +265,7 @@ test "rocr update length 14" {
 test "rocr100 update length 14" {
     const input = testdata.testInput();
     var rocr = try createRocr(testing.allocator, 14, true);
+    rocr.fixSlices();
     defer rocr.deinit();
 
     for (0..13) |i| {
@@ -286,6 +287,7 @@ test "rocr is primed" {
     const input = testdata.testInput();
     inline for ([_]usize{ 1, 2, 5, 10 }) |length| {
         var rocr = try createRocr(testing.allocator, length, false);
+        rocr.fixSlices();
         defer rocr.deinit();
         try testing.expect(!rocr.isPrimed());
         for (0..length) |i| {
@@ -301,6 +303,7 @@ test "rocr is primed" {
 
 test "rocr metadata" {
     var rocr = try createRocr(testing.allocator, 5, false);
+    rocr.fixSlices();
     defer rocr.deinit();
     var m: Metadata = undefined;
     rocr.getMetadata(&m);
@@ -311,6 +314,7 @@ test "rocr metadata" {
 
 test "rocr100 metadata" {
     var rocr = try createRocr(testing.allocator, 5, true);
+    rocr.fixSlices();
     defer rocr.deinit();
     var m: Metadata = undefined;
     rocr.getMetadata(&m);
@@ -329,6 +333,7 @@ test "rocr update entity" {
     const time: i64 = 1617235200;
 
     var rocr = try createRocr(testing.allocator, length, false);
+    rocr.fixSlices();
     defer rocr.deinit();
     _ = rocr.update(inp);
     _ = rocr.update(inp);

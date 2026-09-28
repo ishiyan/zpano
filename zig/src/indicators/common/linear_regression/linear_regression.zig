@@ -197,17 +197,31 @@ pub const LinearRegression = struct {
     }
 
     pub fn getMetadata(self: *const LinearRegression, out: *Metadata) void {
+        const mn = self.line.mnemonic;
+        const desc = self.line.description;
+
+        var value_desc_buf: [256]u8 = undefined;
+        const value_desc = std.fmt.bufPrint(&value_desc_buf, "{s} value", .{desc}) catch desc;
+        var forecast_desc_buf: [256]u8 = undefined;
+        const forecast_desc = std.fmt.bufPrint(&forecast_desc_buf, "{s} forecast", .{desc}) catch desc;
+        var intercept_desc_buf: [256]u8 = undefined;
+        const intercept_desc = std.fmt.bufPrint(&intercept_desc_buf, "{s} intercept", .{desc}) catch desc;
+        var slope_desc_buf: [256]u8 = undefined;
+        const slope_desc = std.fmt.bufPrint(&slope_desc_buf, "{s} slope", .{desc}) catch desc;
+        var angle_desc_buf: [256]u8 = undefined;
+        const angle_desc = std.fmt.bufPrint(&angle_desc_buf, "{s} angle", .{desc}) catch desc;
+
         build_metadata_mod.buildMetadata(
             out,
             .linear_regression,
-            self.line.mnemonic,
-            self.line.description,
+            mn,
+            desc,
             &[_]build_metadata_mod.OutputText{
-                .{ .mnemonic = self.line.mnemonic, .description = self.line.description },
-                .{ .mnemonic = self.line.mnemonic, .description = self.line.description },
-                .{ .mnemonic = self.line.mnemonic, .description = self.line.description },
-                .{ .mnemonic = self.line.mnemonic, .description = self.line.description },
-                .{ .mnemonic = self.line.mnemonic, .description = self.line.description },
+                .{ .mnemonic = mn, .description = value_desc },
+                .{ .mnemonic = mn, .description = forecast_desc },
+                .{ .mnemonic = mn, .description = intercept_desc },
+                .{ .mnemonic = mn, .description = slope_desc },
+                .{ .mnemonic = mn, .description = angle_desc },
             },
         );
     }
@@ -312,8 +326,7 @@ const testing = std.testing;
 const testdata = @import("testdata.zig");
 
 fn createLinreg(allocator: std.mem.Allocator, length: usize) !LinearRegression {
-    var lr = try LinearRegression.init(allocator, .{ .length = length });
-    lr.fixSlices();
+    const lr = try LinearRegression.init(allocator, .{ .length = length });
     return lr;
 }
 
@@ -328,6 +341,7 @@ test "linear regression value output period 14 all 252 rows" {
     const exp_value = testdata.testExpectedValue();
 
     var lr = try createLinreg(testing.allocator, 14);
+    lr.fixSlices();
     defer lr.deinit();
 
     for (0..13) |i| {
@@ -350,6 +364,7 @@ test "linear regression all 5 outputs period 14 all 252 rows" {
     const exp_slope_deg = testdata.testExpectedSlopeDeg();
 
     var lr = try createLinreg(testing.allocator, 14);
+    lr.fixSlices();
     defer lr.deinit();
 
     // Feed first 12 samples via update.
@@ -381,6 +396,7 @@ test "linear regression all 5 outputs period 14 all 252 rows" {
 test "linear regression is primed" {
     const input = testdata.testInput();
     var lr = try createLinreg(testing.allocator, 14);
+    lr.fixSlices();
     defer lr.deinit();
 
     try testing.expect(!lr.isPrimed());
@@ -395,6 +411,7 @@ test "linear regression is primed" {
 test "linear regression is primed length 2" {
     const input = testdata.testInput();
     var lr = try createLinreg(testing.allocator, 2);
+    lr.fixSlices();
     defer lr.deinit();
 
     try testing.expect(!lr.isPrimed());
@@ -406,6 +423,7 @@ test "linear regression is primed length 2" {
 
 test "linear regression metadata" {
     var lr = try createLinreg(testing.allocator, 14);
+    lr.fixSlices();
     defer lr.deinit();
     var m: Metadata = undefined;
     lr.getMetadata(&m);
@@ -414,6 +432,13 @@ test "linear regression metadata" {
     try testing.expectEqualStrings("linreg(14)", m.mnemonic);
     try testing.expectEqualStrings("Linear Regression linreg(14)", m.description);
     try testing.expectEqual(@as(usize, 5), m.outputs_len);
+    const suffixes = [_][]const u8{ "value", "forecast", "intercept", "slope", "angle" };
+    for (suffixes, 0..) |suffix, i| {
+        var buf: [64]u8 = undefined;
+        const exp = try std.fmt.bufPrint(&buf, "Linear Regression linreg(14) {s}", .{suffix});
+        try testing.expectEqualStrings("linreg(14)", m.outputs_buf[i].mnemonic);
+        try testing.expectEqualStrings(exp, m.outputs_buf[i].description);
+    }
 }
 
 test "linear regression init invalid length" {
@@ -440,6 +465,7 @@ test "linear regression update entity" {
     // bar
     {
         var lr = try createLinreg(testing.allocator, 14);
+        lr.fixSlices();
         defer lr.deinit();
         for (0..13) |i| {
             _ = lr.update(input[i]);
@@ -453,6 +479,7 @@ test "linear regression update entity" {
     // quote
     {
         var lr = try createLinreg(testing.allocator, 14);
+        lr.fixSlices();
         defer lr.deinit();
         for (0..13) |i| {
             _ = lr.update(input[i]);
@@ -465,6 +492,7 @@ test "linear regression update entity" {
     // trade
     {
         var lr = try createLinreg(testing.allocator, 14);
+        lr.fixSlices();
         defer lr.deinit();
         for (0..13) |i| {
             _ = lr.update(input[i]);

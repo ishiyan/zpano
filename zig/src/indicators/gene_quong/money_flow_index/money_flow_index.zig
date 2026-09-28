@@ -62,6 +62,8 @@ pub const MoneyFlowIndex = struct {
     allocator: std.mem.Allocator,
     mnemonic_buf: [128]u8,
     mnemonic_len: usize,
+    description_buf: [160]u8,
+    description_len: usize,
 
     pub fn init(allocator: std.mem.Allocator, params: MoneyFlowIndexParams) !MoneyFlowIndex {
         if (params.length < 1) {
@@ -79,7 +81,9 @@ pub const MoneyFlowIndex = struct {
         const mnemonic = std.fmt.bufPrint(&mnemonic_buf, "mfi({d}{s})", .{ params.length, triple }) catch unreachable;
         const mnemonic_len = mnemonic.len;
 
-        const desc = "Money Flow Index " ++ "mfi";
+        var description_buf: [160]u8 = undefined;
+        const description = std.fmt.bufPrint(&description_buf, "Money Flow Index {s}", .{mnemonic}) catch unreachable;
+        const description_len = description.len;
 
         const neg_buf = try allocator.alloc(f64, params.length);
         @memset(neg_buf, 0);
@@ -89,7 +93,7 @@ pub const MoneyFlowIndex = struct {
         return .{
             .line = LineIndicator.new(
                 mnemonic_buf[0..mnemonic_len],
-                desc,
+                description_buf[0..description_len],
                 params.bar_component,
                 params.quote_component,
                 params.trade_component,
@@ -109,6 +113,8 @@ pub const MoneyFlowIndex = struct {
             .allocator = allocator,
             .mnemonic_buf = mnemonic_buf,
             .mnemonic_len = mnemonic_len,
+            .description_buf = description_buf,
+            .description_len = description_len,
         };
     }
 
@@ -119,6 +125,7 @@ pub const MoneyFlowIndex = struct {
 
     pub fn fixSlices(self: *MoneyFlowIndex) void {
         self.line.mnemonic = self.mnemonic_buf[0..self.mnemonic_len];
+        self.line.description = self.description_buf[0..self.description_len];
     }
 
     /// Update with volume = 1 (scalar path).
@@ -320,8 +327,7 @@ fn roundTo(v: f64, comptime digits: comptime_int) f64 {
 
 // Typical price test data: (high + low + close) / 3, 252 entries.
 fn createMfi(allocator: std.mem.Allocator) !MoneyFlowIndex {
-    var mfi = try MoneyFlowIndex.init(allocator, .{ .length = 14 });
-    mfi.fixSlices();
+    const mfi = try MoneyFlowIndex.init(allocator, .{ .length = 14 });
     return mfi;
 }
 
@@ -332,6 +338,7 @@ test "money flow index with volume" {
     const digits = 9;
 
     var mfi = try createMfi(testing.allocator);
+    mfi.fixSlices();
     defer mfi.deinit();
 
     for (0..14) |i| {
@@ -357,6 +364,7 @@ test "money flow index volume 1" {
     const digits = 9;
 
     var mfi = try createMfi(testing.allocator);
+    mfi.fixSlices();
     defer mfi.deinit();
 
     for (0..14) |i| {
@@ -406,6 +414,7 @@ test "money flow index NaN" {
 
 test "money flow index metadata" {
     var mfi = try createMfi(testing.allocator);
+    mfi.fixSlices();
     defer mfi.deinit();
 
     var m: Metadata = undefined;
@@ -415,6 +424,8 @@ test "money flow index metadata" {
     try testing.expectEqual(@as(usize, 1), m.outputs_len);
     try testing.expectEqual(@as(i32, 1), m.outputs_buf[0].kind);
     try testing.expectEqualStrings("mfi(14, hlc/3)", m.mnemonic);
+    try testing.expectEqualStrings("Money Flow Index mfi(14, hlc/3)", m.description);
+    try testing.expectEqualStrings("Money Flow Index mfi(14, hlc/3)", m.outputs_buf[0].description);
 }
 
 test "money flow index update bar" {
@@ -437,6 +448,7 @@ test "money flow index update bar" {
     };
 
     var mfi = try createMfi(testing.allocator);
+    mfi.fixSlices();
     defer mfi.deinit();
 
     const time: i64 = 1617235200;

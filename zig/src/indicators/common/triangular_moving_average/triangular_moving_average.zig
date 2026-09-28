@@ -291,8 +291,7 @@ const testing = std.testing;
 const testdata = @import("testdata.zig");
 
 fn createTrima(allocator: std.mem.Allocator, length: usize) !TriangularMovingAverage {
-    var trima = try TriangularMovingAverage.init(allocator, .{ .length = length });
-    trima.fixSlices();
+    const trima = try TriangularMovingAverage.init(allocator, .{ .length = length });
     return trima;
 }
 
@@ -307,6 +306,7 @@ fn runAll(trima: *TriangularMovingAverage, input: *const [252]f64) [252]f64 {
 test "trima update length 9" {
     const input = testdata.testInput();
     var trima = try createTrima(testing.allocator, 9);
+    trima.fixSlices();
     defer trima.deinit();
     const results = runAll(&trima, &input);
 
@@ -321,6 +321,7 @@ test "trima update length 9" {
 test "trima update length 10" {
     const input = testdata.testInput();
     var trima = try createTrima(testing.allocator, 10);
+    trima.fixSlices();
     defer trima.deinit();
     const results = runAll(&trima, &input);
 
@@ -337,6 +338,7 @@ test "trima update length 10" {
 test "trima update length 12" {
     const input = testdata.testInput();
     var trima = try createTrima(testing.allocator, 12);
+    trima.fixSlices();
     defer trima.deinit();
     const results = runAll(&trima, &input);
 
@@ -351,6 +353,7 @@ test "trima update length 12" {
 test "trima is primed length 9" {
     const input = testdata.testInput();
     var trima = try createTrima(testing.allocator, 9);
+    trima.fixSlices();
     defer trima.deinit();
 
     try testing.expect(!trima.isPrimed());
@@ -365,6 +368,7 @@ test "trima is primed length 9" {
 test "trima is primed length 12" {
     const input = testdata.testInput();
     var trima = try createTrima(testing.allocator, 12);
+    trima.fixSlices();
     defer trima.deinit();
 
     try testing.expect(!trima.isPrimed());
@@ -378,6 +382,7 @@ test "trima is primed length 12" {
 
 test "trima metadata" {
     var trima = try createTrima(testing.allocator, 5);
+    trima.fixSlices();
     defer trima.deinit();
     var m: Metadata = undefined;
     trima.getMetadata(&m);
@@ -405,6 +410,7 @@ test "trima update entity" {
     // scalar
     {
         var trima = try createTrima(testing.allocator, 12);
+        trima.fixSlices();
         defer trima.deinit();
         for (0..11) |i| {
             _ = trima.update(input[i]);
@@ -419,6 +425,7 @@ test "trima update entity" {
     // bar
     {
         var trima = try createTrima(testing.allocator, 12);
+        trima.fixSlices();
         defer trima.deinit();
         for (0..11) |i| {
             _ = trima.update(input[i]);
@@ -433,6 +440,7 @@ test "trima update entity" {
 test "trima mnemonic components" {
     {
         var trima = try createTrima(testing.allocator, 5);
+        trima.fixSlices();
         defer trima.deinit();
         try testing.expectEqualStrings("trima(5)", trima.line.mnemonic);
     }

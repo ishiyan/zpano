@@ -241,17 +241,37 @@ pub const FractalGraphDimensionIndex = struct {
     }
 
     pub fn getMetadata(self: *const FractalGraphDimensionIndex, out: *Metadata) void {
+        const mn = self.line.mnemonic;
+        const desc = self.line.description;
+
+        var upper_mn_buf: [160]u8 = undefined;
+        const upper_mn = std.fmt.bufPrint(&upper_mn_buf, "{s} upper", .{mn}) catch mn;
+        var upper_desc_buf: [256]u8 = undefined;
+        const upper_desc = std.fmt.bufPrint(&upper_desc_buf, "{s} Upper", .{desc}) catch desc;
+        var lower_mn_buf: [160]u8 = undefined;
+        const lower_mn = std.fmt.bufPrint(&lower_mn_buf, "{s} lower", .{mn}) catch mn;
+        var lower_desc_buf: [256]u8 = undefined;
+        const lower_desc = std.fmt.bufPrint(&lower_desc_buf, "{s} Lower", .{desc}) catch desc;
+        var stddev_mn_buf: [160]u8 = undefined;
+        const stddev_mn = std.fmt.bufPrint(&stddev_mn_buf, "{s} stddev", .{mn}) catch mn;
+        var stddev_desc_buf: [256]u8 = undefined;
+        const stddev_desc = std.fmt.bufPrint(&stddev_desc_buf, "{s} Stddev", .{desc}) catch desc;
+        var band_mn_buf: [160]u8 = undefined;
+        const band_mn = std.fmt.bufPrint(&band_mn_buf, "{s} band", .{mn}) catch mn;
+        var band_desc_buf: [256]u8 = undefined;
+        const band_desc = std.fmt.bufPrint(&band_desc_buf, "{s} Band", .{desc}) catch desc;
+
         build_metadata_mod.buildMetadata(
             out,
             .fractal_graph_dimension_index,
-            self.line.mnemonic,
-            self.line.description,
+            mn,
+            desc,
             &[_]build_metadata_mod.OutputText{
-                .{ .mnemonic = self.line.mnemonic, .description = self.line.description },
-                .{ .mnemonic = "upper", .description = "Upper" },
-                .{ .mnemonic = "lower", .description = "Lower" },
-                .{ .mnemonic = "stddev", .description = "Stddev" },
-                .{ .mnemonic = "band", .description = "Band" },
+                .{ .mnemonic = mn, .description = desc },
+                .{ .mnemonic = upper_mn, .description = upper_desc },
+                .{ .mnemonic = lower_mn, .description = lower_desc },
+                .{ .mnemonic = stddev_mn, .description = stddev_desc },
+                .{ .mnemonic = band_mn, .description = band_desc },
             },
         );
     }
@@ -346,8 +366,7 @@ const testing = std.testing;
 const testdata = @import("testdata.zig");
 
 fn createFgdi(allocator: std.mem.Allocator, period: usize) !FractalGraphDimensionIndex {
-    var ind = try FractalGraphDimensionIndex.init(allocator, .{ .period = period });
-    ind.fixSlices();
+    const ind = try FractalGraphDimensionIndex.init(allocator, .{ .period = period });
     return ind;
 }
 
@@ -366,6 +385,7 @@ test "fgdi update period 5" {
     const exp_lower = testdata.expectedLowerP5();
     const exp_stddev = testdata.expectedStddevP5();
     var ind = try createFgdi(testing.allocator, 5);
+    ind.fixSlices();
     defer ind.deinit();
 
     for (0..252) |i| {
@@ -384,6 +404,7 @@ test "fgdi update period 10" {
     const exp_lower = testdata.expectedLowerP10();
     const exp_stddev = testdata.expectedStddevP10();
     var ind = try createFgdi(testing.allocator, 10);
+    ind.fixSlices();
     defer ind.deinit();
 
     for (0..252) |i| {
@@ -402,6 +423,7 @@ test "fgdi update period 15" {
     const exp_lower = testdata.expectedLowerP15();
     const exp_stddev = testdata.expectedStddevP15();
     var ind = try createFgdi(testing.allocator, 15);
+    ind.fixSlices();
     defer ind.deinit();
 
     for (0..252) |i| {
@@ -420,6 +442,7 @@ test "fgdi update period 20" {
     const exp_lower = testdata.expectedLowerP20();
     const exp_stddev = testdata.expectedStddevP20();
     var ind = try createFgdi(testing.allocator, 20);
+    ind.fixSlices();
     defer ind.deinit();
 
     for (0..252) |i| {
@@ -438,6 +461,7 @@ test "fgdi update period 30" {
     const exp_lower = testdata.expectedLowerP30();
     const exp_stddev = testdata.expectedStddevP30();
     var ind = try createFgdi(testing.allocator, 30);
+    ind.fixSlices();
     defer ind.deinit();
 
     for (0..252) |i| {
@@ -456,6 +480,7 @@ test "fgdi update period 50" {
     const exp_lower = testdata.expectedLowerP50();
     const exp_stddev = testdata.expectedStddevP50();
     var ind = try createFgdi(testing.allocator, 50);
+    ind.fixSlices();
     defer ind.deinit();
 
     for (0..252) |i| {
@@ -474,6 +499,7 @@ test "fgdi update period 80" {
     const exp_lower = testdata.expectedLowerP80();
     const exp_stddev = testdata.expectedStddevP80();
     var ind = try createFgdi(testing.allocator, 80);
+    ind.fixSlices();
     defer ind.deinit();
 
     for (0..252) |i| {
@@ -492,6 +518,7 @@ test "fgdi update period 120" {
     const exp_lower = testdata.expectedLowerP120();
     const exp_stddev = testdata.expectedStddevP120();
     var ind = try createFgdi(testing.allocator, 120);
+    ind.fixSlices();
     defer ind.deinit();
 
     for (0..252) |i| {
@@ -506,6 +533,7 @@ test "fgdi update period 120" {
 test "fgdi is primed" {
     const input = testdata.testInput();
     var ind = try createFgdi(testing.allocator, 30);
+    ind.fixSlices();
     defer ind.deinit();
 
     for (0..29) |i| {
@@ -518,6 +546,7 @@ test "fgdi is primed" {
 
 test "fgdi nan passthrough" {
     var ind = try createFgdi(testing.allocator, 5);
+    ind.fixSlices();
     defer ind.deinit();
     const result = ind.updateAll(math.nan(f64));
     try testing.expect(math.isNan(result.fgdi));
@@ -529,4 +558,27 @@ test "fgdi nan passthrough" {
 test "fgdi invalid period" {
     const result = FractalGraphDimensionIndex.init(testing.allocator, .{ .period = 1 });
     try testing.expectError(error.InvalidPeriod, result);
+}
+
+test "fgdi metadata" {
+    var ind = try FractalGraphDimensionIndex.init(testing.allocator, .{ .period = 30 });
+    defer ind.deinit();
+    ind.fixSlices();
+
+    var m: Metadata = undefined;
+    ind.getMetadata(&m);
+
+    try testing.expectEqualStrings("fgdi(30)", m.mnemonic);
+    try testing.expectEqualStrings("Fractal graph dimension index fgdi(30)", m.description);
+    try testing.expectEqual(@as(usize, 5), m.outputs_len);
+    try testing.expectEqualStrings("fgdi(30)", m.outputs_buf[0].mnemonic);
+    try testing.expectEqualStrings("Fractal graph dimension index fgdi(30)", m.outputs_buf[0].description);
+    try testing.expectEqualStrings("fgdi(30) upper", m.outputs_buf[1].mnemonic);
+    try testing.expectEqualStrings("Fractal graph dimension index fgdi(30) Upper", m.outputs_buf[1].description);
+    try testing.expectEqualStrings("fgdi(30) lower", m.outputs_buf[2].mnemonic);
+    try testing.expectEqualStrings("Fractal graph dimension index fgdi(30) Lower", m.outputs_buf[2].description);
+    try testing.expectEqualStrings("fgdi(30) stddev", m.outputs_buf[3].mnemonic);
+    try testing.expectEqualStrings("Fractal graph dimension index fgdi(30) Stddev", m.outputs_buf[3].description);
+    try testing.expectEqualStrings("fgdi(30) band", m.outputs_buf[4].mnemonic);
+    try testing.expectEqualStrings("Fractal graph dimension index fgdi(30) Band", m.outputs_buf[4].description);
 }

@@ -468,8 +468,7 @@ const testing = std.testing;
 const testdata = @import("testdata.zig");
 
 fn createNma(allocator: std.mem.Allocator, primary_period: usize, secondary_period: usize, ma_type: MAType) !NewMovingAverage {
-    var nma = try NewMovingAverage.init(allocator, .{ .primary_period = primary_period, .secondary_period = secondary_period, .ma_type = ma_type });
-    nma.fixSlices();
+    const nma = try NewMovingAverage.init(allocator, .{ .primary_period = primary_period, .secondary_period = secondary_period, .ma_type = ma_type });
     return nma;
 }
 
@@ -492,6 +491,7 @@ test "nma pri8 sec4 LWMA" {
     const input = &testdata.test_input;
     const exp = &testdata.expected_pri8_sec4_lwma;
     var nma = try createNma(testing.allocator, 8, 4, .lwma);
+    nma.fixSlices();
     defer nma.deinit();
     try checkNmaUpdate(&nma, input, exp);
 }
@@ -500,6 +500,7 @@ test "nma sec8 pri_auto LWMA (default)" {
     const input = &testdata.test_input;
     const exp = &testdata.expected_sec8_pri_auto_lwma;
     var nma = try createNma(testing.allocator, 0, 8, .lwma);
+    nma.fixSlices();
     defer nma.deinit();
     try checkNmaUpdate(&nma, input, exp);
 }
@@ -508,6 +509,7 @@ test "nma sec8 pri_auto SMA" {
     const input = &testdata.test_input;
     const exp = &testdata.expected_sec8_sma;
     var nma = try createNma(testing.allocator, 0, 8, .sma);
+    nma.fixSlices();
     defer nma.deinit();
     try checkNmaUpdate(&nma, input, exp);
 }
@@ -516,6 +518,7 @@ test "nma sec8 pri_auto EMA" {
     const input = &testdata.test_input;
     const exp = &testdata.expected_sec8_ema;
     var nma = try createNma(testing.allocator, 0, 8, .ema);
+    nma.fixSlices();
     defer nma.deinit();
     try checkNmaUpdate(&nma, input, exp);
 }
@@ -524,6 +527,7 @@ test "nma sec8 pri_auto SMMA" {
     const input = &testdata.test_input;
     const exp = &testdata.expected_sec8_smma;
     var nma = try createNma(testing.allocator, 0, 8, .smma);
+    nma.fixSlices();
     defer nma.deinit();
     try checkNmaUpdate(&nma, input, exp);
 }
@@ -531,6 +535,7 @@ test "nma sec8 pri_auto SMMA" {
 test "nma is primed" {
     const input = &testdata.test_input;
     var nma = try createNma(testing.allocator, 0, 8, .lwma);
+    nma.fixSlices();
     defer nma.deinit();
 
     // With default params: pri=32, sec=8. Warmup = 32 + 8 - 2 = 38 bars.
@@ -545,6 +550,7 @@ test "nma is primed" {
 
 test "nma metadata" {
     var nma = try createNma(testing.allocator, 0, 8, .lwma);
+    nma.fixSlices();
     defer nma.deinit();
     var m: Metadata = undefined;
     nma.getMetadata(&m);

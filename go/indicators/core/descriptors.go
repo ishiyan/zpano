@@ -908,4 +908,13 @@ var descriptors = map[Identifier]Descriptor{
 			{Kind: 2 /* Signal */, Shape: shape.Scalar, Role: Signal, Pane: Own},
 		},
 	},
+
+	DirectionalTrendIndex: {
+		Identifier: DirectionalTrendIndex, Family: "William Blau",
+		Adaptivity: Static, InputRequirement: BarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{
+			{Kind: 1 /* DTI */, Shape: shape.Scalar, Role: BoundedOscillator, Pane: Own},
+			{Kind: 2 /* Signal */, Shape: shape.Scalar, Role: Signal, Pane: Own},
+		},
+	},
 }

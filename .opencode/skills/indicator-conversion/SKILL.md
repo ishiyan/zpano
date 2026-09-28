@@ -1098,10 +1098,12 @@ calculation tests.
 Run the tests for the specific indicator:
 
 ```bash
-# zpano uses Jasmine (not Jest) via tsx. From /ts:
-npm test                                    # full suite
-node --import tsx/esm ./node_modules/.bin/jasmine --config=jasmine.json --filter=SineWave
+# zpano uses Jasmine (not Jest) with the custom ESM loader ./loader.js. From /ts:
+npm test                                    # full suite (runs tsc build first)
+npm run build && node --loader ./loader.js node_modules/.bin/jasmine --config=jasmine.json --filter=SineWave
 # --filter is a case-sensitive regex substring match against the spec describe() name.
+# Use the same loader as the "test" script in package.json; `--import tsx/esm` fails
+# with ERR_MODULE_NOT_FOUND.
 ```
 
 All tests must pass.

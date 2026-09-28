@@ -285,16 +285,32 @@ pub const FractalBands = struct {
     }
 
     pub fn getMetadata(self: *const FractalBands, out: *Metadata) void {
+        const mn = self.line.mnemonic;
+        const desc = self.line.description;
+
+        var upper_mn_buf: [160]u8 = undefined;
+        const upper_mn = std.fmt.bufPrint(&upper_mn_buf, "{s} upper", .{mn}) catch mn;
+        var upper_desc_buf: [256]u8 = undefined;
+        const upper_desc = std.fmt.bufPrint(&upper_desc_buf, "{s} Upper Band", .{desc}) catch desc;
+        var lower_mn_buf: [160]u8 = undefined;
+        const lower_mn = std.fmt.bufPrint(&lower_mn_buf, "{s} lower", .{mn}) catch mn;
+        var lower_desc_buf: [256]u8 = undefined;
+        const lower_desc = std.fmt.bufPrint(&lower_desc_buf, "{s} Lower Band", .{desc}) catch desc;
+        var band_mn_buf: [160]u8 = undefined;
+        const band_mn = std.fmt.bufPrint(&band_mn_buf, "{s} band", .{mn}) catch mn;
+        var band_desc_buf: [256]u8 = undefined;
+        const band_desc = std.fmt.bufPrint(&band_desc_buf, "{s} Band", .{desc}) catch desc;
+
         build_metadata_mod.buildMetadata(
             out,
             .fractal_bands,
-            self.line.mnemonic,
-            self.line.description,
+            mn,
+            desc,
             &[_]build_metadata_mod.OutputText{
-                .{ .mnemonic = self.line.mnemonic, .description = self.line.description },
-                .{ .mnemonic = "upper", .description = "Upper Band" },
-                .{ .mnemonic = "lower", .description = "Lower Band" },
-                .{ .mnemonic = "band", .description = "Band" },
+                .{ .mnemonic = mn, .description = desc },
+                .{ .mnemonic = upper_mn, .description = upper_desc },
+                .{ .mnemonic = lower_mn, .description = lower_desc },
+                .{ .mnemonic = band_mn, .description = band_desc },
             },
         );
     }
@@ -390,8 +406,7 @@ const testing = std.testing;
 const testdata = @import("testdata.zig");
 
 fn createFban(allocator: std.mem.Allocator, period: usize, normal_speed: usize, alpha: f64) !FractalBands {
-    var ind = try FractalBands.init(allocator, .{ .period = period, .normal_speed = normal_speed, .alpha = alpha });
-    ind.fixSlices();
+    const ind = try FractalBands.init(allocator, .{ .period = period, .normal_speed = normal_speed, .alpha = alpha });
     return ind;
 }
 
@@ -409,6 +424,7 @@ test "fban P10_NS20_A2" {
     const exp_upper = testdata.expectedUpperP10Ns20A2();
     const exp_lower = testdata.expectedLowerP10Ns20A2();
     var ind = try createFban(testing.allocator, 10, 20, 2.0);
+    ind.fixSlices();
     defer ind.deinit();
 
     for (0..252) |i| {
@@ -425,6 +441,7 @@ test "fban P20_NS20_A2" {
     const exp_upper = testdata.expectedUpperP20Ns20A2();
     const exp_lower = testdata.expectedLowerP20Ns20A2();
     var ind = try createFban(testing.allocator, 20, 20, 2.0);
+    ind.fixSlices();
     defer ind.deinit();
 
     for (0..252) |i| {
@@ -441,6 +458,7 @@ test "fban P30_NS20_A2" {
     const exp_upper = testdata.expectedUpperP30Ns20A2();
     const exp_lower = testdata.expectedLowerP30Ns20A2();
     var ind = try createFban(testing.allocator, 30, 20, 2.0);
+    ind.fixSlices();
     defer ind.deinit();
 
     for (0..252) |i| {
@@ -457,6 +475,7 @@ test "fban P50_NS20_A2" {
     const exp_upper = testdata.expectedUpperP50Ns20A2();
     const exp_lower = testdata.expectedLowerP50Ns20A2();
     var ind = try createFban(testing.allocator, 50, 20, 2.0);
+    ind.fixSlices();
     defer ind.deinit();
 
     for (0..252) |i| {
@@ -473,6 +492,7 @@ test "fban P30_NS10_A2" {
     const exp_upper = testdata.expectedUpperP30Ns10A2();
     const exp_lower = testdata.expectedLowerP30Ns10A2();
     var ind = try createFban(testing.allocator, 30, 10, 2.0);
+    ind.fixSlices();
     defer ind.deinit();
 
     for (0..252) |i| {
@@ -489,6 +509,7 @@ test "fban P30_NS40_A2" {
     const exp_upper = testdata.expectedUpperP30Ns40A2();
     const exp_lower = testdata.expectedLowerP30Ns40A2();
     var ind = try createFban(testing.allocator, 30, 40, 2.0);
+    ind.fixSlices();
     defer ind.deinit();
 
     for (0..252) |i| {
@@ -505,6 +526,7 @@ test "fban P30_NS20_A1" {
     const exp_upper = testdata.expectedUpperP30Ns20A1();
     const exp_lower = testdata.expectedLowerP30Ns20A1();
     var ind = try createFban(testing.allocator, 30, 20, 1.0);
+    ind.fixSlices();
     defer ind.deinit();
 
     for (0..252) |i| {
@@ -521,6 +543,7 @@ test "fban P30_NS20_A3" {
     const exp_upper = testdata.expectedUpperP30Ns20A3();
     const exp_lower = testdata.expectedLowerP30Ns20A3();
     var ind = try createFban(testing.allocator, 30, 20, 3.0);
+    ind.fixSlices();
     defer ind.deinit();
 
     for (0..252) |i| {
@@ -534,6 +557,7 @@ test "fban P30_NS20_A3" {
 test "fban is primed" {
     const input = testdata.testInput();
     var ind = try createFban(testing.allocator, 30, 20, 2.0);
+    ind.fixSlices();
     defer ind.deinit();
 
     for (0..29) |i| {
@@ -546,6 +570,7 @@ test "fban is primed" {
 
 test "fban nan passthrough" {
     var ind = try createFban(testing.allocator, 5, 20, 2.0);
+    ind.fixSlices();
     defer ind.deinit();
     const result = ind.updateAll(math.nan(f64));
     try testing.expect(math.isNan(result.frasma2));
@@ -566,4 +591,25 @@ test "fban invalid normal speed" {
 test "fban invalid alpha" {
     const result = FractalBands.init(testing.allocator, .{ .period = 30, .normal_speed = 20, .alpha = 0.0 });
     try testing.expectError(error.InvalidAlpha, result);
+}
+
+test "fban metadata" {
+    var ind = try FractalBands.init(testing.allocator, .{ .period = 30, .normal_speed = 20, .alpha = 2.0 });
+    defer ind.deinit();
+    ind.fixSlices();
+
+    var m: Metadata = undefined;
+    ind.getMetadata(&m);
+
+    try testing.expectEqualStrings("fban(30,20,2)", m.mnemonic);
+    try testing.expectEqualStrings("Fractal bands fban(30,20,2)", m.description);
+    try testing.expectEqual(@as(usize, 4), m.outputs_len);
+    try testing.expectEqualStrings("fban(30,20,2)", m.outputs_buf[0].mnemonic);
+    try testing.expectEqualStrings("Fractal bands fban(30,20,2)", m.outputs_buf[0].description);
+    try testing.expectEqualStrings("fban(30,20,2) upper", m.outputs_buf[1].mnemonic);
+    try testing.expectEqualStrings("Fractal bands fban(30,20,2) Upper Band", m.outputs_buf[1].description);
+    try testing.expectEqualStrings("fban(30,20,2) lower", m.outputs_buf[2].mnemonic);
+    try testing.expectEqualStrings("Fractal bands fban(30,20,2) Lower Band", m.outputs_buf[2].description);
+    try testing.expectEqualStrings("fban(30,20,2) band", m.outputs_buf[3].mnemonic);
+    try testing.expectEqualStrings("Fractal bands fban(30,20,2) Band", m.outputs_buf[3].description);
 }

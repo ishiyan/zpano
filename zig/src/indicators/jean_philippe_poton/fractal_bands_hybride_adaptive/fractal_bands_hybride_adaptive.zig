@@ -427,16 +427,32 @@ pub const FractalBandsHybrideAdaptive = struct {
 
     /// Returns the indicator metadata.
     pub fn getMetadata(self: *const FractalBandsHybrideAdaptive, out: *Metadata) void {
+        const mn = self.line.mnemonic;
+        const desc = self.line.description;
+
+        var upper_mn_buf: [160]u8 = undefined;
+        const upper_mn = std.fmt.bufPrint(&upper_mn_buf, "{s} upper", .{mn}) catch mn;
+        var upper_desc_buf: [256]u8 = undefined;
+        const upper_desc = std.fmt.bufPrint(&upper_desc_buf, "{s} Upper Band", .{desc}) catch desc;
+        var lower_mn_buf: [160]u8 = undefined;
+        const lower_mn = std.fmt.bufPrint(&lower_mn_buf, "{s} lower", .{mn}) catch mn;
+        var lower_desc_buf: [256]u8 = undefined;
+        const lower_desc = std.fmt.bufPrint(&lower_desc_buf, "{s} Lower Band", .{desc}) catch desc;
+        var band_mn_buf: [160]u8 = undefined;
+        const band_mn = std.fmt.bufPrint(&band_mn_buf, "{s} band", .{mn}) catch mn;
+        var band_desc_buf: [256]u8 = undefined;
+        const band_desc = std.fmt.bufPrint(&band_desc_buf, "{s} Band", .{desc}) catch desc;
+
         build_metadata_mod.buildMetadata(
             out,
             .fractal_bands_hybride_adaptive,
-            self.line.mnemonic,
-            self.line.description,
+            mn,
+            desc,
             &[_]build_metadata_mod.OutputText{
-                .{ .mnemonic = self.line.mnemonic, .description = self.line.description },
-                .{ .mnemonic = "upper", .description = "Upper Band" },
-                .{ .mnemonic = "lower", .description = "Lower Band" },
-                .{ .mnemonic = "band", .description = "Band" },
+                .{ .mnemonic = mn, .description = desc },
+                .{ .mnemonic = upper_mn, .description = upper_desc },
+                .{ .mnemonic = lower_mn, .description = lower_desc },
+                .{ .mnemonic = band_mn, .description = band_desc },
             },
         );
     }
@@ -965,4 +981,25 @@ test "fractal_bands_hybride_adaptive nan_passthrough" {
     try testing.expect(math.isNan(result.frasma2));
     try testing.expect(math.isNan(result.upper));
     try testing.expect(math.isNan(result.lower));
+}
+
+test "fractal_bands_hybride_adaptive metadata" {
+    var ind = try FractalBandsHybrideAdaptive.init(testing.allocator, .{ .period = 30, .normal_speed_fallback = 30, .alpha = 2.0, .nyquist = 0.5, .alpha_hp = 0.07 });
+    defer ind.deinit();
+    ind.fixSlices();
+
+    var m: Metadata = undefined;
+    ind.getMetadata(&m);
+
+    try testing.expectEqualStrings("fbanha(30,30,2,0.5,0.07)", m.mnemonic);
+    try testing.expectEqualStrings("Fractal bands hybride adaptive fbanha(30,30,2,0.5,0.07)", m.description);
+    try testing.expectEqual(@as(usize, 4), m.outputs_len);
+    try testing.expectEqualStrings("fbanha(30,30,2,0.5,0.07)", m.outputs_buf[0].mnemonic);
+    try testing.expectEqualStrings("Fractal bands hybride adaptive fbanha(30,30,2,0.5,0.07)", m.outputs_buf[0].description);
+    try testing.expectEqualStrings("fbanha(30,30,2,0.5,0.07) upper", m.outputs_buf[1].mnemonic);
+    try testing.expectEqualStrings("Fractal bands hybride adaptive fbanha(30,30,2,0.5,0.07) Upper Band", m.outputs_buf[1].description);
+    try testing.expectEqualStrings("fbanha(30,30,2,0.5,0.07) lower", m.outputs_buf[2].mnemonic);
+    try testing.expectEqualStrings("Fractal bands hybride adaptive fbanha(30,30,2,0.5,0.07) Lower Band", m.outputs_buf[2].description);
+    try testing.expectEqualStrings("fbanha(30,30,2,0.5,0.07) band", m.outputs_buf[3].mnemonic);
+    try testing.expectEqualStrings("Fractal bands hybride adaptive fbanha(30,30,2,0.5,0.07) Band", m.outputs_buf[3].description);
 }

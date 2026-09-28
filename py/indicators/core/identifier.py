@@ -423,3 +423,6 @@ class Identifier(IntEnum):
 
     # Identifies the William Blau Double Smoothed Stochastic (DSS) indicator.
     DOUBLE_SMOOTHED_STOCHASTIC = 114
+
+    # Identifies the William Blau Directional Trend Index (DTI) indicator.
+    DIRECTIONAL_TREND_INDEX = 115

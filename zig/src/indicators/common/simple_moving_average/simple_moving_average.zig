@@ -281,8 +281,7 @@ fn expected10() [51]f64 {
 }
 
 fn createSma(allocator: std.mem.Allocator, length: usize) !SimpleMovingAverage {
-    var sma = try SimpleMovingAverage.init(allocator, .{ .length = length });
-    sma.fixSlices();
+    const sma = try SimpleMovingAverage.init(allocator, .{ .length = length });
     return sma;
 }
 
@@ -303,6 +302,7 @@ test "sma update length 3" {
     const input = testdata.testInput();
     const exp = expected3();
     var sma = try createSma(testing.allocator, 3);
+    sma.fixSlices();
     defer sma.deinit();
     try checkUpdate(2, 51, &sma, &input, &exp);
 }
@@ -311,6 +311,7 @@ test "sma update length 5" {
     const input = testdata.testInput();
     const exp = expected5();
     var sma = try createSma(testing.allocator, 5);
+    sma.fixSlices();
     defer sma.deinit();
     try checkUpdate(4, 51, &sma, &input, &exp);
 }
@@ -319,6 +320,7 @@ test "sma update length 10" {
     const input = testdata.testInput();
     const exp = expected10();
     var sma = try createSma(testing.allocator, 10);
+    sma.fixSlices();
     defer sma.deinit();
     try checkUpdate(9, 51, &sma, &input, &exp);
 }
@@ -326,6 +328,7 @@ test "sma update length 10" {
 test "sma is primed" {
     const input = testdata.testInput();
     var sma = try createSma(testing.allocator, 3);
+    sma.fixSlices();
     defer sma.deinit();
 
     try testing.expect(!sma.isPrimed());
@@ -341,6 +344,7 @@ test "sma is primed" {
 
 test "sma metadata" {
     var sma = try createSma(testing.allocator, 5);
+    sma.fixSlices();
     defer sma.deinit();
     var m: Metadata = undefined;
     sma.getMetadata(&m);
@@ -361,6 +365,7 @@ test "sma update entity" {
     // scalar
     {
         var sma = try createSma(testing.allocator, length);
+        sma.fixSlices();
         defer sma.deinit();
         _ = sma.update(0.0);
         const out = sma.updateScalar(&.{ .time = time, .value = inp });
@@ -373,6 +378,7 @@ test "sma update entity" {
     // bar
     {
         var sma = try createSma(testing.allocator, length);
+        sma.fixSlices();
         defer sma.deinit();
         _ = sma.update(0.0);
         const bar = Bar{ .time = time, .open = 0, .high = 0, .low = 0, .close = inp, .volume = 0 };
@@ -384,6 +390,7 @@ test "sma update entity" {
     // quote
     {
         var sma = try createSma(testing.allocator, length);
+        sma.fixSlices();
         defer sma.deinit();
         _ = sma.update(0.0);
         const quote = Quote{ .time = time, .bid_price = inp, .ask_price = inp, .bid_size = 0, .ask_size = 0 };
@@ -395,6 +402,7 @@ test "sma update entity" {
     // trade
     {
         var sma = try createSma(testing.allocator, length);
+        sma.fixSlices();
         defer sma.deinit();
         _ = sma.update(0.0);
         const trade = Trade{ .time = time, .price = inp, .volume = 0 };
@@ -416,6 +424,7 @@ test "sma mnemonic components" {
     // all defaults -> no component suffix
     {
         var sma = try createSma(testing.allocator, 5);
+        sma.fixSlices();
         defer sma.deinit();
         try testing.expectEqualStrings("sma(5)", sma.line.mnemonic);
     }

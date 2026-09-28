@@ -230,14 +230,14 @@ const testing = std.testing;
 const testdata = @import("testdata.zig");
 
 fn createRoc(allocator: std.mem.Allocator, length: usize) !RateOfChange {
-    var roc = try RateOfChange.init(allocator, .{ .length = length });
-    roc.fixSlices();
+    const roc = try RateOfChange.init(allocator, .{ .length = length });
     return roc;
 }
 
 test "roc update length 14" {
     const input = testdata.testInput();
     var roc = try createRoc(testing.allocator, 14);
+    roc.fixSlices();
     defer roc.deinit();
 
     for (0..13) |i| {
@@ -259,6 +259,7 @@ test "roc is primed" {
     const input = testdata.testInput();
     inline for ([_]usize{ 1, 2, 5, 10 }) |length| {
         var roc = try createRoc(testing.allocator, length);
+        roc.fixSlices();
         defer roc.deinit();
         try testing.expect(!roc.isPrimed());
         for (0..length) |i| {
@@ -274,6 +275,7 @@ test "roc is primed" {
 
 test "roc metadata" {
     var roc = try createRoc(testing.allocator, 5);
+    roc.fixSlices();
     defer roc.deinit();
     var m: Metadata = undefined;
     roc.getMetadata(&m);
@@ -296,6 +298,7 @@ test "roc update entity" {
     // scalar
     {
         var roc = try createRoc(testing.allocator, length);
+        roc.fixSlices();
         defer roc.deinit();
         _ = roc.update(inp);
         _ = roc.update(inp);

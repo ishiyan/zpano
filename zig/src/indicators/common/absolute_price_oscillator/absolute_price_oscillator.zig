@@ -294,13 +294,12 @@ const testing = std.testing;
 const testdata = @import("testdata.zig");
 
 fn createApo(allocator: std.mem.Allocator, fast: usize, slow: usize, ma_type: MovingAverageType, first_is_avg: bool) !AbsolutePriceOscillator {
-    var apo = try AbsolutePriceOscillator.init(allocator, .{
+    const apo = try AbsolutePriceOscillator.init(allocator, .{
         .fast_length = fast,
         .slow_length = slow,
         .moving_average_type = ma_type,
         .first_is_average = first_is_avg,
     });
-    apo.fixSlices();
     return apo;
 }
 
@@ -308,6 +307,7 @@ test "apo sma 12/26" {
     const tolerance = 5e-4;
     const input = testdata.testInput();
     var apo = try createApo(testing.allocator, 12, 26, .sma, false);
+    apo.fixSlices();
     defer apo.deinit();
 
     for (0..25) |_i| {
@@ -338,6 +338,7 @@ test "apo ema 12/26" {
     const tolerance = 5e-4;
     const input = testdata.testInput();
     var apo = try createApo(testing.allocator, 12, 26, .ema, false);
+    apo.fixSlices();
     defer apo.deinit();
 
     for (0..25) |_i| {
@@ -362,6 +363,7 @@ test "apo ema 12/26" {
 
 test "apo is primed" {
     var apo = try createApo(testing.allocator, 3, 5, .sma, false);
+    apo.fixSlices();
     defer apo.deinit();
 
     try testing.expect(!apo.isPrimed());
@@ -377,12 +379,14 @@ test "apo is primed" {
 
 test "apo nan passthrough" {
     var apo = try createApo(testing.allocator, 2, 3, .sma, false);
+    apo.fixSlices();
     defer apo.deinit();
     try testing.expect(math.isNan(apo.update(math.nan(f64))));
 }
 
 test "apo metadata sma" {
     var apo = try createApo(testing.allocator, 12, 26, .sma, false);
+    apo.fixSlices();
     defer apo.deinit();
     var m: Metadata = undefined;
     apo.getMetadata(&m);
@@ -393,6 +397,7 @@ test "apo metadata sma" {
 
 test "apo metadata ema" {
     var apo = try createApo(testing.allocator, 12, 26, .ema, false);
+    apo.fixSlices();
     defer apo.deinit();
     var m: Metadata = undefined;
     apo.getMetadata(&m);
@@ -402,6 +407,7 @@ test "apo metadata ema" {
 test "apo update entity" {
     const input = testdata.testInput();
     var apo = try createApo(testing.allocator, 2, 3, .sma, false);
+    apo.fixSlices();
     defer apo.deinit();
 
     const time: i64 = 1617235200;

@@ -70,6 +70,8 @@ pub const KaufmanAdaptiveMovingAverage = struct {
     allocator: std.mem.Allocator,
     mnemonic_buf: [128]u8,
     mnemonic_len: usize,
+    description_buf: [192]u8,
+    description_len: usize,
 
     pub fn initLength(allocator: std.mem.Allocator, params: KaufmanAdaptiveMovingAverageLengthParams) !KaufmanAdaptiveMovingAverage {
         if (params.efficiency_ratio_length < 2) return error.InvalidEfficiencyRatioLength;
@@ -133,6 +135,10 @@ pub const KaufmanAdaptiveMovingAverage = struct {
         mnemonic_buf: [128]u8,
         mnemonic_len: usize,
     ) !KaufmanAdaptiveMovingAverage {
+        var description_buf: [192]u8 = undefined;
+        const description_slice = std.fmt.bufPrint(&description_buf, "Kaufman adaptive moving average {s}", .{mnemonic_buf[0..mnemonic_len]}) catch
+            return error.MnemonicTooLong;
+
         const buf_len = efficiency_ratio_length + 1;
         const window = try allocator.alloc(f64, buf_len);
         @memset(window, 0);
@@ -142,7 +148,7 @@ pub const KaufmanAdaptiveMovingAverage = struct {
         return .{
             .line = LineIndicator.new(
                 mnemonic_buf[0..mnemonic_len],
-                "Kaufman adaptive moving average ",
+                description_buf[0..description_slice.len],
                 bc_opt,
                 qc_opt,
                 tc_opt,
@@ -161,6 +167,8 @@ pub const KaufmanAdaptiveMovingAverage = struct {
             .allocator = allocator,
             .mnemonic_buf = mnemonic_buf,
             .mnemonic_len = mnemonic_len,
+            .description_buf = description_buf,
+            .description_len = description_slice.len,
         };
     }
 
@@ -171,6 +179,7 @@ pub const KaufmanAdaptiveMovingAverage = struct {
 
     pub fn fixSlices(self: *KaufmanAdaptiveMovingAverage) void {
         self.line.mnemonic = self.mnemonic_buf[0..self.mnemonic_len];
+        self.line.description = self.description_buf[0..self.description_len];
     }
 
     pub fn update(self: *KaufmanAdaptiveMovingAverage, sample: f64) f64 {
@@ -337,22 +346,20 @@ const testing = std.testing;
 const testdata = @import("testdata.zig");
 
 fn createKamaLength(allocator: std.mem.Allocator, er_len: u32, fastest: u32, slowest: u32) !KaufmanAdaptiveMovingAverage {
-    var kama = try KaufmanAdaptiveMovingAverage.initLength(allocator, .{
+    const kama = try KaufmanAdaptiveMovingAverage.initLength(allocator, .{
         .efficiency_ratio_length = er_len,
         .fastest_length = fastest,
         .slowest_length = slowest,
     });
-    kama.fixSlices();
     return kama;
 }
 
 fn createKamaAlpha(allocator: std.mem.Allocator, er_len: u32, fastest_alpha: f64, slowest_alpha: f64) !KaufmanAdaptiveMovingAverage {
-    var kama = try KaufmanAdaptiveMovingAverage.initSmoothingFactor(allocator, .{
+    const kama = try KaufmanAdaptiveMovingAverage.initSmoothingFactor(allocator, .{
         .efficiency_ratio_length = er_len,
         .fastest_smoothing_factor = fastest_alpha,
         .slowest_smoothing_factor = slowest_alpha,
     });
-    kama.fixSlices();
     return kama;
 }
 
@@ -365,6 +372,7 @@ test "kaufman adaptive moving average value" {
     const expected = testdata.testExpected();
 
     var kama = try createKamaLength(testing.allocator, 10, 2, 30);
+    kama.fixSlices();
     defer kama.deinit();
 
     for (0..10) |i| {
@@ -387,6 +395,7 @@ test "kaufman adaptive moving average efficiency ratio" {
     const expected_er = testdata.testExpectedEr();
 
     var kama = try createKamaLength(testing.allocator, 10, 2, 30);
+    kama.fixSlices();
     defer kama.deinit();
 
     for (0..10) |_| {
@@ -396,6 +405,7 @@ test "kaufman adaptive moving average efficiency ratio" {
     // Re-create to get clean state
     kama.deinit();
     kama = try createKamaLength(testing.allocator, 10, 2, 30);
+    kama.fixSlices();
 
     for (0..10) |i| {
         _ = kama.update(input[i]);
@@ -411,6 +421,7 @@ test "kaufman adaptive moving average is primed" {
     const input = testdata.testInput();
 
     var kama = try createKamaLength(testing.allocator, 10, 2, 30);
+    kama.fixSlices();
     defer kama.deinit();
 
     try testing.expect(!kama.isPrimed());
@@ -423,6 +434,7 @@ test "kaufman adaptive moving average is primed" {
     // Re-create for clean state
     kama.deinit();
     kama = try createKamaLength(testing.allocator, 10, 2, 30);
+    kama.fixSlices();
 
     for (0..10) |i| {
         _ = kama.update(input[i]);
@@ -435,6 +447,7 @@ test "kaufman adaptive moving average is primed" {
 
 test "kaufman adaptive moving average metadata length" {
     var kama = try createKamaLength(testing.allocator, 10, 2, 30);
+    kama.fixSlices();
     defer kama.deinit();
 
     var m: Metadata = undefined;
@@ -444,20 +457,25 @@ test "kaufman adaptive moving average metadata length" {
     try testing.expectEqual(@as(usize, 1), m.outputs_len);
     try testing.expectEqual(@as(i32, 1), m.outputs_buf[0].kind);
     try testing.expectEqualStrings("kama(10, 2, 30)", m.mnemonic);
+    try testing.expectEqualStrings("Kaufman adaptive moving average kama(10, 2, 30)", m.description);
+    try testing.expectEqualStrings("Kaufman adaptive moving average kama(10, 2, 30)", m.outputs_buf[0].description);
 }
 
 test "kaufman adaptive moving average metadata alpha" {
     var kama = try createKamaAlpha(testing.allocator, 10, 0.666666666, 0.064516129);
+    kama.fixSlices();
     defer kama.deinit();
 
     var m: Metadata = undefined;
     kama.getMetadata(&m);
 
     try testing.expectEqualStrings("kama(10, 0.6667, 0.0645)", m.mnemonic);
+    try testing.expectEqualStrings("Kaufman adaptive moving average kama(10, 0.6667, 0.0645)", m.description);
 }
 
 test "kaufman adaptive moving average update scalar" {
     var kama = try createKamaLength(testing.allocator, 10, 2, 30);
+    kama.fixSlices();
     defer kama.deinit();
 
     for (0..10) |_| {
@@ -474,6 +492,7 @@ test "kaufman adaptive moving average update scalar" {
 
 test "kaufman adaptive moving average update bar" {
     var kama = try createKamaLength(testing.allocator, 10, 2, 30);
+    kama.fixSlices();
     defer kama.deinit();
 
     for (0..10) |_| {

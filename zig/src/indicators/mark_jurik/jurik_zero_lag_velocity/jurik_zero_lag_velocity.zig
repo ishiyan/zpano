@@ -322,6 +322,8 @@ pub const JurikZeroLagVelocity = struct {
 
     mnemonic_buf: [96]u8,
     mnemonic_len: usize,
+    description_buf: [160]u8,
+    description_len: usize,
 
     pub fn init(params: JurikZeroLagVelocityParams) !JurikZeroLagVelocity {
         const depth = params.depth;
@@ -341,10 +343,14 @@ pub const JurikZeroLagVelocity = struct {
         }) catch unreachable;
         const mnemonic_len = mnemonic.len;
 
+        var description_buf: [160]u8 = undefined;
+        const description = std.fmt.bufPrint(&description_buf, "Jurik zero lag velocity {s}", .{mnemonic}) catch unreachable;
+        const description_len = description.len;
+
         return .{
             .line = LineIndicator.new(
                 mnemonic_buf[0..mnemonic_len],
-                "Jurik zero lag velocity ",
+                description_buf[0..description_len],
                 params.bar_component,
                 params.quote_component,
                 params.trade_component,
@@ -356,11 +362,14 @@ pub const JurikZeroLagVelocity = struct {
             .bar = 0,
             .mnemonic_buf = mnemonic_buf,
             .mnemonic_len = mnemonic_len,
+            .description_buf = description_buf,
+            .description_len = description_len,
         };
     }
 
     pub fn fixSlices(self: *JurikZeroLagVelocity) void {
         self.line.mnemonic = self.mnemonic_buf[0..self.mnemonic_len];
+        self.line.description = self.description_buf[0..self.description_len];
     }
 
     pub fn update(self: *JurikZeroLagVelocity, sample: f64) f64 {
@@ -550,4 +559,15 @@ test "jvel depth 14" {
 }
 test "jvel depth 15" {
     try runVelTest(15, testdata.expectedDepth15());
+}
+
+test "jvel metadata description" {
+    var ind = JurikZeroLagVelocity.init(.{ .depth = 10 }) catch unreachable;
+    ind.fixSlices();
+
+    var m: Metadata = undefined;
+    ind.getMetadata(&m);
+
+    try testing.expectEqualStrings("Jurik zero lag velocity jvel(10)", m.description);
+    try testing.expectEqualStrings("Jurik zero lag velocity jvel(10)", m.outputs_buf[0].description);
 }

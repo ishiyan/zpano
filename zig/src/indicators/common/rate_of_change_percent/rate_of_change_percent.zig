@@ -227,14 +227,14 @@ const testing = std.testing;
 const testdata = @import("testdata.zig");
 
 fn createRocp(allocator: std.mem.Allocator, length: usize) !RateOfChangePercent {
-    var rocp = try RateOfChangePercent.init(allocator, .{ .length = length });
-    rocp.fixSlices();
+    const rocp = try RateOfChangePercent.init(allocator, .{ .length = length });
     return rocp;
 }
 
 test "rocp update length 14" {
     const input = testdata.testInput();
     var rocp = try createRocp(testing.allocator, 14);
+    rocp.fixSlices();
     defer rocp.deinit();
 
     for (0..13) |i| {
@@ -256,6 +256,7 @@ test "rocp is primed" {
     const input = testdata.testInput();
     inline for ([_]usize{ 1, 2, 5, 10 }) |length| {
         var rocp = try createRocp(testing.allocator, length);
+        rocp.fixSlices();
         defer rocp.deinit();
         try testing.expect(!rocp.isPrimed());
         for (0..length) |i| {
@@ -271,6 +272,7 @@ test "rocp is primed" {
 
 test "rocp metadata" {
     var rocp = try createRocp(testing.allocator, 5);
+    rocp.fixSlices();
     defer rocp.deinit();
     var m: Metadata = undefined;
     rocp.getMetadata(&m);

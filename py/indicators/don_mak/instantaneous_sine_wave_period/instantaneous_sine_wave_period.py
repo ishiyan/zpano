@@ -231,7 +231,7 @@ class InstantaneousSineWavePeriod(Indicator):
                 OutputText(f"{self._mnemonic} acceleration", f"{desc} Acceleration"),
                 OutputText(f"{self._mnemonic} amplitude", f"{desc} Amplitude"),
                 OutputText(f"{self._mnemonic} phase", f"{desc} Phase"),
-                OutputText(f"{self._mnemonic} dc_level", f"{desc} DC Level"),
+                OutputText(f"{self._mnemonic} dcLevel", f"{desc} DC Level"),
             ],
         )
 

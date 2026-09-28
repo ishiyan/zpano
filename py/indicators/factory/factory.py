@@ -734,4 +734,9 @@ def create_indicator(
         from ..william_blau.double_smoothed_stochastic.double_smoothed_stochastic import DoubleSmoothedStochastic
         return DoubleSmoothedStochastic(_apply(default_params(), params))
 
+    if identifier == Identifier.DIRECTIONAL_TREND_INDEX:
+        from ..william_blau.directional_trend_index.params import default_params
+        from ..william_blau.directional_trend_index.directional_trend_index import DirectionalTrendIndex
+        return DirectionalTrendIndex(_apply(default_params(), params))
+
     raise ValueError(f"unsupported indicator: {identifier}")

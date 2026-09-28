@@ -316,8 +316,7 @@ const testing = std.testing;
 const testdata = @import("testdata.zig");
 
 fn createFrasma(allocator: std.mem.Allocator, period: usize, normal_speed: usize) !FractalAdaptiveSimpleMovingAverage {
-    var f = try FractalAdaptiveSimpleMovingAverage.init(allocator, .{ .period = period, .normal_speed = normal_speed });
-    f.fixSlices();
+    const f = try FractalAdaptiveSimpleMovingAverage.init(allocator, .{ .period = period, .normal_speed = normal_speed });
     return f;
 }
 
@@ -325,6 +324,7 @@ test "frasma update period 5" {
     const input = testdata.testInput();
     const exp = testdata.expectedP5();
     var f = try createFrasma(testing.allocator, 5, 20);
+    f.fixSlices();
     defer f.deinit();
 
     for (0..252) |i| {
@@ -341,6 +341,7 @@ test "frasma update period 10" {
     const input = testdata.testInput();
     const exp = testdata.expectedP10();
     var f = try createFrasma(testing.allocator, 10, 20);
+    f.fixSlices();
     defer f.deinit();
 
     for (0..252) |i| {
@@ -357,6 +358,7 @@ test "frasma update period 15" {
     const input = testdata.testInput();
     const exp = testdata.expectedP15();
     var f = try createFrasma(testing.allocator, 15, 20);
+    f.fixSlices();
     defer f.deinit();
 
     for (0..252) |i| {
@@ -373,6 +375,7 @@ test "frasma update period 20" {
     const input = testdata.testInput();
     const exp = testdata.expectedP20();
     var f = try createFrasma(testing.allocator, 20, 20);
+    f.fixSlices();
     defer f.deinit();
 
     for (0..252) |i| {
@@ -389,6 +392,7 @@ test "frasma update period 30" {
     const input = testdata.testInput();
     const exp = testdata.expectedP30();
     var f = try createFrasma(testing.allocator, 30, 20);
+    f.fixSlices();
     defer f.deinit();
 
     for (0..252) |i| {
@@ -405,6 +409,7 @@ test "frasma update period 50" {
     const input = testdata.testInput();
     const exp = testdata.expectedP50();
     var f = try createFrasma(testing.allocator, 50, 20);
+    f.fixSlices();
     defer f.deinit();
 
     for (0..252) |i| {
@@ -421,6 +426,7 @@ test "frasma update period 80" {
     const input = testdata.testInput();
     const exp = testdata.expectedP80();
     var f = try createFrasma(testing.allocator, 80, 20);
+    f.fixSlices();
     defer f.deinit();
 
     for (0..252) |i| {
@@ -437,6 +443,7 @@ test "frasma update period 120" {
     const input = testdata.testInput();
     const exp = testdata.expectedP120();
     var f = try createFrasma(testing.allocator, 120, 20);
+    f.fixSlices();
     defer f.deinit();
 
     for (0..252) |i| {
@@ -452,6 +459,7 @@ test "frasma update period 120" {
 test "frasma is primed" {
     const input = testdata.testInput();
     var f = try createFrasma(testing.allocator, 30, 20);
+    f.fixSlices();
     defer f.deinit();
 
     for (0..29) |i| {
@@ -464,6 +472,7 @@ test "frasma is primed" {
 
 test "frasma nan passthrough" {
     var f = try createFrasma(testing.allocator, 5, 20);
+    f.fixSlices();
     defer f.deinit();
     try testing.expect(math.isNan(f.update(math.nan(f64))));
 }

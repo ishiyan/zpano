@@ -218,14 +218,22 @@ pub const HurstDifference = struct {
     }
 
     pub fn getMetadata(self: *const HurstDifference, out: *Metadata) void {
+        const mn = self.line.mnemonic;
+        const desc = self.line.description;
+
+        var fgdi_mn_buf: [160]u8 = undefined;
+        const fgdi_mn = std.fmt.bufPrint(&fgdi_mn_buf, "{s} fgdi", .{mn}) catch mn;
+        var fgdi_desc_buf: [256]u8 = undefined;
+        const fgdi_desc = std.fmt.bufPrint(&fgdi_desc_buf, "{s} FGDI", .{desc}) catch desc;
+
         build_metadata_mod.buildMetadata(
             out,
             .hurst_difference,
-            self.line.mnemonic,
-            self.line.description,
+            mn,
+            desc,
             &[_]build_metadata_mod.OutputText{
-                .{ .mnemonic = self.line.mnemonic, .description = self.line.description },
-                .{ .mnemonic = "fgdi", .description = "FGDI" },
+                .{ .mnemonic = mn, .description = desc },
+                .{ .mnemonic = fgdi_mn, .description = fgdi_desc },
             },
         );
     }
@@ -311,8 +319,7 @@ const testing = std.testing;
 const testdata = @import("testdata.zig");
 
 fn createHurdif(allocator: std.mem.Allocator, period: usize) !HurstDifference {
-    var ind = try HurstDifference.init(allocator, .{ .period = period });
-    ind.fixSlices();
+    const ind = try HurstDifference.init(allocator, .{ .period = period });
     return ind;
 }
 
@@ -329,6 +336,7 @@ test "hurdif update period 5" {
     const exp_fgdi = testdata.expectedFDIP5();
     const exp_hdiff = testdata.expectedHDIFFP5();
     var ind = try createHurdif(testing.allocator, 5);
+    ind.fixSlices();
     defer ind.deinit();
 
     for (0..252) |i| {
@@ -343,6 +351,7 @@ test "hurdif update period 10" {
     const exp_fgdi = testdata.expectedFDIP10();
     const exp_hdiff = testdata.expectedHDIFFP10();
     var ind = try createHurdif(testing.allocator, 10);
+    ind.fixSlices();
     defer ind.deinit();
 
     for (0..252) |i| {
@@ -357,6 +366,7 @@ test "hurdif update period 15" {
     const exp_fgdi = testdata.expectedFDIP15();
     const exp_hdiff = testdata.expectedHDIFFP15();
     var ind = try createHurdif(testing.allocator, 15);
+    ind.fixSlices();
     defer ind.deinit();
 
     for (0..252) |i| {
@@ -371,6 +381,7 @@ test "hurdif update period 20" {
     const exp_fgdi = testdata.expectedFDIP20();
     const exp_hdiff = testdata.expectedHDIFFP20();
     var ind = try createHurdif(testing.allocator, 20);
+    ind.fixSlices();
     defer ind.deinit();
 
     for (0..252) |i| {
@@ -385,6 +396,7 @@ test "hurdif update period 30" {
     const exp_fgdi = testdata.expectedFDIP30();
     const exp_hdiff = testdata.expectedHDIFFP30();
     var ind = try createHurdif(testing.allocator, 30);
+    ind.fixSlices();
     defer ind.deinit();
 
     for (0..252) |i| {
@@ -399,6 +411,7 @@ test "hurdif update period 50" {
     const exp_fgdi = testdata.expectedFDIP50();
     const exp_hdiff = testdata.expectedHDIFFP50();
     var ind = try createHurdif(testing.allocator, 50);
+    ind.fixSlices();
     defer ind.deinit();
 
     for (0..252) |i| {
@@ -413,6 +426,7 @@ test "hurdif update period 80" {
     const exp_fgdi = testdata.expectedFDIP80();
     const exp_hdiff = testdata.expectedHDIFFP80();
     var ind = try createHurdif(testing.allocator, 80);
+    ind.fixSlices();
     defer ind.deinit();
 
     for (0..252) |i| {
@@ -427,6 +441,7 @@ test "hurdif update period 120" {
     const exp_fgdi = testdata.expectedFDIP120();
     const exp_hdiff = testdata.expectedHDIFFP120();
     var ind = try createHurdif(testing.allocator, 120);
+    ind.fixSlices();
     defer ind.deinit();
 
     for (0..252) |i| {
@@ -439,6 +454,7 @@ test "hurdif update period 120" {
 test "hurdif is primed" {
     const input = testdata.testInput();
     var ind = try createHurdif(testing.allocator, 30);
+    ind.fixSlices();
     defer ind.deinit();
 
     for (0..30) |i| {
@@ -451,6 +467,7 @@ test "hurdif is primed" {
 
 test "hurdif nan passthrough" {
     var ind = try createHurdif(testing.allocator, 5);
+    ind.fixSlices();
     defer ind.deinit();
     const result = ind.updateAll(math.nan(f64));
     try testing.expect(math.isNan(result.hurst_diff));
@@ -460,4 +477,21 @@ test "hurdif nan passthrough" {
 test "hurdif invalid period" {
     const result = HurstDifference.init(testing.allocator, .{ .period = 1 });
     try testing.expectError(error.InvalidPeriod, result);
+}
+
+test "hurdif metadata" {
+    var ind = try HurstDifference.init(testing.allocator, .{ .period = 30 });
+    defer ind.deinit();
+    ind.fixSlices();
+
+    var m: Metadata = undefined;
+    ind.getMetadata(&m);
+
+    try testing.expectEqualStrings("hurdif(30)", m.mnemonic);
+    try testing.expectEqualStrings("Hurst difference hurdif(30)", m.description);
+    try testing.expectEqual(@as(usize, 2), m.outputs_len);
+    try testing.expectEqualStrings("hurdif(30)", m.outputs_buf[0].mnemonic);
+    try testing.expectEqualStrings("Hurst difference hurdif(30)", m.outputs_buf[0].description);
+    try testing.expectEqualStrings("hurdif(30) fgdi", m.outputs_buf[1].mnemonic);
+    try testing.expectEqualStrings("Hurst difference hurdif(30) FGDI", m.outputs_buf[1].description);
 }

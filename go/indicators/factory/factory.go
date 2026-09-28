@@ -115,6 +115,7 @@ import (
 	"zpano/indicators/welleswilder/truerange"
 	"zpano/indicators/williamblau/candlestickmomentumindex"
 	"zpano/indicators/williamblau/candlestickstrengthindex"
+	"zpano/indicators/williamblau/directionaltrendindex"
 	"zpano/indicators/williamblau/doublesmoothedmomenta"
 	"zpano/indicators/williamblau/doublesmoothedstochastic"
 	"zpano/indicators/williamblau/ergodicoscillator"
@@ -1267,6 +1268,14 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 		}
 
 		return doublesmoothedstochastic.NewDoubleSmoothedStochastic(p)
+
+	case core.DirectionalTrendIndex:
+		p := directionaltrendindex.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return directionaltrendindex.NewDirectionalTrendIndex(p)
 
 	default:
 		return nil, fmt.Errorf("unsupported indicator: %s", identifier)

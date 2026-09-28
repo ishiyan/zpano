@@ -404,12 +404,11 @@ fn almostEqual(a: f64, b: f64, eps: f64) bool {
 }
 
 fn createBBTrend(allocator: std.mem.Allocator, is_unbiased: bool) !BollingerBandsTrend {
-    var bbt = try BollingerBandsTrend.init(allocator, .{
+    const bbt = try BollingerBandsTrend.init(allocator, .{
         .fast_length = 20,
         .slow_length = 50,
         .is_unbiased = is_unbiased,
     });
-    bbt.fixSlices();
     return bbt;
 }
 
@@ -419,6 +418,7 @@ test "bollinger bands trend sample stddev full data" {
     const expected = testdata.testSampleExpected();
 
     var bbt = try createBBTrend(testing.allocator, true);
+    bbt.fixSlices();
     defer bbt.deinit();
 
     for (0..252) |i| {
@@ -439,6 +439,7 @@ test "bollinger bands trend population stddev full data" {
     const expected = testdata.testPopulationExpected();
 
     var bbt = try createBBTrend(testing.allocator, false);
+    bbt.fixSlices();
     defer bbt.deinit();
 
     for (0..252) |i| {
@@ -455,6 +456,7 @@ test "bollinger bands trend population stddev full data" {
 
 test "bollinger bands trend is primed" {
     var bbt = try createBBTrend(testing.allocator, true);
+    bbt.fixSlices();
     defer bbt.deinit();
 
     const closing = testdata.testClosingPrice();
@@ -472,6 +474,7 @@ test "bollinger bands trend is primed" {
 
 test "bollinger bands trend nan input" {
     var bbt = try createBBTrend(testing.allocator, true);
+    bbt.fixSlices();
     defer bbt.deinit();
 
     const v = bbt.update(math.nan(f64));
@@ -480,6 +483,7 @@ test "bollinger bands trend nan input" {
 
 test "bollinger bands trend metadata" {
     var bbt = try createBBTrend(testing.allocator, true);
+    bbt.fixSlices();
     defer bbt.deinit();
 
     var m: Metadata = undefined;
@@ -496,6 +500,7 @@ test "bollinger bands trend update scalar" {
     const expected = testdata.testSampleExpected();
 
     var bbt = try createBBTrend(testing.allocator, true);
+    bbt.fixSlices();
     defer bbt.deinit();
 
     const time: i64 = 1617235200;

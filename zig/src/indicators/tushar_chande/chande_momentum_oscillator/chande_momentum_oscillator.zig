@@ -289,8 +289,7 @@ const testing = std.testing;
 const testdata = @import("testdata.zig");
 
 fn createCmo(allocator: std.mem.Allocator, length: usize) !ChandeMomentumOscillator {
-    var cmo = try ChandeMomentumOscillator.init(allocator, .{ .length = length });
-    cmo.fixSlices();
+    const cmo = try ChandeMomentumOscillator.init(allocator, .{ .length = length });
     return cmo;
 }
 
@@ -298,6 +297,7 @@ test "cmo update length 10 book" {
     const input = testdata.testBookLength10Input();
     const output = testdata.testBookLength10Output();
     var cmo = try createCmo(testing.allocator, 10);
+    cmo.fixSlices();
     defer cmo.deinit();
 
     // First 10 updates produce NaN.
@@ -321,6 +321,7 @@ test "cmo is primed" {
 
     inline for ([_]usize{ 1, 2, 3, 5, 10 }) |length| {
         var cmo = try createCmo(testing.allocator, length);
+        cmo.fixSlices();
         defer cmo.deinit();
 
         try testing.expect(!cmo.isPrimed());
@@ -339,6 +340,7 @@ test "cmo is primed" {
 
 test "cmo metadata" {
     var cmo = try createCmo(testing.allocator, 5);
+    cmo.fixSlices();
     defer cmo.deinit();
     var m: Metadata = undefined;
     cmo.getMetadata(&m);
@@ -359,6 +361,7 @@ test "cmo update entity" {
     // scalar
     {
         var cmo = try createCmo(testing.allocator, length);
+        cmo.fixSlices();
         defer cmo.deinit();
         _ = cmo.update(0.0);
         _ = cmo.update(0.0);
@@ -372,6 +375,7 @@ test "cmo update entity" {
     // bar
     {
         var cmo = try createCmo(testing.allocator, length);
+        cmo.fixSlices();
         defer cmo.deinit();
         _ = cmo.update(0.0);
         _ = cmo.update(0.0);
@@ -384,6 +388,7 @@ test "cmo update entity" {
     // quote
     {
         var cmo = try createCmo(testing.allocator, length);
+        cmo.fixSlices();
         defer cmo.deinit();
         _ = cmo.update(0.0);
         _ = cmo.update(0.0);
@@ -396,6 +401,7 @@ test "cmo update entity" {
     // trade
     {
         var cmo = try createCmo(testing.allocator, length);
+        cmo.fixSlices();
         defer cmo.deinit();
         _ = cmo.update(0.0);
         _ = cmo.update(0.0);
@@ -415,6 +421,7 @@ test "cmo mnemonic components" {
     // all defaults -> no component suffix
     {
         var cmo = try createCmo(testing.allocator, 5);
+        cmo.fixSlices();
         defer cmo.deinit();
         try testing.expectEqualStrings("cmo(5)", cmo.line.mnemonic);
     }

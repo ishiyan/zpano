@@ -295,8 +295,7 @@ const testing = std.testing;
 const testdata = @import("testdata.zig");
 
 fn createAlma(allocator: std.mem.Allocator, window: usize, sigma: f64, offset: f64) !ArnaudLegouxMovingAverage {
-    var alma = try ArnaudLegouxMovingAverage.init(allocator, .{ .window = window, .sigma = sigma, .offset = offset });
-    alma.fixSlices();
+    const alma = try ArnaudLegouxMovingAverage.init(allocator, .{ .window = window, .sigma = sigma, .offset = offset });
     return alma;
 }
 
@@ -325,6 +324,7 @@ test "alma w9 s6 o0.85 (default)" {
     const input = testdata.testInput();
     const exp = testdata.expectedW9_S6_O0_85();
     var alma = try createAlma(testing.allocator, 9, 6.0, 0.85);
+    alma.fixSlices();
     defer alma.deinit();
     try checkAlmaUpdate(252, &alma, 9, &input, &exp);
 }
@@ -333,6 +333,7 @@ test "alma w9 s6 o0.5" {
     const input = testdata.testInput();
     const exp = testdata.expectedW9_S6_O0_5();
     var alma = try createAlma(testing.allocator, 9, 6.0, 0.5);
+    alma.fixSlices();
     defer alma.deinit();
     try checkAlmaUpdate(252, &alma, 9, &input, &exp);
 }
@@ -341,6 +342,7 @@ test "alma w10 s6 o0.85" {
     const input = testdata.testInput();
     const exp = testdata.expectedW10_S6_O0_85();
     var alma = try createAlma(testing.allocator, 10, 6.0, 0.85);
+    alma.fixSlices();
     defer alma.deinit();
     try checkAlmaUpdate(252, &alma, 10, &input, &exp);
 }
@@ -349,6 +351,7 @@ test "alma w5 s6 o0.9" {
     const input = testdata.testInput();
     const exp = testdata.expectedW5_S6_O0_9();
     var alma = try createAlma(testing.allocator, 5, 6.0, 0.9);
+    alma.fixSlices();
     defer alma.deinit();
     try checkAlmaUpdate(252, &alma, 5, &input, &exp);
 }
@@ -357,6 +360,7 @@ test "alma w1 s6 o0.85 (passthrough)" {
     const input = testdata.testInput();
     const exp = testdata.expectedW1_S6_O0_85();
     var alma = try createAlma(testing.allocator, 1, 6.0, 0.85);
+    alma.fixSlices();
     defer alma.deinit();
     try checkAlmaUpdate(252, &alma, 1, &input, &exp);
 }
@@ -365,6 +369,7 @@ test "alma w3 s6 o0.85" {
     const input = testdata.testInput();
     const exp = testdata.expectedW3_S6_O0_85();
     var alma = try createAlma(testing.allocator, 3, 6.0, 0.85);
+    alma.fixSlices();
     defer alma.deinit();
     try checkAlmaUpdate(252, &alma, 3, &input, &exp);
 }
@@ -373,6 +378,7 @@ test "alma w21 s6 o0.85" {
     const input = testdata.testInput();
     const exp = testdata.expectedW21_S6_O0_85();
     var alma = try createAlma(testing.allocator, 21, 6.0, 0.85);
+    alma.fixSlices();
     defer alma.deinit();
     try checkAlmaUpdate(252, &alma, 21, &input, &exp);
 }
@@ -381,6 +387,7 @@ test "alma w50 s6 o0.85" {
     const input = testdata.testInput();
     const exp = testdata.expectedW50_S6_O0_85();
     var alma = try createAlma(testing.allocator, 50, 6.0, 0.85);
+    alma.fixSlices();
     defer alma.deinit();
     try checkAlmaUpdate(252, &alma, 50, &input, &exp);
 }
@@ -389,6 +396,7 @@ test "alma w9 s6 o0 (left-aligned)" {
     const input = testdata.testInput();
     const exp = testdata.expectedW9_S6_O0();
     var alma = try createAlma(testing.allocator, 9, 6.0, 0.0);
+    alma.fixSlices();
     defer alma.deinit();
     try checkAlmaUpdate(252, &alma, 9, &input, &exp);
 }
@@ -397,6 +405,7 @@ test "alma w9 s6 o1 (right-aligned)" {
     const input = testdata.testInput();
     const exp = testdata.expectedW9_S6_O1();
     var alma = try createAlma(testing.allocator, 9, 6.0, 1.0);
+    alma.fixSlices();
     defer alma.deinit();
     try checkAlmaUpdate(252, &alma, 9, &input, &exp);
 }
@@ -405,6 +414,7 @@ test "alma w9 s2 o0.85 (narrow)" {
     const input = testdata.testInput();
     const exp = testdata.expectedW9_S2_O0_85();
     var alma = try createAlma(testing.allocator, 9, 2.0, 0.85);
+    alma.fixSlices();
     defer alma.deinit();
     try checkAlmaUpdate(252, &alma, 9, &input, &exp);
 }
@@ -413,6 +423,7 @@ test "alma w9 s20 o0.85 (wide)" {
     const input = testdata.testInput();
     const exp = testdata.expectedW9_S20_O0_85();
     var alma = try createAlma(testing.allocator, 9, 20.0, 0.85);
+    alma.fixSlices();
     defer alma.deinit();
     try checkAlmaUpdate(252, &alma, 9, &input, &exp);
 }
@@ -421,6 +432,7 @@ test "alma w9 s0.5 o0.85" {
     const input = testdata.testInput();
     const exp = testdata.expectedW9_S0_5_O0_85();
     var alma = try createAlma(testing.allocator, 9, 0.5, 0.85);
+    alma.fixSlices();
     defer alma.deinit();
     try checkAlmaUpdate(252, &alma, 9, &input, &exp);
 }
@@ -429,6 +441,7 @@ test "alma w15 s4 o0.7" {
     const input = testdata.testInput();
     const exp = testdata.expectedW15_S4_O0_7();
     var alma = try createAlma(testing.allocator, 15, 4.0, 0.7);
+    alma.fixSlices();
     defer alma.deinit();
     try checkAlmaUpdate(252, &alma, 15, &input, &exp);
 }
@@ -436,6 +449,7 @@ test "alma w15 s4 o0.7" {
 test "alma is primed" {
     const input = testdata.testInput();
     var alma = try createAlma(testing.allocator, 9, 6.0, 0.85);
+    alma.fixSlices();
     defer alma.deinit();
 
     try testing.expect(!alma.isPrimed());
@@ -451,6 +465,7 @@ test "alma is primed" {
 
 test "alma is primed window 1" {
     var alma = try createAlma(testing.allocator, 1, 6.0, 0.85);
+    alma.fixSlices();
     defer alma.deinit();
 
     try testing.expect(!alma.isPrimed());
@@ -460,6 +475,7 @@ test "alma is primed window 1" {
 
 test "alma metadata" {
     var alma = try createAlma(testing.allocator, 9, 6.0, 0.85);
+    alma.fixSlices();
     defer alma.deinit();
     var m: Metadata = undefined;
     alma.getMetadata(&m);
@@ -479,6 +495,7 @@ test "alma update entity" {
     // scalar
     {
         var alma = try createAlma(testing.allocator, window, 6.0, 0.85);
+        alma.fixSlices();
         defer alma.deinit();
         for (0..8) |i| {
             _ = alma.update(input[i]);
@@ -494,6 +511,7 @@ test "alma update entity" {
     // bar
     {
         var alma = try createAlma(testing.allocator, window, 6.0, 0.85);
+        alma.fixSlices();
         defer alma.deinit();
         for (0..8) |i| {
             _ = alma.update(input[i]);
@@ -508,6 +526,7 @@ test "alma update entity" {
     // quote
     {
         var alma = try createAlma(testing.allocator, window, 6.0, 0.85);
+        alma.fixSlices();
         defer alma.deinit();
         for (0..8) |i| {
             _ = alma.update(input[i]);
@@ -522,6 +541,7 @@ test "alma update entity" {
     // trade
     {
         var alma = try createAlma(testing.allocator, window, 6.0, 0.85);
+        alma.fixSlices();
         defer alma.deinit();
         for (0..8) |i| {
             _ = alma.update(input[i]);
@@ -555,6 +575,7 @@ test "alma mnemonic components" {
     // all defaults -> no component suffix
     {
         var alma = try createAlma(testing.allocator, 9, 6.0, 0.85);
+        alma.fixSlices();
         defer alma.deinit();
         try testing.expectEqualStrings("alma(9, 6, 0.85)", alma.line.mnemonic);
     }

@@ -47,7 +47,7 @@ export class RescaledFractalAdaptiveSimpleMovingAverage extends LineIndicator {
         }
 
         this.mnemonic = rescaledFractalAdaptiveSimpleMovingAverageMnemonic(params);
-        this.description = 'Rescaled fractal adaptive simple moving average ' + this.mnemonic;
+        this.description = 'RS fractal adaptive simple moving average ' + this.mnemonic;
         this.barComponent = params.barComponent;
         this.quoteComponent = params.quoteComponent;
         this.tradeComponent = params.tradeComponent;

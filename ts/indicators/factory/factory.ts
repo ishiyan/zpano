@@ -268,6 +268,8 @@ import { StochasticMomentumIndex } from '../william-blau/stochastic-momentum-ind
 import { defaultParams as defaultSmiParams } from '../william-blau/stochastic-momentum-index/params.js';
 import { DoubleSmoothedStochastic } from '../william-blau/double-smoothed-stochastic/double-smoothed-stochastic.js';
 import { defaultParams as defaultDssParams } from '../william-blau/double-smoothed-stochastic/params.js';
+import { DirectionalTrendIndex } from '../william-blau/directional-trend-index/directional-trend-index.js';
+import { defaultParams as defaultDtiParams } from '../william-blau/directional-trend-index/params.js';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -750,6 +752,9 @@ export function createIndicator(identifier: IndicatorIdentifier, params?: Record
 
         case IndicatorIdentifier.DoubleSmoothedStochastic:
             return new DoubleSmoothedStochastic({ ...defaultDssParams(), ...p });
+
+        case IndicatorIdentifier.DirectionalTrendIndex:
+            return new DirectionalTrendIndex({ ...defaultDtiParams(), ...p });
 
         default:
             throw new Error(`Unsupported indicator: ${IndicatorIdentifier[identifier] ?? identifier}`);

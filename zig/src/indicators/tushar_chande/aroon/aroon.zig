@@ -57,6 +57,8 @@ pub const Aroon = struct {
     allocator: std.mem.Allocator,
     mnemonic_buf: [32]u8,
     mnemonic_len: usize,
+    description_buf: [64]u8,
+    description_len: usize,
 
     pub const Error = error{
         InvalidLength,
@@ -76,6 +78,10 @@ pub const Aroon = struct {
         const mnemonic_slice = std.fmt.bufPrint(&mnemonic_buf, "aroon({d})", .{length}) catch
             return error.InvalidLength;
 
+        var description_buf: [64]u8 = undefined;
+        const description_slice = std.fmt.bufPrint(&description_buf, "Aroon {s}", .{mnemonic_slice}) catch
+            return error.InvalidLength;
+
         return Aroon{
             .length = length,
             .factor = 100.0 / @as(f64, @floatFromInt(length)),
@@ -92,6 +98,8 @@ pub const Aroon = struct {
             .allocator = allocator,
             .mnemonic_buf = mnemonic_buf,
             .mnemonic_len = mnemonic_slice.len,
+            .description_buf = description_buf,
+            .description_len = description_slice.len,
         };
     }
 
@@ -189,10 +197,7 @@ pub const Aroon = struct {
 
     pub fn getMetadata(self: *const Aroon, out: *Metadata) void {
         const mnemonic = self.mnemonic_buf[0..self.mnemonic_len];
-        const desc_prefix = "Aroon ";
-
-        var desc_buf: [64]u8 = undefined;
-        const desc = std.fmt.bufPrint(&desc_buf, "{s}{s}", .{ desc_prefix, mnemonic }) catch mnemonic;
+        const desc = self.description_buf[0..self.description_len];
 
         var up_mnemonic_buf: [48]u8 = undefined;
         const up_mnemonic = std.fmt.bufPrint(&up_mnemonic_buf, "{s} up", .{mnemonic}) catch mnemonic;
@@ -369,7 +374,11 @@ test "Aroon metadata" {
 
     try std.testing.expectEqual(Identifier.aroon, meta.identifier);
     try std.testing.expectEqualStrings("aroon(14)", meta.mnemonic);
+    try std.testing.expectEqualStrings("Aroon aroon(14)", meta.description);
     try std.testing.expectEqual(@as(usize, 3), meta.outputs_len);
+    try std.testing.expectEqualStrings("Aroon aroon(14) Up", meta.outputs_buf[0].description);
+    try std.testing.expectEqualStrings("Aroon aroon(14) Down", meta.outputs_buf[1].description);
+    try std.testing.expectEqualStrings("Aroon aroon(14) Oscillator", meta.outputs_buf[2].description);
 }
 
 test "Aroon updateBar" {

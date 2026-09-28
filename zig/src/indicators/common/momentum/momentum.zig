@@ -241,14 +241,14 @@ const testing = std.testing;
 const testdata = @import("testdata.zig");
 
 fn createMomentum(allocator: std.mem.Allocator, length: usize) !Momentum {
-    var mom = try Momentum.init(allocator, .{ .length = length });
-    mom.fixSlices();
+    const mom = try Momentum.init(allocator, .{ .length = length });
     return mom;
 }
 
 test "momentum update length 14" {
     const input = testdata.testInput();
     var mom = try createMomentum(testing.allocator, 14);
+    mom.fixSlices();
     defer mom.deinit();
 
     // First 13 updates (index 0..12) produce NaN.
@@ -276,6 +276,7 @@ test "momentum is primed" {
 
     inline for ([_]usize{ 1, 2, 3, 5, 10 }) |length| {
         var mom = try createMomentum(testing.allocator, length);
+        mom.fixSlices();
         defer mom.deinit();
 
         try testing.expect(!mom.isPrimed());
@@ -294,6 +295,7 @@ test "momentum is primed" {
 
 test "momentum metadata" {
     var mom = try createMomentum(testing.allocator, 5);
+    mom.fixSlices();
     defer mom.deinit();
     var m: Metadata = undefined;
     mom.getMetadata(&m);
@@ -314,6 +316,7 @@ test "momentum update entity" {
     // scalar
     {
         var mom = try createMomentum(testing.allocator, length);
+        mom.fixSlices();
         defer mom.deinit();
         _ = mom.update(0.0);
         _ = mom.update(0.0);
@@ -327,6 +330,7 @@ test "momentum update entity" {
     // bar
     {
         var mom = try createMomentum(testing.allocator, length);
+        mom.fixSlices();
         defer mom.deinit();
         _ = mom.update(0.0);
         _ = mom.update(0.0);
@@ -339,6 +343,7 @@ test "momentum update entity" {
     // quote
     {
         var mom = try createMomentum(testing.allocator, length);
+        mom.fixSlices();
         defer mom.deinit();
         _ = mom.update(0.0);
         _ = mom.update(0.0);
@@ -351,6 +356,7 @@ test "momentum update entity" {
     // trade
     {
         var mom = try createMomentum(testing.allocator, length);
+        mom.fixSlices();
         defer mom.deinit();
         _ = mom.update(0.0);
         _ = mom.update(0.0);
@@ -370,6 +376,7 @@ test "momentum mnemonic components" {
     // all defaults -> no component suffix
     {
         var mom = try createMomentum(testing.allocator, 5);
+        mom.fixSlices();
         defer mom.deinit();
         try testing.expectEqualStrings("mom(5)", mom.line.mnemonic);
     }

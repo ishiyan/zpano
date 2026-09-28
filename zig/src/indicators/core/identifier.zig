@@ -298,6 +298,8 @@ pub const Identifier = enum(u8) {
     stochastic_momentum_index = 113,
     /// Identifies the William Blau Double Smoothed Stochastic (DSS) indicator.
     double_smoothed_stochastic = 114,
+    /// Identifies the William Blau Directional Trend Index (DTI) indicator.
+    directional_trend_index = 115,
 
     /// Returns the camelCase string representation matching Go's String().
     pub fn asStr(self: Identifier) []const u8 {
@@ -463,6 +465,7 @@ pub const Identifier = enum(u8) {
             .candlestick_strength_index => "candlestickStrengthIndex",
             .stochastic_momentum_index => "stochasticMomentumIndex",
             .double_smoothed_stochastic => "doubleSmoothedStochastic",
+            .directional_trend_index => "directionalTrendIndex",
         };
     }
 
@@ -630,6 +633,7 @@ pub const Identifier = enum(u8) {
             .{ "candlestickStrengthIndex", Identifier.candlestick_strength_index },
             .{ "stochasticMomentumIndex", Identifier.stochastic_momentum_index },
             .{ "doubleSmoothedStochastic", Identifier.double_smoothed_stochastic },
+            .{ "directionalTrendIndex", Identifier.directional_trend_index },
         };
 
         inline for (map) |entry| {

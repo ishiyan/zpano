@@ -425,11 +425,10 @@ fn almostEqual(a: f64, b: f64, eps: f64) bool {
 }
 
 fn createBB(allocator: std.mem.Allocator, length: usize, is_unbiased: bool) !BollingerBands {
-    var bb = try BollingerBands.init(allocator, .{
+    const bb = try BollingerBands.init(allocator, .{
         .length = length,
         .is_unbiased = is_unbiased,
     });
-    bb.fixSlices();
     return bb;
 }
 
@@ -443,6 +442,7 @@ test "bollinger bands sample stddev length 20 full data" {
     const exp_pctb = testdata.testSamplePercentBandExpected();
 
     var bb = try createBB(testing.allocator, 20, true);
+    bb.fixSlices();
     defer bb.deinit();
 
     for (0..252) |i| {
@@ -499,6 +499,7 @@ test "bollinger bands population stddev length 20 full data" {
 
 test "bollinger bands is primed" {
     var bb = try createBB(testing.allocator, 20, true);
+    bb.fixSlices();
     defer bb.deinit();
 
     const closing = testdata.testClosingPrice();
@@ -516,6 +517,7 @@ test "bollinger bands is primed" {
 
 test "bollinger bands nan input" {
     var bb = try createBB(testing.allocator, 20, true);
+    bb.fixSlices();
     defer bb.deinit();
 
     const r = bb.update(math.nan(f64));
@@ -528,6 +530,7 @@ test "bollinger bands nan input" {
 
 test "bollinger bands metadata" {
     var bb = try createBB(testing.allocator, 20, true);
+    bb.fixSlices();
     defer bb.deinit();
 
     var m: Metadata = undefined;
@@ -547,6 +550,7 @@ test "bollinger bands update scalar" {
     const sma20 = testdata.testSma20Expected();
 
     var bb = try createBB(testing.allocator, 20, true);
+    bb.fixSlices();
     defer bb.deinit();
 
     const time: i64 = 1617235200;

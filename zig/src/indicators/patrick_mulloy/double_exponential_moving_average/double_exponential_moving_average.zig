@@ -308,26 +308,25 @@ const testing = std.testing;
 const testdata = @import("testdata.zig");
 
 fn createDemaLength(length: usize, first_is_average: bool) !DoubleExponentialMovingAverage {
-    var dema = try DoubleExponentialMovingAverage.initLength(.{
+    const dema = try DoubleExponentialMovingAverage.initLength(.{
         .length = length,
         .first_is_average = first_is_average,
     });
-    dema.fixSlices();
     return dema;
 }
 
 fn createDemaAlpha(alpha: f64, first_is_average: bool) !DoubleExponentialMovingAverage {
-    var dema = try DoubleExponentialMovingAverage.initSmoothingFactor(.{
+    const dema = try DoubleExponentialMovingAverage.initSmoothingFactor(.{
         .smoothing_factor = alpha,
         .first_is_average = first_is_average,
     });
-    dema.fixSlices();
     return dema;
 }
 
 test "dema update length 2 firstIsAverage true" {
     const input = testdata.testInput();
     var dema = try createDemaLength(2, true);
+    dema.fixSlices();
 
     // length2 = 2*2-1 = 3, lprimed = 2*2-2 = 2
     // Indices 0,1: NaN
@@ -351,6 +350,7 @@ test "dema update length 2 firstIsAverage true" {
 test "dema update length 14 firstIsAverage true" {
     const input = testdata.testInput();
     var dema = try createDemaLength(14, true);
+    dema.fixSlices();
     const lprimed = 2 * 14 - 2;
 
     for (0..lprimed) |i| {
@@ -376,6 +376,7 @@ test "dema update length 14 firstIsAverage true" {
 test "dema update length 2 firstIsAverage false (Metastock)" {
     const input = testdata.testInput();
     var dema = try createDemaLength(2, false);
+    dema.fixSlices();
     const lprimed = 2 * 2 - 2;
 
     for (0..lprimed) |i| {
@@ -398,6 +399,7 @@ test "dema update length 2 firstIsAverage false (Metastock)" {
 test "dema update length 14 firstIsAverage false (Metastock)" {
     const input = testdata.testInput();
     var dema = try createDemaLength(14, false);
+    dema.fixSlices();
     const lprimed = 2 * 14 - 2;
 
     for (0..lprimed) |i| {
@@ -428,6 +430,7 @@ test "dema isPrimed length 14" {
     // firstIsAverage = true
     {
         var dema = try createDemaLength(l, true);
+        dema.fixSlices();
         try testing.expect(!dema.isPrimed());
         for (0..lprimed) |i| {
             _ = dema.update(input[i]);
@@ -442,6 +445,7 @@ test "dema isPrimed length 14" {
     // firstIsAverage = false
     {
         var dema = try createDemaLength(l, false);
+        dema.fixSlices();
         try testing.expect(!dema.isPrimed());
         for (0..lprimed) |i| {
             _ = dema.update(input[i]);
@@ -456,6 +460,7 @@ test "dema isPrimed length 14" {
 
 test "dema metadata length" {
     var dema = try createDemaLength(10, true);
+    dema.fixSlices();
     var m: Metadata = undefined;
     dema.getMetadata(&m);
 
@@ -467,6 +472,7 @@ test "dema metadata length" {
 test "dema metadata alpha" {
     const alpha: f64 = 2.0 / 11.0;
     var dema = try createDemaAlpha(alpha, false);
+    dema.fixSlices();
     var m: Metadata = undefined;
     dema.getMetadata(&m);
 
@@ -483,6 +489,7 @@ test "dema update entity" {
     // scalar
     {
         var dema = try createDemaLength(2, false);
+        dema.fixSlices();
         _ = dema.update(0.0);
         _ = dema.update(0.0);
         const out = dema.updateScalar(&.{ .time = time, .value = inp });
@@ -495,6 +502,7 @@ test "dema update entity" {
     // bar
     {
         var dema = try createDemaLength(2, false);
+        dema.fixSlices();
         _ = dema.update(0.0);
         _ = dema.update(0.0);
         const bar = Bar{ .time = time, .open = 0, .high = 0, .low = 0, .close = inp, .volume = 0 };

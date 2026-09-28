@@ -175,6 +175,8 @@ pub const JurikCompositeFractalBehaviorIndex = struct {
 
     mnemonic_buf: [96]u8,
     mnemonic_len: usize,
+    description_buf: [160]u8,
+    description_len: usize,
 
     pub fn init(params: JurikCompositeFractalBehaviorIndexParams) !JurikCompositeFractalBehaviorIndex {
         const fractal_type = params.fractal_type;
@@ -197,6 +199,10 @@ pub const JurikCompositeFractalBehaviorIndex = struct {
         }) catch unreachable;
         const mnemonic_len = mnemonic.len;
 
+        var description_buf: [160]u8 = undefined;
+        const description = std.fmt.bufPrint(&description_buf, "Jurik composite fractal behavior index {s}", .{mnemonic}) catch unreachable;
+        const description_len = description.len;
+
         const depths = depth_sets[fractal_type - 1];
         const num_ch: u32 = @intCast(depths.len);
 
@@ -213,7 +219,7 @@ pub const JurikCompositeFractalBehaviorIndex = struct {
         return .{
             .line = LineIndicator.new(
                 mnemonic_buf[0..mnemonic_len],
-                "Jurik composite fractal behavior index ",
+                description_buf[0..description_len],
                 params.bar_component,
                 params.quote_component,
                 params.trade_component,
@@ -230,11 +236,14 @@ pub const JurikCompositeFractalBehaviorIndex = struct {
             .er19 = 20,
             .mnemonic_buf = mnemonic_buf,
             .mnemonic_len = mnemonic_len,
+            .description_buf = description_buf,
+            .description_len = description_len,
         };
     }
 
     pub fn fixSlices(self: *JurikCompositeFractalBehaviorIndex) void {
         self.line.mnemonic = self.mnemonic_buf[0..self.mnemonic_len];
+        self.line.description = self.description_buf[0..self.description_len];
     }
 
     pub fn update(self: *JurikCompositeFractalBehaviorIndex, sample: f64) f64 {
@@ -507,4 +516,15 @@ test "jcfb type 4 smooth 10" {
 }
 test "jcfb type 4 smooth 50" {
     try runCfbTest(4, 50, testdata.expectedType4Smooth50());
+}
+
+test "jcfb metadata description" {
+    var ind = JurikCompositeFractalBehaviorIndex.init(.{ .fractal_type = 2, .smooth = 10 }) catch unreachable;
+    ind.fixSlices();
+
+    var m: Metadata = undefined;
+    ind.getMetadata(&m);
+
+    try testing.expectEqualStrings("Jurik composite fractal behavior index jcfb(2,10)", m.description);
+    try testing.expectEqualStrings("Jurik composite fractal behavior index jcfb(2,10)", m.outputs_buf[0].description);
 }

@@ -80,6 +80,8 @@ pub const JurikAdaptiveRelativeTrendStrengthIndex = struct {
 
     mnemonic_buf: [96]u8,
     mnemonic_len: usize,
+    description_buf: [160]u8,
+    description_len: usize,
 
     pub fn init(params: JurikAdaptiveRelativeTrendStrengthIndexParams) !JurikAdaptiveRelativeTrendStrengthIndex {
         const lo_length = params.lo_length;
@@ -101,10 +103,14 @@ pub const JurikAdaptiveRelativeTrendStrengthIndex = struct {
         }) catch unreachable;
         const mnemonic_len = mnemonic.len;
 
+        var description_buf: [160]u8 = undefined;
+        const description = std.fmt.bufPrint(&description_buf, "Jurik adaptive relative trend strength index {s}", .{mnemonic}) catch unreachable;
+        const description_len = description.len;
+
         return .{
             .line = LineIndicator.new(
                 mnemonic_buf[0..mnemonic_len],
-                "Jurik adaptive relative trend strength index ",
+                description_buf[0..description_len],
                 params.bar_component,
                 params.quote_component,
                 params.trade_component,
@@ -140,11 +146,14 @@ pub const JurikAdaptiveRelativeTrendStrengthIndex = struct {
             .den3b = 0,
             .mnemonic_buf = mnemonic_buf,
             .mnemonic_len = mnemonic_len,
+            .description_buf = description_buf,
+            .description_len = description_len,
         };
     }
 
     pub fn fixSlices(self: *JurikAdaptiveRelativeTrendStrengthIndex) void {
         self.line.mnemonic = self.mnemonic_buf[0..self.mnemonic_len];
+        self.line.description = self.description_buf[0..self.description_len];
     }
 
     pub fn update(self: *JurikAdaptiveRelativeTrendStrengthIndex, sample: f64) f64 {
@@ -412,4 +421,15 @@ test "jarsx lo=10 hi=30" {
 }
 test "jarsx lo=10 hi=60" {
     try runJarsxTest(10, 60, testdata.expectedLo10Hi60());
+}
+
+test "30) metadata description" {
+    var ind = JurikAdaptiveRelativeTrendStrengthIndex.init(.{ .lo_length = 5, .hi_length = 30 }) catch unreachable;
+    ind.fixSlices();
+
+    var m: Metadata = undefined;
+    ind.getMetadata(&m);
+
+    try testing.expectEqualStrings("Jurik adaptive relative trend strength index jarsx(5, 30)", m.description);
+    try testing.expectEqualStrings("Jurik adaptive relative trend strength index jarsx(5, 30)", m.outputs_buf[0].description);
 }

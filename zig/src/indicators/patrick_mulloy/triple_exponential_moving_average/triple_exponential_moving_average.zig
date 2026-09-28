@@ -333,26 +333,25 @@ const testing = std.testing;
 const testdata = @import("testdata.zig");
 
 fn createTemaLength(length: usize, first_is_average: bool) !TripleExponentialMovingAverage {
-    var tema = try TripleExponentialMovingAverage.initLength(.{
+    const tema = try TripleExponentialMovingAverage.initLength(.{
         .length = length,
         .first_is_average = first_is_average,
     });
-    tema.fixSlices();
     return tema;
 }
 
 fn createTemaAlpha(alpha: f64, first_is_average: bool) !TripleExponentialMovingAverage {
-    var tema = try TripleExponentialMovingAverage.initSmoothingFactor(.{
+    const tema = try TripleExponentialMovingAverage.initSmoothingFactor(.{
         .smoothing_factor = alpha,
         .first_is_average = first_is_average,
     });
-    tema.fixSlices();
     return tema;
 }
 
 test "tema update length 14 firstIsAverage true" {
     const input = testdata.testInput();
     var tema = try createTemaLength(14, true);
+    tema.fixSlices();
     const lprimed = 3 * 14 - 3;
 
     for (0..lprimed) |i| {
@@ -375,6 +374,7 @@ test "tema update length 14 firstIsAverage true" {
 test "tema update length 14 firstIsAverage false (Metastock)" {
     const input = testdata.testInput();
     var tema = try createTemaLength(14, false);
+    tema.fixSlices();
     const lprimed = 3 * 14 - 3;
 
     for (0..lprimed) |i| {
@@ -399,6 +399,7 @@ test "tema update length 26 firstIsAverage false (Metastock) TASC" {
     const lprimed = 3 * l - 3;
 
     var tema = try createTemaLength(l, false);
+    tema.fixSlices();
 
     const in = testdata.testTascInput();
     const exp = testdata.testTascExpected();
@@ -428,6 +429,7 @@ test "tema isPrimed length 14" {
     // firstIsAverage = true
     {
         var tema = try createTemaLength(l, true);
+        tema.fixSlices();
         try testing.expect(!tema.isPrimed());
         for (0..lprimed) |i| {
             _ = tema.update(input[i]);
@@ -442,6 +444,7 @@ test "tema isPrimed length 14" {
     // firstIsAverage = false
     {
         var tema = try createTemaLength(l, false);
+        tema.fixSlices();
         try testing.expect(!tema.isPrimed());
         for (0..lprimed) |i| {
             _ = tema.update(input[i]);
@@ -456,6 +459,7 @@ test "tema isPrimed length 14" {
 
 test "tema metadata length" {
     var tema = try createTemaLength(10, true);
+    tema.fixSlices();
     var m: Metadata = undefined;
     tema.getMetadata(&m);
 
@@ -467,6 +471,7 @@ test "tema metadata length" {
 test "tema metadata alpha" {
     const alpha: f64 = 2.0 / 11.0;
     var tema = try createTemaAlpha(alpha, false);
+    tema.fixSlices();
     var m: Metadata = undefined;
     tema.getMetadata(&m);
 
@@ -484,6 +489,7 @@ test "tema update entity" {
     // scalar (firstIsAverage=false)
     {
         var tema = try createTemaLength(2, false);
+        tema.fixSlices();
         // lprimed = 3*2-3 = 3, feed 3 zeros
         _ = tema.update(0.0);
         _ = tema.update(0.0);
@@ -498,6 +504,7 @@ test "tema update entity" {
     // bar (firstIsAverage=true)
     {
         var tema = try createTemaLength(2, true);
+        tema.fixSlices();
         _ = tema.update(0.0);
         _ = tema.update(0.0);
         _ = tema.update(0.0);

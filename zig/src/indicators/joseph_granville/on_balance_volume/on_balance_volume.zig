@@ -214,8 +214,7 @@ const testing = std.testing;
 const testdata = @import("testdata.zig");
 
 fn createObv() OnBalanceVolume {
-    var obv = OnBalanceVolume.init(.{});
-    obv.fixSlices();
+    const obv = OnBalanceVolume.init(.{});
     return obv;
 }
 
@@ -225,6 +224,7 @@ test "on balance volume with volume" {
     const expected = testdata.testExpected();
 
     var obv = createObv();
+    obv.fixSlices();
 
     for (0..12) |i| {
         const v = obv.updateWithVolume(prices[i], vol[i]);
@@ -236,6 +236,7 @@ test "on balance volume with volume" {
 
 test "on balance volume is primed" {
     var obv = createObv();
+    obv.fixSlices();
 
     try testing.expect(!obv.isPrimed());
 
@@ -248,6 +249,7 @@ test "on balance volume is primed" {
 
 test "on balance volume NaN" {
     var obv = createObv();
+    obv.fixSlices();
 
     try testing.expect(math.isNan(obv.update(math.nan(f64))));
     try testing.expect(math.isNan(obv.updateWithVolume(1.0, math.nan(f64))));
@@ -268,6 +270,7 @@ test "on balance volume metadata" {
 
 test "on balance volume update scalar" {
     var obv = createObv();
+    obv.fixSlices();
     const time: i64 = 1617235200;
 
     const out = obv.updateScalar(&.{ .time = time, .value = 10.0 });
@@ -284,6 +287,7 @@ test "on balance volume update bar" {
     const time: i64 = 1617235200;
 
     var obv = createObv();
+    obv.fixSlices();
 
     for (0..12) |i| {
         const bar = Bar{ .time = time, .open = 0, .high = 0, .low = 0, .close = prices[i], .volume = vol[i] };
@@ -297,6 +301,7 @@ test "on balance volume update bar" {
 
 test "on balance volume equal prices" {
     var obv = createObv();
+    obv.fixSlices();
 
     var v = obv.updateWithVolume(10.0, 100.0);
     try testing.expectEqual(@as(f64, 100.0), v);

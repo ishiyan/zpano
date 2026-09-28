@@ -113,5 +113,6 @@
   { "identifier": "candlestickMomentumIndex", "params": { "r": 20, "s": 5, "u": 3, "ul": 3 } },
   { "identifier": "candlestickStrengthIndex", "params": { "r": 20, "s": 5, "u": 3, "ul": 3 } },
   { "identifier": "stochasticMomentumIndex", "params": { "q": 5, "r": 20, "s": 5, "u": 3, "ul": 3 } },
-  { "identifier": "doubleSmoothedStochastic", "params": { "q": 5, "r": 7, "s": 3, "g": 3 } }
+  { "identifier": "doubleSmoothedStochastic", "params": { "q": 5, "r": 7, "s": 3, "g": 3 } },
+  { "identifier": "directionalTrendIndex", "params": { "q": 2, "r": 20, "s": 5, "u": 3, "ul": 3 } }
 ]

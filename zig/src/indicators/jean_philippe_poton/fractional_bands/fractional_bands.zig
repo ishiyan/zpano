@@ -284,16 +284,32 @@ pub const FractionalBands = struct {
     }
 
     pub fn getMetadata(self: *const FractionalBands, out: *Metadata) void {
+        const mn = self.line.mnemonic;
+        const desc = self.line.description;
+
+        var upper_mn_buf: [160]u8 = undefined;
+        const upper_mn = std.fmt.bufPrint(&upper_mn_buf, "{s} upper", .{mn}) catch mn;
+        var upper_desc_buf: [256]u8 = undefined;
+        const upper_desc = std.fmt.bufPrint(&upper_desc_buf, "{s} Upper Band", .{desc}) catch desc;
+        var lower_mn_buf: [160]u8 = undefined;
+        const lower_mn = std.fmt.bufPrint(&lower_mn_buf, "{s} lower", .{mn}) catch mn;
+        var lower_desc_buf: [256]u8 = undefined;
+        const lower_desc = std.fmt.bufPrint(&lower_desc_buf, "{s} Lower Band", .{desc}) catch desc;
+        var band_mn_buf: [160]u8 = undefined;
+        const band_mn = std.fmt.bufPrint(&band_mn_buf, "{s} band", .{mn}) catch mn;
+        var band_desc_buf: [256]u8 = undefined;
+        const band_desc = std.fmt.bufPrint(&band_desc_buf, "{s} Band", .{desc}) catch desc;
+
         build_metadata_mod.buildMetadata(
             out,
             .fractional_bands,
-            self.line.mnemonic,
-            self.line.description,
+            mn,
+            desc,
             &[_]build_metadata_mod.OutputText{
-                .{ .mnemonic = self.line.mnemonic, .description = self.line.description },
-                .{ .mnemonic = "upper", .description = "Upper Band" },
-                .{ .mnemonic = "lower", .description = "Lower Band" },
-                .{ .mnemonic = "band", .description = "Band" },
+                .{ .mnemonic = mn, .description = desc },
+                .{ .mnemonic = upper_mn, .description = upper_desc },
+                .{ .mnemonic = lower_mn, .description = lower_desc },
+                .{ .mnemonic = band_mn, .description = band_desc },
             },
         );
     }
@@ -388,8 +404,7 @@ const testing = std.testing;
 const testdata = @import("testdata.zig");
 
 fn createFctban(allocator: std.mem.Allocator, period: usize, price_scale: f64) !FractionalBands {
-    var ind = try FractionalBands.init(allocator, .{ .period = period, .price_scale = price_scale });
-    ind.fixSlices();
+    const ind = try FractionalBands.init(allocator, .{ .period = period, .price_scale = price_scale });
     return ind;
 }
 
@@ -407,6 +422,7 @@ test "fctban P5_S1" {
     const exp_upper = testdata.expectedUpperP5S1();
     const exp_lower = testdata.expectedLowerP5S1();
     var ind = try createFctban(testing.allocator, 5, 1.0);
+    ind.fixSlices();
     defer ind.deinit();
 
     for (0..252) |i| {
@@ -423,6 +439,7 @@ test "fctban P10_S1" {
     const exp_upper = testdata.expectedUpperP10S1();
     const exp_lower = testdata.expectedLowerP10S1();
     var ind = try createFctban(testing.allocator, 10, 1.0);
+    ind.fixSlices();
     defer ind.deinit();
 
     for (0..252) |i| {
@@ -439,6 +456,7 @@ test "fctban P20_S1" {
     const exp_upper = testdata.expectedUpperP20S1();
     const exp_lower = testdata.expectedLowerP20S1();
     var ind = try createFctban(testing.allocator, 20, 1.0);
+    ind.fixSlices();
     defer ind.deinit();
 
     for (0..252) |i| {
@@ -455,6 +473,7 @@ test "fctban P30_S1" {
     const exp_upper = testdata.expectedUpperP30S1();
     const exp_lower = testdata.expectedLowerP30S1();
     var ind = try createFctban(testing.allocator, 30, 1.0);
+    ind.fixSlices();
     defer ind.deinit();
 
     for (0..252) |i| {
@@ -471,6 +490,7 @@ test "fctban P50_S1" {
     const exp_upper = testdata.expectedUpperP50S1();
     const exp_lower = testdata.expectedLowerP50S1();
     var ind = try createFctban(testing.allocator, 50, 1.0);
+    ind.fixSlices();
     defer ind.deinit();
 
     for (0..252) |i| {
@@ -487,6 +507,7 @@ test "fctban P80_S1" {
     const exp_upper = testdata.expectedUpperP80S1();
     const exp_lower = testdata.expectedLowerP80S1();
     var ind = try createFctban(testing.allocator, 80, 1.0);
+    ind.fixSlices();
     defer ind.deinit();
 
     for (0..252) |i| {
@@ -503,6 +524,7 @@ test "fctban P30_S100" {
     const exp_upper = testdata.expectedUpperP30S100();
     const exp_lower = testdata.expectedLowerP30S100();
     var ind = try createFctban(testing.allocator, 30, 100.0);
+    ind.fixSlices();
     defer ind.deinit();
 
     for (0..252) |i| {
@@ -519,6 +541,7 @@ test "fctban P30_S10000" {
     const exp_upper = testdata.expectedUpperP30S10000();
     const exp_lower = testdata.expectedLowerP30S10000();
     var ind = try createFctban(testing.allocator, 30, 10000.0);
+    ind.fixSlices();
     defer ind.deinit();
 
     for (0..252) |i| {
@@ -532,6 +555,7 @@ test "fctban P30_S10000" {
 test "fctban is primed" {
     const input = testdata.testInput();
     var ind = try createFctban(testing.allocator, 30, 1.0);
+    ind.fixSlices();
     defer ind.deinit();
 
     for (0..30) |i| {
@@ -544,6 +568,7 @@ test "fctban is primed" {
 
 test "fctban nan passthrough" {
     var ind = try createFctban(testing.allocator, 5, 1.0);
+    ind.fixSlices();
     defer ind.deinit();
     const result = ind.updateAll(math.nan(f64));
     try testing.expect(math.isNan(result.frasma2));
@@ -559,4 +584,25 @@ test "fctban invalid period" {
 test "fctban invalid price scale" {
     const result = FractionalBands.init(testing.allocator, .{ .period = 30, .price_scale = 0.0 });
     try testing.expectError(error.InvalidPriceScale, result);
+}
+
+test "fctban metadata" {
+    var ind = try FractionalBands.init(testing.allocator, .{ .period = 30, .price_scale = 1.0 });
+    defer ind.deinit();
+    ind.fixSlices();
+
+    var m: Metadata = undefined;
+    ind.getMetadata(&m);
+
+    try testing.expectEqualStrings("fctban(30,1)", m.mnemonic);
+    try testing.expectEqualStrings("Fractional bands fctban(30,1)", m.description);
+    try testing.expectEqual(@as(usize, 4), m.outputs_len);
+    try testing.expectEqualStrings("fctban(30,1)", m.outputs_buf[0].mnemonic);
+    try testing.expectEqualStrings("Fractional bands fctban(30,1)", m.outputs_buf[0].description);
+    try testing.expectEqualStrings("fctban(30,1) upper", m.outputs_buf[1].mnemonic);
+    try testing.expectEqualStrings("Fractional bands fctban(30,1) Upper Band", m.outputs_buf[1].description);
+    try testing.expectEqualStrings("fctban(30,1) lower", m.outputs_buf[2].mnemonic);
+    try testing.expectEqualStrings("Fractional bands fctban(30,1) Lower Band", m.outputs_buf[2].description);
+    try testing.expectEqualStrings("fctban(30,1) band", m.outputs_buf[3].mnemonic);
+    try testing.expectEqualStrings("Fractional bands fctban(30,1) Band", m.outputs_buf[3].description);
 }

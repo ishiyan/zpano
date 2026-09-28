@@ -292,8 +292,7 @@ const testing = std.testing;
 const testdata = @import("testdata.zig");
 
 fn createVariance(allocator: std.mem.Allocator, length: usize, unbiased: bool) !Variance {
-    var v = try Variance.init(allocator, .{ .length = length, .is_unbiased = unbiased });
-    v.fixSlices();
+    const v = try Variance.init(allocator, .{ .length = length, .is_unbiased = unbiased });
     return v;
 }
 
@@ -304,6 +303,7 @@ fn almostEqual(a: f64, b: f64, eps: f64) bool {
 test "variance population length 3" {
     const input = testdata.testInput();
     var v = try createVariance(testing.allocator, 3, false);
+    v.fixSlices();
     defer v.deinit();
 
     const expected = [_]f64{
@@ -328,6 +328,7 @@ test "variance population length 3" {
 test "variance population length 5" {
     const input = testdata.testInput();
     var v = try createVariance(testing.allocator, 5, false);
+    v.fixSlices();
     defer v.deinit();
 
     const expected = [_]f64{
@@ -348,6 +349,7 @@ test "variance population length 5" {
 test "variance sample length 3" {
     const input = testdata.testInput();
     var v = try createVariance(testing.allocator, 3, true);
+    v.fixSlices();
     defer v.deinit();
 
     const expected = [_]f64{
@@ -372,6 +374,7 @@ test "variance sample length 3" {
 test "variance is primed" {
     const input = testdata.testInput();
     var v = try createVariance(testing.allocator, 3, false);
+    v.fixSlices();
     defer v.deinit();
 
     try testing.expect(!v.isPrimed());
@@ -385,6 +388,7 @@ test "variance is primed" {
 
 test "variance metadata population" {
     var v = try createVariance(testing.allocator, 7, false);
+    v.fixSlices();
     defer v.deinit();
     var m: Metadata = undefined;
     v.getMetadata(&m);
@@ -396,6 +400,7 @@ test "variance metadata population" {
 
 test "variance metadata sample" {
     var v = try createVariance(testing.allocator, 7, true);
+    v.fixSlices();
     defer v.deinit();
     var m: Metadata = undefined;
     v.getMetadata(&m);
@@ -414,6 +419,7 @@ test "variance update entity" {
     // scalar
     {
         var v = try createVariance(testing.allocator, length, true);
+        v.fixSlices();
         defer v.deinit();
         _ = v.update(0.0);
         _ = v.update(0.0);
@@ -427,6 +433,7 @@ test "variance update entity" {
     // bar
     {
         var v = try createVariance(testing.allocator, length, true);
+        v.fixSlices();
         defer v.deinit();
         _ = v.update(0.0);
         _ = v.update(0.0);
@@ -447,6 +454,7 @@ test "variance init invalid length" {
 test "variance mnemonic components" {
     {
         var v = try createVariance(testing.allocator, 5, true);
+        v.fixSlices();
         defer v.deinit();
         try testing.expectEqualStrings("var.s(5)", v.line.mnemonic);
     }

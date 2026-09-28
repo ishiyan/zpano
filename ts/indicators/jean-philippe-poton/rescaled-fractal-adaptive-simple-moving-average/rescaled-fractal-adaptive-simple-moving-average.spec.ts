@@ -65,5 +65,8 @@ describe('RescaledFractalAdaptiveSimpleMovingAverage', () => {
         const f = new RescaledFractalAdaptiveSimpleMovingAverage({ period: 64, normalSpeed: 30, priceScale: 1.0 });
         const meta = f.metadata();
         expect(meta.identifier).toBe(IndicatorIdentifier.RescaledFractalAdaptiveSimpleMovingAverage);
+        expect(meta.mnemonic).toBe('rsfrasma(64,30,1.0)');
+        expect(meta.description).toBe('RS fractal adaptive simple moving average rsfrasma(64,30,1.0)');
+        expect(meta.outputs[0].description).toBe('RS fractal adaptive simple moving average rsfrasma(64,30,1.0)');
     });
 });

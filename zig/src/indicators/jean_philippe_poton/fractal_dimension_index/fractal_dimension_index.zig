@@ -268,8 +268,7 @@ const testing = std.testing;
 const testdata = @import("testdata.zig");
 
 fn createFdi(allocator: std.mem.Allocator, period: usize) !FractalDimensionIndex {
-    var fdi = try FractalDimensionIndex.init(allocator, .{ .period = period });
-    fdi.fixSlices();
+    const fdi = try FractalDimensionIndex.init(allocator, .{ .period = period });
     return fdi;
 }
 
@@ -277,6 +276,7 @@ test "fdi update period 5" {
     const input = testdata.testInput();
     const exp = testdata.expected_P5();
     var fdi = try createFdi(testing.allocator, 5);
+    fdi.fixSlices();
     defer fdi.deinit();
 
     for (0..252) |i| {
@@ -293,6 +293,7 @@ test "fdi update period 10" {
     const input = testdata.testInput();
     const exp = testdata.expected_P10();
     var fdi = try createFdi(testing.allocator, 10);
+    fdi.fixSlices();
     defer fdi.deinit();
 
     for (0..252) |i| {
@@ -309,6 +310,7 @@ test "fdi update period 15" {
     const input = testdata.testInput();
     const exp = testdata.expected_P15();
     var fdi = try createFdi(testing.allocator, 15);
+    fdi.fixSlices();
     defer fdi.deinit();
 
     for (0..252) |i| {
@@ -325,6 +327,7 @@ test "fdi update period 20" {
     const input = testdata.testInput();
     const exp = testdata.expected_P20();
     var fdi = try createFdi(testing.allocator, 20);
+    fdi.fixSlices();
     defer fdi.deinit();
 
     for (0..252) |i| {
@@ -341,6 +344,7 @@ test "fdi update period 30" {
     const input = testdata.testInput();
     const exp = testdata.expected_P30();
     var fdi = try createFdi(testing.allocator, 30);
+    fdi.fixSlices();
     defer fdi.deinit();
 
     for (0..252) |i| {
@@ -357,6 +361,7 @@ test "fdi update period 50" {
     const input = testdata.testInput();
     const exp = testdata.expected_P50();
     var fdi = try createFdi(testing.allocator, 50);
+    fdi.fixSlices();
     defer fdi.deinit();
 
     for (0..252) |i| {
@@ -373,6 +378,7 @@ test "fdi update period 80" {
     const input = testdata.testInput();
     const exp = testdata.expected_P80();
     var fdi = try createFdi(testing.allocator, 80);
+    fdi.fixSlices();
     defer fdi.deinit();
 
     for (0..252) |i| {
@@ -389,6 +395,7 @@ test "fdi update period 120" {
     const input = testdata.testInput();
     const exp = testdata.expected_P120();
     var fdi = try createFdi(testing.allocator, 120);
+    fdi.fixSlices();
     defer fdi.deinit();
 
     for (0..252) |i| {
@@ -404,6 +411,7 @@ test "fdi update period 120" {
 test "fdi is primed" {
     const input = testdata.testInput();
     var fdi = try createFdi(testing.allocator, 30);
+    fdi.fixSlices();
     defer fdi.deinit();
 
     for (0..30) |i| {
@@ -416,6 +424,7 @@ test "fdi is primed" {
 
 test "fdi nan passthrough" {
     var fdi = try createFdi(testing.allocator, 5);
+    fdi.fixSlices();
     defer fdi.deinit();
     try testing.expect(math.isNan(fdi.update(math.nan(f64))));
 }

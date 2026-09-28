@@ -358,14 +358,14 @@ fn expectedSample() [252]f64 {
 }
 
 fn createStdDev(allocator: std.mem.Allocator, length: usize, unbiased: bool) !StandardDeviation {
-    var sd = try StandardDeviation.init(allocator, .{ .length = length, .is_unbiased = unbiased });
-    sd.fixSlices();
+    const sd = try StandardDeviation.init(allocator, .{ .length = length, .is_unbiased = unbiased });
     return sd;
 }
 
 test "stdev population" {
     const input = testdata.testInput();
     var sd = try createStdDev(testing.allocator, 5, false);
+    sd.fixSlices();
     defer sd.deinit();
     const expected = expectedPopulation();
 
@@ -382,6 +382,7 @@ test "stdev population" {
 test "stdev sample" {
     const input = testdata.testInput();
     var sd = try createStdDev(testing.allocator, 5, true);
+    sd.fixSlices();
     defer sd.deinit();
     const expected = expectedSample();
 
@@ -398,6 +399,7 @@ test "stdev sample" {
 test "stdev is primed" {
     const input = testdata.testInput();
     var sd = try createStdDev(testing.allocator, 5, true);
+    sd.fixSlices();
     defer sd.deinit();
 
     try testing.expect(!sd.isPrimed());
@@ -411,6 +413,7 @@ test "stdev is primed" {
 
 test "stdev metadata population" {
     var sd = try createStdDev(testing.allocator, 7, false);
+    sd.fixSlices();
     defer sd.deinit();
     var m: Metadata = undefined;
     sd.getMetadata(&m);
@@ -422,6 +425,7 @@ test "stdev metadata population" {
 
 test "stdev metadata sample" {
     var sd = try createStdDev(testing.allocator, 7, true);
+    sd.fixSlices();
     defer sd.deinit();
     var m: Metadata = undefined;
     sd.getMetadata(&m);
@@ -438,6 +442,7 @@ test "stdev update entity" {
     const time: i64 = 1617235200;
 
     var sd = try createStdDev(testing.allocator, length, true);
+    sd.fixSlices();
     defer sd.deinit();
     _ = sd.update(0.0);
     _ = sd.update(0.0);
@@ -458,6 +463,7 @@ test "stdev init invalid length" {
 test "stdev mnemonic components" {
     {
         var sd = try createStdDev(testing.allocator, 5, true);
+        sd.fixSlices();
         defer sd.deinit();
         try testing.expectEqualStrings("stdev.s(5)", sd.line.mnemonic);
     }

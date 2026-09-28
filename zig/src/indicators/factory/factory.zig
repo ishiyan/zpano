@@ -182,6 +182,7 @@ const cmi_mod = @import("../william_blau/candlestick_momentum_index/candlestick_
 const csi_mod = @import("../william_blau/candlestick_strength_index/candlestick_strength_index.zig");
 const smi_mod = @import("../william_blau/stochastic_momentum_index/stochastic_momentum_index.zig");
 const dss_mod = @import("../william_blau/double_smoothed_stochastic/double_smoothed_stochastic.zig");
+const dti_mod = @import("../william_blau/directional_trend_index/directional_trend_index.zig");
 
 pub const FactoryError = error{
     UnsupportedIndicator,
@@ -1572,6 +1573,13 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
             .r = getUsize(obj, "r", 7),
             .s = getUsize(obj, "s", 3),
             .g = getUsize(obj, "g", 3),
+        }),
+        .directional_trend_index => createWithAllocParams(dti_mod.DirectionalTrendIndex, dti_mod.DirectionalTrendIndexParams, allocator, obj, .{
+            .q = getUsize(obj, "q", 2),
+            .r = getUsize(obj, "r", 20),
+            .s = getUsize(obj, "s", 5),
+            .u = getUsize(obj, "u", 3),
+            .ul = getUsize(obj, "ul", 3),
         }),
     };
 }

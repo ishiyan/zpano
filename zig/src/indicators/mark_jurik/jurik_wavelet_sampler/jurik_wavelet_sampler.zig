@@ -74,6 +74,8 @@ pub const JurikWaveletSampler = struct {
 
     mnemonic_buf: [96]u8,
     mnemonic_len: usize,
+    description_buf: [160]u8,
+    description_len: usize,
 
     pub fn init(params: JurikWaveletSamplerParams) !JurikWaveletSampler {
         const index = params.index;
@@ -93,6 +95,10 @@ pub const JurikWaveletSampler = struct {
         }) catch unreachable;
         const mnemonic_len = mnemonic.len;
 
+        var description_buf: [160]u8 = undefined;
+        const description = std.fmt.bufPrint(&description_buf, "Jurik wavelet sampler {s}", .{mnemonic}) catch unreachable;
+        const description_len = description.len;
+
         // Compute max lookback.
         var max_lookback: u32 = 0;
         for (0..index) |c| {
@@ -103,7 +109,7 @@ pub const JurikWaveletSampler = struct {
         return .{
             .line = LineIndicator.new(
                 mnemonic_buf[0..mnemonic_len],
-                "Jurik wavelet sampler ",
+                description_buf[0..description_len],
                 params.bar_component,
                 params.quote_component,
                 params.trade_component,
@@ -116,11 +122,14 @@ pub const JurikWaveletSampler = struct {
             .columns = [_]f64{0} ** 18,
             .mnemonic_buf = mnemonic_buf,
             .mnemonic_len = mnemonic_len,
+            .description_buf = description_buf,
+            .description_len = description_len,
         };
     }
 
     pub fn fixSlices(self: *JurikWaveletSampler) void {
         self.line.mnemonic = self.mnemonic_buf[0..self.mnemonic_len];
+        self.line.description = self.description_buf[0..self.description_len];
     }
 
     /// Returns a copy of the current column values.
@@ -371,4 +380,15 @@ test "jwav index=16" {
             }
         }
     }
+}
+
+test "jwav metadata description" {
+    var ind = JurikWaveletSampler.init(.{ .index = 12 }) catch unreachable;
+    ind.fixSlices();
+
+    var m: Metadata = undefined;
+    ind.getMetadata(&m);
+
+    try testing.expectEqualStrings("Jurik wavelet sampler jwav(12)", m.description);
+    try testing.expectEqualStrings("Jurik wavelet sampler jwav(12)", m.outputs_buf[0].description);
 }

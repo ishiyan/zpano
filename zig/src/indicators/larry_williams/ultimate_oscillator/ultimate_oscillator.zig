@@ -94,6 +94,8 @@ pub const UltimateOscillator = struct {
     allocator: std.mem.Allocator,
     mnemonic_buf: [64]u8,
     mnemonic_len: usize,
+    description_buf: [128]u8,
+    description_len: usize,
 
     pub const Error = error{
         InvalidLength1,
@@ -121,6 +123,10 @@ pub const UltimateOscillator = struct {
         const mn_slice = std.fmt.bufPrint(&mnemonic_buf, "ultosc({d}, {d}, {d})", .{ l1, l2, l3 }) catch return error.MnemonicTooLong;
         const mnemonic_len = mn_slice.len;
 
+        var description_buf: [128]u8 = undefined;
+        const desc_slice = std.fmt.bufPrint(&description_buf, "Ultimate Oscillator {s}", .{mn_slice}) catch return error.MnemonicTooLong;
+        const description_len = desc_slice.len;
+
         const bp_buffer = allocator.alloc(f64, s3) catch return error.OutOfMemory;
         errdefer allocator.free(bp_buffer);
         const tr_buffer = allocator.alloc(f64, s3) catch return error.OutOfMemory;
@@ -147,6 +153,8 @@ pub const UltimateOscillator = struct {
             .allocator = allocator,
             .mnemonic_buf = mnemonic_buf,
             .mnemonic_len = mnemonic_len,
+            .description_buf = description_buf,
+            .description_len = description_len,
         };
     }
 
@@ -247,9 +255,7 @@ pub const UltimateOscillator = struct {
 
     pub fn getMetadata(self: *const UltimateOscillator, out: *Metadata) void {
         const mnemonic = self.mnemonic_buf[0..self.mnemonic_len];
-
-        var description_buf: [128]u8 = undefined;
-        const description = std.fmt.bufPrint(&description_buf, "Ultimate Oscillator {s}", .{mnemonic}) catch "Ultimate Oscillator";
+        const description = self.description_buf[0..self.description_len];
 
         build_metadata_mod.buildMetadata(out, Identifier.ultimate_oscillator, mnemonic, description, &.{
             .{ .mnemonic = mnemonic, .description = description },
@@ -419,7 +425,9 @@ test "UltimateOscillator metadata" {
 
     try testing.expectEqual(Identifier.ultimate_oscillator, meta.identifier);
     try testing.expectEqualStrings("ultosc(7, 14, 28)", meta.mnemonic);
+    try testing.expectEqualStrings("Ultimate Oscillator ultosc(7, 14, 28)", meta.description);
     try testing.expectEqual(@as(usize, 1), meta.outputs_len);
+    try testing.expectEqualStrings("Ultimate Oscillator ultosc(7, 14, 28)", meta.outputs_buf[0].description);
 }
 
 test "UltimateOscillator invalid params" {

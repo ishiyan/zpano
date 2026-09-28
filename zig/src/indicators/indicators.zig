@@ -189,6 +189,7 @@ pub const candlestick_momentum_index = @import("william_blau/candlestick_momentu
 pub const candlestick_strength_index = @import("william_blau/candlestick_strength_index/candlestick_strength_index.zig");
 pub const stochastic_momentum_index = @import("william_blau/stochastic_momentum_index/stochastic_momentum_index.zig");
 pub const double_smoothed_stochastic = @import("william_blau/double_smoothed_stochastic/double_smoothed_stochastic.zig");
+pub const directional_trend_index = @import("william_blau/directional_trend_index/directional_trend_index.zig");
 
 pub const hilbert_transformer = @import("john_ehlers/hilbert_transformer/hilbert_transformer.zig");
 pub const homodyne_discriminator = @import("john_ehlers/hilbert_transformer/homodyne_discriminator.zig");
@@ -319,6 +320,7 @@ comptime {
     _ = candlestick_strength_index;
     _ = stochastic_momentum_index;
     _ = double_smoothed_stochastic;
+    _ = directional_trend_index;
     _ = frequency_response;
     _ = factory;
     _ = arnaud_legoux_moving_average;

@@ -254,14 +254,14 @@ const testing = std.testing;
 const testdata = @import("testdata.zig");
 
 fn createWma(allocator: std.mem.Allocator, length: usize) !WeightedMovingAverage {
-    var wma = try WeightedMovingAverage.init(allocator, .{ .length = length });
-    wma.fixSlices();
+    const wma = try WeightedMovingAverage.init(allocator, .{ .length = length });
     return wma;
 }
 
 test "wma update length 2" {
     const input = testdata.testInput();
     var wma = try createWma(testing.allocator, 2);
+    wma.fixSlices();
     defer wma.deinit();
 
     // Index 0: NaN
@@ -279,6 +279,7 @@ test "wma update length 2" {
     }
     // We need to check the last value separately — recompute from scratch
     var wma2 = try createWma(testing.allocator, 2);
+    wma2.fixSlices();
     defer wma2.deinit();
     var last: f64 = undefined;
     for (0..252) |i| {
@@ -293,6 +294,7 @@ test "wma update length 2" {
 test "wma update length 30" {
     const input = testdata.testInput();
     var wma = try createWma(testing.allocator, 30);
+    wma.fixSlices();
     defer wma.deinit();
 
     for (0..29) |i| {
@@ -302,6 +304,7 @@ test "wma update length 30" {
     var results: [252]f64 = undefined;
     // Re-init to get all results
     var wma2 = try createWma(testing.allocator, 30);
+    wma2.fixSlices();
     defer wma2.deinit();
     for (0..252) |i| {
         results[i] = wma2.update(input[i]);
@@ -320,6 +323,7 @@ test "wma update length 30" {
 test "wma is primed length 2" {
     const input = testdata.testInput();
     var wma = try createWma(testing.allocator, 2);
+    wma.fixSlices();
     defer wma.deinit();
 
     try testing.expect(!wma.isPrimed());
@@ -332,6 +336,7 @@ test "wma is primed length 2" {
 test "wma is primed length 30" {
     const input = testdata.testInput();
     var wma = try createWma(testing.allocator, 30);
+    wma.fixSlices();
     defer wma.deinit();
 
     try testing.expect(!wma.isPrimed());
@@ -345,6 +350,7 @@ test "wma is primed length 30" {
 
 test "wma metadata" {
     var wma = try createWma(testing.allocator, 5);
+    wma.fixSlices();
     defer wma.deinit();
     var m: Metadata = undefined;
     wma.getMetadata(&m);
@@ -363,6 +369,7 @@ test "wma update entity" {
     // scalar
     {
         var wma = try createWma(testing.allocator, 2);
+        wma.fixSlices();
         defer wma.deinit();
         _ = wma.update(input[0]);
         const out = wma.updateScalar(&.{ .time = time, .value = input[1] });
@@ -375,6 +382,7 @@ test "wma update entity" {
     // bar
     {
         var wma = try createWma(testing.allocator, 2);
+        wma.fixSlices();
         defer wma.deinit();
         _ = wma.update(input[0]);
         const bar = Bar{ .time = time, .open = 0, .high = 0, .low = 0, .close = input[1], .volume = 0 };
@@ -386,6 +394,7 @@ test "wma update entity" {
     // quote
     {
         var wma = try createWma(testing.allocator, 2);
+        wma.fixSlices();
         defer wma.deinit();
         _ = wma.update(input[0]);
         const quote = Quote{ .time = time, .bid_price = input[1], .ask_price = input[1], .bid_size = 0, .ask_size = 0 };
@@ -397,6 +406,7 @@ test "wma update entity" {
     // trade
     {
         var wma = try createWma(testing.allocator, 2);
+        wma.fixSlices();
         defer wma.deinit();
         _ = wma.update(input[0]);
         const trade = Trade{ .time = time, .price = input[1], .volume = 0 };
@@ -417,6 +427,7 @@ test "wma init invalid length" {
 test "wma mnemonic components" {
     {
         var wma = try createWma(testing.allocator, 5);
+        wma.fixSlices();
         defer wma.deinit();
         try testing.expectEqualStrings("wma(5)", wma.line.mnemonic);
     }

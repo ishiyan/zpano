@@ -428,6 +428,9 @@ const (
 	// DoubleSmoothedStochastic identifies the William Blau Double Smoothed Stochastic (DSS) indicator.
 	DoubleSmoothedStochastic
 
+	// DirectionalTrendIndex identifies the William Blau Directional Trend Index (DTI) indicator.
+	DirectionalTrendIndex
+
 	last
 )
 
@@ -598,6 +601,7 @@ const (
 	candlestickStrengthIndex                  = "candlestickStrengthIndex"
 	stochasticMomentumIndex                   = "stochasticMomentumIndex"
 	doubleSmoothedStochastic                  = "doubleSmoothedStochastic"
+	directionalTrendIndex                     = "directionalTrendIndex"
 )
 
 // String implements the Stringer interface.
@@ -858,6 +862,8 @@ func (i Identifier) String() string {
 		return stochasticMomentumIndex
 	case DoubleSmoothedStochastic:
 		return doubleSmoothedStochastic
+	case DirectionalTrendIndex:
+		return directionalTrendIndex
 	default:
 		return unknown
 	}
@@ -1155,6 +1161,8 @@ func (i *Identifier) UnmarshalJSON(data []byte) error {
 		*i = StochasticMomentumIndex
 	case doubleSmoothedStochastic:
 		*i = DoubleSmoothedStochastic
+	case directionalTrendIndex:
+		*i = DirectionalTrendIndex
 	default:
 		return fmt.Errorf(errFmt, s)
 	}
