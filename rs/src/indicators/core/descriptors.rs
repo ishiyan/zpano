@@ -1995,4 +1995,14 @@ pub static DESCRIPTORS: &[Descriptor] = &[
             OutputDescriptor { kind: 2, shape: Scalar, role: Signal, pane: Own },
         ],
     },
+    Descriptor {
+        identifier: TickVolumeIndicator,
+        family: "William Blau",
+        adaptivity: Static,
+        input_requirement: BarInput,
+        volume_usage: NoVolume,
+        outputs: &[
+            OutputDescriptor { kind: 1, shape: Scalar, role: BoundedOscillator, pane: Own },
+        ],
+    },
 ];

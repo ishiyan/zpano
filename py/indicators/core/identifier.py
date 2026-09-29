@@ -426,3 +426,6 @@ class Identifier(IntEnum):
 
     # Identifies the William Blau Directional Trend Index (DTI) indicator.
     DIRECTIONAL_TREND_INDEX = 115
+
+    # Identifies the William Blau Tick Volume Indicator (TVI) indicator.
+    TICK_VOLUME_INDICATOR = 116

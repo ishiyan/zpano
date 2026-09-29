@@ -183,6 +183,7 @@ const csi_mod = @import("../william_blau/candlestick_strength_index/candlestick_
 const smi_mod = @import("../william_blau/stochastic_momentum_index/stochastic_momentum_index.zig");
 const dss_mod = @import("../william_blau/double_smoothed_stochastic/double_smoothed_stochastic.zig");
 const dti_mod = @import("../william_blau/directional_trend_index/directional_trend_index.zig");
+const tvi_mod = @import("../william_blau/tick_volume_indicator/tick_volume_indicator.zig");
 
 pub const FactoryError = error{
     UnsupportedIndicator,
@@ -1581,6 +1582,11 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
             .u = getUsize(obj, "u", 3),
             .ul = getUsize(obj, "ul", 3),
         }),
+        .tick_volume_indicator => createWithParams(tvi_mod.TickVolumeIndicator, allocator, tvi_mod.TickVolumeIndicator.init(.{
+            .r = getUsize(obj, "r", 12),
+            .s = getUsize(obj, "s", 12),
+            .u = getUsize(obj, "u", 1),
+        })),
     };
 }
 

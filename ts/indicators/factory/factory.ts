@@ -270,6 +270,8 @@ import { DoubleSmoothedStochastic } from '../william-blau/double-smoothed-stocha
 import { defaultParams as defaultDssParams } from '../william-blau/double-smoothed-stochastic/params.js';
 import { DirectionalTrendIndex } from '../william-blau/directional-trend-index/directional-trend-index.js';
 import { defaultParams as defaultDtiParams } from '../william-blau/directional-trend-index/params.js';
+import { TickVolumeIndicator } from '../william-blau/tick-volume-indicator/tick-volume-indicator.js';
+import { defaultParams as defaultTviParams } from '../william-blau/tick-volume-indicator/params.js';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -755,6 +757,9 @@ export function createIndicator(identifier: IndicatorIdentifier, params?: Record
 
         case IndicatorIdentifier.DirectionalTrendIndex:
             return new DirectionalTrendIndex({ ...defaultDtiParams(), ...p });
+
+        case IndicatorIdentifier.TickVolumeIndicator:
+            return new TickVolumeIndicator({ ...defaultTviParams(), ...p });
 
         default:
             throw new Error(`Unsupported indicator: ${IndicatorIdentifier[identifier] ?? identifier}`);

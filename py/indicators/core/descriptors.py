@@ -584,6 +584,9 @@ _descriptors: dict[Id, Descriptor] = {
         Id.DIRECTIONAL_TREND_INDEX, "William Blau", A.STATIC, I.BAR_INPUT, V.NO_VOLUME,
         [_o(0, S.SCALAR, R.BOUNDED_OSCILLATOR, P.OWN),
          _o(1, S.SCALAR, R.SIGNAL, P.OWN)]),
+    Id.TICK_VOLUME_INDICATOR: _d(
+        Id.TICK_VOLUME_INDICATOR, "William Blau", A.STATIC, I.BAR_INPUT, V.NO_VOLUME,
+        [_o(0, S.SCALAR, R.BOUNDED_OSCILLATOR, P.OWN)]),
 }
 
 

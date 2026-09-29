@@ -122,6 +122,7 @@ import (
 	"zpano/indicators/williamblau/macdindex"
 	"zpano/indicators/williamblau/meandeviationindex"
 	"zpano/indicators/williamblau/stochasticmomentumindex"
+	"zpano/indicators/williamblau/tickvolumeindicator"
 	"zpano/indicators/williamblau/truestrengthindex"
 	"zpano/indicators/zurabsilagadze/movingminimax"
 )
@@ -1276,6 +1277,14 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 		}
 
 		return directionaltrendindex.NewDirectionalTrendIndex(p)
+
+	case core.TickVolumeIndicator:
+		p := tickvolumeindicator.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return tickvolumeindicator.NewTickVolumeIndicator(p)
 
 	default:
 		return nil, fmt.Errorf("unsupported indicator: %s", identifier)

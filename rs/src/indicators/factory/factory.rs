@@ -335,6 +335,9 @@ use crate::indicators::william_blau::double_smoothed_stochastic::double_smoothed
 use crate::indicators::william_blau::directional_trend_index::directional_trend_index::{
     DirectionalTrendIndex, DirectionalTrendIndexParams,
 };
+use crate::indicators::william_blau::tick_volume_indicator::tick_volume_indicator::{
+    TickVolumeIndicator, TickVolumeIndicatorParams,
+};
 
 /// Create an indicator from its identifier and a JSON-encoded parameter string.
 ///
@@ -1802,6 +1805,14 @@ pub fn create_indicator(
             if let Some(v) = get_usize(&params, "u") { p.u = v; }
             if let Some(v) = get_usize(&params, "ul") { p.ul = v; }
             Ok(Box::new(DirectionalTrendIndex::new(&p)?))
+        }
+
+        Identifier::TickVolumeIndicator => {
+            let mut p = TickVolumeIndicatorParams::default();
+            if let Some(v) = get_usize(&params, "r") { p.r = v; }
+            if let Some(v) = get_usize(&params, "s") { p.s = v; }
+            if let Some(v) = get_usize(&params, "u") { p.u = v; }
+            Ok(Box::new(TickVolumeIndicator::new(&p)?))
         }
 
         _ => Err(format!("unsupported indicator: {:?}", identifier)),

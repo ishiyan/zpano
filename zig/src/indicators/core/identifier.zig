@@ -300,6 +300,8 @@ pub const Identifier = enum(u8) {
     double_smoothed_stochastic = 114,
     /// Identifies the William Blau Directional Trend Index (DTI) indicator.
     directional_trend_index = 115,
+    /// Identifies the William Blau Tick Volume Indicator (TVI) indicator.
+    tick_volume_indicator = 116,
 
     /// Returns the camelCase string representation matching Go's String().
     pub fn asStr(self: Identifier) []const u8 {
@@ -466,6 +468,7 @@ pub const Identifier = enum(u8) {
             .stochastic_momentum_index => "stochasticMomentumIndex",
             .double_smoothed_stochastic => "doubleSmoothedStochastic",
             .directional_trend_index => "directionalTrendIndex",
+            .tick_volume_indicator => "tickVolumeIndicator",
         };
     }
 
@@ -634,6 +637,7 @@ pub const Identifier = enum(u8) {
             .{ "stochasticMomentumIndex", Identifier.stochastic_momentum_index },
             .{ "doubleSmoothedStochastic", Identifier.double_smoothed_stochastic },
             .{ "directionalTrendIndex", Identifier.directional_trend_index },
+            .{ "tickVolumeIndicator", Identifier.tick_volume_indicator },
         };
 
         inline for (map) |entry| {

@@ -418,4 +418,7 @@ export enum IndicatorIdentifier {
 
     /** Identifies the William Blau __Directional Trend Index__ (DTI) indicator. */
     DirectionalTrendIndex,
+
+    /** Identifies the William Blau __Tick Volume Indicator__ (TVI) indicator. */
+    TickVolumeIndicator,
 }

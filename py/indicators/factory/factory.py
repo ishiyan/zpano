@@ -739,4 +739,9 @@ def create_indicator(
         from ..william_blau.directional_trend_index.directional_trend_index import DirectionalTrendIndex
         return DirectionalTrendIndex(_apply(default_params(), params))
 
+    if identifier == Identifier.TICK_VOLUME_INDICATOR:
+        from ..william_blau.tick_volume_indicator.params import default_params
+        from ..william_blau.tick_volume_indicator.tick_volume_indicator import TickVolumeIndicator
+        return TickVolumeIndicator(_apply(default_params(), params))
+
     raise ValueError(f"unsupported indicator: {identifier}")

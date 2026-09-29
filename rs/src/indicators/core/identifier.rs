@@ -301,6 +301,8 @@ pub enum Identifier {
     DoubleSmoothedStochastic = 114,
     /// Identifies the William Blau Directional Trend Index (DTI) indicator.
     DirectionalTrendIndex = 115,
+    /// Identifies the William Blau Tick Volume Indicator (TVI) indicator.
+    TickVolumeIndicator = 116,
 }
 
 impl Identifier {
@@ -431,6 +433,7 @@ impl Identifier {
             Self::StochasticMomentumIndex => "stochasticMomentumIndex",
             Self::DoubleSmoothedStochastic => "doubleSmoothedStochastic",
             Self::DirectionalTrendIndex => "directionalTrendIndex",
+            Self::TickVolumeIndicator => "tickVolumeIndicator",
         }
     }
 
@@ -565,6 +568,7 @@ impl Identifier {
             "stochasticMomentumIndex" => Some(Self::StochasticMomentumIndex),
             "doubleSmoothedStochastic" => Some(Self::DoubleSmoothedStochastic),
             "directionalTrendIndex" => Some(Self::DirectionalTrendIndex),
+            "tickVolumeIndicator" => Some(Self::TickVolumeIndicator),
             _ => None,
         }
     }

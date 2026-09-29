@@ -431,6 +431,9 @@ const (
 	// DirectionalTrendIndex identifies the William Blau Directional Trend Index (DTI) indicator.
 	DirectionalTrendIndex
 
+	// TickVolumeIndicator identifies the William Blau Tick Volume Indicator (TVI) indicator.
+	TickVolumeIndicator
+
 	last
 )
 
@@ -602,6 +605,7 @@ const (
 	stochasticMomentumIndex                   = "stochasticMomentumIndex"
 	doubleSmoothedStochastic                  = "doubleSmoothedStochastic"
 	directionalTrendIndex                     = "directionalTrendIndex"
+	tickVolumeIndicator                       = "tickVolumeIndicator"
 )
 
 // String implements the Stringer interface.
@@ -864,6 +868,8 @@ func (i Identifier) String() string {
 		return doubleSmoothedStochastic
 	case DirectionalTrendIndex:
 		return directionalTrendIndex
+	case TickVolumeIndicator:
+		return tickVolumeIndicator
 	default:
 		return unknown
 	}
@@ -1163,6 +1169,8 @@ func (i *Identifier) UnmarshalJSON(data []byte) error {
 		*i = DoubleSmoothedStochastic
 	case directionalTrendIndex:
 		*i = DirectionalTrendIndex
+	case tickVolumeIndicator:
+		*i = TickVolumeIndicator
 	default:
 		return fmt.Errorf(errFmt, s)
 	}

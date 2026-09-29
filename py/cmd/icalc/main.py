@@ -148,6 +148,7 @@ _IDENTIFIER_MAP: dict[str, Identifier] = {
     'stochasticMomentumIndex': Identifier.STOCHASTIC_MOMENTUM_INDEX,
     'doubleSmoothedStochastic': Identifier.DOUBLE_SMOOTHED_STOCHASTIC,
     'directionalTrendIndex': Identifier.DIRECTIONAL_TREND_INDEX,
+    'tickVolumeIndicator': Identifier.TICK_VOLUME_INDICATOR,
 }
 
 
