@@ -421,4 +421,7 @@ export enum IndicatorIdentifier {
 
     /** Identifies the William Blau __Tick Volume Indicator__ (TVI) indicator. */
     TickVolumeIndicator,
+
+    /** Identifies the William Blau __Slope Divergence TSI Filter__ (SDTSI) indicator. */
+    SlopeDivergenceTsiFilter,
 }

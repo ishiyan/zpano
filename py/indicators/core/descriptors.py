@@ -587,6 +587,9 @@ _descriptors: dict[Id, Descriptor] = {
     Id.TICK_VOLUME_INDICATOR: _d(
         Id.TICK_VOLUME_INDICATOR, "William Blau", A.STATIC, I.BAR_INPUT, V.NO_VOLUME,
         [_o(0, S.SCALAR, R.BOUNDED_OSCILLATOR, P.OWN)]),
+    Id.SLOPE_DIVERGENCE_TSI_FILTER: _d(
+        Id.SLOPE_DIVERGENCE_TSI_FILTER, "William Blau", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
+        [_o(0, S.SCALAR, R.BOUNDED_OSCILLATOR, P.OWN)]),
 }
 
 

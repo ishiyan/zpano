@@ -338,6 +338,9 @@ use crate::indicators::william_blau::directional_trend_index::directional_trend_
 use crate::indicators::william_blau::tick_volume_indicator::tick_volume_indicator::{
     TickVolumeIndicator, TickVolumeIndicatorParams,
 };
+use crate::indicators::william_blau::slope_divergence_tsi_filter::slope_divergence_tsi_filter::{
+    SlopeDivergenceTsiFilter, SlopeDivergenceTsiFilterParams,
+};
 
 /// Create an indicator from its identifier and a JSON-encoded parameter string.
 ///
@@ -1813,6 +1816,17 @@ pub fn create_indicator(
             if let Some(v) = get_usize(&params, "s") { p.s = v; }
             if let Some(v) = get_usize(&params, "u") { p.u = v; }
             Ok(Box::new(TickVolumeIndicator::new(&p)?))
+        }
+
+        Identifier::SlopeDivergenceTsiFilter => {
+            let mut p = SlopeDivergenceTsiFilterParams::default();
+            if let Some(v) = get_usize(&params, "q") { p.q = v; }
+            if let Some(v) = get_usize(&params, "r") { p.r = v; }
+            if let Some(v) = get_usize(&params, "s") { p.s = v; }
+            if let Some(v) = get_usize(&params, "u") { p.u = v; }
+            if let Some(v) = get_usize(&params, "x") { p.x = v; }
+            if let Some(v) = get_usize(&params, "y") { p.y = v; }
+            Ok(Box::new(SlopeDivergenceTsiFilter::new(&p)?))
         }
 
         _ => Err(format!("unsupported indicator: {:?}", identifier)),

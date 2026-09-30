@@ -144,6 +144,7 @@ func TestIdentifierString(t *testing.T) {
 		{DoubleSmoothedStochastic, doubleSmoothedStochastic},
 		{DirectionalTrendIndex, directionalTrendIndex},
 		{TickVolumeIndicator, tickVolumeIndicator},
+		{SlopeDivergenceTsiFilter, slopeDivergenceTsiFilter},
 		// ── boundary ──────────────────────────────────────────────────────────
 		{last, unknown},
 		{Identifier(0), unknown},
@@ -300,6 +301,7 @@ func TestIdentifierIsKnown(t *testing.T) {
 		{DoubleSmoothedStochastic, true},
 		{DirectionalTrendIndex, true},
 		{TickVolumeIndicator, true},
+		{SlopeDivergenceTsiFilter, true},
 		// ── boundary ──────────────────────────────────────────────────────────
 		{last, false},
 		{Identifier(0), false},
@@ -460,6 +462,7 @@ func TestIdentifierMarshalJSON(t *testing.T) {
 		{DoubleSmoothedStochastic, dqs + doubleSmoothedStochastic + dqs, true},
 		{DirectionalTrendIndex, dqs + directionalTrendIndex + dqs, true},
 		{TickVolumeIndicator, dqs + tickVolumeIndicator + dqs, true},
+		{SlopeDivergenceTsiFilter, dqs + slopeDivergenceTsiFilter + dqs, true},
 		// ── boundary ──────────────────────────────────────────────────────────
 		{last, nilstr, false},
 		{Identifier(9999), nilstr, false},
@@ -633,6 +636,7 @@ func TestIdentifierUnmarshalJSON(t *testing.T) {
 		{DoubleSmoothedStochastic, dqs + doubleSmoothedStochastic + dqs, true},
 		{DirectionalTrendIndex, dqs + directionalTrendIndex + dqs, true},
 		{TickVolumeIndicator, dqs + tickVolumeIndicator + dqs, true},
+		{SlopeDivergenceTsiFilter, dqs + slopeDivergenceTsiFilter + dqs, true},
 		// ── boundary ──────────────────────────────────────────────────────────
 		{zero, "\"unknown\"", false},
 		{zero, "\"foobar\"", false},

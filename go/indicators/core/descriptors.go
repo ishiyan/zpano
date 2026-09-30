@@ -925,4 +925,12 @@ var descriptors = map[Identifier]Descriptor{
 			{Kind: 1 /* Value */, Shape: shape.Scalar, Role: BoundedOscillator, Pane: Own},
 		},
 	},
+
+	SlopeDivergenceTsiFilter: {
+		Identifier: SlopeDivergenceTsiFilter, Family: "William Blau",
+		Adaptivity: Static, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{
+			{Kind: 1 /* Value */, Shape: shape.Scalar, Role: BoundedOscillator, Pane: Own},
+		},
+	},
 }

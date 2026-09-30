@@ -434,6 +434,9 @@ const (
 	// TickVolumeIndicator identifies the William Blau Tick Volume Indicator (TVI) indicator.
 	TickVolumeIndicator
 
+	// SlopeDivergenceTsiFilter identifies the William Blau Slope Divergence TSI Filter (SDTSI) indicator.
+	SlopeDivergenceTsiFilter
+
 	last
 )
 
@@ -606,6 +609,7 @@ const (
 	doubleSmoothedStochastic                  = "doubleSmoothedStochastic"
 	directionalTrendIndex                     = "directionalTrendIndex"
 	tickVolumeIndicator                       = "tickVolumeIndicator"
+	slopeDivergenceTsiFilter                  = "slopeDivergenceTsiFilter"
 )
 
 // String implements the Stringer interface.
@@ -870,6 +874,8 @@ func (i Identifier) String() string {
 		return directionalTrendIndex
 	case TickVolumeIndicator:
 		return tickVolumeIndicator
+	case SlopeDivergenceTsiFilter:
+		return slopeDivergenceTsiFilter
 	default:
 		return unknown
 	}
@@ -1171,6 +1177,8 @@ func (i *Identifier) UnmarshalJSON(data []byte) error {
 		*i = DirectionalTrendIndex
 	case tickVolumeIndicator:
 		*i = TickVolumeIndicator
+	case slopeDivergenceTsiFilter:
+		*i = SlopeDivergenceTsiFilter
 	default:
 		return fmt.Errorf(errFmt, s)
 	}

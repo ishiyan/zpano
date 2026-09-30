@@ -303,6 +303,8 @@ pub enum Identifier {
     DirectionalTrendIndex = 115,
     /// Identifies the William Blau Tick Volume Indicator (TVI) indicator.
     TickVolumeIndicator = 116,
+    /// Identifies the William Blau Slope Divergence TSI Filter (SDTSI) indicator.
+    SlopeDivergenceTsiFilter = 117,
 }
 
 impl Identifier {
@@ -434,6 +436,7 @@ impl Identifier {
             Self::DoubleSmoothedStochastic => "doubleSmoothedStochastic",
             Self::DirectionalTrendIndex => "directionalTrendIndex",
             Self::TickVolumeIndicator => "tickVolumeIndicator",
+            Self::SlopeDivergenceTsiFilter => "slopeDivergenceTsiFilter",
         }
     }
 
@@ -569,6 +572,7 @@ impl Identifier {
             "doubleSmoothedStochastic" => Some(Self::DoubleSmoothedStochastic),
             "directionalTrendIndex" => Some(Self::DirectionalTrendIndex),
             "tickVolumeIndicator" => Some(Self::TickVolumeIndicator),
+            "slopeDivergenceTsiFilter" => Some(Self::SlopeDivergenceTsiFilter),
             _ => None,
         }
     }

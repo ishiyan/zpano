@@ -9,3 +9,4 @@ pub mod stochastic_momentum_index;
 pub mod double_smoothed_stochastic;
 pub mod directional_trend_index;
 pub mod tick_volume_indicator;
+pub mod slope_divergence_tsi_filter;

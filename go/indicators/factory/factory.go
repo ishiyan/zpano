@@ -121,6 +121,7 @@ import (
 	"zpano/indicators/williamblau/ergodicoscillator"
 	"zpano/indicators/williamblau/macdindex"
 	"zpano/indicators/williamblau/meandeviationindex"
+	"zpano/indicators/williamblau/slopedivergencetsifilter"
 	"zpano/indicators/williamblau/stochasticmomentumindex"
 	"zpano/indicators/williamblau/tickvolumeindicator"
 	"zpano/indicators/williamblau/truestrengthindex"
@@ -1285,6 +1286,14 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 		}
 
 		return tickvolumeindicator.NewTickVolumeIndicator(p)
+
+	case core.SlopeDivergenceTsiFilter:
+		p := slopedivergencetsifilter.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return slopedivergencetsifilter.NewSlopeDivergenceTsiFilter(p)
 
 	default:
 		return nil, fmt.Errorf("unsupported indicator: %s", identifier)

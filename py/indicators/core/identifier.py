@@ -429,3 +429,6 @@ class Identifier(IntEnum):
 
     # Identifies the William Blau Tick Volume Indicator (TVI) indicator.
     TICK_VOLUME_INDICATOR = 116
+
+    # Identifies the William Blau Slope Divergence TSI Filter (SDTSI) indicator.
+    SLOPE_DIVERGENCE_TSI_FILTER = 117

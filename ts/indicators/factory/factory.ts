@@ -272,6 +272,8 @@ import { DirectionalTrendIndex } from '../william-blau/directional-trend-index/d
 import { defaultParams as defaultDtiParams } from '../william-blau/directional-trend-index/params.js';
 import { TickVolumeIndicator } from '../william-blau/tick-volume-indicator/tick-volume-indicator.js';
 import { defaultParams as defaultTviParams } from '../william-blau/tick-volume-indicator/params.js';
+import { SlopeDivergenceTsiFilter } from '../william-blau/slope-divergence-tsi-filter/slope-divergence-tsi-filter.js';
+import { defaultParams as defaultSdtsiParams } from '../william-blau/slope-divergence-tsi-filter/params.js';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -760,6 +762,9 @@ export function createIndicator(identifier: IndicatorIdentifier, params?: Record
 
         case IndicatorIdentifier.TickVolumeIndicator:
             return new TickVolumeIndicator({ ...defaultTviParams(), ...p });
+
+        case IndicatorIdentifier.SlopeDivergenceTsiFilter:
+            return new SlopeDivergenceTsiFilter({ ...defaultSdtsiParams(), ...p });
 
         default:
             throw new Error(`Unsupported indicator: ${IndicatorIdentifier[identifier] ?? identifier}`);
