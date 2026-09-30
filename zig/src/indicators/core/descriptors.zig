@@ -299,4 +299,5 @@ pub const descriptors = [_]Descriptor{
     .{ .identifier = .tick_volume_indicator, .family = "William Blau", .adaptivity = .static_, .input_requirement = .bar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .bounded_oscillator, .pane = .own }} },
     .{ .identifier = .slope_divergence_tsi_filter, .family = "William Blau", .adaptivity = .static_, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .bounded_oscillator, .pane = .own }} },
     .{ .identifier = .adx_type_filter, .family = "William Blau", .adaptivity = .static_, .input_requirement = .bar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .oscillator, .pane = .own }} },
+    .{ .identifier = .nonambiguous_trend_filter, .family = "William Blau", .adaptivity = .static_, .input_requirement = .bar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .oscillator, .pane = .own }} },
 };

@@ -298,9 +298,9 @@ context). All other languages use fully-qualified symbol names.
 ### Identifier Registry Parity
 
 Go, TypeScript, Python, Zig, and Rust MUST have the same set of registered
-identifiers. All five currently have **84** identifiers (Go: `core.Identifier`
-iota 1–84; TS: `IndicatorIdentifier` enum 0–83; Python: `Identifier` IntEnum
-0–83; Zig: `Identifier` enum(u8) 0–83; Rust: `Identifier` enum 0–83) with
+identifiers. All five currently have **120** identifiers (Go: `core.Identifier`
+iota 1–120; TS: `IndicatorIdentifier` enum 0–119; Python: `Identifier` IntEnum
+0–119; Zig: `Identifier` enum(u8) 0–119; Rust: `Identifier` enum 0–119) with
 identical names (PascalCase in Go/TS/Rust, UPPER_SNAKE_CASE in Python,
 snake_case in Zig). When adding a new indicator, register the identifier in
 **all** languages even if only one implementation exists yet.
@@ -923,7 +923,7 @@ TypeScript, because downstream tooling keys off them.
    defaults are in effect, or wrap the component suffix in parens when needed
    (e.g. `obv(hl/2)`).
 
-**Canonical inventory (65 indicators with mnemonics, plus 4 paired directional):**
+**Canonical inventory (68 indicators with mnemonics, plus 4 paired directional):**
 
 | Prefix    | Indicator                                            |
 |-----------|------------------------------------------------------|
@@ -935,6 +935,7 @@ TypeScript, because downstream tooling keys off them.
 | `adxr`    | average directional movement index rating            |
 | `apo`     | absolute price oscillator                            |
 | `aroon`   | Aroon                                                |
+| `atf`     | ADX-type filter (`atf.<src>`: `tsi`, `smi`, `dti`, `tvi`, `tsin`) |
 | `atcf`    | adaptive trend and cycle filter                      |
 | `atr`     | average true range                                   |
 | `bb`      | Bollinger bands                                      |
@@ -970,6 +971,7 @@ TypeScript, because downstream tooling keys off them.
 | `mfi`     | money flow index                                     |
 | `mom`     | momentum                                             |
 | `natr`    | normalized average true range                        |
+| `ntf`     | nonambiguous trend filter (`ntf.<base>`: `tsi`, `smi`, `dti`, `tvi`, `mdi`, `cmi`, `csi`) |
 | `obv`     | on-balance volume                                    |
 | `ppo`     | percentage price oscillator                          |
 | `roc`     | rate of change                                       |
@@ -978,6 +980,7 @@ TypeScript, because downstream tooling keys off them.
 | `roof`    | roofing filter                                       |
 | `rsi`     | relative strength index                              |
 | `sar`     | parabolic stop and reverse                           |
+| `sdtsi`   | slope divergence TSI filter                          |
 | `sma`     | simple moving average                                |
 | `ss`      | super smoother                                       |
 | `stdev`   | standard deviation (`.s` sample / `.p` population)   |

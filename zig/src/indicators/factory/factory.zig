@@ -186,6 +186,7 @@ const dti_mod = @import("../william_blau/directional_trend_index/directional_tre
 const tvi_mod = @import("../william_blau/tick_volume_indicator/tick_volume_indicator.zig");
 const sdtsi_mod = @import("../william_blau/slope_divergence_tsi_filter/slope_divergence_tsi_filter.zig");
 const atf_mod = @import("../william_blau/adx_type_filter/adx_type_filter.zig");
+const ntf_mod = @import("../william_blau/nonambiguous_trend_filter/nonambiguous_trend_filter.zig");
 
 pub const FactoryError = error{
     UnsupportedIndicator,
@@ -1606,6 +1607,17 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
             .q = getUsize(obj, "q", 0),
             .r = getUsize(obj, "r", 32),
             .s = getUsize(obj, "s", 32),
+            .bar_component = getBarComponent(obj),
+            .quote_component = getQuoteComponent(obj),
+            .trade_component = getTradeComponent(obj),
+        }),
+        .nonambiguous_trend_filter => createWithAllocParams(ntf_mod.NonambiguousTrendFilter, ntf_mod.NonambiguousTrendFilterParams, allocator, obj, .{
+            .base = std.enums.fromInt(ntf_mod.NonambiguousTrendFilterBase, getInt(obj, "base", 0)) orelse
+                return FactoryError.IndicatorInitFailed,
+            .q = getUsize(obj, "q", 0),
+            .r = getUsize(obj, "r", 0),
+            .s = getUsize(obj, "s", 0),
+            .u = getUsize(obj, "u", 0),
             .bar_component = getBarComponent(obj),
             .quote_component = getQuoteComponent(obj),
             .trade_component = getTradeComponent(obj),

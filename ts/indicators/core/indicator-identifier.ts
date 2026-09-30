@@ -427,4 +427,7 @@ export enum IndicatorIdentifier {
 
     /** Identifies the William Blau __ADX-Type Filter__ (ATF) indicator. */
     AdxTypeFilter,
+
+    /** Identifies the William Blau __Nonambiguous Trend Filter__ (NTF) indicator. */
+    NonambiguousTrendFilter,
 }

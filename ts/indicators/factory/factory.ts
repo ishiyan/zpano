@@ -276,6 +276,8 @@ import { SlopeDivergenceTsiFilter } from '../william-blau/slope-divergence-tsi-f
 import { defaultParams as defaultSdtsiParams } from '../william-blau/slope-divergence-tsi-filter/params.js';
 import { AdxTypeFilter } from '../william-blau/adx-type-filter/adx-type-filter.js';
 import { defaultParams as defaultAtfParams } from '../william-blau/adx-type-filter/params.js';
+import { NonambiguousTrendFilter } from '../william-blau/nonambiguous-trend-filter/nonambiguous-trend-filter.js';
+import { defaultParams as defaultNtfParams } from '../william-blau/nonambiguous-trend-filter/params.js';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -770,6 +772,9 @@ export function createIndicator(identifier: IndicatorIdentifier, params?: Record
 
         case IndicatorIdentifier.AdxTypeFilter:
             return new AdxTypeFilter({ ...defaultAtfParams(), ...p });
+
+        case IndicatorIdentifier.NonambiguousTrendFilter:
+            return new NonambiguousTrendFilter({ ...defaultNtfParams(), ...p });
 
         default:
             throw new Error(`Unsupported indicator: ${IndicatorIdentifier[identifier] ?? identifier}`);

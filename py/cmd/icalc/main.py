@@ -151,6 +151,7 @@ _IDENTIFIER_MAP: dict[str, Identifier] = {
     'tickVolumeIndicator': Identifier.TICK_VOLUME_INDICATOR,
     'slopeDivergenceTsiFilter': Identifier.SLOPE_DIVERGENCE_TSI_FILTER,
     'adxTypeFilter': Identifier.ADX_TYPE_FILTER,
+    'nonambiguousTrendFilter': Identifier.NONAMBIGUOUS_TREND_FILTER,
 }
 
 

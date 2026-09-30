@@ -754,4 +754,9 @@ def create_indicator(
         from ..william_blau.adx_type_filter.adx_type_filter import AdxTypeFilter
         return AdxTypeFilter(_apply(default_params(), params))
 
+    if identifier == Identifier.NONAMBIGUOUS_TREND_FILTER:
+        from ..william_blau.nonambiguous_trend_filter.params import default_params
+        from ..william_blau.nonambiguous_trend_filter.nonambiguous_trend_filter import NonambiguousTrendFilter
+        return NonambiguousTrendFilter(_apply(default_params(), params))
+
     raise ValueError(f"unsupported indicator: {identifier}")

@@ -440,6 +440,9 @@ const (
 	// AdxTypeFilter identifies the William Blau ADX-Type Filter (ATF) indicator.
 	AdxTypeFilter
 
+	// NonambiguousTrendFilter identifies the William Blau Nonambiguous Trend Filter (NTF) indicator.
+	NonambiguousTrendFilter
+
 	last
 )
 
@@ -614,6 +617,7 @@ const (
 	tickVolumeIndicator                       = "tickVolumeIndicator"
 	slopeDivergenceTsiFilter                  = "slopeDivergenceTsiFilter"
 	adxTypeFilter                             = "adxTypeFilter"
+	nonambiguousTrendFilter                   = "nonambiguousTrendFilter"
 )
 
 // String implements the Stringer interface.
@@ -882,6 +886,8 @@ func (i Identifier) String() string {
 		return slopeDivergenceTsiFilter
 	case AdxTypeFilter:
 		return adxTypeFilter
+	case NonambiguousTrendFilter:
+		return nonambiguousTrendFilter
 	default:
 		return unknown
 	}
@@ -1187,6 +1193,8 @@ func (i *Identifier) UnmarshalJSON(data []byte) error {
 		*i = SlopeDivergenceTsiFilter
 	case adxTypeFilter:
 		*i = AdxTypeFilter
+	case nonambiguousTrendFilter:
+		*i = NonambiguousTrendFilter
 	default:
 		return fmt.Errorf(errFmt, s)
 	}

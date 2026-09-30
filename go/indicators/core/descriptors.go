@@ -941,4 +941,12 @@ var descriptors = map[Identifier]Descriptor{
 			{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Oscillator, Pane: Own},
 		},
 	},
+
+	NonambiguousTrendFilter: {
+		Identifier: NonambiguousTrendFilter, Family: "William Blau",
+		Adaptivity: Static, InputRequirement: BarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{
+			{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Oscillator, Pane: Own},
+		},
+	},
 }

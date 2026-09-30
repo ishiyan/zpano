@@ -593,6 +593,9 @@ _descriptors: dict[Id, Descriptor] = {
     Id.ADX_TYPE_FILTER: _d(
         Id.ADX_TYPE_FILTER, "William Blau", A.STATIC, I.BAR_INPUT, V.NO_VOLUME,
         [_o(0, S.SCALAR, R.OSCILLATOR, P.OWN)]),
+    Id.NONAMBIGUOUS_TREND_FILTER: _d(
+        Id.NONAMBIGUOUS_TREND_FILTER, "William Blau", A.STATIC, I.BAR_INPUT, V.NO_VOLUME,
+        [_o(0, S.SCALAR, R.OSCILLATOR, P.OWN)]),
 }
 
 

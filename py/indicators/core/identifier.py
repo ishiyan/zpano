@@ -435,3 +435,6 @@ class Identifier(IntEnum):
 
     # Identifies the William Blau ADX-Type Filter (ATF) indicator.
     ADX_TYPE_FILTER = 118
+
+    # Identifies the William Blau Nonambiguous Trend Filter (NTF) indicator.
+    NONAMBIGUOUS_TREND_FILTER = 119

@@ -344,6 +344,9 @@ use crate::indicators::william_blau::slope_divergence_tsi_filter::slope_divergen
 use crate::indicators::william_blau::adx_type_filter::adx_type_filter::{
     AdxTypeFilter, AdxTypeFilterParams, AdxTypeFilterSource,
 };
+use crate::indicators::william_blau::nonambiguous_trend_filter::nonambiguous_trend_filter::{
+    NonambiguousTrendFilter, NonambiguousTrendFilterBase, NonambiguousTrendFilterParams,
+};
 
 /// Create an indicator from its identifier and a JSON-encoded parameter string.
 ///
@@ -1842,6 +1845,19 @@ pub fn create_indicator(
             if let Some(v) = get_usize(&params, "r") { p.r = v; }
             if let Some(v) = get_usize(&params, "s") { p.s = v; }
             Ok(Box::new(AdxTypeFilter::new(&p)?))
+        }
+
+        Identifier::NonambiguousTrendFilter => {
+            let mut p = NonambiguousTrendFilterParams::default();
+            if let Some(v) = get_i64(&params, "base") {
+                p.base = NonambiguousTrendFilterBase::from_i64(v)
+                    .ok_or_else(|| format!("invalid nonambiguous trend filter parameters: unknown base {}", v))?;
+            }
+            if let Some(v) = get_usize(&params, "q") { p.q = v; }
+            if let Some(v) = get_usize(&params, "r") { p.r = v; }
+            if let Some(v) = get_usize(&params, "s") { p.s = v; }
+            if let Some(v) = get_usize(&params, "u") { p.u = v; }
+            Ok(Box::new(NonambiguousTrendFilter::new(&p)?))
         }
 
         _ => Err(format!("unsupported indicator: {:?}", identifier)),

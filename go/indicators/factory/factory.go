@@ -122,6 +122,7 @@ import (
 	"zpano/indicators/williamblau/ergodicoscillator"
 	"zpano/indicators/williamblau/macdindex"
 	"zpano/indicators/williamblau/meandeviationindex"
+	"zpano/indicators/williamblau/nonambiguoustrendfilter"
 	"zpano/indicators/williamblau/slopedivergencetsifilter"
 	"zpano/indicators/williamblau/stochasticmomentumindex"
 	"zpano/indicators/williamblau/tickvolumeindicator"
@@ -1303,6 +1304,14 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 		}
 
 		return adxtypefilter.NewAdxTypeFilter(p)
+
+	case core.NonambiguousTrendFilter:
+		p := nonambiguoustrendfilter.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return nonambiguoustrendfilter.NewNonambiguousTrendFilter(p)
 
 	default:
 		return nil, fmt.Errorf("unsupported indicator: %s", identifier)
