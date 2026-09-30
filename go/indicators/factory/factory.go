@@ -113,6 +113,7 @@ import (
 	"zpano/indicators/welleswilder/parabolicstopandreverse"
 	"zpano/indicators/welleswilder/relativestrengthindex"
 	"zpano/indicators/welleswilder/truerange"
+	"zpano/indicators/williamblau/adxtypefilter"
 	"zpano/indicators/williamblau/candlestickmomentumindex"
 	"zpano/indicators/williamblau/candlestickstrengthindex"
 	"zpano/indicators/williamblau/directionaltrendindex"
@@ -1294,6 +1295,14 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 		}
 
 		return slopedivergencetsifilter.NewSlopeDivergenceTsiFilter(p)
+
+	case core.AdxTypeFilter:
+		p := adxtypefilter.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+
+		return adxtypefilter.NewAdxTypeFilter(p)
 
 	default:
 		return nil, fmt.Errorf("unsupported indicator: %s", identifier)

@@ -424,4 +424,7 @@ export enum IndicatorIdentifier {
 
     /** Identifies the William Blau __Slope Divergence TSI Filter__ (SDTSI) indicator. */
     SlopeDivergenceTsiFilter,
+
+    /** Identifies the William Blau __ADX-Type Filter__ (ATF) indicator. */
+    AdxTypeFilter,
 }

@@ -590,6 +590,9 @@ _descriptors: dict[Id, Descriptor] = {
     Id.SLOPE_DIVERGENCE_TSI_FILTER: _d(
         Id.SLOPE_DIVERGENCE_TSI_FILTER, "William Blau", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
         [_o(0, S.SCALAR, R.BOUNDED_OSCILLATOR, P.OWN)]),
+    Id.ADX_TYPE_FILTER: _d(
+        Id.ADX_TYPE_FILTER, "William Blau", A.STATIC, I.BAR_INPUT, V.NO_VOLUME,
+        [_o(0, S.SCALAR, R.OSCILLATOR, P.OWN)]),
 }
 
 

@@ -358,6 +358,7 @@ const descriptors: Map<IndicatorIdentifier, Descriptor> = new Map<IndicatorIdent
   [IndicatorIdentifier.DirectionalTrendIndex, desc(IndicatorIdentifier.DirectionalTrendIndex, 'William Blau', A.Static, I.BarInput, V.NoVolume, [out(0, S.Scalar, R.BoundedOscillator, P.Own), out(1, S.Scalar, R.Signal, P.Own)])],
   [IndicatorIdentifier.TickVolumeIndicator, desc(IndicatorIdentifier.TickVolumeIndicator, 'William Blau', A.Static, I.BarInput, V.NoVolume, [out(0, S.Scalar, R.BoundedOscillator, P.Own)])],
   [IndicatorIdentifier.SlopeDivergenceTsiFilter, desc(IndicatorIdentifier.SlopeDivergenceTsiFilter, 'William Blau', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.BoundedOscillator, P.Own)])],
+  [IndicatorIdentifier.AdxTypeFilter, desc(IndicatorIdentifier.AdxTypeFilter, 'William Blau', A.Static, I.BarInput, V.NoVolume, [out(0, S.Scalar, R.Oscillator, P.Own)])],
 ]);
 
 /**

@@ -305,6 +305,8 @@ pub enum Identifier {
     TickVolumeIndicator = 116,
     /// Identifies the William Blau Slope Divergence TSI Filter (SDTSI) indicator.
     SlopeDivergenceTsiFilter = 117,
+    /// Identifies the William Blau ADX-Type Filter (ATF) indicator.
+    AdxTypeFilter = 118,
 }
 
 impl Identifier {
@@ -437,6 +439,7 @@ impl Identifier {
             Self::DirectionalTrendIndex => "directionalTrendIndex",
             Self::TickVolumeIndicator => "tickVolumeIndicator",
             Self::SlopeDivergenceTsiFilter => "slopeDivergenceTsiFilter",
+            Self::AdxTypeFilter => "adxTypeFilter",
         }
     }
 
@@ -573,6 +576,7 @@ impl Identifier {
             "directionalTrendIndex" => Some(Self::DirectionalTrendIndex),
             "tickVolumeIndicator" => Some(Self::TickVolumeIndicator),
             "slopeDivergenceTsiFilter" => Some(Self::SlopeDivergenceTsiFilter),
+            "adxTypeFilter" => Some(Self::AdxTypeFilter),
             _ => None,
         }
     }

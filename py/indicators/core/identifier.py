@@ -432,3 +432,6 @@ class Identifier(IntEnum):
 
     # Identifies the William Blau Slope Divergence TSI Filter (SDTSI) indicator.
     SLOPE_DIVERGENCE_TSI_FILTER = 117
+
+    # Identifies the William Blau ADX-Type Filter (ATF) indicator.
+    ADX_TYPE_FILTER = 118

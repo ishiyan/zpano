@@ -192,6 +192,7 @@ pub const double_smoothed_stochastic = @import("william_blau/double_smoothed_sto
 pub const directional_trend_index = @import("william_blau/directional_trend_index/directional_trend_index.zig");
 pub const tick_volume_indicator = @import("william_blau/tick_volume_indicator/tick_volume_indicator.zig");
 pub const slope_divergence_tsi_filter = @import("william_blau/slope_divergence_tsi_filter/slope_divergence_tsi_filter.zig");
+pub const adx_type_filter = @import("william_blau/adx_type_filter/adx_type_filter.zig");
 
 pub const hilbert_transformer = @import("john_ehlers/hilbert_transformer/hilbert_transformer.zig");
 pub const homodyne_discriminator = @import("john_ehlers/hilbert_transformer/homodyne_discriminator.zig");
@@ -325,6 +326,7 @@ comptime {
     _ = directional_trend_index;
     _ = tick_volume_indicator;
     _ = slope_divergence_tsi_filter;
+    _ = adx_type_filter;
     _ = frequency_response;
     _ = factory;
     _ = arnaud_legoux_moving_average;

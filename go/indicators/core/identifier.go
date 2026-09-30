@@ -437,6 +437,9 @@ const (
 	// SlopeDivergenceTsiFilter identifies the William Blau Slope Divergence TSI Filter (SDTSI) indicator.
 	SlopeDivergenceTsiFilter
 
+	// AdxTypeFilter identifies the William Blau ADX-Type Filter (ATF) indicator.
+	AdxTypeFilter
+
 	last
 )
 
@@ -610,6 +613,7 @@ const (
 	directionalTrendIndex                     = "directionalTrendIndex"
 	tickVolumeIndicator                       = "tickVolumeIndicator"
 	slopeDivergenceTsiFilter                  = "slopeDivergenceTsiFilter"
+	adxTypeFilter                             = "adxTypeFilter"
 )
 
 // String implements the Stringer interface.
@@ -876,6 +880,8 @@ func (i Identifier) String() string {
 		return tickVolumeIndicator
 	case SlopeDivergenceTsiFilter:
 		return slopeDivergenceTsiFilter
+	case AdxTypeFilter:
+		return adxTypeFilter
 	default:
 		return unknown
 	}
@@ -1179,6 +1185,8 @@ func (i *Identifier) UnmarshalJSON(data []byte) error {
 		*i = TickVolumeIndicator
 	case slopeDivergenceTsiFilter:
 		*i = SlopeDivergenceTsiFilter
+	case adxTypeFilter:
+		*i = AdxTypeFilter
 	default:
 		return fmt.Errorf(errFmt, s)
 	}

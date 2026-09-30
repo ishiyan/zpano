@@ -304,6 +304,8 @@ pub const Identifier = enum(u8) {
     tick_volume_indicator = 116,
     /// Identifies the William Blau Slope Divergence TSI Filter (SDTSI) indicator.
     slope_divergence_tsi_filter = 117,
+    /// Identifies the William Blau ADX-Type Filter (ATF) indicator.
+    adx_type_filter = 118,
 
     /// Returns the camelCase string representation matching Go's String().
     pub fn asStr(self: Identifier) []const u8 {
@@ -472,6 +474,7 @@ pub const Identifier = enum(u8) {
             .directional_trend_index => "directionalTrendIndex",
             .tick_volume_indicator => "tickVolumeIndicator",
             .slope_divergence_tsi_filter => "slopeDivergenceTsiFilter",
+            .adx_type_filter => "adxTypeFilter",
         };
     }
 
@@ -642,6 +645,7 @@ pub const Identifier = enum(u8) {
             .{ "directionalTrendIndex", Identifier.directional_trend_index },
             .{ "tickVolumeIndicator", Identifier.tick_volume_indicator },
             .{ "slopeDivergenceTsiFilter", Identifier.slope_divergence_tsi_filter },
+            .{ "adxTypeFilter", Identifier.adx_type_filter },
         };
 
         inline for (map) |entry| {

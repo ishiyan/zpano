@@ -749,4 +749,9 @@ def create_indicator(
         from ..william_blau.slope_divergence_tsi_filter.slope_divergence_tsi_filter import SlopeDivergenceTsiFilter
         return SlopeDivergenceTsiFilter(_apply(default_params(), params))
 
+    if identifier == Identifier.ADX_TYPE_FILTER:
+        from ..william_blau.adx_type_filter.params import default_params
+        from ..william_blau.adx_type_filter.adx_type_filter import AdxTypeFilter
+        return AdxTypeFilter(_apply(default_params(), params))
+
     raise ValueError(f"unsupported indicator: {identifier}")

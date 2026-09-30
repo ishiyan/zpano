@@ -2015,4 +2015,14 @@ pub static DESCRIPTORS: &[Descriptor] = &[
             OutputDescriptor { kind: 1, shape: Scalar, role: BoundedOscillator, pane: Own },
         ],
     },
+    Descriptor {
+        identifier: AdxTypeFilter,
+        family: "William Blau",
+        adaptivity: Static,
+        input_requirement: BarInput,
+        volume_usage: NoVolume,
+        outputs: &[
+            OutputDescriptor { kind: 1, shape: Scalar, role: Oscillator, pane: Own },
+        ],
+    },
 ];

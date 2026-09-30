@@ -3200,6 +3200,46 @@
     ]
   }
 
+[118] atf.tsi(2,32,32)
+  Identifier:  ADX_TYPE_FILTER
+  Description: ADX-Type Filter atf.tsi(2,32,32)
+  Outputs (1):
+    [0] kind=0 shape=0 mnemonic='atf.tsi(2,32,32)' description='ADX-Type Filter atf.tsi(2,32,32)'
+  Full metadata JSON:
+  {
+    "identifier": 118,
+    "mnemonic": "atf.tsi(2,32,32)",
+    "description": "ADX-Type Filter atf.tsi(2,32,32)",
+    "outputs": [
+      {
+        "kind": 0,
+        "shape": 0,
+        "mnemonic": "atf.tsi(2,32,32)",
+        "description": "ADX-Type Filter atf.tsi(2,32,32)"
+      }
+    ]
+  }
+
+[119] atf.smi(32,32,32)
+  Identifier:  ADX_TYPE_FILTER
+  Description: ADX-Type Filter atf.smi(32,32,32)
+  Outputs (1):
+    [0] kind=0 shape=0 mnemonic='atf.smi(32,32,32)' description='ADX-Type Filter atf.smi(32,32,32)'
+  Full metadata JSON:
+  {
+    "identifier": 118,
+    "mnemonic": "atf.smi(32,32,32)",
+    "description": "ADX-Type Filter atf.smi(32,32,32)",
+    "outputs": [
+      {
+        "kind": 0,
+        "shape": 0,
+        "mnemonic": "atf.smi(32,32,32)",
+        "description": "ADX-Type Filter atf.smi(32,32,32)"
+      }
+    ]
+  }
+
 
 === Bar Data & Indicator Outputs ===
 
@@ -3322,6 +3362,8 @@ Bar[  0] 2020-01-02  O=91.5000 H=93.2500 L=90.7500 C=91.5000 V=4077500
   dti(2,20,5,3,3)                               primed=False dti(2,20,5,3,3) dti=NaN dti(2,20,5,3,3) signal=NaN
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-40.0000
   sdtsi(2,32,32,7,32,7)                         primed=False sdtsi(2,32,32,7,32,7)=NaN
+  atf.tsi(2,32,32)                              primed=False atf.tsi(2,32,32)=NaN
+  atf.smi(32,32,32)                             primed=False atf.smi(32,32,32)=NaN
 
 Bar[  1] 2020-01-03  O=91.5000 H=94.9400 L=91.4050 C=94.8150 V=4955900
   sma(14)                                       primed=False sma(14)=NaN
@@ -3442,6 +3484,8 @@ Bar[  1] 2020-01-03  O=91.5000 H=94.9400 L=91.4050 C=94.8150 V=4955900
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=100.0000 dti(2,20,5,3,3) signal=100.0000
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-35.5944
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=3.3150
+  atf.smi(32,32,32)                             primed=False atf.smi(32,32,32)=NaN
 
 Bar[  2] 2020-01-04  O=94.8150 H=96.3750 L=94.2500 C=94.3750 V=4775300
   sma(14)                                       primed=False sma(14)=NaN
@@ -3562,6 +3606,8 @@ Bar[  2] 2020-01-04  O=94.8150 H=96.3750 L=94.2500 C=94.3750 V=4775300
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=100.0000 dti(2,20,5,3,3) signal=100.0000
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-33.5261
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=3.3012
+  atf.smi(32,32,32)                             primed=False atf.smi(32,32,32)=NaN
 
 Bar[  3] 2020-01-05  O=94.3750 H=96.1900 L=93.5000 C=95.0950 V=4155300
   sma(14)                                       primed=False sma(14)=NaN
@@ -3682,6 +3728,8 @@ Bar[  3] 2020-01-05  O=94.3750 H=96.1900 L=93.5000 C=95.0950 V=4155300
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=98.5715 dti(2,20,5,3,3) signal=99.2857
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-30.7503
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=3.2796
+  atf.smi(32,32,32)                             primed=False atf.smi(32,32,32)=NaN
 
 Bar[  4] 2020-01-06  O=95.0950 H=96.0000 L=92.8150 C=93.7800 V=4593100
   sma(14)                                       primed=False sma(14)=NaN
@@ -3802,6 +3850,8 @@ Bar[  4] 2020-01-06  O=95.0950 H=96.0000 L=92.8150 C=93.7800 V=4593100
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=95.6439 dti(2,20,5,3,3) signal=97.4648
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-29.0417
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=3.2436
+  atf.smi(32,32,32)                             primed=False atf.smi(32,32,32)=NaN
 
 Bar[  5] 2020-01-07  O=93.7800 H=94.7200 L=93.5000 C=94.6250 V=3631300
   sma(14)                                       primed=False sma(14)=NaN
@@ -3922,6 +3972,8 @@ Bar[  5] 2020-01-07  O=93.7800 H=94.7200 L=93.5000 C=94.6250 V=3631300
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=92.7435 dti(2,20,5,3,3) signal=95.1042
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-26.5354
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=3.2030
+  atf.smi(32,32,32)                             primed=False atf.smi(32,32,32)=NaN
 
 Bar[  6] 2020-01-08  O=94.6250 H=95.0000 L=92.0000 C=92.5300 V=3382800
   sma(14)                                       primed=False sma(14)=NaN
@@ -4042,6 +4094,8 @@ Bar[  6] 2020-01-08  O=94.6250 H=95.0000 L=92.0000 C=92.5300 V=3382800
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=87.8738 dti(2,20,5,3,3) signal=91.4890
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-25.7921
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=3.1478
+  atf.smi(32,32,32)                             primed=False atf.smi(32,32,32)=NaN
 
 Bar[  7] 2020-01-09  O=92.5300 H=93.7200 L=89.7500 C=92.7500 V=4954200
   sma(14)                                       primed=False sma(14)=NaN
@@ -4162,6 +4216,8 @@ Bar[  7] 2020-01-09  O=92.5300 H=93.7200 L=89.7500 C=92.7500 V=4954200
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=78.7354 dti(2,20,5,3,3) signal=85.1122
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-22.4653
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=3.0882
+  atf.smi(32,32,32)                             primed=False atf.smi(32,32,32)=NaN
 
 Bar[  8] 2020-01-10  O=92.7500 H=92.4700 L=89.4400 C=90.3150 V=4500000
   sma(14)                                       primed=False sma(14)=NaN
@@ -4282,6 +4338,8 @@ Bar[  8] 2020-01-10  O=92.7500 H=92.4700 L=89.4400 C=90.3150 V=4500000
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=69.4032 dti(2,20,5,3,3) signal=77.2577
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-20.6873
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=3.0154
+  atf.smi(32,32,32)                             primed=False atf.smi(32,32,32)=NaN
 
 Bar[  9] 2020-01-11  O=90.3150 H=92.7500 L=90.6250 C=92.4700 V=3397500
   sma(14)                                       primed=False sma(14)=NaN
@@ -4402,6 +4460,8 @@ Bar[  9] 2020-01-11  O=90.3150 H=92.7500 L=90.6250 C=92.4700 V=3397500
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=61.7806 dti(2,20,5,3,3) signal=69.5191
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-17.6316
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=2.9480
+  atf.smi(32,32,32)                             primed=False atf.smi(32,32,32)=NaN
 
 Bar[ 10] 2020-01-12  O=92.4700 H=96.2500 L=92.7500 C=96.1250 V=4204500
   sma(14)                                       primed=False sma(14)=NaN
@@ -4522,6 +4582,8 @@ Bar[ 10] 2020-01-12  O=92.4700 H=96.2500 L=92.7500 C=96.1250 V=4204500
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=57.7512 dti(2,20,5,3,3) signal=63.6352
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-12.0353
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=2.8911
+  atf.smi(32,32,32)                             primed=False atf.smi(32,32,32)=NaN
 
 Bar[ 11] 2020-01-13  O=96.1250 H=99.6250 L=96.3150 C=97.2500 V=6321400
   sma(14)                                       primed=False sma(14)=NaN
@@ -4642,6 +4704,8 @@ Bar[ 11] 2020-01-13  O=96.1250 H=99.6250 L=96.3150 C=97.2500 V=6321400
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=57.4266 dti(2,20,5,3,3) signal=60.5309
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-9.0428
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=2.8344
+  atf.smi(32,32,32)                             primed=False atf.smi(32,32,32)=NaN
 
 Bar[ 12] 2020-01-14  O=97.2500 H=99.1250 L=96.0300 C=98.5000 V=10203600
   sma(14)                                       primed=False sma(14)=NaN
@@ -4762,6 +4826,8 @@ Bar[ 12] 2020-01-14  O=97.2500 H=99.1250 L=96.0300 C=98.5000 V=10203600
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=57.7674 dti(2,20,5,3,3) signal=59.1491
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-5.1154
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=2.7786
+  atf.smi(32,32,32)                             primed=False atf.smi(32,32,32)=NaN
 
 Bar[ 13] 2020-01-15  O=98.5000 H=92.7500 L=88.8150 C=89.8750 V=19043900
   sma(14)                                       primed=True  sma(14)=93.8575
@@ -4882,6 +4948,8 @@ Bar[ 13] 2020-01-15  O=98.5000 H=92.7500 L=88.8150 C=89.8750 V=19043900
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=46.5542 dti(2,20,5,3,3) signal=52.8516
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-3.7661
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=2.6874
+  atf.smi(32,32,32)                             primed=False atf.smi(32,32,32)=NaN
 
 Bar[ 14] 2020-01-16  O=89.8750 H=91.3150 L=86.7500 C=91.0000 V=11692000
   sma(14)                                       primed=True  sma(14)=93.8218
@@ -5002,6 +5070,8 @@ Bar[ 14] 2020-01-16  O=89.8750 H=91.3150 L=86.7500 C=91.0000 V=11692000
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=32.9888 dti(2,20,5,3,3) signal=42.9202
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=0.5466
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=2.6012
+  atf.smi(32,32,32)                             primed=False atf.smi(32,32,32)=NaN
 
 Bar[ 15] 2020-01-17  O=91.0000 H=93.2500 L=90.9400 C=92.8150 V=9553300
   sma(14)                                       primed=True  sma(14)=93.6789
@@ -5122,6 +5192,8 @@ Bar[ 15] 2020-01-17  O=91.0000 H=93.2500 L=90.9400 C=92.8150 V=9553300
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=23.7250 dti(2,20,5,3,3) signal=33.3226
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=4.6617
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=2.5223
+  atf.smi(32,32,32)                             primed=False atf.smi(32,32,32)=NaN
 
 Bar[ 16] 2020-01-18  O=92.8150 H=93.4050 L=88.9050 C=89.1550 V=8920300
   sma(14)                                       primed=True  sma(14)=93.3061
@@ -5242,6 +5314,8 @@ Bar[ 16] 2020-01-18  O=92.8150 H=93.4050 L=88.9050 C=89.1550 V=8920300
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=15.8671 dti(2,20,5,3,3) signal=24.5949
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=4.1514
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=88.8090
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=2.4299
+  atf.smi(32,32,32)                             primed=False atf.smi(32,32,32)=NaN
 
 Bar[ 17] 2020-01-19  O=89.1550 H=90.6550 L=88.7800 C=89.3450 V=5970900
   sma(14)                                       primed=True  sma(14)=92.8954
@@ -5362,6 +5436,8 @@ Bar[ 17] 2020-01-19  O=89.1550 H=90.6550 L=88.7800 C=89.3450 V=5970900
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=10.0214 dti(2,20,5,3,3) signal=17.3081
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=3.1490
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=86.7392
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=2.3402
+  atf.smi(32,32,32)                             primed=False atf.smi(32,32,32)=NaN
 
 Bar[ 18] 2020-01-20  O=89.3450 H=91.9700 L=89.2500 C=91.6250 V=5062300
   sma(14)                                       primed=True  sma(14)=92.7414
@@ -5482,6 +5558,8 @@ Bar[ 18] 2020-01-20  O=89.3450 H=91.9700 L=89.2500 C=91.6250 V=5062300
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=6.9179 dti(2,20,5,3,3) signal=12.1130
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=3.9663
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=84.6538
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=2.2607
+  atf.smi(32,32,32)                             primed=False atf.smi(32,32,32)=NaN
 
 Bar[ 19] 2020-01-21  O=91.6250 H=92.2500 L=89.7500 C=89.8750 V=3705600
   sma(14)                                       primed=True  sma(14)=92.4021
@@ -5602,6 +5680,8 @@ Bar[ 19] 2020-01-21  O=91.6250 H=92.2500 L=89.7500 C=89.8750 V=3705600
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=5.4595 dti(2,20,5,3,3) signal=8.7863
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=2.7027
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=82.5139
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=2.1759
+  atf.smi(32,32,32)                             primed=False atf.smi(32,32,32)=NaN
 
 Bar[ 20] 2020-01-22  O=89.8750 H=90.3450 L=87.5000 C=88.3750 V=5865600
   sma(14)                                       primed=True  sma(14)=92.1054
@@ -5722,6 +5802,8 @@ Bar[ 20] 2020-01-22  O=89.8750 H=90.3450 L=87.5000 C=88.3750 V=5865600
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=2.6847 dti(2,20,5,3,3) signal=5.7355
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=0.8704
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=80.3084
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=2.0876
+  atf.smi(32,32,32)                             primed=False atf.smi(32,32,32)=NaN
 
 Bar[ 21] 2020-01-23  O=88.3750 H=88.5000 L=86.5300 C=87.6250 V=5603000
   sma(14)                                       primed=True  sma(14)=91.7393
@@ -5842,6 +5924,8 @@ Bar[ 21] 2020-01-23  O=88.3750 H=88.5000 L=86.5300 C=87.6250 V=5603000
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-0.8703 dti(2,20,5,3,3) signal=2.4326
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-0.2963
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=78.0731
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=1.9992
+  atf.smi(32,32,32)                             primed=False atf.smi(32,32,32)=NaN
 
 Bar[ 22] 2020-01-24  O=87.6250 H=88.2500 L=84.6250 C=84.7800 V=5811900
   sma(14)                                       primed=True  sma(14)=91.3439
@@ -5962,6 +6046,8 @@ Bar[ 22] 2020-01-24  O=87.6250 H=88.2500 L=84.6250 C=84.7800 V=5811900
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-5.7159 dti(2,20,5,3,3) signal=-1.6416
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-3.7779
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=75.7125
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=1.9034
+  atf.smi(32,32,32)                             primed=False atf.smi(32,32,32)=NaN
 
 Bar[ 23] 2020-01-25  O=84.7800 H=85.5000 L=82.2800 C=83.0000 V=8483800
   sma(14)                                       primed=True  sma(14)=90.6675
@@ -6082,6 +6168,8 @@ Bar[ 23] 2020-01-25  O=84.7800 H=85.5000 L=82.2800 C=83.0000 V=8483800
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-11.9964 dti(2,20,5,3,3) signal=-6.8190
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-7.5963
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=73.2274
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=1.8053
+  atf.smi(32,32,32)                             primed=False atf.smi(32,32,32)=NaN
 
 Bar[ 24] 2020-01-26  O=83.0000 H=84.4400 L=81.5650 C=83.5000 V=5995200
   sma(14)                                       primed=True  sma(14)=89.7657
@@ -6202,6 +6290,8 @@ Bar[ 24] 2020-01-26  O=83.0000 H=84.4400 L=81.5650 C=83.5000 V=5995200
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-17.9834 dti(2,20,5,3,3) signal=-12.4012
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-9.3614
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=70.7260
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=1.7140
+  atf.smi(32,32,32)                             primed=False atf.smi(32,32,32)=NaN
 
 Bar[ 25] 2020-01-27  O=83.5000 H=84.7500 L=80.8750 C=81.3750 V=5408800
   sma(14)                                       primed=True  sma(14)=88.6318
@@ -6322,6 +6412,8 @@ Bar[ 25] 2020-01-27  O=83.5000 H=84.7500 L=80.8750 C=81.3750 V=5408800
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-23.0291 dti(2,20,5,3,3) signal=-17.7151
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-12.6066
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=68.1560
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=1.6193
+  atf.smi(32,32,32)                             primed=False atf.smi(32,32,32)=NaN
 
 Bar[ 26] 2020-01-28  O=81.3750 H=84.4400 L=81.2500 C=84.4400 V=5430500
   sma(14)                                       primed=True  sma(14)=87.6275
@@ -6442,6 +6534,8 @@ Bar[ 26] 2020-01-28  O=81.3750 H=84.4400 L=81.2500 C=84.4400 V=5430500
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-26.9006 dti(2,20,5,3,3) signal=-22.3079
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-12.0723
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=65.6379
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=1.5410
+  atf.smi(32,32,32)                             primed=False atf.smi(32,32,32)=NaN
 
 Bar[ 27] 2020-01-29  O=84.4400 H=89.4050 L=84.0650 C=89.2500 V=6283800
   sma(14)                                       primed=True  sma(14)=87.5829
@@ -6562,6 +6656,8 @@ Bar[ 27] 2020-01-29  O=84.4400 H=89.4050 L=84.0650 C=89.2500 V=6283800
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-23.3661 dti(2,20,5,3,3) signal=-22.8370
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-7.3363
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=63.2797
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=1.4840
+  atf.smi(32,32,32)                             primed=False atf.smi(32,32,32)=NaN
 
 Bar[ 28] 2020-01-30  O=89.2500 H=88.1250 L=85.5950 C=86.3750 V=5834800
   sma(14)                                       primed=True  sma(14)=87.2525
@@ -6682,6 +6778,8 @@ Bar[ 28] 2020-01-30  O=89.2500 H=88.1250 L=85.5950 C=86.3750 V=5834800
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-18.3151 dti(2,20,5,3,3) signal=-20.5760
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-4.6570
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=60.9397
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=1.4176
+  atf.smi(32,32,32)                             primed=False atf.smi(32,32,32)=NaN
 
 Bar[ 29] 2020-01-31  O=86.3750 H=89.1250 L=85.9700 C=86.2500 V=4515500
   sma(14)                                       primed=True  sma(14)=86.7836
@@ -6802,6 +6900,8 @@ Bar[ 29] 2020-01-31  O=86.3750 H=89.1250 L=85.9700 C=86.2500 V=4515500
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-12.6164 dti(2,20,5,3,3) signal=-16.5962
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-4.6222
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=58.6729
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=1.3534
+  atf.smi(32,32,32)                             primed=False atf.smi(32,32,32)=NaN
 
 Bar[ 30] 2020-02-01  O=86.2500 H=87.1550 L=84.4050 C=85.2500 V=4493300
   sma(14)                                       primed=True  sma(14)=86.5046
@@ -6922,6 +7022,8 @@ Bar[ 30] 2020-02-01  O=86.2500 H=87.1550 L=84.4050 C=85.2500 V=4493300
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-9.2538 dti(2,20,5,3,3) signal=-12.9250
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-5.2983
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=56.4625
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=1.2881
+  atf.smi(32,32,32)                             primed=False atf.smi(32,32,32)=NaN
 
 Bar[ 31] 2020-02-02  O=85.2500 H=87.2500 L=85.0950 C=87.1250 V=4346100
   sma(14)                                       primed=True  sma(14)=86.3461
@@ -7042,6 +7144,8 @@ Bar[ 31] 2020-02-02  O=85.2500 H=87.2500 L=85.0950 C=87.1250 V=4346100
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-7.1719 dti(2,20,5,3,3) signal=-10.0484
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-4.2589
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=54.3776
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=1.2326
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=3.1250
 
 Bar[ 32] 2020-02-03  O=87.1250 H=87.3750 L=85.5000 C=85.8150 V=3700300
   sma(14)                                       primed=True  sma(14)=85.9311
@@ -7162,6 +7266,8 @@ Bar[ 32] 2020-02-03  O=87.1250 H=87.3750 L=85.5000 C=85.8150 V=3700300
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-5.7164 dti(2,20,5,3,3) signal=-7.8824
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-4.3923
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=52.3620
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=1.1743
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=3.1298
 
 Bar[ 33] 2020-02-04  O=85.8150 H=88.9700 L=85.5300 C=88.9700 V=4600200
   sma(14)                                       primed=True  sma(14)=85.8664
@@ -7282,6 +7388,8 @@ Bar[ 33] 2020-02-04  O=85.8150 H=88.9700 L=85.5300 C=88.9700 V=4600200
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-2.8191 dti(2,20,5,3,3) signal=-5.3508
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-1.7231
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=50.5002
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=1.1301
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=3.1273
 
 Bar[ 34] 2020-02-05  O=88.9700 H=90.0000 L=87.8750 C=88.4700 V=4557200
   sma(14)                                       primed=True  sma(14)=85.8732
@@ -7402,6 +7510,8 @@ Bar[ 34] 2020-02-05  O=88.9700 H=90.0000 L=87.8750 C=88.4700 V=4557200
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=1.2447 dti(2,20,5,3,3) signal=-2.0530
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-0.4754
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=48.7661
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=1.0852
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=3.1201
 
 Bar[ 35] 2020-02-06  O=88.4700 H=89.8450 L=86.5650 C=86.8750 V=4323600
   sma(14)                                       primed=True  sma(14)=85.8196
@@ -7522,6 +7632,8 @@ Bar[ 35] 2020-02-06  O=88.4700 H=89.8450 L=86.5650 C=86.8750 V=4323600
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=3.3315 dti(2,20,5,3,3) signal=0.6392
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-1.6418
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=47.0783
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=1.0356
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=3.1147
 
 Bar[ 36] 2020-02-07  O=86.8750 H=86.9700 L=84.6550 C=86.8150 V=5237500
   sma(14)                                       primed=True  sma(14)=85.9650
@@ -7642,6 +7754,8 @@ Bar[ 36] 2020-02-07  O=86.8750 H=86.9700 L=84.6550 C=86.8150 V=5237500
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=1.9849 dti(2,20,5,3,3) signal=1.3121
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-0.8699
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=45.4616
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.9879
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=3.1110
 
 Bar[ 37] 2020-02-08  O=86.8150 H=85.9400 L=83.2500 C=84.8750 V=7404100
   sma(14)                                       primed=True  sma(14)=86.0989
@@ -7762,6 +7876,8 @@ Bar[ 37] 2020-02-08  O=86.8150 H=85.9400 L=83.2500 C=84.8750 V=7404100
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-1.8602 dti(2,20,5,3,3) signal=-0.2741
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=0.1621
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=43.8289
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.9350
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=3.1162
 
 Bar[ 38] 2020-02-09  O=84.8750 H=84.7500 L=82.5650 C=84.1900 V=4798400
   sma(14)                                       primed=True  sma(14)=86.1482
@@ -7882,6 +7998,8 @@ Bar[ 38] 2020-02-09  O=84.8750 H=84.7500 L=82.5650 C=84.1900 V=4798400
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-6.4690 dti(2,20,5,3,3) signal=-3.3715
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=1.7811
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=42.1885
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.8824
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=3.1315
 
 Bar[ 39] 2020-02-10  O=84.1900 H=85.4700 L=83.4400 C=83.8750 V=4372800
   sma(14)                                       primed=True  sma(14)=86.3268
@@ -8002,6 +8120,8 @@ Bar[ 39] 2020-02-10  O=84.1900 H=85.4700 L=83.4400 C=83.8750 V=4372800
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-9.4577 dti(2,20,5,3,3) signal=-6.4146
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=1.9873
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=40.5645
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.8316
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=3.1570
 
 Bar[ 40] 2020-02-11  O=83.8750 H=84.4700 L=82.5300 C=83.3750 V=3872300
   sma(14)                                       primed=True  sma(14)=86.2507
@@ -8122,6 +8242,8 @@ Bar[ 40] 2020-02-11  O=83.8750 H=84.4700 L=82.5300 C=83.3750 V=3872300
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-12.3931 dti(2,20,5,3,3) signal=-9.4039
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=1.8971
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=38.9613
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.7819
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=3.1931
 
 Bar[ 41] 2020-02-12  O=83.3750 H=88.5000 L=85.0650 C=85.5000 V=10750800
   sma(14)                                       primed=True  sma(14)=85.9829
@@ -8242,6 +8364,8 @@ Bar[ 41] 2020-02-12  O=83.3750 H=88.5000 L=85.0650 C=85.5000 V=10750800
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-9.0959 dti(2,20,5,3,3) signal=-9.2499
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-0.4083
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=37.4585
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.7429
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=3.2307
 
 Bar[ 42] 2020-02-13  O=85.5000 H=89.4700 L=86.8750 C=89.1900 V=5804800
   sma(14)                                       primed=True  sma(14)=86.1839
@@ -8362,6 +8486,8 @@ Bar[ 42] 2020-02-13  O=85.5000 H=89.4700 L=86.8750 C=89.1900 V=5804800
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-3.5303 dti(2,20,5,3,3) signal=-6.3901
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-0.3323
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=36.1514
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.7193
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=3.2559
 
 Bar[ 43] 2020-02-14  O=89.1900 H=90.0000 L=88.5300 C=89.4400 V=3785500
   sma(14)                                       primed=True  sma(14)=86.4118
@@ -8482,6 +8608,8 @@ Bar[ 43] 2020-02-14  O=89.1900 H=90.0000 L=88.5300 C=89.4400 V=3785500
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=2.0827 dti(2,20,5,3,3) signal=-2.1537
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=0.0333
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=35.0182
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.6968
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=3.2682
 
 Bar[ 44] 2020-02-15  O=89.4400 H=92.4400 L=89.2800 C=91.0950 V=5014800
   sma(14)                                       primed=True  sma(14)=86.8293
@@ -8602,6 +8730,8 @@ Bar[ 44] 2020-02-15  O=89.4400 H=92.4400 L=89.2800 C=91.0950 V=5014800
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=9.2796 dti(2,20,5,3,3) signal=3.5629
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=0.7149
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.6805
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=3.2526
 
 Bar[ 45] 2020-02-16  O=91.0950 H=91.4400 L=90.1250 C=90.7500 V=3507700
   sma(14)                                       primed=True  sma(14)=87.0882
@@ -8722,6 +8852,8 @@ Bar[ 45] 2020-02-16  O=91.0950 H=91.4400 L=90.1250 C=90.7500 V=3507700
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=15.3580 dti(2,20,5,3,3) signal=9.4604
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=1.1495
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.6623
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=3.2136
 
 Bar[ 46] 2020-02-17  O=90.7500 H=92.9700 L=90.7500 C=91.4400 V=4298800
   sma(14)                                       primed=True  sma(14)=87.4900
@@ -8842,6 +8974,8 @@ Bar[ 46] 2020-02-17  O=90.7500 H=92.9700 L=90.7500 C=91.4400 V=4298800
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=21.4135 dti(2,20,5,3,3) signal=15.4370
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=0.6821
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.6463
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=3.1516
 
 Bar[ 47] 2020-02-18  O=91.4400 H=91.7200 L=89.0000 C=89.0000 V=4842500
   sma(14)                                       primed=True  sma(14)=87.4921
@@ -8962,6 +9096,8 @@ Bar[ 47] 2020-02-18  O=91.4400 H=91.7200 L=89.0000 C=89.0000 V=4842500
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=23.6682 dti(2,20,5,3,3) signal=19.5526
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-2.1896
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.6209
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=3.0784
 
 Bar[ 48] 2020-02-19  O=89.0000 H=91.1550 L=88.5650 C=91.0000 V=3952200
   sma(14)                                       primed=True  sma(14)=87.6729
@@ -9082,6 +9218,8 @@ Bar[ 48] 2020-02-19  O=89.0000 H=91.1550 L=88.5650 C=91.0000 V=3952200
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=23.6472 dti(2,20,5,3,3) signal=21.5999
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-2.1120
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.6036
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=2.9876
 
 Bar[ 49] 2020-02-20  O=91.0000 H=91.7500 L=90.0950 C=90.5000 V=3304700
   sma(14)                                       primed=True  sma(14)=87.9318
@@ -9202,6 +9340,8 @@ Bar[ 49] 2020-02-20  O=91.0000 H=91.7500 L=90.0950 C=90.5000 V=3304700
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=23.4765 dti(2,20,5,3,3) signal=22.5382
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-2.8194
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.5842
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=2.8833
 
 Bar[ 50] 2020-02-21  O=90.5000 H=90.0000 L=89.0000 C=89.0300 V=3462000
   sma(14)                                       primed=True  sma(14)=88.0900
@@ -9322,6 +9462,8 @@ Bar[ 50] 2020-02-21  O=90.5000 H=90.0000 L=89.0000 C=89.0300 V=3462000
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=21.6158 dti(2,20,5,3,3) signal=22.0770
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-4.2276
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.5595
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=2.7730
 
 Bar[ 51] 2020-02-22  O=89.0300 H=88.8750 L=86.4700 C=88.8150 V=7253900
   sma(14)                                       primed=True  sma(14)=88.3714
@@ -9442,6 +9584,8 @@ Bar[ 51] 2020-02-22  O=89.0300 H=88.8750 L=86.4700 C=88.8150 V=7253900
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=15.7958 dti(2,20,5,3,3) signal=18.9364
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-2.9293
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.5349
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=2.6585
 
 Bar[ 52] 2020-02-23  O=88.8150 H=89.0000 L=84.0000 C=84.2800 V=9753100
   sma(14)                                       primed=True  sma(14)=88.3779
@@ -9562,6 +9706,8 @@ Bar[ 52] 2020-02-23  O=88.8150 H=89.0000 L=84.0000 C=84.2800 V=9753100
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=6.8618 dti(2,20,5,3,3) signal=12.8991
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-6.1722
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=28.2434
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.5104
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=2.5574
 
 Bar[ 53] 2020-02-24  O=84.2800 H=85.2500 L=83.3150 C=83.5000 V=5953000
   sma(14)                                       primed=True  sma(14)=88.3511
@@ -9682,6 +9828,8 @@ Bar[ 53] 2020-02-24  O=84.2800 H=85.2500 L=83.3150 C=83.5000 V=5953000
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-1.7382 dti(2,20,5,3,3) signal=5.5804
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-9.8587
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=27.0632
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4898
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=2.4713
 
 Bar[ 54] 2020-02-25  O=83.5000 H=83.8150 L=82.0000 C=82.6900 V=5011700
   sma(14)                                       primed=True  sma(14)=88.3021
@@ -9802,6 +9950,8 @@ Bar[ 54] 2020-02-25  O=83.5000 H=83.8150 L=82.0000 C=82.6900 V=5011700
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-9.9001 dti(2,20,5,3,3) signal=-2.1598
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-12.7460
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=25.7268
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4727
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=2.4018
 
 Bar[ 55] 2020-02-26  O=82.6900 H=85.2500 L=83.2500 C=84.7500 V=5910800
   sma(14)                                       primed=True  sma(14)=88.2486
@@ -9922,6 +10072,8 @@ Bar[ 55] 2020-02-26  O=82.6900 H=85.2500 L=83.2500 C=84.7500 V=5910800
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-14.2826 dti(2,20,5,3,3) signal=-8.2212
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-13.6052
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=24.3890
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4484
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=2.3397
 
 Bar[ 56] 2020-02-27  O=84.7500 H=86.6250 L=84.7500 C=85.6550 V=4916900
   sma(14)                                       primed=True  sma(14)=87.9961
@@ -10042,6 +10194,8 @@ Bar[ 56] 2020-02-27  O=84.7500 H=86.6250 L=84.7500 C=85.6550 V=4916900
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-14.7329 dti(2,20,5,3,3) signal=-11.4771
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-14.0428
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=23.1177
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4219
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=2.2809
 
 Bar[ 57] 2020-02-28  O=85.6550 H=87.9400 L=85.2800 C=86.1900 V=4135000
   sma(14)                                       primed=True  sma(14)=87.7639
@@ -10162,6 +10316,8 @@ Bar[ 57] 2020-02-28  O=85.6550 H=87.9400 L=85.2800 C=86.1900 V=4135000
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-12.1375 dti(2,20,5,3,3) signal=-11.8073
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-14.8243
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=21.9438
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.3977
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=2.2241
 
 Bar[ 58] 2020-02-29  O=86.1900 H=89.3750 L=87.1900 C=88.9400 V=4054200
   sma(14)                                       primed=True  sma(14)=87.6100
@@ -10282,6 +10438,8 @@ Bar[ 58] 2020-02-29  O=86.1900 H=89.3750 L=87.1900 C=88.9400 V=4054200
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-7.3022 dti(2,20,5,3,3) signal=-9.5547
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-13.7520
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=20.9699
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.3849
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=2.1604
 
 Bar[ 59] 2020-03-01  O=88.9400 H=90.6250 L=88.4400 C=89.2800 V=3735300
   sma(14)                                       primed=True  sma(14)=87.5050
@@ -10402,6 +10560,8 @@ Bar[ 59] 2020-03-01  O=88.9400 H=90.6250 L=88.4400 C=89.2800 V=3735300
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-1.2630 dti(2,20,5,3,3) signal=-5.4089
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-13.1813
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=20.1716
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.3734
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=2.0896
 
 Bar[ 60] 2020-03-02  O=89.2800 H=90.7500 L=88.2500 C=88.6250 V=2921900
   sma(14)                                       primed=True  sma(14)=87.3039
@@ -10522,6 +10682,8 @@ Bar[ 60] 2020-03-02  O=89.2800 H=90.7500 L=88.2500 C=88.6250 V=2921900
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=3.8500 dti(2,20,5,3,3) signal=-0.7795
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-14.2003
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=19.4749
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.3595
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=2.0153
 
 Bar[ 61] 2020-03-03  O=88.6250 H=88.8450 L=87.3450 C=88.5000 V=2658400
   sma(14)                                       primed=True  sma(14)=87.2682
@@ -10642,6 +10804,8 @@ Bar[ 61] 2020-03-03  O=88.6250 H=88.8450 L=87.3450 C=88.5000 V=2658400
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=6.5873 dti(2,20,5,3,3) signal=2.9039
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-13.8980
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.3455
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=1.9386
 
 Bar[ 62] 2020-03-04  O=88.5000 H=91.9700 L=89.2800 C=91.9700 V=4624400
   sma(14)                                       primed=True  sma(14)=87.3375
@@ -10762,6 +10926,8 @@ Bar[ 62] 2020-03-04  O=88.5000 H=91.9700 L=89.2800 C=91.9700 V=4624400
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=11.5610 dti(2,20,5,3,3) signal=7.2325
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-10.5473
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.3446
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=1.8474
 
 Bar[ 63] 2020-03-05  O=91.9700 H=93.3750 L=91.0950 C=91.5000 V=4372200
   sma(14)                                       primed=True  sma(14)=87.4089
@@ -10882,6 +11048,8 @@ Bar[ 63] 2020-03-05  O=91.9700 H=93.3750 L=91.0950 C=91.5000 V=4372200
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=17.5257 dti(2,20,5,3,3) signal=12.3791
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-9.3920
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.3408
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=1.7461
 
 Bar[ 64] 2020-03-06  O=91.5000 H=93.8150 L=89.5300 C=93.2500 V=5831600
   sma(14)                                       primed=True  sma(14)=87.7104
@@ -11002,6 +11170,8 @@ Bar[ 64] 2020-03-06  O=91.5000 H=93.8150 L=89.5300 C=93.2500 V=5831600
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=20.8488 dti(2,20,5,3,3) signal=16.6139
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-4.9945
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.3426
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=1.6499
 
 Bar[ 65] 2020-03-07  O=93.2500 H=94.0300 L=91.1550 C=93.5000 V=4268600
   sma(14)                                       primed=True  sma(14)=88.0450
@@ -11122,6 +11292,8 @@ Bar[ 65] 2020-03-07  O=93.2500 H=94.0300 L=91.1550 C=93.5000 V=4268600
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=22.8955 dti(2,20,5,3,3) signal=19.7547
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-0.0187
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=18.0755
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.3439
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=1.5791
 
 Bar[ 66] 2020-03-08  O=93.5000 H=94.0300 L=92.0000 C=93.1550 V=3059200
   sma(14)                                       primed=True  sma(14)=88.6789
@@ -11242,6 +11414,8 @@ Bar[ 66] 2020-03-08  O=93.5000 H=94.0300 L=92.0000 C=93.1550 V=3059200
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=24.1754 dti(2,20,5,3,3) signal=21.9651
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=3.7246
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=18.1580
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.3425
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=1.5297
 
 Bar[ 67] 2020-03-09  O=93.1550 H=91.8150 L=90.5300 C=91.7200 V=4495500
   sma(14)                                       primed=True  sma(14)=89.2661
@@ -11362,6 +11536,8 @@ Bar[ 67] 2020-03-09  O=93.1550 H=91.8150 L=90.5300 C=91.7200 V=4495500
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=22.6732 dti(2,20,5,3,3) signal=22.3191
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=7.4245
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=18.1935
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.3347
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=1.4941
 
 Bar[ 68] 2020-03-10  O=91.7200 H=92.0000 L=89.9700 C=90.0000 V=3425000
   sma(14)                                       primed=True  sma(14)=89.7882
@@ -11482,6 +11658,8 @@ Bar[ 68] 2020-03-10  O=91.7200 H=92.0000 L=89.9700 C=90.0000 V=3425000
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=19.9379 dti(2,20,5,3,3) signal=21.1285
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=8.0011
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.3203
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=1.4645
 
 Bar[ 69] 2020-03-11  O=90.0000 H=91.9400 L=88.8150 C=89.6900 V=3630800
   sma(14)                                       primed=True  sma(14)=90.1411
@@ -11602,6 +11780,8 @@ Bar[ 69] 2020-03-11  O=90.0000 H=91.9400 L=88.8150 C=89.6900 V=3630800
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=15.4402 dti(2,20,5,3,3) signal=18.2843
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=6.8076
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.3053
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=1.4391
 
 Bar[ 70] 2020-03-12  O=89.6900 H=89.7500 L=86.7500 C=88.8750 V=4168100
   sma(14)                                       primed=True  sma(14)=90.3711
@@ -11722,6 +11902,8 @@ Bar[ 70] 2020-03-12  O=89.6900 H=89.7500 L=86.7500 C=88.8750 V=4168100
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=8.0687 dti(2,20,5,3,3) signal=13.1765
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=6.9886
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2879
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=1.4146
 
 Bar[ 71] 2020-03-13  O=88.8750 H=88.7500 L=85.0650 C=85.1900 V=5966900
   sma(14)                                       primed=True  sma(14)=90.2996
@@ -11842,6 +12024,8 @@ Bar[ 71] 2020-03-13  O=88.8750 H=88.7500 L=85.0650 C=85.1900 V=5966900
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-0.9600 dti(2,20,5,3,3) signal=6.1083
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=3.5522
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2830
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=1.3774
 
 Bar[ 72] 2020-03-14  O=85.1900 H=86.1550 L=82.0300 C=83.3750 V=7692800
   sma(14)                                       primed=True  sma(14)=89.9021
@@ -11962,6 +12146,8 @@ Bar[ 72] 2020-03-14  O=85.1900 H=86.1550 L=82.0300 C=83.3750 V=7692800
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-12.1324 dti(2,20,5,3,3) signal=-3.0121
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-0.2806
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=15.8553
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2842
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=1.3225
 
 Bar[ 73] 2020-03-15  O=83.3750 H=84.8750 L=81.5000 C=84.8750 V=7362500
   sma(14)                                       primed=True  sma(14)=89.5875
@@ -12082,6 +12268,8 @@ Bar[ 73] 2020-03-15  O=83.3750 H=84.8750 L=81.5000 C=84.8750 V=7362500
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-21.6502 dti(2,20,5,3,3) signal=-12.3311
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=0.2125
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=14.7486
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2787
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=1.2585
 
 Bar[ 74] 2020-03-16  O=84.8750 H=85.9400 L=82.5650 C=85.9400 V=6581300
   sma(14)                                       primed=True  sma(14)=89.3957
@@ -12202,6 +12390,8 @@ Bar[ 74] 2020-03-16  O=84.8750 H=85.9400 L=82.5650 C=85.9400 V=6581300
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-26.9366 dti(2,20,5,3,3) signal=-19.6339
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=3.5399
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=13.6463
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2690
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=1.1908
 
 Bar[ 75] 2020-03-17  O=85.9400 H=99.3750 L=96.3450 C=97.2500 V=19587700
   sma(14)                                       primed=True  sma(14)=90.0207
@@ -12322,6 +12512,8 @@ Bar[ 75] 2020-03-17  O=85.9400 H=99.3750 L=96.3450 C=97.2500 V=19587700
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-11.0801 dti(2,20,5,3,3) signal=-15.3570
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=4.6566
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2875
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=1.1516
 
 Bar[ 76] 2020-03-18  O=97.2500 H=103.2800 L=96.4700 C=99.8750 V=10378600
   sma(14)                                       primed=True  sma(14)=90.5854
@@ -12442,6 +12634,8 @@ Bar[ 76] 2020-03-18  O=97.2500 H=103.2800 L=96.4700 C=99.8750 V=10378600
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=6.7767 dti(2,20,5,3,3) signal=-4.2902
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=5.1387
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=13.2010
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.3125
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=1.1404
 
 Bar[ 77] 2020-03-19  O=99.8750 H=105.3750 L=101.1550 C=104.9400 V=9334700
   sma(14)                                       primed=True  sma(14)=91.5454
@@ -12562,6 +12756,8 @@ Bar[ 77] 2020-03-19  O=99.8750 H=105.3750 L=101.1550 C=104.9400 V=9334700
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=20.4899 dti(2,20,5,3,3) signal=8.0999
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=7.9320
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=13.8665
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.3519
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=1.1685
 
 Bar[ 78] 2020-03-20  O=104.9400 H=107.6250 L=104.2500 C=106.0000 V=10467200
   sma(14)                                       primed=True  sma(14)=92.4561
@@ -12682,6 +12878,8 @@ Bar[ 78] 2020-03-20  O=104.9400 H=107.6250 L=104.2500 C=106.0000 V=10467200
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=30.7476 dti(2,20,5,3,3) signal=19.4237
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=9.6713
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=14.9482
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.3894
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=1.2310
 
 Bar[ 79] 2020-03-21  O=106.0000 H=105.2500 L=101.7500 C=102.5000 V=5671400
   sma(14)                                       primed=True  sma(14)=93.0989
@@ -12802,6 +13000,8 @@ Bar[ 79] 2020-03-21  O=106.0000 H=105.2500 L=101.7500 C=102.5000 V=5671400
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=35.2492 dti(2,20,5,3,3) signal=27.3365
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=9.1017
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=16.0251
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4081
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=1.3108
 
 Bar[ 80] 2020-03-22  O=102.5000 H=104.5000 L=101.7200 C=102.4050 V=5645000
   sma(14)                                       primed=True  sma(14)=93.7596
@@ -12922,6 +13122,8 @@ Bar[ 80] 2020-03-22  O=102.5000 H=104.5000 L=101.7200 C=102.4050 V=5645000
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=37.2162 dti(2,20,5,3,3) signal=32.2763
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=7.4914
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=17.0458
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4228
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=1.4052
 
 Bar[ 81] 2020-03-23  O=102.4050 H=105.5000 L=101.7200 C=104.5950 V=4518600
   sma(14)                                       primed=True  sma(14)=94.6793
@@ -13042,6 +13244,8 @@ Bar[ 81] 2020-03-23  O=102.4050 H=105.5000 L=101.7200 C=104.5950 V=4518600
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=38.5250 dti(2,20,5,3,3) signal=35.4007
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=7.5917
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=18.0875
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4423
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=1.5202
 
 Bar[ 82] 2020-03-24  O=104.5950 H=106.1250 L=103.1550 C=106.1250 V=4519500
   sma(14)                                       primed=True  sma(14)=95.8311
@@ -13162,6 +13366,8 @@ Bar[ 82] 2020-03-24  O=104.5950 H=106.1250 L=103.1550 C=106.1250 V=4519500
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=39.6684 dti(2,20,5,3,3) signal=37.5346
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=9.6274
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=19.1681
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4634
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=1.6586
 
 Bar[ 83] 2020-03-25  O=106.1250 H=107.9400 L=105.6900 C=106.0000 V=5569700
   sma(14)                                       primed=True  sma(14)=96.9961
@@ -13282,6 +13488,8 @@ Bar[ 83] 2020-03-25  O=106.1250 H=107.9400 L=105.6900 C=106.0000 V=5569700
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=41.3532 dti(2,20,5,3,3) signal=39.4439
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=9.7503
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=20.2249
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4799
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=1.8161
 
 Bar[ 84] 2020-03-26  O=106.0000 H=106.2500 L=103.6550 C=106.0650 V=4239700
   sma(14)                                       primed=True  sma(14)=98.2239
@@ -13402,6 +13610,8 @@ Bar[ 84] 2020-03-26  O=106.0000 H=106.2500 L=103.6550 C=106.0650 V=4239700
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=40.7498 dti(2,20,5,3,3) signal=40.0968
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=11.2622
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=21.2327
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4930
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=1.9900
 
 Bar[ 85] 2020-03-27  O=106.0650 H=107.0000 L=104.0000 C=104.6250 V=4175300
   sma(14)                                       primed=True  sma(14)=99.6121
@@ -13522,6 +13732,8 @@ Bar[ 85] 2020-03-27  O=106.0650 H=107.0000 L=104.0000 C=104.6250 V=4175300
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=39.8572 dti(2,20,5,3,3) signal=39.9770
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=10.8418
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=22.0851
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4974
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=2.1726
 
 Bar[ 86] 2020-03-28  O=104.6250 H=108.7500 L=105.5300 C=108.6250 V=4995300
   sma(14)                                       primed=True  sma(14)=101.4157
@@ -13642,6 +13854,8 @@ Bar[ 86] 2020-03-28  O=104.6250 H=108.7500 L=105.5300 C=108.6250 V=4995300
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=39.8642 dti(2,20,5,3,3) signal=39.9206
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=12.4505
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=22.9697
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.5142
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=2.3753
 
 Bar[ 87] 2020-03-29  O=108.6250 H=110.9400 L=108.5300 C=109.3150 V=4776600
   sma(14)                                       primed=True  sma(14)=103.1614
@@ -13762,6 +13976,8 @@ Bar[ 87] 2020-03-29  O=108.6250 H=110.9400 L=108.5300 C=109.3150 V=4776600
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=41.2180 dti(2,20,5,3,3) signal=40.5693
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=12.7790
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=23.8719
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.5296
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=2.5936
 
 Bar[ 88] 2020-03-30  O=109.3150 H=110.9400 L=108.7500 C=110.5000 V=4190000
   sma(14)                                       primed=True  sma(14)=104.9157
@@ -13882,6 +14098,8 @@ Bar[ 88] 2020-03-30  O=109.3150 H=110.9400 L=108.7500 C=110.5000 V=4190000
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=42.7486 dti(2,20,5,3,3) signal=41.6590
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=13.7904
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=24.8019
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.5456
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=2.8291
 
 Bar[ 89] 2020-03-31  O=110.5000 H=114.2200 L=107.7500 C=112.7500 V=6035300
   sma(14)                                       primed=True  sma(14)=106.0229
@@ -14002,6 +14220,8 @@ Bar[ 89] 2020-03-31  O=110.5000 H=114.2200 L=107.7500 C=112.7500 V=6035300
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=45.1577 dti(2,20,5,3,3) signal=43.4083
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=16.4600
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=25.8062
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.5660
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=3.0813
 
 Bar[ 90] 2020-04-01  O=112.7500 H=123.0000 L=117.0000 C=123.0000 V=12168900
   sma(14)                                       primed=True  sma(14)=107.6746
@@ -14122,6 +14342,8 @@ Bar[ 90] 2020-04-01  O=112.7500 H=123.0000 L=117.0000 C=123.0000 V=12168900
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=51.1502 dti(2,20,5,3,3) signal=47.2793
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=21.8751
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=27.2070
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.6196
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=3.3687
 
 Bar[ 91] 2020-04-02  O=123.0000 H=121.7500 L=118.0000 C=119.6250 V=9040800
   sma(14)                                       primed=True  sma(14)=108.7236
@@ -14242,6 +14464,8 @@ Bar[ 91] 2020-04-02  O=123.0000 H=121.7500 L=118.0000 C=119.6250 V=9040800
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=56.4664 dti(2,20,5,3,3) signal=51.8728
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=24.6252
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=28.5874
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.6522
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=3.6738
 
 Bar[ 92] 2020-04-03  O=119.6250 H=119.8150 L=116.0000 C=118.7500 V=5780300
   sma(14)                                       primed=True  sma(14)=109.6343
@@ -14362,6 +14586,8 @@ Bar[ 92] 2020-04-03  O=119.6250 H=119.8150 L=116.0000 C=118.7500 V=5780300
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=57.9486 dti(2,20,5,3,3) signal=54.9107
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=27.0200
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=29.8389
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.6754
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=3.9901
 
 Bar[ 93] 2020-04-04  O=118.7500 H=120.3150 L=118.5000 C=119.2500 V=4320800
   sma(14)                                       primed=True  sma(14)=110.8307
@@ -14482,6 +14708,8 @@ Bar[ 93] 2020-04-04  O=118.7500 H=120.3150 L=118.5000 C=119.2500 V=4320800
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=58.1835 dti(2,20,5,3,3) signal=56.5471
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=28.1462
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=30.9748
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.6952
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=4.3170
 
 Bar[ 94] 2020-04-05  O=119.2500 H=119.3750 L=116.5300 C=117.9400 V=3899100
   sma(14)                                       primed=True  sma(14)=111.9404
@@ -14602,6 +14830,8 @@ Bar[ 94] 2020-04-05  O=119.2500 H=119.3750 L=116.5300 C=117.9400 V=3899100
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=55.6198 dti(2,20,5,3,3) signal=56.0835
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=28.3870
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=31.9105
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.7053
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=4.6473
 
 Bar[ 95] 2020-04-06  O=117.9400 H=118.1900 L=116.2500 C=116.4400 V=3221400
   sma(14)                                       primed=True  sma(14)=112.7864
@@ -14722,6 +14952,8 @@ Bar[ 95] 2020-04-06  O=117.9400 H=118.1900 L=116.2500 C=116.4400 V=3221400
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=52.3529 dti(2,20,5,3,3) signal=54.2182
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=27.1000
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=32.5885
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.7061
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=4.9738
 
 Bar[ 96] 2020-04-07  O=116.4400 H=116.6900 L=114.5950 C=115.1900 V=3455500
   sma(14)                                       primed=True  sma(14)=113.4339
@@ -14842,6 +15074,8 @@ Bar[ 96] 2020-04-07  O=116.4400 H=116.6900 L=114.5950 C=115.1900 V=3455500
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=47.4484 dti(2,20,5,3,3) signal=50.8333
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=25.1118
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=32.9975
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.6997
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=5.2912
 
 Bar[ 97] 2020-04-08  O=115.1900 H=115.3450 L=110.8750 C=111.8750 V=4304200
   sma(14)                                       primed=True  sma(14)=113.8536
@@ -14962,6 +15196,8 @@ Bar[ 97] 2020-04-08  O=115.1900 H=115.3450 L=110.8750 C=111.8750 V=4304200
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=38.6206 dti(2,20,5,3,3) signal=44.7270
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=21.1083
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=33.0094
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.6792
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=5.5872
 
 Bar[ 98] 2020-04-09  O=111.8750 H=113.0000 L=110.5000 C=110.5950 V=4703900
   sma(14)                                       primed=True  sma(14)=114.1771
@@ -15082,6 +15318,8 @@ Bar[ 98] 2020-04-09  O=111.8750 H=113.0000 L=110.5000 C=110.5950 V=4703900
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=30.0332 dti(2,20,5,3,3) signal=37.3801
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=16.1678
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.6540
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=5.8586
 
 Bar[ 99] 2020-04-10  O=110.5950 H=118.3150 L=110.7200 C=118.1250 V=8316300
   sma(14)                                       primed=True  sma(14)=115.1414
@@ -15202,6 +15440,8 @@ Bar[ 99] 2020-04-10  O=110.5950 H=118.3150 L=110.7200 C=118.1250 V=8316300
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=26.3868 dti(2,20,5,3,3) signal=31.8835
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=16.8649
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.6570
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=6.1348
 
 Bar[100] 2020-04-11  O=118.1250 H=116.8700 L=112.6200 C=116.0000 V=10553900
   sma(14)                                       primed=True  sma(14)=115.6682
@@ -15322,6 +15562,8 @@ Bar[100] 2020-04-11  O=118.1250 H=116.8700 L=112.6200 C=116.0000 V=10553900
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=25.0835 dti(2,20,5,3,3) signal=28.4835
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=18.5677
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.6494
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=6.4066
 
 Bar[101] 2020-04-12  O=116.0000 H=116.7500 L=114.1900 C=116.0000 V=6384800
   sma(14)                                       primed=True  sma(14)=116.1457
@@ -15442,6 +15684,8 @@ Bar[101] 2020-04-12  O=116.0000 H=116.7500 L=114.1900 C=116.0000 V=6384800
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=24.7390 dti(2,20,5,3,3) signal=26.6112
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=20.1444
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.6403
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=6.6734
 
 Bar[102] 2020-04-13  O=116.0000 H=113.8700 L=111.1900 C=112.0000 V=7163300
   sma(14)                                       primed=True  sma(14)=116.2529
@@ -15562,6 +15806,8 @@ Bar[102] 2020-04-13  O=116.0000 H=113.8700 L=111.1900 C=112.0000 V=7163300
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=21.6996 dti(2,20,5,3,3) signal=24.1554
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=20.1790
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.6152
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=6.9201
 
 Bar[103] 2020-04-14  O=112.0000 H=114.6200 L=109.4400 C=113.7500 V=7007800
   sma(14)                                       primed=True  sma(14)=116.3243
@@ -15682,6 +15928,8 @@ Bar[103] 2020-04-14  O=112.0000 H=114.6200 L=109.4400 C=113.7500 V=7007800
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=17.4284 dti(2,20,5,3,3) signal=20.7919
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=21.8032
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.5973
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=7.1546
 
 Bar[104] 2020-04-15  O=113.7500 H=115.3100 L=111.5600 C=112.9400 V=5114100
   sma(14)                                       primed=True  sma(14)=115.6057
@@ -15802,6 +16050,8 @@ Bar[104] 2020-04-15  O=113.7500 H=115.3100 L=111.5600 C=112.9400 V=5114100
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=14.0669 dti(2,20,5,3,3) signal=17.4294
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=21.7450
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.5763
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=7.3746
 
 Bar[105] 2020-04-16  O=112.9400 H=116.0000 L=112.4400 C=116.0000 V=5263800
   sma(14)                                       primed=True  sma(14)=115.3468
@@ -15922,6 +16172,8 @@ Bar[105] 2020-04-16  O=112.9400 H=116.0000 L=112.4400 C=116.0000 V=5263800
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=12.1218 dti(2,20,5,3,3) signal=14.7756
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=23.5336
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.5669
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=7.5901
 
 Bar[106] 2020-04-17  O=116.0000 H=121.6900 L=117.5000 C=120.5000 V=6666100
   sma(14)                                       primed=True  sma(14)=115.4718
@@ -16042,6 +16294,8 @@ Bar[106] 2020-04-17  O=116.0000 H=121.6900 L=117.5000 C=120.5000 V=6666100
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=15.3735 dti(2,20,5,3,3) signal=15.0745
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=25.3304
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.5730
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=7.7923
 
 Bar[107] 2020-04-18  O=120.5000 H=119.8700 L=116.0600 C=116.6200 V=7398400
   sma(14)                                       primed=True  sma(14)=115.2839
@@ -16162,6 +16416,8 @@ Bar[107] 2020-04-18  O=120.5000 H=119.8700 L=116.0600 C=116.6200 V=7398400
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=17.9787 dti(2,20,5,3,3) signal=16.5266
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=24.2344
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.5621
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=7.9673
 
 Bar[108] 2020-04-19  O=116.6200 H=120.8700 L=116.5600 C=117.0000 V=5575000
   sma(14)                                       primed=True  sma(14)=115.2168
@@ -16282,6 +16538,8 @@ Bar[108] 2020-04-19  O=116.6200 H=120.8700 L=116.5600 C=117.0000 V=5575000
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=20.5084 dti(2,20,5,3,3) signal=18.5175
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=20.5985
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.5517
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.1106
 
 Bar[109] 2020-04-20  O=117.0000 H=116.7500 L=113.3100 C=115.2500 V=4852300
   sma(14)                                       primed=True  sma(14)=115.1318
@@ -16402,6 +16660,8 @@ Bar[109] 2020-04-20  O=117.0000 H=116.7500 L=113.3100 C=115.2500 V=4852300
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=19.1615 dti(2,20,5,3,3) signal=18.8395
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=17.8615
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.5342
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.2178
 
 Bar[110] 2020-04-21  O=115.2500 H=116.5000 L=112.5600 C=114.3100 V=4298100
   sma(14)                                       primed=True  sma(14)=115.0689
@@ -16522,6 +16782,8 @@ Bar[110] 2020-04-21  O=115.2500 H=116.5000 L=112.5600 C=114.3100 V=4298100
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=16.2225 dti(2,20,5,3,3) signal=17.5310
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=15.1967
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.5133
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.2895
 
 Bar[111] 2020-04-22  O=114.3100 H=116.0000 L=114.0000 C=115.5000 V=4900500
   sma(14)                                       primed=True  sma(14)=115.3279
@@ -16642,6 +16904,8 @@ Bar[111] 2020-04-22  O=114.3100 H=116.0000 L=114.0000 C=115.5000 V=4900500
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=13.3787 dti(2,20,5,3,3) signal=15.4549
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=13.7286
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4973
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.3338
 
 Bar[112] 2020-04-23  O=115.5000 H=118.3100 L=114.7500 C=115.8700 V=4887700
   sma(14)                                       primed=True  sma(14)=115.7046
@@ -16762,6 +17026,8 @@ Bar[112] 2020-04-23  O=115.5000 H=118.3100 L=114.7500 C=115.8700 V=4887700
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=12.8289 dti(2,20,5,3,3) signal=14.1419
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=11.5007
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4827
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.3551
 
 Bar[113] 2020-04-24  O=115.8700 H=121.5000 L=118.8700 C=120.6900 V=6964800
   sma(14)                                       primed=True  sma(14)=115.8879
@@ -16882,6 +17148,8 @@ Bar[113] 2020-04-24  O=115.8700 H=121.5000 L=118.8700 C=120.6900 V=6964800
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=15.5178 dti(2,20,5,3,3) signal=14.8299
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=10.3370
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4858
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.3713
 
 Bar[114] 2020-04-25  O=120.6900 H=122.0000 L=119.0000 C=120.1900 V=4679200
   sma(14)                                       primed=True  sma(14)=116.1871
@@ -17002,6 +17270,8 @@ Bar[114] 2020-04-25  O=120.6900 H=122.0000 L=119.0000 C=120.1900 V=4679200
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=18.9867 dti(2,20,5,3,3) signal=16.9083
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=8.8717
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4849
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.3800
 
 Bar[115] 2020-04-26  O=120.1900 H=121.4400 L=119.7500 C=120.7500 V=9165000
   sma(14)                                       primed=True  sma(14)=116.5264
@@ -17122,6 +17392,8 @@ Bar[115] 2020-04-26  O=120.1900 H=121.4400 L=119.7500 C=120.7500 V=9165000
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=22.0392 dti(2,20,5,3,3) signal=19.4737
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=7.8938
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4844
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.3841
 
 Bar[116] 2020-04-27  O=120.7500 H=125.7500 L=122.6200 C=124.7500 V=6469800
   sma(14)                                       primed=True  sma(14)=117.4371
@@ -17242,6 +17514,8 @@ Bar[116] 2020-04-27  O=120.7500 H=125.7500 L=122.6200 C=124.7500 V=6469800
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=27.3592 dti(2,20,5,3,3) signal=23.4165
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=7.7697
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4969
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.3933
 
 Bar[117] 2020-04-28  O=124.7500 H=127.7500 L=123.0000 C=123.3700 V=6792000
   sma(14)                                       primed=True  sma(14)=118.1243
@@ -17362,6 +17636,8 @@ Bar[117] 2020-04-28  O=124.7500 H=127.7500 L=123.0000 C=123.3700 V=6792000
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=33.4199 dti(2,20,5,3,3) signal=28.4182
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=4.6654
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=22.6970
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.5010
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.3952
 
 Bar[118] 2020-04-29  O=123.3700 H=124.1900 L=121.7500 C=122.9400 V=4423800
   sma(14)                                       primed=True  sma(14)=118.8386
@@ -17482,6 +17758,8 @@ Bar[118] 2020-04-29  O=123.3700 H=124.1900 L=121.7500 C=122.9400 V=4423800
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=36.8691 dti(2,20,5,3,3) signal=32.6437
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=2.2890
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=22.7526
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.5012
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.3852
 
 Bar[119] 2020-04-30  O=122.9400 H=124.4400 L=121.5600 C=122.5600 V=5231900
   sma(14)                                       primed=True  sma(14)=119.3071
@@ -17602,6 +17880,8 @@ Bar[119] 2020-04-30  O=122.9400 H=124.4400 L=121.5600 C=122.5600 V=5231900
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=38.8660 dti(2,20,5,3,3) signal=35.7548
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-0.1137
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=22.8021
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4981
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.3632
 
 Bar[120] 2020-05-01  O=122.5600 H=125.7500 L=123.1200 C=123.1200 V=4565600
   sma(14)                                       primed=True  sma(14)=119.4943
@@ -17722,6 +18002,8 @@ Bar[120] 2020-05-01  O=122.5600 H=125.7500 L=123.1200 C=123.1200 V=4565600
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=40.7742 dti(2,20,5,3,3) signal=38.2645
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-3.7473
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=22.8647
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4956
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.3328
 
 Bar[121] 2020-05-02  O=123.1200 H=124.6900 L=122.1900 C=122.5600 V=6235200
   sma(14)                                       primed=True  sma(14)=119.9186
@@ -17842,6 +18124,8 @@ Bar[121] 2020-05-02  O=123.1200 H=124.6900 L=122.1900 C=122.5600 V=6235200
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=41.0721 dti(2,20,5,3,3) signal=39.6683
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-7.6300
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=22.9049
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4896
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.2899
 
 Bar[122] 2020-05-03  O=122.5600 H=125.3100 L=122.7500 C=124.6200 V=5225900
   sma(14)                                       primed=True  sma(14)=120.4629
@@ -17962,6 +18246,8 @@ Bar[122] 2020-05-03  O=122.5600 H=125.3100 L=122.7500 C=124.6200 V=5225900
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=41.1449 dti(2,20,5,3,3) signal=40.4066
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-9.4889
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=22.9976
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4900
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.2437
 
 Bar[123] 2020-05-04  O=124.6200 H=132.0000 L=124.3700 C=129.2500 V=8261400
   sma(14)                                       primed=True  sma(14)=121.4629
@@ -18082,6 +18368,8 @@ Bar[123] 2020-05-04  O=124.6200 H=132.0000 L=124.3700 C=129.2500 V=8261400
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=44.8664 dti(2,20,5,3,3) signal=42.6365
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-8.7582
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=23.2784
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.5055
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.2041
 
 Bar[124] 2020-05-05  O=129.2500 H=131.3100 L=128.0000 C=131.0000 V=5912500
   sma(14)                                       primed=True  sma(14)=122.6550
@@ -18202,6 +18490,8 @@ Bar[124] 2020-05-05  O=129.2500 H=131.3100 L=128.0000 C=131.0000 V=5912500
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=48.7085 dti(2,20,5,3,3) signal=45.6725
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-6.1366
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=23.7361
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.5239
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.1767
 
 Bar[125] 2020-05-06  O=131.0000 H=132.2500 L=129.5000 C=132.2500 V=3545600
   sma(14)                                       primed=True  sma(14)=123.8514
@@ -18322,6 +18612,8 @@ Bar[125] 2020-05-06  O=131.0000 H=132.2500 L=129.5000 C=132.2500 V=3545600
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=52.1963 dti(2,20,5,3,3) signal=48.9344
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-2.2378
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=24.3413
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.5427
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.1644
 
 Bar[126] 2020-05-07  O=132.2500 H=133.8800 L=130.8100 C=131.0000 V=5714500
   sma(14)                                       primed=True  sma(14)=124.9321
@@ -18442,6 +18734,8 @@ Bar[126] 2020-05-07  O=132.2500 H=133.8800 L=130.8100 C=131.0000 V=5714500
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=55.5816 dti(2,20,5,3,3) signal=52.2580
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-1.3158
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=24.9596
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.5527
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.1578
 
 Bar[127] 2020-05-08  O=131.0000 H=133.5000 L=130.6300 C=132.8100 V=6653900
   sma(14)                                       primed=True  sma(14)=125.7979
@@ -18562,6 +18856,8 @@ Bar[127] 2020-05-08  O=131.0000 H=133.5000 L=130.6300 C=132.8100 V=6653900
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=58.0013 dti(2,20,5,3,3) signal=55.1297
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=0.4216
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=25.6292
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.5662
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.1630
 
 Bar[128] 2020-05-09  O=132.8100 H=135.5000 L=132.1300 C=134.0000 V=6094500
   sma(14)                                       primed=True  sma(14)=126.7843
@@ -18682,6 +18978,8 @@ Bar[128] 2020-05-09  O=132.8100 H=135.5000 L=132.1300 C=134.0000 V=6094500
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=60.4681 dti(2,20,5,3,3) signal=57.7989
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=1.9204
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=26.3540
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.5804
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.1800
 
 Bar[129] 2020-05-10  O=134.0000 H=137.4400 L=133.8800 C=137.3800 V=4799200
   sma(14)                                       primed=True  sma(14)=127.9721
@@ -18802,6 +19100,8 @@ Bar[129] 2020-05-10  O=134.0000 H=137.4400 L=133.8800 C=137.3800 V=4799200
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=63.1847 dti(2,20,5,3,3) signal=60.4918
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=5.3736
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=27.2068
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.6032
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.2161
 
 Bar[130] 2020-05-11  O=137.3800 H=138.6900 L=135.3800 C=137.8100 V=5050800
   sma(14)                                       primed=True  sma(14)=128.9050
@@ -18922,6 +19222,8 @@ Bar[130] 2020-05-11  O=137.3800 H=138.6900 L=135.3800 C=137.8100 V=5050800
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=65.8585 dti(2,20,5,3,3) signal=63.1751
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=8.8124
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=28.1345
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.6227
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.2683
 
 Bar[131] 2020-05-12  O=137.8100 H=139.1900 L=135.7500 C=137.8800 V=5648900
   sma(14)                                       primed=True  sma(14)=129.9414
@@ -19042,6 +19344,8 @@ Bar[131] 2020-05-12  O=137.8100 H=139.1900 L=135.7500 C=137.8800 V=5648900
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=68.1577 dti(2,20,5,3,3) signal=65.6664
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=11.6368
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=29.0892
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.6378
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.3338
 
 Bar[132] 2020-05-13  O=137.8800 H=138.5000 L=136.1900 C=137.2500 V=4726300
   sma(14)                                       primed=True  sma(14)=130.9636
@@ -19162,6 +19466,8 @@ Bar[132] 2020-05-13  O=137.8800 H=138.5000 L=136.1900 C=137.2500 V=4726300
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=69.9269 dti(2,20,5,3,3) signal=67.7967
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=13.3457
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=29.9996
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.6465
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.4086
 
 Bar[133] 2020-05-14  O=137.2500 H=138.1300 L=134.5000 C=136.3100 V=5585600
   sma(14)                                       primed=True  sma(14)=131.9457
@@ -19282,6 +19588,8 @@ Bar[133] 2020-05-14  O=137.2500 H=138.1300 L=134.5000 C=136.3100 V=5585600
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=68.1700 dti(2,20,5,3,3) signal=67.9833
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=14.2292
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=30.8004
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.6484
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.4877
 
 Bar[134] 2020-05-15  O=136.3100 H=137.5000 L=135.3800 C=136.2500 V=5124800
   sma(14)                                       primed=True  sma(14)=132.8836
@@ -19402,6 +19710,8 @@ Bar[134] 2020-05-15  O=136.3100 H=137.5000 L=135.3800 C=136.2500 V=5124800
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=65.5494 dti(2,20,5,3,3) signal=66.7664
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=14.3797
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=31.5034
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.6475
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.5701
 
 Bar[135] 2020-05-16  O=136.2500 H=138.8800 L=133.6900 C=134.6300 V=7630200
   sma(14)                                       primed=True  sma(14)=133.7457
@@ -19522,6 +19832,8 @@ Bar[135] 2020-05-16  O=136.2500 H=138.8800 L=133.6900 C=134.6300 V=7630200
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=62.4693 dti(2,20,5,3,3) signal=64.6178
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=11.5861
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=32.0228
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.6383
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.6454
 
 Bar[136] 2020-05-17  O=134.6300 H=132.1300 L=126.0600 C=128.2500 V=14311600
   sma(14)                                       primed=True  sma(14)=134.0050
@@ -19642,6 +19954,8 @@ Bar[136] 2020-05-17  O=134.6300 H=132.1300 L=126.0600 C=128.2500 V=14311600
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=46.0442 dti(2,20,5,3,3) signal=55.3310
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=7.9726
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.6044
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.6890
 
 Bar[137] 2020-05-18  O=128.2500 H=129.7500 L=126.8700 C=129.0000 V=8793600
   sma(14)                                       primed=True  sma(14)=133.9871
@@ -19762,6 +20076,8 @@ Bar[137] 2020-05-18  O=128.2500 H=129.7500 L=126.8700 C=129.0000 V=8793600
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=30.4190 dti(2,20,5,3,3) signal=42.8750
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=6.2723
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.5751
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.7071
 
 Bar[138] 2020-05-19  O=129.0000 H=128.5000 L=123.5000 C=123.8700 V=8874200
   sma(14)                                       primed=True  sma(14)=133.4779
@@ -19882,6 +20198,8 @@ Bar[138] 2020-05-19  O=129.0000 H=128.5000 L=123.5000 C=123.8700 V=8874200
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=14.4219 dti(2,20,5,3,3) signal=28.6485
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=2.0035
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.5522
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.6837
 
 Bar[139] 2020-05-20  O=123.8700 H=125.4400 L=122.6200 C=124.8100 V=6966600
   sma(14)                                       primed=True  sma(14)=132.9464
@@ -20002,6 +20320,8 @@ Bar[139] 2020-05-20  O=123.8700 H=125.4400 L=122.6200 C=124.8100 V=6966600
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=1.3751 dti(2,20,5,3,3) signal=15.0118
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=0.0425
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.5266
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.6272
 
 Bar[140] 2020-05-21  O=124.8100 H=125.1200 L=122.7500 C=123.0000 V=5525500
   sma(14)                                       primed=True  sma(14)=132.3750
@@ -20122,6 +20442,8 @@ Bar[140] 2020-05-21  O=124.8100 H=125.1200 L=122.7500 C=123.0000 V=5525500
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-8.0244 dti(2,20,5,3,3) signal=3.4937
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-2.6036
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.5087
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.5352
 
 Bar[141] 2020-05-22  O=123.0000 H=126.5000 L=123.5600 C=126.2500 V=6515500
   sma(14)                                       primed=True  sma(14)=131.9064
@@ -20242,6 +20564,8 @@ Bar[141] 2020-05-22  O=123.0000 H=126.5000 L=123.5600 C=126.2500 V=6515500
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-13.0234 dti(2,20,5,3,3) signal=-4.7649
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-2.8147
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4790
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.4239
 
 Bar[142] 2020-05-23  O=126.2500 H=128.6900 L=125.8100 C=128.3800 V=5291900
   sma(14)                                       primed=True  sma(14)=131.5050
@@ -20362,6 +20686,8 @@ Bar[142] 2020-05-23  O=126.2500 H=128.6900 L=125.8100 C=128.3800 V=5291900
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-13.1649 dti(2,20,5,3,3) signal=-8.9649
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-1.3792
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4567
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.3014
 
 Bar[143] 2020-05-24  O=128.3800 H=126.6200 L=124.6200 C=125.3700 V=5711700
   sma(14)                                       primed=True  sma(14)=130.6471
@@ -20482,6 +20808,8 @@ Bar[143] 2020-05-24  O=128.3800 H=126.6200 L=124.6200 C=125.3700 V=5711700
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-12.8416 dti(2,20,5,3,3) signal=-10.9032
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-0.6527
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4338
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.1569
 
 Bar[144] 2020-05-25  O=125.3700 H=126.6900 L=124.3700 C=125.6900 V=4327700
   sma(14)                                       primed=True  sma(14)=129.7814
@@ -20602,6 +20930,8 @@ Bar[144] 2020-05-25  O=125.3700 H=126.6900 L=124.3700 C=125.6900 V=4327700
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-12.6007 dti(2,20,5,3,3) signal=-11.7520
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=0.1215
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4108
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=7.9872
 
 Bar[145] 2020-05-26  O=125.6900 H=126.0000 L=121.8100 C=122.2500 V=4568000
   sma(14)                                       primed=True  sma(14)=128.6650
@@ -20722,6 +21052,8 @@ Bar[145] 2020-05-26  O=125.6900 H=126.0000 L=121.8100 C=122.2500 V=4568000
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-14.7625 dti(2,20,5,3,3) signal=-13.2573
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-1.6573
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=20.6755
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4017
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=7.7829
 
 Bar[146] 2020-05-27  O=122.2500 H=123.1200 L=118.1900 C=119.3700 V=6859200
   sma(14)                                       primed=True  sma(14)=127.3879
@@ -20842,6 +21174,8 @@ Bar[146] 2020-05-27  O=122.2500 H=123.1200 L=118.1900 C=119.3700 V=6859200
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-20.3047 dti(2,20,5,3,3) signal=-16.7810
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-4.6878
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=18.8972
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4027
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=7.5398
 
 Bar[147] 2020-05-28  O=119.3700 H=121.8700 L=118.0600 C=118.5000 V=5757500
   sma(14)                                       primed=True  sma(14)=126.1157
@@ -20962,6 +21296,8 @@ Bar[147] 2020-05-28  O=119.3700 H=121.8700 L=118.0600 C=118.5000 V=5757500
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-25.6273 dti(2,20,5,3,3) signal=-21.2041
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-8.7561
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=16.9969
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4053
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=7.2604
 
 Bar[148] 2020-05-29  O=118.5000 H=124.0000 L=117.5600 C=123.1900 V=7367000
   sma(14)                                       primed=True  sma(14)=125.1829
@@ -21082,6 +21418,8 @@ Bar[148] 2020-05-29  O=118.5000 H=124.0000 L=117.5600 C=123.1900 V=7367000
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-27.6863 dti(2,20,5,3,3) signal=-24.4452
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-7.9038
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=15.2694
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.3889
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=6.9681
 
 Bar[149] 2020-05-30  O=123.1900 H=127.0000 L=121.0000 C=123.5000 V=6144100
   sma(14)                                       primed=True  sma(14)=124.3879
@@ -21202,6 +21540,8 @@ Bar[149] 2020-05-30  O=123.1900 H=127.0000 L=121.0000 C=123.5000 V=6144100
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-24.5126 dti(2,20,5,3,3) signal=-24.4789
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-7.6759
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=13.7300
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.3719
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=6.6667
 
 Bar[150] 2020-05-31  O=123.5000 H=124.4400 L=121.1200 C=122.1900 V=4052700
   sma(14)                                       primed=True  sma(14)=123.9550
@@ -21322,6 +21662,8 @@ Bar[150] 2020-05-31  O=123.5000 H=124.4400 L=121.1200 C=122.1900 V=4052700
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-20.5043 dti(2,20,5,3,3) signal=-22.4916
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-8.1172
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=12.2950
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.3603
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=6.3535
 
 Bar[151] 2020-06-01  O=122.1900 H=122.5000 L=118.9400 C=119.3100 V=5849700
   sma(14)                                       primed=True  sma(14)=123.2629
@@ -21442,6 +21784,8 @@ Bar[151] 2020-06-01  O=122.1900 H=122.5000 L=118.9400 C=119.3100 V=5849700
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-18.7962 dti(2,20,5,3,3) signal=-20.6439
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-10.0261
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=10.8237
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.3593
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=6.0205
 
 Bar[152] 2020-06-02  O=119.3100 H=123.7500 L=119.8100 C=123.3100 V=5544700
   sma(14)                                       primed=True  sma(14)=123.2229
@@ -21562,6 +21906,8 @@ Bar[152] 2020-06-02  O=119.3100 H=123.7500 L=119.8100 C=123.3100 V=5544700
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-16.6682 dti(2,20,5,3,3) signal=-18.6560
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-9.1920
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=9.5483
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.3424
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=5.6859
 
 Bar[153] 2020-06-03  O=123.3100 H=123.8100 L=121.0000 C=121.1200 V=5032200
   sma(14)                                       primed=True  sma(14)=122.9593
@@ -21682,6 +22028,8 @@ Bar[153] 2020-06-03  O=123.3100 H=123.8100 L=121.0000 C=121.1200 V=5032200
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-14.7603 dti(2,20,5,3,3) signal=-16.7082
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-10.0479
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=8.3349
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.3343
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=5.3431
 
 Bar[154] 2020-06-04  O=121.1200 H=124.5000 L=122.0000 C=123.3700 V=4400600
   sma(14)                                       primed=True  sma(14)=122.9857
@@ -21802,6 +22150,8 @@ Bar[154] 2020-06-04  O=121.1200 H=124.5000 L=122.0000 C=123.3700 V=4400600
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-12.4357 dti(2,20,5,3,3) signal=-14.5719
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-10.3542
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=7.3022
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.3177
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=5.0360
 
 Bar[155] 2020-06-05  O=123.3700 H=127.8700 L=124.5000 C=127.3700 V=4894100
   sma(14)                                       primed=True  sma(14)=123.0657
@@ -21922,6 +22272,8 @@ Bar[155] 2020-06-05  O=123.3700 H=127.8700 L=124.5000 C=127.3700 V=4894100
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-6.4588 dti(2,20,5,3,3) signal=-10.5154
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-8.8547
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=6.5969
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.3097
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=4.7501
 
 Bar[156] 2020-06-06  O=127.3700 H=128.5600 L=126.5600 C=128.5000 V=5140000
   sma(14)                                       primed=True  sma(14)=123.0743
@@ -22042,6 +22394,8 @@ Bar[156] 2020-06-06  O=127.3700 H=128.5600 L=126.5600 C=128.5000 V=5140000
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=0.1210 dti(2,20,5,3,3) signal=-5.1972
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-6.4318
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.3057
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=4.4800
 
 Bar[157] 2020-06-07  O=128.5000 H=129.6300 L=123.5000 C=123.8700 V=6610900
   sma(14)                                       primed=True  sma(14)=122.9671
@@ -22162,6 +22516,8 @@ Bar[157] 2020-06-07  O=128.5000 H=129.6300 L=123.5000 C=123.8700 V=6610900
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=3.3796 dti(2,20,5,3,3) signal=-0.9088
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-7.8782
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=5.7398
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2903
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=4.2417
 
 Bar[158] 2020-06-08  O=123.8700 H=124.8700 L=121.2500 C=122.9400 V=7585200
   sma(14)                                       primed=True  sma(14)=122.7707
@@ -22282,6 +22638,8 @@ Bar[158] 2020-06-08  O=123.8700 H=124.8700 L=121.2500 C=122.9400 V=7585200
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=2.4659 dti(2,20,5,3,3) signal=0.7785
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-8.8781
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=5.2571
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2791
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=4.0358
 
 Bar[159] 2020-06-09  O=122.9400 H=124.3700 L=121.0600 C=121.7500 V=5963100
   sma(14)                                       primed=True  sma(14)=122.7350
@@ -22402,6 +22760,8 @@ Bar[159] 2020-06-09  O=122.9400 H=124.3700 L=121.0600 C=121.7500 V=5963100
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=0.2965 dti(2,20,5,3,3) signal=0.5375
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-10.6397
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=4.7075
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2726
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=3.8636
 
 Bar[160] 2020-06-10  O=121.7500 H=124.8700 L=122.3100 C=124.4400 V=6045500
   sma(14)                                       primed=True  sma(14)=123.0971
@@ -22522,6 +22882,8 @@ Bar[160] 2020-06-10  O=121.7500 H=124.8700 L=122.3100 C=124.4400 V=6045500
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-1.3061 dti(2,20,5,3,3) signal=-0.3843
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-10.6398
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=4.2486
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2562
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=3.7119
 
 Bar[161] 2020-06-11  O=124.4400 H=123.6200 L=121.0000 C=122.0000 V=8443300
   sma(14)                                       primed=True  sma(14)=123.3471
@@ -22642,6 +23004,8 @@ Bar[161] 2020-06-11  O=124.4400 H=123.6200 L=121.0000 C=122.0000 V=8443300
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-3.8435 dti(2,20,5,3,3) signal=-2.1139
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-10.8627
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=3.7514
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2495
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=3.5878
 
 Bar[162] 2020-06-12  O=122.0000 H=124.0600 L=120.8700 C=122.3700 V=6464700
   sma(14)                                       primed=True  sma(14)=123.2886
@@ -22762,6 +23126,8 @@ Bar[162] 2020-06-12  O=122.0000 H=124.0600 L=120.8700 C=122.3700 V=6464700
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-5.8498 dti(2,20,5,3,3) signal=-3.9819
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-10.9229
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=3.2621
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2413
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=3.4872
 
 Bar[163] 2020-06-13  O=122.3700 H=125.8700 L=122.0600 C=122.9400 V=6248300
   sma(14)                                       primed=True  sma(14)=123.2486
@@ -22882,6 +23248,8 @@ Bar[163] 2020-06-13  O=122.3700 H=125.8700 L=122.0600 C=122.9400 V=6248300
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-5.1092 dti(2,20,5,3,3) signal=-4.5455
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-12.0542
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=2.8181
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2311
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=3.4050
 
 Bar[164] 2020-06-14  O=122.9400 H=125.1900 L=122.7500 C=124.0000 V=4357200
   sma(14)                                       primed=True  sma(14)=123.3779
@@ -23002,6 +23370,8 @@ Bar[164] 2020-06-14  O=122.9400 H=125.1900 L=122.7500 C=124.0000 V=4357200
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-3.6092 dti(2,20,5,3,3) signal=-4.0773
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-12.6416
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=2.4629
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2173
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=3.3354
 
 Bar[165] 2020-06-15  O=124.0000 H=125.6200 L=122.6900 C=123.1900 V=4774700
   sma(14)                                       primed=True  sma(14)=123.6550
@@ -23122,6 +23492,8 @@ Bar[165] 2020-06-15  O=124.0000 H=125.6200 L=122.6900 C=123.1900 V=4774700
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-1.6403 dti(2,20,5,3,3) signal=-2.8588
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-14.1381
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=2.1400
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2074
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=3.2803
 
 Bar[166] 2020-06-16  O=123.1900 H=126.0000 L=122.8700 C=124.5600 V=6216900
   sma(14)                                       primed=True  sma(14)=123.7443
@@ -23242,6 +23614,8 @@ Bar[166] 2020-06-16  O=123.1900 H=126.0000 L=122.8700 C=124.5600 V=6216900
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=0.6641 dti(2,20,5,3,3) signal=-1.0974
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-14.7581
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=1.9070
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.1968
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=3.2330
 
 Bar[167] 2020-06-17  O=124.5600 H=128.5000 L=125.5000 C=127.2500 V=6266900
   sma(14)                                       primed=True  sma(14)=124.1821
@@ -23362,6 +23736,8 @@ Bar[167] 2020-06-17  O=124.5600 H=128.5000 L=125.5000 C=127.2500 V=6266900
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=5.9437 dti(2,20,5,3,3) signal=2.4232
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-14.5535
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.1967
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=3.1706
 
 Bar[168] 2020-06-18  O=127.2500 H=126.7500 L=124.2500 C=125.8700 V=5584800
   sma(14)                                       primed=True  sma(14)=124.3607
@@ -23482,6 +23858,8 @@ Bar[168] 2020-06-18  O=127.2500 H=126.7500 L=124.2500 C=125.8700 V=5584800
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=9.2732 dti(2,20,5,3,3) signal=5.8482
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-13.6202
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=1.8691
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.1907
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=3.0957
 
 Bar[169] 2020-06-19  O=125.8700 H=129.7500 L=128.0000 C=128.8600 V=5284500
   sma(14)                                       primed=True  sma(14)=124.4671
@@ -23602,6 +23980,8 @@ Bar[169] 2020-06-19  O=125.8700 H=129.7500 L=128.0000 C=128.8600 V=5284500
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=14.7843 dti(2,20,5,3,3) signal=10.3162
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-12.7760
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=2.0521
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.1958
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=2.9991
 
 Bar[170] 2020-06-20  O=128.8600 H=132.6900 L=128.3800 C=132.0000 V=7554500
   sma(14)                                       primed=True  sma(14)=124.7171
@@ -23722,6 +24102,8 @@ Bar[170] 2020-06-20  O=128.8600 H=132.6900 L=128.3800 C=132.0000 V=7554500
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=22.5574 dti(2,20,5,3,3) signal=16.4368
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-9.6081
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=2.4810
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2111
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=2.8776
 
 Bar[171] 2020-06-21  O=132.0000 H=133.9400 L=130.6900 C=130.7500 V=7209500
   sma(14)                                       primed=True  sma(14)=125.2086
@@ -23842,6 +24224,8 @@ Bar[171] 2020-06-21  O=132.0000 H=133.9400 L=130.6900 C=130.7500 V=7209500
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=30.0047 dti(2,20,5,3,3) signal=23.2207
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-9.3797
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=3.0027
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2192
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=2.7415
 
 Bar[172] 2020-06-22  O=130.7500 H=136.5000 L=131.6300 C=134.7500 V=8424800
   sma(14)                                       primed=True  sma(14)=126.0521
@@ -23962,6 +24346,8 @@ Bar[172] 2020-06-22  O=130.7500 H=136.5000 L=131.6300 C=134.7500 V=8424800
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=37.5150 dti(2,20,5,3,3) signal=30.3679
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-7.8833
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=3.7434
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2402
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=2.5829
 
 Bar[173] 2020-06-23  O=134.7500 H=137.6900 L=134.3800 C=135.0000 V=5094500
   sma(14)                                       primed=True  sma(14)=126.9986
@@ -24082,6 +24468,8 @@ Bar[173] 2020-06-23  O=134.7500 H=137.6900 L=134.3800 C=135.0000 V=5094500
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=43.9782 dti(2,20,5,3,3) signal=37.1730
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-8.1389
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=4.6160
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2588
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=2.4464
 
 Bar[174] 2020-06-24  O=135.0000 H=135.5600 L=132.0000 C=132.3800 V=4443600
   sma(14)                                       primed=True  sma(14)=127.5657
@@ -24202,6 +24590,8 @@ Bar[174] 2020-06-24  O=135.0000 H=135.5600 L=132.0000 C=132.3800 V=4443600
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=44.9398 dti(2,20,5,3,3) signal=41.0564
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-10.1288
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=5.4255
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2647
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=2.3343
 
 Bar[175] 2020-06-25  O=132.3800 H=133.5600 L=131.9400 C=133.3100 V=4591100
   sma(14)                                       primed=True  sma(14)=128.3736
@@ -24322,6 +24712,8 @@ Bar[175] 2020-06-25  O=132.3800 H=133.5600 L=131.9400 C=133.3100 V=4591100
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=44.0536 dti(2,20,5,3,3) signal=42.5550
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-10.6225
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=6.2071
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2723
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=2.2477
 
 Bar[176] 2020-06-26  O=133.3100 H=135.0000 L=131.9400 C=131.9400 V=5658400
   sma(14)                                       primed=True  sma(14)=129.0571
@@ -24442,6 +24834,8 @@ Bar[176] 2020-06-26  O=133.3100 H=135.0000 L=131.9400 C=131.9400 V=5658400
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=43.6677 dti(2,20,5,3,3) signal=43.1113
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-12.9803
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=6.8807
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2729
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=2.1789
 
 Bar[177] 2020-06-27  O=131.9400 H=132.3800 L=129.5600 C=130.0000 V=6094100
   sma(14)                                       primed=True  sma(14)=129.5614
@@ -24562,6 +24956,8 @@ Bar[177] 2020-06-27  O=131.9400 H=132.3800 L=129.5600 C=130.0000 V=6094100
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=39.9181 dti(2,20,5,3,3) signal=41.5147
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-15.8534
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=7.3687
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2654
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=2.1189
 
 Bar[178] 2020-06-28  O=130.0000 H=131.4400 L=123.7500 C=125.3700 V=14862200
   sma(14)                                       primed=True  sma(14)=129.6593
@@ -24682,6 +25078,8 @@ Bar[178] 2020-06-28  O=130.0000 H=131.4400 L=123.7500 C=125.3700 V=14862200
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=28.0634 dti(2,20,5,3,3) signal=34.7890
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-20.1893
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=7.4935
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2579
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=2.0499
 
 Bar[179] 2020-06-29  O=125.3700 H=130.8800 L=126.0000 C=130.1300 V=7544700
   sma(14)                                       primed=True  sma(14)=130.1550
@@ -24802,6 +25200,8 @@ Bar[179] 2020-06-29  O=125.3700 H=130.8800 L=126.0000 C=130.1300 V=7544700
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=17.2559 dti(2,20,5,3,3) signal=26.0225
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-20.0834
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=7.5716
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2517
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=1.9907
 
 Bar[180] 2020-06-30  O=130.1300 H=129.6300 L=126.2500 C=127.1200 V=6985600
   sma(14)                                       primed=True  sma(14)=130.3379
@@ -24922,6 +25322,8 @@ Bar[180] 2020-06-30  O=130.1300 H=129.6300 L=126.2500 C=127.1200 V=6985600
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=9.1021 dti(2,20,5,3,3) signal=17.5623
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-20.6667
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2386
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=1.9267
 
 Bar[181] 2020-07-01  O=127.1200 H=127.2500 L=124.3700 C=125.1900 V=8093000
   sma(14)                                       primed=True  sma(14)=130.1907
@@ -25042,6 +25444,8 @@ Bar[181] 2020-07-01  O=127.1200 H=127.2500 L=124.3700 C=125.1900 V=8093000
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=1.3794 dti(2,20,5,3,3) signal=9.4708
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-21.5066
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2333
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=1.8517
 
 Bar[182] 2020-07-02  O=125.1900 H=127.8100 L=121.4400 C=122.0000 V=7590000
   sma(14)                                       primed=True  sma(14)=129.9143
@@ -25162,6 +25566,8 @@ Bar[182] 2020-07-02  O=125.1900 H=127.8100 L=121.4400 C=122.0000 V=7590000
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-6.8556 dti(2,20,5,3,3) signal=1.3076
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-24.6353
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=6.5773
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2394
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=1.7555
 
 Bar[183] 2020-07-03  O=122.0000 H=125.0000 L=120.4400 C=125.0000 V=7451300
   sma(14)                                       primed=True  sma(14)=129.6386
@@ -25282,6 +25688,8 @@ Bar[183] 2020-07-03  O=122.0000 H=125.0000 L=120.4400 C=125.0000 V=7451300
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-14.3489 dti(2,20,5,3,3) signal=-6.5206
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-23.1205
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=5.9580
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2330
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=1.6504
 
 Bar[184] 2020-07-04  O=125.0000 H=126.8100 L=121.3700 C=123.0000 V=7078000
   sma(14)                                       primed=True  sma(14)=128.9957
@@ -25402,6 +25810,8 @@ Bar[184] 2020-07-04  O=125.0000 H=126.8100 L=121.3700 C=123.0000 V=7078000
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-18.0760 dti(2,20,5,3,3) signal=-12.2983
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-22.6666
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=5.2458
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2337
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=1.5715
 
 Bar[185] 2020-07-05  O=123.0000 H=124.7500 L=121.6900 C=123.5000 V=7105300
   sma(14)                                       primed=True  sma(14)=128.4779
@@ -25522,6 +25932,8 @@ Bar[185] 2020-07-05  O=123.0000 H=124.7500 L=121.6900 C=123.5000 V=7105300
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-19.8977 dti(2,20,5,3,3) signal=-16.0980
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-21.5861
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=4.5193
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2317
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=1.5165
 
 Bar[186] 2020-07-06  O=123.5000 H=122.8100 L=120.0000 C=120.0600 V=8778800
   sma(14)                                       primed=True  sma(14)=127.4286
@@ -25642,6 +26054,8 @@ Bar[186] 2020-07-06  O=123.5000 H=122.8100 L=120.0000 C=120.0600 V=8778800
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-22.1215 dti(2,20,5,3,3) signal=-19.1098
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-22.1005
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=3.6520
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2418
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=1.4946
 
 Bar[187] 2020-07-07  O=120.0600 H=122.2500 L=119.6200 C=121.0000 V=6643900
   sma(14)                                       primed=True  sma(14)=126.4286
@@ -25762,6 +26176,8 @@ Bar[187] 2020-07-07  O=120.0600 H=122.2500 L=119.6200 C=121.0000 V=6643900
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-24.3548 dti(2,20,5,3,3) signal=-21.7323
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-22.0323
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=2.7622
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2463
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=1.4980
 
 Bar[188] 2020-07-08  O=121.0000 H=121.0600 L=115.5000 C=117.7500 V=10563900
   sma(14)                                       primed=True  sma(14)=125.3836
@@ -25882,6 +26298,8 @@ Bar[188] 2020-07-08  O=121.0000 H=121.0600 L=115.5000 C=117.7500 V=10563900
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-29.2928 dti(2,20,5,3,3) signal=-25.5125
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-21.8831
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=1.7437
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2613
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=1.5279
 
 Bar[189] 2020-07-09  O=117.7500 H=120.0000 L=116.7500 C=119.8700 V=7043100
   sma(14)                                       primed=True  sma(14)=124.4236
@@ -26002,6 +26420,8 @@ Bar[189] 2020-07-09  O=117.7500 H=120.0000 L=116.7500 C=119.8700 V=7043100
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-33.9462 dti(2,20,5,3,3) signal=-29.7294
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-19.5248
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.7660
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2657
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=1.5734
 
 Bar[190] 2020-07-10  O=119.8700 H=123.2500 L=119.0600 C=122.0000 V=6438900
   sma(14)                                       primed=True  sma(14)=123.7136
@@ -26122,6 +26542,8 @@ Bar[190] 2020-07-10  O=119.8700 H=123.2500 L=119.0600 C=122.0000 V=6438900
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-33.1110 dti(2,20,5,3,3) signal=-31.4202
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-16.3210
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-0.0611
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2609
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=1.6247
 
 Bar[191] 2020-07-11  O=122.0000 H=122.7500 L=119.0600 C=119.1900 V=8057700
   sma(14)                                       primed=True  sma(14)=122.9414
@@ -26242,6 +26664,8 @@ Bar[191] 2020-07-11  O=122.0000 H=122.7500 L=119.0600 C=119.1900 V=8057700
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-30.8110 dti(2,20,5,3,3) signal=-31.1156
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-15.7500
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-0.8812
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2660
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=1.6911
 
 Bar[192] 2020-07-12  O=119.1900 H=119.1900 L=115.0600 C=116.3700 V=14240000
   sma(14)                                       primed=True  sma(14)=122.2986
@@ -26362,6 +26786,8 @@ Bar[192] 2020-07-12  O=119.1900 H=119.1900 L=115.0600 C=116.3700 V=14240000
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-31.3370 dti(2,20,5,3,3) signal=-31.2263
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-15.8624
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-1.7873
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2799
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=1.7803
 
 Bar[193] 2020-07-13  O=116.3700 H=115.0600 L=111.0600 C=113.5000 V=17872300
   sma(14)                                       primed=True  sma(14)=121.1107
@@ -26482,6 +26908,8 @@ Bar[193] 2020-07-13  O=116.3700 H=115.0600 L=111.0600 C=113.5000 V=17872300
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-35.1419 dti(2,20,5,3,3) signal=-33.1841
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-15.0276
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-2.8371
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.3016
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=1.8924
 
 Bar[194] 2020-07-14  O=113.5000 H=116.6900 L=113.1200 C=114.2500 V=7831100
   sma(14)                                       primed=True  sma(14)=120.1914
@@ -26602,6 +27030,8 @@ Bar[194] 2020-07-14  O=113.5000 H=116.6900 L=113.1200 C=114.2500 V=7831100
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-36.8102 dti(2,20,5,3,3) signal=-34.9971
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-14.8983
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-3.9121
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.3170
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=2.0216
 
 Bar[195] 2020-07-15  O=114.2500 H=114.8700 L=110.0000 C=110.0000 V=8277700
   sma(14)                                       primed=True  sma(14)=119.1064
@@ -26722,6 +27152,8 @@ Bar[195] 2020-07-15  O=114.2500 H=114.8700 L=110.0000 C=110.0000 V=8277700
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-39.2178 dti(2,20,5,3,3) signal=-37.1075
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-17.2990
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-5.1386
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.3450
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=2.1790
 
 Bar[196] 2020-07-16  O=110.0000 H=110.8700 L=105.0000 C=105.0600 V=15017800
   sma(14)                                       primed=True  sma(14)=117.8964
@@ -26842,6 +27274,8 @@ Bar[196] 2020-07-16  O=110.0000 H=110.8700 L=105.0000 C=105.0600 V=15017800
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-43.6833 dti(2,20,5,3,3) signal=-40.3954
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-21.7877
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-6.6151
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.3865
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=2.3698
 
 Bar[197] 2020-07-17  O=105.0600 H=107.2500 L=104.6900 C=107.0000 V=14183300
   sma(14)                                       primed=True  sma(14)=116.6107
@@ -26962,6 +27396,8 @@ Bar[197] 2020-07-17  O=105.0600 H=107.2500 L=104.6900 C=107.0000 V=14183300
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-47.6484 dti(2,20,5,3,3) signal=-44.0219
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-23.3984
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-8.1132
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4147
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=2.5815
 
 Bar[198] 2020-07-18  O=107.0000 H=108.8700 L=103.8700 C=107.8700 V=13921100
   sma(14)                                       primed=True  sma(14)=115.5300
@@ -27082,6 +27518,8 @@ Bar[198] 2020-07-18  O=107.0000 H=108.8700 L=103.8700 C=107.8700 V=13921100
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-49.6789 dti(2,20,5,3,3) signal=-46.8504
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-22.0943
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-9.5324
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4348
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=2.8063
 
 Bar[199] 2020-07-19  O=107.8700 H=109.0000 L=104.6900 C=107.0000 V=9683000
   sma(14)                                       primed=True  sma(14)=114.3514
@@ -27202,6 +27640,8 @@ Bar[199] 2020-07-19  O=107.8700 H=109.0000 L=104.6900 C=107.0000 V=9683000
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-50.6001 dti(2,20,5,3,3) signal=-48.7252
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-20.4387
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-10.8843
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4541
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=3.0449
 
 Bar[200] 2020-07-20  O=107.0000 H=108.5000 L=105.4400 C=107.1200 V=9187300
   sma(14)                                       primed=True  sma(14)=113.4271
@@ -27322,6 +27762,8 @@ Bar[200] 2020-07-20  O=107.0000 H=108.5000 L=105.4400 C=107.1200 V=9187300
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-51.0193 dti(2,20,5,3,3) signal=-49.8722
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-18.7209
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-12.1435
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4691
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=3.2945
 
 Bar[201] 2020-07-21  O=107.1200 H=113.0600 L=107.0000 C=107.0000 V=11380500
   sma(14)                                       primed=True  sma(14)=112.4271
@@ -27442,6 +27884,8 @@ Bar[201] 2020-07-21  O=107.1200 H=113.0600 L=107.0000 C=107.0000 V=11380500
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-45.4796 dti(2,20,5,3,3) signal=-47.6759
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-20.3438
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-13.3089
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4810
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=3.5533
 
 Bar[202] 2020-07-22  O=107.0000 H=93.0000 L=89.0000 C=91.0000 V=69447300
   sma(14)                                       primed=True  sma(14)=110.5164
@@ -27562,6 +28006,8 @@ Bar[202] 2020-07-22  O=107.0000 H=93.0000 L=89.0000 C=91.0000 V=69447300
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-47.2340 dti(2,20,5,3,3) signal=-47.4550
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-21.0190
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-14.9386
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.5486
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=3.8507
 
 Bar[203] 2020-07-23  O=91.0000 H=94.6200 L=92.5000 C=93.9400 V=26673600
   sma(14)                                       primed=True  sma(14)=108.6643
@@ -27682,6 +28128,8 @@ Bar[203] 2020-07-23  O=91.0000 H=94.6200 L=92.5000 C=93.9400 V=26673600
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-48.4982 dti(2,20,5,3,3) signal=-47.9766
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-20.8073
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-16.6639
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.5953
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=4.1703
 
 Bar[204] 2020-07-24  O=93.9400 H=95.1200 L=92.1200 C=93.8700 V=13768400
   sma(14)                                       primed=True  sma(14)=106.6550
@@ -27802,6 +28250,8 @@ Bar[204] 2020-07-24  O=93.9400 H=95.1200 L=92.1200 C=93.8700 V=13768400
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-49.1764 dti(2,20,5,3,3) signal=-48.5765
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-19.9980
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-18.3819
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.6347
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=4.5085
 
 Bar[205] 2020-07-25  O=93.8700 H=96.0000 L=94.6200 C=95.5000 V=11371600
   sma(14)                                       primed=True  sma(14)=104.9629
@@ -27922,6 +28372,8 @@ Bar[205] 2020-07-25  O=93.8700 H=96.0000 L=94.6200 C=95.5000 V=11371600
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-48.7850 dti(2,20,5,3,3) signal=-48.6807
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-19.0066
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-19.9526
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.6611
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=4.8520
 
 Bar[206] 2020-07-26  O=95.5000 H=95.5600 L=92.8100 C=93.0000 V=9872200
   sma(14)                                       primed=True  sma(14)=103.2936
@@ -28042,6 +28494,8 @@ Bar[206] 2020-07-26  O=95.5000 H=95.5600 L=92.8100 C=93.0000 V=9872200
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-48.7262 dti(2,20,5,3,3) signal=-48.7035
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-19.3913
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-21.4491
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.6911
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=5.2072
 
 Bar[207] 2020-07-27  O=93.0000 H=95.3100 L=94.2500 C=94.9400 V=9450500
   sma(14)                                       primed=True  sma(14)=101.9679
@@ -28162,6 +28616,8 @@ Bar[207] 2020-07-27  O=93.0000 H=95.3100 L=94.2500 C=94.9400 V=9450500
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-48.7760 dti(2,20,5,3,3) signal=-48.7397
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-19.3508
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-22.7511
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.7080
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=5.5641
 
 Bar[208] 2020-07-28  O=94.9400 H=99.0000 L=96.2500 C=98.2500 V=11083300
   sma(14)                                       primed=True  sma(14)=100.8250
@@ -28282,6 +28738,8 @@ Bar[208] 2020-07-28  O=94.9400 H=99.0000 L=96.2500 C=98.2500 V=11083300
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-45.5684 dti(2,20,5,3,3) signal=-47.1540
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-18.1520
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-23.7227
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.7081
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=5.9043
 
 Bar[209] 2020-07-29  O=98.2500 H=98.8100 L=96.3700 C=96.7500 V=9552800
   sma(14)                                       primed=True  sma(14)=99.8786
@@ -28402,6 +28860,8 @@ Bar[209] 2020-07-29  O=98.2500 H=98.8100 L=96.3700 C=96.7500 V=9552800
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-41.9374 dti(2,20,5,3,3) signal=-44.5457
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-18.0731
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-24.4901
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.7111
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=6.2323
 
 Bar[210] 2020-07-30  O=96.7500 H=96.8100 L=93.6900 C=94.8100 V=11108400
   sma(14)                                       primed=True  sma(14)=99.1464
@@ -28522,6 +28982,8 @@ Bar[210] 2020-07-30  O=96.7500 H=96.8100 L=93.6900 C=94.8100 V=11108400
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-39.8090 dti(2,20,5,3,3) signal=-42.1773
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-18.2328
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-25.1546
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.7183
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=6.5545
 
 Bar[211] 2020-07-31  O=94.8100 H=95.9400 L=93.5000 C=94.3700 V=10374200
   sma(14)                                       primed=True  sma(14)=98.2443
@@ -28642,6 +29104,8 @@ Bar[211] 2020-07-31  O=94.8100 H=95.9400 L=93.5000 C=94.3700 V=10374200
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-38.6398 dti(2,20,5,3,3) signal=-40.4086
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-18.5352
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-25.7429
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.7236
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=6.8696
 
 Bar[212] 2020-08-01  O=94.3700 H=94.4400 L=90.0000 C=91.5600 V=16701900
   sma(14)                                       primed=True  sma(14)=97.0793
@@ -28762,6 +29226,8 @@ Bar[212] 2020-08-01  O=94.3700 H=94.4400 L=90.0000 C=91.5600 V=16701900
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-39.4306 dti(2,20,5,3,3) signal=-39.9196
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-19.1183
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-26.3423
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.7359
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=7.1843
 
 Bar[213] 2020-08-02  O=91.5600 H=92.9400 L=90.1900 C=90.2500 V=13741900
   sma(14)                                       primed=True  sma(14)=95.8829
@@ -28882,6 +29348,8 @@ Bar[213] 2020-08-02  O=91.5600 H=92.9400 L=90.1900 C=90.2500 V=13741900
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-40.7153 dti(2,20,5,3,3) signal=-40.3175
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-21.0806
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-26.9666
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.7490
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=7.5023
 
 Bar[214] 2020-08-03  O=90.2500 H=93.9400 L=90.5000 C=93.9400 V=8523600
   sma(14)                                       primed=True  sma(14)=94.9414
@@ -29002,6 +29470,8 @@ Bar[214] 2020-08-03  O=90.2500 H=93.9400 L=90.5000 C=93.9400 V=8523600
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-40.9358 dti(2,20,5,3,3) signal=-40.6266
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-19.4519
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-27.4097
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.7441
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=7.8067
 
 Bar[215] 2020-08-04  O=93.9400 H=95.5000 L=92.1200 C=93.6200 V=9551900
   sma(14)                                       primed=True  sma(14)=93.9857
@@ -29122,6 +29592,8 @@ Bar[215] 2020-08-04  O=93.9400 H=95.5000 L=92.1200 C=93.6200 V=9551900
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-39.1350 dti(2,20,5,3,3) signal=-39.8808
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-18.0682
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-27.7282
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.7383
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.0991
 
 Bar[216] 2020-08-05  O=93.6200 H=97.0600 L=94.1200 C=97.0000 V=8680500
   sma(14)                                       primed=True  sma(14)=94.4143
@@ -29242,6 +29714,8 @@ Bar[216] 2020-08-05  O=93.6200 H=97.0600 L=94.1200 C=97.0000 V=8680500
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-35.3238 dti(2,20,5,3,3) signal=-37.6023
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-14.5845
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-27.7907
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.7180
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.3636
 
 Bar[217] 2020-08-06  O=97.0000 H=97.5000 L=94.8700 C=95.0000 V=7151700
   sma(14)                                       primed=True  sma(14)=94.4900
@@ -29362,6 +29836,8 @@ Bar[217] 2020-08-06  O=97.0000 H=97.5000 L=94.8700 C=95.0000 V=7151700
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-31.0484 dti(2,20,5,3,3) signal=-34.3254
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-13.5428
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.7049
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.6072
 
 Bar[218] 2020-08-07  O=95.0000 H=96.2500 L=93.0000 C=95.8700 V=9673100
   sma(14)                                       primed=True  sma(14)=94.6329
@@ -29482,6 +29958,8 @@ Bar[218] 2020-08-07  O=95.0000 H=96.2500 L=93.0000 C=95.8700 V=9673100
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-28.4359 dti(2,20,5,3,3) signal=-31.3806
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-10.5879
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.6875
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.8282
 
 Bar[219] 2020-08-08  O=95.8700 H=96.3700 L=93.8700 C=94.0600 V=6264700
   sma(14)                                       primed=True  sma(14)=94.5300
@@ -29602,6 +30080,8 @@ Bar[219] 2020-08-08  O=95.8700 H=96.3700 L=93.8700 C=94.0600 V=6264700
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-26.7209 dti(2,20,5,3,3) signal=-29.0508
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-9.8483
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.6762
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=9.0352
 
 Bar[220] 2020-08-09  O=94.0600 H=95.0000 L=93.0000 C=94.6200 V=8541600
   sma(14)                                       primed=True  sma(14)=94.6457
@@ -29722,6 +30202,8 @@ Bar[220] 2020-08-09  O=94.0600 H=95.0000 L=93.0000 C=94.6200 V=8541600
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-26.1681 dti(2,20,5,3,3) signal=-27.6094
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-8.2023
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.6618
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=9.2268
 
 Bar[221] 2020-08-10  O=94.6200 H=94.8700 L=92.6200 C=93.7500 V=8358000
   sma(14)                                       primed=True  sma(14)=94.5607
@@ -29842,6 +30324,8 @@ Bar[221] 2020-08-10  O=94.6200 H=94.8700 L=92.6200 C=93.7500 V=8358000
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-26.3710 dti(2,20,5,3,3) signal=-26.9902
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-6.8337
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.6498
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=9.4076
 
 Bar[222] 2020-08-11  O=93.7500 H=98.2500 L=93.5600 C=98.0000 V=18720800
   sma(14)                                       primed=True  sma(14)=94.5429
@@ -29962,6 +30446,8 @@ Bar[222] 2020-08-11  O=93.7500 H=98.2500 L=93.5600 C=98.0000 V=18720800
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-22.6774 dti(2,20,5,3,3) signal=-24.8338
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=-2.3142
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.6212
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=9.5614
 
 Bar[223] 2020-08-12  O=98.0000 H=105.1200 L=98.3700 C=103.9400 V=19683100
   sma(14)                                       primed=True  sma(14)=95.0564
@@ -30082,6 +30568,8 @@ Bar[223] 2020-08-12  O=98.0000 H=105.1200 L=98.3700 C=103.9400 V=19683100
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=-10.8814 dti(2,20,5,3,3) signal=-17.8576
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=4.2763
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.5952
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=9.6626
 
 Bar[224] 2020-08-13  O=103.9400 H=108.4400 L=104.4400 C=107.8700 V=13682500
   sma(14)                                       primed=True  sma(14)=95.9893
@@ -30202,6 +30690,8 @@ Bar[224] 2020-08-13  O=103.9400 H=108.4400 L=104.4400 C=107.8700 V=13682500
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=2.8441 dti(2,20,5,3,3) signal=-7.5068
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=10.7247
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.5845
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=9.6980
 
 Bar[225] 2020-08-14  O=107.8700 H=109.8700 L=106.0000 C=106.0600 V=10668100
   sma(14)                                       primed=True  sma(14)=96.8243
@@ -30322,6 +30812,8 @@ Bar[225] 2020-08-14  O=107.8700 H=109.8700 L=106.0000 C=106.0600 V=10668100
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=14.4430 dti(2,20,5,3,3) signal=3.4681
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=12.1098
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0000
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.5663
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=9.6817
 
 Bar[226] 2020-08-15  O=106.0600 H=105.0000 L=101.8100 C=104.5000 V=9710600
   sma(14)                                       primed=True  sma(14)=97.7486
@@ -30442,6 +30934,8 @@ Bar[226] 2020-08-15  O=106.0600 H=105.0000 L=101.8100 C=104.5000 V=9710600
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=18.7190 dti(2,20,5,3,3) signal=11.0936
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=14.3438
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-21.4370
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.5424
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=9.6224
 
 Bar[227] 2020-08-16  O=104.5000 H=106.0000 L=104.1200 C=105.0000 V=3113100
   sma(14)                                       primed=True  sma(14)=98.8021
@@ -30562,6 +31056,8 @@ Bar[227] 2020-08-16  O=104.5000 H=106.0000 L=104.1200 C=105.0000 V=3113100
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=20.6053 dti(2,20,5,3,3) signal=15.8494
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=15.6401
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-19.9481
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.5212
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=9.5202
 
 Bar[228] 2020-08-17  O=105.0000 H=104.9400 L=103.3700 C=104.1900 V=5682000
   sma(14)                                       primed=True  sma(14)=99.5343
@@ -30682,6 +31178,8 @@ Bar[228] 2020-08-17  O=105.0000 H=104.9400 L=103.3700 C=104.1900 V=5682000
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=20.7415 dti(2,20,5,3,3) signal=18.2955
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=16.4525
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-18.5317
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4976
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=9.3834
 
 Bar[229] 2020-08-18  O=104.1900 H=104.5000 L=102.1200 C=103.0600 V=5763600
   sma(14)                                       primed=True  sma(14)=100.2086
@@ -30802,6 +31300,8 @@ Bar[229] 2020-08-18  O=104.1900 H=104.5000 L=102.1200 C=103.0600 V=5763600
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=19.1977 dti(2,20,5,3,3) signal=18.7466
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=16.4002
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-17.2402
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4708
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=9.2207
 
 Bar[230] 2020-08-19  O=103.0600 H=104.4400 L=102.2500 C=103.4200 V=5340000
   sma(14)                                       primed=True  sma(14)=100.6671
@@ -30922,6 +31422,8 @@ Bar[230] 2020-08-19  O=103.0600 H=104.4400 L=102.2500 C=103.4200 V=5340000
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=17.4223 dti(2,20,5,3,3) signal=18.0845
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=16.2062
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-16.0518
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4467
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=9.0345
 
 Bar[231] 2020-08-20  O=103.4200 H=106.3100 L=103.3700 C=105.2700 V=6220800
   sma(14)                                       primed=True  sma(14)=101.4007
@@ -31042,6 +31544,8 @@ Bar[231] 2020-08-20  O=103.4200 H=106.3100 L=103.3700 C=105.2700 V=6220800
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=17.1189 dti(2,20,5,3,3) signal=17.6017
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=16.3517
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-14.8803
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4306
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.8215
 
 Bar[232] 2020-08-21  O=105.2700 H=112.8700 L=107.9400 C=111.8700 V=14680500
   sma(14)                                       primed=True  sma(14)=102.5436
@@ -31162,6 +31666,8 @@ Bar[232] 2020-08-21  O=105.2700 H=112.8700 L=107.9400 C=111.8700 V=14680500
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=21.6277 dti(2,20,5,3,3) signal=19.6147
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=18.0561
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-13.4562
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4390
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.5612
 
 Bar[233] 2020-08-22  O=111.8700 H=116.5000 L=112.5000 C=116.0000 V=9933000
   sma(14)                                       primed=True  sma(14)=104.1107
@@ -31282,6 +31788,8 @@ Bar[233] 2020-08-22  O=111.8700 H=116.5000 L=112.5000 C=116.0000 V=9933000
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=28.5100 dti(2,20,5,3,3) signal=24.0623
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=20.9649
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-11.7256
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4601
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=8.2515
 
 Bar[234] 2020-08-23  O=116.0000 H=119.1900 L=115.4400 C=116.6200 V=11329500
   sma(14)                                       primed=True  sma(14)=105.6821
@@ -31402,6 +31910,8 @@ Bar[234] 2020-08-23  O=116.0000 H=119.1900 L=115.4400 C=116.6200 V=11329500
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=35.6535 dti(2,20,5,3,3) signal=29.8579
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=21.4014
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-9.8211
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4792
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=7.9037
 
 Bar[235] 2020-08-24  O=116.6200 H=121.0000 L=115.5000 C=118.2800 V=8145300
   sma(14)                                       primed=True  sma(14)=107.4343
@@ -31522,6 +32032,8 @@ Bar[235] 2020-08-24  O=116.6200 H=121.0000 L=115.5000 C=118.2800 V=8145300
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=41.9559 dti(2,20,5,3,3) signal=35.9069
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=20.8971
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-7.7895
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.5004
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=7.5207
 
 Bar[236] 2020-08-25  O=118.2800 H=122.1200 L=112.2500 C=113.3700 V=16644700
   sma(14)                                       primed=True  sma(14)=108.5321
@@ -31642,6 +32154,8 @@ Bar[236] 2020-08-25  O=118.2800 H=122.1200 L=112.2500 C=113.3700 V=16644700
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=44.4751 dti(2,20,5,3,3) signal=40.1910
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=13.9923
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-5.9180
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4993
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=7.1284
 
 Bar[237] 2020-08-26  O=113.3700 H=111.9400 L=107.5600 C=109.0000 V=12593800
   sma(14)                                       primed=True  sma(14)=108.8936
@@ -31762,6 +32276,8 @@ Bar[237] 2020-08-26  O=113.3700 H=111.9400 L=107.5600 C=109.0000 V=12593800
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=40.7273 dti(2,20,5,3,3) signal=40.4591
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=8.2011
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-4.3802
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4804
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=6.7451
 
 Bar[238] 2020-08-27  O=109.0000 H=112.7500 L=106.5600 C=109.7000 V=7138100
   sma(14)                                       primed=True  sma(14)=109.0243
@@ -31882,6 +32398,8 @@ Bar[238] 2020-08-27  O=109.0000 H=112.7500 L=106.5600 C=109.7000 V=7138100
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=35.8822 dti(2,20,5,3,3) signal=38.1707
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=4.1810
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-3.0882
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4645
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=6.3688
 
 Bar[239] 2020-08-28  O=109.7000 H=110.1900 L=106.8700 C=109.2500 V=7442300
   sma(14)                                       primed=True  sma(14)=109.2521
@@ -32002,6 +32520,8 @@ Bar[239] 2020-08-28  O=109.7000 H=110.1900 L=106.8700 C=109.2500 V=7442300
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=31.6583 dti(2,20,5,3,3) signal=34.9145
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=2.2989
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-2.0180
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4472
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=6.0015
 
 Bar[240] 2020-08-29  O=109.2500 H=107.9400 L=104.5000 C=107.0000 V=9442300
   sma(14)                                       primed=True  sma(14)=109.4307
@@ -32122,6 +32642,8 @@ Bar[240] 2020-08-29  O=109.2500 H=107.9400 L=104.5000 C=107.0000 V=9442300
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=26.2283 dti(2,20,5,3,3) signal=30.5714
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=1.8835
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-1.2147
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4219
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=5.6520
 
 Bar[241] 2020-08-30  O=107.0000 H=109.6900 L=105.7500 C=109.1900 V=7123600
   sma(14)                                       primed=True  sma(14)=109.7300
@@ -32242,6 +32764,8 @@ Bar[241] 2020-08-30  O=107.0000 H=109.6900 L=105.7500 C=109.1900 V=7123600
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=22.3829 dti(2,20,5,3,3) signal=26.4771
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=3.2548
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=-0.5260
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.4062
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=5.3113
 
 Bar[242] 2020-08-31  O=109.1900 H=111.0600 L=108.6200 C=110.0000 V=7680600
   sma(14)                                       primed=True  sma(14)=110.1450
@@ -32362,6 +32886,8 @@ Bar[242] 2020-08-31  O=109.1900 H=111.0600 L=108.6200 C=110.0000 V=7680600
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=20.5565 dti(2,20,5,3,3) signal=23.5168
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=4.3650
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.0977
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.3937
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=5.0021
 
 Bar[243] 2020-09-01  O=110.0000 H=110.4400 L=107.7500 C=109.2000 V=4839800
   sma(14)                                       primed=True  sma(14)=110.5836
@@ -32482,6 +33008,8 @@ Bar[243] 2020-09-01  O=110.0000 H=110.4400 L=107.7500 C=109.2000 V=4839800
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=18.9404 dti(2,20,5,3,3) signal=21.2286
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=5.2216
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=0.6283
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.3784
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=4.7225
 
 Bar[244] 2020-09-02  O=109.2000 H=110.1200 L=108.0600 C=110.1200 V=4775500
   sma(14)                                       primed=True  sma(14)=111.0621
@@ -32602,6 +33130,8 @@ Bar[244] 2020-09-02  O=109.2000 H=110.1200 L=108.0600 C=110.1200 V=4775500
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=17.6729 dti(2,20,5,3,3) signal=19.4508
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=7.0140
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=1.1180
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.3668
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=4.4729
 
 Bar[245] 2020-09-03  O=110.1200 H=110.3100 L=108.0000 C=108.0000 V=4008800
   sma(14)                                       primed=True  sma(14)=111.2571
@@ -32722,6 +33252,8 @@ Bar[245] 2020-09-03  O=110.1200 H=110.3100 L=108.0000 C=108.0000 V=4008800
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=16.8097 dti(2,20,5,3,3) signal=18.1303
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=6.8449
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=1.4817
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.3475
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=4.2425
 
 Bar[246] 2020-09-04  O=108.0000 H=110.4400 L=108.1900 C=108.6200 V=4533600
   sma(14)                                       primed=True  sma(14)=111.0250
@@ -32842,6 +33374,8 @@ Bar[246] 2020-09-04  O=108.0000 H=110.4400 L=108.1900 C=108.6200 V=4533600
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=16.3101 dti(2,20,5,3,3) signal=17.2202
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=5.7509
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=1.7754
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.3314
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=4.0291
 
 Bar[247] 2020-09-05  O=108.6200 H=110.0000 L=108.1200 C=109.7500 V=3741100
   sma(14)                                       primed=True  sma(14)=110.5786
@@ -32962,6 +33496,8 @@ Bar[247] 2020-09-05  O=108.6200 H=110.0000 L=108.1200 C=109.7500 V=3741100
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=15.9365 dti(2,20,5,3,3) signal=16.5783
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=5.7422
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=2.0587
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.3202
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=3.8347
 
 Bar[248] 2020-09-06  O=109.7500 H=110.7500 L=109.0600 C=109.8100 V=4084800
   sma(14)                                       primed=True  sma(14)=110.0921
@@ -33082,6 +33618,8 @@ Bar[248] 2020-09-06  O=109.7500 H=110.7500 L=109.0600 C=109.8100 V=4084800
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=16.2933 dti(2,20,5,3,3) signal=16.4358
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=5.5429
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=2.3302
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.3093
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=3.6580
 
 Bar[249] 2020-09-07  O=109.8100 H=110.5000 L=108.7500 C=109.0000 V=2685200
   sma(14)                                       primed=True  sma(14)=109.4293
@@ -33202,6 +33740,8 @@ Bar[249] 2020-09-07  O=109.8100 H=110.5000 L=108.7500 C=109.0000 V=2685200
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=16.4820 dti(2,20,5,3,3) signal=16.4589
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=4.4490
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=2.5532
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2956
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=3.4946
 
 Bar[250] 2020-09-08  O=109.0000 H=110.5000 L=108.5600 C=108.7500 V=3438000
   sma(14)                                       primed=True  sma(14)=109.0993
@@ -33322,6 +33862,8 @@ Bar[250] 2020-09-08  O=109.0000 H=110.5000 L=108.5600 C=108.7500 V=3438000
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=16.3257 dti(2,20,5,3,3) signal=16.3923
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=2.4057
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=2.7275
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2815
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=3.3427
 
 Bar[251] 2020-09-09  O=108.7500 H=109.5000 L=106.6200 C=107.8700 V=2870500
   sma(14)                                       primed=True  sma(14)=109.0186
@@ -33442,4 +33984,6 @@ Bar[251] 2020-09-09  O=108.7500 H=109.5000 L=106.6200 C=107.8700 V=2870500
   dti(2,20,5,3,3)                               primed=True  dti(2,20,5,3,3) dti=13.3255 dti(2,20,5,3,3) signal=14.8589
   tvi(12,12,1)                                  primed=True  tvi(12,12,1)=0.4964
   sdtsi(2,32,32,7,32,7)                         primed=True  sdtsi(2,32,32,7,32,7)=2.8267
+  atf.tsi(2,32,32)                              primed=True  atf.tsi(2,32,32)=0.2648
+  atf.smi(32,32,32)                             primed=True  atf.smi(32,32,32)=3.1982
 

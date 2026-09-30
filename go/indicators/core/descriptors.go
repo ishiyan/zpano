@@ -933,4 +933,12 @@ var descriptors = map[Identifier]Descriptor{
 			{Kind: 1 /* Value */, Shape: shape.Scalar, Role: BoundedOscillator, Pane: Own},
 		},
 	},
+
+	AdxTypeFilter: {
+		Identifier: AdxTypeFilter, Family: "William Blau",
+		Adaptivity: Static, InputRequirement: BarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{
+			{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Oscillator, Pane: Own},
+		},
+	},
 }

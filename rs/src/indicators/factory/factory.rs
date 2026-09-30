@@ -341,6 +341,9 @@ use crate::indicators::william_blau::tick_volume_indicator::tick_volume_indicato
 use crate::indicators::william_blau::slope_divergence_tsi_filter::slope_divergence_tsi_filter::{
     SlopeDivergenceTsiFilter, SlopeDivergenceTsiFilterParams,
 };
+use crate::indicators::william_blau::adx_type_filter::adx_type_filter::{
+    AdxTypeFilter, AdxTypeFilterParams, AdxTypeFilterSource,
+};
 
 /// Create an indicator from its identifier and a JSON-encoded parameter string.
 ///
@@ -1827,6 +1830,18 @@ pub fn create_indicator(
             if let Some(v) = get_usize(&params, "x") { p.x = v; }
             if let Some(v) = get_usize(&params, "y") { p.y = v; }
             Ok(Box::new(SlopeDivergenceTsiFilter::new(&p)?))
+        }
+
+        Identifier::AdxTypeFilter => {
+            let mut p = AdxTypeFilterParams::default();
+            if let Some(v) = get_i64(&params, "source") {
+                p.source = AdxTypeFilterSource::from_i64(v)
+                    .ok_or_else(|| format!("invalid adx type filter parameters: unknown source {}", v))?;
+            }
+            if let Some(v) = get_usize(&params, "q") { p.q = v; }
+            if let Some(v) = get_usize(&params, "r") { p.r = v; }
+            if let Some(v) = get_usize(&params, "s") { p.s = v; }
+            Ok(Box::new(AdxTypeFilter::new(&p)?))
         }
 
         _ => Err(format!("unsupported indicator: {:?}", identifier)),

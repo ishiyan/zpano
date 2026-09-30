@@ -185,6 +185,7 @@ const dss_mod = @import("../william_blau/double_smoothed_stochastic/double_smoot
 const dti_mod = @import("../william_blau/directional_trend_index/directional_trend_index.zig");
 const tvi_mod = @import("../william_blau/tick_volume_indicator/tick_volume_indicator.zig");
 const sdtsi_mod = @import("../william_blau/slope_divergence_tsi_filter/slope_divergence_tsi_filter.zig");
+const atf_mod = @import("../william_blau/adx_type_filter/adx_type_filter.zig");
 
 pub const FactoryError = error{
     UnsupportedIndicator,
@@ -1595,6 +1596,16 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
             .u = getUsize(obj, "u", 7),
             .x = getUsize(obj, "x", 32),
             .y = getUsize(obj, "y", 7),
+            .bar_component = getBarComponent(obj),
+            .quote_component = getQuoteComponent(obj),
+            .trade_component = getTradeComponent(obj),
+        }),
+        .adx_type_filter => createWithAllocParams(atf_mod.AdxTypeFilter, atf_mod.AdxTypeFilterParams, allocator, obj, .{
+            .source = std.enums.fromInt(atf_mod.AdxTypeFilterSource, getInt(obj, "source", 0)) orelse
+                return FactoryError.IndicatorInitFailed,
+            .q = getUsize(obj, "q", 0),
+            .r = getUsize(obj, "r", 32),
+            .s = getUsize(obj, "s", 32),
             .bar_component = getBarComponent(obj),
             .quote_component = getQuoteComponent(obj),
             .trade_component = getTradeComponent(obj),

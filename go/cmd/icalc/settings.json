@@ -116,5 +116,7 @@
   { "identifier": "doubleSmoothedStochastic", "params": { "q": 5, "r": 7, "s": 3, "g": 3 } },
   { "identifier": "directionalTrendIndex", "params": { "q": 2, "r": 20, "s": 5, "u": 3, "ul": 3 } },
   { "identifier": "tickVolumeIndicator", "params": { "r": 12, "s": 12, "u": 1 } },
-  { "identifier": "slopeDivergenceTsiFilter", "params": { "q": 2, "r": 32, "s": 32, "u": 7, "x": 32, "y": 7 } }
+  { "identifier": "slopeDivergenceTsiFilter", "params": { "q": 2, "r": 32, "s": 32, "u": 7, "x": 32, "y": 7 } },
+  { "identifier": "adxTypeFilter", "params": { "source": 0, "q": 2, "r": 32, "s": 32 } },
+  { "identifier": "adxTypeFilter", "params": { "source": 1, "q": 32, "r": 32, "s": 32 } }
 ]
