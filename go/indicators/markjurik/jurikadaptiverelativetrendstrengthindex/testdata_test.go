@@ -302,6 +302,5 @@ var expectedLo10Hi60 = []float64{
 	59.881177250520800, 59.566168324058147,
 }
 
-var expectedARTSI = expectedLo5Hi30
 
 var _ = math.NaN

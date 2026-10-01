@@ -525,6 +525,22 @@ test "QPL reference projection" {
     }
     try checkSeries(&up, &testdata.expectedUPPER_R50_0());
     try checkSeries(&lo, &testdata.expectedLOWER_R50_0());
+
+    try checkSeries(nqpr, &testdata.expectedNQPR_R1000_0());
+    for (nqpr, 0..) |m, i| {
+        up[i] = 1000.0 * m;
+        lo[i] = 1000.0 / m;
+    }
+    try checkSeries(&up, &testdata.expectedUPPER_R1000_0());
+    try checkSeries(&lo, &testdata.expectedLOWER_R1000_0());
+
+    try checkSeries(nqpr, &testdata.expectedNQPR_R1_2345());
+    for (nqpr, 0..) |m, i| {
+        up[i] = 1.2345 * m;
+        lo[i] = 1.2345 / m;
+    }
+    try checkSeries(&up, &testdata.expectedUPPER_R1_2345());
+    try checkSeries(&lo, &testdata.expectedLOWER_R1_2345());
 }
 
 test "QPL scalars" {

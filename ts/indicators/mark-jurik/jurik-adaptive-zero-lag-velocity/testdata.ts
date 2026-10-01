@@ -462,4 +462,3 @@ export const expectedPeriod300: number[] = [
     0.256730546434329, 0.206716829856002,
 ];
 
-export const expectedAZLV = expectedLo5Hi30;
