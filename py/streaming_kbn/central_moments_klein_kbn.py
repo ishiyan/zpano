@@ -4,134 +4,160 @@ from .klein_kbn_accumulator import KleinKBNAccumulator
 
 
 ##########################################################
-# Central moments with KBN (Kahan-Babuška-Neumaier) compensated
-# summation for improved numerical stability.
-# https://github.com/kuiperzone/Compensated-Accumulators/tree/master/CompensatedAccumulators
-# https://www.johndcook.com/skewness_kurtosis.html
-# How to implement revert?
+# Central moments with Klein KBN (Kahan-Babuška-Neumaier)
+# compensated summation for improved numerical stability.
+#
+# References:
+#   P. Pébay, "Formulas for Robust, One-Pass Parallel Computation
+#     of Covariances and Arbitrary-Order Statistical Moments",
+#     Sandia Report SAND2008-6212 (2008).
+#   https://www.johndcook.com/skewness_kurtosis.html
+#   https://github.com/kuiperzone/Compensated-Accumulators
 ##########################################################
 
 class CentralMomentsKleinKBN:
-    """
+    r"""
     Streaming mean, variance, skewness, kurtosis via Pébay's central moment
-    update with KBN (Kahan-Babuška-Neumaier) double-compensated accumulation.
+    update with Klein KBN (Kahan-Babuška-Neumaier) compensated accumulation.
 
-    Maintains running sums of central moments m₂, m₃, m₄ (as KleinKBNAccumulators)
-    updated in O(1) per sample.  Preferred over RawMomentsKleinKBN for forward-only
-    computation (no revert) because it avoids the numerical cancellation
-    inherent in converting raw power sums to central moments.
+    Maintains the mean M₁ and the sums of central powers
+
+        M₂ = Σ(x - x̄)²,   M₃ = Σ(x - x̄)³,   M₄ = Σ(x - x̄)⁴
+
+    (each as a KleinKBNAccumulator), updated in O(1) per sample.
+    The population central moments are μₖ = Mₖ / n.
+
+    Preferred over RawMomentsKleinKBN when samples are only added (or
+    removed in LIFO order), because it avoids the catastrophic cancellation
+    inherent in converting raw power sums Σxᵏ to central moments.  This
+    matters for data with a large mean relative to its spread.
 
     Parameters
     ----------
     ddof : int, default=1
         Delta degrees of freedom for variance.
-        variance = m₂ / (n - ddof).  ddof=0 gives population, ddof=1 gives sample.
+        variance = M₂ / (n - ddof).  ddof=0 gives population, ddof=1 gives sample.
     bias : bool, default=True
-        If True, compute population standardized moments (m₃/m₂^1.5).
-        If False, apply the Fisher-Pearson adjusted (bias-corrected) factor:
-        skewness_bcf = skewness_pop · √(n·(n-1)) / (n-2)
+        If True, return the biased (population) skewness and kurtosis.
+        If False, apply the bias corrections (see Notes).
     fisher : bool, default=True
         If True, return excess kurtosis (subtract 3 so Gaussian→0).
-        If False, return raw kurtosis (Gaussian→3).
+        If False, return raw (Pearson) kurtosis (Gaussian→3).
         Applied after the bias correction when bias=False.
 
     Notes
     -----
-    Skewness (bias=True):
-        g₁ = √n · m₃ / m₂^1.5
+    The results match scipy.stats.skew(bias=...) and
+    scipy.stats.kurtosis(bias=..., fisher=...).
 
-    Skewness (bias=False):
+    Skewness (bias=True), requires n ≥ 2:
+        g₁ = μ₃ / μ₂^1.5 = √n · M₃ / M₂^1.5
+
+    Skewness (bias=False), requires n ≥ 3:
         G₁ = g₁ · √(n·(n-1)) / (n-2)
 
-    Kurtosis (bias=True, fisher=True):
-        g₂ = n · m₄ / m₂²  -  3
+    Kurtosis (bias=True), requires n ≥ 2:
+        β₂ = μ₄ / μ₂² = n · M₄ / M₂²
+        fisher=True:  g₂ = β₂ - 3
+        fisher=False: β₂
 
-    Kurtosis (bias=True, fisher=False):
-        g₂ = n · m₄ / m₂²
+    Kurtosis (bias=False), requires n ≥ 4:
+        G₂ = ((n²-1) · β₂  -  3·(n-1)²) / ((n-2)·(n-3))
+        fisher=True:  G₂
+        fisher=False: G₂ + 3
 
-    Kurtosis (bias=False, fisher=True):
-        G₂ = ((n²-1) · n·m₄/m₂²  -  3·(n-1)²) / ((n-2)·(n-3))
-
-    Kurtosis (bias=False, fisher=False):
-        G₂ = ((n²-1) · n·m₄/m₂²  -  3·(n-1)²) / ((n-2)·(n-3))  +  3
+    Skewness and kurtosis are NaN when M₂ = 0 (constant data).
     """
     def __init__(self, ddof=1, bias=True, fisher=True) -> None:
         self.ddof = ddof
         self.bias = bias
         self.fisher = fisher
-        self.n = 0
-        self.m1: KleinKBNAccumulator = KleinKBNAccumulator()
-        self.m2: KleinKBNAccumulator = KleinKBNAccumulator()
-        self.m3: KleinKBNAccumulator = KleinKBNAccumulator()
-        self.m4: KleinKBNAccumulator = KleinKBNAccumulator()
+        self._n = 0
+        self._m1: KleinKBNAccumulator = KleinKBNAccumulator()
+        self._m2: KleinKBNAccumulator = KleinKBNAccumulator()
+        self._m3: KleinKBNAccumulator = KleinKBNAccumulator()
+        self._m4: KleinKBNAccumulator = KleinKBNAccumulator()
 
     def reset(self) -> None:
-        self.n = 0
-        self.m1.reset()
-        self.m2.reset()
-        self.m3.reset()
-        self.m4.reset()
+        """Clears all accumulated state."""
+        self._n = 0
+        self._m1.reset()
+        self._m2.reset()
+        self._m3.reset()
+        self._m4.reset()
 
-    def update(self, x) -> None:
-        n_old = self.n
+    def update(self, x: float) -> None:
+        r"""
+        Adds a sample x using Pébay's update (n = count after adding x):
+
+            δ    = x − M₁
+            δₙ   = δ / n
+            term = δ · δₙ · (n − 1)
+
+            M₁ += δₙ
+            M₄ += term·δₙ²·(n²−3n+3) + 6·δₙ²·M₂ − 4·δₙ·M₃
+            M₃ += term·δₙ·(n−2) − 3·δₙ·M₂
+            M₂ += term
+
+        M₄ and M₃ are updated before M₂ and M₃ respectively, because
+        they use the values from before x was added.
+        """
+        n_old = self._n
         n_new = n_old + 1
-        self.n = n_new
-        delta = x - self.m1.value
+        self._n = n_new
+        delta = x - self._m1.value
         delta_n = delta / n_new
         delta_n2 = delta_n * delta_n
         term = delta * delta_n * n_old
-        self.m1.update(delta_n)
-        self.m4.update(term * delta_n2 * (n_new * n_new - 3 * n_new + 3) + 6 * delta_n2 * self.m2.value - 4 * delta_n * self.m3.value)
-        self.m3.update(term * delta_n * (n_new - 2) - 3 * delta_n * self.m2.value)
-        self.m2.update(term)
+        m2 = self._m2.value
+        m3 = self._m3.value
+        self._m1.update(delta_n)
+        self._m4.update(term * delta_n2 * (n_new * n_new - 3 * n_new + 3) + 6 * delta_n2 * m2 - 4 * delta_n * m3)
+        self._m3.update(term * delta_n * (n_new - 2) - 3 * delta_n * m2)
+        self._m2.update(term)
 
-    def revert(self, x) -> None:
-        """
+    def revert(self, x: float) -> None:
+        r"""
         LIFO revert: removes the most recently added sample x, restoring
-        the state to exactly what it would be had x never been added.
-
-        Uses the same inverse Pébay formulas as CentralMoments.revert().
-        KleinKBNAccumulator.set() is used for m₁–m₄, which resets the
-        compensation terms (_cs, _ccs to zero).  This means subsequent
-        updates rebuild compensation from the restored value — a minor
-        loss of error correction for each revert operation.
+        the state to what it would be had x never been added.
 
         Only the most recent sample can be reverted (LIFO stack, not FIFO
-        queue).  For rolling-window FIFO removal use a wrapper that keeps
-        a sample deque and calls reset() + forward replay of the reduced
-        window, or use RawMoments/RawMomentsKleinKBN which support FIFO revert natively.
+        queue): the update of M₃ and M₄ depends on the mean at the time a
+        sample was added, so an older sample cannot be removed exactly.
+        For FIFO rolling windows use RawMomentsKleinKBN, which supports
+        removal of any previously added sample.
 
-        Inverse formulas (where nₙ = count before revert, nₒ = nₙ - 1):
+        The restored M₁–M₄ are written with KleinKBNAccumulator.set(), which
+        clears their compensation terms.  Subsequent updates rebuild the
+        compensation from the restored values, a minor loss of error
+        correction for each revert.
 
-            m₁_old = (nₙ · m₁_new − x) / nₒ            [mean undo]
-            δ      = x − m₁_old
+        Inverse formulas (where nₙ = count before revert, nₒ = nₙ − 1):
+
+            M₁_old = (nₙ · M₁_new − x) / nₒ            [mean undo]
+            δ      = x − M₁_old
             δₙ     = δ / nₙ
-            δₙ²    = δₙ · δₙ
             term   = δ · δₙ · nₒ
 
-            m₂_old = m₂_new − term                      [2nd moment undo]
-            m₃_old = m₃_new − (term·δₙ·(nₙ−2) − 3·δₙ·m₂_old)
-                                                        [3rd moment undo]
-            m₄_old = m₄_new − (term·δₙ²·(nₙ²−3nₙ+3)
-                                + 6·δₙ²·m₂_old − 4·δₙ·m₃_old)
-                                                        [4th moment undo]
+            M₂_old = M₂_new − term
+            M₃_old = M₃_new − (term·δₙ·(nₙ−2) − 3·δₙ·M₂_old)
+            M₄_old = M₄_new − (term·δₙ²·(nₙ²−3nₙ+3)
+                                + 6·δₙ²·M₂_old − 4·δₙ·M₃_old)
+
+        Raises ValueError if there are no samples.
         """
-        n_new = self.n
+        n_new = self._n
         if n_new == 0:
-            raise ValueError("Cannot go below 0")
+            raise ValueError("Cannot revert from an empty accumulator")
         n_old = n_new - 1
         if n_old == 0:
-            self.n = 0
-            self.m1.reset()
-            self.m2.reset()
-            self.m3.reset()
-            self.m4.reset()
+            self.reset()
             return
 
-        m1_new = self.m1.value
-        m2_new = self.m2.value
-        m3_new = self.m3.value
-        m4_new = self.m4.value
+        m1_new = self._m1.value
+        m2_new = self._m2.value
+        m3_new = self._m3.value
+        m4_new = self._m4.value
 
         m1_old = (n_new * m1_new - x) / n_old
         delta = x - m1_old
@@ -143,43 +169,66 @@ class CentralMomentsKleinKBN:
         m3_old = m3_new - (term * delta_n * (n_new - 2) - 3 * delta_n * m2_old)
         m4_old = m4_new - (term * delta_n2 * (n_new * n_new - 3 * n_new + 3) + 6 * delta_n2 * m2_old - 4 * delta_n * m3_old)
 
-        self.n = n_old
-        self.m1.set(m1_old)
-        self.m2.set(m2_old)
-        self.m3.set(m3_old)
-        self.m4.set(m4_old)
+        self._n = n_old
+        self._m1.set(m1_old)
+        self._m2.set(m2_old)
+        self._m3.set(m3_old)
+        self._m4.set(m4_old)
+
+    @property
+    def n(self) -> int:
+        """The number of samples."""
+        return self._n
 
     @property
     def mean(self) -> float:
-        return self.m1.value
+        """The arithmetic mean (0.0 when empty)."""
+        return self._m1.value
 
     @property
     def variance(self) -> float:
-        N = self.n - self.ddof
-        return self.m2.value / N if N > 0 else math.nan
+        """
+        The variance M₂ / (n - ddof), NaN when n ≤ ddof.
+
+        A slightly negative M₂ caused by rounding after revert()
+        is clamped to zero.
+        """
+        d = self._n - self.ddof
+        if d <= 0:
+            return math.nan
+        return max(self._m2.value, 0.0) / d
 
     @property
     def standard_deviation(self) -> float:
-        N = self.n - self.ddof
-        return (self.m2.value / N)**0.5 if N > 0 else math.nan
+        """The square root of the variance, NaN when n ≤ ddof."""
+        v = self.variance
+        return v if math.isnan(v) else math.sqrt(v)
 
     @property
     def skewness(self) -> float:
-        N = self.n
-        if N < 3 or self.m2.value <= 0:
+        """The skewness g₁ (bias=True) or G₁ (bias=False); see the class Notes."""
+        n = self._n
+        m2 = self._m2.value
+        if n < 2 or m2 <= 0:
             return math.nan
-        g1 = math.sqrt(N) * self.m3.value / (self.m2.value ** 1.5)
+        g1 = math.sqrt(n) * self._m3.value / (m2 * math.sqrt(m2))
         if self.bias:
             return g1
-        return g1 * math.sqrt(N * (N - 1)) / (N - 2)
+        if n < 3:
+            return math.nan
+        return g1 * math.sqrt(n * (n - 1)) / (n - 2)
 
     @property
     def kurtosis(self) -> float:
-        N = self.n
-        if N <= 3 or self.m2.value <= 0:
+        """The kurtosis selected by bias and fisher; see the class Notes."""
+        n = self._n
+        m2 = self._m2.value
+        if n < 2 or m2 <= 0:
             return math.nan
-        raw = N * self.m4.value / (self.m2.value * self.m2.value)
-        if not self.bias:
-            adj = ((N * N - 1) * raw - 3 * (N - 1) ** 2) / ((N - 2) * (N - 3))
-            return adj if self.fisher else adj + 3.0
-        return raw - 3.0 if self.fisher else raw
+        b2 = n * self._m4.value / (m2 * m2)
+        if self.bias:
+            return b2 - 3.0 if self.fisher else b2
+        if n < 4:
+            return math.nan
+        g2 = ((n * n - 1) * b2 - 3 * (n - 1) ** 2) / ((n - 2) * (n - 3))
+        return g2 if self.fisher else g2 + 3.0

@@ -430,8 +430,10 @@ class TestKurtosis(unittest.TestCase):
 
         - *excess* or *fisher*: bias=True, fisher=True
         - *moment* or *pearson*`: bias=True, fisher=False
-        - *sample*: bias=False, fisher=False
         - *sample_excess*: bias=False, fisher=True
+        - *sample*: no parameter combination, use `kurtosis_sample_corrected`;
+          `kurtosis` with bias=False, fisher=False returns `kurtosis_sample`
+          (scipy-compatible G2+3), which differs from the R value.
 
         Calculation doesn't depend on periods per annum, so we use yearly default.
         """
@@ -457,7 +459,8 @@ class TestKurtosis(unittest.TestCase):
                     actual = kbn.kurtosis_sample_corrected
                 else: # method  == 'sample_excess'
                     actual = kbn.kurtosis_sample_excess
-                assertFloatEqual(self, actual, kbn.kurtosis, places=15,
+                dispatched = kbn.kurtosis_sample if method == 'sample_corrected' else actual
+                assertFloatEqual(self, dispatched, kbn.kurtosis, places=15,
                                      prefix=f'step {i} kurtosis_{method} / kurtosis')
                 assertFloatEqual(self, actual, expected[i], places=13,
                                      prefix=f'step {i} kurtosis_{method}')

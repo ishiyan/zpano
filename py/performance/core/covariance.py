@@ -1,7 +1,5 @@
 import math
 
-from ...streaming_kbn import RawMomentsKleinKBN
-
 class Covariance:
     """
     Streaming covariance using Welford's algorithm.
