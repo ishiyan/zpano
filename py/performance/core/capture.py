@@ -1,7 +1,6 @@
 import math
 
 from ...streaming_kbn import KleinKBNAccumulator
-from .min_max import MinMax
 
 class Capture:
     def __init__(self) -> None:

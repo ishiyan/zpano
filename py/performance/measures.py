@@ -142,23 +142,18 @@ class Measures:
         self._benchmark_returns_kbn: RawMomentsKleinKBN = RawMomentsKleinKBN(ddof=1, bias=True, fisher=True)
         self._benchmark_excess_returns_kbn: RawMomentsKleinKBN = RawMomentsKleinKBN(ddof=1, bias=True, fisher=True)
 
-        #self._excess_covariance: core.CovarianceBullBear = core.CovarianceBullBear(ddof=1, threshold=self.risk_free_rate)
         self._sfm_regression: core.SFMRegression = core.SFMRegression(risk_free_rate=self.risk_free_rate)
-        self._covariance: core.Covariance = core.Covariance(ddof=1, threshold=0)
         self._active_returns_kbn: RawMomentsKleinKBN = RawMomentsKleinKBN(ddof=1, bias=True, fisher=True)
-        self._active_returns_cumulative: core.CumulativeReturn = core.CumulativeReturn(window_size=self._rolling_window_size)
 
         self._target_returns_kbn: RawMomentsKleinKBN = RawMomentsKleinKBN(ddof=1, bias=True, fisher=True)
         self._target_partial_moments: core.PartialMoments = core.PartialMoments(threshold=self.target_return)
         self._raw_partial_moments: core.RawPartialMoments = core.RawPartialMoments()
         self._benchmark_target_partial_moments: core.PartialMoments = core.PartialMoments(threshold=self.target_return)
 
-        self._cumulative_return: core.CumulativeReturn = core.CumulativeReturn(window_size=self._rolling_window_size)
-        self._cumulative_excess_return: core.CumulativeReturn = core.CumulativeReturn(window_size=self._rolling_window_size)
-        self._benchmark_cumulative_return: core.CumulativeReturn = core.CumulativeReturn(window_size=self._rolling_window_size)
+        self._cumulative_return: core.CumulativeReturn = core.CumulativeReturn()
+        self._cumulative_excess_return: core.CumulativeReturn = core.CumulativeReturn()
+        self._benchmark_cumulative_return: core.CumulativeReturn = core.CumulativeReturn()
 
-        self._drawdowns_cumulative = collections.deque(maxlen=maxlen)
-        self._drawdowns_cumulative_minmax:core.MinMax = core.MinMax(window_size=self._rolling_window_size)
         self._drawdown_continuous_runs: core.ContinuousDrawdownRuns = core.ContinuousDrawdownRuns()
         self._drawdown_high_watermark: core.HighWaterMarkDrawdown = core.HighWaterMarkDrawdown(window_size=self._rolling_window_size)
         self._drawdown_high_watermark_benchmark: core.HighWaterMarkDrawdown = core.HighWaterMarkDrawdown(window_size=self._rolling_window_size)
@@ -186,11 +181,8 @@ class Measures:
         self._benchmark_returns_kbn.reset()
         self._benchmark_excess_returns_kbn.reset()
 
-        #self._excess_covariance.reset()
         self._sfm_regression.reset()
-        self._covariance.reset()
         self._active_returns_kbn.reset()
-        self._active_returns_cumulative.reset()
 
         self._target_returns_kbn.reset()
         self._target_partial_moments.reset()
@@ -201,8 +193,6 @@ class Measures:
         self._cumulative_excess_return.reset()
         self._benchmark_cumulative_return.reset()
 
-        self._drawdowns_cumulative.clear()
-        self._drawdowns_cumulative_minmax.reset()
         self._drawdown_continuous_runs.reset()
         self._drawdown_high_watermark.reset()
         self._drawdown_high_watermark_benchmark.reset()
@@ -238,7 +228,8 @@ class Measures:
                 If either return is outside the valid domain required by a
                 particular calculation.
         """
-        if self._rolling_window_size > 0 and len(self._returns) == self._rolling_window_size:
+        evicted = self._rolling_window_size > 0 and len(self._returns) == self._rolling_window_size
+        if evicted:
             ret_old = self._returns.popleft()
             ret_bench_old = self._returns_benchmark.popleft()
             self._returns_kbn.revert(ret_old)
@@ -258,13 +249,10 @@ class Measures:
             self._benchmark_returns_kbn.revert(ret_bench_old)
             self._benchmark_excess_returns_kbn.revert(ret_bench_old - self.risk_free_rate)
             self._active_returns_kbn.revert(ret_old - ret_bench_old)
-            self._active_returns_cumulative.revert(ret_old - ret_bench_old)
-            self._covariance.revert(ret_old, ret_bench_old)
             self._sfm_regression.revert(ret_old, ret_bench_old)
-            #self._excess_covariance.revert(ret_old, ret_bench_old)
             # Drawdowns
-            # Note high watermark drawdown and drawdown episodes classes have no revert()
-            self._drawdowns_cumulative.popleft()
+            # Note high watermark drawdown and drawdown episodes classes have no revert(),
+            # they evict the oldest observation themselves.
             self._drawdown_continuous_runs.revert(ret_old) # Burke
 
         self._returns_kbn.update(ret)
@@ -283,10 +271,7 @@ class Measures:
         ret_bench_excess = ret_bench - self.risk_free_rate
         self._benchmark_excess_returns_kbn.update(ret_bench_excess)
         self._active_returns_kbn.update(ret - ret_bench)
-        self._active_returns_cumulative.update(ret - ret_bench)
-        self._covariance.update(ret, ret_bench)
         self._sfm_regression.update(ret, ret_bench)
-        #self._excess_covariance.update(ret, ret_bench)
 
         self._returns.append(ret)
         self._returns_benchmark.append(ret_bench)
@@ -296,24 +281,23 @@ class Measures:
         self._cumulative_excess_return.update(ret_excess)
         self._benchmark_cumulative_return.update(ret_bench)
 
-        # Drawdowns from peaks to valleys, operates on cumulative returns
-        dd = self._cumulative_return.geometric_return_plus_1 / self._cumulative_return.geometric_return_plus_1_max - 1
-        self._drawdowns_cumulative.append(dd)
-        self._drawdowns_cumulative_minmax.update(dd)
-
         # Drawdown calculation used in Burke
         self._drawdown_continuous_runs.update(ret)
 
         # High-water-mark drawdown and drawdown episodes
+        # Drawdown episodes have no revert(): when an observation leaves the
+        # rolling window (or the window's drawdowns were recomputed), the
+        # episodes are rebuilt from the window's drawdowns, so that episode
+        # indices refer to positions in the window.
         hwm = self._drawdown_high_watermark
         recalculated = hwm.update(ret)
-        if recalculated:
+        if recalculated or evicted:
             self._drawdown_episodes.recalculate(hwm.drawdowns)
         else:
             self._drawdown_episodes.update(hwm.drawdown)
         hwm = self._drawdown_high_watermark_benchmark
         recalculated = hwm.update(ret_bench)
-        if recalculated:
+        if recalculated or evicted:
             self._drawdown_episodes_benchmark.recalculate(hwm.drawdowns)
         else:
             self._drawdown_episodes_benchmark.update(hwm.drawdown)
@@ -364,13 +348,15 @@ class Measures:
 
         # Lo's recommended aggregation period
         # dayly 252, weekly 52, monthly 12, quarterly 4
-        q = min(self.periods_per_annum, n - 1)
+        q = int(min(self.periods_per_annum, n - 1))
 
+        # Deque indexing is O(n), so copy the window to a list once.
+        w = list(self._returns)
         s = 0.0
         for k in range(1, q):
             numer = 0.0
             for t in range(k, n):
-                numer += (self._returns[t] - mean) * (self._returns[t-k] - mean)
+                numer += (w[t] - mean) * (w[t-k] - mean)
             rho = numer / denom
             s += (1.0 - k / q) * rho
 
@@ -562,8 +548,9 @@ class Measures:
     @property
     def skewness_kurtosis_ratio(self) -> float:
         """
-        Skewness-Kurtosis Ratio of the return distribution is
-        the ratio of sample skewness to sample kurtosis.
+        Skewness-Kurtosis Ratio of the return distribution is the ratio
+        of the population ('moment') skewness g₁ to the population
+        (Pearson, non-excess) kurtosis β₂.
 
         Positive values indicate that positive asymmetry dominates
         relative to tail heaviness, while negative values indicate
@@ -585,7 +572,8 @@ class Measures:
         Jarque–Bera normality test statistic.
 
         Tests the null hypothesis that the sample was drawn from a normal
-        distribution using sample skewness and Fisher excess kurtosis.
+        distribution using the population ('moment') skewness and the
+        population excess kurtosis.
 
         JB = n/6 * (skewness^2 + excess_kurtosis^2/4)
 
@@ -800,7 +788,7 @@ class Measures:
         """
         # Use excess return over risk-free rate
         denom = self.var_historical(confidence=confidence)
-        return self._excess_returns.mean / denom if denom != 0 else math.nan
+        return self._excess_returns_kbn.mean / denom if denom != 0 else math.nan
 
     def reward_to_var_ratio_gaussian(self, confidence: float = 0.95) -> float:
         """
@@ -825,7 +813,7 @@ class Measures:
         """
         # Use excess return over risk-free rate
         denom = self.var_gaussian(confidence=confidence)
-        return self._excess_returns.mean / denom if denom != 0 else math.nan
+        return self._excess_returns_kbn.mean / denom if denom != 0 else math.nan
 
     def reward_to_var_ratio_cornish_fisher(self, confidence: float = 0.95) -> float:
         """
@@ -850,7 +838,7 @@ class Measures:
         """
         # Use excess return over risk-free rate
         denom = self.var_cornish_fisher(confidence=confidence)
-        return self._excess_returns.mean / denom if denom != 0 else math.nan
+        return self._excess_returns_kbn.mean / denom if denom != 0 else math.nan
 
     def reward_to_es_ratio_historical(self, confidence: float = 0.95) -> float:
         """
@@ -874,7 +862,7 @@ class Measures:
         """
         # Use excess return over risk-free rate
         denom = self.es_historical(confidence=confidence)
-        return self._excess_returns.mean / denom if denom != 0 else math.nan
+        return self._excess_returns_kbn.mean / denom if denom != 0 else math.nan
 
     def reward_to_es_ratio_gaussian(self, confidence: float = 0.95) -> float:
         """
@@ -899,7 +887,7 @@ class Measures:
         """
         # Use excess return over risk-free rate
         denom = self.es_gaussian(confidence=confidence)
-        return self._excess_returns.mean / denom if denom != 0 else math.nan
+        return self._excess_returns_kbn.mean / denom if denom != 0 else math.nan
 
     def reward_to_es_ratio_cornish_fisher(self, confidence: float = 0.95) -> float:
         """
@@ -924,7 +912,7 @@ class Measures:
         """
         # Use excess return over risk-free rate
         denom = self.es_cornish_fisher(confidence=confidence)
-        return self._excess_returns.mean / denom if denom != 0 else math.nan
+        return self._excess_returns_kbn.mean / denom if denom != 0 else math.nan
 
     @property
     def mean_absolute_deviation_ratio(self) -> float:
@@ -1717,9 +1705,10 @@ class Measures:
         the denominator is the square root of the second-order lower
         partial moment (LPM2) about MAR.
 
-        Unlike the standard Sortino ratio, which may use a compounded
-        or geometric excess return depending on its implementation, this
-        measure uses the arithmetic mean of excess returns.
+        Some implementations of the Sortino ratio use a compounded or
+        geometric excess return; this measure always uses the arithmetic
+        mean of excess returns.  In this class ``sortino_ratio`` also uses
+        the arithmetic mean, so both properties return the same value.
 
         The MAR (target return) is specified when constructing the
         ``Measures`` object.
@@ -2426,6 +2415,8 @@ class Measures:
             num = self._target_partial_moments.higher_partial_moment_4
             num = num ** (1.0/4)
 
+        if math.isnan(num) or math.isnan(denom) or denom == 0:
+            return math.nan
         return num / denom
 
     def rachev_ratio(self, alpha: float = 0.1, beta: float = 0.1) -> float:
@@ -2519,9 +2510,15 @@ class Measures:
         Each value measures the percentage decline of cumulative portfolio
         wealth from the highest cumulative wealth previously reached:
     
-            D_t = W_t / max(W_1, ..., W_t) - 1
+            D_t = W_t / max(W_0, W_1, ..., W_t) - 1
     
-        where ``W_t`` is cumulative wealth at observation ``t``.
+        where ``W_t`` is cumulative wealth at observation ``t`` and
+        ``W_0 = 1`` is the starting wealth, so a first negative return
+        already produces a drawdown (as in PerformanceAnalytics
+        ``Drawdowns()``).  In a rolling window, ``W_0`` is the wealth just
+        before the first observation in the window.
+
+        The series is identical to ``drawdowns_high_watermark``.
     
         Drawdowns are expressed as decimal returns and are non-positive.
         A value of ``0`` indicates that a new cumulative high has been
@@ -2540,7 +2537,7 @@ class Measures:
                 Cumulative geometric-return drawdowns for the current
                 observation history or rolling window.
         """
-        return list(self._drawdowns_cumulative)
+        return list(self._drawdown_high_watermark.drawdowns)
 
     @property
     def min_drawdowns_cumulative(self) -> float:
@@ -2563,7 +2560,7 @@ class Measures:
                 The minimum cumulative drawdown. Returns ``nan`` when no
                 drawdown observations are available.
         """
-        return self._drawdowns_cumulative_minmax.min
+        return self._drawdown_high_watermark.maximum_drawdown
 
     @property
     def worst_drawdowns_cumulative(self) -> float:
@@ -2587,7 +2584,7 @@ class Measures:
                 Absolute magnitude of the worst cumulative drawdown.
                 Returns ``nan`` when no drawdown observations are available.
         """
-        return abs(self._drawdowns_cumulative_minmax.min)
+        return abs(self._drawdown_high_watermark.maximum_drawdown)
 
     @property
     def drawdowns_high_watermark(self) -> List[float]:
@@ -2685,14 +2682,19 @@ class Measures:
     @property
     def calmar_ratio(self) -> float:
         """
-        Calmar ratio based on annualized return and maximum drawdown.
+        Calmar ratio based on geometric mean return and maximum drawdown.
     
         The Calmar ratio is calculated as:
     
-            Calmar = CAGR / |MDD|
+            Calmar = R_g / |MDD|
     
-        where ``CAGR`` is the geometric mean return of the portfolio and
+        where ``R_g`` is the geometric mean return of the portfolio and
         ``MDD`` is the worst cumulative peak-to-valley drawdown.
+
+        The return is the per-period geometric mean return; it is not
+        annualized (``periods_per_annum`` is not used).  This matches the
+        PerformanceAnalytics reference data, which was generated with
+        ``scale=1``.  Annualize the result separately if needed.
     
         The drawdown is calculated from cumulative geometric returns, not
         from individual-period returns.
@@ -2719,15 +2721,20 @@ class Measures:
 
     def sterling_ratio(self, excess: float = 0.1) -> float:
         """
-        Sterling ratio based on annualized return and maximum drawdown.
+        Sterling ratio based on geometric mean return and maximum drawdown.
     
         The Sterling ratio is calculated as:
     
-            Sterling = CAGR / (|MDD| + R_e)
+            Sterling = R_g / (|MDD| + R_e)
     
-        where ``CAGR`` is the geometric mean return, ``MDD`` is the worst
+        where ``R_g`` is the geometric mean return, ``MDD`` is the worst
         cumulative peak-to-valley drawdown, and ``R_e`` is the specified
         excess adjustment.
+
+        The return is the per-period geometric mean return; it is not
+        annualized (``periods_per_annum`` is not used).  This matches the
+        PerformanceAnalytics reference data, which was generated with
+        ``scale=1``.  Annualize the result separately if needed.
     
         ``excess`` is an additional drawdown allowance used in the Sterling
         denominator. Both ``excess`` and worst cumulative peak-to-valley
@@ -2764,15 +2771,21 @@ class Measures:
     
             Burke = (R_p - R_f) / sqrt(sum_j DD_j^2)
     
-        where ``R_p`` is the geometric mean return of the portfolio,
-        ``R_f`` is the configured risk-free rate, and ``DD_j`` is the
-        compounded drawdown of the ``j``-th continuous losing run.
+        where ``R_p`` is the per-period geometric mean return of the
+        portfolio (not annualized), ``R_f`` is the configured periodic
+        risk-free rate, and ``DD_j`` is the drawdown of the ``j``-th
+        continuous losing run.
     
         A continuous losing run is a maximal sequence of consecutive
-        negative returns. Its drawdown is the compounded return over the
-        entire run:
+        negative returns. Following PerformanceAnalytics ``BurkeRatio``,
+        its drawdown is compounded as if the returns were percentages:
     
-            DD_j = prod_{i in run_j}(1 + r_i) - 1
+            DD_j = (prod_{i in run_j}(1 + r_i / 100) - 1) * 100
+
+        For decimal returns this is close to the sum of the run's
+        returns rather than their compounded return,
+        prod(1 + r_i) - 1.  The quirk is kept so that the results match
+        the R reference implementation.
     
         The denominator therefore penalizes the severity of individual
         losing episodes and, unlike maximum drawdown, incorporates all
@@ -2867,9 +2880,10 @@ class Measures:
 
             Pain Ratio = (R_p - R_f) / Pain Index
 
-        where ``R_p`` is the geometric mean portfolio return, ``R_f`` is
-        the configured risk-free rate, and the Pain Index is the average
-        magnitude of the high-water-mark drawdowns.
+        where ``R_p`` is the per-period geometric mean portfolio return
+        (not annualized), ``R_f`` is the configured periodic risk-free
+        rate, and the Pain Index is the average magnitude of the
+        high-water-mark drawdowns.
     
         Unlike the Calmar ratio, which uses only the worst drawdown, the
         Pain Ratio uses the average depth of drawdowns over time.
@@ -2925,8 +2939,9 @@ class Measures:
 
             Martin = (R_p - R_f) / UI
 
-        where ``R_p`` is the geometric mean portfolio return, ``R_f`` is
-        the configured risk-free rate, and ``UI`` is the Ulcer Index.
+        where ``R_p`` is the per-period geometric mean portfolio return
+        (not annualized), ``R_f`` is the configured periodic risk-free
+        rate, and ``UI`` is the Ulcer Index.
 
         The Ulcer Index is calculated from the complete high-water-mark
         drawdown series and therefore penalizes both the depth and
@@ -3027,7 +3042,7 @@ class Measures:
         """
         return math.sqrt(self._drawdown_episodes.average_episode_drawdown_squared)
     
-    def cdar_average(self, confidence: float) -> float:
+    def cdar_average(self, confidence: float = 0.95) -> float:
         """
         Conditional Drawdown at Risk (CDaR).
 
@@ -3067,7 +3082,7 @@ class Measures:
 
         return -tail_sum.value / tail_len if tail_len > 0 else 0
 
-    def cdar_discrete(self, confidence: float) -> float:
+    def cdar_discrete(self, confidence: float = 0.95) -> float:
         """
         Conditional Drawdown at Risk (CDaR).
 
@@ -3218,7 +3233,8 @@ class Measures:
         """
         Reward to Conditional Drawdown Ratio.
         
-        CAGR divided by Conditional Drawdown at Risk (CDaR).
+        Per-period geometric mean return (not annualized) divided by
+        Conditional Drawdown at Risk (CDaR).
         Uses historical CDaR as the average of worst (1-confidence) drawdowns.
         
         Args:
@@ -3298,7 +3314,6 @@ class Measures:
             The estimated SFM intercept. Returns ``math.nan`` if the benchmark
             beta cannot be estimated.
         """
-        #return self._excess_covariance.alpha
         return self._sfm_regression.alpha
 
     @property
@@ -3329,7 +3344,6 @@ class Measures:
             The estimated SFM beta, or ``math.nan`` if the benchmark excess
             returns have zero variance.
         """
-        #return self._excess_covariance.beta
         return self._sfm_regression.beta
 
     @property
@@ -3358,7 +3372,6 @@ class Measures:
             The estimated bull-market SFM beta, or ``math.nan`` if the
             conditional benchmark excess returns have zero variance.
         """
-        #return self._excess_covariance.beta_bull
         return self._sfm_regression.beta_bull
 
     @property
@@ -3387,7 +3400,6 @@ class Measures:
             The estimated bear-market SFM beta, or ``math.nan`` if the
             conditional benchmark excess returns have zero variance.
         """
-        #return self._excess_covariance.beta_bear
         return self._sfm_regression.beta_bear
 
     @property
@@ -3419,8 +3431,6 @@ class Measures:
             if the bear beta is zero or either conditional beta cannot be
             estimated.
         """
-        #denom = self._excess_covariance.beta_bear
-        #return self._excess_covariance.beta_bull / denom if denom != 0 else math.nan
         denom = self._sfm_regression.beta_bear
         return self._sfm_regression.beta_bull / denom if denom != 0 else math.nan
 
@@ -3448,11 +3458,6 @@ class Measures:
             The coefficient of determination in the range [0, 1], or
             ``math.nan`` if it cannot be estimated.
         """
-        #cov = self._excess_covariance.value
-        #var_r = self._excess_returns_kbn.variance
-        #var_b = self._benchmark_excess_returns_kbn.variance
-        #denom = var_r * var_b
-        #return (cov * cov) / denom if denom > 0 else 0
         return self._sfm_regression.r2
 
     @property
@@ -4577,12 +4582,10 @@ class Measures:
                 is undefined or the Downside Capture Ratio is zero.
         """
         up = self.upside_capture_ratio(geometric=geometric)
-        if up is None:
-            return None
         down = self.downside_capture_ratio(geometric=geometric)
-        if down is None:
-            return None
-        return up / down if down != 0 else None
+        if math.isnan(up) or math.isnan(down) or down == 0:
+            return math.nan
+        return up / down
 
     @property
     def up_number_ratio(self) -> float:

@@ -9,12 +9,16 @@ def dd_percent(logsum: float) -> float:
 
 class ContinuousDrawdownRuns:
     """
-    Streaming 'continuous' drawdown runs for Burke-type measures..
+    Streaming 'continuous' drawdown runs for Burke-type measures.
 
     A continuous drawdown is the compounded loss over a maximal run of
-    consecutive negative returns:
+    consecutive negative returns.  Following PerformanceAnalytics
+    ``BurkeRatio``, returns are compounded as if they were percentages:
 
         DD = (prod(1 + r_i * 0.01) - 1) * 100
+
+    For decimal returns this is close to the sum of the run's returns,
+    not their compounded return; the quirk is kept to match R.
 
     The Burke denominator is:
 
@@ -30,7 +34,7 @@ class ContinuousDrawdownRuns:
     The complexity is O(1) per call.
     """
     def __init__(self) -> None:
-        # Eeach run: [logsum, count].
+        # Each run: [logsum, count].
         self._runs: collections.deque[list] = collections.deque()
 
         # Sum of squared continuous drawdowns.

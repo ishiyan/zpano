@@ -38,9 +38,14 @@ class DrawdownEpisodes:
     ``HighWaterMarkDrawdown`` and maintains the corresponding
     drawdown episodes incrementally.
 
-    Drawdowns are expected as percent returns, for example ``-2.5``
+    Drawdowns are expected as decimals, for example ``-0.025``
     for a 2.5% drawdown and ``0.0`` for an observation at a
     high-water mark.
+
+    Indices are positions in the sequence of observations passed to
+    ``update()`` since the last ``reset()``/``recalculate()``.  For a
+    rolling window, call ``recalculate()`` with the window's drawdowns
+    whenever they are recomputed, so indices refer to the window.
 
     A drawdown episode begins with the first negative drawdown and
     remains open until a non-negative drawdown is observed.
@@ -88,15 +93,12 @@ class DrawdownEpisodes:
         Args:
             drawdown:
                 Drawdown at the current observation, expressed as a
-                percent return. Drawdowns must be non-positive, although
+                decimal. Drawdowns must be non-positive, although
                 non-negative values are accepted and treated as recovery
                 or high-water-mark observations.
         """
         idx = self._count
         self._count += 1
-
-        # Convert to decimals.
-        #drawdown *= 0.01
 
         if drawdown < 0.0:
             # We are underwater.
@@ -157,11 +159,8 @@ class DrawdownEpisodes:
     @property
     def depths(self) -> list[float]:
         """
-        Drawdown episode depths currently known to the tracker.
-
-        If the latest drawdown episode is still open, it is included
-        using the last processed observation as ``to_idx`` and with
-        ``recovered=False``.
+        Drawdown episode depths currently known to the tracker,
+        including the depth so far of an open episode.
         """
         depths = list(episode.depth for episode in self._episodes)
         if self._current_from is not None:
@@ -183,7 +182,9 @@ class DrawdownEpisodes:
     @property
     def average_episode_drawdown_squared(self) -> float:
         """
-        The mean of the observed discrete squared episode drawdowns.
+        The sum of squared episode depths divided by the number of
+        observations (not the number of episodes), as in
+        PerformanceAnalytics ``DrawdownDeviation``.
         """
         sum_depth_squared = self._sum_depth_squared.value
         count = self._count

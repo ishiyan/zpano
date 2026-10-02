@@ -7,21 +7,27 @@ class HighWaterMarkDrawdown:
     """
     Rolling high-water-mark drawdown.
 
-    Drawdown at each observation is measured from the highest cumulative
-    equity value reached up to that observation within the current rolling
-    window.
+    Drawdown at each observation is measured from the high-water mark,
+    the highest equity value reached up to that observation within the
+    current rolling window, including the equity at the start of the window:
 
-    Drawdowns are expressed as percentage decimals and are non-positive:
+        drawdown_t = equity_t / max(equity_start, equity_1, ..., equity_t) - 1
 
-        drawdown = (equity / high_water_mark - 1)
+    This matches R PerformanceAnalytics ``Drawdowns()``, which uses
+    ``cummax(c(1, cumprod(1 + R)))``: a first negative return already
+    produces a drawdown.  For a rolling window, ``equity_start`` is the
+    equity just before the first observation in the window, so the result
+    equals a fresh calculation over the window's returns.
+
+    Drawdowns are expressed as decimals and are non-positive.
 
     Cumulative log-equity is maintained internally so that returns can be
     accumulated accurately. Running sums of drawdowns and squared drawdowns
     are maintained using compensated floating-point accumulation.
 
-    When the observation leaving the window was a high-water mark, all
-    drawdowns in the window are recomputed because the applicable peak may
-    change. Otherwise, the update is O(1).
+    When an observation leaves the window, the window's starting equity
+    changes.  The drawdowns in the window are recomputed only when this
+    changes their high-water marks; otherwise, the update is O(1).
 
     A window size of zero means an expanding (unbounded) window.
     """
@@ -32,14 +38,17 @@ class HighWaterMarkDrawdown:
         # Cumulative log-equity at each observation.
         self._cumlog: collections.deque[float] = collections.deque(maxlen=maxlen)
 
-        # Drawdown at each observation, in percent (<= 0).
+        # Drawdown at each observation, as a decimal (<= 0).
         self._dd: collections.deque[float] = collections.deque(maxlen=maxlen)
 
         # Cumulative log return.
         self._c: KleinKBNAccumulator = KleinKBNAccumulator()
 
+        # Log-equity just before the first observation in the window.
+        self._base: float = 0.0
+
         # Current high-water mark in log-equity space.
-        self._peak: float = -math.inf
+        self._peak: float = 0.0
 
         # Running drawdown aggregates.
         self._sum_dd: KleinKBNAccumulator = KleinKBNAccumulator()
@@ -52,19 +61,20 @@ class HighWaterMarkDrawdown:
         self._sum_dd.reset()
         self._sum_dd2.reset()
         self._c.reset()
-        self._peak = -math.inf
+        self._base = 0.0
+        self._peak = 0.0
 
     def _recompute(self) -> None:
         """
-         Recompute all drawdowns from the cumulative log-equity values.
+        Recompute all drawdowns from the cumulative log-equity values.
 
-        This is required when the previous high-water mark leaves the
-        rolling window.
+        This is required when an observation leaving the rolling window
+        changes the high-water marks of the remaining observations.
         """
         self._dd.clear()
         self._sum_dd.reset()
         self._sum_dd2.reset()
-        peak = -math.inf
+        peak = self._base
         for c in self._cumlog:
             if c >= peak:
                 peak = c
@@ -85,7 +95,7 @@ class HighWaterMarkDrawdown:
 
         Args:
             ret:
-                Period return expressed as a percentag decimal.
+                Period return expressed as a decimal.
                 For example, ``0.02`` represents a 2% return
                 and ``-0.015`` represents a -1.5% return.
 
@@ -93,7 +103,7 @@ class HighWaterMarkDrawdown:
             True if the rolling window required a drawdown recomputation,
             otherwise False.
         """
-        evicted_peak = False
+        old_base = None
         if self._window_size and len(self._cumlog) == self._window_size:
             old_c = self._cumlog.popleft()
             old_dd = self._dd.popleft()
@@ -101,18 +111,25 @@ class HighWaterMarkDrawdown:
             self._sum_dd.revert(old_dd)
             self._sum_dd2.revert(old_dd * old_dd)
 
-            # A zero drawdown identifies an observation at the
-            # high-water mark. If it leaves, the peak may change.
-            evicted_peak = old_dd == 0.0
+            # The evicted observation's equity is the new starting equity.
+            # High-water marks of the remaining observations can only
+            # change if the old starting equity was above the evicted one.
+            if old_c < self._base:
+                old_base = self._base
+            self._base = old_c
 
         # Global cumulative log-equity.
         self._c.update(math.log1p(ret))
         c = self._c.value
         self._cumlog.append(c)
 
-        if evicted_peak:
+        # Peaks of all remaining observations were max(old_base, c0, ..., cj);
+        # without old_base they are max(c0, c1, ..., cj).  They differ only
+        # if the new first observation is also below old_base.
+        if old_base is not None and self._cumlog[0] < old_base:
             self._recompute()
             return True
+
         if c >= self._peak:
             self._peak = c
             dd = 0.0
@@ -125,11 +142,13 @@ class HighWaterMarkDrawdown:
         return False
 
     @property
-    def drawdowns(self) -> list[float]:
-        """Drawdowns for observations currently in the window."""
-        # This was a defencive copy, disabled because we don't want
-        # to expose this class outside.
-        # return list(self._dd)
+    def drawdowns(self) -> collections.deque[float]:
+        """
+        Drawdowns for observations currently in the window.
+
+        Returns the internal deque without a defensive copy, because
+        this class is private to the package; callers must not modify it.
+        """
         return self._dd
 
     @property

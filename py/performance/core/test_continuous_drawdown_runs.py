@@ -1,4 +1,5 @@
 import math
+import random
 import unittest
 
 from .continuous_drawdown_runs import ContinuousDrawdownRuns
@@ -294,6 +295,41 @@ class TestContinuousDrawdownRuns(unittest.TestCase):
 
         self.assertAlmostEqual(acc.sum_drawdowns_squared, expected_sum_sq, places=12)
         self.assertAlmostEqual(acc.sqrt_sum_drawdowns_squared, expected_sqrt, places=12)
+
+    # ------------------------------------------------------------------
+    # Brute-force rolling-window test
+    # ------------------------------------------------------------------
+
+    def test_rolling_window_matches_fresh_calculation(self):
+        """
+        At every step, the runs equal those of the returns currently in
+        the window, computed from scratch.  Returns are percentages, with
+        exact zeros mixed in as separators.
+        """
+        def reference_runs(window):
+            runs, current = [], []
+            for r in window:
+                if r < 0:
+                    current.append(r)
+                elif current:
+                    runs.append(dd(*current))
+                    current = []
+            if current:
+                runs.append(dd(*current))
+            return runs
+
+        rng = random.Random(42)
+        for window_size in (1, 2, 3, 5, 12):
+            returns = [rng.choice([0.0, rng.gauss(0.0, 3.0)]) for _ in range(150)]
+            acc = ContinuousDrawdownRuns()
+            for i, ret in enumerate(returns):
+                if i >= window_size:
+                    acc.revert(returns[i - window_size])
+                acc.update(ret)
+                window = returns[max(0, i - window_size + 1):i + 1]
+                expected = reference_runs(window)
+                assertState(self, acc, expected, expected_run_count=len(expected),
+                            prefix=f'window {window_size} step {i}')
 
 if __name__ == "__main__":
     unittest.main()

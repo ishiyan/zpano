@@ -1,7 +1,9 @@
 import unittest
 from unittest.mock import PropertyMock, patch
 from datetime import datetime
+import inspect
 import math
+import random
 
 # from accounts.performances import Measures
 from ..streaming_kbn import RawMomentsKleinKBN
@@ -269,6 +271,63 @@ def add_bacon(measures: Measures, start: int = 0, count: int = bacon_portfolio_l
             ret_bench=benchmark_returns[i])
 
 SQRT2 = 1.4142135623730950488016887242097
+
+def public_measures() -> list[str]:
+    """Names of all public properties and methods of Measures, except mutators."""
+    names = []
+    for name, member in inspect.getmembers(Measures):
+        if name.startswith('_') or name in ('reset', 'add_return'):
+            continue
+        if isinstance(member, property) or inspect.isfunction(member):
+            names.append(name)
+    return names
+
+def evaluate(measures: Measures, name: str):
+    """Value of a property, or of a method called with its default arguments."""
+    member = getattr(type(measures), name)
+    return getattr(measures, name) if isinstance(member, property) else getattr(measures, name)()
+
+class TestEdgeCases(unittest.TestCase):
+    def test_empty(self):
+        """No property or method raises before the first return."""
+        m = make_measures()
+        for name in public_measures():
+            with self.subTest(name=name):
+                evaluate(m, name)
+
+    def test_single_return(self):
+        m = make_measures()
+        m.add_return(0.01, 0.02)
+        for name in public_measures():
+            with self.subTest(name=name):
+                evaluate(m, name)
+        self.assertTrue(math.isnan(m.sharpe_ratio))
+        self.assertAlmostEqual(m.cumulative_geometric_return, 0.01, places=15)
+
+    def test_first_negative_return_is_a_drawdown(self):
+        """
+        As in PerformanceAnalytics Drawdowns(), the high-water mark starts
+        at the initial equity 1.
+        """
+        m = make_measures()
+        m.add_return(-0.05, -0.02)
+        m.add_return(0.02, 0.01)
+        assertSeriesEqual(self, m.drawdowns_high_watermark, [-0.05, -0.031], places=15)
+        assertSeriesEqual(self, m.drawdowns_cumulative, [-0.05, -0.031], places=15)
+        self.assertAlmostEqual(m.worst_drawdowns_cumulative, 0.05, places=15)
+        self.assertAlmostEqual(m.pain_index, (0.05 + 0.031) / 2, places=15)
+        self.assertAlmostEqual(m.drawdown_average, 0.05, places=15)
+
+    def test_long_daily_series(self):
+        """Every measure works with more observations than periods per annum."""
+        rng = random.Random(1)
+        m = Measures(periods_per_annum=252.0)
+        for _ in range(300):
+            m.add_return(rng.gauss(0.0005, 0.01), rng.gauss(0.0004, 0.01))
+        for name in public_measures():
+            with self.subTest(name=name):
+                evaluate(m, name)
+        self.assertTrue(math.isfinite(m.autocorrelation_penalty))
 
 class TestAutocorrelationPenalty(unittest.TestCase):
     """
@@ -592,33 +651,53 @@ class TestEsHistorical(unittest.TestCase):
             assertSeriesEqual(self, actual, expected, places=15,
                               prefix=f'es historical p {p}')
 
-class TestRewardToVarRatioHistorical(unittest.TestCase):
-    def no_test(self):
-        pass
+class TestRewardToVarEsRatios(unittest.TestCase):
+    """
+    reward_to_var_ratio_* and reward_to_es_ratio_* divide the mean excess
+    return by the VaR/ES of the raw returns.
+    """
+    NAMES = ['var_historical', 'var_gaussian', 'var_cornish_fisher',
+             'es_historical', 'es_gaussian', 'es_cornish_fisher']
 
-class TestRewardToVarRatioGaussian(unittest.TestCase):
-    def no_test(self):
-        pass
+    def test_zero_risk_free_rate_equals_sharpe_variants(self):
+        """With a zero risk-free rate, they equal sharpe_ratio_var_* / sharpe_ratio_es_*."""
+        for name in self.NAMES:
+            reward = run_stream_method(f'reward_to_{name.split("_")[0]}_ratio_{name.split("_", 1)[1]}')
+            sharpe = run_stream_method(f'sharpe_ratio_{name}')
+            assertSeriesEqual(self, reward, sharpe, places=14, prefix=f'reward_to {name}', skip=1)
 
-class TestRewardToVarRatioCornishFisher(unittest.TestCase):
-    def no_test(self):
-        pass
-
-class TestRewardToEsRatioHistorical(unittest.TestCase):
-    def no_test(self):
-        pass
-
-class TestRewardToEsRatioGaussian(unittest.TestCase):
-    def no_test(self):
-        pass
-
-class TestRewardToEsRatioCornishFisher(unittest.TestCase):
-    def no_test(self):
-        pass
+    def test_definition(self):
+        annual_rf = 0.05
+        for name in self.NAMES:
+            reward_name = f'reward_to_{name.split("_")[0]}_ratio_{name.split("_", 1)[1]}'
+            for confidence in (0.9, 0.95):
+                m = make_measures(annual_rf=annual_rf, monthly=True)
+                for i in range(bacon_portfolio_len):
+                    m.add_return(bacon_portfolio_returns[i], bacon_benchmark_returns[i])
+                    excess_mean = math.fsum(r - m.risk_free_rate
+                        for r in bacon_portfolio_returns[:i + 1]) / (i + 1)
+                    denom = getattr(m, name)(confidence=confidence)
+                    expected = excess_mean / denom if denom != 0 else math.nan
+                    actual = getattr(m, reward_name)(confidence=confidence)
+                    assertFloatEqual(self, actual, expected, places=14,
+                        prefix=f'{reward_name} confidence {confidence} step {i}')
 
 class TestMeanAbsoluteDeviationRatio(unittest.TestCase):
-    def no_test(self):
-        pass
+    def test_exact_values(self):
+        """
+        mean / (sum|r - mean| / n) on the Bacon portfolio returns, computed
+        with exact rational arithmetic (fractions.Fraction).
+        """
+        expected = [
+            math.nan, 1.2608695652173914, 1.5789473684210527, 0.6818181818181818,
+            0.9, 1.129032258064516, 1.308695652173913, 1.2618556701030927,
+            0.9623076923076923, 1.0358796296296295, 0.9166666666666666, 0.96045197740113,
+            1.0325794291868604, 0.7659033078880407, 0.480644111906311, 0.5178463399879009,
+            0.3424072265625, 0.276536312849162, 0.3738222796970257, 0.4428828239908482,
+            0.29573420836751435, 0.3247753530166881, 0.3100659077291792, 0.289544235924933]
+        actual = run_stream_property("mean_absolute_deviation_ratio")
+        assertSeriesEqual(self, actual, expected, places=15,
+                          prefix="mean absolute deviation ratio")
 
 class TestUpsidePotentialRatio(unittest.TestCase):
     def test_matches_performance_analytics_output(self):
@@ -1476,8 +1555,21 @@ class TestCDaRAlpha(unittest.TestCase):
             places = 15, prefix=f'CDaR alpha (geometric) zero returns')
 
 class TestRewardToConditionalDrawdown(unittest.TestCase):
-    def no_test(self):
-        pass
+    def test_definition(self):
+        """
+        Geometric mean return divided by the mean magnitude of the worst
+        max(1, int(n * (1 - confidence))) drawdowns.
+        """
+        for confidence in (0.8, 0.95):
+            m = make_measures()
+            for i in range(bacon_portfolio_len):
+                m.add_return(bacon_portfolio_returns[i], bacon_benchmark_returns[i])
+                dd = sorted(m.drawdowns_high_watermark)
+                tail = dd[:max(1, int(len(dd) * (1 - confidence)))]
+                cdar = -sum(tail) / len(tail)
+                expected = m.geometric_mean_return / cdar if cdar != 0 else math.nan
+                assertFloatEqual(self, m.reward_to_conditional_drawdown(confidence=confidence),
+                    expected, places=15, prefix=f'confidence {confidence} step {i}')
 
 class TestSfmRiskPremium(unittest.TestCase):
     def test_matches_performance_analytics_output(self):
@@ -1669,8 +1761,20 @@ class TestInformationRatio(unittest.TestCase):
                         prefix="information ratio (yearly)")
 
 class TestInformationRatioModified(unittest.TestCase):
-    def no_test(self):
-        pass
+    def test_sign_rule(self):
+        """
+        Equals information_ratio when the mean active return is positive,
+        otherwise its negation.
+        """
+        m = make_measures(monthly=True)
+        for i in range(bacon_portfolio_len):
+            m.add_return(bacon_portfolio_returns[i], bacon_benchmark_returns[i])
+            active = math.fsum(bacon_portfolio_returns[j] - bacon_benchmark_returns[j]
+                               for j in range(i + 1))
+            ir = m.information_ratio
+            expected = math.nan if math.isnan(ir) else (ir if active > 0 else -ir)
+            assertFloatEqual(self, m.information_ratio_modified, expected, places=15,
+                             prefix=f'step {i}')
 
 class TestSystematicRisk(unittest.TestCase):
     def test_matches_performance_analytics_output(self):
@@ -2025,74 +2129,50 @@ class TestRollingWindow(unittest.TestCase):
     """
     def test_rolling_matches_fresh(self):
         """
-        Rolling window=10 after 24 returns is like fresh instance with last 10 returns.
+        At every step, including while the window is still filling, every
+        public property and every method (with default arguments) of a
+        rolling-window instance equals that of a fresh instance fed only
+        the returns in the window.
         """
-        window = 10
-        r_rolling = make_measures(rolling_window_size=window)
-        add_bacon(r_rolling)
-        r_fresh = make_measures()
-        add_bacon(r_fresh, start=bacon_portfolio_len - window)
-
-        self.assertAlmostEqual(r_rolling.sharpe_ratio, r_fresh.sharpe_ratio, places=13)
-        self.assertAlmostEqual(r_rolling.sortino_ratio, r_fresh.sortino_ratio, places=13)
-        self.assertAlmostEqual(r_rolling.cumulative_geometric_return, r_fresh.cumulative_geometric_return, places=13)
-        self.assertAlmostEqual(r_rolling.kurtosis, r_fresh.kurtosis, places=13)
-        self.assertAlmostEqual(r_rolling.omega_ratio, r_fresh.omega_ratio, places=13)
-        self.assertAlmostEqual(r_rolling.calmar_ratio, r_fresh.calmar_ratio, delta=0.06)
-        self.assertAlmostEqual(r_rolling.pain_index, r_fresh.pain_index, places=13)
-        self.assertAlmostEqual(r_rolling.ulcer_index, r_fresh.ulcer_index, places=13)
-        self.assertAlmostEqual(r_rolling.martin_ratio, r_fresh.martin_ratio, places=12)
-        self.assertAlmostEqual(r_rolling.burke_ratio, r_fresh.burke_ratio, places=12)
-        self.assertAlmostEqual(r_rolling.burke_ratio_modified, r_fresh.burke_ratio_modified, places=12)
-        self.assertAlmostEqual(r_rolling.worst_drawdowns_cumulative, r_fresh.worst_drawdowns_cumulative, delta=0.2)
-
-    def test_rolling_sharpe_step_by_step(self):
-        """
-        Check rolling Sharpe at each step against known expected values.
-        """
-        expected = [
-            math.nan,
-            0.8915694197569513, 1.1419253390798365,
-            0.49779248369997886, 0.6680426571226848, 0.8511810078441023,
-            0.9735918376312113, 0.8462916062735413, 0.6475912629068395,
-            0.7524743687246648,
-            # After step 10 the window is full, old returns start dropping
-            0.6988231811021255, 0.7111123104828202, 0.798675261552181,
-            0.6310757998776281, 0.3386466454024338, 0.32170438498662823,
-            0.16115775541041388, -0.022215518961695248, 0.14832204365045173,
-            0.17865069359303465, 0.05655715365926667, -0.049597686094872355,
-            -0.14538530360069923, -0.08934238062974807,
+        rng = random.Random(42)
+        random_returns = [rng.gauss(0.002, 0.03) for _ in range(150)]
+        random_benchmark = [rng.gauss(0.001, 0.025) for _ in range(150)]
+        configs = [
+            dict(window=10, periods_per_annum=1, annual_rf=0.0, annual_mar=0.0,
+                 returns=bacon_portfolio_returns, benchmark=bacon_benchmark_returns),
+            dict(window=30, periods_per_annum=12, annual_rf=0.05, annual_mar=0.03,
+                 returns=random_returns, benchmark=random_benchmark),
         ]
-        rolling_window = 10
-        actual = run_stream_property("sharpe_ratio", rolling_window_size=rolling_window)
-        assertSeriesEqual(self, actual, expected, places=13,
-                          prefix=f'sharpe ratio (rolling window {rolling_window})')
+        names = public_measures()
+        for cfg in configs:
+            window = cfg['window']
+            def create():
+                return Measures(periods_per_annum=cfg['periods_per_annum'],
+                    annual_risk_free_rate=cfg['annual_rf'],
+                    annual_target_return=cfg['annual_mar'])
+            rolling = Measures(periods_per_annum=cfg['periods_per_annum'],
+                annual_risk_free_rate=cfg['annual_rf'],
+                annual_target_return=cfg['annual_mar'],
+                rolling_window_size=window)
+            returns, benchmark = cfg['returns'], cfg['benchmark']
+            for i in range(len(returns)):
+                rolling.add_return(returns[i], benchmark[i])
+                fresh = create()
+                for j in range(max(0, i - window + 1), i + 1):
+                    fresh.add_return(returns[j], benchmark[j])
+                for name in names:
+                    actual, expected = evaluate(rolling, name), evaluate(fresh, name)
+                    prefix = f'window {window} step {i} {name}'
+                    if isinstance(expected, list):
+                        assertSeriesEqual(self, actual, expected, places=12, prefix=prefix)
+                        self.assertEqual(len(actual), len(expected), msg=prefix)
+                    elif isinstance(expected, bool):
+                        self.assertEqual(actual, expected, msg=prefix)
+                    else:
+                        delta = 1e-12 * max(1.0, abs(expected)) if math.isfinite(expected) else None
+                        assertFloatEqual(self, actual, expected, delta=delta, prefix=prefix)
 
-    def test_rolling_cumulative_geometric_return_step_by_step(self):
-        """
-        Check rolling cumulative geometric return at each step.
-        """
-        expected = [
-            0.0029999999999998916, 0.029077999999999937,
-            0.04039785799999973, 0.02999387941999987,
-            0.045443787611299635, 0.07157988230158208,
-            0.08872516041840739, 0.1616697461664407,
-            0.14540636972011045, 0.19122262450891503,
-            # After step 10 the window is full, old returns start dropping
-            0.18172134734433754, 0.24506898292322488,
-            0.2807831278339803, 0.2458526788930535,
-            0.1525671581089434, 0.14357151199687346,
-            0.0704099487293568, -0.018874479983775894,
-            0.06471024991618646, 0.08313792731858194,
-            0.017823077430024314, -0.035845669483492104,
-            -0.07756388570776418, -0.050743313329589035,
-        ]
-        rolling_window = 10
-        actual = run_stream_property("cumulative_geometric_return", rolling_window_size=rolling_window)
-        assertSeriesEqual(self, actual, expected, places=13,
-                          prefix=f'cumulative geometric return (rolling window {rolling_window})')
-
-class TestGenerateRefewrenceOutput(unittest.TestCase):
+class TestGenerateReferenceOutput(unittest.TestCase):
     def foo_test_generate_reference_output(self):
         def f(z:float):
             return "math.nan" if math.isnan(z) else z
