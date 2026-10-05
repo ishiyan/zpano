@@ -1,4 +1,5 @@
 import math
+import statistics
 import unittest
 
 from .central_moments_klein_kbn import CentralMomentsKleinKBN
@@ -102,6 +103,11 @@ class TestCentralMomentsKleinKBN(unittest.TestCase):
         self.assertTrue(math.isnan(m.variance))
         self.assertTrue(math.isnan(m.standard_deviation))
 
+    def test_invalid_ddof(self):
+        for ddof in (-1, 0.5, True):
+            with self.subTest(ddof=ddof), self.assertRaises(ValueError):
+                CentralMomentsKleinKBN(ddof=ddof)
+
     def test_minimum_sample_sizes(self):
         data = [1.0, 2.0, 4.0, 8.0]
         # (bias, fisher) -> minimum n for (skewness, kurtosis)
@@ -169,6 +175,34 @@ class TestCentralMomentsKleinKBN(unittest.TestCase):
         self.assertEqual(m.n, 0)
         self.assertEqual(m.mean, 0.0)
         self.assertTrue(math.isnan(m.variance))
+
+    def test_revert_oldest_and_middle(self):
+        data = [0.0, 1.0, 2.0, 4.0, 8.0]
+        m = feed(CentralMomentsKleinKBN(ddof=0), data)
+        for removed in (0.0, 2.0):
+            m.revert(removed)
+            data.remove(removed)
+            mean = statistics.fmean(data)
+            mu2 = math.fsum((x - mean) ** 2 for x in data) / len(data)
+            mu3 = math.fsum((x - mean) ** 3 for x in data) / len(data)
+            mu4 = math.fsum((x - mean) ** 4 for x in data) / len(data)
+            self.assertEqual(m.n, len(data))
+            self.assertAlmostEqual(m.mean, mean, places=14)
+            self.assertAlmostEqual(m.variance, mu2, places=14)
+            self.assertAlmostEqual(m.skewness, mu3 / mu2 ** 1.5, places=13)
+            self.assertAlmostEqual(m.kurtosis, mu4 / mu2 ** 2 - 3, places=13)
+
+    def test_fifo_rolling_window(self):
+        m = CentralMomentsKleinKBN(ddof=0)
+        width = 6
+        for i, x in enumerate(BACON):
+            m.update(x)
+            if i >= width:
+                m.revert(BACON[i - width])
+            window = BACON[max(0, i - width + 1):i + 1]
+            self.assertEqual(m.n, len(window))
+            self.assertAlmostEqual(m.mean, statistics.fmean(window), places=14)
+            self.assertAlmostEqual(m.variance, statistics.pvariance(window), places=14)
 
     def test_revert_empty_raises(self):
         m = CentralMomentsKleinKBN()

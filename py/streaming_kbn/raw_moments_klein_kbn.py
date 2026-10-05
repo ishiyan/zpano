@@ -54,7 +54,7 @@ class RawMomentsKleinKBN:
 
     Parameters
     ----------
-    ddof : int, default=1
+    ddof : nonnegative int, default=1
         Delta degrees of freedom for variance and standard_deviation.
         variance = Σ(x - x̄)² / (n - ddof).  ddof=0 gives population, ddof=1 gives sample.
     bias : bool, default=True
@@ -79,6 +79,8 @@ class RawMomentsKleinKBN:
     separate properties.
     """
     def __init__(self, ddof=1, bias=True, fisher=True) -> None:
+        if type(ddof) is not int or ddof < 0:
+            raise ValueError("ddof must be a nonnegative integer")
         self._n = 0
         self._x1: KleinKBNAccumulator = KleinKBNAccumulator()
         self._x2: KleinKBNAccumulator = KleinKBNAccumulator()

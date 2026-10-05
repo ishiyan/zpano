@@ -4,26 +4,18 @@ from datetime import datetime
 import inspect
 import math
 import random
+import statistics
 
-# from accounts.performances import Measures
 from ..streaming_kbn import RawMomentsKleinKBN
 from ..performance import Measures
 
 from . import reference_data as rd
 
-# To run individual tests:
-# - `cd zpano/py`
-# - read `readme.md` and make sure you installed and activated virtual environment
-# - activate virtual environment
-#   - linux: `source .venv/bin/activate`
-#   - windows:  `venv\Scripts\activate`
-# - We need `numpy` for testing
-#   - `python -m pip install numpy`
-# - Change directory to `zpano` root: `cd ..`, otherwise it will not resolve `..streaming_kbn`
-# - Run all tests: 
-#   python -m unittest py.performance.test_performance_measures
-# - Run individual tests:
-#   python -m unittest py.performance.test_performance_measures.TestCumulativeGeometricReturn
+# From the repository root, run the public API tests with:
+#   python3 -m unittest py.performance.test_measures
+# Run the separate private core tests with:
+#   python3 -m unittest discover -s py/performance/core -t . -p 'test_*.py'
+# Neither command requires third-party Python packages.
    
 """
 Test input data from the 'Portfolio bacon' dataset
@@ -164,7 +156,8 @@ The script uses the built-in `portfolio_bacon` (second edition) dataset.
 To regenerate the data, see ./reference-data/<name>.R.
 """
 
-def assertFloatEqual(testcase: unittest.TestCase, actual, expected, places=15, delta=None, prefix=""):
+def assertFloatEqual(testcase: unittest.TestCase, actual, expected, places=15, delta=None,
+                     prefix="", rel_tol=None):
     if math.isnan(expected):
         testcase.assertTrue(math.isnan(actual),
             msg=f'{prefix}: expected NaN, actual {actual}')
@@ -179,17 +172,26 @@ def assertFloatEqual(testcase: unittest.TestCase, actual, expected, places=15, d
             msg=f'{prefix}: expected {expected}, got {actual}')
         testcase.assertFalse(math.isinf(actual),
             msg=f'{prefix}: expected {expected}, got {actual}')
-        if delta is None:
+        if rel_tol is not None:
+            testcase.assertTrue(math.isclose(actual, expected, rel_tol=rel_tol,
+                                             abs_tol=delta or 0.0),
+                                msg=f'{prefix}: expected {expected}, got {actual}')
+        elif delta is None:
             testcase.assertAlmostEqual(actual, expected, places=places,
                 msg=f'{prefix}: expected {expected}, got {actual}')
         else:
             testcase.assertAlmostEqual(actual, expected, delta=delta,
                 msg=f'{prefix}: expected {expected}, got {actual}')
 
-def assertSeriesEqual(testcase, actual, expected, places=15, delta=None, prefix="", skip=0):
+def assertSeriesEqual(testcase, actual, expected, places=15, delta=None, prefix="",
+                      skip=0, rel_tol=None):
+    actual = list(actual)
+    expected = list(expected)
+    testcase.assertEqual(len(actual), len(expected), msg=f"{prefix}: series length")
     for i, (a, e) in enumerate(zip(actual, expected)):
         if i >= skip:
-            assertFloatEqual(testcase, a, e, places=places, delta=delta, prefix=f"{prefix} step {i}")
+            assertFloatEqual(testcase, a, e, places=places, delta=delta,
+                             prefix=f"{prefix} step {i}", rel_tol=rel_tol)
 
 def periods_per_annum(daily: bool = False, monthly: bool = False) -> float:
     if daily and monthly:
@@ -286,6 +288,21 @@ def evaluate(measures: Measures, name: str):
     """Value of a property, or of a method called with its default arguments."""
     member = getattr(type(measures), name)
     return getattr(measures, name) if isinstance(member, property) else getattr(measures, name)()
+
+class TestSeriesAssertions(unittest.TestCase):
+    def test_rejects_truncated_series(self):
+        with self.assertRaises(AssertionError):
+            assertSeriesEqual(self, [1.0], [1.0, 2.0])
+        with self.assertRaises(AssertionError):
+            assertSeriesEqual(self, [1.0, 2.0], [1.0])
+
+    def test_accepts_generator(self):
+        assertSeriesEqual(self, (x for x in [1.0, 2.0]), [1.0, 2.0])
+
+    def test_relative_tolerance_for_large_reference_values(self):
+        assertSeriesEqual(self, [1e12 + 0.1], [1e12], rel_tol=1e-12)
+        with self.assertRaises(AssertionError):
+            assertSeriesEqual(self, [1e12 + 2], [1e12], rel_tol=1e-12)
 
 class TestEdgeCases(unittest.TestCase):
     def test_empty(self):
@@ -915,8 +932,18 @@ class TestSharpeRatioEsHistorical(unittest.TestCase):
             for rf, expected in rf_pack.items():
                 actual = run_stream_method("sharpe_ratio_es_historical",
                                            annual_risk_free_rate=rf, confidence=p)
-                assertSeriesEqual(self, actual, expected, delta=0.16,
-                                  prefix=f'Sharpe ratio (ES historical) conf {p} Rf {rf}')
+                self.assertEqual(len(actual), len(expected))
+                for i, (a, e) in enumerate(zip(actual, expected)):
+                    prefix = f'Sharpe ratio (ES historical) conf {p} Rf {rf} step {i}'
+                    if p == 0.9 and rf == 0.001 and i == 10:
+                        # The quantile is exactly the second-worst return.
+                        # This implementation includes both tied-to-tail
+                        # observations; the R reference includes only one.
+                        excess_mean = math.fsum(r - rf for r in bacon_portfolio_returns[:11]) / 11
+                        self.assertAlmostEqual(a, excess_mean / 0.013, places=13,
+                                               msg=prefix)
+                    else:
+                        assertFloatEqual(self, a, e, delta=1e-12, prefix=prefix)
 
 class TestSharpeRatioEsGaussian(unittest.TestCase):
     def test_matches_performance_analytics_output(self):
@@ -1205,6 +1232,12 @@ class TestLossRate(unittest.TestCase):
                           prefix="loss rate")
 
 class TestVolatilitySkewness(unittest.TestCase):
+    def bacon_reference(self, expected):
+        # The MAR 0.2 and 0.3 fixtures contain three extra trailing zeros.
+        # Compare the 24 observations that correspond to the Bacon inputs.
+        self.assertTrue(all(x == 0 for x in expected[bacon_portfolio_len:]))
+        return expected[:bacon_portfolio_len]
+
     def test_matches_performance_analytics_output(self):
         """
         Calculation doesn't depend on periods per annum, so we use yearly default.
@@ -1212,12 +1245,12 @@ class TestVolatilitySkewness(unittest.TestCase):
         for mar, expected in rd.volatility_skewness.EXPECTED_VALUES_BY_MAR_VARIABILITY.items():
             actual = run_stream_property("volatility_skewness",
                                          annual_target_return=mar)
-            assertSeriesEqual(self, actual, expected, places=13,
+            assertSeriesEqual(self, actual, self.bacon_reference(expected), places=13,
                               prefix=f'volatility skewness MAR {mar}')
         for mar, expected in rd.volatility_skewness.EXPECTED_VALUES_BY_MAR_VOLATILITY.items():
             actual = run_stream_property("variability_skewness",
                                          annual_target_return=mar)
-            assertSeriesEqual(self, actual, expected, places=13,
+            assertSeriesEqual(self, actual, self.bacon_reference(expected), places=13,
                               prefix=f'variability skewness MAR {mar}')
 
 class TestFarinelliTibilettiRatio(unittest.TestCase):
@@ -1265,15 +1298,15 @@ class TestRachevRatio(unittest.TestCase):
             for rf, expected in bundle.items():
                 actual = run_stream_method("rachev_ratio",
                     alpha=alpha, beta=beta, annual_risk_free_rate=rf)
-            assertSeriesEqual(self, actual, expected, places=14,
-                              prefix=f'Rachev ratio (alpha {alpha} beta {beta} Rf {rf})')
+                assertSeriesEqual(self, actual, expected, places=14,
+                                  prefix=f'Rachev ratio (alpha {alpha} beta {beta} Rf {rf})')
         alpha = 0.1
         for beta, bundle in rd.rachev_ratio.EXPECTED_VALUES_BY_BETA_RF_ALFA_0_1.items():
             for rf, expected in bundle.items():
                 actual = run_stream_method("rachev_ratio",
                     alpha=alpha, beta=beta, annual_risk_free_rate=rf)
-            assertSeriesEqual(self, actual, expected, places=14,
-                              prefix=f'Rachev ratio (alpha {alpha} beta {beta} Rf {rf})')
+                assertSeriesEqual(self, actual, expected, places=14,
+                                  prefix=f'Rachev ratio (alpha {alpha} beta {beta} Rf {rf})')
 
 class TestDrawdownsCumulative(unittest.TestCase):
     def test_matches_performance_analytics_output(self):
@@ -1323,6 +1356,8 @@ class TestDrawdownsHighWatermark(unittest.TestCase):
 
 class TestDrawdownsContinuousRuns(unittest.TestCase):
     def test_matches_bacon_2023_output(self):
+        # The book's four-decimal drawdown values are approximate; the core
+        # run tracker has separate exact rolling-window tests.
         actual = run_stream_method("drawdowns_continuous_runs",
             returns=bacon_2023_portfolio_returns, benchmark_returns=bacon_2023_portfolio_returns)
         actual = actual[len(actual) - 1]
@@ -1375,6 +1410,8 @@ class TestBurkeRatioModified(unittest.TestCase):
 
 class TestPainIndex(unittest.TestCase):
     def test_matches_performance_analytics_output(self):
+        # R's drawdown series differs slightly from the high-water-mark
+        # series used here. TestDocumentedFormulas checks the exact formula.
         expected = rd.pain_index.EXPECTED_VALUES
         actual = run_stream_property("pain_index")
         assertSeriesEqual(self, actual, expected, delta=0.00098,
@@ -1384,6 +1421,8 @@ class TestPainIndex(unittest.TestCase):
                           prefix="pain index (daily)")
 
 class TestPainRatio(unittest.TestCase):
+    """Keep the R comparison; check the documented ratio separately below."""
+
     def test_matches_performance_analytics_output(self):
         for rf, expected in rd.pain_ratio.EXPECTED_VALUES_BY_RF.items():
             actual = run_stream_property("pain_ratio",
@@ -1398,6 +1437,8 @@ class TestPainRatio(unittest.TestCase):
 
 class TestUlcerIndex(unittest.TestCase):
     def test_matches_performance_analytics_output(self):
+        # The drawdown convention differs from the R fixture; the precise
+        # root-mean-square definition is checked in TestDocumentedFormulas.
         expected = rd.ulcer_index.EXPECTED_VALUES
         actual = run_stream_property("ulcer_index")
         assertSeriesEqual(self, actual, expected, delta=0.00192,
@@ -1407,6 +1448,8 @@ class TestUlcerIndex(unittest.TestCase):
                           prefix="ulcer index (daily)")
 
 class TestMartinRatio(unittest.TestCase):
+    """Keep the R comparison; check the documented ratio separately below."""
+
     def test_matches_performance_analytics_output(self):
         for rf, expected in rd.martin_ratio.EXPECTED_VALUES_BY_RF.items():
             actual = run_stream_property("martin_ratio",
@@ -1471,14 +1514,16 @@ class TestDrawdownDeviation(unittest.TestCase):
 
 class TestCDaRAverage(unittest.TestCase):
     def test_matches_performance_analytics_output(self):
+        # R and this implementation select the continuous drawdown tail
+        # differently. TestDocumentedFormulas checks our linear quantile.
         for p, expected in rd.cdar.EXPECTED_VALUES_BY_P_AVERAGE_GEOMETRIC_INVERTED.items():
             actual = run_stream_method("cdar_average", confidence=p)
             assertSeriesEqual(self, actual, expected, delta=0.02938,
-                              prefix=f'CDaR discrete geometric (yearly) p {p}')
+                              prefix=f'CDaR average geometric (yearly) p {p}')
         for p, expected in rd.cdar.EXPECTED_VALUES_BY_P_AVERAGE_GEOMETRIC_INVERTED.items():
             actual = run_stream_method("cdar_average", confidence=p, daily=True)
             assertSeriesEqual(self, actual, expected, delta=0.02938,
-                              prefix=f'CDaR discrete geometric (daily) p {p}')
+                              prefix=f'CDaR average geometric (daily) p {p}')
 
 class TestCDaRDiscrete(unittest.TestCase):
     def test_matches_performance_analytics_output(self):
@@ -1492,22 +1537,41 @@ class TestCDaRDiscrete(unittest.TestCase):
                               prefix=f'CDaR discrete geometric (daily) p {p}')
 
 class TestCDaRBeta(unittest.TestCase):
+    def test_discrete_tail_selection(self):
+        m = make_measures()
+        for portfolio, benchmark in ((0.1, 0.1), (-0.05, -0.1),
+                                     (0.2, 0.2), (-0.1, -0.2),
+                                     (0.3, 0.3), (-0.15, -0.3)):
+            m.add_return(portfolio, benchmark)
+        # At 50% confidence, two of three episodes are selected. The
+        # denominator is the second-worst depth, -0.2.
+        self.assertAlmostEqual(m.cdar_beta(0.5), (-0.15 - 0.1) / (2 * -0.2),
+                               places=14)
+        self.assertAlmostEqual(m.cdar_beta(0.8), -0.15 / -0.3, places=14)
+
     def test_matches_performance_analytics_output(self):
         for p, expected in rd.cdar_beta.EXPECTED_VALUES_BY_P_GEOMETRIC.items():
             actual = run_stream_method("cdar_beta", confidence=p)
-            assertSeriesEqual(self, actual, expected, delta=0.3529,
+            assertSeriesEqual(self, actual, expected, places=13,
                               prefix=f'CDaR beta geometric (yearly) p {p}')
         for p, expected in rd.cdar_beta.EXPECTED_VALUES_BY_P_GEOMETRIC.items():
             actual = run_stream_method("cdar_beta", confidence=p, daily=True)
-            assertSeriesEqual(self, actual, expected, delta=0.3529,
+            assertSeriesEqual(self, actual, expected, places=13,
                               prefix=f'CDaR beta geometric (daily) p {p}')
 
     def test_mathematical_properties(self):
-        # Identity (portfolio == benchmark).
+        # With one selected episode, identical portfolio and benchmark
+        # returns give the same numerator and denominator.
+        measures = make_measures()
+        for ret in (0.05, -0.1):
+            measures.add_return(ret, ret)
+        assertFloatEqual(self, measures.cdar_beta(), 1.0, places=15,
+                         prefix='CDaR beta (one episode) identity')
+
         measures = make_measures()
         add_bacon(measures, benchmark_returns=bacon_portfolio_returns)
-        assertFloatEqual(self, measures.cdar_beta(), 1.0, delta=0.1568,
-                              prefix='CDaR beta (geometric) identity')
+        assertFloatEqual(self, measures.cdar_beta(), 1.0, places=14,
+                         prefix='CDaR beta (Bacon) identity')
 
         # No drawdowns
         measures_transformed = make_measures()
@@ -1522,6 +1586,10 @@ class TestCDaRBeta(unittest.TestCase):
         assertFloatEqual(self, measures_transformed.cdar_beta(), 0.0,
             places = 15, prefix=f'CDaR beta (geometric) zero returns')
 
+        for confidence in (0.0, 1.0):
+            with self.assertRaises(ValueError):
+                measures.cdar_beta(confidence)
+
 class TestCDaRAlpha(unittest.TestCase):
     def test_matches_performance_analytics_output(self):
         """
@@ -1531,14 +1599,14 @@ class TestCDaRAlpha(unittest.TestCase):
         """
         for p, expected in rd.cdar_alpha.EXPECTED_VALUES_BY_P_GEOMETRIC.items():
             actual = run_stream_method("cdar_alpha", confidence=p, monthly=True)
-            assertSeriesEqual(self, actual, expected, delta=0.0671,
+            assertSeriesEqual(self, actual, expected, places=14,
                               prefix=f'CDaR alpha geometric (monthly) p {p}')
 
     def test_mathematical_properties(self):
         # Identity (portfolio == benchmark).
         measures = make_measures(monthly=True)
         add_bacon(measures, benchmark_returns=bacon_portfolio_returns)
-        assertFloatEqual(self, measures.cdar_alpha(), 0.0, delta=0.0178,
+        assertFloatEqual(self, measures.cdar_alpha(), 0.0, places=14,
                               prefix='CDaR alpha (geometric) identity')
 
         # No drawdowns
@@ -1670,13 +1738,42 @@ class TestSfmR2(unittest.TestCase):
                               prefix=f'SFM R^2 (daily, Rf {rf})')
 
 class TestJensenAlpha(unittest.TestCase):
+    def test_high_daily_risk_free_rate_definition(self):
+        # The R fixtures lose precision after compounding a 10% or 30%
+        # periodic rate over 252 periods. Check the documented formula.
+        for rf in (0.1, 0.3):
+            annual_rf = (1 + rf) ** 252 - 1
+            m = Measures(periods_per_annum=252, annual_risk_free_rate=annual_rf)
+            for i, (ret, bench) in enumerate(zip(bacon_portfolio_returns,
+                                                  bacon_benchmark_returns)):
+                m.add_return(ret, bench)
+                if i == 0:
+                    continue
+                p_ann = math.prod(1 + x for x in bacon_portfolio_returns[:i + 1]) \
+                    ** (252 / (i + 1)) - 1
+                b_ann = math.prod(1 + x for x in bacon_benchmark_returns[:i + 1]) \
+                    ** (252 / (i + 1)) - 1
+                expected = p_ann - (m.sfm_beta * b_ann +
+                                    (1 - m.sfm_beta) * annual_rf)
+                assertFloatEqual(self, m.jensen_alpha, expected,
+                                 delta=1e-9, rel_tol=1e-12,
+                                 prefix=f'Jensen alpha rf={rf} step={i}')
+                if m.sfm_beta != 0:
+                    assertFloatEqual(self, m.jensen_alpha_modified,
+                                     expected / m.sfm_beta,
+                                     delta=1e-9, rel_tol=1e-12,
+                                     prefix=f'Jensen alpha modified rf={rf} step={i}')
+
     def test_matches_performance_analytics_output(self):
         for rf, expected in rd.jensen_alpha.EXPECTED_VALUES_BY_RF_DAILY_PERFAN.items():
             annual_rf = (1 + rf) ** 252 - 1
             actual = run_stream_property("jensen_alpha", daily=True,
                  annual_risk_free_rate=annual_rf)
-            assertSeriesEqual(self, actual, expected, delta=9e-10 if rf < 0.1 else 9e14,
-                    prefix=f'Jensen alpha (daily, Rf {rf})')
+            if rf <= 0.05:
+                # At higher periodic rates the R reference loses precision
+                # through cancellation; the formula test above covers them.
+                assertSeriesEqual(self, actual, expected, delta=9e-10, rel_tol=1e-10,
+                        prefix=f'Jensen alpha (daily, Rf {rf})')
         for rf, expected in rd.jensen_alpha.EXPECTED_VALUES_BY_RF_MONTHLY_PERFAN.items():
             annual_rf = (1 + rf) ** 12 - 1
             actual = run_stream_property("jensen_alpha", monthly=True,
@@ -1898,27 +1995,41 @@ class TestAppraisalRatio(unittest.TestCase):
                               prefix=f'appraisal ratio (yearly, Rf {rf})')
 
 class TestJensenAlphaModified(unittest.TestCase):
+    def test_definition(self):
+        m = make_measures()
+        for i, (ret, bench) in enumerate(zip(bacon_portfolio_returns,
+                                              bacon_benchmark_returns)):
+            m.add_return(ret, bench)
+            beta = m.sfm_beta
+            expected = m.jensen_alpha / beta if beta != 0 else math.nan
+            assertFloatEqual(self, m.jensen_alpha_modified, expected,
+                             places=14, prefix=f'Jensen alpha modified n={i + 1}')
+
     def test_matches_performance_analytics_output(self):
         for rf, expected in rd.jensen_alpha_modified.EXPECTED_VALUES_BY_RF_DAILY_PERFAN.items():
             annual_rf = (1 + rf) ** 252 - 1
             actual = run_stream_property("jensen_alpha_modified", daily=True,
                  annual_risk_free_rate=annual_rf)
             if rf < 0.05:
-                assertSeriesEqual(self, actual, expected, delta=0.9917,
+                # Annualizing 24 daily observations amplifies the reference's
+                # floating-point error, even when the formula agrees.
+                assertSeriesEqual(self, actual, expected, delta=1e-8,
                               prefix=f'Jensen alpha modified (daily, Rf {rf})')
         for rf, expected in rd.jensen_alpha_modified.EXPECTED_VALUES_BY_RF_MONTHLY_PERFAN.items():
             annual_rf = (1 + rf) ** 12 - 1
             actual = run_stream_property("jensen_alpha_modified", monthly=True,
                  annual_risk_free_rate=annual_rf)
-            assertSeriesEqual(self, actual, expected, delta=0.0015 if rf < 0.05 else 0.6378,
+            assertSeriesEqual(self, actual, expected, delta=1e-10,
                               prefix=f'Jensen alpha modified (monthly, Rf {rf})')
         for rf, expected in rd.jensen_alpha_modified.EXPECTED_VALUES_BY_RF_ANNUAL_PERFAN.items():
             actual = run_stream_property("jensen_alpha_modified",
                  annual_risk_free_rate=rf)
-            assertSeriesEqual(self, actual, expected, delta=0.00011 if rf < 0.05 else 0.0023,
+            assertSeriesEqual(self, actual, expected, delta=1e-13,
                               prefix=f'Jensen alpha modified (yearly, Rf {rf})')
 
 class TestJensenAlphaAlternative(unittest.TestCase):
+    """Compare R and separately check the documented systematic-risk ratio."""
+
     def test_matches_performance_analytics_output(self):
         for rf, expected in rd.jensen_alpha_alternative.EXPECTED_VALUES_BY_RF_DAILY_PERFAN.items():
             annual_rf = (1 + rf) ** 252 - 1
@@ -1940,6 +2051,8 @@ class TestJensenAlphaAlternative(unittest.TestCase):
                               prefix=f'Jensen alpha alternative (yearly, Rf {rf})')
 
 class TestMSquared(unittest.TestCase):
+    """Compare R and separately check the documented geometric formula."""
+
     def test_matches_performance_analytics_output(self):
         for rf, expected in rd.m_squared.EXPECTED_VALUES_BY_RF_DAILY_PERFAN.items():
             annual_rf = (1 + rf) ** 252 - 1
@@ -1961,6 +2074,8 @@ class TestMSquared(unittest.TestCase):
                               prefix=f'M squared (yearly, Rf {rf})')
 
 class TestMSquaredExcess(unittest.TestCase):
+    """Compare R and separately check the documented geometric formula."""
+
     def test_matches_performance_analytics_output(self):
         for rf, expected in rd.m_squared_excess.EXPECTED_VALUES_BY_RF_DAILY_PERFAN.items():
             annual_rf = (1 + rf) ** 252 - 1
@@ -2121,6 +2236,98 @@ class TestDownPercentageRatio(unittest.TestCase):
         actual = run_stream_property("down_percentage_ratio")
         assertSeriesEqual(self, actual, expected, places=15,
                               prefix=f'Down percentage ratio (yearly)')
+
+class TestDocumentedFormulas(unittest.TestCase):
+    """Formula checks alongside comparisons with the R fixtures."""
+
+    def test_drawdown_risk_and_ratios(self):
+        for rf in (0.0, 0.05):
+            m = make_measures(annual_rf=rf)
+            for i, (ret, bench) in enumerate(zip(bacon_portfolio_returns,
+                                                  bacon_benchmark_returns)):
+                m.add_return(ret, bench)
+                drawdowns = m.drawdowns_high_watermark
+                n = i + 1
+                pain = -math.fsum(drawdowns) / n
+                ulcer = math.sqrt(math.fsum(x * x for x in drawdowns) / n)
+                geometric_return = math.prod(1 + x for x in bacon_portfolio_returns[:n]) \
+                    ** (1 / n) - 1
+                self.assertAlmostEqual(m.pain_index, pain, places=14)
+                self.assertAlmostEqual(m.ulcer_index, ulcer, places=14)
+                if pain > 0:
+                    self.assertAlmostEqual(m.pain_ratio,
+                                           (geometric_return - rf) / pain, places=12)
+                if ulcer > 0:
+                    self.assertAlmostEqual(m.martin_ratio,
+                                           (geometric_return - rf) / ulcer, places=12)
+
+    def test_cdar_average_and_alpha(self):
+        m = make_measures(monthly=True)
+        for ret, bench in zip(bacon_portfolio_returns, bacon_benchmark_returns):
+            m.add_return(ret, bench)
+            drawdowns = sorted(m.drawdowns_high_watermark)
+            for confidence in (0.9, 0.95):
+                position = (1 - confidence) * (len(drawdowns) - 1)
+                lo = int(position)
+                q = drawdowns[lo] + (position - lo) * (
+                    drawdowns[min(lo + 1, len(drawdowns) - 1)] - drawdowns[lo])
+                tail = [d for d in drawdowns if d <= q]
+                expected_cdar = -math.fsum(tail) / len(tail) if q < 0 else 0.0
+                self.assertAlmostEqual(m.cdar_average(confidence), expected_cdar,
+                                       places=14)
+                beta = m.cdar_beta(confidence)
+                if math.isfinite(beta):
+                    portfolio_mean = statistics.fmean(bacon_portfolio_returns[:len(drawdowns)])
+                    benchmark_mean = statistics.fmean(bacon_benchmark_returns[:len(drawdowns)])
+                    expected_alpha = (1 + portfolio_mean) ** 12 - 1 \
+                        - beta * ((1 + benchmark_mean) ** 12 - 1)
+                    self.assertAlmostEqual(m.cdar_alpha(confidence), expected_alpha,
+                                           places=13)
+
+    def test_m_squared_and_jensen_alpha_alternative(self):
+        for periods, periodic_rf in ((1, 0.05), (12, 0.05), (252, 0.01)):
+            annual_rf = (1 + periodic_rf) ** periods - 1
+            m = Measures(periods_per_annum=periods,
+                         annual_risk_free_rate=annual_rf)
+            for i, (ret, bench) in enumerate(zip(bacon_portfolio_returns,
+                                                  bacon_benchmark_returns)):
+                m.add_return(ret, bench)
+                n = i + 1
+                if n < 2:
+                    continue
+                portfolio = bacon_portfolio_returns[:n]
+                benchmark = bacon_benchmark_returns[:n]
+                p_ann = math.prod(1 + x for x in portfolio) ** (periods / n) - 1
+                b_ann = math.prod(1 + x for x in benchmark) ** (periods / n) - 1
+                p_std = statistics.pstdev(portfolio)
+                b_std = statistics.pstdev(benchmark)
+                scale = b_std / p_std
+                expected_m2 = p_ann * scale + annual_rf * (1 - scale)
+                assertFloatEqual(self, m.m_squared, expected_m2,
+                                 delta=1e-10, rel_tol=1e-11,
+                                 prefix=f'M squared periods={periods} n={n}')
+                expected_excess = (1 + expected_m2) / (1 + b_ann) - 1
+                assertFloatEqual(self, m.m_squared_excess, expected_excess,
+                                 delta=1e-10, rel_tol=1e-11,
+                                 prefix=f'M squared excess periods={periods} n={n}')
+                systematic_risk = abs(m.sfm_beta) * statistics.stdev(benchmark) \
+                    * math.sqrt(periods)
+                if systematic_risk > 0 and math.isfinite(systematic_risk):
+                    assertFloatEqual(self, m.jensen_alpha_alternative,
+                                     m.jensen_alpha / systematic_risk,
+                                     delta=1e-10, rel_tol=1e-11,
+                                     prefix=f'Jensen alpha alternative periods={periods} n={n}')
+
+    def test_m_squared_equal_volatility_with_extreme_rate(self):
+        m = Measures(periods_per_annum=252,
+                     annual_risk_free_rate=1.3 ** 252 - 1)
+        for portfolio, benchmark in ((0.125, 0.25), (0.375, 0.5)):
+            m.add_return(portfolio, benchmark)
+        # Binary-exact inputs give exactly equal portfolio and benchmark
+        # volatility, so the annual risk-free terms must cancel.
+        expected = ((1.125 * 1.375) ** 126) - 1
+        self.assertTrue(math.isclose(m.m_squared, expected, rel_tol=1e-14))
+
 
 class TestRollingWindow(unittest.TestCase):
     """

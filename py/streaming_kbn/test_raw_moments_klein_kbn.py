@@ -91,6 +91,11 @@ class TestRawMomentsKleinKBN(unittest.TestCase):
         self.assertAlmostEqual(m.variance, 1.0, places=15)
         self.assertAlmostEqual(m.standard_deviation, 1.0, places=15)
 
+    def test_invalid_ddof(self):
+        for ddof in (-1, 0.5, True):
+            with self.subTest(ddof=ddof), self.assertRaises(ValueError):
+                RawMomentsKleinKBN(ddof=ddof)
+
     def test_kurtosis_sample_corrected_difference(self):
         # kurtosis_sample_corrected - kurtosis_sample = (9n-15) / ((n-2)(n-3))
         m = feed(RawMomentsKleinKBN(), BACON)
@@ -140,6 +145,15 @@ class TestRawMomentsKleinKBN(unittest.TestCase):
         m = feed(RawMomentsKleinKBN(), [x * 1e-6 for x in BACON])
         self.assertAlmostEqual(m.skewness_moment, EXPECTED['skewness_moment'], places=13)
         self.assertAlmostEqual(m.kurtosis_excess, EXPECTED['kurtosis_excess'], places=13)
+
+    def test_large_offset_preserves_variance_but_not_higher_moments(self):
+        # Welford's variance remains usable when raw-power cancellation
+        # makes skewness and kurtosis unreliable.
+        m = feed(RawMomentsKleinKBN(ddof=0), [1e8, 1e8 + 1, 1e8 + 2])
+        self.assertAlmostEqual(m.mean, 1e8 + 1, places=10)
+        self.assertAlmostEqual(m.variance, 2 / 3, places=14)
+        self.assertTrue(math.isnan(m.skewness))
+        self.assertTrue(math.isnan(m.kurtosis))
 
     def test_revert_partial(self):
         data = [10.0, 18.0, 5.0, 12.0, 7.0]

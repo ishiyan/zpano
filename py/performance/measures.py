@@ -3132,28 +3132,31 @@ class Measures:
     
         1. Identify discrete benchmark drawdown episodes using geometric
            drawdown chaining.
-        2. Select the worst ``1 - confidence`` fraction of drawdown episodes.
+        2. Select the worst ``1 - confidence`` fraction of drawdown episodes,
+           using at least one episode and a discrete cutoff depth.
         3. For each selected episode, calculate the portfolio return from
            the beginning of the drawdown through its trough.
         4. Aggregate those portfolio returns geometrically.
         5. Divide their sum by the number of selected drawdowns times the
-           benchmark CDD quantile.
+           benchmark cutoff depth.
     
         Note
         ----
         This follows the behavior of the supplied PerformanceAnalytics R
-        implementation. In particular, the legacy ``CDD()`` implementation returns
-        the drawdown quantile rather than the conditional mean despite its
-        documentation describing CDD as a conditional measure.
+        implementation. The denominator is the selected benchmark drawdown
+        depth, not an interpolated quantile or a conditional mean.
     
         Args:
             confidence:
                 Confidence level for the drawdown tail. For example, ``0.95``
-                selects drawdowns at or below the 5th percentile.
+                selects at least the worst 5% of episodes.
     
         Returns:
             CDaR Beta, or ``math.nan`` when it cannot be calculated.
         """
+        if not 0.0 < confidence < 1.0:
+            raise ValueError("confidence must be between 0 and 1")
+
         w = self._returns
         if w is None:
             return math.nan
@@ -3163,8 +3166,9 @@ class Measures:
         if not depths:
             return math.nan
 
-        q = core.percentile(depths, 1.0 - confidence)
-        if  q == 0.0:
+        tail_count = max(1, math.ceil(len(depths) * (1.0 - confidence)))
+        q = sorted(depths)[tail_count - 1]
+        if q == 0.0:
             return math.nan
 
         sum_ret = KleinKBNAccumulator()
@@ -3495,7 +3499,9 @@ class Measures:
             periods_per_year=self.periods_per_annum)
         mean_b = self._benchmark_cumulative_return.annualized_geometric_mean_return( \
             periods_per_year=self.periods_per_annum)
-        return mean - (rf +  self.sfm_beta * (mean_b - rf))
+        beta = self.sfm_beta
+        # This form retains mean_b when beta == 1, even for a huge rf.
+        return mean - (beta * mean_b + (1.0 - beta) * rf)
 
     @property
     def fama_beta(self) -> float:
@@ -3907,7 +3913,7 @@ class Measures:
         alpha = self.jensen_alpha
         if math.isnan(alpha):
             return math.nan
-        beta = self.fama_beta
+        beta = self.sfm_beta
         return alpha / beta if beta != 0 else math.nan
 
     @property
@@ -3979,7 +3985,9 @@ class Measures:
         if math.isnan(b_std):
             return math.nan
 
-        return (p_ret - self._annual_risk_free_rate) * b_std / p_std + self._annual_risk_free_rate
+        scale = b_std / p_std
+        # Keep p_ret when scale == 1 instead of subtracting two large rf terms.
+        return p_ret * scale + self._annual_risk_free_rate * (1.0 - scale)
 
     @property
     def m_squared_excess(self) -> float:

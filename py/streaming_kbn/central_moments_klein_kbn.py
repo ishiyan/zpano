@@ -27,14 +27,16 @@ class CentralMomentsKleinKBN:
     (each as a KleinKBNAccumulator), updated in O(1) per sample.
     The population central moments are μₖ = Mₖ / n.
 
-    Preferred over RawMomentsKleinKBN when samples are only added (or
-    removed in LIFO order), because it avoids the catastrophic cancellation
-    inherent in converting raw power sums Σxᵏ to central moments.  This
-    matters for data with a large mean relative to its spread.
+    Avoids the catastrophic cancellation inherent in converting raw power
+    sums Σxᵏ to central moments.  This matters for data with a large mean
+    relative to its spread.  Inverse updates can remove any previously
+    added sample, including the oldest sample in a FIFO rolling window.
+    Reversion clears the compensation terms, so repeated removals can
+    accumulate rounding error.
 
     Parameters
     ----------
-    ddof : int, default=1
+    ddof : nonnegative int, default=1
         Delta degrees of freedom for variance.
         variance = M₂ / (n - ddof).  ddof=0 gives population, ddof=1 gives sample.
     bias : bool, default=True
@@ -69,6 +71,8 @@ class CentralMomentsKleinKBN:
     Skewness and kurtosis are NaN when M₂ = 0 (constant data).
     """
     def __init__(self, ddof=1, bias=True, fisher=True) -> None:
+        if type(ddof) is not int or ddof < 0:
+            raise ValueError("ddof must be a nonnegative integer")
         self.ddof = ddof
         self.bias = bias
         self.fisher = fisher
@@ -118,19 +122,13 @@ class CentralMomentsKleinKBN:
 
     def revert(self, x: float) -> None:
         r"""
-        LIFO revert: removes the most recently added sample x, restoring
-        the state to what it would be had x never been added.
-
-        Only the most recent sample can be reverted (LIFO stack, not FIFO
-        queue): the update of M₃ and M₄ depends on the mean at the time a
-        sample was added, so an older sample cannot be removed exactly.
-        For FIFO rolling windows use RawMomentsKleinKBN, which supports
-        removal of any previously added sample.
+        Removes a previously added sample x, regardless of insertion order.
+        Reverting a value that was never added corrupts the state.
 
         The restored M₁–M₄ are written with KleinKBNAccumulator.set(), which
         clears their compensation terms.  Subsequent updates rebuild the
-        compensation from the restored values, a minor loss of error
-        correction for each revert.
+        compensation from the restored values.  Repeated reverts can
+        accumulate rounding error, especially for large-offset data.
 
         Inverse formulas (where nₙ = count before revert, nₒ = nₙ − 1):
 
