@@ -73,6 +73,27 @@ class TestKleinKBNSummator(unittest.TestCase):
         with self.assertRaises(ValueError):
             s.revert(1.0)
 
+    def test_revert_to_empty_clears_compensation(self):
+        for final_zero in (False, True):
+            with self.subTest(final_zero=final_zero):
+                s = KleinKBNSummator()
+                for x in [0.1, 1e16, 1e32, 1e48]:
+                    s.update(x)
+                if final_zero:
+                    s.update(0.0)
+                for x in [1e16, 0.1, 1e32, 1e48]:
+                    s.revert(x)
+                if final_zero:
+                    self.assertEqual(s.n, 1)
+                    s.revert(0.0)
+                self.assertEqual(s.n, 0)
+                self.assertEqual(s.value, 0.0)
+                self.assertTrue(math.isnan(s.mean))
+                s.update(3.0)
+                self.assertEqual(s.n, 1)
+                self.assertEqual(s.value, 3.0)
+                self.assertEqual(s.mean, 3.0)
+
     def test_reset(self):
         s = KleinKBNSummator()
         for x in [1.0, 2.0]:

@@ -1,147 +1,172 @@
-# Pébay Central-Moment Streaming Statistics (`CentralMomentsKleinKBN`)
+# Pébay central-moment streaming statistics
 
-## Domain: Streaming Mean, Variance, Skewness, Kurtosis
+`CentralMomentsKleinKBN` computes mean, variance, skewness, and kurtosis directly from running central moments, using Pébay's formulas with Klein second-order KBN accumulation. It avoids the raw-power conversion cancellation that affects higher moments when the mean is large relative to the spread. See the [package overview](streaming_kbn.md) for all five implementations and API conventions.
 
-Computing the first four moments of a data stream in O(1) per element can be done either via raw power sums (Σx, Σx², …) or by maintaining running central moments (m₁, m₂, m₃, m₄) directly. `CentralMomentsKleinKBN` implements the latter using Pébay's update formulas, with all accumulators backed by `KleinKBNAccumulator` for KBN double-compensated summation.
+## State and settings
 
-| Property | RawMomentsKleinKBN | CentralMomentsKleinKBN |
+| State | Initial value | Purpose |
 | --- | --- | --- |
-| Accumulates | Σx, Σx², Σx³, Σx⁴ | m₁, m₂, m₃, m₄ |
-| Numerical stability | ❌ Cancellation for large mean | ✅ Direct central moments |
-| Revert | ✅ FIFO via `update(-x)` | ⚠️ LIFO only, compensation reset |
-| Preferred use | Rolling windows with moderate values | Forward-only, high-precision |
+| `n` | 0 | Sample count |
+| `M1` | Zero-valued KBN accumulator | Running mean |
+| `M2` | Zero-valued KBN accumulator | Sum of squared deviations |
+| `M3` | Zero-valued KBN accumulator | Sum of cubed deviations |
+| `M4` | Zero-valued KBN accumulator | Sum of fourth powers of deviations |
 
-### Why Central Moments Are More Stable
+`M1` stores the mean. `M2`, `M3`, and `M4` store **sums**, not normalized moments:
 
-When data has a non-zero mean, raw power sums like Σx² contain a large `n·x̄²` term that must be subtracted to get the variance. The subtraction `Σx² − (Σx)²/n` can catastrophically cancel, losing precision. Central moment updates avoid this by working directly with deviations from the running mean.
+$$
+M_k = \sum_i (x_i - \bar{x})^k,
+\qquad
+\mu_k = M_k / n
+\quad (k = 2, 3, 4).
+$$
 
-## Algorithm
+Every accumulator is a [KleinKBNAccumulator](klein_kbn_accumulator.md). Every operation and query takes O(1) time; storage is O(1).
 
-### Pébay Forward Update
+The conventional settings are `ddof = 1`, `bias = true`, `fisher = true`. They are mutable, and reset retains them. `ddof` must be a nonnegative integer; [construction and validation](streaming_kbn.md#language-api-mapping) differ by language.
 
-Pébay's formulas (also sometimes called the "online" or "parallel" algorithm) update the central moments in O(1) per sample without computing raw power sums:
+| Operation | Behavior |
+| --- | --- |
+| `update(x)` | Add a sample using the compensated central-moment formulas |
+| `revert(x)` | Remove a present sample; fail if empty; reset after final removal |
+| `reset()` | Clear count and all four accumulators, retaining settings |
+
+## Forward update and reset
+
+`m2` and `m3` are captured before updating their accumulators. Counts used in arithmetic products below are converted to floating point before multiplication.
 
 ```pseudocode
-n_new = n_old + 1
-δ     = x − m₁                    [deviation from old mean]
-δₙ    = δ / n_new                 [normalized deviation]
-δₙ²   = δₙ · δₙ
-term  = δ · δₙ · n_old
+PROCEDURE UPDATE(x)
+    nOld ← n
+    nNew ← nOld + 1
+    n ← nNew
+    delta ← x − M1.VALUE()
+    d ← delta / nNew
+    d2 ← d × d
+    term ← delta × d × nOld
+    m2 ← M2.VALUE()
+    m3 ← M3.VALUE()
 
-m₁   += δₙ                        [mean update]
-m₄   += term·δₙ²·(n_new² − 3·n_new + 3)
-       + 6·δₙ²·m₂ − 4·δₙ·m₃      [4th moment update]
-m₃   += term·δₙ·(n_new − 2)
-       − 3·δₙ·m₂                  [3rd moment update]
-m₂   += term                      [2nd moment / variance sum]
+    M1.UPDATE(d)
+    M4.UPDATE(term × d2 × (nNew × nNew − 3 × nNew + 3)
+              + 6 × d2 × m2 − 4 × d × m3)
+    M3.UPDATE(term × d × (nNew − 2) − 3 × d × m2)
+    M2.UPDATE(term)
+END PROCEDURE
+
+PROCEDURE RESET()
+    n ← 0
+    FOR EACH accumulator IN [M1, M2, M3, M4] DO
+        accumulator.RESET()
+    END FOR
+END PROCEDURE
 ```
 
-Each of `m₁, m₂, m₃, m₄` is stored as a `KleinKBNAccumulator`, providing KBN compensation for the running sums.
+Updating M4 before M3 and M2 preserves the dependency on the previous central sums.
 
-### Inverse Pébay Revert (LIFO)
+## Inverse removal
 
-Only the most recently added sample can be reverted (LIFO stack). The inverse formulas restore the state to exactly what it would be had the last sample never been added:
+Any sample still present can be removed, including the oldest in a FIFO window. The algorithm reconstructs the moments of the remaining samples. In the notation below, `nNew` is the current count before removal and `nOld` is the remaining count, viewing removal as the inverse of insertion.
 
 ```pseudocode
-n_new = n (before revert), n_old = n − 1
+PROCEDURE REVERT(x)
+    IF n = 0 THEN
+        ERROR("Cannot revert from an empty accumulator")
+    END IF
+    IF n = 1 THEN
+        RESET()
+        RETURN
+    END IF
+    nNew ← n
+    nOld ← nNew − 1
+    m1New ← M1.VALUE()
+    m2New ← M2.VALUE()
+    m3New ← M3.VALUE()
+    m4New ← M4.VALUE()
 
-m₁_old = (n_new · m₁_new − x) / n_old
-δ      = x − m₁_old
-δₙ     = δ / n_new
-δₙ²    = δₙ · δₙ
-term   = δ · δₙ · n_old
+    m1Old ← (nNew × m1New − x) / nOld
+    delta ← x − m1Old
+    d ← delta / nNew
+    d2 ← d × d
+    term ← delta × d × nOld
+    m2Old ← m2New − term
+    m3Old ← m3New − (term × d × (nNew − 2) − 3 × d × m2Old)
+    m4Old ← m4New − (term × d2 × (nNew × nNew − 3 × nNew + 3)
+                     + 6 × d2 × m2Old − 4 × d × m3Old)
 
-m₂_old = m₂_new − term
-m₃_old = m₃_new − (term·δₙ·(n_new−2) − 3·δₙ·m₂_old)
-m₄_old = m₄_new − (term·δₙ²·(n_new²−3·n_new+3)
-                   + 6·δₙ²·m₂_old − 4·δₙ·m₃_old)
+    n ← nOld
+    M1.SET(m1Old)
+    M2.SET(m2Old)
+    M3.SET(m3Old)
+    M4.SET(m4Old)
+END PROCEDURE
 ```
 
-After computing the restored values, each accumulator is set via `set(value)`, which resets the KBN compensation terms (`_cs`, `_ccs`) to zero. This means subsequent updates rebuild compensation from the restored value — a minor loss of error correction per revert.
+The restored values must be calculated in dependency order: mean, second sum, third sum, then fourth sum. `SET` clears each accumulator's compensation terms. Subsequent updates build compensation from these restored values; repeated removals can accumulate rounding error, especially for data with a large mean.
 
-Because of this compensation reset, `CentralMomentsKleinKBN` is not well-suited for frequent FIFO rolling-window use. Prefer `RawMomentsKleinKBN` for rolling windows.
+The identities do not depend on insertion position in exact arithmetic. Floating-point removal is not an exact inverse, and the implementation does not check sample membership. The final removal resets count and all accumulators exactly. See the [error mapping](streaming_kbn.md#errors-and-validation) for empty removal.
 
-### Query Formulas
+## Public queries
 
-Moments are derived directly from the running central moment accumulators:
+Define `m2 = M2.VALUE()`, `m3 = M3.VALUE()`, and `m4 = M4.VALUE()`. For valid positive variance and sufficient samples, the standardized moments are:
+
+$$
+g_1 = \frac{\sqrt{n}\,m3}{m2\sqrt{m2}},
+\qquad
+\beta_2 = \frac{n\,m4}{m2^2},
+\qquad
+G_2 = \frac{(n^2-1)\beta_2 - 3(n-1)^2}{(n-2)(n-3)}.
+$$
+
+| Query | Formula or behavior | Unavailable result |
+| --- | --- | --- |
+| `n` | Sample count | Always available |
+| `mean` | `M1.VALUE()` | 0.0 when empty |
+| `variance` | `MAX(m2, 0) / (n − ddof)` | NaN when n ≤ ddof |
+| `standard_deviation` | Square root of variance | NaN when variance is unavailable |
+| `skewness` | g₁ if bias is true; g₁ × √(n(n − 1)) / (n − 2) otherwise | NaN when n < 2 or m2 ≤ 0; additionally n < 3 when bias is false |
+| `kurtosis` | Selected by the table below | NaN when n < 2 or m2 ≤ 0; additionally n < 4 when bias is false |
+
+Variance checks `n ≤ ddof` before subtracting counts, then converts the difference to floating point. Negative second sums from rounding are clamped to zero for variance; skewness and kurtosis require a strictly positive second sum. There is no relative raw-power cancellation guard because these queries use central sums directly.
+
+| bias | fisher | `kurtosis` |
+| --- | --- | --- |
+| true | true | β₂ − 3 |
+| true | false | β₂ |
+| false | true | G₂ |
+| false | false | G₂ + 3 |
+
+These selections follow the same statistical conventions as the setting-selected queries on raw moments. `ddof` affects variance and standard deviation only; `fisher` affects kurtosis only. Central moments has no separate fixed-ddof, raw-power, or explicit skewness/kurtosis variant queries.
+
+## Usage and choice of tracker
 
 ```pseudocode
-variance     = m₂ / (n − ddof)
-skewness     = √n · m₃ / m₂^1.5                       [bias=True]
-kurtosis     = n · m₄ / m₂² − 3                       [bias=True, fisher=True]
+moments ← CREATE CentralMomentsKleinKBN(ddof: 0, bias: true, fisher: true)
+FOR EACH x IN [1e8, 1e8 + 1, 1e8 + 2] DO
+    moments.UPDATE(x)
+END FOR
+OUTPUT READ moments.mean                 // 100000001.0
+OUTPUT READ moments.variance             // approximately 2/3
+OUTPUT READ moments.skewness             // 0.0
+OUTPUT READ moments.kurtosis             // −1.5
+
+moments.REVERT(1e8)                       // FIFO removal
+OUTPUT READ moments.n                    // 2
 ```
 
-Bias and Fisher corrections follow the same pattern as `RawMomentsKleinKBN`.
+For FIFO streams, retain a queue as shown in the [rolling-window pattern](streaming_kbn.md#rolling-window-pattern).
 
-Guard clauses: skewness returns `0.0` when `n < 3` or `m₂ ≤ 0`; kurtosis returns `0.0` when `n ≤ 3` or `m₂ ≤ 0`.
-
-## Implementation: `CentralMomentsKleinKBN`
-
-### State Variables
-
-| Variable | Type | Purpose |
+| Aspect | RawMomentsKleinKBN | CentralMomentsKleinKBN |
 | --- | --- | --- |
-| `n` | `int` | Sample count |
-| `m1` | `KleinKBNAccumulator` | Running mean m₁ |
-| `m2` | `KleinKBNAccumulator` | Sum of squared deviations m₂ |
-| `m3` | `KleinKBNAccumulator` | Sum of cubed deviations m₃ |
-| `m4` | `KleinKBNAccumulator` | Sum of quartic deviations m₄ |
-| `ddof` | `int` | Delta degrees of freedom for variance |
-| `bias` | `bool` | If True, population standardized moments |
-| `fisher` | `bool` | If True, excess kurtosis (Gaussian → 0) |
+| Mean and variance | Compensated Welford tracker | Compensated central-moment updates |
+| Higher moments | Convert raw power sums; cancellation can reduce accuracy or produce NaN | Use central sums directly; avoids that conversion |
+| Nonfinal removal | Retains compensation | Clears compensation on restored moments |
+| Query choices | Raw sums, fixed-ddof queries, explicit moment variants, setting-selected queries | Setting-selected queries |
+| FIFO removal | Supported | Supported |
 
-### Parameters
+Use central moments for higher moments when the mean is large relative to the spread. Use [raw moments](raw_moments_klein_kbn.md) when raw sums or explicit statistical variants are needed. Neither tracker guarantees exact reversal or indefinitely accurate rolling-window shifts. Inputs and all intermediate calculations must remain finite.
 
-- **`ddof`** (int, default=1) — Divisor for variance is `n − ddof`. `ddof=0` gives population variance, `ddof=1` gives sample.
-- **`bias`** (bool, default=True) — If True, compute population skewness/kurtosis. If False, apply Fisher-Pearson bias correction.
-- **`fisher`** (bool, default=True) — If True, return excess kurtosis (subtract 3). If False, return raw kurtosis (Gaussian → 3).
-
-### Methods
-
-- **`update(x)`** — Adds sample `x` using Pébay's O(1) central moment formulas with KBN-compensated accumulation.
-- **`revert(x)`** — LIFO revert: removes the most recently added sample `x` using inverse Pébay formulas. Resets KBN compensation on the restored values. Raises `ValueError` if `n = 0`.
-- **`reset()`** — Resets all accumulators and count to zero.
-- **`mean`** — Returns `m1.value`.
-- **`variance`** — Returns `m2.value / (n − ddof)`. Returns `0.0` if `n ≤ ddof`.
-- **`standard_deviation`** — Returns `√variance`.
-- **`skewness`** — Returns the computed skewness. Returns `0.0` if `n < 3` or `m₂ ≤ 0`.
-- **`kurtosis`** — Returns the computed (excess) kurtosis. Returns `0.0` if `n ≤ 3` or `m₂ ≤ 0`.
-
-### Usage
-
-```python
-from central_moments_klein_kbn import CentralMomentsKleinKBN
-
-m = CentralMomentsKleinKBN(ddof=0, bias=True, fisher=True)
-for x in data:
-    m.update(x)
-
-print(m.mean, m.variance, m.skewness, m.kurtosis)
-```
-
-LIFO revert (rare use — only for undoing the most recent sample):
-
-```python
-m.update(x)
-# ...
-m.revert(x)  # restores prior state
-```
-
-For rolling FIFO windows, use `RawMomentsKleinKBN` instead.
-
-## Comparison: `CentralMomentsKleinKBN` vs `RawMomentsKleinKBN`
-
-| Aspect | CentralMomentsKleinKBN | RawMomentsKleinKBN |
-| --- | --- | --- |
-| Forward accuracy | ✅ Best (no raw-sum cancellation) | ⚠️ Good with KBN, but \|x̄\| ≫ 0 erodes precision |
-| Revert | ⚠️ LIFO only, compensation reset | ✅ FIFO via `update(-x)` |
-| Rolling window | ❌ Not recommended | ✅ Natural |
-| Skewness/kurtosis guards | Returns `0.0` | Returns `nan` |
-| Complexity | Higher (Pébay formulas) | Lower (raw sums) |
-
-Choose `CentralMomentsKleinKBN` for forward-only streaming where numerical accuracy matters. Choose `RawMomentsKleinKBN` when you need FIFO rolling-window support or prefer raw-sum semantics.
-
-### References
+## References
 
 - Pébay, P. (2008). "Formulas for robust, one-pass parallel computation of covariances and arbitrary-order statistical moments". *Sandia Report SAND2008-6212*.
 - Cook, J. D. [Skewness and kurtosis](https://www.johndcook.com/skewness_kurtosis.html).

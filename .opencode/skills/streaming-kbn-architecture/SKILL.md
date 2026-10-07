@@ -5,7 +5,11 @@ description: Architecture, algorithms, and implementation reference for the zpan
 
 # Streaming KBN Architecture
 
-Architecture, algorithms, and implementation reference for the streaming KBN-compensated statistical accumulators in zpano. This package provides four classes for streaming O(1) computation of mean, variance, skewness, kurtosis, and linear regression, all backed by Klein second-order Kahan-Babuška-Neumaier (KBN) double-compensated summation.
+Architecture, algorithms, and implementation reference for the streaming KBN-compensated statistical accumulators in zpano. This package provides five classes for streaming (one-pass, O(1) per sample) computation of sums, mean, variance, skewness, kurtosis, and linear regression, all backed by Klein second-order Kahan-Babuška-Neumaier (KBN) double-compensated summation.
+
+**Reference implementation:** Python `py/streaming_kbn/`. Go, TypeScript, Zig, and Rust are ports of it and must match it to 13+ decimal places. `py/streaming_kbn_deprecated/` is the legacy pre-rework version, kept only for history; do not port from it.
+
+Inputs are assumed to be finite. No implementation validates NaN or infinity, or recovers when an intermediate product overflows.
 
 ## Module Dependencies
 
@@ -13,10 +17,18 @@ Architecture, algorithms, and implementation reference for the streaming KBN-com
 streaming_kbn/              (standalone — zero dependencies on other zpano modules)
     |
     v
-(consumers)                 (indicators module, icalc CLI tool, arbitary callers)
+(consumers)                 (indicators module, icalc CLI tool, arbitrary callers)
 ```
 
-The streaming_kbn package has **zero dependencies** on other zpano modules (`entities/`, `indicators/`, etc.). It is pure math operating on `f64` values.
+Inside the package:
+
+```
+KleinKBNAccumulator
+    ├── KleinKBNSummator
+    ├── RawMomentsKleinKBN ──┐
+    ├── CentralMomentsKleinKBN
+    └───────────────────────┴── LinearRegressionKleinKBN  (uses 2× RawMomentsKleinKBN(ddof=0) + 1 accumulator)
+```
 
 ## Domain: KBN-Compensated Accumulation
 
@@ -30,8 +42,6 @@ Adding floating-point numbers naively accumulates round-off error because each a
 cond = Σ|xᵢ| / |Σxᵢ|
 ```
 
-A large condition number means the sum is intrinsically sensitive to round-off.
-
 **Peters example** — `[1.0, 1e100, 1.0, -1e100]`:
 
 | Method | Result |
@@ -40,80 +50,82 @@ A large condition number means the sum is intrinsically sensitive to round-off.
 | Naive / Kahan | 0.0 |
 | **KBN / Klein KBN** | **2.0** |
 
-Naive and standard Kahan both return 0.0 because the `1.0` additions are completely lost when `1e100` dominates the significand.
-
 ### Algorithm Progression
 
-**Kahan (1965):** Single-level compensated summation with `c = (t - s) - y`. Reduces error to `O(ε + nε²)` but fails when sum and addend differ hugely.
+**Kahan (1965):** Single-level compensated summation with `c = (t - s) - y`. Fails when sum and addend differ hugely.
 
 **Kahan-Babuška-Neumaier (KBN, 1974):** Branches on which operand is larger — the term `(big - (big + small))` is exact via [2Sum](https://en.wikipedia.org/wiki/2Sum). The correction `c` accumulates losses and is applied as a final `s + c`.
 
-**Klein second-order (2006):** Applies the same KBN trick to *the correction term itself*:
-
-```
-Level 1 (KBN):      t = s + x;  if |s| >= |x|:  c = (s - t) + x
-                    else:                        c = (x - t) + s
-
-Level 2 (Klein):    same correction applied to cs + c
-```
-
-The corrected value is `sum + cs + ccs`.
+**Klein second-order (2006):** Applies the same KBN trick to *the correction term itself*, and accumulates the second-level residual in `ccs`. The corrected value is `sum + cs + ccs`.
 
 ## Package Structure
 
-### Documentation (`readme/streaming_kbn/`)
+### Documentation (`readme/streaming-kbn/`)
 ```
+streaming_kbn.md                    # Package overview, all-language APIs + source mapping
 klein_kbn_accumulator.md            # Algorithm documentation
+klein_kbn_summator.md               # Counted sum, mean + final-sample reset
 raw_moments_klein_kbn.md            # Algorithm + revert math
 central_moments_klein_kbn.md        # Algorithm + Pébay formulas
 linear_regression_klein_kbn.md      # Algorithm + cross-product revert math
 ```
+The class pages use language-neutral pseudocode. The package overview documents
+shared settings, NaN/error behavior, construction, entry files, and source links
+for all five implementations.
 
-### Python (`py/streaming_kbn/`)
+### Python (`py/streaming_kbn/`) — reference
 ```
-__init__.py                         # Package init
-klein_kbn_accumulator.py            # KleinKBNAccumulator class
-raw_moments_klein_kbn.py            # RawMomentsKleinKBN class
-central_moments_klein_kbn.py        # CentralMomentsKleinKBN class
-linear_regression_klein_kbn.py      # LinearRegressionKleinKBN class
-test_klein_kbn_accumulator.py       # 5 tests
-test_raw_moments_klein_kbn.py       # 7 tests
-test_central_moments_klein_kbn.py   # 8 tests
-test_linear_regression_klein_kbn.py # 9 tests
+__init__.py                         # Package docstring + exports of all 5 classes
+klein_kbn_accumulator.py            # KleinKBNAccumulator
+klein_kbn_summator.py               # KleinKBNSummator
+raw_moments_klein_kbn.py            # RawMomentsKleinKBN
+central_moments_klein_kbn.py        # CentralMomentsKleinKBN
+linear_regression_klein_kbn.py      # LinearRegressionKleinKBN
+test_klein_kbn_accumulator.py       # 12 tests
+test_klein_kbn_summator.py          # 10 tests
+test_raw_moments_klein_kbn.py       # 19 tests
+test_central_moments_klein_kbn.py   # 19 tests
+test_linear_regression_klein_kbn.py # 15 tests
 ```
+Tests use only the standard library (`math`, `random`, `statistics`, `unittest`); reference values are hard-coded.
 
-### Go (`go/streamingkbn/`)
+### Go (`go/streamingkbn/`, package `streamingkbn`)
 ```
+doc.go                              # Package documentation
 kleinkbnaccumulator.go              # KleinKBNAccumulator
+kleinkbnsummator.go                 # KleinKBNSummator
 rawmomentskleinkbn.go               # RawMomentsKleinKBN
 centralmomentskleinkbn.go           # CentralMomentsKleinKBN
 linearregressionkleinkbn.go         # LinearRegressionKleinKBN
-*_test.go                           # Co-located test files (30 tests)
+*_test.go                           # Co-located tests (shared helpers in one test file)
 ```
 
 ### TypeScript (`ts/streaming-kbn/`)
 ```
-index.ts                            # Barrel re-exports
+index.ts                            # Barrel re-exports (all 5 classes)
 klein-kbn-accumulator.ts            # KleinKbnAccumulator
+klein-kbn-summator.ts               # KleinKbnSummator
 raw-moments-klein-kbn.ts            # RawMomentsKleinKbn
 central-moments-klein-kbn.ts        # CentralMomentsKleinKbn
 linear-regression-klein-kbn.ts      # LinearRegressionKleinKbn
-*.spec.ts                           # Co-located spec files (30 tests)
+*.spec.ts                           # Co-located Jasmine specs
 ```
 
 ### Zig (`zig/src/streaming_kbn/`)
 ```
-klein_kbn_accumulator.zig           # KleinKbnAccumulator + inline tests
-raw_moments_klein_kbn.zig           # RawMomentsKleinKbn + inline tests
-central_moments_klein_kbn.zig       # CentralMomentsKleinKbn + inline tests
-linear_regression_klein_kbn.zig     # LinearRegressionKleinKbn + inline tests
 streaming_kbn.zig                   # Barrel re-export
+klein_kbn_accumulator.zig           # KleinKBNAccumulator + inline tests
+klein_kbn_summator.zig              # KleinKBNSummator + inline tests
+raw_moments_klein_kbn.zig           # RawMomentsKleinKBN + inline tests
+central_moments_klein_kbn.zig       # CentralMomentsKleinKBN + inline tests
+linear_regression_klein_kbn.zig     # LinearRegressionKleinKBN + inline tests
 ```
 
 ### Rust (`rs/src/streaming_kbn/`)
 ```
 mod.rs                              # Module root with pub use re-exports
 klein_kbn_accumulator.rs            # KleinKbnAccumulator + inline tests
+klein_kbn_summator.rs               # KleinKbnSummator + inline tests
 raw_moments_klein_kbn.rs            # RawMomentsKleinKbn + inline tests
 central_moments_klein_kbn.rs        # CentralMomentsKleinKbn + inline tests
 linear_regression_klein_kbn.rs      # LinearRegressionKleinKbn + inline tests
@@ -121,210 +133,198 @@ linear_regression_klein_kbn.rs      # LinearRegressionKleinKbn + inline tests
 
 ### Build Registration
 
-- **Zig:** `build.zig` defines 4 library modules (`klein_kbn_accumulator`, `raw_moments_klein_kbn`, `central_moments_klein_kbn`, `linear_regression_klein_kbn`) + a barrel module (`streaming_kbn`). Test modules wired via `b.createModule()` + `b.addTest()`.
-- **Rust:** `rs/src/lib.rs` requires `pub mod streaming_kbn;`.
-- **TypeScript:** `ts/tsconfig.json` needs `"streaming-kbn/**/*.ts"` in `include`.
+- **Zig:** `build.zig` defines 5 library modules (`klein_kbn_accumulator`, `klein_kbn_summator`, `raw_moments_klein_kbn`, `central_moments_klein_kbn`, `linear_regression_klein_kbn`) + a barrel module (`streaming_kbn`). Each non-barrel source file also gets a test module (`b.createModule()` with the same imports) + `b.addTest(.{ .root_module = ..., .filters = filters })` + run artifact wired into `test_step`.
+- **Rust:** `rs/src/lib.rs` requires `pub mod streaming_kbn;`; `mod.rs` declares and re-exports all 5.
+- **TypeScript:** `ts/tsconfig.json` has `"streaming-kbn/**/*.ts"` in `include`; update `index.ts` when adding classes. Specs run from `dist/`, so clean `dist/` after deleting a spec.
 - **Go/Python:** No registration needed — package boundaries are directory-based.
 
 ## Class Reference
 
-### 1. `KleinKbnAccumulator`
+### 1. `KleinKBNAccumulator`
 
-Klein second-order KBN compensated summation. Maintains `_sum + _cs + _ccs`.
-
-#### Algorithm
+Klein second-order KBN compensated sum. State `_sum`, `_cs`, `_ccs` (all 0.0 initially).
 
 ```
 update(x):
-    s = _sum
-    t = s + x
-    if |s| >= |x|:  c = (s - t) + x
-    else:           c = (x - t) + s
+    s = _sum;  t = s + x
+    c = (s - t) + x  if |s| >= |x|  else  (x - t) + s
     _sum = t
-
-    cs = _cs
-    t = cs + c
-    if |cs| >= |c|:  cc = (cs - t) + c
-    else:            cc = (c - t) + cs
+    cs = _cs;  t = cs + c
+    cc = (cs - t) + c  if |cs| >= |c|  else  (c - t) + cs
     _cs = t
-    _ccs = cc
+    _ccs += cc                 # accumulate (the legacy version overwrote with `= cc` — a bug)
 
-value():    return _sum + _cs + _ccs
-set(x):     _sum = x, _cs = 0, _ccs = 0
+value:      _sum + _cs + _ccs
+set(x):     _sum = x; _cs = _ccs = 0
 reset():    set(0)
-revert(x):  update(-x)
+revert(x):  update(-x)         # removes any previously added value
 ```
 
-#### Cross-Language API
+### 2. `KleinKBNSummator`
 
-| Operation | Python | Go | TypeScript | Zig | Rust |
-|-----------|--------|----|------------|-----|------|
-| Constructor | `KleinKBNAccumulator()` | `&KleinKBNAccumulator{}` | `new KleinKbnAccumulator()` | `KleinKbnAccumulator{}` / `.init` | `KleinKbnAccumulator::new()` |
-| Update | `update(x)` | `Update(x)` | `update(x)` | `update(x)` | `update(x)` |
-| Revert | `revert(x)` | `Revert(x)` | `revert(x)` | `revert(x)` | `revert(x)` |
-| Set | `set(x)` | `Set(x)` | `set(x)` | `set(x)` | `set(x)` |
-| Reset | `reset()` | `Reset()` | `reset()` | `reset()` | `reset()` |
-| Value (getter) | `.value` | `.Value()` | `.value` | `.value()` | `.value()` |
+Compensated sum plus sample count and mean. State: `_n` and one accumulator.
 
-### 2. `RawMomentsKleinKBN`
+| Member | Semantics |
+|--------|-----------|
+| `update(x)` | `n += 1`; adds `x` to the sum only when `x != 0` (zeros are counted but never touch the compensation) |
+| `revert(x)` | error if `n <= 0` ("Cannot revert from an empty summator"); `reset()` and return if `n == 1` (including a final zero sample); otherwise `n -= 1` and revert `x` only when `x != 0` |
+| `reset()` | clears count and sum |
+| `value` | compensated sum, 0.0 when empty |
+| `mean` | `value / n`, **NaN when empty** |
+| `n` | sample count |
 
-Streaming mean, variance, skewness, kurtosis via raw power sums (x¹..x⁴) with KBN compensation.
+### 3. `RawMomentsKleinKBN(ddof=1, bias=True, fisher=True)`
+
+Mean/variance from a KBN-compensated Welford tracker; skewness/kurtosis converted from raw power sums Σx..Σx⁴ at query time. `ddof` must be a nonnegative integer. `ddof`, `bias`, `fisher` are public and mutable.
 
 #### State
 
-| Variable | Accumulator | Purpose |
-|----------|-------------|---------|
-| `n` | `int`/`usize` | Sample count |
-| `x1` | KleinKBN | Σx |
-| `x2` | KleinKBN | Σx² |
-| `x3` | KleinKBN | Σx³ |
-| `x4` | KleinKBN | Σx⁴ |
-| `mean` | KleinKBN | Welford running mean |
-| `s` | KleinKBN | Welford sum of squared deviations |
-| `ddof` | int/`usize` | Delta degrees of freedom for variance |
-| `bias` | bool | Population (true) vs bias-corrected (false) moments |
-| `fisher` | bool | Excess kurtosis (true) vs raw kurtosis (false) |
+| Variable | Purpose |
+|----------|---------|
+| `_n` | sample count |
+| `_x1.._x4` | accumulators for Σx, Σx², Σx³, Σx⁴ (powers built by repeated multiplication `x2=x*x; x3=x2*x; x4=x3*x`) |
+| `_mean`, `_s` | accumulators for Welford mean and M₂ = Σ(x − x̄)² |
 
-#### Central Moment Conversion
+#### Update / revert
 
 ```
-A = Σx / n
-B = Σx²/n − A²
-R = √B
-C = Σx³/n − A³ − 3·A·B
-D = Σx⁴/n − A⁴ − 6·B·A² − 4·C·A
-
-skewness (bias=true):  g1 = C / R³
-skewness (bias=false): G1 = g1 · √(n·(n−1)) / (n−2)
-
-kurtosis (bias=true, fisher=true):  g2 = n·D/B² − 3
-kurtosis (bias=false, fisher=true):
-  G2 = ((n²−1)·(n·D/B²) − 3·(n−1)²) / ((n−2)·(n−3))
+update(x):  n += 1; add x, x², x³, x⁴
+            δ = x − mean;  mean += δ/n;  s += δ·(x − mean)
+revert(x):  error if n <= 0 ("Cannot revert from an empty accumulator"); reset() if n == 1
+            n -= 1; revert x, x², x³, x⁴
+            δ = x − mean;  mean −= δ/n;  s −= δ·(x − mean)
 ```
+Any previously added sample can be reverted (power sums and Welford's mean/M₂ are symmetric functions of the samples) → suitable for FIFO rolling windows.
 
-Guard clauses: skewness requires `n ≥ 3` and `B > 1e-14`; kurtosis requires `n ≥ 4` and `B > 1e-14`.
-
-#### FIFO Revert (Order-Independence)
-
-`RawMomentsKleinKBN.revert(x)` works for **any** sample regardless of insertion order because:
-
-1. **Power sums are linear and commutative:** removing `x_k^p` by `update(-x_k^p)` is exact — addition is order-independent.
-2. **Welford variance revert depends only on current state and `x_k`:**
-
-   ```
-   n'      = n − 1
-   x̄'     = x̄ − (x_k − x̄) / n'
-   S_xx'  = S_xx − (n/n') · (x_k − x̄)²
-   ```
-
-   These formulas hold for any `x_k` in the set, regardless of insertion position.
-3. **KBN compensation is preserved** because `revert` calls `update(-x)`, which uses the same KBN branch logic — the compensation terms remain intact.
-
-This is what makes `RawMomentsKleinKBN` suitable for FIFO rolling windows (deque-based).
-
-#### Cross-Language Notes
-
-- **`variance` getter may reset `_s`:** If `_s.value < 0` (floating-point noise), the accumulator is reset to zero before returning NaN. In Rust this means `variance()` takes `&mut self`.
-- **`standard_deviation`** is computed directly as `√(s/n)` to avoid calling `variance` (and its potential side-effect). Go/TS/Zig/Rust follow this pattern.
-
-### 3. `CentralMomentsKleinKBN`
-
-Streaming mean, variance, skewness, kurtosis via Pébay's central moment update with KBN compensation. Avoids the numerical cancellation inherent in raw power-sum conversion.
-
-#### Pébay Forward Update
+#### Central moment conversion (query time)
 
 ```
-n_new = n_old + 1
-δ     = x − m₁
-δₙ    = δ / n_new
-term  = δ · δₙ · n_old
-
-m₁   += δₙ
-m₂   += term
-m₃   += term · δₙ · (n_new − 2)  −  3·δₙ·m₂
-m₄   += term · δₙ² · (n_new² − 3·n_new + 3)  +  6·δₙ²·m₂  −  4·δₙ·m₃
+n < 2 → none (NaN results)
+μ₁ = Σx/n;  r = μ₁²;  mean_x2 = Σx²/n;  μ₂ = mean_x2 − r
+μ₂ <= 1e-14 · mean_x2  → none           # relative cancellation guard (scale-invariant)
+r *= μ₁;  μ₃ = Σx³/n − r − 3·μ₁·μ₂
+r *= μ₁;  μ₄ = Σx⁴/n − r − 6·μ₂·μ₁·μ₁ − 4·μ₃·μ₁
+g₁ = μ₃ / (μ₂·√μ₂)        β₂ = μ₄ / (μ₂·μ₂)
 ```
 
-#### Inverse Pébay Revert (LIFO only)
+#### Properties (all floats unless noted)
+
+| Property | Formula | Needs |
+|----------|---------|-------|
+| `mean` | Welford mean (**0.0 when empty**) | — |
+| `variance`, `standard_deviation` | `max(s,0)/(n−ddof)` using instance `ddof`, no side effects | n > ddof |
+| `variance_ddof_0/1`, `standard_deviation_ddof_0/1` | same with fixed ddof | n > ddof |
+| `skewness_moment` | g₁ (scipy `skew(bias=True)`) | n ≥ 2 |
+| `skewness_fisher` | `g₁·√(n(n−1))/(n−2)` (scipy `skew(bias=False)`) | n ≥ 3 |
+| `skewness_sample` | `g₁·n²/((n−1)(n−2))` (PerformanceAnalytics "sample") | n ≥ 3 |
+| `kurtosis_moment` | β₂ | n ≥ 2 |
+| `kurtosis_excess` | β₂ − 3 | n ≥ 2 |
+| `kurtosis_sample_excess` | G₂ = `((n²−1)·β₂ − 3(n−1)²)/((n−2)(n−3))` | n ≥ 4 |
+| `kurtosis_sample` | G₂ + 3 | n ≥ 4 |
+| `kurtosis_sample_corrected` | `β₂·(n²−1)/((n−2)(n−3))` (PerformanceAnalytics "sample") | n ≥ 4 |
+| `x1_sum..x4_sum` | raw sums (0.0 when empty) | — |
+| `x1..x4` | raw moments `sum/n` (**NaN when empty**) | — |
+| `n` | int | — |
+
+Dispatch (`skewness`, `kurtosis`) — matches scipy:
+
+| bias | fisher | skewness | kurtosis |
+|------|--------|----------|----------|
+| true | true | `skewness_moment` | `kurtosis_excess` |
+| true | false | `skewness_moment` | `kurtosis_moment` |
+| false | true | `skewness_fisher` | `kurtosis_sample_excess` |
+| false | false | `skewness_fisher` | `kurtosis_sample` |
+
+Accuracy caveat: raw-sum conversion suffers catastrophic cancellation when the mean is large relative to the spread (e.g. `[1e8, 1e8+1, 1e8+2]` gives the correct variance 2/3 via Welford but NaN skewness/kurtosis). Use `CentralMomentsKleinKBN` for such data.
+
+### 4. `CentralMomentsKleinKBN(ddof=1, bias=True, fisher=True)`
+
+Pébay (2008) central-moment updates of M₁ (mean) and M₂, M₃, M₄ (sums of central powers), each a KBN accumulator. Same constructor validation as raw moments.
+
+#### Forward update (n = count after adding x)
 
 ```
-m₁_old = (n_new · m₁_new − x) / n_old
-δ      = x − m₁_old
-δₙ     = δ / n_new
-term   = δ · δₙ · n_old
-
-m₂_old = m₂_new − term
-m₃_old = m₃_new − (term·δₙ·(n_new−2) − 3·δₙ·m₂_old)
-m₄_old = m₄_new − (term·δₙ²·(n_new²−3·n_new+3) + 6·δₙ²·m₂_old − 4·δₙ·m₃_old)
+δ = x − M₁;  δₙ = δ/n;  δₙ² = δₙ·δₙ;  term = δ·δₙ·(n−1)
+m2, m3 = M₂, M₃ (captured before updating)
+M₁ += δₙ
+M₄ += term·δₙ²·(n²−3n+3) + 6·δₙ²·m2 − 4·δₙ·m3
+M₃ += term·δₙ·(n−2) − 3·δₙ·m2
+M₂ += term
 ```
 
-After computing restored values, each accumulator is set via `set(value)`, which resets KBN compensation terms to zero. This means **only the most recent sample can be reverted** (LIFO stack) — not suitable for FIFO rolling windows.
+#### Inverse revert (any sample, any order)
+
+```
+error if n == 0 ("Cannot revert from an empty accumulator"); reset() if n_old == 0
+M₁_old = (nₙ·M₁ − x)/nₒ;  δ = x − M₁_old;  δₙ = δ/nₙ;  term = δ·δₙ·nₒ
+M₂_old = M₂ − term
+M₃_old = M₃ − (term·δₙ·(nₙ−2) − 3·δₙ·M₂_old)
+M₄_old = M₄ − (term·δₙ²·(nₙ²−3nₙ+3) + 6·δₙ²·M₂_old − 4·δₙ·M₃_old)
+```
+Restored values are written with `set()`, which clears the compensation terms; repeated reverts can accumulate rounding error (especially for large-offset data) but removal of the oldest sample (FIFO) is supported.
+
+#### Properties
+
+| Property | Formula | Needs |
+|----------|---------|-------|
+| `n`, `mean` (0.0 when empty) | | |
+| `variance` / `standard_deviation` | `max(M₂,0)/(n−ddof)` | n > ddof |
+| `skewness` | g₁ = `√n·M₃/(M₂·√M₂)`; bias=false → `g₁·√(n(n−1))/(n−2)` | n ≥ 2 and M₂ > 0; unbiased n ≥ 3 |
+| `kurtosis` | β₂ = `n·M₄/(M₂·M₂)`; bias=true → β₂−3 (fisher) / β₂; bias=false → G₂ (fisher) / G₂+3 | n ≥ 2 and M₂ > 0; unbiased n ≥ 4 |
+
+No separate variant getters (unlike raw moments).
 
 #### Raw vs Central Moments
 
 | Aspect | RawMomentsKleinKBN | CentralMomentsKleinKBN |
 |--------|--------------------|------------------------|
-| Forward accuracy | ⚠️ Good with KBN, but large mean erodes precision | ✅ Best (no raw-sum cancellation) |
-| Revert | ✅ FIFO via `update(-x)` | ⚠️ LIFO only, compensation reset |
-| Rolling window | ✅ Natural (deque-based) | ❌ Not recommended |
-| Guard-clause return value | NaN | NaN |
+| Forward accuracy (large mean) | ⚠️ higher moments lose precision | ✅ best |
+| Revert | ✅ any sample, compensation preserved | ✅ any sample, compensation cleared |
+| Variant getters | ✅ many | dispatch only |
 
-### 4. `LinearRegressionKleinKBN`
+### 5. `LinearRegressionKleinKBN()`
 
-Streaming simple linear regression (`y = β₁x + β₀`) with KBN-compensated accumulation.
-
-#### State
-
-| Variable | Type | Purpose |
-|----------|------|---------|
-| `n` | int | Sample count |
-| `xMoments` | RawMomentsKleinKBN(ddof=0) | `x̄`, `S_xx` |
-| `yMoments` | RawMomentsKleinKBN(ddof=0) | `ȳ`, `S_yy` |
-| `sXY` | KleinKbnAccumulator | Cross-product sum `S_xy` |
-
-#### Welford Cross-Product Update
+Streaming OLS `y = b·x + a`. State: `_n`, `_x_moments`/`_y_moments` = `RawMomentsKleinKBN(ddof=0)`, `_s_xy` accumulator.
 
 ```
-n_old = n
-n += 1
-term = (x̄ − x) · (ȳ − y) · n_old / n
-s_xy += term
-x_moments.update(x)    # updates x̄, S_xx
-y_moments.update(y)    # updates ȳ, S_yy
+update(x, y):  n_old = n; n += 1
+               s_xy += (x̄ − x)·(ȳ − y)·n_old/(n_old+1)    # means before the sample
+               x_moments.update(x); y_moments.update(y)
+revert(x, y):  error if n == 0 ("Cannot revert from an empty regression"); reset() if n == 1
+               x_moments.revert(x); y_moments.revert(y)    # means after removal
+               n' = n − 1;  s_xy −= (x̄ − x)·(ȳ − y)·n'/(n'+1);  n = n'
 ```
 
-#### Revert Inverse Formula
-
-```
-x_moments.revert(x)    # restores x̄₀
-y_moments.revert(y)    # restores ȳ₀
-n -= 1
-term = (x̄₀ − x) · (ȳ₀ − y) · n / (n+1)
-s_xy -= term
-```
-
-FIFO revert works because:
-1. `RawMomentsKleinKBN.revert()` is order-independent (restores `x̄₀`, `S_xx` for any removed sample).
-2. The cross-product revert formula uses only restored means and the removed sample — quantities well-defined regardless of insertion order.
-3. KBN compensation is preserved through KBN subtraction (`update(-term)`).
-
-#### Property Formulas
-
-```
-β₁ = s_xy / S_xx        (slope, guard: n < 2 or S_xx = 0 → NaN)
-β₀ = ȳ − β₁ · x̄        (intercept, NaN propagates from slope)
-r  = s_xy / √(S_xx·S_yy)  (correlation, guard: n < 2 or σ_x·σ_y = 0 → NaN)
-```
+| Property | Formula | NaN when |
+|----------|---------|----------|
+| `n` | | |
+| `mean_x`, `mean_y` | (0.0 when empty) | |
+| `variance_x`, `variance_y` | population variance | empty |
+| `co_moment` | S_xy (0.0 when empty) | |
+| `covariance` | S_xy / n | n < 1 |
+| `slope` | S_xy / S_xx, S_xx = variance_x·n | n < 2 or S_xx = 0 |
+| `intercept` | ȳ − slope·x̄ | slope NaN |
+| `correlation` | `clamp(S_xy/(σx·σy·n), −1, 1)` | n < 2 or σx·σy = 0 |
 
 ## Cross-Language Conventions
 
-### NaN Returns for Impossible Computations
+### NaN / zero policy
 
-All languages return NaN (not null, None, or 0) for impossible-computation cases:
-- `n ≤ ddof` for variance (all 4 classes)
-- `n < 3` for skewness, `n < 4` for kurtosis
-- `n < 2` or zero variance for slope/correlation/intercept
-- Non-positive `B` (central moment guard) for skewness/kurtosis
+All languages return NaN (not null/None/Option) where Python returns `math.nan`, and 0.0 where Python returns 0.0. Notable empty-state values: `mean`/`mean_x`/`mean_y`/`value`/`x*_sum`/`co_moment` → 0.0; `KleinKBNSummator.mean`, `x1..x4`, `variance*`, `covariance` → NaN.
+
+### Errors
+
+| Situation | Python | Go | TypeScript | Zig | Rust |
+|-----------|--------|----|------------|-----|------|
+| Revert on empty (summator, moments, regression) | `ValueError` | `panic` | `throw new Error` | `error.EmptyRevert` (`revert` returns `!void`) | `panic!` |
+| Invalid ddof | `ValueError` | `panic` (negative) | `throw` (not non-negative integer) | unrepresentable (`u32`) | unrepresentable (`usize`) |
+
+Messages mirror the Python text. `KleinKBNAccumulator.revert` never fails.
+
+In Go, evaluate count products in moment formulas in floating-point arithmetic
+after converting the count, so `int` products cannot overflow. For variance,
+compare `n <= ddof` before subtracting unsigned counts; do not narrow Rust's
+`usize` values to signed integers.
 
 ### Filename Patterns
 
@@ -340,31 +340,27 @@ All languages return NaN (not null, None, or 0) for impossible-computation cases
 
 | Concept | Python | Go | TypeScript | Zig | Rust |
 |---------|--------|----|------------|-----|------|
-| Class name | `KleinKBNAccumulator` | `KleinKBNAccumulator` | `KleinKbnAccumulator` | `KleinKbnAccumulator` | `KleinKbnAccumulator` |
-| Class name | `RawMomentsKleinKBN` | `RawMomentsKleinKBN` | `RawMomentsKleinKbn` | `RawMomentsKleinKbn` | `RawMomentsKleinKbn` |
-| Class name | `CentralMomentsKleinKBN` | `CentralMomentsKleinKBN` | `CentralMomentsKleinKbn` | `CentralMomentsKleinKbn` | `CentralMomentsKleinKbn` |
-| Class name | `LinearRegressionKleinKBN` | `LinearRegressionKleinKBN` | `LinearRegressionKleinKbn` | `LinearRegressionKleinKbn` | `LinearRegressionKleinKbn` |
-| Constructor | `(ddof=1, bias=True, fisher=True)` | `New*(ddof, bias, fisher)` | `(ddof=1, bias=true, fisher=true)` | `.init(ddof, bias, fisher)` | `::new(ddof, bias, fisher)` |
-| Default ddof | 1 | varies by call site | 1 | varies by call site | varies by call site |
+| Class names | `KleinKBNAccumulator`, `KleinKBNSummator`, `RawMomentsKleinKBN`, `CentralMomentsKleinKBN`, `LinearRegressionKleinKBN` | same as Python | `…Kbn` (`KleinKbnSummator`, `RawMomentsKleinKbn`, …) | same as Python (`…KBN`) | `…Kbn` |
+| Moments constructor | `(ddof=1, bias=True, fisher=True)` | `NewRawMomentsKleinKBN(ddof, bias, fisher)` | `new RawMomentsKleinKbn(ddof = 1, bias = true, fisher = true)` | struct literal with field defaults `.{ .ddof = 1, .bias = true, .fisher = true }` | `::new(ddof, bias, fisher)`; `Default` = (1, true, true) |
+| Other constructors | `X()` | `&KleinKBNAccumulator{}`, `NewKleinKBNSummator()`, `NewLinearRegressionKleinKBN()` | `new X()` | `X{}` | `X::new()` / `Default` |
+| Property access | `m.skewness_moment` | `m.SkewnessMoment()` | `m.skewnessMoment` (getter) | `m.skewnessMoment()` | `m.skewness_moment()` (`&self`) |
+| ddof/bias/fisher | public attrs | `Ddof()`/`SetDdof()` etc. | public properties | public fields | `ddof()`/`set_ddof()` etc. |
 
 ### Test Conventions
 
 | Language | Framework | Location | Key assertion |
 |----------|-----------|----------|---------------|
-| Python | `unittest` | Separate `test_*.py` | `assertAlmostEqual(x, y, places=13)` |
-| Go | `testing` | Same package `*_test.go` | `almostEqual(a, b, 1e-14)` |
-| TypeScript | Jasmine | Same dir `*.spec.ts` | `toBeCloseTo(x, 13)` |
-| Zig | built-in | Inline at bottom of source | `try testing.expect(almostEqual(...))` |
-| Rust | built-in | Inline `#[cfg(test)] mod tests` | `assert!((a - b).abs() < eps)` |
+| Python | `unittest` | `test_*.py` next to sources | `assertAlmostEqual(x, y, places=N)` |
+| Go | `testing` | `*_test.go`, `t.Parallel()` | `almostEqual(a, b, tol)` |
+| TypeScript | Jasmine | `*.spec.ts` | `toBeCloseTo(x, N)` |
+| Zig | built-in | inline at bottom of source | `try testing.expect(almostEqual(...))`, `expectError(error.EmptyRevert, ...)` |
+| Rust | built-in | inline `#[cfg(test)] mod tests` | `assert!(almost_equal(..))`, `#[should_panic]` |
 
-### Default Parameter Values (Moments Classes)
-
-- **Python:** `ddof=1, bias=True, fisher=True` (default constructor; tests override to `ddof=0`)
-- **Go/TS/Zig/Rust:** No defaults — parameters always explicit at call site. Tests use `ddof=0, bias=true, fisher=true`.
+Every Python test method is ported in every language (except `test_invalid_ddof` in Zig/Rust). Tests that use Python's `math.fsum` use a test-local port of CPython's `math_fsum` (Shewchuk partials + half-even correction); tests that use `random.Random(42)` use each language's own seeded PRNG with the same distributions.
 
 ## Test Data & Expected Values
 
-### Bacon Data (24-element return series)
+### Bacon Data (24 portfolio returns; Bacon 2008, p. 65)
 
 ```
 [ 0.003,  0.026,  0.011, -0.010,  0.015,  0.025,  0.016,  0.067,
@@ -372,52 +368,59 @@ All languages return NaN (not null, None, or 0) for impossible-computation cases
  -0.049, -0.022,  0.070,  0.058, -0.065,  0.024, -0.005, -0.009 ]
 ```
 
-### RawMomentsKleinKbn Expected Values (ddof=0, bias=true, fisher=true)
+### Exact reference values for Bacon
+
+Computed with exact rational arithmetic on the binary float inputs (square roots with 50-digit decimals), rounded to the nearest float. Shared by raw and central moments tests.
 
 | Metric | Expected |
 |--------|----------|
-| Mean | 0.009000000000000001 |
-| Variance | 0.0014989166666666666 |
-| Skewness | -0.08256245520856798 |
-| Kurtosis | -0.5675462058921257 |
+| mean | 0.009000000000000001 |
+| variance_ddof_0 | 0.0014989166666666668 |
+| variance_ddof_1 | 0.0015640869565217393 |
+| standard_deviation_ddof_0 | 0.03871584516275819 |
+| standard_deviation_ddof_1 | 0.039548539246370897 |
+| skewness_moment (skew bias=True) | -0.08256245520856804 |
+| skewness_fisher (skew bias=False) | -0.08817174934967535 |
+| skewness_sample (PA "sample") | -0.09398413873544505 |
+| kurtosis_moment | 2.4324537941078743 |
+| kurtosis_excess | -0.5675462058921257 |
+| kurtosis_sample_excess | -0.40766032118608714 |
+| kurtosis_sample | 2.592339678813913 |
+| kurtosis_sample_corrected (PA "sample") | 3.027404613878848 |
+| x1_sum / x2_sum / x3_sum / x4_sum | 0.21600000000000003 / 0.037918 / 0.0008738040000000003 / 0.00014466403 |
+| x1 / x2 / x3 / x4 | 0.009000000000000001 / 0.0015799166666666668 / 3.640850000000001e-05 / 6.0276679166666674e-06 |
 
-### RawMomentsKleinKbn Expected Values (bias=false, fisher=true)
+Shifted data `1e4 + x` (central moments): skewness (biased) -0.08256245521966786, excess kurtosis -0.5675462058934164.
 
-| Metric | Expected |
-|--------|----------|
-| Skewness | -0.08817174934967527 |
-| Kurtosis | -0.40766032118608714 |
-
-### CentralMomentsKleinKbn Expected Values (ddof=0, bias=true, fisher=true)
-
-| Metric | Expected |
-|--------|----------|
-| Mean | 0.009000000000000001 |
-| Variance | 0.0014989166666666668 |
-| Skewness | -0.08256245520856803 |
-| Kurtosis | -0.5675462058921261 |
-
-### CentralMomentsKleinKbn Expected Values (bias=false, fisher=true)
+### Linear regression (x = benchmark, y = portfolio, 24 values each; see the Python test)
 
 | Metric | Expected |
 |--------|----------|
-| Skewness | -0.08817174934967532 |
-| Kurtosis | -0.4076603211860876 |
+| slope | 0.9988502086225746 |
+| intercept | -0.001030120844918352 |
+| correlation | 0.9693858148753051 |
+| co_moment | 0.033844 |
+| covariance | 0.0014101666666666668 |
+| variance_x | 0.0014117899305555557 |
+| variance_y | 0.0014989166666666668 |
 
-Note: RawMoments and CentralMoments produce slightly different values due to different accumulation paths (raw power sums vs Pébay). Both match scipy within tolerance.
+### Accumulator
+
+- Peters `[1.0, 1e100, 1.0, -1e100]` → 2.0 (naive 0.0).
+- NumPy issue 8786 data → `-0.377392919181026`.
+- Second-level correction `[1e-16, -1e16, 1.0, 1e-16, -1.0, -1e-16, -1e-32, 1e16]` → `9.999999999999999e-17` (the legacy `_ccs = cc` bug gives `-1.0000000000000001e-16`).
 
 ## References
 
 - Higham, N. J. (1993). "The accuracy of floating point summation". *SIAM Journal on Scientific Computing*, 14(4), 783–799.
 - Kahan, W. (1965). "Further remarks on reducing truncation errors". *Communications of the ACM*, 8(1), 40.
-- Neumaier, A. (1974). "Rundungsfehleranalyse einiger Verfahren zur Summation endlicher Summen". *Zeitschrift für Angewandte Mathematik und Mechanik*, 54(1), 39–51.
+- Neumaier, A. (1974). "Rundungsfehleranalyse einiger Verfahren zur Summation endlicher Summen". *ZAMM*, 54(1), 39–51.
 - Klein, A. (2006). "A generalized Kahan–Babuška-Summation-Algorithm". *Computing*, 76(3–4), 279–293.
 - Pébay, P. (2008). "Formulas for robust, one-pass parallel computation of covariances and arbitrary-order statistical moments". *Sandia Report SAND2008-6212*.
 - Welford, B. P. (1962). "Note on a method for calculating corrected sums of squares and products". *Technometrics*, 4(3), 419–420.
-- Cook, J. D. [Skewness and kurtosis](https://www.johndcook.com/skewness_kurtosis.html).
-- Cook, J. D. [Running regression](https://www.johndcook.com/running_regression.html).
+- Bacon, C. R. (2008). *Practical Portfolio Performance Measurement and Attribution*, 2nd ed., Wiley.
+- Cook, J. D. [Skewness and kurtosis](https://www.johndcook.com/skewness_kurtosis.html); [Running regression](https://www.johndcook.com/running_regression.html).
 - Kuiperzone. [Compensated-Accumulators](https://github.com/kuiperzone/Compensated-Accumulators).
-- Wikipedia. [Kahan summation algorithm](https://en.wikipedia.org/wiki/Kahan_summation_algorithm).
-- Wikipedia. [2Sum](https://en.wikipedia.org/wiki/2Sum).
+- Wikipedia. [Kahan summation algorithm](https://en.wikipedia.org/wiki/Kahan_summation_algorithm); [2Sum](https://en.wikipedia.org/wiki/2Sum).
 - NumPy issue #8786 — [Badly conditioned sum](https://github.com/numpy/numpy/issues/8786).
-- CPython `math.fsum` implementation — [Peters' example](https://github.com/python/cpython/blob/main/Modules/mathmodule.c).
+- CPython `math.fsum` — [mathmodule.c](https://github.com/python/cpython/blob/main/Modules/mathmodule.c).

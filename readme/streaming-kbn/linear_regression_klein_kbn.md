@@ -1,166 +1,158 @@
-# Streaming Linear Regression (`LinearRegressionKleinKBN`)
+# Streaming linear regression
 
-## Domain: Streaming Linear Regression with Update/Revert
+`LinearRegressionKleinKBN` fits the ordinary least squares model $y = a + b x$, where $b$ is the slope and $a$ is the intercept. It supports streaming insertion and removal of complete observation pairs, including FIFO removal. For all five source implementations and their API naming, see the [package overview](streaming_kbn.md).
 
-Fitting a linear model $y = \beta_1 x + \beta_0$ to a data stream in O(1) per observation requires maintaining sufficient statistics from which the slope, intercept, and correlation can be derived at query time. The statistics needed are:
+## State and sufficient statistics
 
-| Statistic | Purpose |
+| State | Initial value | Purpose |
+| --- | --- | --- |
+| `n` | 0 | Number of observation pairs |
+| `X`, `Y` | Empty raw-moment trackers with ddof = 0, bias = true, fisher = true | Means and population variances of x and y |
+| `C` | Zero-valued KBN accumulator | Co-moment Sxy |
+
+The internal trackers are [RawMomentsKleinKBN](raw_moments_klein_kbn.md) instances. Their compensated Welford statistics provide the means and sums of squared deviations. A dedicated [KleinKBNAccumulator](klein_kbn_accumulator.md) tracks the cross-product sum.
+
+$$
+S_{xx} = \sum_i (x_i-\bar{x})^2,
+\qquad
+S_{yy} = \sum_i (y_i-\bar{y})^2,
+\qquad
+S_{xy} = \sum_i (x_i-\bar{x})(y_i-\bar{y}).
+$$
+
+The public formulas are:
+
+$$
+b = S_{xy}/S_{xx},
+\qquad
+a = \bar{y} - b\bar{x},
+\qquad
+r = S_{xy}/\sqrt{S_{xx}S_{yy}}.
+$$
+
+Every update, removal, reset, and query takes O(1) time; internal storage is O(1). There are no public regression settings.
+
+| Operation | Behavior |
 | --- | --- |
-| $n$ | Sample count |
-| $\bar{x},\ \bar{y}$ | Running means of $x$ and $y$ |
-| $S_{xx} = \sum (x_i - \bar{x})^2$ | Sum of squared $x$ deviations |
-| $S_{yy} = \sum (y_i - \bar{y})^2$ | Sum of squared $y$ deviations |
-| $S_{xy} = \sum (x_i - \bar{x})(y_i - \bar{y})$ | Sum of cross products |
+| `update(x, y)` | Add an observation pair |
+| `revert(x, y)` | Remove a present pair; fail if empty; reset after final removal |
+| `reset()` | Clear count, both marginal trackers, and the co-moment accumulator |
 
-Given these, the regression statistics are:
+## Update and reset
 
-$$
-\begin{aligned}
-\beta_1 &= \frac{S_{xy}}{S_{xx}} \\
-\beta_0 &= \bar{y} - \beta_1 \bar{x} \\
-r      &= \frac{S_{xy}}{\sqrt{S_{xx} S_{yy}}}
-\end{aligned}
-$$
-
-`LinearRegressionKleinKBN` maintains $\bar{x}$, $\bar{y}$, $S_{xx}$, $S_{yy}$ via two `RawMomentsKleinKBN` instances (which use KBN-compensated Welford variance tracking), and $S_{xy}$ via a dedicated `KleinKBNAccumulator` for the cross-product sum. All internal accumulators use Klein second-order Kahan-Babuška-Neumaier compensation for improved numerical stability.
-
-## Algorithm
-
-### Welford Cross-Product Update
-
-The update formula for $S_{xy}$ is derived from Welford's covariance identity. Let $n_0$ be the count before adding $(x, y)$, and let $\bar{x}_0,\ \bar{y}_0$ be the means before the update:
-
-$$
-S_{xy}^{(1)} = S_{xy}^{(0)} + \frac{n_0}{n_0 + 1}(\bar{x}_0 - x)(\bar{y}_0 - y)
-$$
-
-Pseudocode:
+The co-moment update uses the means **before** adding the pair. Its contribution is accumulated with KBN compensation.
 
 ```pseudocode
-n_old ← n
-n ← n + 1
-term ← (x̄ − x) · (ȳ − y) · n_old / n
-S_xy ← S_xy + term
-x_moments.update(x)     # updates x̄, S_xx
-y_moments.update(y)     # updates ȳ, S_yy
+PROCEDURE UPDATE(x, y)
+    nOld ← n
+    n ← nOld + 1
+    term ← (READ X.mean − x) × (READ Y.mean − y) × nOld / (nOld + 1)
+    C.UPDATE(term)
+    X.UPDATE(x)
+    Y.UPDATE(y)
+END PROCEDURE
+
+PROCEDURE RESET()
+    n ← 0
+    X.RESET()
+    Y.RESET()
+    C.RESET()
+END PROCEDURE
 ```
 
-### Revert Inverse Formula
+In exact arithmetic, the cross-product identity is:
 
-To remove an observation $(x, y)$, we first revert `_x_moments` and `_y_moments` (which restores the means $\bar{x}_0,\ \bar{y}_0$ to their values before $(x, y)$ was added), then subtract the same cross-product term that was added:
+$$
+S_{xy}^{new} = S_{xy}^{old}
++ (\bar{x}_{old}-x)(\bar{y}_{old}-y)\frac{n_{old}}{n_{old}+1}.
+$$
+
+## Removal
+
+The marginal trackers are reverted first. The co-moment subtraction then uses the means of the **remaining** observations, which need not equal any historical means from before insertion.
 
 ```pseudocode
-x_moments.revert(x)     # restores x̄₀
-y_moments.revert(y)     # restores ȳ₀
-n ← n − 1
-term ← (x̄₀ − x) · (ȳ₀ − y) · n / (n + 1)
-S_xy ← S_xy − term
+PROCEDURE REVERT(x, y)
+    IF n = 0 THEN
+        ERROR("Cannot revert from an empty regression")
+    END IF
+    IF n = 1 THEN
+        RESET()
+        RETURN
+    END IF
+    X.REVERT(x)
+    Y.REVERT(y)
+    remaining ← n − 1
+    term ← (READ X.mean − x) × (READ Y.mean − y) × remaining / (remaining + 1)
+    C.REVERT(term)
+    n ← remaining
+END PROCEDURE
 ```
 
-Edge case: reverting the last element ($n: 1 \to 0$) simply calls `reset()`, since a single point contributes nothing to covariance and the term is zero.
-
-### Why FIFO Revert Works
-
-`LinearRegressionKleinKBN.revert(x, y)$ works for **any** observation in the window, not just the most recent. This enables FIFO rolling-window semantics (remove the oldest, add the newest). The order-independence follows from two facts:
-
-**1. `RawMomentsKleinKBN.revert()` is order-independent.** As shown in the [raw moments documentation](raw_moments_klein_kbn.md), both the power sums $\Sigma x^p$ and the Welford variance tracker use formulas that depend only on the current state and the value $x_k$ being removed — not on its insertion position. Together these correctly restore $\bar{x}_0$ and $S_{xx}$ for any $x_k$.
-
-**2. The cross-product revert formula is also order-independent.** Let the current state before revert be $(n, \bar{x}, \bar{y})$ (the means include the observation $(x_k, y_k)$ being removed). After reverting `_x_moments` and `_y_moments`, the means are restored to $\bar{x}_0,\ \bar{y}_0$ — the means of the remaining $n-1$ samples. The term to subtract is:
+For current count $N$ and remaining means $\bar{x}'$, $\bar{y}'$, the inverse identity is:
 
 $$
-\text{term} = (\bar{x}_0 - x_k)\,(\bar{y}_0 - y_k)\,\frac{n-1}{n}
+S_{xy}' = S_{xy}
+- (\bar{x}'-x)(\bar{y}'-y)\frac{N-1}{N}.
 $$
 
-This uses only the restored means and the removed sample — quantities that are well-defined regardless of when $(x_k, y_k)$ was added. The derivation from the definition of $S_{xy}$ confirms this:
+It depends on the remaining sample set and removed pair, not the pair's insertion position. This permits removing the oldest pair in a FIFO window. The pair must still be present; membership is not validated.
 
-$$
-\begin{aligned}
-S_{xy} &= \sum_{i=1}^n (x_i - \bar{x})(y_i - \bar{y}) \\[4pt]
-S_{xy}' &= \sum_{i \ne k} (x_i - \bar{x}_0)(y_i - \bar{y}_0) \\[4pt]
-        &= S_{xy} - (\bar{x}_0 - x_k)(\bar{y}_0 - y_k)\,\frac{n-1}{n}
-\end{aligned}
-$$
+Nonfinal removal retains the compensation in the marginal trackers and the co-moment accumulator. Floating-point rounding can still accumulate, and historical accumulator state is not restored. Final removal resets everything exactly. Empty-removal failures follow the [shared language mapping](streaming_kbn.md#errors-and-validation).
 
-**3. KBN compensation is preserved.** Both `_x_moments.revert(x)$, `_y_moments.revert(y)$, and `_s_xy.update(-term)$ use KBN subtraction (via `update(-*)$), maintaining the double-compensated error correction. No precision is lost on revert.
+## Public queries and guards
 
-Together these facts mean you can use a deque-based rolling window with `LinearRegressionKleinKBN` and get numerically correct results over arbitrarily many window shifts.
-
-### Property Formulas
-
-With `RawMomentsKleinKBN(ddof=0)`, the variance is $S_{xx} / n$ (population), so $S_{xx} = \text{variance}_x \cdot n$:
-
-$$
-\begin{aligned}
-\beta_1 &= \frac{S_{xy}}{S_{xx}} \\
-\beta_0 &= \bar{y} - \beta_1 \bar{x} \\
-r      &= \frac{S_{xy}}{\sqrt{S_{xx} S_{yy}}}
-\end{aligned}
-$$
-
-Guard clauses: slope returns $0.0$ when $n < 2$ or $S_{xx} = 0$; correlation returns $0.0$ when $n < 2$ or either standard deviation is zero.
-
-## Implementation: `LinearRegressionKleinKBN`
-
-### State Variables
-
-| Variable | Type | Purpose |
+| Query | Result | Empty or degenerate behavior |
 | --- | --- | --- |
-| `n` | `int` | Sample count |
-| `_x_moments` | `RawMomentsKleinKBN(ddof=0)` | Running mean $\bar{x}$, variance $S_{xx}/n$ |
-| `_y_moments` | `RawMomentsKleinKBN(ddof=0)` | Running mean $\bar{y}$, variance $S_{yy}/n$ |
-| `_s_xy` | `KleinKBNAccumulator` | Sum of cross products $S_{xy}$ |
+| `n` | Number of observation pairs | 0 when empty |
+| `mean_x`, `mean_y` | Means from X and Y | 0.0 when empty |
+| `variance_x`, `variance_y` | Population variances, Sxx / n and Syy / n | NaN when empty |
+| `co_moment` | `C.VALUE()`, the unnormalized Sxy | 0.0 when empty |
+| `covariance` | Population covariance, Sxy / n | NaN when empty |
+| `slope` | Sxy / (variance_x × n) | NaN when n < 2 or variance_x × n = 0 |
+| `intercept` | mean_y − slope × mean_x | NaN when slope is NaN |
+| `correlation` | Sxy / (standard_deviation_x × standard_deviation_y × n), clamped to [−1, 1] | NaN when n < 2 or the standard-deviation product is zero |
 
-### Methods
+The internal standard deviations use ddof = 0. The implementation evaluates their product and then multiplies by the count, matching the following pseudocode:
 
-- **`update(x, y)`** — Adds observation $(x, y)$ using the Welford cross-product identity. Updates $\bar{x},\ S_{xx},\ \bar{y},\ S_{yy},\ S_{xy}$ in O(1).
-- **`revert(x, y)`** — Removes an observation $(x, y)$ using the inverse formula. Works for any sample in the window (not just the most recent), enabling FIFO rolling windows via a deque.
-- **`reset()`** — Resets all accumulators and count to zero.
-- **`slope`** — Returns $\beta_1 = S_{xy} / S_{xx}$. Returns $0.0$ if $n < 2$ or $S_{xx} = 0$.
-- **`intercept`** — Returns $\beta_0 = \bar{y} - \beta_1 \bar{x}$.
-- **`correlation`** — Returns Pearson's $r = S_{xy} / \sqrt{S_{xx} S_{yy}}$. Returns $0.0$ if $n < 2$ or either variance is zero.
-
-### Usage
-
-```python
-from linear_regression_klein_kbn import LinearRegressionKleinKBN
-
-reg = LinearRegressionKleinKBN()
-for x, y in zip(xs, ys):
-    reg.update(x, y)
-
-print(reg.slope, reg.intercept, reg.correlation)
+```pseudocode
+FUNCTION CORRELATION()
+    IF n < 2 THEN
+        RETURN NaN
+    END IF
+    product ← (READ X.standard_deviation) × (READ Y.standard_deviation)
+    IF product = 0 THEN
+        RETURN NaN
+    END IF
+    r ← C.VALUE() / (product × n)
+    RETURN MAX(−1, MIN(1, r))
+END FUNCTION
 ```
 
-Rolling window via FIFO revert:
+Clamping absorbs small excursions beyond the correlation interval from rounding. Unavailable slope and correlation return NaN in every implementation. With one finite pair, population variances and covariance are zero; slope, intercept, and correlation remain NaN. Constant x prevents slope calculation, while constant y can still give a valid zero slope if x varies.
 
-```python
-from collections import deque
+## Usage
 
-window = deque(maxlen=100)
-reg = LinearRegressionKleinKBN()
+```pseudocode
+regression ← CREATE LinearRegressionKleinKBN()
+FOR EACH (x, y) IN [(1, 3), (2, 5), (3, 7)] DO
+    regression.UPDATE(x, y)
+END FOR
+OUTPUT READ regression.slope             // 2.0
+OUTPUT READ regression.intercept         // 1.0
+OUTPUT READ regression.correlation       // approximately 1.0
+OUTPUT READ regression.covariance        // approximately 4/3
 
-for x, y in stream:
-    if len(window) == 100:
-        x_old, y_old = window[0]
-        reg.revert(x_old, y_old)
-    reg.update(x, y)
-    window.append((x, y))
+regression.REVERT(1, 3)                   // remove the oldest pair
+OUTPUT READ regression.n                 // 2
+OUTPUT READ regression.slope             // 2.0
 ```
 
-## Comparison: `LinearRegressionKleinKBN` vs `Regression`
+For a rolling regression, retain complete pairs in a queue and use the [rolling-window pattern](streaming_kbn.md#rolling-window-pattern).
 
-| Aspect | `Regression` | `LinearRegressionKleinKBN` |
-| --- | --- | --- |
-| $S_{xx}, S_{yy}$ | `CentralMoments(ddof=1)` | `RawMomentsKleinKBN(ddof=0)` |
-| $S_{xy}$ | Plain `float` | `KleinKBNAccumulator` (KBN-compensated) |
-| `revert(x, y)` | ❌ Not implemented | ✅ Inverse formula with KBN |
-| Rolling window | ❌ Requires full refit | ✅ FIFO via revert |
-| Numerical stability (forward) | ✅ Pébay central moments | ✅ KBN-compensated raw moments |
-| Numerical stability (revert) | N/A | ✅ KBN compensation preserved |
+Mean and variance come from Welford updates rather than raw-power conversion, so the higher-moment cancellation guard does not participate in regression queries. The internal raw-moment trackers still calculate powers through x⁴ and y⁴. Inputs and intermediate calculations are assumed finite; compensation does not guarantee exact subtraction or indefinitely accurate window shifts.
 
-The key advantage of `LinearRegressionKleinKBN` is **revert support** enabling O(1) rolling-window regression. The KBN compensation on $S_{xy}$ also provides better accuracy on the cross-product sum compared to a plain float accumulator.
-
-### References
+## References
 
 - Cook, J. D. [Running regression](https://www.johndcook.com/running_regression.html).
 - Welford, B. P. (1962). "Note on a method for calculating corrected sums of squares and products". *Technometrics*, 4(3), 419–420.

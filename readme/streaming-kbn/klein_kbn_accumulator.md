@@ -1,142 +1,116 @@
-# Klein second-order Kahan-Babuška-Neumaier (KBN) compensated summation
+# Klein second-order KBN accumulator
 
-## Domain: Floating-Point Summation
+`KleinKBNAccumulator` maintains a compensated floating-point sum. It is the numerical building block for all other streaming KBN classes. For language names, source links, and shared conventions, see the [package overview](streaming_kbn.md).
 
-Adding a sequence of floating-point numbers naively accumulates round-off error because each addition rounds the result to the available significand. Low-order bits of the smaller operand are lost whenever the sum becomes large relative to the addend.
+## Why compensate a sum?
 
-**Naive sum** `s += x`: worst-case relative error grows as `O(ε n)`, and RMS error as `O(ε √n)` (a random walk) for zero-mean inputs [[Higham93](#ref-higham93)]. The bound is proportional to the **condition number** of the summation problem:
+Each floating-point addition rounds to the available significand. Adding small values to a large running total can lose their contribution. Cancellation can then expose these lost contributions in the final result.
 
-```pseudocode
-cond = Σ|xᵢ| / |Σxᵢ|
-```
+The condition number of a sum is $\sum_i |x_i| / |\sum_i x_i|$, for a nonzero total. A large value means the result is sensitive to small errors. Compensation reduces rounding error; it cannot remove the sensitivity of the underlying problem.
 
-A large condition number means the sum is intrinsically sensitive to round-off, regardless of the algorithm.
+Peters' example illustrates the benefit:
 
-**Example (Peters)** — `[1.0, 1e100, 1.0, -1e100]`:
-
-| Method | Result |
+| Method applied to `[1, 1e100, 1, −1e100]` | Result |
 | --- | --- |
-| Exact | 2.0 |
-| Naive | 0.0 |
-| Kahan | 0.0 |
-| **KBN** | **2.0** |
+| Exact sum | 2.0 |
+| Naive summation | 0.0 |
+| Standard Kahan summation | 0.0 |
+| KBN and Klein second-order KBN | 2.0 |
 
-Naive and standard Kahan both return 0.0 because the `1.0` additions are completely lost when `1e100` dominates the significand.
+### Algorithm progression
 
-## Algorithm Progression
+Kahan's algorithm maintains one correction, feeding it into the next addition. Neumaier's KBN algorithm branches on the larger operand to recover the residual of each addition and accumulates those residuals separately. Klein's second-order variant also compensates the accumulation of those residuals.
 
-### Naive Summation
+| Algorithm | Running state | Result |
+| --- | --- | --- |
+| Naive | Primary sum | Primary sum |
+| Kahan | Primary sum and correction fed into the next addition | Primary sum |
+| KBN | Primary sum and accumulated residuals | Sum plus correction |
+| Klein second-order KBN | Primary sum and two correction levels | `(sum + cs) + ccs` |
 
-```pseudocode
-s = 0
-for x in input:
-    s += x
-return s
-```
+## State and public API
 
-Error grows linearly with the number of terms and can be catastrophic for ill-conditioned sums.
+| State | Initial value | Purpose |
+| --- | --- | --- |
+| `sum` | 0.0 | Primary running sum |
+| `cs` | 0.0 | Sum of first-level residuals |
+| `ccs` | 0.0 | Accumulated residuals from adding to `cs` |
 
-### Kahan Compensated Summation
-
-William Kahan (1965) [[Kahan65](#ref-kahan65)] introduced a running compensation term `c` that captures the low-order bits lost in each addition:
-
-```pseudocode
-s = 0
-c = 0
-for x in input:
-    y = x - c       // reinstate previous loss
-    t = s + y
-    c = (t - s) - y // capture what s lost when t was rounded
-    s = t
-return s
-```
-
-This reduces the error bound to `O(ε + nε²)`, effectively independent of `n` for practical sizes. However, when `|s|` and `|x|` differ hugely (e.g. `1e100 + 1.0`), Kahan still loses the small addend because the subtraction `(t - s) - y` itself rounds to zero.
-
-### Kahan-Babuška-Neumaier (KBN)
-
-Neumaier (1974) [[Neumaier74](#ref-neumaier74)] improved the algorithm by branching on **which operand is larger**, ensuring the correction is always computed from the smaller operand's perspective:
-
-```pseudocode
-s = 0
-c = 0
-for x in input:
-    t = s + x
-    if |s| >= |x|:
-        c += (s - t) + x    // x lost low-order bits
-    else:
-        c += (x - t) + s    // s lost low-order bits
-    s = t
-return s + c
-```
-
-The correction is only applied once at the end (`s + c`), unlike Kahan which applies it each iteration.
-
-The branch ensures that the term `(big - (big + small))` — which is exact in floating-point [[2Sum](#ref-2sum)] — is always computed with the small operand as the last subtraction, preserving the error. Peters' example yields the correct 2.0.
-
-### Klein Second-Order KBN (Double-Compensated)
-
-Klein (2006) [[Klein06](#ref-klein06)] generalised KBN to arbitrary order. The second-order variant applies the same KBN trick to **the correction term itself**, maintaining two compensation levels:
-
-```pseudocode
-s  = 0
-cs = 0     // first-level compensation
-ccs = 0    // second-level compensation
-
-for x in input:
-    // Level 1: KBN on sum + x
-    t = s + x
-    if |s| >= |x|: c = (s - t) + x
-    else:          c = (x - t) + s
-    s = t
-
-    // Level 2: KBN on cs + c
-    t = cs + c
-    if |cs| >= |c|: cc = (cs - t) + c
-    else:           cc = (c - t) + cs
-    cs = t
-    ccs += cc
-
-return s + (cs + ccs)
-```
-
-This double compensation further reduces residual error when the first-level correction `c` itself loses bits during accumulation.
-
-## Implementation: `KleinKBNAccumulator`
-
-The `KleinKBNAccumulator` class implements Klein's second-order KBN algorithm. It maintains three state variables:
-
-| Variable | Purpose |
+| Operation/query | Behavior |
 | --- | --- |
-| `_sum` | Primary sum (level 1 result) |
-| `_cs` | First-level KBN correction accumulator |
-| `_ccs` | Second-level KBN correction (applied to `_cs`) |
+| `update(x)` | Add `x` using two compensation levels |
+| `revert(x)` | Add `−x` using the same algorithm |
+| `set(x)` | Replace the total with `x` and clear both corrections |
+| `reset()` | Set all three state values to zero |
+| `value` | Read `(sum + cs) + ccs` |
 
-The corrected value at any point is `_sum + _cs + _ccs`.
+There is no sample count, mean, or empty-removal check. Every operation takes O(1) time and the state takes O(1) storage.
 
-### Methods
+## Algorithm
 
-- **`update(x)`** — Adds `x` using two-level KBN compensation.
-- **`revert(x)`** — Removes `x` by calling `update(-x)`. Provides a symmetrical inverse for rolling-window use, mirroring the `revert(x)` pattern in `Variance` and `RunningVariance`.
-- **`set(x)`** — Overwrites the accumulator with `x` (resets both compensation terms to zero).
-- **`reset()`** — Resets all state to zero.
-- **`value`** — Returns `_sum + _cs + _ccs`.
+```pseudocode
+PROCEDURE UPDATE(x)
+    s ← sum
+    t ← s + x
+    IF ABS(s) ≥ ABS(x) THEN
+        c ← (s − t) + x
+    ELSE
+        c ← (x − t) + s
+    END IF
+    sum ← t
 
-### Usage
+    first ← cs
+    t ← first + c
+    IF ABS(first) ≥ ABS(c) THEN
+        second ← (first − t) + c
+    ELSE
+        second ← (c − t) + first
+    END IF
+    cs ← t
+    ccs ← ccs + second
+END PROCEDURE
 
-```python
-kbn = KleinKBNAccumulator()
-for x in data:
-    kbn.update(x)
-result = kbn.value
+FUNCTION VALUE()
+    RETURN (sum + cs) + ccs
+END FUNCTION
+
+PROCEDURE SET(x)
+    sum ← x
+    cs ← 0
+    ccs ← 0
+END PROCEDURE
+
+PROCEDURE RESET()
+    SET(0)
+END PROCEDURE
+
+PROCEDURE REVERT(x)
+    UPDATE(−x)
+END PROCEDURE
 ```
 
-For rolling windows:
+The second-level residual is **added** to `ccs` on every update. Overwriting it would discard earlier corrections. The final value uses the left-associated expression `(sum + cs) + ccs`, matching all five implementations; reassociating it can change the rounded result.
 
-```python
-kbn.update(x)   # add new value
-kbn.revert(y)   # remove old value
+## Usage and accuracy
+
+```pseudocode
+total ← CREATE KleinKBNAccumulator()
+FOR EACH x IN [1, 1e100, 1, −1e100] DO
+    total.UPDATE(x)
+END FOR
+OUTPUT READ total.value                  // 2.0
+
+total.REVERT(1)                           // remove one occurrence
+OUTPUT READ total.value                  // 1.0
+total.SET(5)                              // replace all accumulated state
+total.RESET()                             // value is now 0.0
 ```
+
+Adding the negation permits removal in any order, provided the caller supplies a value still present in its logical sample set. It does not restore historical internal state or guarantee an exact floating-point inverse. With no count, the accumulator cannot automatically reset after the last removal; use [KleinKBNSummator](klein_kbn_summator.md) when that behavior and a mean are needed.
+
+The sequence `[1e−16, −1e16, 1, 1e−16, −1, −1e−16, −1e−32, 1e16]` exercises the second correction level. The current implementation returns `9.999999999999999e−17`.
+
+Inputs and intermediate calculations are assumed finite. Compensation does not guarantee correctly rounded sums, exact reversal, or indefinitely accurate rolling-window updates.
 
 ## References
 

@@ -37,7 +37,9 @@ class RawMomentsKleinKBN:
     Accuracy caveat: converting raw power sums to central moments suffers
     catastrophic cancellation when the mean is large compared to the spread
     (e.g. prices rather than returns).  For such data skewness and kurtosis
-    lose precision.  Use CentralMomentsKleinKBN if FIFO revert is not needed.
+    lose precision.  Use CentralMomentsKleinKBN for such data; it supports
+    FIFO removal, but repeated removals clear compensation and can accumulate
+    rounding error.
 
     Notation
     --------

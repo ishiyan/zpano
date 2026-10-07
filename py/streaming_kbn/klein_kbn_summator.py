@@ -29,10 +29,15 @@ class KleinKBNSummator:
         """
         Removes a previously added value x.
 
+        Removing the final sample clears the sum and its compensation terms.
+
         Raises ValueError if the summator is empty.
         """
         if self._n <= 0:
             raise ValueError("Cannot revert from an empty summator")
+        if self._n == 1:
+            self.reset()
+            return
         self._n -= 1
         # Adding zero leaves the accumulator unchanged, so skip it.
         if x != 0:
