@@ -1,0 +1,15 @@
+// Code generated from py/performance/reference_data/bernardo_ledoit_ratio.py. DO NOT EDIT.
+
+const std = @import("std");
+const Entry = @import("entry.zig").Entry;
+const nan = std.math.nan(f64);
+
+/// `bernardo_ledoit_ratio.EXPECTED_VALUES`
+pub const expected_values: []const f64 = &.{
+    nan, nan, nan, 4.0,
+    5.5, 8.0, 9.6, 16.3,
+    6.79166666666667, 8.45833333333333, 7.0, 9.79310344827586,
+    11.1724137931034, 4.90909090909091, 2.5511811023622, 2.68503937007874,
+    1.9375, 1.72222222222222, 2.07575757575758, 2.36868686868687,
+    1.78326996197719, 1.8745247148289, 1.83955223880597, 1.7797833935018,
+};

@@ -36,24 +36,6 @@ pub fn build(b: *std.Build) void {
         },
     });
 
-    const periodicity_mod = b.addModule("periodicity", .{
-        .root_source_file = b.path("src/performance/periodicity.zig"),
-        .target = target,
-        .optimize = optimize,
-    });
-
-    _ = b.addModule("ratios", .{
-        .root_source_file = b.path("src/performance/ratios.zig"),
-        .target = target,
-        .optimize = optimize,
-        .imports = &.{
-            .{ .name = "conventions", .module = conventions_mod },
-            .{ .name = "daycounting", .module = daycounting_mod },
-            .{ .name = "fractional", .module = fractional_mod },
-            .{ .name = "periodicity", .module = periodicity_mod },
-        },
-    });
-
     // --- Roundtrip library modules ---
     const execution_mod = b.addModule("execution", .{
         .root_source_file = b.path("src/roundtrips/execution.zig"),
@@ -399,6 +381,19 @@ pub fn build(b: *std.Build) void {
         },
     });
 
+    // --- Performance measures library module ---
+    _ = b.addModule("performance", .{
+        .root_source_file = b.path("src/performance/performance.zig"),
+        .target = target,
+        .optimize = optimize,
+        .imports = &.{
+            .{ .name = "klein_kbn_accumulator", .module = klein_kbn_accumulator_mod },
+            .{ .name = "klein_kbn_summator", .module = klein_kbn_summator_mod },
+            .{ .name = "raw_moments_klein_kbn", .module = raw_moments_klein_kbn_mod },
+            .{ .name = "linear_regression_klein_kbn", .module = linear_regression_klein_kbn_mod },
+        },
+    });
+
     // --- Test modules (separate modules that share the same source files) ---
     const conventions_test_mod = b.createModule(.{
         .root_source_file = b.path("src/daycounting/conventions.zig"),
@@ -422,24 +417,6 @@ pub fn build(b: *std.Build) void {
         .imports = &.{
             .{ .name = "conventions", .module = conventions_mod },
             .{ .name = "daycounting", .module = daycounting_mod },
-        },
-    });
-
-    const periodicity_test_mod = b.createModule(.{
-        .root_source_file = b.path("src/performance/periodicity.zig"),
-        .target = target,
-        .optimize = optimize,
-    });
-
-    const ratios_test_mod = b.createModule(.{
-        .root_source_file = b.path("src/performance/ratios.zig"),
-        .target = target,
-        .optimize = optimize,
-        .imports = &.{
-            .{ .name = "conventions", .module = conventions_mod },
-            .{ .name = "daycounting", .module = daycounting_mod },
-            .{ .name = "fractional", .module = fractional_mod },
-            .{ .name = "periodicity", .module = periodicity_mod },
         },
     });
 
@@ -691,8 +668,6 @@ pub fn build(b: *std.Build) void {
     const conventions_tests = b.addTest(.{ .root_module = conventions_test_mod, .filters = filters });
     const daycounting_tests = b.addTest(.{ .root_module = daycounting_test_mod, .filters = filters });
     const fractional_tests = b.addTest(.{ .root_module = fractional_test_mod, .filters = filters });
-    const periodicity_tests = b.addTest(.{ .root_module = periodicity_test_mod, .filters = filters });
-    const ratios_tests = b.addTest(.{ .root_module = ratios_test_mod, .filters = filters });
     const execution_tests = b.addTest(.{ .root_module = execution_test_mod, .filters = filters });
     const side_tests = b.addTest(.{ .root_module = side_test_mod, .filters = filters });
     const matching_tests = b.addTest(.{ .root_module = matching_test_mod, .filters = filters });
@@ -718,6 +693,20 @@ pub fn build(b: *std.Build) void {
     const sig_compose_tests = b.addTest(.{ .root_module = sig_compose_test_mod, .filters = filters });
     const cp_tests = b.addTest(.{ .root_module = cp_test_mod, .filters = filters });
     const signal_ensemble_tests = b.addTest(.{ .root_module = signal_ensemble_test_mod, .filters = filters });
+    // --- Performance measures test module ---
+    const performance_test_mod = b.createModule(.{
+        .root_source_file = b.path("src/performance/performance.zig"),
+        .target = target,
+        .optimize = optimize,
+        .imports = &.{
+            .{ .name = "klein_kbn_accumulator", .module = klein_kbn_accumulator_mod },
+            .{ .name = "klein_kbn_summator", .module = klein_kbn_summator_mod },
+            .{ .name = "raw_moments_klein_kbn", .module = raw_moments_klein_kbn_mod },
+            .{ .name = "linear_regression_klein_kbn", .module = linear_regression_klein_kbn_mod },
+        },
+    });
+
+    const performance_tests = b.addTest(.{ .root_module = performance_test_mod, .filters = filters });
     const klein_kbn_accumulator_tests = b.addTest(.{ .root_module = klein_kbn_accumulator_test_mod, .filters = filters });
     const klein_kbn_summator_tests = b.addTest(.{ .root_module = klein_kbn_summator_test_mod, .filters = filters });
     const raw_moments_klein_kbn_tests = b.addTest(.{ .root_module = raw_moments_klein_kbn_test_mod, .filters = filters });
@@ -727,8 +716,6 @@ pub fn build(b: *std.Build) void {
     const run_conventions_tests = b.addRunArtifact(conventions_tests);
     const run_daycounting_tests = b.addRunArtifact(daycounting_tests);
     const run_fractional_tests = b.addRunArtifact(fractional_tests);
-    const run_periodicity_tests = b.addRunArtifact(periodicity_tests);
-    const run_ratios_tests = b.addRunArtifact(ratios_tests);
     const run_execution_tests = b.addRunArtifact(execution_tests);
     const run_side_tests = b.addRunArtifact(side_tests);
     const run_matching_tests = b.addRunArtifact(matching_tests);
@@ -754,6 +741,7 @@ pub fn build(b: *std.Build) void {
     const run_sig_compose_tests = b.addRunArtifact(sig_compose_tests);
     const run_cp_tests = b.addRunArtifact(cp_tests);
     const run_signal_ensemble_tests = b.addRunArtifact(signal_ensemble_tests);
+    const run_performance_tests = b.addRunArtifact(performance_tests);
     const run_klein_kbn_accumulator_tests = b.addRunArtifact(klein_kbn_accumulator_tests);
     const run_klein_kbn_summator_tests = b.addRunArtifact(klein_kbn_summator_tests);
     const run_raw_moments_klein_kbn_tests = b.addRunArtifact(raw_moments_klein_kbn_tests);
@@ -764,8 +752,6 @@ pub fn build(b: *std.Build) void {
     test_step.dependOn(&run_conventions_tests.step);
     test_step.dependOn(&run_daycounting_tests.step);
     test_step.dependOn(&run_fractional_tests.step);
-    test_step.dependOn(&run_periodicity_tests.step);
-    test_step.dependOn(&run_ratios_tests.step);
     test_step.dependOn(&run_execution_tests.step);
     test_step.dependOn(&run_side_tests.step);
     test_step.dependOn(&run_matching_tests.step);
@@ -791,6 +777,7 @@ pub fn build(b: *std.Build) void {
     test_step.dependOn(&run_sig_compose_tests.step);
     test_step.dependOn(&run_cp_tests.step);
     test_step.dependOn(&run_signal_ensemble_tests.step);
+    test_step.dependOn(&run_performance_tests.step);
     test_step.dependOn(&run_klein_kbn_accumulator_tests.step);
     test_step.dependOn(&run_klein_kbn_summator_tests.step);
     test_step.dependOn(&run_raw_moments_klein_kbn_tests.step);

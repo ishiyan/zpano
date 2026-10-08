@@ -5,20 +5,20 @@
 Multi-language financial library (Python, Go, TypeScript, Zig, Rust) implementing seven core modules:
 1. **Day Counting** — Financial day count conventions (30/360, Actual/Actual, etc.) per ISO 20022 and ISDA standards, with Excel YEARFRAC compatibility.
 2. **Entities** — Financial trading data types (Bar, Quote, Trade, Scalar) with computed properties and component extraction. Also provides component enums (BarComponent, QuoteComponent, TradeComponent) with factory functions, mnemonics, and default constants used by the indicators module. See the `entities-architecture` skill for the full cross-language reference.
-3. **Performance Metrics** — Portfolio performance ratios (Sharpe, Sortino, Omega, Kappa, Calmar, Sterling, Burke, Pain, Ulcer, Martin, etc.).
+3. **Performance Measures** — Streaming `Measures` class with ~135 portfolio/benchmark performance and risk measures (moments, VaR/ES, partial moments, Sharpe/Sortino/Omega/Kappa families, drawdowns and CDaR, single-factor-model and benchmark-relative measures, capture ratios), built on `streaming_kbn`. See the `performance-measures-architecture` skill.
 4. **Roundtrips** — Trading round-trip tracking with execution matching, PnL computation (gross/net, long/short), and 100+ incremental performance statistics (ROI, Sharpe, Sortino, Calmar, drawdowns, MAE/MFE, efficiency, consecutive streaks, duration analytics).
 5. **Symbology** — Financial security identifier validation (ISIN, CUSIP, SEDOL) with check digit calculation and validation, country code verification, and SEC 13F workaround support.
 6. **Indicators** — 63 technical analysis indicators (SMA, EMA, RSI, MACD, Bollinger Bands, etc.) organized by author, with a shared `core/` framework providing the `Indicator` interface, `LineIndicator` base, metadata, descriptor registry, output types, and frequency response utilities. Implemented in all five languages (Go, TypeScript, Python, Zig, Rust). See the `indicator-architecture` skill for the full design reference.
 7. **Cmd** — Three CLI tools (`icalc`, `iconf`, `ifres`) that exercise the indicators module: indicator calculation against 252-bar reference data, chart configuration generation, and frequency response analysis. Implemented in all five languages.
 
-Go and TypeScript are the reference implementations for modules 6 and 7; Python, Zig, and Rust implementations are complete and must match reference output to 13+ decimal places. Python is the reference for modules 1–5. All ports must match reference output to 13+ decimal places. The `laptop/` directory is an older working copy; prefer editing files under `py/`, `go/`, `ts/`, `zig/`, and `rs/`. The `performatce/` directory name is an intentional typo — do not rename it.
+Go and TypeScript are the reference implementations for modules 6 and 7; Python, Zig, and Rust implementations are complete and must match reference output to 13+ decimal places. Python is the reference for modules 1–5. All ports must match reference output to 13+ decimal places. The `laptop/` directory is an older working copy; prefer editing files under `py/`, `go/`, `ts/`, `zig/`, and `rs/`. `py/performance_deprecated/` and `py/streaming_kbn_deprecated/` are legacy versions kept for history; do not port from them.
 
 ## Build / Lint / Test Commands
 
 No linter, formatter, or CI/CD pipeline is configured for any language.
 
 ### Python
-Dependencies: Python 3.10+, `numpy`, `scipy`. Tests import from `accounts.daycounting` and `accounts.performances` (absolute paths).
+Dependencies: Python 3.10+, `numpy`, `scipy`. Tests import from `accounts.daycounting` (absolute paths); newer packages (`performance`, `streaming_kbn`) use relative imports.
 ```bash
 python -m unittest discover -s py -p "test_*.py"                            # all tests
 python -m unittest py.daycounting.test_daycounting.TestEur30360             # single class
@@ -35,7 +35,7 @@ Dependencies: Go 1.26+ (zero external deps). Run from the `go/` directory.
 cd go && go test ./...                                                      # all tests
 cd go && go test ./daycounting -run TestEur30360 -v                         # single test function
 cd go && go test ./daycounting -run "TestEur30360/Excel_basis_4" -v         # single subtest
-cd go && go test ./performance -run TestSharpeRatio -v                      # single perf test
+cd go && go test ./performance/... -run TestSharpeRatio -v                  # single perf test
 cd go && go test ./roundtrips -run TestRoundtripPerformance -v              # roundtrip perf test
 cd go && go test ./symbology -run TestValidateISIN -v                       # single symbology test
 cd go && go test ./entities -run TestBar -v                                 # single entities test
@@ -47,14 +47,14 @@ cd go && go test ./daycounting -bench=. -benchmem                           # be
 ### TypeScript
 Dependencies: Node.js 20+, TypeScript 5.3+, Jasmine 5.1+. Single unified npm package at `ts/` with all modules.
 ```bash
-cd ts && npm install && npm test                                             # all tests (8935 specs)
+cd ts && npm install && npm test                                             # all tests (22967 specs)
 cd ts && npm run build                                                       # build only (tsc)
 ```
 
 ### Zig
 Dependencies: Zig 0.16.0-dev. Installed at `/usr/local/zig/` with `/usr/local/bin/zig` on PATH.
 ```bash
-cd zig && zig build test                        # all tests (367 tests across 21 modules)
+cd zig && zig build test                        # all tests (1919 tests)
 cd zig && zig build test 2>&1 --summary all     # with per-module counts
 ```
 Zig has no built-in way to run a single named test from the build system. To filter, use the `zig test` command directly with `--test-filter`:
@@ -66,7 +66,7 @@ cd zig && zig test src/daycounting/daycounting.zig --test-filter "act365Fixed" \
 ### Rust
 Dependencies: Rust 1.75.0+ (installed via apt at `/usr/bin/rustc`, `/usr/bin/cargo`), zero external deps.
 ```bash
-cd rs && cargo test                                                       # all tests (342 tests)
+cd rs && cargo test                                                       # all tests (1994 tests)
 cd rs && cargo test --lib daycounting                                     # daycounting tests only
 cd rs && cargo test --lib performance                                     # performance tests only
 cd rs && cargo test --lib roundtrips                                      # roundtrips tests only
@@ -80,7 +80,7 @@ cd rs && cargo test --lib test_sharpe -- --nocapture                      # with
 
 ```
 py/daycounting/          — conventions.py, daycounting.py, fractional.py, tests
-py/performatce/          — periodicity.py, ratios.py, tests (typo is intentional)
+py/performance/          — measures.py (Measures), core/ (streaming helpers), reference_data/ (test expected values), tests; resampler/ is experimental and not ported
 py/roundtrips/           — execution.py, side.py, matching.py, grouping.py, roundtrip.py, performance.py, tests
 py/symbology/            — isin.py, cusip.py, sedol.py, tests
 py/entities/             — bar.py, quote.py, trade.py, scalar.py, bar_component.py, quote_component.py, trade_component.py, tests
@@ -91,7 +91,7 @@ py/cmd/icalc/            — CLI indicator calculator
 py/cmd/iconf/            — CLI chart configuration generator
 py/cmd/ifres/            — CLI frequency response calculator
 go/daycounting/          — daycounting.go, fractional.go, conventions/ subpackage
-go/performance/          — periodicity.go, ratios.go
+go/performance/          — measures.go, core/ (package core), referencedata/ (generated), tests
 go/roundtrips/           — execution.go, side.go, matching.go, grouping.go, roundtrip.go, performance.go, tests
 go/symbology/            — isin.go, cusip.go, sedol.go, tests
 go/entities/             — bar.go, quote.go, trade.go, scalar.go, barcomponent.go, quotecomponent.go, tradecomponent.go, tests
@@ -102,7 +102,7 @@ go/cmd/icalc/            — CLI indicator calculator
 go/cmd/iconf/            — CLI chart configuration generator
 go/cmd/ifres/            — CLI frequency response calculator
 ts/daycounting/          — conventions.ts, daycounting.ts, fractional.ts
-ts/performance/          — periodicity.ts, ratios.ts
+ts/performance/          — measures.ts, index.ts, core/, reference-data/ (generated), specs
 ts/roundtrips/           — execution.ts, side.ts, matching.ts, grouping.ts, roundtrip.ts, performance.ts
 ts/symbology/            — isin.ts, cusip.ts, sedol.ts
 ts/entities/             — bar.ts, quote.ts, trade.ts, scalar.ts, bar-component.ts, quote-component.ts, trade-component.ts
@@ -113,7 +113,7 @@ ts/cmd/icalc/            — CLI indicator calculator
 ts/cmd/iconf/            — CLI chart configuration generator
 ts/cmd/ifres/            — CLI frequency response calculator
 zig/src/daycounting/     — conventions.zig, daycounting.zig, fractional.zig
-zig/src/performance/     — periodicity.zig, ratios.zig
+zig/src/performance/     — performance.zig (barrel), measures.zig, core/, reference_data/ (generated), tests
 zig/src/roundtrips/      — execution.zig, side.zig, matching.zig, grouping.zig, roundtrip.zig, performance.zig
 zig/src/symbology/       — isin.zig, cusip.zig, sedol.zig
 zig/src/entities/        — bar.zig, quote.zig, trade.zig, scalar.zig, bar_component.zig, quote_component.zig, trade_component.zig, entities.zig (barrel)
@@ -125,7 +125,7 @@ zig/src/cmd/iconf/       — CLI chart configuration generator
 zig/src/cmd/ifres/       — CLI frequency response calculator
 zig/build.zig            — build config
 rs/src/daycounting/      — conventions.rs, daycounting.rs, fractional.rs
-rs/src/performance/      — periodicity.rs, ratios.rs
+rs/src/performance/      — mod.rs, measures.rs, core/, reference_data/ (generated, cfg(test)), tests
 rs/src/roundtrips/       — mod.rs, execution.rs, side.rs, matching.rs, grouping.rs, roundtrip.rs, performance.rs
 rs/src/symbology/        — mod.rs, isin.rs, cusip.rs, sedol.rs
 rs/src/entities/         — mod.rs, bar.rs, quote.rs, trade.rs, scalar.rs, bar_component.rs, quote_component.rs, trade_component.rs
@@ -170,9 +170,9 @@ readme/performance/      — R validation scripts, reference PDFs, CSV data, SVG
 - Imports: `const std = @import("std");` first, then module imports by build.zig name (`@import("conventions")`), then type aliases.
 - Optionals (`?f64`) for impossible computations; `orelse return null` to chain. Error unions (`!void`, `!f64`) for allocation failures. Pure math functions return plain `f64`.
 - `ArrayList(f64)` uses the Zig 0.16 unmanaged API: init with `.empty`, pass allocator to `.append(self.allocator, item)`, `.deinit(self.allocator)`, `.appendSlice(self.allocator, items)`. `.clearRetainingCapacity()` takes no allocator.
-- The `Ratios` struct stores `allocator: std.mem.Allocator` and passes it to all ArrayList operations.
+- Allocating types (e.g. performance `Measures`, drawdown helpers) store `allocator: std.mem.Allocator` and pass it to all ArrayList operations.
 - Tests live at the bottom of source files. Use `test "descriptive name" { ... }` blocks. Assertions: `try std.testing.expect(almostEqual(...))`, `try std.testing.expectEqual(expected, actual)`. Use `testing.allocator` with `defer obj.deinit()`.
-- Build.zig defines 21+ modules with a dependency graph: `conventions` (no deps) -> `daycounting` -> `fractional`; `periodicity` (no deps); `ratios` (depends on all four); `execution` (depends on `fractional`); `side`, `matching`, `grouping` (no deps); `roundtrip` (depends on `execution`, `side`, `fractional`); `performance` (depends on `roundtrip`, `execution`, `side`, `fractional`); `isin`, `cusip`, `sedol` (no deps, standalone symbology modules); `bar`, `quote`, `trade`, `scalar`, `bar_component` (depends on `bar`), `quote_component` (depends on `quote`), `trade_component` (depends on `trade`) (standalone entities modules); `entities` (barrel, depends on all entity modules); `indicators` (depends on `entities`).
+- Build.zig defines 21+ modules with a dependency graph: `conventions` (no deps) -> `daycounting` -> `fractional`; `execution` (depends on `fractional`); `side`, `matching`, `grouping` (no deps); `roundtrip` (depends on `execution`, `side`, `fractional`); `performance` (depends on `roundtrip`, `execution`, `side`, `fractional`); `isin`, `cusip`, `sedol` (no deps, standalone symbology modules); `bar`, `quote`, `trade`, `scalar`, `bar_component` (depends on `bar`), `quote_component` (depends on `quote`), `trade_component` (depends on `trade`) (standalone entities modules); `entities` (barrel, depends on all entity modules); `indicators` (depends on `entities`); streaming KBN modules (`klein_kbn_accumulator`, `klein_kbn_summator`, `raw_moments_klein_kbn`, `central_moments_klein_kbn`, `linear_regression_klein_kbn`, barrel `streaming_kbn`); `performance` measures (depends on the streaming KBN modules; distinct from roundtrips' `rt_performance`).
 - Modules are registered with `b.addModule()` and tests with `b.createModule()` + `b.addTest(.{ .root_module = mod })`.
 
 ### Rust
@@ -180,14 +180,14 @@ readme/performance/      — R validation scripts, reference PDFs, CSV data, SVG
 - `snake_case` functions, `PascalCase` types/enums, `UPPER_SNAKE_CASE` constants, `snake_case` enum variants with `#[repr(u8)]` for the Convention enum.
 - `Option<f64>` for impossible computations; plain `f64` for pure math. `Result<..., String>` or `panic!` for invalid inputs.
 - `DateTime` struct with fields `year: i32, month: i32, day: i32, hour: i32, minute: i32, second: i32`.
-- Tests live in `#[cfg(test)] mod tests { ... }` at the bottom of source files. Helper `almost_equal(a, b, epsilon)` with `epsilon = 1e-14` (daycounting) or `1e-13` (ratios).
+- Tests live in `#[cfg(test)] mod tests { ... }` at the bottom of source files. Helper `almost_equal(a, b, epsilon)` with `epsilon = 1e-14` (daycounting) or `1e-13` (performance).
 - Zero external dependencies. All math uses `f64` methods (`.ln()`, `.sqrt()`, `.powf()`, `.abs()`, `.cbrt()`).
 - Module structure: `daycounting`, `performance`, `roundtrips`, `symbology`, `entities`, and `indicators` as submodules of the `zpano` crate, each with `mod.rs` re-exporting contents.
 
 ## Cross-Language Rules
 
 - All five implementations must produce identical results to 13+ decimal places.
-- Test tolerances: Python `places=13`, Go `epsilon=1e-14`, TypeScript `toBeCloseTo(x, 13)`, Zig `epsilon = 1e-13`, Rust `epsilon = 1e-14` (daycounting) / `1e-13` (ratios).
+- Test tolerances: Python `places=13`, Go `epsilon=1e-14`, TypeScript `toBeCloseTo(x, 13)`, Zig `epsilon = 1e-13`, Rust `epsilon = 1e-14` (daycounting) / `1e-13` (performance).
 - Reference validation: Excel YEARFRAC (daycounting), R PerformanceAnalytics (performance metrics).
 - Known deviations from Excel are documented inline with `Error:` comments in tests.
 - 15 day count conventions share the same enum values (0–14) across all languages.
@@ -224,7 +224,7 @@ Key behavioral details:
 - **Go `Mnemonic()` method**: Go component enums have a `Mnemonic() string` method on the enum type itself (in addition to the standalone `ComponentValue`/mnemonic functions). Unknown values return `"unknown"`. Other languages use standalone functions and return `"??"` for unknown values.
 
 ### Performance Module
-The `Ratios` struct/class accumulates portfolio returns incrementally via `addReturn()` and computes 20+ financial ratios at each step. All ratio methods are read-only accessors that derive values from internal state. The test dataset ("Bacon data") is a 24-element array of returns with corresponding dates, shared across all languages.
+The `Measures` class accumulates paired portfolio/benchmark returns via `add_return(ret, ret_bench)` (optionally over a rolling window, with revert-on-evict) and exposes ~135 measures as read-only properties/methods. `periods_per_annum` drives annualization and the periodic risk-free/target rates; no timestamps are used. Streaming helpers live in `core/`; expected values (mostly R PerformanceAnalytics on the Bacon portfolio/benchmark data, 24 observations) live in `reference_data/` and are generated into the other languages. Python is the reference; see the `performance-measures-architecture` skill.
 
 ### Roundtrips Module
 Six source files per language implement trading round-trip tracking:
@@ -299,10 +299,10 @@ All commands run from the project root (`~/repos/zpano/`).
 | Language | Prerequisites | Command | Expected |
 |----------|--------------|---------|----------|
 | **Python** | Python 3.10+, `numpy`, `scipy`, symlink `ln -sf py accounts`, `touch py/__init__.py` | `PYTHONPATH=. python3 -m unittest discover -s py -p "test_*.py" -t .` | 339 tests |
-| **Go** | Go 1.26+ | `cd go && go test ./...&& cd ..`| 84 packages OK |
-| **TypeScript** | Node.js 20+, TypeScript 5.3+, Jasmine 5.1+ | `cd ts && npm install && npm test && cd ..` | 8935 specs |
-| **Zig** | Zig 0.16.0-dev | `cd zig && zig build test --summary all && cd ..` | 1014 tests |
-| **Rust** | Rust 1.75.0+ (apt) | `cd rs && cargo test && cd ..` | 985 tests |
+| **Go** | Go 1.26+ | `cd go && go test ./...&& cd ..`| 138 packages OK |
+| **TypeScript** | Node.js 20+, TypeScript 5.3+, Jasmine 5.1+ | `cd ts && npm install && npm test && cd ..` | 22967 specs |
+| **Zig** | Zig 0.16.0-dev | `cd zig && zig build test --summary all && cd ..` | 1919 tests |
+| **Rust** | Rust 1.75.0+ (apt) | `cd rs && cargo test && cd ..` | 1994 tests |
 
 ```bash
 python3 -m unittest discover -s py -p "test_*.py" -t .

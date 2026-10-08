@@ -1,58 +1,42 @@
-// Package performance provides portfolio performance measurement ratios
-// for evaluating the risk-adjusted returns of financial strategies.
+// Package performance provides streaming calculation of time-series
+// performance and risk measures of a portfolio and its benchmark.
 //
-// This package implements various financial ratios commonly used in
-// portfolio performance analysis, including Sharpe, Sortino, Omega,
-// Kappa, Calmar, Sterling, Burke, Pain, Ulcer, and Martin ratios.
+// [Measures] consumes one (portfolio, benchmark) return pair at a time via
+// [Measures.AddReturn] and exposes about 140 measures: moments and
+// normality tests, VaR and expected shortfall, upside/downside partial
+// moments, the Sharpe, Sortino, Omega and Kappa families, drawdown
+// measures and conditional drawdown at risk (CDaR), single-factor-model
+// (SFM) and benchmark-relative measures, capture ratios and
+// miscellaneous ratios. Most measures are O(1) reads from Klein
+// Kahan-Babuška-Neumaier compensated streaming state (package
+// zpano/streamingkbn and zpano/performance/core); a documented minority
+// recompute over the stored window.
 //
-// # Key Features
+// Returns must be regularly spaced periodic returns expressed as
+// decimals. No timestamps are used: the annualization convention is the
+// explicit periodsPerAnnum argument of [NewMeasures] (see the
+// PeriodsPerAnnum* constants). The annual risk-free rate and the annual
+// target return (minimum acceptable return, MAR) are converted to
+// periodic rates as (1 + r)^(1/P) - 1.
 //
-//   - Incremental computation via AddReturn for streaming/online analysis
-//   - Multiple risk-adjusted return ratios (Sharpe, Sortino, Omega, etc.)
-//   - Drawdown analysis (cumulative, peak-based, continuous)
-//   - Higher and lower partial moment calculations
-//   - Support for multiple periodicities (daily, weekly, monthly, quarterly, annual)
-//   - Configurable risk-free rate and target return
-//   - Day count convention support via the daycounting package
+// A positive rolling window size restricts every measure to the most
+// recent observations; zero means an unbounded running window. In both
+// modes the portfolio and benchmark returns of the window are stored.
 //
-// # Architecture
+// Conventions:
+//   - Measures return NaN when they are undefined (for example before
+//     enough observations have been added), 0 where the reference
+//     implementation returns 0, and ±Inf where noted.
+//   - Python properties are methods without parameters (SharpeRatio());
+//     Python methods with default arguments take explicit parameters, the
+//     Python defaults being documented on each method.
+//   - Only methods that validate their arguments return an error
+//     (IsNormalDistribution, FarinelliTibilettiRatio, RachevRatio,
+//     CdarAverage, CdarDiscrete, CdarBeta, CdarAlpha, TailRatio,
+//     BiasRatio and the constructor). Methods that pass a confidence
+//     level to the core helpers (VaR, ES, Sharpe VaR/ES, reward-to-VaR/ES)
+//     return NaN for an invalid confidence level instead.
 //
-// The central type is [Ratios], which accumulates returns incrementally
-// and maintains running statistics for all supported ratios. Each call to
-// [Ratios.AddReturn] updates internal state so that any ratio can be
-// queried at any point in time.
-//
-// # Validation
-//
-// All calculations are validated against:
-//
-//   - R's PerformanceAnalytics package (Portfolio Bacon dataset)
-//   - Python reference implementation (scipy.stats for kurtosis/skewness)
-//   - Results must match to 13+ decimal places
-//
-// # Usage Example
-//
-//	import (
-//	    "time"
-//	    "zpano/performance"
-//	    "zpano/daycounting/conventions"
-//	)
-//
-//	r := performance.New(
-//	    performance.Daily,
-//	    0.0,   // annual risk-free rate
-//	    0.0,   // annual target return
-//	    conventions.RAW,
-//	)
-//	r.Reset()
-//	r.AddReturn(0.003, 0.002, 1.0, date1, date2)
-//	sharpe := r.SharpeRatio(false, false)
-//
-// # Standards Compliance
-//
-// The package implements methods documented in:
-//
-//   - Carl R. Bacon, "Practical Portfolio Performance Measurement and Attribution" (2nd & 3rd ed.)
-//   - R's PerformanceAnalytics package
-//   - ISDA and ISO 20022 day count conventions (via the daycounting package)
+// This package is a port of the Python reference implementation
+// py/performance/measures.py and matches it to 13+ decimal places.
 package performance
