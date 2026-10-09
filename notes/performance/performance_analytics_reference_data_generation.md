@@ -2,6 +2,24 @@
 
 The data were produced with the R scripts using the [datacamp.com](https://www.datacamp.com/datalab/w/28c21593-21e6-47d9-8e72-acebdd3be32c/edit) online R interpreter
 
+The R output is recorded in `py/performance/reference_data/*.py`. Some measures
+have no R data, as indicated below; their tests use manual calculations or
+formula-based reference values instead.
+
+[gen.py](gen.py) translates those existing Python fixtures into the Go,
+TypeScript, Rust, and Zig reference-data files. It does not generate the R
+results or independently validate the formulas. From the repository root:
+
+```bash
+python3 notes/performance/gen.py
+```
+
+An optional output-root argument writes all four generated trees elsewhere for
+comparison, for example `python3 notes/performance/gen.py /tmp/perf-refdata`.
+Apply `gofmt` to generated Go files when comparing with the checked-in versions.
+The checked-in TypeScript, Rust, and Zig fixtures currently retain the
+generator's formatting.
+
 Every script begins with loading the packages, `PerformanceAnalytics` and the optional `RobStatTM`, followed by the test data loading.
 
 We use the monthly [portfolio_bacon.csv](https://github.com/braverock/PerformanceAnalytics/blob/master/data/portfolio_bacon.csv) as the test data.

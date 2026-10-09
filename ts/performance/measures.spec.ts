@@ -931,21 +931,14 @@ describe('Measures', () => {
     });
 
     describe('VolatilitySkewness', () => {
-        function baconReference(expected: readonly number[]): readonly number[] {
-            // The MAR 0.2 and 0.3 fixtures contain three extra trailing zeros.
-            // Compare the 24 observations that correspond to the Bacon inputs.
-            assertTrue(expected.slice(baconPortfolioLen).every(x => x === 0));
-            return expected.slice(0, baconPortfolioLen);
-        }
-
         it('matches PerformanceAnalytics output', () => {
-            for (const [m, expected] of rdVolatilitySkewness.EXPECTED_VALUES_BY_MAR_VARIABILITY) {
-                const actual = runStreamProperty('volatilitySkewness', mar(m));
-                assertSeriesEqual(actual, baconReference(expected), { places: 13, prefix: `volatility skewness MAR ${m}` });
-            }
             for (const [m, expected] of rdVolatilitySkewness.EXPECTED_VALUES_BY_MAR_VOLATILITY) {
+                const actual = runStreamProperty('volatilitySkewness', mar(m));
+                assertSeriesEqual(actual, expected, { places: 13, prefix: `volatility skewness MAR ${m}` });
+            }
+            for (const [m, expected] of rdVolatilitySkewness.EXPECTED_VALUES_BY_MAR_VARIABILITY) {
                 const actual = runStreamProperty('variabilitySkewness', mar(m));
-                assertSeriesEqual(actual, baconReference(expected), { places: 13, prefix: `variability skewness MAR ${m}` });
+                assertSeriesEqual(actual, expected, { places: 13, prefix: `variability skewness MAR ${m}` });
             }
         });
     });
@@ -1028,8 +1021,8 @@ describe('Measures', () => {
 
         it('check ordering', () => {
             const m = makeMeasures();
-            // JB is NaN before enough data: false before validating confidence.
-            expect(m.isNormalDistribution(2)).toBeFalse();
+            // Invalid confidence is rejected even before enough data.
+            expect(() => m.isNormalDistribution(2)).toThrowError('confidence must be between 0 and 1');
             // Rachev checks n < 2 before validating alpha and beta.
             m.addReturn(0.01, 0.01);
             expect(m.rachevRatio(0, 0)).toBeNaN();

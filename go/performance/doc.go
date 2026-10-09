@@ -33,10 +33,12 @@
 //   - Only methods that validate their arguments return an error
 //     (IsNormalDistribution, FarinelliTibilettiRatio, RachevRatio,
 //     CdarAverage, CdarDiscrete, CdarBeta, CdarAlpha, TailRatio,
-//     BiasRatio and the constructor). Methods that pass a confidence
+//     BiasRatio, RewardToConditionalDrawdown and the constructor). Methods that pass a confidence
 //     level to the core helpers (VaR, ES, Sharpe VaR/ES, reward-to-VaR/ES)
 //     return NaN for an invalid confidence level instead.
 //
 // This package is a port of the Python reference implementation
-// py/performance/measures.py and matches it to 13+ decimal places.
+// py/performance/measures.py. Ordinary-scale results match to 13+ decimal
+// places; large annualized values require relative tolerance because
+// transcendental functions can differ by several ulps across platforms.
 package performance

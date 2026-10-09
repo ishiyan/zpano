@@ -108,7 +108,7 @@ func (m *Measures) HurstExponent() float64 {
 // NaN when the standard deviation is undefined or zero. Returns an error
 // if stdDevMultiplier is not positive.
 func (m *Measures) BiasRatio(stdDevMultiplier float64) (float64, error) {
-	if stdDevMultiplier <= 0 {
+	if !(stdDevMultiplier > 0) {
 		return math.NaN(), errStdDevMultiplier
 	}
 
@@ -203,19 +203,13 @@ func (m *Measures) KRatio() float64 {
 	return slope / (seSlope * math.Sqrt(fn))
 }
 
-// GainToPainRatio returns Jack Schwager's gain-to-pain ratio as computed
-// by the reference implementation: the arithmetic mean return divided by
-// the sum Σmax(-r, 0) of the loss magnitudes, i.e. (Σr/Σlosses)/n.
-//
-// Note that the reference implementation divides by a sum rather than by
-// the first-order lower partial moment (a mean) that its documentation
-// describes; this port preserves that behavior.
-//
+// GainToPainRatio returns Jack Schwager's net sum of returns divided by
+// the sum of loss magnitudes: Σr / Σmax(-r, 0).
 // NaN when there are no losses.
 func (m *Measures) GainToPainRatio() float64 {
 	lpm1 := m.rawPartialMoments.LowerPartialMoment1()
 	if math.IsNaN(lpm1) || lpm1 == 0 {
 		return math.NaN()
 	}
-	return m.returnsKBN.Mean() / lpm1
+	return m.returnsKBN.X1Sum() / lpm1
 }

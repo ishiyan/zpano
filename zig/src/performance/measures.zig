@@ -23,7 +23,8 @@
 //! - `error.InvalidArgument` is returned exactly where Python raises
 //!   `ValueError` directly (`init`, `isNormalDistribution`,
 //!   `farinelliTibilettiRatio`, `rachevRatio`, `cdarAverage`,
-//!   `cdarDiscrete`, `cdarBeta`, `cdarAlpha`, `tailRatio`, `biasRatio`).
+//!   `cdarDiscrete`, `cdarBeta`, `cdarAlpha`, `tailRatio`, `biasRatio`,
+//!   `rewardToConditionalDrawdown`).
 //! - VaR/ES based measures (`var*`, `es*`, `rewardTo*Ratio*`,
 //!   `sharpeRatioVar*`, `sharpeRatioEs*`), whose Python versions raise only
 //!   indirectly through core helpers, return NaN exactly where Python would
@@ -67,12 +68,11 @@ pub const AddReturnError = Allocator.Error || error{EmptyRevert};
 /// `Measures.isNormalDistribution`: true when `jb <= -2·ln(1 - confidence)`
 /// (the χ²(2) critical value).
 ///
-/// Returns false when `jb` is NaN (checked before validating
-/// `confidence`), `error.InvalidArgument` when `confidence <= 0` or
-/// `confidence >= 1` (Python ValueError).
+/// Returns false when `jb` is NaN and confidence is valid.
+/// Returns `error.InvalidArgument` unless confidence is in (0, 1), including NaN.
 pub fn isNormalFromJb(jb: f64, confidence: f64) error{InvalidArgument}!bool {
+    if (!(0 < confidence and confidence < 1)) return error.InvalidArgument;
     if (math.isNan(jb)) return false;
-    if (confidence <= 0 or confidence >= 1) return error.InvalidArgument;
     // For 2 degrees of freedom chi2.ppf(p, 2) = -2 ln(1 - p).
     const critical = -2.0 * math.log1p(-confidence);
     return jb <= critical;
@@ -516,7 +516,7 @@ pub const Measures = struct {
     ///
     /// True: normality cannot be rejected. False: normality is rejected or
     /// there is insufficient data (JB is NaN). `error.InvalidArgument`
-    /// when confidence ∉ (0, 1) and JB is not NaN. See `isNormalFromJb`.
+    /// when confidence ∉ (0, 1), including NaN. See `isNormalFromJb`.
     pub fn isNormalDistribution(self: *const Self, confidence: f64) error{InvalidArgument}!bool {
         return isNormalFromJb(self.jarqueBeraNormalityTestStatistic(), confidence);
     }
@@ -1359,9 +1359,10 @@ pub const Measures = struct {
 
     /// Reward to conditional drawdown: geometric mean return divided by the
     /// mean magnitude of the worst max(1, int(n · (1 - confidence)))
-    /// drawdowns (Python default confidence = 0.95; not validated). NaN
-    /// when empty (and when confidence is NaN, where Python raises).
-    pub fn rewardToConditionalDrawdown(self: *const Self, confidence: f64) Allocator.Error!f64 {
+    /// drawdowns (Python default confidence = 0.95). NaN when empty.
+    /// Returns `error.InvalidArgument` unless confidence is in (0, 1).
+    pub fn rewardToConditionalDrawdown(self: *const Self, confidence: f64) Error!f64 {
+        if (!(0 < confidence and confidence < 1)) return error.InvalidArgument;
         const cagr = self.cumulative_return.geometricMeanReturn();
         if (math.isNan(cagr)) return nan;
 
@@ -1370,7 +1371,6 @@ pub const Measures = struct {
         if (dd.len < 1) return nan;
 
         const t = fl(dd.len) * (1 - confidence);
-        if (math.isNan(t)) return nan;
         const n_tail: usize = if (t >= fl(dd.len)) dd.len else if (t < 1) 1 else @intFromFloat(t);
         std.mem.sort(f64, dd, {}, std.sort.asc(f64)); // Most negative first
         const sorted_tail = dd[0..n_tail];
@@ -1464,11 +1464,10 @@ pub const Measures = struct {
         return if (te != 0) self.activePremium() / te else nan;
     }
 
-    /// Modified information ratio (Israelson): the information ratio when
-    /// the arithmetic mean active return is positive, otherwise its
-    /// negation.
+    /// Information ratio when the annualized geometric active premium is
+    /// positive, and its negation otherwise.
     pub fn informationRatioModified(self: *const Self) f64 {
-        const excess = self.active_returns_kbn.mean();
+        const excess = self.activePremium();
         const ir = self.informationRatio();
         if (math.isNan(excess) or math.isNan(ir)) return nan;
         return if (excess > 0) ir else -ir;
@@ -1640,9 +1639,9 @@ pub const Measures = struct {
     /// Bias ratio: count(0 <= r <= k·sigma) / (1 + count(-k·sigma <= r < 0))
     /// (Python default std_dev_multiplier = 1.0). O(n).
     ///
-    /// `error.InvalidArgument` when std_dev_multiplier <= 0.
+    /// `error.InvalidArgument` when std_dev_multiplier is nonpositive or NaN.
     pub fn biasRatio(self: *const Self, std_dev_multiplier: f64) error{InvalidArgument}!f64 {
-        if (std_dev_multiplier <= 0) return error.InvalidArgument;
+        if (!(std_dev_multiplier > 0)) return error.InvalidArgument;
         const s = self.returns_kbn.standardDeviationDdof1();
         if (math.isNan(s) or s == 0) return nan;
         const threshold = std_dev_multiplier * s;
@@ -1706,13 +1705,12 @@ pub const Measures = struct {
         return slope / (se_slope * @sqrt(n));
     }
 
-    /// Jack Schwager's gain-to-pain ratio as implemented in Python:
-    /// mean(r) / Σmax(-r, 0) (the denominator is a raw partial moment
-    /// sum, not a mean).
+    /// Jack Schwager's gain-to-pain ratio: Σr / Σmax(-r, 0).
+    /// NaN when there are no losses.
     pub fn gainToPainRatio(self: *const Self) f64 {
         const lpm1 = self.raw_partial_moments.lowerPartialMoment1();
         if (math.isNan(lpm1) or lpm1 == 0) return nan;
-        return self.returns_kbn.mean() / lpm1;
+        return self.returns_kbn.x1Sum() / lpm1;
     }
 
     // ── Capture ──────────────────────────────────────────────────────────

@@ -31,7 +31,7 @@ No dependency on `daycounting`, `entities`, or `indicators`. Measures take no ti
 |---|---|---|---|---|
 | `__init__.py` | `doc.go` | `index.ts` | `mod.rs` | `performance.zig` (barrel, build module `performance`) |
 | `measures.py` | `measures.go` + `measures_{distribution,ratios,drawdowns,benchmark,misc}.go` (split by family) | `measures.ts` | `measures.rs` | `measures.zig` |
-| `test_measures.py` | `measures_test.go`, `measures_helpers_test.go`, `measures_<family>_test.go` | `measures.spec.ts`, `measures-drawdowns-benchmark.spec.ts`, `measures-test-helpers.ts` | `measures_tests/` (`mod.rs` helpers + `general`, `risk`, `ratios`, `drawdowns`, `benchmark`, `formulas`) | `measures_test.zig`, `measures_test_2.zig` |
+| `test_measures.py`, `test_review_regressions.py` | `measures_test.go`, `measures_helpers_test.go`, `measures_<family>_test.go`, `measures_review_test.go` | `measures.spec.ts`, `measures-drawdowns-benchmark.spec.ts`, `measures-test-helpers.ts`, `measures-review.spec.ts` | `measures_tests/` (`mod.rs` helpers + `general`, `risk`, `ratios`, `drawdowns`, `benchmark`, `formulas`, `review`) | `measures_test.zig`, `measures_test_2.zig`, `measures_review_test.zig` |
 | `core/__init__.py` | `core/doc.go` (package `core`) | `core/index.ts` | `core/mod.rs` | `core/core.zig` |
 | `core/drawdown_episodes.py` | `core/drawdownepisodes.go` | `core/drawdown-episodes.ts` | `core/drawdown_episodes.rs` | `core/drawdown_episodes.zig` |
 | `core/test_*.py` | `core/*_test.go` (+ `helpers_test.go`) | `core/*.spec.ts` | inline `#[cfg(test)]` (+ `risk_helpers_tests.rs`, `test_support` in `core/mod.rs`) | inline `test` blocks (+ internal `core/fifo_buffer.zig`) |
@@ -83,13 +83,17 @@ Measures(periods_per_annum=252, annual_risk_free_rate=0, annual_target_return=0,
 2. `update` every accumulator with the new pair, append to the windows.
 3. High-watermark drawdown and drawdown episodes have **no revert**: `HighWaterMarkDrawdown.update` evicts internally and returns `recalculated=True` when it had to recompute the window. If `recalculated or evicted`, episodes are rebuilt with `episodes.recalculate(hwm.drawdowns)` (O(w), keeps indices window-relative); otherwise `episodes.update(hwm.drawdown)` (O(1)).
 
-Inputs are not validated; `ret <= −1` fails in `log1p`.
+Inputs are not validated. Python raises from `log1p` if the portfolio return,
+benchmark return, or their risk-free-adjusted returns are ≤ −1; the ports use
+IEEE NaN/inf instead. Successful numerical parity assumes these log arguments
+are in domain. Zig allocation failure can leave `Measures` partially updated;
+call `reset()` before reusing it, as documented on `addReturn`.
 
 ## Core Helpers (`core/`)
 
 | Helper | Purpose |
 |---|---|
-| `norm_cdf`, `norm_pdf`, `norm_ppf` | Standard normal; `norm_ppf` = Acklam rational approximation, error unless 0 < p < 1 |
+| `norm_cdf`, `norm_pdf`, `norm_ppf` | Standard normal; `norm_ppf` = Acklam rational approximation, error for p ≤ 0 or p ≥ 1 (NaN passes and yields NaN) |
 | `percentile(window, q)` | NumPy "linear" percentile; error if q ∉ [0,1] or window empty |
 | `var_historical/gaussian/cornish_fisher` | VaR from window / moments (Gaussian and CF use ddof=0 σ; CF falls back to Gaussian when S or K is NaN) |
 | `es_historical/gaussian/cornish_fisher` | Expected shortfall, same conventions |
@@ -109,7 +113,7 @@ Inputs are not validated; `ret <= −1` fails in `log1p`.
 Notation: r return, e = r − rf, T periodic target, b benchmark, n window size, P periods per annum, `LPMk/HPMk` partial moments about T (÷n), `Gm = expm1(Σlog1p r / n)`, `Gann = expm1(Σlog1p r · P/n)`. **P** = property, **M** = method (Python defaults shown; explicit arguments in Go/Rust/Zig). Unless noted: O(1), not annualized, NaN when undefined.
 
 ### Moments and normality (`_returns_kbn`)
-`skewness` (g1), `skewness_moment`, `skewness_fisher` (n≥3), `skewness_sample` (n≥3), `kurtosis` (β2−3), `kurtosis_excess`, `kurtosis_moment`, `kurtosis_sample_excess` (n≥4), `kurtosis_sample_corrected` (PA "sample"), `kurtosis_sample` — all from `RawMomentsKleinKBN` (see the streaming-kbn skill). `skewness_kurtosis_ratio = g1/β2`; `jarque_bera_normality_test_statistic = n/6·(g1² + (β2−3)²/4)`; M `is_normal_distribution(confidence=0.95) → bool` = JB ≤ −2·ln(1−c) (False if JB is NaN; error if c ∉ (0,1)).
+`skewness` (g1), `skewness_moment`, `skewness_fisher` (n≥3), `skewness_sample` (n≥3), `kurtosis` (β2−3), `kurtosis_excess`, `kurtosis_moment`, `kurtosis_sample_excess` (n≥4), `kurtosis_sample_corrected` (PA "sample"), `kurtosis_sample` — all from `RawMomentsKleinKBN` (see the streaming-kbn skill). `skewness_kurtosis_ratio = g1/β2`; `jarque_bera_normality_test_statistic = n/6·(g1² + (β2−3)²/4)`; M `is_normal_distribution(confidence=0.95) → bool` = JB ≤ −2·ln(1−c) (validates c ∈ (0,1), rejecting NaN, before returning False if JB is NaN).
 
 ### Return and growth (`_cumulative_return`)
 `cumulative_geometric_return` (0.0 empty), `geometric_mean_return` (Gm), `compound_annual_growth_rate` (Gann).
@@ -130,11 +134,11 @@ M `var_historical / var_gaussian / var_cornish_fisher`, `es_historical / es_gaus
 `mean_non_zero_return`, `mean_win_return`, `mean_loss_return`, `win_rate`, `loss_rate`.
 
 ### Drawdowns
-- Lists: `drawdowns_cumulative` = `drawdowns_high_watermark` (copy of the per-observation drawdowns, PA `Drawdowns()`), M `drawdowns_continuous_runs(max_runs=None)` (R percent convention; sorted worst-first and truncated when `max_runs > 0`).
+- Lists: `drawdowns_cumulative` = `drawdowns_high_watermark` (copy of the per-observation drawdowns, PA `Drawdowns()`), M `drawdowns_continuous_runs(max_runs=None)` (R percent convention; chronological by default, sorted worst-first and truncated when `max_runs > 0`).
 - `min_drawdowns_cumulative` (≤ 0), `worst_drawdowns_cumulative` (|min|) — O(n).
 - `calmar_ratio = Gm/|MDD|`, M `sterling_ratio(excess=0.1) = Gm/(|MDD| + excess)` (not annualized, PA scale=1), `burke_ratio = (Gm − rf)/√ΣDD²`, `burke_ratio_modified = burke·√n`, `pain_index = −mean(D)`, `pain_ratio`, `ulcer_index = √mean(D²)`, `martin_ratio`.
 - Episodes (0.0 when none): `drawdown_average`, `drawdown_average_length`, `drawdown_average_peak_to_trough`, `drawdown_average_recovery`, `drawdown_deviation = √(Σdepth²/n_obs)`.
-- CDaR (confidence = 0.95, error if ∉ (0,1)): M `cdar_average` (continuous path), `cdar_discrete` (episode depths, PA default), `cdar_beta` (benchmark episodes vs portfolio returns), `cdar_alpha` (annualized with P), `reward_to_conditional_drawdown` (no validation).
+- CDaR (confidence = 0.95, error if ∉ (0,1)): M `cdar_average` (continuous path), `cdar_discrete` (episode depths, PA default), `cdar_beta` (benchmark episodes vs portfolio returns), `cdar_alpha` (annualized with P), `reward_to_conditional_drawdown` (Gm / mean magnitude of the worst `max(1, int(n·(1-c)))` path drawdowns).
 
 ### SFM / benchmark (x = b − rf, y = r − rf)
 `sfm_risk_premium`, `sfm_alpha`, `sfm_beta`, `sfm_beta_bull`, `sfm_beta_bear`, `timing_ratio = β_bull/β_bear`, `sfm_r2`, `jensen_alpha = Gann_p − (β·Gann_b + (1−β)·rf_a)` (annual), `fama_beta = σ0(r)/σ0(b)`, `modigliani` (periodic), `tracking_error = σ1(r−b)·√P`, `active_premium = Gann_p − Gann_b`, `information_ratio`, `information_ratio_modified`, `systematic_risk = |β|·σ1(b−rf)·√P`, `treynor_ratio`, `treynor_ratio_modified`, `specific_risk` (O(n)), `total_risk = √(sys² + spec²)`, `appraisal_ratio`, `jensen_alpha_modified`, `jensen_alpha_alternative`, `m_squared`, `m_squared_excess`, `m_squared_sortino`. Annualized: Jensen family, tracking error, active premium, IR, systematic/specific/total risk, Treynor, M² family.
@@ -143,9 +147,26 @@ M `var_historical / var_gaussian / var_cornish_fisher`, `es_historical / es_gaus
 M `upside_capture_ratio(geometric=True)`, `downside_capture_ratio(geometric=True)`, `overall_capture_ratio(geometric=True)`; `up_number_ratio`, `down_number_ratio` (down bucket b ≤ 0), `up_percentage_ratio`, `down_percentage_ratio` (strict b < 0).
 
 ### Miscellaneous
-`autocorrelation_penalty` (Lo 2002, lag horizon from P, 1.0 when undefined, O(n·q)), M `tail_ratio(cutoff=0.95)` (not in R; error unless 0.5 < cutoff < 1), `kelly_ratio_full = mean(e)/Var1(e)`, `kelly_ratio` (half Kelly), `hurst_exponent` (single-scale R/S, O(n)), M `bias_ratio(std_dev_multiplier=1.0)` (O(n), error if ≤ 0), `k_ratio` (Kestner, O(n), plain sums), `gain_to_pain_ratio`.
+`autocorrelation_penalty` (Lo 2002, lag horizon from P, 1.0 when undefined, O(n·q)), M `tail_ratio(cutoff=0.95)` (not in R; error unless 0.5 < cutoff < 1), `kelly_ratio_full = mean(e)/Var1(e)`, `kelly_ratio` (half Kelly), `hurst_exponent` (single-scale R/S, O(n)), M `bias_ratio(std_dev_multiplier=1.0)` (O(n), error if nonpositive or NaN), `k_ratio` (Kestner, O(n), plain sums), `gain_to_pain_ratio`.
 
-**Known Python quirks preserved by all ports (do not "fix" in one language only):** `gain_to_pain_ratio` divides by a raw-partial-moment **sum** (effectively (Σr/Σlosses)/n), unlike its docstring; `drawdowns_continuous_runs` follows R's percent convention, so its docstring example is off; `information_ratio_modified` takes its sign from the arithmetic mean of active returns; `omega_excess_return` recomputes benchmark downside deviation over the window.
+### Behavioral contracts and compatibility
+
+- `gain_to_pain_ratio = Σr / Σmax(-r, 0)`, using compensated sums for both numerator and denominator. It returns NaN without losses and is independent of observation count when a series is repeated.
+- `drawdowns_continuous_runs` uses `(prod(1 + r_i * 0.01) - 1) * 100`, following R's Burke percent convention. Without a positive `max_runs`, runs remain chronological; only truncated results are sorted worst-first.
+- `down_number_ratio` includes zero benchmark returns (`b ≤ 0`). `down_percentage_ratio` uses strict `b < 0`.
+- `information_ratio_modified` returns IR when the annualized geometric `active_premium > 0`, otherwise −IR. It does not branch on arithmetic active mean. This sign adjustment retains inverse tracking-error scaling and is not Israelson's tracking-error exponent modification.
+- `is_normal_distribution` and `reward_to_conditional_drawdown` validate `0 < confidence < 1` before data-availability fallbacks, rejecting NaN and infinities even on empty instances. With valid confidence and an undefined JB statistic, normality returns False.
+- `bias_ratio` requires a positive multiplier, rejecting NaN before data-availability checks. Positive infinity remains accepted.
+- In `reference_data/volatility_skewness.py`, `…_VOLATILITY` contains `sqrt(HPM2/LPM2)` and `…_VARIABILITY` contains `HPM2/LPM2`. Each MAR fixture contains exactly 24 observations; tests use the matching label.
+- `omega_excess_return` recomputes benchmark downside deviation over the window.
+
+The review corrections changed gain-to-pain numerical results, modified-IR
+sign selection, and invalid-argument behavior in every language. Go
+`RewardToConditionalDrawdown` now returns `(float64, error)`; Rust
+`reward_to_conditional_drawdown` returns `Result<f64, String>`; Zig's method
+adds `error.InvalidArgument` to its error union. Update callers accordingly.
+See [the port review and fix record](../../../notes/performance/performance_port_review.md)
+for regressions, validation evidence, and numerical limits.
 
 ## Cross-Language Conventions
 
@@ -165,7 +186,7 @@ M `upside_capture_ratio(geometric=True)`, `downside_capture_ratio(geometric=True
 | Rust | `Result<T, String>` |
 | Zig | error unions (`!T`), plus `error.OutOfMemory` where allocation happens |
 
-Fallible: constructor, `is_normal_distribution`, `farinelli_tibiletti_ratio`, `rachev_ratio`, `cdar_average/discrete/beta/alpha`, `tail_ratio`, `bias_ratio`, core `norm_ppf`, `percentile`, `CumulativeReturn.revert`. Measures that call these with always-valid internal arguments are not fallible.
+Fallible: constructor, `is_normal_distribution`, `farinelli_tibiletti_ratio`, `rachev_ratio`, `cdar_average/discrete/beta/alpha`, `tail_ratio`, `bias_ratio`, `reward_to_conditional_drawdown`, core `norm_ppf`, `percentile`, `CumulativeReturn.revert`. Measures that call these with always-valid internal arguments are not fallible.
 
 ### Naming
 
@@ -181,19 +202,33 @@ Rolling windows: Go slices (append + reslice), TS arrays (push/shift), Rust `Vec
 
 Invalid `confidence` for VaR/ES-based measures (Python raises only indirectly, from `percentile`/`norm_ppf`): Go, Rust and Zig return NaN exactly where Python would raise (historical variants accept c = 0 and c = 1; Gaussian/Cornish-Fisher need the `norm_ppf` argument in (0,1)); TS throws like Python. Zig methods that need scratch memory (historical VaR/ES, Rachev, CDaR, tail ratio, list results) return `!f64` / `![]f64` (`error.OutOfMemory`); returned lists are freed with the `Measures` allocator.
 
-The ports reproduce Python's compensated built-in `sum()` (Python ≥ 3.12) where measures use it (Rachev, reward-to-conditional-drawdown) and Python's `min`/`max` NaN ordering. `erf` is a private fdlibm port in TS, Rust and Zig (bit-identical to CPython's `math.erf`).
+All four ports reproduce Python's compensated built-in `sum()` (Python ≥ 3.12)
+for Rachev and reward-to-conditional-drawdown, retaining input order and the
+non-finite correction fallback. Do not replace these sums with ordinary
+iterator sums: long series can otherwise miss the precision target.
+
+`erf` is a private fdlibm port in TS, Rust and Zig, matching the glibc-based
+CPython reference on the tested platform. Transcendental functions are platform
+dependent: Go/Zig `pow` may differ from Python's libm by several ulps. Large
+annualized outputs need relative tolerance; a blanket guarantee of 13 absolute
+decimal places for arbitrarily large outputs is not achievable.
 
 ## Tests and Reference Data
 
 - **Dataset:** "portfolio_bacon" from PerformanceAnalytics: Bacon (2008, 2nd ed.) p. 65 portfolio and p. 66 benchmark returns, 24 observations each, defined at the top of `test_measures.py`.
 - **Streaming checks:** most measure tests stream the 24 observations through a fresh `Measures` and compare each intermediate value with a 24-element expected list (`run_stream_method` / `run_stream_property`), for several rf/MAR/confidence values and daily/monthly/annual P. Rolling-window tests check that a window of size w equals a fresh instance fed with the last w observations.
-- **Reference data:** `py/performance/reference_data/*.py` are pure literals: lists, and dicts keyed by float/int/bool/str (or nested float→float dicts). The port files are **generated** from them, not hand-edited: each file starts with `Code generated … DO NOT EDIT.`, and floats use Python `repr` so they round-trip exactly. Shapes per language:
+- **Expected-value provenance:** the R scripts documented in [performance_analytics_reference_data_generation.md](../../../notes/performance/performance_analytics_reference_data_generation.md) produced the PerformanceAnalytics expected values using the online R interpreter described there. R output was recorded in `py/performance/reference_data/*.py`; measures without R data use manual/formula-based fixtures. The Python-to-port generator is a source translator, not the producer of R results or an independent mathematical oracle.
+- **Reference-data translation:** `py/performance/reference_data/*.py` contain literal lists and dicts keyed by float/int/bool/str (or nested float→float dicts). [notes/performance/gen.py](../../../notes/performance/gen.py), formerly `/tmp/gen_perf_refdata/gen.py`, imports them and emits all four port trees. The port files are **generated**, not hand-edited: each data file starts with `Code generated … DO NOT EDIT.`, and floats use Python `repr` so they round-trip exactly. Shapes per language:
   - Go: package-level `var <Module><Name>` holding `[]float64` / `map[float64][]float64` / `map[bool]…` / `map[string]…` / nested maps.
   - TS: `export const NAME: readonly number[] | ReadonlyMap<…>`.
   - Rust: `pub const NAME: &[f64]` / `&[(K, &[f64])]` plus `reference_data::lookup(pairs, key)`.
   - Zig: `pub const name: []const f64` / `[]const Entry(K, V)` plus `reference_data.lookup(K, V, entries, key)`; the module `var` is imported as `@"var"`.
 
-  To regenerate after a Python change, rerun the generator that imports `py.performance.reference_data` and re-emits the four trees, then rebuild every language.
+  After changing Python reference fixtures, run `python3 notes/performance/gen.py`
+  from the repository root, format the Go output (Rust fixtures currently retain
+  the generator's formatting), and rebuild every language.
+  An optional output-root argument supports comparison without overwriting the
+  checked-in trees: `python3 notes/performance/gen.py /tmp/perf-refdata`.
 - **Python-only test mechanics:** the `inspect`-based `public_measures()` becomes an explicit list in the ports. The `PropertyMock` patch of the JB statistic becomes a direct test of the decision rule. `random.Random(seed)` becomes each language's own seeded PRNG with the same distributions; any assertion that depends on Python's exact random stream is adapted to an equivalent invariant.
 - **Tolerances:** `assertAlmostEqual(places=N)` maps to Go/Rust/Zig `|a−b| ≤ 0.5·10⁻ᴺ` (or `1e-N`) and TS `toBeCloseTo(x, N)`. Large reference values use a relative tolerance (see `TestSeriesAssertions`).
 

@@ -456,11 +456,9 @@ test "TestInformationRatio test_matches_performance_analytics_output" {
 test "TestInformationRatioModified test_sign_rule" {
     var m = try makeMeasures(.{ .monthly = true });
     defer m.deinit();
-    var diffs: [n_bacon]f64 = undefined;
     for (0..n_bacon) |i| {
         try m.addReturn(bp[i], bb[i]);
-        diffs[i] = bp[i] - bb[i];
-        const active = fsum(diffs[0 .. i + 1]);
+        const active = m.activePremium();
         const ir = m.informationRatio();
         const expected = if (math.isNan(ir)) nan else if (active > 0) ir else -ir;
         try expectFloat(m.informationRatioModified(), expected, .{}, "step {d}", .{i});

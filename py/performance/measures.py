@@ -611,12 +611,16 @@ class Measures:
         Returns:
             True  : normality cannot be rejected.
             False : normality is rejected  or insufficient data to perform the test.
+
+        Raises:
+            ValueError: If confidence is outside (0, 1), including NaN,
+                even when there are insufficient observations.
         """
+        if not 0 < confidence < 1:
+            raise ValueError("confidence must be between 0 and 1")
         bj = self.jarque_bera_normality_test_statistic
         if math.isnan(bj):
             return False
-        if confidence <= 0 or confidence >= 1:
-            raise ValueError("confidence must be between 0 and 1")
 
         # Pure Python inverse CDF for Chi-Squared distribution with 2 degrees of freedom.
         #
@@ -2630,7 +2634,7 @@ class Measures:
     
         For a losing run consisting of returns ``r_a, ..., r_b``:
     
-            DD_j = prod(1 + r_i) - 1
+            DD_j = (prod(1 + r_i * 0.01) - 1) * 100
     
         for ``i = a, ..., b``.
     
@@ -2643,15 +2647,18 @@ class Measures:
     
         contain two continuous losing runs:
     
-            (0.99 * 0.98) - 1 = -0.0298
-            (0.97 * 0.96) - 1 = -0.0688
+            (0.9999 * 0.9998 - 1) * 100 = -0.029998
+            (0.9997 * 0.9996 - 1) * 100 = -0.069988
     
         The resulting drawdowns are therefore approximately::
     
-            [-0.0298, -0.0688]
+            [-0.029998, -0.069988]
     
-        Drawdowns are non-positive and are expressed using the same
-        normalized return convention as the input returns.
+        This follows R PerformanceAnalytics' BurkeRatio percent convention:
+        input returns are divided by 100 before compounding, and the result
+        is multiplied by 100. For decimal returns, this is close to the sum
+        of each run's returns rather than ordinary decimal compounding.
+        Drawdowns are non-positive.
     
         This representation is used by the Burke ratio, whose denominator
         is based on the square root of the sum of squared continuous
@@ -3242,11 +3249,13 @@ class Measures:
         Uses historical CDaR as the average of worst (1-confidence) drawdowns.
         
         Args:
-            confidence: Confidence level for conditional drawdown
+            confidence: Confidence level in (0, 1). Invalid values raise ValueError.
             
         Returns:
             Reward-to-CDaR or math.nan
         """
+        if not 0 < confidence < 1:
+            raise ValueError("confidence must be between 0 and 1")
         cagr = self._cumulative_return.geometric_mean_return
         if math.isnan(cagr):
             return math.nan
@@ -3667,11 +3676,10 @@ class Measures:
     @property
     def information_ratio_modified(self) -> float:
         """
-        Modified Information Ratio (Israelson).
+        Sign-adjusted Information Ratio.
 
-        A sign-adjusted version of the Information Ratio that avoids the
-        undesirable interpretation of a higher Information Ratio when
-        active return is negative and tracking error increases.
+        Uses the annualized geometric active premium to choose whether to
+        retain or negate the conventional Information Ratio.
 
         The conventional Information Ratio is::
 
@@ -3682,17 +3690,16 @@ class Measures:
             MIR = IR,   if active_premium > 0
                   -IR,  otherwise
 
-        Thus, positive active performance retains the conventional
-        Information Ratio, while negative active performance is reported
-        with the opposite sign so that increasing tracking error cannot
-        make a negatively performing strategy appear less unfavorable.
+        The active premium is the difference between the portfolio and
+        benchmark annualized geometric returns. This sign adjustment is
+        not Israelson's tracking-error exponent modification; the result
+        still scales inversely with tracking error.
 
         Returns:
             float: Modified Information Ratio, or ``math.nan`` when the
             active premium or Information Ratio is unavailable.
         """
-        # Active premium = mean(Rp - Rb)
-        excess = self._active_returns_kbn.mean
+        excess = self.active_premium
         ir = self.information_ratio
         if math.isnan(excess) or math.isnan(ir):
             return math.nan
@@ -4315,10 +4322,12 @@ class Measures:
         Returns:
             float:
                 Bias Ratio, or ``math.nan`` when there are insufficient
-                observations, the standard deviation is undefined or zero,
-                or the multiplier is invalid.
+                observations or the standard deviation is undefined or zero.
+
+        Raises:
+            ValueError: If the multiplier is nonpositive or NaN.
         """
-        if std_dev_multiplier <= 0:
+        if not std_dev_multiplier > 0:
             raise ValueError("std_dev_multiplier must be positive")
         w = self._returns
         if w is None:
@@ -4479,7 +4488,7 @@ class Measures:
         lpm1 = self._raw_partial_moments.lower_partial_moment_1
         if math.isnan(lpm1) or lpm1 == 0:
             return math.nan
-        return self._returns_kbn.mean / lpm1
+        return self._returns_kbn.x1_sum / lpm1
 
     def upside_capture_ratio(self, geometric: bool = True) -> float:
         """
@@ -4631,13 +4640,13 @@ class Measures:
         Down Number Ratio.
 
         Measures the frequency with which the investment had a negative
-        return during periods when the benchmark had a negative return.
+        return during periods when the benchmark had a nonpositive return.
 
         The ratio is calculated as::
 
             down_number_ratio =
-                number(asset_return < 0 and benchmark_return < 0)
-                / number(benchmark_return < 0)
+                number(asset_return < 0 and benchmark_return <= 0)
+                / number(benchmark_return <= 0)
 
         A value of ``0.0`` means that the investment had no negative returns
         during benchmark-down periods, while ``1.0`` means that it was
@@ -4651,7 +4660,7 @@ class Measures:
         Returns:
             float:
                 Down Number Ratio, or ``math.nan`` when the benchmark has no
-                negative-return periods.
+                nonpositive-return periods.
         """
         return self._capture.down_number_ratio
 

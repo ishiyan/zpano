@@ -786,12 +786,11 @@ test "TestIsNormalDistribution test_mocked_jb" {
     try testing.expect(try isNormalFromJb(8.0, 0.99));
     try testing.expect(!try isNormalFromJb(10.0, 0.99));
 
-    // The method delegates to the rule (JB is NaN when empty, checked
-    // before the confidence).
+    // The method validates confidence even when JB is NaN.
     var m = try Measures.init(ta, 1, 0, 0, 0);
     defer m.deinit();
     try testing.expect(!try m.isNormalDistribution(0.95));
-    try testing.expect(!try m.isNormalDistribution(1.0));
+    try expectInvalid(m.isNormalDistribution(1.0));
 }
 
 test "TestVarCornishFisher test_matches_performance_analytics_output" {
@@ -1185,26 +1184,16 @@ test "TestLossRate test_calculated_by_hand" {
     try expectSeries(actual, rd.loss_rate.expected_values, .{}, "loss rate", .{});
 }
 
-fn baconReference(expected: []const f64) ![]const f64 {
-    // The MAR 0.2 and 0.3 fixtures contain three extra trailing zeros.
-    // Compare the 24 observations that correspond to the Bacon inputs.
-    if (expected.len > bacon_portfolio_len) {
-        for (expected[bacon_portfolio_len..]) |x| try testing.expect(x == 0);
-        return expected[0..bacon_portfolio_len];
-    }
-    return expected;
-}
-
 test "TestVolatilitySkewness test_matches_performance_analytics_output" {
-    for (rd.volatility_skewness.expected_values_by_mar_variability) |e| {
+    for (rd.volatility_skewness.expected_values_by_mar_volatility) |e| {
         const actual = try runStream(.{ .mar = e.key }, Measures.volatilitySkewness, .{});
         defer ta.free(actual);
-        try expectSeries(actual, try baconReference(e.value), .{ .places = 13 }, "volatility skewness MAR {d}", .{e.key});
+        try expectSeries(actual, e.value, .{ .places = 13 }, "volatility skewness MAR {d}", .{e.key});
     }
-    for (rd.volatility_skewness.expected_values_by_mar_volatility) |e| {
+    for (rd.volatility_skewness.expected_values_by_mar_variability) |e| {
         const actual = try runStream(.{ .mar = e.key }, Measures.variabilitySkewness, .{});
         defer ta.free(actual);
-        try expectSeries(actual, try baconReference(e.value), .{ .places = 13 }, "variability skewness MAR {d}", .{e.key});
+        try expectSeries(actual, e.value, .{ .places = 13 }, "variability skewness MAR {d}", .{e.key});
     }
 }
 

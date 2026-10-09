@@ -1,7 +1,7 @@
 // Code generated from py/performance/reference_data/volatility_skewness.py. DO NOT EDIT.
 
-/** volatility_skewness.EXPECTED_VALUES_BY_MAR_VOLATILITY */
-export const EXPECTED_VALUES_BY_MAR_VOLATILITY: ReadonlyMap<number, readonly number[]> = new Map([
+/** volatility_skewness.EXPECTED_VALUES_BY_MAR_VARIABILITY */
+export const EXPECTED_VALUES_BY_MAR_VARIABILITY: ReadonlyMap<number, readonly number[]> = new Map([
     [0.0, [
         NaN, NaN, NaN, 8.06,
         10.31, 16.56, 19.12, 64.01,
@@ -68,8 +68,8 @@ export const EXPECTED_VALUES_BY_MAR_VOLATILITY: ReadonlyMap<number, readonly num
     ]],
 ]);
 
-/** volatility_skewness.EXPECTED_VALUES_BY_MAR_VARIABILITY */
-export const EXPECTED_VALUES_BY_MAR_VARIABILITY: ReadonlyMap<number, readonly number[]> = new Map([
+/** volatility_skewness.EXPECTED_VALUES_BY_MAR_VOLATILITY */
+export const EXPECTED_VALUES_BY_MAR_VOLATILITY: ReadonlyMap<number, readonly number[]> = new Map([
     [0.0, [
         NaN, NaN, NaN, 2.83901391331568,
         3.21091887160046, 4.06939798987516, 4.37264222181509, 8.00062497558785,
@@ -125,7 +125,6 @@ export const EXPECTED_VALUES_BY_MAR_VARIABILITY: ReadonlyMap<number, readonly nu
         0.0, 0.0, 0.0, 0.0,
         0.0, 0.0, 0.0, 0.0,
         0.0, 0.0, 0.0, 0.0,
-        0.0, 0.0, 0.0,
     ]],
     [0.3, [
         0.0, 0.0, 0.0, 0.0,

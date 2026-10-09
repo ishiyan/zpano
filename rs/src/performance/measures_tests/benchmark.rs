@@ -171,13 +171,12 @@ fn test_information_ratio_matches_performance_analytics_output() {
 
 #[test]
 fn test_information_ratio_modified_sign_rule() {
-    // Equals information_ratio when the mean active return is positive,
+    // Equals information_ratio when the geometric active premium is positive,
     // otherwise its negation.
     let mut m = make_measures(0, 0.0, 0.0, MONTHLY);
     for i in 0..BACON_PORTFOLIO_LEN {
         m.add_return(BACON_PORTFOLIO_RETURNS[i], BACON_BENCHMARK_RETURNS[i]);
-        let diffs: Vec<f64> = (0..=i).map(|j| BACON_PORTFOLIO_RETURNS[j] - BACON_BENCHMARK_RETURNS[j]).collect();
-        let active = fsum(&diffs);
+        let active = m.active_premium();
         let ir = m.information_ratio();
         let expected = if ir.is_nan() { f64::NAN } else if active > 0.0 { ir } else { -ir };
         assert_float(m.information_ratio_modified(), expected, Places(15), &format!("step {i}"));

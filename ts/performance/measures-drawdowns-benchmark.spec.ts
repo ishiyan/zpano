@@ -526,12 +526,12 @@ describe('Measures', () => {
 
     describe('InformationRatioModified', () => {
         it('sign rule', () => {
-            // Equals informationRatio when the mean active return is positive,
+            // Equals informationRatio when the geometric active premium is positive,
             // otherwise its negation.
             const m = makeMeasures(0, 0, 0, false, true);
             for (let i = 0; i < baconPortfolioLen; i++) {
                 m.addReturn(baconPortfolioReturns[i], baconBenchmarkReturns[i]);
-                const active = fsum(baconPortfolioReturns.slice(0, i + 1).map((r, j) => r - baconBenchmarkReturns[j]));
+                const active = m.activePremium;
                 const ir = m.informationRatio;
                 const expected = Number.isNaN(ir) ? NaN : (active > 0 ? ir : -ir);
                 assertFloatEqual(m.informationRatioModified, expected, { places: 15, prefix: `step ${i}` });

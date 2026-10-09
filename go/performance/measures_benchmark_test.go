@@ -155,16 +155,12 @@ func TestInformationRatioMatchesPerformanceAnalyticsOutput(t *testing.T) {
 
 func TestInformationRatioModifiedSignRule(t *testing.T) {
 	t.Parallel()
-	// Equals the information ratio when the mean active return is positive,
+	// Equals the information ratio when the geometric active premium is positive,
 	// otherwise its negation.
 	m := makeMeasures(t, 0, 0, 0, false, true)
 	for i := range baconPortfolioLen {
 		m.AddReturn(baconPortfolioReturns[i], baconBenchmarkReturns[i])
-		diffs := make([]float64, i+1)
-		for j := range i + 1 {
-			diffs[j] = baconPortfolioReturns[j] - baconBenchmarkReturns[j]
-		}
-		active := fsum(diffs)
+		active := m.ActivePremium()
 		ir := m.InformationRatio()
 		expected := ir
 		if math.IsNaN(ir) {

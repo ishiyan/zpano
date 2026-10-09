@@ -174,7 +174,7 @@ func (m *Measures) JarqueBeraNormalityTestStatistic() float64 {
 //
 // Returns true if normality cannot be rejected, false if it is rejected
 // or there is insufficient data to perform the test. Returns an error if
-// the statistic is available and confidence is not in (0, 1).
+// confidence is not in (0, 1), including NaN, even without observations.
 func (m *Measures) IsNormalDistribution(confidence float64) (bool, error) {
 	return isNormalFromJB(m.JarqueBeraNormalityTestStatistic(), confidence)
 }
@@ -182,11 +182,11 @@ func (m *Measures) IsNormalDistribution(confidence float64) (bool, error) {
 // isNormalFromJB is the decision rule of IsNormalDistribution for a given
 // Jarque–Bera statistic jb.
 func isNormalFromJB(jb, confidence float64) (bool, error) {
+	if !(0 < confidence && confidence < 1) {
+		return false, errConfidence
+	}
 	if math.IsNaN(jb) {
 		return false, nil
-	}
-	if confidence <= 0 || confidence >= 1 {
-		return false, errConfidence
 	}
 
 	// The χ² distribution with 2 degrees of freedom is the exponential

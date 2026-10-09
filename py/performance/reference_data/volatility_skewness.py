@@ -1,6 +1,6 @@
 import math
 
-EXPECTED_VALUES_BY_MAR_VOLATILITY = {
+EXPECTED_VALUES_BY_MAR_VARIABILITY = {
     0.0: [
     #math.inf, math.inf, math.inf,
     math.nan, math.nan, math.nan,
@@ -77,7 +77,7 @@ EXPECTED_VALUES_BY_MAR_VOLATILITY = {
     0, 0, 0]
 }
 
-EXPECTED_VALUES_BY_MAR_VARIABILITY = {
+EXPECTED_VALUES_BY_MAR_VOLATILITY = {
     0.0: [
     #math.inf, math.inf, math.inf,
     math.nan, math.nan, math.nan,
@@ -135,7 +135,6 @@ EXPECTED_VALUES_BY_MAR_VARIABILITY = {
     0, 0, 0,
     0, 0, 0],
     0.2: [
-    0, 0, 0,
     0, 0, 0,
     0, 0, 0,
     0, 0, 0,

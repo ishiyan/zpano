@@ -304,7 +304,7 @@ func TestRewardToConditionalDrawdownDefinition(t *testing.T) {
 			if cdar != 0 {
 				expected = m.GeometricMeanReturn() / cdar
 			}
-			assertFloatEqual(t, m.RewardToConditionalDrawdown(confidence), expected, places(15),
+			assertFloatEqual(t, must(m.RewardToConditionalDrawdown(confidence)), expected, places(15),
 				fmt.Sprintf("confidence %v step %d", confidence, i))
 		}
 	}

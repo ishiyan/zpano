@@ -116,7 +116,7 @@ var publicMeasures = []publicMeasure{
 	pf("prospect_ratio", func(m *Measures) float64 { return m.ProspectRatio(2.25) }),
 	pf("prospect_ratio_performance_analytics", (*Measures).ProspectRatioPerformanceAnalytics),
 	pfe("rachev_ratio", func(m *Measures) (float64, error) { return m.RachevRatio(0.1, 0.1) }),
-	pf("reward_to_conditional_drawdown", func(m *Measures) float64 { return m.RewardToConditionalDrawdown(0.95) }),
+	pfe("reward_to_conditional_drawdown", func(m *Measures) (float64, error) { return m.RewardToConditionalDrawdown(0.95) }),
 	pf("reward_to_es_ratio_cornish_fisher", func(m *Measures) float64 { return m.RewardToEsRatioCornishFisher(0.95) }),
 	pf("reward_to_es_ratio_gaussian", func(m *Measures) float64 { return m.RewardToEsRatioGaussian(0.95) }),
 	pf("reward_to_es_ratio_historical", func(m *Measures) float64 { return m.RewardToEsRatioHistorical(0.95) }),

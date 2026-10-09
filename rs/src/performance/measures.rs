@@ -43,6 +43,25 @@ fn ppf_ok(p: f64) -> bool {
     !(p <= 0.0 || p >= 1.0)
 }
 
+/// CPython 3.12+ float sum, preserving input order and non-finite fallback.
+fn py_sum(values: &[f64]) -> f64 {
+    let mut result: f64 = 0.0;
+    let mut correction: f64 = 0.0;
+    for &x in values {
+        let next = result + x;
+        if result.abs() >= x.abs() {
+            correction += (result - next) + x;
+        } else {
+            correction += (x - next) + result;
+        }
+        result = next;
+    }
+    if correction != 0.0 && correction.is_finite() {
+        result += correction;
+    }
+    result
+}
+
 /// Python `sorted()` of floats (stable, ascending).
 fn sorted(values: impl IntoIterator<Item = f64>) -> Vec<f64> {
     let mut v: Vec<f64> = values.into_iter().collect();
@@ -52,19 +71,18 @@ fn sorted(values: impl IntoIterator<Item = f64>) -> Vec<f64> {
 
 /// Jarque-Bera decision rule used by [`Measures::is_normal_distribution`].
 ///
-/// Returns `Ok(false)` when `jb` is NaN (checked before the confidence),
+/// Returns `Ok(false)` when `jb` is NaN and confidence is valid,
 /// otherwise `jb <= -2 ln(1 - confidence)` (the χ²(2) inverse CDF).
 ///
 /// # Errors
 ///
 /// `"confidence must be between 0 and 1"` unless `0 < confidence < 1`.
 pub(crate) fn is_normal_from_jb(jb: f64, confidence: f64) -> Result<bool, String> {
+    if !is_open_unit(confidence) {
+        return Err("confidence must be between 0 and 1".to_string());
+    }
     if jb.is_nan() {
         return Ok(false);
-    }
-    // As in Python, a NaN confidence passes this check (and yields false).
-    if confidence <= 0.0 || confidence >= 1.0 {
-        return Err("confidence must be between 0 and 1".to_string());
     }
     let critical = -2.0 * (-confidence).ln_1p();
     Ok(jb <= critical)
@@ -441,7 +459,7 @@ impl Measures {
 
     /// Jarque-Bera normality test: `Ok(true)` if normality cannot be
     /// rejected, `Ok(false)` if it is rejected or there is insufficient
-    /// data (NaN statistic, checked before the confidence).
+    /// data (NaN statistic with valid confidence).
     ///
     /// Python default: `confidence = 0.95`.
     ///
@@ -1143,7 +1161,7 @@ impl Measures {
         if lower_tail.is_empty() {
             return Ok(f64::NAN);
         }
-        let es_lower = -lower_tail.iter().sum::<f64>() / lower_tail.len() as f64;
+        let es_lower = -py_sum(&lower_tail) / lower_tail.len() as f64;
         let sorted_returns = sorted(returns.iter().copied());
         // PerformanceAnalytics: n.upper <- floor((1-beta) * n) (1-based).
         let upper_position = ((1.0 - beta) * n as f64).floor();
@@ -1159,7 +1177,7 @@ impl Measures {
         if upper_tail.is_empty() || es_lower == 0.0 {
             return Ok(f64::NAN);
         }
-        let es_upper = upper_tail.iter().sum::<f64>() / upper_tail.len() as f64;
+        let es_upper = py_sum(&upper_tail) / upper_tail.len() as f64;
         Ok(es_upper / es_lower)
     }
 
@@ -1439,24 +1457,26 @@ impl Measures {
 
     /// Geometric mean return over the mean magnitude of the worst
     /// `max(1, trunc(n · (1 - confidence)))` drawdowns.
-    /// `confidence` is not validated (a non-finite confidence selects one
-    /// drawdown, where Python raises).
+    /// Returns an error unless confidence is in (0, 1), including on empty data.
     ///
     /// Python default: `confidence = 0.95`.
-    pub fn reward_to_conditional_drawdown(&self, confidence: f64) -> f64 {
+    pub fn reward_to_conditional_drawdown(&self, confidence: f64) -> Result<f64, String> {
+        if !is_open_unit(confidence) {
+            return Err("confidence must be between 0 and 1".to_string());
+        }
         let cagr = self.cumulative_return.geometric_mean_return();
         if cagr.is_nan() {
-            return f64::NAN;
+            return Ok(f64::NAN);
         }
         let dd = self.drawdowns_cumulative();
         if dd.is_empty() {
-            return f64::NAN;
+            return Ok(f64::NAN);
         }
-        let n_tail = ((dd.len() as f64 * (1.0 - confidence)) as i64).max(1) as usize;
+        let n_tail = ((dd.len() as f64 * (1.0 - confidence)) as usize).max(1);
         let sorted_dd = sorted(dd);
         let sorted_tail = &sorted_dd[..n_tail.min(sorted_dd.len())];
-        let cdar = -sorted_tail.iter().sum::<f64>() / sorted_tail.len() as f64;
-        if cdar != 0.0 { cagr / cdar } else { f64::NAN }
+        let cdar = -py_sum(sorted_tail) / sorted_tail.len() as f64;
+        Ok(if cdar != 0.0 { cagr / cdar } else { f64::NAN })
     }
 
     // ------------------------------------------------------------------
@@ -1543,10 +1563,10 @@ impl Measures {
         if te != 0.0 { self.active_premium() / te } else { f64::NAN }
     }
 
-    /// Modified information ratio (Israelson): the information ratio with
-    /// the sign of the arithmetic mean active return.
+    /// Information ratio when the annualized geometric active premium is
+    /// positive, and its negation otherwise.
     pub fn information_ratio_modified(&self) -> f64 {
-        let excess = self.active_returns_kbn.mean();
+        let excess = self.active_premium();
         let ir = self.information_ratio();
         if excess.is_nan() || ir.is_nan() {
             return f64::NAN;
@@ -1781,9 +1801,9 @@ impl Measures {
     ///
     /// # Errors
     ///
-    /// `"std_dev_multiplier must be positive"` if `std_dev_multiplier <= 0`.
+    /// `"std_dev_multiplier must be positive"` if the multiplier is nonpositive or NaN.
     pub fn bias_ratio(&self, std_dev_multiplier: f64) -> Result<f64, String> {
-        if std_dev_multiplier <= 0.0 {
+        if !(std_dev_multiplier > 0.0) {
             return Err("std_dev_multiplier must be positive".to_string());
         }
         let std = self.returns_kbn.standard_deviation_ddof_1();
@@ -1855,15 +1875,14 @@ impl Measures {
         slope / (se_slope * nf.sqrt())
     }
 
-    /// Jack Schwager's gain-to-pain ratio, as implemented in Python:
-    /// mean return divided by the raw **sum** of losses Σmax(-r, 0)
-    /// (effectively (Σr / Σlosses) / n, unlike the textbook Σr / Σlosses).
+    /// Jack Schwager's gain-to-pain ratio: Σr / Σmax(-r, 0).
+    /// NaN when there are no losses.
     pub fn gain_to_pain_ratio(&self) -> f64 {
         let lpm1 = self.raw_partial_moments.lower_partial_moment_1();
         if lpm1.is_nan() || lpm1 == 0.0 {
             return f64::NAN;
         }
-        self.returns_kbn.mean() / lpm1
+        self.returns_kbn.x1_sum() / lpm1
     }
 
     // ------------------------------------------------------------------

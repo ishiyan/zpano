@@ -341,7 +341,7 @@ fn test_reward_to_conditional_drawdown_definition() {
             let cdar = -tail.iter().sum::<f64>() / tail.len() as f64;
             let expected = if cdar != 0.0 { m.geometric_mean_return() / cdar } else { f64::NAN };
             assert_float(
-                m.reward_to_conditional_drawdown(confidence),
+                m.reward_to_conditional_drawdown(confidence).unwrap(),
                 expected,
                 Places(15),
                 &format!("confidence {confidence} step {i}"),

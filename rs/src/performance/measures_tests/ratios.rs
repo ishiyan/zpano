@@ -138,24 +138,15 @@ fn test_loss_rate_calculated_by_hand() {
 
 // TestVolatilitySkewness
 
-/// The MAR 0.2 and 0.3 fixtures contain three extra trailing zeros;
-/// compare the 24 observations that correspond to the Bacon inputs.
-fn bacon_reference(expected: &[f64]) -> &[f64] {
-    let n = BACON_PORTFOLIO_LEN.min(expected.len());
-    assert!(expected[n..].iter().all(|&x| x == 0.0));
-    &expected[..n]
-}
-
 #[test]
 fn test_volatility_skewness_matches_performance_analytics_output() {
-    // The fixture names are swapped relative to the measures, as in Python.
-    for &(mar, expected) in rd::volatility_skewness::EXPECTED_VALUES_BY_MAR_VARIABILITY {
-        let actual = run(cfg().mar(mar), Measures::volatility_skewness);
-        assert_series(&actual, bacon_reference(expected), Places(13), 0, &format!("volatility skewness MAR {mar}"));
-    }
     for &(mar, expected) in rd::volatility_skewness::EXPECTED_VALUES_BY_MAR_VOLATILITY {
+        let actual = run(cfg().mar(mar), Measures::volatility_skewness);
+        assert_series(&actual, expected, Places(13), 0, &format!("volatility skewness MAR {mar}"));
+    }
+    for &(mar, expected) in rd::volatility_skewness::EXPECTED_VALUES_BY_MAR_VARIABILITY {
         let actual = run(cfg().mar(mar), Measures::variability_skewness);
-        assert_series(&actual, bacon_reference(expected), Places(13), 0, &format!("variability skewness MAR {mar}"));
+        assert_series(&actual, expected, Places(13), 0, &format!("variability skewness MAR {mar}"));
     }
 }
 

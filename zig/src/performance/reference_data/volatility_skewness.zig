@@ -4,8 +4,8 @@ const std = @import("std");
 const Entry = @import("entry.zig").Entry;
 const nan = std.math.nan(f64);
 
-/// `volatility_skewness.EXPECTED_VALUES_BY_MAR_VOLATILITY`
-pub const expected_values_by_mar_volatility: []const Entry(f64, []const f64) = &.{
+/// `volatility_skewness.EXPECTED_VALUES_BY_MAR_VARIABILITY`
+pub const expected_values_by_mar_variability: []const Entry(f64, []const f64) = &.{
     .{ .key = 0.0, .value = &.{
         nan, nan, nan, 8.06,
         10.31, 16.56, 19.12, 64.01,
@@ -72,8 +72,8 @@ pub const expected_values_by_mar_volatility: []const Entry(f64, []const f64) = &
     } },
 };
 
-/// `volatility_skewness.EXPECTED_VALUES_BY_MAR_VARIABILITY`
-pub const expected_values_by_mar_variability: []const Entry(f64, []const f64) = &.{
+/// `volatility_skewness.EXPECTED_VALUES_BY_MAR_VOLATILITY`
+pub const expected_values_by_mar_volatility: []const Entry(f64, []const f64) = &.{
     .{ .key = 0.0, .value = &.{
         nan, nan, nan, 2.83901391331568,
         3.21091887160046, 4.06939798987516, 4.37264222181509, 8.00062497558785,
@@ -129,7 +129,6 @@ pub const expected_values_by_mar_variability: []const Entry(f64, []const f64) = 
         0.0, 0.0, 0.0, 0.0,
         0.0, 0.0, 0.0, 0.0,
         0.0, 0.0, 0.0, 0.0,
-        0.0, 0.0, 0.0,
     } },
     .{ .key = 0.3, .value = &.{
         0.0, 0.0, 0.0, 0.0,

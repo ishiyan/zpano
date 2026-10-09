@@ -1232,25 +1232,19 @@ class TestLossRate(unittest.TestCase):
                           prefix="loss rate")
 
 class TestVolatilitySkewness(unittest.TestCase):
-    def bacon_reference(self, expected):
-        # The MAR 0.2 and 0.3 fixtures contain three extra trailing zeros.
-        # Compare the 24 observations that correspond to the Bacon inputs.
-        self.assertTrue(all(x == 0 for x in expected[bacon_portfolio_len:]))
-        return expected[:bacon_portfolio_len]
-
     def test_matches_performance_analytics_output(self):
         """
         Calculation doesn't depend on periods per annum, so we use yearly default.
         """
-        for mar, expected in rd.volatility_skewness.EXPECTED_VALUES_BY_MAR_VARIABILITY.items():
+        for mar, expected in rd.volatility_skewness.EXPECTED_VALUES_BY_MAR_VOLATILITY.items():
             actual = run_stream_property("volatility_skewness",
                                          annual_target_return=mar)
-            assertSeriesEqual(self, actual, self.bacon_reference(expected), places=13,
+            assertSeriesEqual(self, actual, expected, places=13,
                               prefix=f'volatility skewness MAR {mar}')
-        for mar, expected in rd.volatility_skewness.EXPECTED_VALUES_BY_MAR_VOLATILITY.items():
+        for mar, expected in rd.volatility_skewness.EXPECTED_VALUES_BY_MAR_VARIABILITY.items():
             actual = run_stream_property("variability_skewness",
                                          annual_target_return=mar)
-            assertSeriesEqual(self, actual, self.bacon_reference(expected), places=13,
+            assertSeriesEqual(self, actual, expected, places=13,
                               prefix=f'variability skewness MAR {mar}')
 
 class TestFarinelliTibilettiRatio(unittest.TestCase):
@@ -1860,14 +1854,13 @@ class TestInformationRatio(unittest.TestCase):
 class TestInformationRatioModified(unittest.TestCase):
     def test_sign_rule(self):
         """
-        Equals information_ratio when the mean active return is positive,
+        Equals information_ratio when the geometric active premium is positive,
         otherwise its negation.
         """
         m = make_measures(monthly=True)
         for i in range(bacon_portfolio_len):
             m.add_return(bacon_portfolio_returns[i], bacon_benchmark_returns[i])
-            active = math.fsum(bacon_portfolio_returns[j] - bacon_benchmark_returns[j]
-                               for j in range(i + 1))
+            active = m.active_premium
             ir = m.information_ratio
             expected = math.nan if math.isnan(ir) else (ir if active > 0 else -ir)
             assertFloatEqual(self, m.information_ratio_modified, expected, places=15,

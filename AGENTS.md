@@ -192,7 +192,7 @@ readme/performance/      — R validation scripts, reference PDFs, CSV data, SVG
 - Known deviations from Excel are documented inline with `Error:` comments in tests.
 - 15 day count conventions share the same enum values (0–14) across all languages.
 - `kurtosis` uses **population excess kurtosis** (`m4/m2^2 - 3`), matching `scipy.stats.kurtosis(bias=True, fisher=True)`.
-- The `autocorrPenalty` / `_autocorr_penalty` method is a stub returning 1 in all implementations.
+- Performance Measures `autocorrelation_penalty` implements Lo (2002) in all languages; it returns 1 when there are insufficient observations or zero variance.
 - Impossible computations return the language-idiomatic nullable: Python `None`, Go `*float64` nil, TypeScript `null`, Zig `?f64` null, Rust `Option<f64>` None.
 
 ## Architecture Notes

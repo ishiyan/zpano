@@ -375,19 +375,23 @@ func (m *Measures) CdarAlpha(confidence float64) (float64, error) {
 // RewardToConditionalDrawdown returns the per-period geometric mean return
 // (not annualized) divided by the historical conditional drawdown, the
 // mean magnitude of the worst max(1, int(n·(1 - confidence))) cumulative
-// drawdowns. The Python default confidence is 0.95; it is not validated.
+// drawdowns. The Python default confidence is 0.95. Invalid confidence
+// (outside (0, 1), including NaN) returns an error before reading state.
 //
 // NaN when there are no returns or the conditional drawdown is zero.
-func (m *Measures) RewardToConditionalDrawdown(confidence float64) float64 {
+func (m *Measures) RewardToConditionalDrawdown(confidence float64) (float64, error) {
+	if !(0 < confidence && confidence < 1) {
+		return math.NaN(), errConfidence
+	}
 	cagr := m.cumulativeReturn.GeometricMeanReturn()
 	if math.IsNaN(cagr) {
-		return math.NaN()
+		return math.NaN(), nil
 	}
 
 	// Drawdowns from cumulative returns.
 	dd := m.DrawdownsCumulative()
 	if len(dd) < 1 {
-		return math.NaN()
+		return math.NaN(), nil
 	}
 
 	// Conditional drawdown: average of the worst (1-confidence) drawdowns.
@@ -397,5 +401,5 @@ func (m *Measures) RewardToConditionalDrawdown(confidence float64) float64 {
 	// Positive number.
 	cdar := -pySum(sortedTail) / float64(len(sortedTail))
 
-	return divOrNaN(cagr, cdar)
+	return divOrNaN(cagr, cdar), nil
 }

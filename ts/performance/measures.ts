@@ -389,16 +389,16 @@ export class Measures {
      * @param confidence Confidence level in (0, 1).
      * @returns True if normality cannot be rejected; false if it is rejected
      *     or there is insufficient data.
-     * @throws Error if confidence is not in (0, 1) (checked only when the
-     *     statistic is available).
+     * @throws Error if confidence is not in (0, 1), including NaN,
+     *     even when the statistic is unavailable.
      */
     isNormalDistribution(confidence: number = 0.95): boolean {
+        if (!(0 < confidence && confidence < 1)) {
+            throw new Error('confidence must be between 0 and 1');
+        }
         const bj = this.jarqueBeraNormalityTestStatistic;
         if (Number.isNaN(bj)) {
             return false;
-        }
-        if (confidence <= 0 || confidence >= 1) {
-            throw new Error('confidence must be between 0 and 1');
         }
         // Inverse CDF of chi-squared with 2 degrees of freedom: -2 ln(1 - p).
         const critical = -2.0 * Math.log1p(-confidence);
@@ -1284,9 +1284,13 @@ export class Measures {
 
     /**
      * Geometric mean return divided by the mean magnitude of the worst
-     * `max(1, int(n * (1 - confidence)))` drawdowns. No confidence validation.
+     * `max(1, int(n * (1 - confidence)))` drawdowns.
+     * @throws Error unless confidence is in (0, 1), including on empty data.
      */
     rewardToConditionalDrawdown(confidence: number = 0.95): number {
+        if (!(0 < confidence && confidence < 1)) {
+            throw new Error('confidence must be between 0 and 1');
+        }
         const cagr = this._cumulativeReturn.geometricMeanReturn;
         if (Number.isNaN(cagr)) {
             return NaN;
@@ -1382,9 +1386,9 @@ export class Measures {
         return te !== 0 ? this.activePremium / te : NaN;
     }
 
-    /** Information ratio with its sign taken from the arithmetic mean active return. */
+    /** Information ratio when annualized geometric active premium is positive; its negation otherwise. */
     get informationRatioModified(): number {
-        const excess = this._activeReturnsKbn.mean;
+        const excess = this.activePremium;
         const ir = this.informationRatio;
         if (Number.isNaN(excess) || Number.isNaN(ir)) {
             return NaN;
@@ -1612,7 +1616,7 @@ export class Measures {
      * @throws Error if the multiplier is not positive.
      */
     biasRatio(stdDevMultiplier: number = 1.0): number {
-        if (stdDevMultiplier <= 0) {
+        if (!(stdDevMultiplier > 0)) {
             throw new Error('std_dev_multiplier must be positive');
         }
         const w = this._returns;
@@ -1688,15 +1692,15 @@ export class Measures {
     }
 
     /**
-     * Gain-to-pain ratio: mean return divided by the raw lower partial
-     * moment (the sum of losses, as in the Python implementation).
+     * Gain-to-pain ratio: sum of returns divided by the sum of loss magnitudes.
+     * NaN when there are no losses.
      */
     get gainToPainRatio(): number {
         const lpm1 = this._rawPartialMoments.lowerPartialMoment1;
         if (Number.isNaN(lpm1) || lpm1 === 0) {
             return NaN;
         }
-        return this._returnsKbn.mean / lpm1;
+        return this._returnsKbn.x1Sum / lpm1;
     }
 
     /** Upside capture ratio (geometric or arithmetic). */

@@ -409,23 +409,13 @@ func TestLossRateCalculatedByHand(t *testing.T) {
 
 func TestVolatilitySkewnessMatchesPerformanceAnalyticsOutput(t *testing.T) {
 	t.Parallel()
-	// The MAR 0.2 and 0.3 fixtures contain three extra trailing zeros.
-	// Compare the 24 observations that correspond to the Bacon inputs.
-	baconReference := func(expected []float64) []float64 {
-		for _, x := range expected[baconPortfolioLen:] {
-			if x != 0 {
-				t.Errorf("expected trailing zeros, got %v", x)
-			}
-		}
-		return expected[:baconPortfolioLen]
+	for mar, expected := range referencedata.VolatilitySkewnessExpectedValuesByMarVolatility {
+		actual := runStream(t, yearlyMar(mar), (*Measures).VolatilitySkewness)
+		assertSeriesEqual(t, actual, expected, places(13), fmt.Sprintf("volatility skewness MAR %v", mar))
 	}
 	for mar, expected := range referencedata.VolatilitySkewnessExpectedValuesByMarVariability {
-		actual := runStream(t, yearlyMar(mar), (*Measures).VolatilitySkewness)
-		assertSeriesEqual(t, actual, baconReference(expected), places(13), fmt.Sprintf("volatility skewness MAR %v", mar))
-	}
-	for mar, expected := range referencedata.VolatilitySkewnessExpectedValuesByMarVolatility {
 		actual := runStream(t, yearlyMar(mar), (*Measures).VariabilitySkewness)
-		assertSeriesEqual(t, actual, baconReference(expected), places(13), fmt.Sprintf("variability skewness MAR %v", mar))
+		assertSeriesEqual(t, actual, expected, places(13), fmt.Sprintf("variability skewness MAR %v", mar))
 	}
 }
 

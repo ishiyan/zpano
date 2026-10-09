@@ -4,8 +4,8 @@ package referencedata
 
 import "math"
 
-// VolatilitySkewnessExpectedValuesByMarVolatility is volatility_skewness.EXPECTED_VALUES_BY_MAR_VOLATILITY.
-var VolatilitySkewnessExpectedValuesByMarVolatility = map[float64][]float64{
+// VolatilitySkewnessExpectedValuesByMarVariability is volatility_skewness.EXPECTED_VALUES_BY_MAR_VARIABILITY.
+var VolatilitySkewnessExpectedValuesByMarVariability = map[float64][]float64{
 	0.0: {
 		math.NaN(), math.NaN(), math.NaN(), 8.06,
 		10.31, 16.56, 19.12, 64.01,
@@ -72,8 +72,8 @@ var VolatilitySkewnessExpectedValuesByMarVolatility = map[float64][]float64{
 	},
 }
 
-// VolatilitySkewnessExpectedValuesByMarVariability is volatility_skewness.EXPECTED_VALUES_BY_MAR_VARIABILITY.
-var VolatilitySkewnessExpectedValuesByMarVariability = map[float64][]float64{
+// VolatilitySkewnessExpectedValuesByMarVolatility is volatility_skewness.EXPECTED_VALUES_BY_MAR_VOLATILITY.
+var VolatilitySkewnessExpectedValuesByMarVolatility = map[float64][]float64{
 	0.0: {
 		math.NaN(), math.NaN(), math.NaN(), 2.83901391331568,
 		3.21091887160046, 4.06939798987516, 4.37264222181509, 8.00062497558785,
@@ -129,7 +129,6 @@ var VolatilitySkewnessExpectedValuesByMarVariability = map[float64][]float64{
 		0.0, 0.0, 0.0, 0.0,
 		0.0, 0.0, 0.0, 0.0,
 		0.0, 0.0, 0.0, 0.0,
-		0.0, 0.0, 0.0,
 	},
 	0.3: {
 		0.0, 0.0, 0.0, 0.0,

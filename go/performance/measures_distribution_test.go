@@ -267,10 +267,10 @@ func TestIsNormalDistributionMockedJB(t *testing.T) {
 	check(8.0, 0.99, true, "custom confidence 8")
 	check(10.0, 0.99, false, "custom confidence 10")
 
-	// The method itself: insufficient data gives false without validating.
+	// Invalid confidence is rejected even with insufficient data.
 	m := newTestMeasures(t, 1, 0, 0, 0)
-	if got, err := m.IsNormalDistribution(2.0); got || err != nil {
-		t.Errorf("empty: expected false, nil; got %v, %v", got, err)
+	if got, err := m.IsNormalDistribution(2.0); got || err == nil {
+		t.Errorf("empty: expected false, error; got %v, %v", got, err)
 	}
 	addBacon(m, nil, nil)
 	if _, err := m.IsNormalDistribution(1.0); err == nil || err.Error() != "confidence must be between 0 and 1" {

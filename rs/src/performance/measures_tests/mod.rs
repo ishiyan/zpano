@@ -14,6 +14,7 @@ mod formulas;
 mod general;
 mod ratios;
 mod risk;
+mod review;
 
 pub(super) const BACON_PORTFOLIO_RETURNS: [f64; 24] = [
     0.003, 0.026, 0.011, -0.010, 0.015, 0.025, 0.016, 0.067, -0.014, 0.040, -0.005, 0.081, 0.040, -0.037,
@@ -360,7 +361,7 @@ pub(super) fn public_measures() -> Vec<(&'static str, Eval)> {
         meth!(prospect_ratio, 2.25),
         prop!(prospect_ratio_performance_analytics),
         fallible!(rachev_ratio, 0.1, 0.1),
-        meth!(reward_to_conditional_drawdown, 0.95),
+        fallible!(reward_to_conditional_drawdown, 0.95),
         meth!(reward_to_es_ratio_cornish_fisher, 0.95),
         meth!(reward_to_es_ratio_gaussian, 0.95),
         meth!(reward_to_es_ratio_historical, 0.95),

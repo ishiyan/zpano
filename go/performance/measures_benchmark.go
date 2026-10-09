@@ -126,13 +126,10 @@ func (m *Measures) InformationRatio() float64 {
 	return divOrNaN(m.ActivePremium(), m.TrackingError())
 }
 
-// InformationRatioModified returns the modified information ratio
-// (Israelson): the information ratio with its sign taken from the
-// arithmetic mean of the active returns (the information ratio if the
-// mean active return is positive, its negation otherwise).
+// InformationRatioModified returns the information ratio when the annualized
+// geometric active premium is positive, and its negation otherwise.
 func (m *Measures) InformationRatioModified() float64 {
-	// Active premium = mean(Rp - Rb).
-	excess := m.activeReturnsKBN.Mean()
+	excess := m.ActivePremium()
 	ir := m.InformationRatio()
 	if math.IsNaN(excess) || math.IsNaN(ir) {
 		return math.NaN()

@@ -304,7 +304,7 @@ fn test_is_normal_distribution_mocked_jb() {
 
     // The method delegates to the rule.
     let ratios = Measures::new(1.0, 0.0, 0.0, 0).unwrap();
-    assert_eq!(ratios.is_normal_distribution(1.0), Ok(false), "NaN statistic checked first");
+    assert!(ratios.is_normal_distribution(1.0).is_err(), "invalid confidence checked first");
     let mut ratios = ratios;
     add_bacon(&mut ratios, &BACON_PORTFOLIO_RETURNS, &BACON_BENCHMARK_RETURNS);
     let jb = ratios.jarque_bera_normality_test_statistic();

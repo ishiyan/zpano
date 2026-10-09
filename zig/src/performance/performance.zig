@@ -45,4 +45,5 @@ test {
 
 test {
     _ = @import("measures_test.zig");
+    _ = @import("measures_review_test.zig");
 }
