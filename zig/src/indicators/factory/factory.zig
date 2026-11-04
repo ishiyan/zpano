@@ -340,6 +340,7 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
     const obj = getObject(parsed) orelse return FactoryError.InvalidParams;
 
     return switch (id) {
+
         // ── common ──────────────────────────────────────────────────────
 
         .simple_moving_average => createWithAllocParams(sma_mod.SimpleMovingAverage, sma_mod.SimpleMovingAverageParams, allocator, obj, .{
@@ -904,6 +905,26 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
         }),
 
         // ── manfred durschner ────────────────────────────────────────────
+
+        // ── lars von thienen ──────────────────────────────────────────────────
+        .bartels_periodicity_score => createWithAllocParams(lvt_bps.BartelsPeriodicityScore,lvt_bps.BartelsPeriodicityScoreParams,allocator,obj,.{.period=getInt(obj,"period",20),.segments=getInt(obj,"segments",5),.smoothing=getF64(obj,"smoothing",0.0),.bar_component=getBarComponent(obj),.quote_component=getQuoteComponent(obj),.trade_component=getTradeComponent(obj)}),
+        .complete_cycle_scanner => createWithAllocParams(lvt_cscan.CompleteCycleScanner,lvt_cscan.CompleteCycleScannerParams,allocator,obj,.{.window=getInt(obj,"window",200),.min_period=getInt(obj,"min_period",5),.max_period=getInt(obj,"max_period",80),.smoothing=getF64(obj,"smoothing",1600.0),.genuine_threshold=getF64(obj,"genuine_threshold",49.0),.phase_cycles=getF64(obj,"phase_cycles",2.0),.top_k=getInt(obj,"top_k",3),.peak_distance=getInt(obj,"peak_distance",2),.max_segments=getInt(obj,"max_segments",5),.bar_component=getBarComponent(obj),.quote_component=getQuoteComponent(obj),.trade_component=getTradeComponent(obj)}),
+        .composite_cycle => createWithAllocParams(lvt_ccyc.CompositeCycle,lvt_ccyc.CompositeCycleParams,allocator,obj,.{.window=getInt(obj,"window",100),.periods=@constCast(&[_]f64{20,40}),.smoothing=getF64(obj,"smoothing",1600.0),.bar_component=getBarComponent(obj),.quote_component=getQuoteComponent(obj),.trade_component=getTradeComponent(obj)}),
+        .cycle_phase_score => createWithAllocParams(lvt_cphase.CyclePhaseScore,lvt_cphase.CyclePhaseScoreParams,allocator,obj,.{.window=getInt(obj,"window",200),.min_period=getInt(obj,"min_period",5),.max_period=getInt(obj,"max_period",80),.smoothing=getF64(obj,"smoothing",1600.0),.genuine_threshold=getF64(obj,"genuine_threshold",49.0),.phase_cycles=getF64(obj,"phase_cycles",2.0),.top_k=getInt(obj,"top_k",3),.peak_distance=getInt(obj,"peak_distance",2),.max_segments=getInt(obj,"max_segments",5),.bar_component=getBarComponent(obj),.quote_component=getQuoteComponent(obj),.trade_component=getTradeComponent(obj)}),
+        .cycle_polarity => createWithAllocParams(lvt_cpol.CyclePolarity,lvt_cpol.CyclePolarityParams,allocator,obj,.{.window=getInt(obj,"window",100),.short_period=getF64(obj,"short_period",20.0),.long_period=getF64(obj,"long_period",40.0),.smoothing=getF64(obj,"smoothing",1600.0),.tolerance=getF64(obj,"tolerance",0.0),.bar_component=getBarComponent(obj),.quote_component=getQuoteComponent(obj),.trade_component=getTradeComponent(obj)}),
+        .cycle_strength => createWithAllocParams(lvt_cstr.CycleStrength,lvt_cstr.CycleStrengthParams,allocator,obj,.{.window=getInt(obj,"window",100),.period=getF64(obj,"period",20.0),.smoothing=getF64(obj,"smoothing",1600.0),.bar_component=getBarComponent(obj),.quote_component=getQuoteComponent(obj),.trade_component=getTradeComponent(obj)}),
+        .cycle_swing_momentum => createWithAllocParams(lvt_csmo.CycleSwingMomentum,lvt_csmo.CycleSwingMomentumParams,allocator,obj,.{.window=getInt(obj,"window",50),.fast_smoothing=getF64(obj,"fast_smoothing",160.0),.slow_smoothing=getF64(obj,"slow_smoothing",1600.0),.band_memory=getInt(obj,"band_memory",34),.leveling=getF64(obj,"leveling",10.0),.bar_component=getBarComponent(obj),.quote_component=getQuoteComponent(obj),.trade_component=getTradeComponent(obj)}),
+        .cyclic_smoothed_relative_strength_index => createWithAllocParams(lvt_crsi.CyclicSmoothedRelativeStrengthIndex,lvt_crsi.CyclicSmoothedRelativeStrengthIndexParams,allocator,obj,.{.dominant_cycle=getInt(obj,"dominant_cycle",20),.vibration=getInt(obj,"vibration",10),.leveling=getF64(obj,"leveling",10.0),.bar_component=getBarComponent(obj),.quote_component=getQuoteComponent(obj),.trade_component=getTradeComponent(obj)}),
+        .detrended_rhythm_oscillators => createWithAllocParams(lvt_dro.DetrendedRhythmOscillators,lvt_dro.DetrendedRhythmOscillatorsParams,allocator,obj,.{.fast_length=getInt(obj,"fast_length",3),.slow_length=getInt(obj,"slow_length",50),.zig_period=getInt(obj,"zig_period",30),.cycle_memory=getInt(obj,"cycle_memory",15),.detrend=getBool(obj,"detrend",true),.bar_component=getBarComponent(obj),.quote_component=getQuoteComponent(obj),.trade_component=getTradeComponent(obj)}),
+        .dominant_market_vibration => createWithAllocParams(lvt_dmv.DominantMarketVibration,lvt_dmv.DominantMarketVibrationParams,allocator,obj,.{.window=getInt(obj,"window",200),.min_period=getInt(obj,"min_period",5),.max_period=getInt(obj,"max_period",80),.smoothing=getF64(obj,"smoothing",1600.0),.genuine_threshold=getF64(obj,"genuine_threshold",49.0),.phase_cycles=getF64(obj,"phase_cycles",2.0),.top_k=getInt(obj,"top_k",3),.peak_distance=getInt(obj,"peak_distance",2),.max_segments=getInt(obj,"max_segments",5),.bar_component=getBarComponent(obj),.quote_component=getQuoteComponent(obj),.trade_component=getTradeComponent(obj)}),
+        .dynamic_cycle_explorer => createWithAllocParams(lvt_dce.DynamicCycleExplorer,lvt_dce.DynamicCycleExplorerParams,allocator,obj,.{.window=getInt(obj,"window",200),.min_period=getInt(obj,"min_period",5),.max_period=getInt(obj,"max_period",80),.smoothing=getF64(obj,"smoothing",1600.0),.genuine_threshold=getF64(obj,"genuine_threshold",49.0),.phase_cycles=getF64(obj,"phase_cycles",2.0),.top_k=getInt(obj,"top_k",3),.peak_distance=getInt(obj,"peak_distance",2),.max_segments=getInt(obj,"max_segments",5),.bar_component=getBarComponent(obj),.quote_component=getQuoteComponent(obj),.trade_component=getTradeComponent(obj)}),
+        .goertzel_cycle_spectrum => createWithAllocParams(lvt_gcs.GoertzelCycleSpectrum,lvt_gcs.GoertzelCycleSpectrumParams,allocator,obj,.{.window=getInt(obj,"window",128),.min_period=getInt(obj,"min_period",5),.max_period=getInt(obj,"max_period",50),.step=getInt(obj,"step",1),.smoothing=getF64(obj,"smoothing",1600.0),.bar_component=getBarComponent(obj),.quote_component=getQuoteComponent(obj),.trade_component=getTradeComponent(obj)}),
+        .hodrick_prescott_smoothing_and_detrending => createWithAllocParams(lvt_hpsd.HodrickPrescottSmoothingAndDetrending,lvt_hpsd.HodrickPrescottSmoothingAndDetrendingParams,allocator,obj,.{.window=getInt(obj,"window",50),.smoothing=getF64(obj,"smoothing",1600.0),.bar_component=getBarComponent(obj),.quote_component=getQuoteComponent(obj),.trade_component=getTradeComponent(obj)}),
+        .metonic_relative_strength_index => createWithAllocParams(lvt_mrsi.MetonicRelativeStrengthIndex,lvt_mrsi.MetonicRelativeStrengthIndexParams,allocator,obj,.{.length=getInt(obj,"length",13),.delay1=getInt(obj,"delay1",6939),.delay2=getInt(obj,"delay2",4016),.delay3=getInt(obj,"delay3",2922),.bar_component=getBarComponent(obj),.quote_component=getQuoteComponent(obj),.trade_component=getTradeComponent(obj)}),
+        .metonic_sentiment_index => createWithAllocParams(lvt_msent.MetonicSentimentIndex,lvt_msent.MetonicSentimentIndexParams,allocator,obj,.{.length=getInt(obj,"length",13),.delay1=getInt(obj,"delay1",6939),.delay2=getInt(obj,"delay2",4016),.delay3=getInt(obj,"delay3",2922),.mode=getInt(obj,"mode",0)}),
+        .metonic_williams_percent_r => createWithAllocParams(lvt_mwillr.MetonicWilliamsPercentR,lvt_mwillr.MetonicWilliamsPercentRParams,allocator,obj,.{.length=getInt(obj,"length",13),.delay1=getInt(obj,"delay1",6939),.delay2=getInt(obj,"delay2",4016),.delay3=getInt(obj,"delay3",2922)}),
+        .phasing_oscillator => createWithAllocParams(lvt_phosc.PhasingOscillator,lvt_phosc.PhasingOscillatorParams,allocator,obj,.{.window=getInt(obj,"window",200),.short_min=getInt(obj,"short_min",5),.short_max=getInt(obj,"short_max",30),.long_min=getInt(obj,"long_min",31),.long_max=getInt(obj,"long_max",80),.smoothing=getF64(obj,"smoothing",1600.0),.genuine_threshold=getF64(obj,"genuine_threshold",49.0),.phase_cycles=getF64(obj,"phase_cycles",2.0),.bar_component=getBarComponent(obj),.quote_component=getQuoteComponent(obj),.trade_component=getTradeComponent(obj)}),
+        .lars_von_thienen_zero_lag_exponential_moving_average => createWithAllocParams(lvt_lzlema.LarsVonThienenZeroLagExponentialMovingAverage,lvt_lzlema.LarsVonThienenZeroLagExponentialMovingAverageParams,allocator,obj,.{.length=getInt(obj,"length",13),.bar_component=getBarComponent(obj),.quote_component=getQuoteComponent(obj),.trade_component=getTradeComponent(obj)}),
 
         .new_moving_average => createWithAllocParams(nma_mod.NewMovingAverage, nma_mod.NewMovingAverageParams, allocator, obj, .{
             .primary_period = getUsize(obj, "primaryPeriod", 0),
@@ -1698,3 +1719,22 @@ test "create true range no params" {
     result.indicator.metadata(&md);
     try std.testing.expect(md.outputs_len > 0);
 }
+
+const lvt_bps=@import("../lars_von_thienen/bartels_periodicity_score/bartels_periodicity_score.zig");
+const lvt_cscan=@import("../lars_von_thienen/complete_cycle_scanner/complete_cycle_scanner.zig");
+const lvt_ccyc=@import("../lars_von_thienen/composite_cycle/composite_cycle.zig");
+const lvt_cphase=@import("../lars_von_thienen/cycle_phase_score/cycle_phase_score.zig");
+const lvt_cpol=@import("../lars_von_thienen/cycle_polarity/cycle_polarity.zig");
+const lvt_cstr=@import("../lars_von_thienen/cycle_strength/cycle_strength.zig");
+const lvt_csmo=@import("../lars_von_thienen/cycle_swing_momentum/cycle_swing_momentum.zig");
+const lvt_crsi=@import("../lars_von_thienen/cyclic_smoothed_relative_strength_index/cyclic_smoothed_relative_strength_index.zig");
+const lvt_dro=@import("../lars_von_thienen/detrended_rhythm_oscillators/detrended_rhythm_oscillators.zig");
+const lvt_dmv=@import("../lars_von_thienen/dominant_market_vibration/dominant_market_vibration.zig");
+const lvt_dce=@import("../lars_von_thienen/dynamic_cycle_explorer/dynamic_cycle_explorer.zig");
+const lvt_gcs=@import("../lars_von_thienen/goertzel_cycle_spectrum/goertzel_cycle_spectrum.zig");
+const lvt_hpsd=@import("../lars_von_thienen/hodrick_prescott_smoothing_and_detrending/hodrick_prescott_smoothing_and_detrending.zig");
+const lvt_mrsi=@import("../lars_von_thienen/metonic_relative_strength_index/metonic_relative_strength_index.zig");
+const lvt_msent=@import("../lars_von_thienen/metonic_sentiment_index/metonic_sentiment_index.zig");
+const lvt_mwillr=@import("../lars_von_thienen/metonic_williams_percent_r/metonic_williams_percent_r.zig");
+const lvt_phosc=@import("../lars_von_thienen/phasing_oscillator/phasing_oscillator.zig");
+const lvt_lzlema=@import("../lars_von_thienen/zero_lag_exponential_moving_average/zero_lag_exponential_moving_average.zig");

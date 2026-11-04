@@ -759,4 +759,94 @@ def create_indicator(
         from ..william_blau.nonambiguous_trend_filter.nonambiguous_trend_filter import NonambiguousTrendFilter
         return NonambiguousTrendFilter(_apply(default_params(), params))
 
+    if identifier == Identifier.BARTELS_PERIODICITY_SCORE:
+        from ..lars_von_thienen.bartels_periodicity_score.params import default_params
+        from ..lars_von_thienen.bartels_periodicity_score.bartels_periodicity_score import BartelsPeriodicityScore
+        return BartelsPeriodicityScore(_apply(default_params(), params))
+
+    if identifier == Identifier.COMPLETE_CYCLE_SCANNER:
+        from ..lars_von_thienen.complete_cycle_scanner.params import default_params
+        from ..lars_von_thienen.complete_cycle_scanner.complete_cycle_scanner import CompleteCycleScanner
+        return CompleteCycleScanner(_apply(default_params(), params))
+
+    if identifier == Identifier.COMPOSITE_CYCLE:
+        from ..lars_von_thienen.composite_cycle.params import default_params
+        from ..lars_von_thienen.composite_cycle.composite_cycle import CompositeCycle
+        return CompositeCycle(_apply(default_params(), params))
+
+    if identifier == Identifier.CYCLE_PHASE_SCORE:
+        from ..lars_von_thienen.cycle_phase_score.params import default_params
+        from ..lars_von_thienen.cycle_phase_score.cycle_phase_score import CyclePhaseScore
+        return CyclePhaseScore(_apply(default_params(), params))
+
+    if identifier == Identifier.CYCLE_POLARITY:
+        from ..lars_von_thienen.cycle_polarity.params import default_params
+        from ..lars_von_thienen.cycle_polarity.cycle_polarity import CyclePolarity
+        return CyclePolarity(_apply(default_params(), params))
+
+    if identifier == Identifier.CYCLE_STRENGTH:
+        from ..lars_von_thienen.cycle_strength.params import default_params
+        from ..lars_von_thienen.cycle_strength.cycle_strength import CycleStrength
+        return CycleStrength(_apply(default_params(), params))
+
+    if identifier == Identifier.CYCLE_SWING_MOMENTUM:
+        from ..lars_von_thienen.cycle_swing_momentum.params import default_params
+        from ..lars_von_thienen.cycle_swing_momentum.cycle_swing_momentum import CycleSwingMomentum
+        return CycleSwingMomentum(_apply(default_params(), params))
+
+    if identifier == Identifier.CYCLIC_SMOOTHED_RELATIVE_STRENGTH_INDEX:
+        from ..lars_von_thienen.cyclic_smoothed_relative_strength_index.params import default_params
+        from ..lars_von_thienen.cyclic_smoothed_relative_strength_index.cyclic_smoothed_relative_strength_index import CyclicSmoothedRelativeStrengthIndex
+        return CyclicSmoothedRelativeStrengthIndex(_apply(default_params(), params))
+
+    if identifier == Identifier.DETRENDED_RHYTHM_OSCILLATORS:
+        from ..lars_von_thienen.detrended_rhythm_oscillators.params import default_params
+        from ..lars_von_thienen.detrended_rhythm_oscillators.detrended_rhythm_oscillators import DetrendedRhythmOscillators
+        return DetrendedRhythmOscillators(_apply(default_params(), params))
+
+    if identifier == Identifier.DOMINANT_MARKET_VIBRATION:
+        from ..lars_von_thienen.dominant_market_vibration.params import default_params
+        from ..lars_von_thienen.dominant_market_vibration.dominant_market_vibration import DominantMarketVibration
+        return DominantMarketVibration(_apply(default_params(), params))
+
+    if identifier == Identifier.DYNAMIC_CYCLE_EXPLORER:
+        from ..lars_von_thienen.dynamic_cycle_explorer.params import default_params
+        from ..lars_von_thienen.dynamic_cycle_explorer.dynamic_cycle_explorer import DynamicCycleExplorer
+        return DynamicCycleExplorer(_apply(default_params(), params))
+
+    if identifier == Identifier.GOERTZEL_CYCLE_SPECTRUM:
+        from ..lars_von_thienen.goertzel_cycle_spectrum.params import default_params
+        from ..lars_von_thienen.goertzel_cycle_spectrum.goertzel_cycle_spectrum import GoertzelCycleSpectrum
+        return GoertzelCycleSpectrum(_apply(default_params(), params))
+
+    if identifier == Identifier.HODRICK_PRESCOTT_SMOOTHING_AND_DETRENDING:
+        from ..lars_von_thienen.hodrick_prescott_smoothing_and_detrending.params import default_params
+        from ..lars_von_thienen.hodrick_prescott_smoothing_and_detrending.hodrick_prescott_smoothing_and_detrending import HodrickPrescottSmoothingAndDetrending
+        return HodrickPrescottSmoothingAndDetrending(_apply(default_params(), params))
+
+    if identifier == Identifier.METONIC_RELATIVE_STRENGTH_INDEX:
+        from ..lars_von_thienen.metonic_relative_strength_index.params import default_params
+        from ..lars_von_thienen.metonic_relative_strength_index.metonic_relative_strength_index import MetonicRelativeStrengthIndex
+        return MetonicRelativeStrengthIndex(_apply(default_params(), params))
+
+    if identifier == Identifier.METONIC_SENTIMENT_INDEX:
+        from ..lars_von_thienen.metonic_sentiment_index.params import default_params
+        from ..lars_von_thienen.metonic_sentiment_index.metonic_sentiment_index import MetonicSentimentIndex
+        return MetonicSentimentIndex(_apply(default_params(), params))
+
+    if identifier == Identifier.METONIC_WILLIAMS_PERCENT_R:
+        from ..lars_von_thienen.metonic_williams_percent_r.params import default_params
+        from ..lars_von_thienen.metonic_williams_percent_r.metonic_williams_percent_r import MetonicWilliamsPercentR
+        return MetonicWilliamsPercentR(_apply(default_params(), params))
+
+    if identifier == Identifier.PHASING_OSCILLATOR:
+        from ..lars_von_thienen.phasing_oscillator.params import default_params
+        from ..lars_von_thienen.phasing_oscillator.phasing_oscillator import PhasingOscillator
+        return PhasingOscillator(_apply(default_params(), params))
+
+    if identifier == Identifier.LARS_VON_THIENEN_ZERO_LAG_EXPONENTIAL_MOVING_AVERAGE:
+        from ..lars_von_thienen.zero_lag_exponential_moving_average.params import default_params
+        from ..lars_von_thienen.zero_lag_exponential_moving_average.zero_lag_exponential_moving_average import LarsVonThienenZeroLagExponentialMovingAverage
+        return LarsVonThienenZeroLagExponentialMovingAverage(_apply(default_params(), params))
+
     raise ValueError(f"unsupported indicator: {identifier}")

@@ -178,10 +178,50 @@ export enum IndicatorIdentifier {
     /** Identifies Larry Williams' __Williams %R__ (WILL%R) indicator. */
     WilliamsPercentR,
 
+
+    // ── Lars von Thienen research ──
+    /** bartels-periodicity-score research indicator. */
+    BartelsPeriodicityScore = 120,
+    /** complete-cycle-scanner research indicator. */
+    CompleteCycleScanner = 121,
+    /** composite-cycle research indicator. */
+    CompositeCycle = 122,
+    /** cycle-phase-score research indicator. */
+    CyclePhaseScore = 123,
+    /** cycle-polarity research indicator. */
+    CyclePolarity = 124,
+    /** cycle-strength research indicator. */
+    CycleStrength = 125,
+    /** cycle-swing-momentum research indicator. */
+    CycleSwingMomentum = 126,
+    /** cyclic-smoothed-relative-strength-index research indicator. */
+    CyclicSmoothedRelativeStrengthIndex = 127,
+    /** detrended-rhythm-oscillators research indicator. */
+    DetrendedRhythmOscillators = 128,
+    /** dominant-market-vibration research indicator. */
+    DominantMarketVibration = 129,
+    /** dynamic-cycle-explorer research indicator. */
+    DynamicCycleExplorer = 130,
+    /** goertzel-cycle-spectrum research indicator. */
+    GoertzelCycleSpectrum = 131,
+    /** hodrick-prescott-smoothing-and-detrending research indicator. */
+    HodrickPrescottSmoothingAndDetrending = 132,
+    /** metonic-relative-strength-index research indicator. */
+    MetonicRelativeStrengthIndex = 133,
+    /** metonic-sentiment-index research indicator. */
+    MetonicSentimentIndex = 134,
+    /** metonic-williams-percent-r research indicator. */
+    MetonicWilliamsPercentR = 135,
+    /** phasing-oscillator research indicator. */
+    PhasingOscillator = 136,
+    /** zero-lag-exponential-moving-average research indicator. */
+    LarsVonThienenZeroLagExponentialMovingAverage = 137,
+
+
     // ── manfred durschner ──────────────────────────────────────────────────
 
     /** Identifies the New Moving Average (NMA) indicator by Dürschner. */
-    NewMovingAverage,
+    NewMovingAverage = 47,
 
     // ── marc chaikin ───────────────────────────────────────────────────────
 

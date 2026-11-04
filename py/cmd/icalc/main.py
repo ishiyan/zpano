@@ -152,6 +152,25 @@ _IDENTIFIER_MAP: dict[str, Identifier] = {
     'slopeDivergenceTsiFilter': Identifier.SLOPE_DIVERGENCE_TSI_FILTER,
     'adxTypeFilter': Identifier.ADX_TYPE_FILTER,
     'nonambiguousTrendFilter': Identifier.NONAMBIGUOUS_TREND_FILTER,
+    "bartelsPeriodicityScore": Identifier.BARTELS_PERIODICITY_SCORE,
+    "completeCycleScanner": Identifier.COMPLETE_CYCLE_SCANNER,
+    "compositeCycle": Identifier.COMPOSITE_CYCLE,
+    "cyclePhaseScore": Identifier.CYCLE_PHASE_SCORE,
+    "cyclePolarity": Identifier.CYCLE_POLARITY,
+    "cycleStrength": Identifier.CYCLE_STRENGTH,
+    "cycleSwingMomentum": Identifier.CYCLE_SWING_MOMENTUM,
+    "cyclicSmoothedRelativeStrengthIndex": Identifier.CYCLIC_SMOOTHED_RELATIVE_STRENGTH_INDEX,
+    "detrendedRhythmOscillators": Identifier.DETRENDED_RHYTHM_OSCILLATORS,
+    "dominantMarketVibration": Identifier.DOMINANT_MARKET_VIBRATION,
+    "dynamicCycleExplorer": Identifier.DYNAMIC_CYCLE_EXPLORER,
+    "goertzelCycleSpectrum": Identifier.GOERTZEL_CYCLE_SPECTRUM,
+    "hodrickPrescottSmoothingAndDetrending": Identifier.HODRICK_PRESCOTT_SMOOTHING_AND_DETRENDING,
+    "metonicRelativeStrengthIndex": Identifier.METONIC_RELATIVE_STRENGTH_INDEX,
+    "metonicSentimentIndex": Identifier.METONIC_SENTIMENT_INDEX,
+    "metonicWilliamsPercentR": Identifier.METONIC_WILLIAMS_PERCENT_R,
+    "phasingOscillator": Identifier.PHASING_OSCILLATOR,
+    "larsVonThienenZeroLagExponentialMovingAverage": Identifier.LARS_VON_THIENEN_ZERO_LAG_EXPONENTIAL_MOVING_AVERAGE,
+
 }
 
 

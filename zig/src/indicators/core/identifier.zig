@@ -135,6 +135,28 @@ pub const Identifier = enum(u8) {
     /// Identifies the Larry Williams Williams %R (WILL%R) indicator.
     williams_percent_r = 46,
 
+
+    // ── lars von thienen ──
+    bartels_periodicity_score = 120,
+    complete_cycle_scanner = 121,
+    composite_cycle = 122,
+    cycle_phase_score = 123,
+    cycle_polarity = 124,
+    cycle_strength = 125,
+    cycle_swing_momentum = 126,
+    cyclic_smoothed_relative_strength_index = 127,
+    detrended_rhythm_oscillators = 128,
+    dominant_market_vibration = 129,
+    dynamic_cycle_explorer = 130,
+    goertzel_cycle_spectrum = 131,
+    hodrick_prescott_smoothing_and_detrending = 132,
+    metonic_relative_strength_index = 133,
+    metonic_sentiment_index = 134,
+    metonic_williams_percent_r = 135,
+    phasing_oscillator = 136,
+    lars_von_thienen_zero_lag_exponential_moving_average = 137,
+
+
     // ── manfred durschner ──────────────────────────────────────────────────
     /// Identifies the New Moving Average (NMA) indicator by Durschner.
     new_moving_average = 47,
@@ -310,8 +332,28 @@ pub const Identifier = enum(u8) {
     nonambiguous_trend_filter = 119,
 
     /// Returns the camelCase string representation matching Go's String().
+
     pub fn asStr(self: Identifier) []const u8 {
         return switch (self) {
+            .bartels_periodicity_score => "bartelsPeriodicityScore",
+            .complete_cycle_scanner => "completeCycleScanner",
+            .composite_cycle => "compositeCycle",
+            .cycle_phase_score => "cyclePhaseScore",
+            .cycle_polarity => "cyclePolarity",
+            .cycle_strength => "cycleStrength",
+            .cycle_swing_momentum => "cycleSwingMomentum",
+            .cyclic_smoothed_relative_strength_index => "cyclicSmoothedRelativeStrengthIndex",
+            .detrended_rhythm_oscillators => "detrendedRhythmOscillators",
+            .dominant_market_vibration => "dominantMarketVibration",
+            .dynamic_cycle_explorer => "dynamicCycleExplorer",
+            .goertzel_cycle_spectrum => "goertzelCycleSpectrum",
+            .hodrick_prescott_smoothing_and_detrending => "hodrickPrescottSmoothingAndDetrending",
+            .metonic_relative_strength_index => "metonicRelativeStrengthIndex",
+            .metonic_sentiment_index => "metonicSentimentIndex",
+            .metonic_williams_percent_r => "metonicWilliamsPercentR",
+            .phasing_oscillator => "phasingOscillator",
+            .lars_von_thienen_zero_lag_exponential_moving_average => "larsVonThienenZeroLagExponentialMovingAverage",
+
 
             // ── common ────────────────────────────────────────────────────────────
             .absolute_price_oscillator => "absolutePriceOscillator",
@@ -484,6 +526,25 @@ pub const Identifier = enum(u8) {
     /// Parses a camelCase string into an Identifier.
     pub fn fromStr(s: []const u8) ?Identifier {
         const map = .{
+            .{ "bartelsPeriodicityScore", Identifier.bartels_periodicity_score },
+            .{ "completeCycleScanner", Identifier.complete_cycle_scanner },
+            .{ "compositeCycle", Identifier.composite_cycle },
+            .{ "cyclePhaseScore", Identifier.cycle_phase_score },
+            .{ "cyclePolarity", Identifier.cycle_polarity },
+            .{ "cycleStrength", Identifier.cycle_strength },
+            .{ "cycleSwingMomentum", Identifier.cycle_swing_momentum },
+            .{ "cyclicSmoothedRelativeStrengthIndex", Identifier.cyclic_smoothed_relative_strength_index },
+            .{ "detrendedRhythmOscillators", Identifier.detrended_rhythm_oscillators },
+            .{ "dominantMarketVibration", Identifier.dominant_market_vibration },
+            .{ "dynamicCycleExplorer", Identifier.dynamic_cycle_explorer },
+            .{ "goertzelCycleSpectrum", Identifier.goertzel_cycle_spectrum },
+            .{ "hodrickPrescottSmoothingAndDetrending", Identifier.hodrick_prescott_smoothing_and_detrending },
+            .{ "metonicRelativeStrengthIndex", Identifier.metonic_relative_strength_index },
+            .{ "metonicSentimentIndex", Identifier.metonic_sentiment_index },
+            .{ "metonicWilliamsPercentR", Identifier.metonic_williams_percent_r },
+            .{ "phasingOscillator", Identifier.phasing_oscillator },
+            .{ "larsVonThienenZeroLagExponentialMovingAverage", Identifier.lars_von_thienen_zero_lag_exponential_moving_average },
+
 
             // ── common ────────────────────────────────────────────────────────────
             .{ "absolutePriceOscillator", Identifier.absolute_price_oscillator },

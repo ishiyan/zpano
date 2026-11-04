@@ -28,3 +28,5 @@ pub mod don_mak;
 pub mod raymond_lee;
 pub mod zurab_silagadze;
 pub mod william_blau;
+
+pub mod lars_von_thienen;

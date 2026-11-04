@@ -186,6 +186,64 @@ class Identifier(IntEnum):
     # Identifies the Larry Williams Williams %R (WILL%R) indicator.
     WILLIAMS_PERCENT_R = 46
 
+
+    # ── lars von thienen ──────────────────────────────────────────────────
+
+    # Lars von Thienen: bartels-periodicity-score.
+    BARTELS_PERIODICITY_SCORE = 120
+
+    # Lars von Thienen: complete-cycle-scanner.
+    COMPLETE_CYCLE_SCANNER = 121
+
+    # Lars von Thienen: composite-cycle.
+    COMPOSITE_CYCLE = 122
+
+    # Lars von Thienen: cycle-phase-score.
+    CYCLE_PHASE_SCORE = 123
+
+    # Lars von Thienen: cycle-polarity.
+    CYCLE_POLARITY = 124
+
+    # Lars von Thienen: cycle-strength.
+    CYCLE_STRENGTH = 125
+
+    # Lars von Thienen: cycle-swing-momentum.
+    CYCLE_SWING_MOMENTUM = 126
+
+    # Lars von Thienen: cyclic-smoothed-relative-strength-index.
+    CYCLIC_SMOOTHED_RELATIVE_STRENGTH_INDEX = 127
+
+    # Lars von Thienen: detrended-rhythm-oscillators.
+    DETRENDED_RHYTHM_OSCILLATORS = 128
+
+    # Lars von Thienen: dominant-market-vibration.
+    DOMINANT_MARKET_VIBRATION = 129
+
+    # Lars von Thienen: dynamic-cycle-explorer.
+    DYNAMIC_CYCLE_EXPLORER = 130
+
+    # Lars von Thienen: goertzel-cycle-spectrum.
+    GOERTZEL_CYCLE_SPECTRUM = 131
+
+    # Lars von Thienen: hodrick-prescott-smoothing-and-detrending.
+    HODRICK_PRESCOTT_SMOOTHING_AND_DETRENDING = 132
+
+    # Lars von Thienen: metonic-relative-strength-index.
+    METONIC_RELATIVE_STRENGTH_INDEX = 133
+
+    # Lars von Thienen: metonic-sentiment-index.
+    METONIC_SENTIMENT_INDEX = 134
+
+    # Lars von Thienen: metonic-williams-percent-r.
+    METONIC_WILLIAMS_PERCENT_R = 135
+
+    # Lars von Thienen: phasing-oscillator.
+    PHASING_OSCILLATOR = 136
+
+    # Lars von Thienen: zero-lag-exponential-moving-average.
+    LARS_VON_THIENEN_ZERO_LAG_EXPONENTIAL_MOVING_AVERAGE = 137
+
+
     # ── manfred durschner ──────────────────────────────────────────────────
 
     # Identifies the New Moving Average (NMA) indicator by Durschner.

@@ -71,6 +71,25 @@ func TestIdentifierString(t *testing.T) {
 		// ── larry williams ─────────────────────────────────────────────────────
 		{UltimateOscillator, ultimateOscillator},
 		{WilliamsPercentR, williamsPercentR},
+		// ── lars von thienen ──────────────────────────────────────────────────
+		{BartelsPeriodicityScore, bartelsPeriodicityScore},
+		{CompleteCycleScanner, completeCycleScanner},
+		{CompositeCycle, compositeCycle},
+		{CyclePhaseScore, cyclePhaseScore},
+		{CyclePolarity, cyclePolarity},
+		{CycleStrength, cycleStrength},
+		{CycleSwingMomentum, cycleSwingMomentum},
+		{CyclicSmoothedRelativeStrengthIndex, cyclicSmoothedRelativeStrengthIndex},
+		{DetrendedRhythmOscillators, detrendedRhythmOscillators},
+		{DominantMarketVibration, dominantMarketVibration},
+		{DynamicCycleExplorer, dynamicCycleExplorer},
+		{GoertzelCycleSpectrum, goertzelCycleSpectrum},
+		{HodrickPrescottSmoothingAndDetrending, hodrickPrescottSmoothingAndDetrending},
+		{MetonicRelativeStrengthIndex, metonicRelativeStrengthIndex},
+		{MetonicSentimentIndex, metonicSentimentIndex},
+		{MetonicWilliamsPercentR, metonicWilliamsPercentR},
+		{PhasingOscillator, phasingOscillator},
+		{LarsVonThienenZeroLagExponentialMovingAverage, larsVonThienenZeroLagExponentialMovingAverage},
 		// ── manfred durschner ──────────────────────────────────────────────────
 		{NewMovingAverage, newMovingAverage},
 		// ── marc chaikin ───────────────────────────────────────────────────────
@@ -230,6 +249,25 @@ func TestIdentifierIsKnown(t *testing.T) {
 		// ── larry williams ─────────────────────────────────────────────────────
 		{UltimateOscillator, true},
 		{WilliamsPercentR, true},
+		// ── lars von thienen ──────────────────────────────────────────────────
+		{BartelsPeriodicityScore, true},
+		{CompleteCycleScanner, true},
+		{CompositeCycle, true},
+		{CyclePhaseScore, true},
+		{CyclePolarity, true},
+		{CycleStrength, true},
+		{CycleSwingMomentum, true},
+		{CyclicSmoothedRelativeStrengthIndex, true},
+		{DetrendedRhythmOscillators, true},
+		{DominantMarketVibration, true},
+		{DynamicCycleExplorer, true},
+		{GoertzelCycleSpectrum, true},
+		{HodrickPrescottSmoothingAndDetrending, true},
+		{MetonicRelativeStrengthIndex, true},
+		{MetonicSentimentIndex, true},
+		{MetonicWilliamsPercentR, true},
+		{PhasingOscillator, true},
+		{LarsVonThienenZeroLagExponentialMovingAverage, true},
 		// ── manfred durschner ──────────────────────────────────────────────────
 		{NewMovingAverage, true},
 		// ── marc chaikin ───────────────────────────────────────────────────────
@@ -393,6 +431,25 @@ func TestIdentifierMarshalJSON(t *testing.T) {
 		// ── larry williams ─────────────────────────────────────────────────────
 		{UltimateOscillator, dqs + ultimateOscillator + dqs, true},
 		{WilliamsPercentR, dqs + williamsPercentR + dqs, true},
+		// ── lars von thienen ──────────────────────────────────────────────────
+		{BartelsPeriodicityScore, dqs + bartelsPeriodicityScore + dqs, true},
+		{CompleteCycleScanner, dqs + completeCycleScanner + dqs, true},
+		{CompositeCycle, dqs + compositeCycle + dqs, true},
+		{CyclePhaseScore, dqs + cyclePhaseScore + dqs, true},
+		{CyclePolarity, dqs + cyclePolarity + dqs, true},
+		{CycleStrength, dqs + cycleStrength + dqs, true},
+		{CycleSwingMomentum, dqs + cycleSwingMomentum + dqs, true},
+		{CyclicSmoothedRelativeStrengthIndex, dqs + cyclicSmoothedRelativeStrengthIndex + dqs, true},
+		{DetrendedRhythmOscillators, dqs + detrendedRhythmOscillators + dqs, true},
+		{DominantMarketVibration, dqs + dominantMarketVibration + dqs, true},
+		{DynamicCycleExplorer, dqs + dynamicCycleExplorer + dqs, true},
+		{GoertzelCycleSpectrum, dqs + goertzelCycleSpectrum + dqs, true},
+		{HodrickPrescottSmoothingAndDetrending, dqs + hodrickPrescottSmoothingAndDetrending + dqs, true},
+		{MetonicRelativeStrengthIndex, dqs + metonicRelativeStrengthIndex + dqs, true},
+		{MetonicSentimentIndex, dqs + metonicSentimentIndex + dqs, true},
+		{MetonicWilliamsPercentR, dqs + metonicWilliamsPercentR + dqs, true},
+		{PhasingOscillator, dqs + phasingOscillator + dqs, true},
+		{LarsVonThienenZeroLagExponentialMovingAverage, dqs + larsVonThienenZeroLagExponentialMovingAverage + dqs, true},
 		// ── manfred durschner ──────────────────────────────────────────────────
 		{NewMovingAverage, dqs + newMovingAverage + dqs, true},
 		// ── marc chaikin ───────────────────────────────────────────────────────
@@ -569,6 +626,25 @@ func TestIdentifierUnmarshalJSON(t *testing.T) {
 		// ── larry williams ─────────────────────────────────────────────────────
 		{UltimateOscillator, dqs + ultimateOscillator + dqs, true},
 		{WilliamsPercentR, dqs + williamsPercentR + dqs, true},
+		// ── lars von thienen ──────────────────────────────────────────────────
+		{BartelsPeriodicityScore, dqs + bartelsPeriodicityScore + dqs, true},
+		{CompleteCycleScanner, dqs + completeCycleScanner + dqs, true},
+		{CompositeCycle, dqs + compositeCycle + dqs, true},
+		{CyclePhaseScore, dqs + cyclePhaseScore + dqs, true},
+		{CyclePolarity, dqs + cyclePolarity + dqs, true},
+		{CycleStrength, dqs + cycleStrength + dqs, true},
+		{CycleSwingMomentum, dqs + cycleSwingMomentum + dqs, true},
+		{CyclicSmoothedRelativeStrengthIndex, dqs + cyclicSmoothedRelativeStrengthIndex + dqs, true},
+		{DetrendedRhythmOscillators, dqs + detrendedRhythmOscillators + dqs, true},
+		{DominantMarketVibration, dqs + dominantMarketVibration + dqs, true},
+		{DynamicCycleExplorer, dqs + dynamicCycleExplorer + dqs, true},
+		{GoertzelCycleSpectrum, dqs + goertzelCycleSpectrum + dqs, true},
+		{HodrickPrescottSmoothingAndDetrending, dqs + hodrickPrescottSmoothingAndDetrending + dqs, true},
+		{MetonicRelativeStrengthIndex, dqs + metonicRelativeStrengthIndex + dqs, true},
+		{MetonicSentimentIndex, dqs + metonicSentimentIndex + dqs, true},
+		{MetonicWilliamsPercentR, dqs + metonicWilliamsPercentR + dqs, true},
+		{PhasingOscillator, dqs + phasingOscillator + dqs, true},
+		{LarsVonThienenZeroLagExponentialMovingAverage, dqs + larsVonThienenZeroLagExponentialMovingAverage + dqs, true},
 		// ── manfred durschner ──────────────────────────────────────────────────
 		{NewMovingAverage, dqs + newMovingAverage + dqs, true},
 		// ── marc chaikin ───────────────────────────────────────────────────────

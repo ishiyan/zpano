@@ -1,3 +1,24 @@
+use crate::entities::bar_component::BarComponent;
+use crate::entities::quote_component::QuoteComponent;
+use crate::entities::trade_component::TradeComponent;
+use crate::indicators::lars_von_thienen::bartels_periodicity_score::{BartelsPeriodicityScore,BartelsPeriodicityScoreParams};
+use crate::indicators::lars_von_thienen::complete_cycle_scanner::{CompleteCycleScanner,CompleteCycleScannerParams};
+use crate::indicators::lars_von_thienen::composite_cycle::{CompositeCycle,CompositeCycleParams};
+use crate::indicators::lars_von_thienen::cycle_phase_score::{CyclePhaseScore,CyclePhaseScoreParams};
+use crate::indicators::lars_von_thienen::cycle_polarity::{CyclePolarity,CyclePolarityParams};
+use crate::indicators::lars_von_thienen::cycle_strength::{CycleStrength,CycleStrengthParams};
+use crate::indicators::lars_von_thienen::cycle_swing_momentum::{CycleSwingMomentum,CycleSwingMomentumParams};
+use crate::indicators::lars_von_thienen::cyclic_smoothed_relative_strength_index::{CyclicSmoothedRelativeStrengthIndex,CyclicSmoothedRelativeStrengthIndexParams};
+use crate::indicators::lars_von_thienen::detrended_rhythm_oscillators::{DetrendedRhythmOscillators,DetrendedRhythmOscillatorsParams};
+use crate::indicators::lars_von_thienen::dominant_market_vibration::{DominantMarketVibration,DominantMarketVibrationParams};
+use crate::indicators::lars_von_thienen::dynamic_cycle_explorer::{DynamicCycleExplorer,DynamicCycleExplorerParams};
+use crate::indicators::lars_von_thienen::goertzel_cycle_spectrum::{GoertzelCycleSpectrum,GoertzelCycleSpectrumParams};
+use crate::indicators::lars_von_thienen::hodrick_prescott_smoothing_and_detrending::{HodrickPrescottSmoothingAndDetrending,HodrickPrescottSmoothingAndDetrendingParams};
+use crate::indicators::lars_von_thienen::metonic_relative_strength_index::{MetonicRelativeStrengthIndex,MetonicRelativeStrengthIndexParams};
+use crate::indicators::lars_von_thienen::metonic_sentiment_index::{MetonicSentimentIndex,MetonicSentimentIndexParams};
+use crate::indicators::lars_von_thienen::metonic_williams_percent_r::{MetonicWilliamsPercentR,MetonicWilliamsPercentRParams};
+use crate::indicators::lars_von_thienen::phasing_oscillator::{PhasingOscillator,PhasingOscillatorParams};
+use crate::indicators::lars_von_thienen::zero_lag_exponential_moving_average::{LarsVonThienenZeroLagExponentialMovingAverage,LarsVonThienenZeroLagExponentialMovingAverageParams};
 /// Factory that maps an [`Identifier`] and a JSON parameter string to a
 /// boxed [`Indicator`] instance. Callers don't need to import individual
 /// indicator modules directly.
@@ -1052,6 +1073,185 @@ pub fn create_indicator(
         }
 
         // ── manfred durschner ────────────────────────────────────────────
+    // ── lars von thienen ──────────────────────────────────────────────────
+Identifier::BartelsPeriodicityScore => {let mut p=BartelsPeriodicityScoreParams::default();
+if let Some(value)=get_f64(&params,"period"){p.period=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"segments"){p.segments=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"smoothing"){p.smoothing=value;}
+if let Some(value)=get_f64(&params,"barComponent"){p.bar_component=Some(lvt_bar_component(value)?);}
+if let Some(value)=get_f64(&params,"quoteComponent"){p.quote_component=Some(lvt_quote_component(value)?);}
+if let Some(value)=get_f64(&params,"tradeComponent"){p.trade_component=Some(lvt_trade_component(value)?);}
+Ok(Box::new(BartelsPeriodicityScore::new(&p)?))},
+Identifier::CompleteCycleScanner => {let mut p=CompleteCycleScannerParams::default();
+if let Some(value)=get_f64(&params,"window"){p.window=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"minPeriod"){p.min_period=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"maxPeriod"){p.max_period=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"smoothing"){p.smoothing=value;}
+if let Some(value)=get_f64(&params,"genuineThreshold"){p.genuine_threshold=value;}
+if let Some(value)=get_f64(&params,"phaseCycles"){p.phase_cycles=value;}
+if let Some(value)=get_f64(&params,"topK"){p.top_k=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"peakDistance"){p.peak_distance=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"maxSegments"){p.max_segments=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"barComponent"){p.bar_component=Some(lvt_bar_component(value)?);}
+if let Some(value)=get_f64(&params,"quoteComponent"){p.quote_component=Some(lvt_quote_component(value)?);}
+if let Some(value)=get_f64(&params,"tradeComponent"){p.trade_component=Some(lvt_trade_component(value)?);}
+Ok(Box::new(CompleteCycleScanner::new(&p)?))},
+Identifier::CompositeCycle => {let mut p=CompositeCycleParams::default();
+if let Some(value)=get_f64(&params,"window"){p.window=lvt_usize(value)?;}
+if let Some(values)=params.get("periods").and_then(JsonValue::as_array){p.periods=values.iter().map(|value|value.as_f64().ok_or("periods must contain numbers".to_string())).collect::<Result<Vec<_>,_>>()?;}
+if let Some(value)=get_f64(&params,"smoothing"){p.smoothing=value;}
+if let Some(value)=get_f64(&params,"barComponent"){p.bar_component=Some(lvt_bar_component(value)?);}
+if let Some(value)=get_f64(&params,"quoteComponent"){p.quote_component=Some(lvt_quote_component(value)?);}
+if let Some(value)=get_f64(&params,"tradeComponent"){p.trade_component=Some(lvt_trade_component(value)?);}
+Ok(Box::new(CompositeCycle::new(&p)?))},
+Identifier::CyclePhaseScore => {let mut p=CyclePhaseScoreParams::default();
+if let Some(value)=get_f64(&params,"window"){p.window=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"minPeriod"){p.min_period=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"maxPeriod"){p.max_period=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"smoothing"){p.smoothing=value;}
+if let Some(value)=get_f64(&params,"genuineThreshold"){p.genuine_threshold=value;}
+if let Some(value)=get_f64(&params,"phaseCycles"){p.phase_cycles=value;}
+if let Some(value)=get_f64(&params,"topK"){p.top_k=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"peakDistance"){p.peak_distance=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"maxSegments"){p.max_segments=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"barComponent"){p.bar_component=Some(lvt_bar_component(value)?);}
+if let Some(value)=get_f64(&params,"quoteComponent"){p.quote_component=Some(lvt_quote_component(value)?);}
+if let Some(value)=get_f64(&params,"tradeComponent"){p.trade_component=Some(lvt_trade_component(value)?);}
+Ok(Box::new(CyclePhaseScore::new(&p)?))},
+Identifier::CyclePolarity => {let mut p=CyclePolarityParams::default();
+if let Some(value)=get_f64(&params,"window"){p.window=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"shortPeriod"){p.short_period=value;}
+if let Some(value)=get_f64(&params,"longPeriod"){p.long_period=value;}
+if let Some(value)=get_f64(&params,"smoothing"){p.smoothing=value;}
+if let Some(value)=get_f64(&params,"tolerance"){p.tolerance=value;}
+if let Some(value)=get_f64(&params,"barComponent"){p.bar_component=Some(lvt_bar_component(value)?);}
+if let Some(value)=get_f64(&params,"quoteComponent"){p.quote_component=Some(lvt_quote_component(value)?);}
+if let Some(value)=get_f64(&params,"tradeComponent"){p.trade_component=Some(lvt_trade_component(value)?);}
+Ok(Box::new(CyclePolarity::new(&p)?))},
+Identifier::CycleStrength => {let mut p=CycleStrengthParams::default();
+if let Some(value)=get_f64(&params,"window"){p.window=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"period"){p.period=value;}
+if let Some(value)=get_f64(&params,"smoothing"){p.smoothing=value;}
+if let Some(value)=get_f64(&params,"barComponent"){p.bar_component=Some(lvt_bar_component(value)?);}
+if let Some(value)=get_f64(&params,"quoteComponent"){p.quote_component=Some(lvt_quote_component(value)?);}
+if let Some(value)=get_f64(&params,"tradeComponent"){p.trade_component=Some(lvt_trade_component(value)?);}
+Ok(Box::new(CycleStrength::new(&p)?))},
+Identifier::CycleSwingMomentum => {let mut p=CycleSwingMomentumParams::default();
+if let Some(value)=get_f64(&params,"window"){p.window=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"fastSmoothing"){p.fast_smoothing=value;}
+if let Some(value)=get_f64(&params,"slowSmoothing"){p.slow_smoothing=value;}
+if let Some(value)=get_f64(&params,"bandMemory"){p.band_memory=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"leveling"){p.leveling=value;}
+if let Some(value)=get_f64(&params,"barComponent"){p.bar_component=Some(lvt_bar_component(value)?);}
+if let Some(value)=get_f64(&params,"quoteComponent"){p.quote_component=Some(lvt_quote_component(value)?);}
+if let Some(value)=get_f64(&params,"tradeComponent"){p.trade_component=Some(lvt_trade_component(value)?);}
+Ok(Box::new(CycleSwingMomentum::new(&p)?))},
+Identifier::CyclicSmoothedRelativeStrengthIndex => {let mut p=CyclicSmoothedRelativeStrengthIndexParams::default();
+if let Some(value)=get_f64(&params,"dominantCycle"){p.dominant_cycle=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"vibration"){p.vibration=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"leveling"){p.leveling=value;}
+if let Some(value)=get_f64(&params,"barComponent"){p.bar_component=Some(lvt_bar_component(value)?);}
+if let Some(value)=get_f64(&params,"quoteComponent"){p.quote_component=Some(lvt_quote_component(value)?);}
+if let Some(value)=get_f64(&params,"tradeComponent"){p.trade_component=Some(lvt_trade_component(value)?);}
+Ok(Box::new(CyclicSmoothedRelativeStrengthIndex::new(&p)?))},
+Identifier::DetrendedRhythmOscillators => {let mut p=DetrendedRhythmOscillatorsParams::default();
+if let Some(value)=get_f64(&params,"fastLength"){p.fast_length=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"slowLength"){p.slow_length=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"zigPeriod"){p.zig_period=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"cycleMemory"){p.cycle_memory=lvt_usize(value)?;}
+if let Some(value)=get_bool(&params,"detrend"){p.detrend=value;}
+if let Some(value)=get_f64(&params,"barComponent"){p.bar_component=Some(lvt_bar_component(value)?);}
+if let Some(value)=get_f64(&params,"quoteComponent"){p.quote_component=Some(lvt_quote_component(value)?);}
+if let Some(value)=get_f64(&params,"tradeComponent"){p.trade_component=Some(lvt_trade_component(value)?);}
+Ok(Box::new(DetrendedRhythmOscillators::new(&p)?))},
+Identifier::DominantMarketVibration => {let mut p=DominantMarketVibrationParams::default();
+if let Some(value)=get_f64(&params,"window"){p.window=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"minPeriod"){p.min_period=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"maxPeriod"){p.max_period=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"smoothing"){p.smoothing=value;}
+if let Some(value)=get_f64(&params,"genuineThreshold"){p.genuine_threshold=value;}
+if let Some(value)=get_f64(&params,"phaseCycles"){p.phase_cycles=value;}
+if let Some(value)=get_f64(&params,"topK"){p.top_k=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"peakDistance"){p.peak_distance=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"maxSegments"){p.max_segments=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"barComponent"){p.bar_component=Some(lvt_bar_component(value)?);}
+if let Some(value)=get_f64(&params,"quoteComponent"){p.quote_component=Some(lvt_quote_component(value)?);}
+if let Some(value)=get_f64(&params,"tradeComponent"){p.trade_component=Some(lvt_trade_component(value)?);}
+Ok(Box::new(DominantMarketVibration::new(&p)?))},
+Identifier::DynamicCycleExplorer => {let mut p=DynamicCycleExplorerParams::default();
+if let Some(value)=get_f64(&params,"window"){p.window=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"minPeriod"){p.min_period=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"maxPeriod"){p.max_period=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"smoothing"){p.smoothing=value;}
+if let Some(value)=get_f64(&params,"genuineThreshold"){p.genuine_threshold=value;}
+if let Some(value)=get_f64(&params,"phaseCycles"){p.phase_cycles=value;}
+if let Some(value)=get_f64(&params,"topK"){p.top_k=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"peakDistance"){p.peak_distance=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"maxSegments"){p.max_segments=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"barComponent"){p.bar_component=Some(lvt_bar_component(value)?);}
+if let Some(value)=get_f64(&params,"quoteComponent"){p.quote_component=Some(lvt_quote_component(value)?);}
+if let Some(value)=get_f64(&params,"tradeComponent"){p.trade_component=Some(lvt_trade_component(value)?);}
+Ok(Box::new(DynamicCycleExplorer::new(&p)?))},
+Identifier::GoertzelCycleSpectrum => {let mut p=GoertzelCycleSpectrumParams::default();
+if let Some(value)=get_f64(&params,"window"){p.window=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"minPeriod"){p.min_period=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"maxPeriod"){p.max_period=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"step"){p.step=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"smoothing"){p.smoothing=value;}
+if let Some(value)=get_f64(&params,"barComponent"){p.bar_component=Some(lvt_bar_component(value)?);}
+if let Some(value)=get_f64(&params,"quoteComponent"){p.quote_component=Some(lvt_quote_component(value)?);}
+if let Some(value)=get_f64(&params,"tradeComponent"){p.trade_component=Some(lvt_trade_component(value)?);}
+Ok(Box::new(GoertzelCycleSpectrum::new(&p)?))},
+Identifier::HodrickPrescottSmoothingAndDetrending => {let mut p=HodrickPrescottSmoothingAndDetrendingParams::default();
+if let Some(value)=get_f64(&params,"window"){p.window=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"smoothing"){p.smoothing=value;}
+if let Some(value)=get_f64(&params,"barComponent"){p.bar_component=Some(lvt_bar_component(value)?);}
+if let Some(value)=get_f64(&params,"quoteComponent"){p.quote_component=Some(lvt_quote_component(value)?);}
+if let Some(value)=get_f64(&params,"tradeComponent"){p.trade_component=Some(lvt_trade_component(value)?);}
+Ok(Box::new(HodrickPrescottSmoothingAndDetrending::new(&p)?))},
+Identifier::MetonicRelativeStrengthIndex => {let mut p=MetonicRelativeStrengthIndexParams::default();
+if let Some(value)=get_f64(&params,"length"){p.length=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"delay1"){p.delay1=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"delay2"){p.delay2=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"delay3"){p.delay3=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"barComponent"){p.bar_component=Some(lvt_bar_component(value)?);}
+if let Some(value)=get_f64(&params,"quoteComponent"){p.quote_component=Some(lvt_quote_component(value)?);}
+if let Some(value)=get_f64(&params,"tradeComponent"){p.trade_component=Some(lvt_trade_component(value)?);}
+Ok(Box::new(MetonicRelativeStrengthIndex::new(&p)?))},
+Identifier::MetonicSentimentIndex => {let mut p=MetonicSentimentIndexParams::default();
+if let Some(value)=get_f64(&params,"length"){p.length=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"delay1"){p.delay1=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"delay2"){p.delay2=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"delay3"){p.delay3=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"mode"){p.mode=lvt_usize(value)?;}
+Ok(Box::new(MetonicSentimentIndex::new(&p)?))},
+Identifier::MetonicWilliamsPercentR => {let mut p=MetonicWilliamsPercentRParams::default();
+if let Some(value)=get_f64(&params,"length"){p.length=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"delay1"){p.delay1=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"delay2"){p.delay2=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"delay3"){p.delay3=lvt_usize(value)?;}
+Ok(Box::new(MetonicWilliamsPercentR::new(&p)?))},
+Identifier::PhasingOscillator => {let mut p=PhasingOscillatorParams::default();
+if let Some(value)=get_f64(&params,"window"){p.window=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"shortMin"){p.short_min=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"shortMax"){p.short_max=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"longMin"){p.long_min=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"longMax"){p.long_max=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"smoothing"){p.smoothing=value;}
+if let Some(value)=get_f64(&params,"genuineThreshold"){p.genuine_threshold=value;}
+if let Some(value)=get_f64(&params,"phaseCycles"){p.phase_cycles=value;}
+if let Some(value)=get_f64(&params,"barComponent"){p.bar_component=Some(lvt_bar_component(value)?);}
+if let Some(value)=get_f64(&params,"quoteComponent"){p.quote_component=Some(lvt_quote_component(value)?);}
+if let Some(value)=get_f64(&params,"tradeComponent"){p.trade_component=Some(lvt_trade_component(value)?);}
+Ok(Box::new(PhasingOscillator::new(&p)?))},
+Identifier::LarsVonThienenZeroLagExponentialMovingAverage => {let mut p=LarsVonThienenZeroLagExponentialMovingAverageParams::default();
+if let Some(value)=get_f64(&params,"length"){p.length=lvt_usize(value)?;}
+if let Some(value)=get_f64(&params,"barComponent"){p.bar_component=Some(lvt_bar_component(value)?);}
+if let Some(value)=get_f64(&params,"quoteComponent"){p.quote_component=Some(lvt_quote_component(value)?);}
+if let Some(value)=get_f64(&params,"tradeComponent"){p.trade_component=Some(lvt_trade_component(value)?);}
+Ok(Box::new(LarsVonThienenZeroLagExponentialMovingAverage::new(&p)?))},
+
+
         Identifier::NewMovingAverage => {
             let mut p = NewMovingAverageParams::default();
             if let Some(v) = get_usize(&params, "primary_period") {
@@ -1860,7 +2060,9 @@ pub fn create_indicator(
             Ok(Box::new(NonambiguousTrendFilter::new(&p)?))
         }
 
+// ── Lars von Thienen research ──
         _ => Err(format!("unsupported indicator: {:?}", identifier)),
+
     }
 }
 
@@ -2033,3 +2235,11 @@ mod tests {
         assert!(result.is_err());
     }
 }
+
+fn lvt_bar_component(value:f64)->Result<BarComponent,String>{if !value.is_finite()||value.fract()!=0.0||value<0.0{return Err("invalid component number".into());}[BarComponent::Open,BarComponent::High,BarComponent::Low,BarComponent::Close,BarComponent::Volume,BarComponent::Median,BarComponent::Typical,BarComponent::Weighted,BarComponent::Average].get(value as usize).copied().ok_or("unknown bar component".into())}
+
+fn lvt_quote_component(value:f64)->Result<QuoteComponent,String>{if !value.is_finite()||value.fract()!=0.0||value<0.0{return Err("invalid component number".into());}[QuoteComponent::Bid,QuoteComponent::Ask,QuoteComponent::BidSize,QuoteComponent::AskSize,QuoteComponent::Mid,QuoteComponent::Weighted,QuoteComponent::WeightedMid,QuoteComponent::SpreadBp].get(value as usize).copied().ok_or("unknown quote component".into())}
+
+fn lvt_trade_component(value:f64)->Result<TradeComponent,String>{if !value.is_finite()||value.fract()!=0.0||value<0.0{return Err("invalid component number".into());}[TradeComponent::Price,TradeComponent::Volume].get(value as usize).copied().ok_or("unknown trade component".into())}
+
+fn lvt_usize(value:f64)->Result<usize,String>{if !value.is_finite() || value.fract()!=0.0 || value<0.0 || value>i64::MAX as f64{return Err("invalid nonnegative integer parameter".into());}Ok(value as usize)}

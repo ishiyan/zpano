@@ -167,6 +167,7 @@ pub fn build(b: *std.Build) void {
             .{ .name = "entities", .module = entities_mod },
         },
     });
+    indicators_mod.addImport("indicators", indicators_mod);
 
     // --- CLI executables ---
     const icalc_exe = b.addExecutable(.{
@@ -190,6 +191,20 @@ pub fn build(b: *std.Build) void {
     }
     const run_icalc_step = b.step("icalc", "Run the icalc indicator calculator");
     run_icalc_step.dependOn(&run_icalc.step);
+
+    const lvt_exe = b.addExecutable(.{
+        .name = "lvt",
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/cmd/lvt/main.zig"),
+            .target = target,
+            .optimize = optimize,
+            .imports = &.{.{ .name = "indicators", .module = indicators_mod }},
+        }),
+    });
+    b.installArtifact(lvt_exe);
+    const run_lvt = b.addRunArtifact(lvt_exe);
+    if (b.args) |args| run_lvt.addArgs(args);
+    b.step("lvt", "Run Lars von Thienen research workflows").dependOn(&run_lvt.step);
 
     const ifres_exe = b.addExecutable(.{
         .name = "ifres",
@@ -548,6 +563,7 @@ pub fn build(b: *std.Build) void {
             .{ .name = "entities", .module = entities_mod },
         },
     });
+    indicators_test_mod.addImport("indicators", indicators_test_mod);
 
     // --- Fuzzy test module (barrel) ---
     const fuzzy_test_mod = b.createModule(.{

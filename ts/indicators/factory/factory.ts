@@ -1,3 +1,39 @@
+import { BartelsPeriodicityScore } from "../lars-von-thienen/bartels-periodicity-score/bartels-periodicity-score.js";
+import { defaultParams as defaultLvtBartelsPeriodicityScoreParams } from "../lars-von-thienen/bartels-periodicity-score/params.js";
+import { CompleteCycleScanner } from "../lars-von-thienen/complete-cycle-scanner/complete-cycle-scanner.js";
+import { defaultParams as defaultLvtCompleteCycleScannerParams } from "../lars-von-thienen/complete-cycle-scanner/params.js";
+import { CompositeCycle } from "../lars-von-thienen/composite-cycle/composite-cycle.js";
+import { defaultParams as defaultLvtCompositeCycleParams } from "../lars-von-thienen/composite-cycle/params.js";
+import { CyclePhaseScore } from "../lars-von-thienen/cycle-phase-score/cycle-phase-score.js";
+import { defaultParams as defaultLvtCyclePhaseScoreParams } from "../lars-von-thienen/cycle-phase-score/params.js";
+import { CyclePolarity } from "../lars-von-thienen/cycle-polarity/cycle-polarity.js";
+import { defaultParams as defaultLvtCyclePolarityParams } from "../lars-von-thienen/cycle-polarity/params.js";
+import { CycleStrength } from "../lars-von-thienen/cycle-strength/cycle-strength.js";
+import { defaultParams as defaultLvtCycleStrengthParams } from "../lars-von-thienen/cycle-strength/params.js";
+import { CycleSwingMomentum } from "../lars-von-thienen/cycle-swing-momentum/cycle-swing-momentum.js";
+import { defaultParams as defaultLvtCycleSwingMomentumParams } from "../lars-von-thienen/cycle-swing-momentum/params.js";
+import { CyclicSmoothedRelativeStrengthIndex } from "../lars-von-thienen/cyclic-smoothed-relative-strength-index/cyclic-smoothed-relative-strength-index.js";
+import { defaultParams as defaultLvtCyclicSmoothedRelativeStrengthIndexParams } from "../lars-von-thienen/cyclic-smoothed-relative-strength-index/params.js";
+import { DetrendedRhythmOscillators } from "../lars-von-thienen/detrended-rhythm-oscillators/detrended-rhythm-oscillators.js";
+import { defaultParams as defaultLvtDetrendedRhythmOscillatorsParams } from "../lars-von-thienen/detrended-rhythm-oscillators/params.js";
+import { DominantMarketVibration } from "../lars-von-thienen/dominant-market-vibration/dominant-market-vibration.js";
+import { defaultParams as defaultLvtDominantMarketVibrationParams } from "../lars-von-thienen/dominant-market-vibration/params.js";
+import { DynamicCycleExplorer } from "../lars-von-thienen/dynamic-cycle-explorer/dynamic-cycle-explorer.js";
+import { defaultParams as defaultLvtDynamicCycleExplorerParams } from "../lars-von-thienen/dynamic-cycle-explorer/params.js";
+import { GoertzelCycleSpectrum } from "../lars-von-thienen/goertzel-cycle-spectrum/goertzel-cycle-spectrum.js";
+import { defaultParams as defaultLvtGoertzelCycleSpectrumParams } from "../lars-von-thienen/goertzel-cycle-spectrum/params.js";
+import { HodrickPrescottSmoothingAndDetrending } from "../lars-von-thienen/hodrick-prescott-smoothing-and-detrending/hodrick-prescott-smoothing-and-detrending.js";
+import { defaultParams as defaultLvtHodrickPrescottSmoothingAndDetrendingParams } from "../lars-von-thienen/hodrick-prescott-smoothing-and-detrending/params.js";
+import { MetonicRelativeStrengthIndex } from "../lars-von-thienen/metonic-relative-strength-index/metonic-relative-strength-index.js";
+import { defaultParams as defaultLvtMetonicRelativeStrengthIndexParams } from "../lars-von-thienen/metonic-relative-strength-index/params.js";
+import { MetonicSentimentIndex } from "../lars-von-thienen/metonic-sentiment-index/metonic-sentiment-index.js";
+import { defaultParams as defaultLvtMetonicSentimentIndexParams } from "../lars-von-thienen/metonic-sentiment-index/params.js";
+import { MetonicWilliamsPercentR } from "../lars-von-thienen/metonic-williams-percent-r/metonic-williams-percent-r.js";
+import { defaultParams as defaultLvtMetonicWilliamsPercentRParams } from "../lars-von-thienen/metonic-williams-percent-r/params.js";
+import { PhasingOscillator } from "../lars-von-thienen/phasing-oscillator/phasing-oscillator.js";
+import { defaultParams as defaultLvtPhasingOscillatorParams } from "../lars-von-thienen/phasing-oscillator/params.js";
+import { LarsVonThienenZeroLagExponentialMovingAverage } from "../lars-von-thienen/zero-lag-exponential-moving-average/zero-lag-exponential-moving-average.js";
+import { defaultParams as defaultLvtLarsVonThienenZeroLagExponentialMovingAverageParams } from "../lars-von-thienen/zero-lag-exponential-moving-average/params.js";
 /**
  * Factory that maps an {@link IndicatorIdentifier} and a plain-object parameter
  * bag to a fully constructed {@link Indicator} instance, so callers don't need
@@ -519,7 +555,28 @@ export function createIndicator(identifier: IndicatorIdentifier, params?: Record
 
         // ── manfred-dürschner ────────────────────────────────────────────
 
-        case IndicatorIdentifier.NewMovingAverage:
+        // ── lars von thienen ──────────────────────────────────────────────────
+    case IndicatorIdentifier.BartelsPeriodicityScore: return new BartelsPeriodicityScore({...defaultLvtBartelsPeriodicityScoreParams(),...p});
+        case IndicatorIdentifier.CompleteCycleScanner: return new CompleteCycleScanner({...defaultLvtCompleteCycleScannerParams(),...p});
+        case IndicatorIdentifier.CompositeCycle: return new CompositeCycle({...defaultLvtCompositeCycleParams(),...p});
+        case IndicatorIdentifier.CyclePhaseScore: return new CyclePhaseScore({...defaultLvtCyclePhaseScoreParams(),...p});
+        case IndicatorIdentifier.CyclePolarity: return new CyclePolarity({...defaultLvtCyclePolarityParams(),...p});
+        case IndicatorIdentifier.CycleStrength: return new CycleStrength({...defaultLvtCycleStrengthParams(),...p});
+        case IndicatorIdentifier.CycleSwingMomentum: return new CycleSwingMomentum({...defaultLvtCycleSwingMomentumParams(),...p});
+        case IndicatorIdentifier.CyclicSmoothedRelativeStrengthIndex: return new CyclicSmoothedRelativeStrengthIndex({...defaultLvtCyclicSmoothedRelativeStrengthIndexParams(),...p});
+        case IndicatorIdentifier.DetrendedRhythmOscillators: return new DetrendedRhythmOscillators({...defaultLvtDetrendedRhythmOscillatorsParams(),...p});
+        case IndicatorIdentifier.DominantMarketVibration: return new DominantMarketVibration({...defaultLvtDominantMarketVibrationParams(),...p});
+        case IndicatorIdentifier.DynamicCycleExplorer: return new DynamicCycleExplorer({...defaultLvtDynamicCycleExplorerParams(),...p});
+        case IndicatorIdentifier.GoertzelCycleSpectrum: return new GoertzelCycleSpectrum({...defaultLvtGoertzelCycleSpectrumParams(),...p});
+        case IndicatorIdentifier.HodrickPrescottSmoothingAndDetrending: return new HodrickPrescottSmoothingAndDetrending({...defaultLvtHodrickPrescottSmoothingAndDetrendingParams(),...p});
+        case IndicatorIdentifier.MetonicRelativeStrengthIndex: return new MetonicRelativeStrengthIndex({...defaultLvtMetonicRelativeStrengthIndexParams(),...p});
+        case IndicatorIdentifier.MetonicSentimentIndex: return new MetonicSentimentIndex({...defaultLvtMetonicSentimentIndexParams(),...p});
+        case IndicatorIdentifier.MetonicWilliamsPercentR: return new MetonicWilliamsPercentR({...defaultLvtMetonicWilliamsPercentRParams(),...p});
+        case IndicatorIdentifier.PhasingOscillator: return new PhasingOscillator({...defaultLvtPhasingOscillatorParams(),...p});
+        case IndicatorIdentifier.LarsVonThienenZeroLagExponentialMovingAverage: return new LarsVonThienenZeroLagExponentialMovingAverage({...defaultLvtLarsVonThienenZeroLagExponentialMovingAverageParams(),...p});
+
+
+    case IndicatorIdentifier.NewMovingAverage:
             return new NewMovingAverage({ ...defaultNmaParams(), ...p });
 
         // ── marc-chaikin ────────────────────────────────────────────────

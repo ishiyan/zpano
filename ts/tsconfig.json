@@ -28,6 +28,7 @@
     "symbology/**/*.ts",
     "entities/**/*.ts",
     "indicators/**/*.ts",
+    "cmd/**/main.ts",
     "fuzzy/**/*.ts",
     "signals/**/*.ts",
     "candlestick-patterns/**/*.ts",

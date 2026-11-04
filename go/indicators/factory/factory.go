@@ -77,6 +77,24 @@ import (
 	"zpano/indicators/josephgranville/onbalancevolume"
 	"zpano/indicators/larrywilliams/ultimateoscillator"
 	"zpano/indicators/larrywilliams/williamspercentr"
+	"zpano/indicators/larsvonthienen/bartelsperiodicityscore"
+	"zpano/indicators/larsvonthienen/completecyclescanner"
+	"zpano/indicators/larsvonthienen/compositecycle"
+	"zpano/indicators/larsvonthienen/cyclephasescore"
+	"zpano/indicators/larsvonthienen/cyclepolarity"
+	"zpano/indicators/larsvonthienen/cyclestrength"
+	"zpano/indicators/larsvonthienen/cycleswingmomentum"
+	"zpano/indicators/larsvonthienen/cyclicsmoothedrelativestrengthindex"
+	"zpano/indicators/larsvonthienen/detrendedrhythmoscillators"
+	"zpano/indicators/larsvonthienen/dominantmarketvibration"
+	"zpano/indicators/larsvonthienen/dynamiccycleexplorer"
+	"zpano/indicators/larsvonthienen/goertzelcyclespectrum"
+	"zpano/indicators/larsvonthienen/hodrickprescottsmoothinganddetrending"
+	"zpano/indicators/larsvonthienen/metonicrelativestrengthindex"
+	"zpano/indicators/larsvonthienen/metonicsentimentindex"
+	"zpano/indicators/larsvonthienen/metonicwilliamspercentr"
+	"zpano/indicators/larsvonthienen/phasingoscillator"
+	lvtzerolagexponentialmovingaverage "zpano/indicators/larsvonthienen/zerolagexponentialmovingaverage"
 	"zpano/indicators/manfreddurschner/newmovingaverage"
 	"zpano/indicators/marcchaikin/advancedecline"
 	"zpano/indicators/marcchaikin/advancedeclineoscillator"
@@ -655,6 +673,116 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 		return ultimateoscillator.NewUltimateOscillator(p)
 
 	// ── manfred durschner ────────────────────────────────────────────────────
+
+	// ── lars von thienen ──────────────────────────────────────────────────
+	case core.BartelsPeriodicityScore:
+		p := bartelsperiodicityscore.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+		return bartelsperiodicityscore.NewBartelsPeriodicityScore(p)
+	case core.CompleteCycleScanner:
+		p := completecyclescanner.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+		return completecyclescanner.NewCompleteCycleScanner(p)
+	case core.CompositeCycle:
+		p := compositecycle.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+		return compositecycle.NewCompositeCycle(p)
+	case core.CyclePhaseScore:
+		p := cyclephasescore.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+		return cyclephasescore.NewCyclePhaseScore(p)
+	case core.CyclePolarity:
+		p := cyclepolarity.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+		return cyclepolarity.NewCyclePolarity(p)
+	case core.CycleStrength:
+		p := cyclestrength.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+		return cyclestrength.NewCycleStrength(p)
+	case core.CycleSwingMomentum:
+		p := cycleswingmomentum.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+		return cycleswingmomentum.NewCycleSwingMomentum(p)
+	case core.CyclicSmoothedRelativeStrengthIndex:
+		p := cyclicsmoothedrelativestrengthindex.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+		return cyclicsmoothedrelativestrengthindex.NewCyclicSmoothedRelativeStrengthIndex(p)
+	case core.DetrendedRhythmOscillators:
+		p := detrendedrhythmoscillators.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+		return detrendedrhythmoscillators.NewDetrendedRhythmOscillators(p)
+	case core.DominantMarketVibration:
+		p := dominantmarketvibration.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+		return dominantmarketvibration.NewDominantMarketVibration(p)
+	case core.DynamicCycleExplorer:
+		p := dynamiccycleexplorer.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+		return dynamiccycleexplorer.NewDynamicCycleExplorer(p)
+	case core.GoertzelCycleSpectrum:
+		p := goertzelcyclespectrum.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+		return goertzelcyclespectrum.NewGoertzelCycleSpectrum(p)
+	case core.HodrickPrescottSmoothingAndDetrending:
+		p := hodrickprescottsmoothinganddetrending.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+		return hodrickprescottsmoothinganddetrending.NewHodrickPrescottSmoothingAndDetrending(p)
+	case core.MetonicRelativeStrengthIndex:
+		p := metonicrelativestrengthindex.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+		return metonicrelativestrengthindex.NewMetonicRelativeStrengthIndex(p)
+	case core.MetonicSentimentIndex:
+		p := metonicsentimentindex.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+		return metonicsentimentindex.NewMetonicSentimentIndex(p)
+	case core.MetonicWilliamsPercentR:
+		p := metonicwilliamspercentr.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+		return metonicwilliamspercentr.NewMetonicWilliamsPercentR(p)
+	case core.PhasingOscillator:
+		p := phasingoscillator.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+		return phasingoscillator.NewPhasingOscillator(p)
+	case core.LarsVonThienenZeroLagExponentialMovingAverage:
+		p := lvtzerolagexponentialmovingaverage.DefaultParams()
+		if err := unmarshal(b, p); err != nil {
+			return nil, err
+		}
+		return lvtzerolagexponentialmovingaverage.NewLarsVonThienenZeroLagExponentialMovingAverage(p)
 
 	case core.NewMovingAverage:
 		p := newmovingaverage.DefaultParams()
@@ -1313,6 +1441,7 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 
 		return nonambiguoustrendfilter.NewNonambiguousTrendFilter(p)
 
+	// ── Lars von Thienen research ──
 	default:
 		return nil, fmt.Errorf("unsupported indicator: %s", identifier)
 	}

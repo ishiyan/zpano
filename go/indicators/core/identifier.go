@@ -189,10 +189,48 @@ const (
 	// WilliamsPercentR identifies the Larry Williams Williams %R (WILL%R) indicator.
 	WilliamsPercentR
 
+	// ── lars von thienen ──
+	// BartelsPeriodicityScore identifies bartels-periodicity-score.
+	BartelsPeriodicityScore Identifier = 121
+	// CompleteCycleScanner identifies complete-cycle-scanner.
+	CompleteCycleScanner Identifier = 122
+	// CompositeCycle identifies composite-cycle.
+	CompositeCycle Identifier = 123
+	// CyclePhaseScore identifies cycle-phase-score.
+	CyclePhaseScore Identifier = 124
+	// CyclePolarity identifies cycle-polarity.
+	CyclePolarity Identifier = 125
+	// CycleStrength identifies cycle-strength.
+	CycleStrength Identifier = 126
+	// CycleSwingMomentum identifies cycle-swing-momentum.
+	CycleSwingMomentum Identifier = 127
+	// CyclicSmoothedRelativeStrengthIndex identifies cyclic-smoothed-relative-strength-index.
+	CyclicSmoothedRelativeStrengthIndex Identifier = 128
+	// DetrendedRhythmOscillators identifies detrended-rhythm-oscillators.
+	DetrendedRhythmOscillators Identifier = 129
+	// DominantMarketVibration identifies dominant-market-vibration.
+	DominantMarketVibration Identifier = 130
+	// DynamicCycleExplorer identifies dynamic-cycle-explorer.
+	DynamicCycleExplorer Identifier = 131
+	// GoertzelCycleSpectrum identifies goertzel-cycle-spectrum.
+	GoertzelCycleSpectrum Identifier = 132
+	// HodrickPrescottSmoothingAndDetrending identifies hodrick-prescott-smoothing-and-detrending.
+	HodrickPrescottSmoothingAndDetrending Identifier = 133
+	// MetonicRelativeStrengthIndex identifies metonic-relative-strength-index.
+	MetonicRelativeStrengthIndex Identifier = 134
+	// MetonicSentimentIndex identifies metonic-sentiment-index.
+	MetonicSentimentIndex Identifier = 135
+	// MetonicWilliamsPercentR identifies metonic-williams-percent-r.
+	MetonicWilliamsPercentR Identifier = 136
+	// PhasingOscillator identifies phasing-oscillator.
+	PhasingOscillator Identifier = 137
+	// LarsVonThienenZeroLagExponentialMovingAverage identifies zero-lag-exponential-moving-average.
+	LarsVonThienenZeroLagExponentialMovingAverage Identifier = 138
+
 	// ── manfred durschner ──────────────────────────────────────────────────
 
 	// NewMovingAverage identifies the New Moving Average (NMA) indicator by Dürschner.
-	NewMovingAverage
+	NewMovingAverage Identifier = iota - 17
 
 	// ── marc chaikin ───────────────────────────────────────────────────────
 
@@ -443,7 +481,7 @@ const (
 	// NonambiguousTrendFilter identifies the William Blau Nonambiguous Trend Filter (NTF) indicator.
 	NonambiguousTrendFilter
 
-	last
+	last Identifier = 139
 )
 
 const (
@@ -592,32 +630,50 @@ const (
 	schaffTrendCycle = "schaffTrendCycle"
 
 	// ── don mak ───────────────────────────────────────────────────────────
-	adaptiveExponentialMovingAverage          = "adaptiveExponentialMovingAverage"
-	instantaneousSineWavePeriod               = "instantaneousSineWavePeriod"
-	polynomialFitDerivative                   = "polynomialFitDerivative"
-	mexicanHatWavelet                         = "mexicanHatWavelet"
-	sincWaveletBandpass                       = "sincWaveletBandpass"
-	modifiedExponentialMovingAverage          = "modifiedExponentialMovingAverage"
-	velocityCorrectedExponentialMovingAverage = "velocityCorrectedExponentialMovingAverage"
-	polynomialForecast                        = "polynomialForecast"
-	parabolicVertex                           = "parabolicVertex"
-	cubicVertex                               = "cubicVertex"
-	quantumPriceLevels                        = "quantumPriceLevels"
-	movingMiniMax                             = "movingMiniMax"
-	trueStrengthIndex                         = "trueStrengthIndex"
-	ergodicOscillator                         = "ergodicOscillator"
-	meanDeviationIndex                        = "meanDeviationIndex"
-	macdIndex                                 = "macdIndex"
-	doubleSmoothedMomenta                     = "doubleSmoothedMomenta"
-	candlestickMomentumIndex                  = "candlestickMomentumIndex"
-	candlestickStrengthIndex                  = "candlestickStrengthIndex"
-	stochasticMomentumIndex                   = "stochasticMomentumIndex"
-	doubleSmoothedStochastic                  = "doubleSmoothedStochastic"
-	directionalTrendIndex                     = "directionalTrendIndex"
-	tickVolumeIndicator                       = "tickVolumeIndicator"
-	slopeDivergenceTsiFilter                  = "slopeDivergenceTsiFilter"
-	adxTypeFilter                             = "adxTypeFilter"
-	nonambiguousTrendFilter                   = "nonambiguousTrendFilter"
+	adaptiveExponentialMovingAverage              = "adaptiveExponentialMovingAverage"
+	instantaneousSineWavePeriod                   = "instantaneousSineWavePeriod"
+	polynomialFitDerivative                       = "polynomialFitDerivative"
+	mexicanHatWavelet                             = "mexicanHatWavelet"
+	sincWaveletBandpass                           = "sincWaveletBandpass"
+	modifiedExponentialMovingAverage              = "modifiedExponentialMovingAverage"
+	velocityCorrectedExponentialMovingAverage     = "velocityCorrectedExponentialMovingAverage"
+	polynomialForecast                            = "polynomialForecast"
+	parabolicVertex                               = "parabolicVertex"
+	cubicVertex                                   = "cubicVertex"
+	quantumPriceLevels                            = "quantumPriceLevels"
+	movingMiniMax                                 = "movingMiniMax"
+	trueStrengthIndex                             = "trueStrengthIndex"
+	ergodicOscillator                             = "ergodicOscillator"
+	meanDeviationIndex                            = "meanDeviationIndex"
+	macdIndex                                     = "macdIndex"
+	doubleSmoothedMomenta                         = "doubleSmoothedMomenta"
+	candlestickMomentumIndex                      = "candlestickMomentumIndex"
+	candlestickStrengthIndex                      = "candlestickStrengthIndex"
+	stochasticMomentumIndex                       = "stochasticMomentumIndex"
+	doubleSmoothedStochastic                      = "doubleSmoothedStochastic"
+	directionalTrendIndex                         = "directionalTrendIndex"
+	tickVolumeIndicator                           = "tickVolumeIndicator"
+	slopeDivergenceTsiFilter                      = "slopeDivergenceTsiFilter"
+	adxTypeFilter                                 = "adxTypeFilter"
+	nonambiguousTrendFilter                       = "nonambiguousTrendFilter"
+	bartelsPeriodicityScore                       = "bartelsPeriodicityScore"
+	completeCycleScanner                          = "completeCycleScanner"
+	compositeCycle                                = "compositeCycle"
+	cyclePhaseScore                               = "cyclePhaseScore"
+	cyclePolarity                                 = "cyclePolarity"
+	cycleStrength                                 = "cycleStrength"
+	cycleSwingMomentum                            = "cycleSwingMomentum"
+	cyclicSmoothedRelativeStrengthIndex           = "cyclicSmoothedRelativeStrengthIndex"
+	detrendedRhythmOscillators                    = "detrendedRhythmOscillators"
+	dominantMarketVibration                       = "dominantMarketVibration"
+	dynamicCycleExplorer                          = "dynamicCycleExplorer"
+	goertzelCycleSpectrum                         = "goertzelCycleSpectrum"
+	hodrickPrescottSmoothingAndDetrending         = "hodrickPrescottSmoothingAndDetrending"
+	metonicRelativeStrengthIndex                  = "metonicRelativeStrengthIndex"
+	metonicSentimentIndex                         = "metonicSentimentIndex"
+	metonicWilliamsPercentR                       = "metonicWilliamsPercentR"
+	phasingOscillator                             = "phasingOscillator"
+	larsVonThienenZeroLagExponentialMovingAverage = "larsVonThienenZeroLagExponentialMovingAverage"
 )
 
 // String implements the Stringer interface.
@@ -888,6 +944,42 @@ func (i Identifier) String() string {
 		return adxTypeFilter
 	case NonambiguousTrendFilter:
 		return nonambiguousTrendFilter
+	case BartelsPeriodicityScore:
+		return bartelsPeriodicityScore
+	case CompleteCycleScanner:
+		return completeCycleScanner
+	case CompositeCycle:
+		return compositeCycle
+	case CyclePhaseScore:
+		return cyclePhaseScore
+	case CyclePolarity:
+		return cyclePolarity
+	case CycleStrength:
+		return cycleStrength
+	case CycleSwingMomentum:
+		return cycleSwingMomentum
+	case CyclicSmoothedRelativeStrengthIndex:
+		return cyclicSmoothedRelativeStrengthIndex
+	case DetrendedRhythmOscillators:
+		return detrendedRhythmOscillators
+	case DominantMarketVibration:
+		return dominantMarketVibration
+	case DynamicCycleExplorer:
+		return dynamicCycleExplorer
+	case GoertzelCycleSpectrum:
+		return goertzelCycleSpectrum
+	case HodrickPrescottSmoothingAndDetrending:
+		return hodrickPrescottSmoothingAndDetrending
+	case MetonicRelativeStrengthIndex:
+		return metonicRelativeStrengthIndex
+	case MetonicSentimentIndex:
+		return metonicSentimentIndex
+	case MetonicWilliamsPercentR:
+		return metonicWilliamsPercentR
+	case PhasingOscillator:
+		return phasingOscillator
+	case LarsVonThienenZeroLagExponentialMovingAverage:
+		return larsVonThienenZeroLagExponentialMovingAverage
 	default:
 		return unknown
 	}
@@ -1195,6 +1287,42 @@ func (i *Identifier) UnmarshalJSON(data []byte) error {
 		*i = AdxTypeFilter
 	case nonambiguousTrendFilter:
 		*i = NonambiguousTrendFilter
+	case bartelsPeriodicityScore:
+		*i = BartelsPeriodicityScore
+	case completeCycleScanner:
+		*i = CompleteCycleScanner
+	case compositeCycle:
+		*i = CompositeCycle
+	case cyclePhaseScore:
+		*i = CyclePhaseScore
+	case cyclePolarity:
+		*i = CyclePolarity
+	case cycleStrength:
+		*i = CycleStrength
+	case cycleSwingMomentum:
+		*i = CycleSwingMomentum
+	case cyclicSmoothedRelativeStrengthIndex:
+		*i = CyclicSmoothedRelativeStrengthIndex
+	case detrendedRhythmOscillators:
+		*i = DetrendedRhythmOscillators
+	case dominantMarketVibration:
+		*i = DominantMarketVibration
+	case dynamicCycleExplorer:
+		*i = DynamicCycleExplorer
+	case goertzelCycleSpectrum:
+		*i = GoertzelCycleSpectrum
+	case hodrickPrescottSmoothingAndDetrending:
+		*i = HodrickPrescottSmoothingAndDetrending
+	case metonicRelativeStrengthIndex:
+		*i = MetonicRelativeStrengthIndex
+	case metonicSentimentIndex:
+		*i = MetonicSentimentIndex
+	case metonicWilliamsPercentR:
+		*i = MetonicWilliamsPercentR
+	case phasingOscillator:
+		*i = PhasingOscillator
+	case larsVonThienenZeroLagExponentialMovingAverage:
+		*i = LarsVonThienenZeroLagExponentialMovingAverage
 	default:
 		return fmt.Errorf(errFmt, s)
 	}

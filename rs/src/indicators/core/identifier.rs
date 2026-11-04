@@ -136,6 +136,45 @@ pub enum Identifier {
     /// Identifies the Larry Williams Williams %R (WILL%R) indicator.
     WilliamsPercentR = 46,
 
+    // ── Lars von Thienen research ──
+    /// bartels-periodicity-score research indicator.
+    BartelsPeriodicityScore = 120,
+    /// complete-cycle-scanner research indicator.
+    CompleteCycleScanner = 121,
+    /// composite-cycle research indicator.
+    CompositeCycle = 122,
+    /// cycle-phase-score research indicator.
+    CyclePhaseScore = 123,
+    /// cycle-polarity research indicator.
+    CyclePolarity = 124,
+    /// cycle-strength research indicator.
+    CycleStrength = 125,
+    /// cycle-swing-momentum research indicator.
+    CycleSwingMomentum = 126,
+    /// cyclic-smoothed-relative-strength-index research indicator.
+    CyclicSmoothedRelativeStrengthIndex = 127,
+    /// detrended-rhythm-oscillators research indicator.
+    DetrendedRhythmOscillators = 128,
+    /// dominant-market-vibration research indicator.
+    DominantMarketVibration = 129,
+    /// dynamic-cycle-explorer research indicator.
+    DynamicCycleExplorer = 130,
+    /// goertzel-cycle-spectrum research indicator.
+    GoertzelCycleSpectrum = 131,
+    /// hodrick-prescott-smoothing-and-detrending research indicator.
+    HodrickPrescottSmoothingAndDetrending = 132,
+    /// metonic-relative-strength-index research indicator.
+    MetonicRelativeStrengthIndex = 133,
+    /// metonic-sentiment-index research indicator.
+    MetonicSentimentIndex = 134,
+    /// metonic-williams-percent-r research indicator.
+    MetonicWilliamsPercentR = 135,
+    /// phasing-oscillator research indicator.
+    PhasingOscillator = 136,
+    /// zero-lag-exponential-moving-average research indicator.
+    LarsVonThienenZeroLagExponentialMovingAverage = 137,
+
+
     // ── manfred durschner ──────────────────────────────────────────────────
     /// Identifies the New Moving Average (NMA) indicator by Durschner.
     NewMovingAverage = 47,
@@ -309,6 +348,7 @@ pub enum Identifier {
     AdxTypeFilter = 118,
     /// Identifies the William Blau Nonambiguous Trend Filter (NTF) indicator.
     NonambiguousTrendFilter = 119,
+
 }
 
 impl Identifier {
@@ -443,6 +483,25 @@ impl Identifier {
             Self::SlopeDivergenceTsiFilter => "slopeDivergenceTsiFilter",
             Self::AdxTypeFilter => "adxTypeFilter",
             Self::NonambiguousTrendFilter => "nonambiguousTrendFilter",
+            Identifier::BartelsPeriodicityScore => "bartelsPeriodicityScore",
+            Identifier::CompleteCycleScanner => "completeCycleScanner",
+            Identifier::CompositeCycle => "compositeCycle",
+            Identifier::CyclePhaseScore => "cyclePhaseScore",
+            Identifier::CyclePolarity => "cyclePolarity",
+            Identifier::CycleStrength => "cycleStrength",
+            Identifier::CycleSwingMomentum => "cycleSwingMomentum",
+            Identifier::CyclicSmoothedRelativeStrengthIndex => "cyclicSmoothedRelativeStrengthIndex",
+            Identifier::DetrendedRhythmOscillators => "detrendedRhythmOscillators",
+            Identifier::DominantMarketVibration => "dominantMarketVibration",
+            Identifier::DynamicCycleExplorer => "dynamicCycleExplorer",
+            Identifier::GoertzelCycleSpectrum => "goertzelCycleSpectrum",
+            Identifier::HodrickPrescottSmoothingAndDetrending => "hodrickPrescottSmoothingAndDetrending",
+            Identifier::MetonicRelativeStrengthIndex => "metonicRelativeStrengthIndex",
+            Identifier::MetonicSentimentIndex => "metonicSentimentIndex",
+            Identifier::MetonicWilliamsPercentR => "metonicWilliamsPercentR",
+            Identifier::PhasingOscillator => "phasingOscillator",
+            Identifier::LarsVonThienenZeroLagExponentialMovingAverage => "larsVonThienenZeroLagExponentialMovingAverage",
+
         }
     }
 
@@ -581,6 +640,24 @@ impl Identifier {
             "slopeDivergenceTsiFilter" => Some(Self::SlopeDivergenceTsiFilter),
             "adxTypeFilter" => Some(Self::AdxTypeFilter),
             "nonambiguousTrendFilter" => Some(Self::NonambiguousTrendFilter),
+            "bartelsPeriodicityScore" => Some(Identifier::BartelsPeriodicityScore),
+            "completeCycleScanner" => Some(Identifier::CompleteCycleScanner),
+            "compositeCycle" => Some(Identifier::CompositeCycle),
+            "cyclePhaseScore" => Some(Identifier::CyclePhaseScore),
+            "cyclePolarity" => Some(Identifier::CyclePolarity),
+            "cycleStrength" => Some(Identifier::CycleStrength),
+            "cycleSwingMomentum" => Some(Identifier::CycleSwingMomentum),
+            "cyclicSmoothedRelativeStrengthIndex" => Some(Identifier::CyclicSmoothedRelativeStrengthIndex),
+            "detrendedRhythmOscillators" => Some(Identifier::DetrendedRhythmOscillators),
+            "dominantMarketVibration" => Some(Identifier::DominantMarketVibration),
+            "dynamicCycleExplorer" => Some(Identifier::DynamicCycleExplorer),
+            "goertzelCycleSpectrum" => Some(Identifier::GoertzelCycleSpectrum),
+            "hodrickPrescottSmoothingAndDetrending" => Some(Identifier::HodrickPrescottSmoothingAndDetrending),
+            "metonicRelativeStrengthIndex" => Some(Identifier::MetonicRelativeStrengthIndex),
+            "metonicSentimentIndex" => Some(Identifier::MetonicSentimentIndex),
+            "metonicWilliamsPercentR" => Some(Identifier::MetonicWilliamsPercentR),
+            "phasingOscillator" => Some(Identifier::PhasingOscillator),
+            "larsVonThienenZeroLagExponentialMovingAverage" => Some(Identifier::LarsVonThienenZeroLagExponentialMovingAverage),
             _ => None,
         }
     }

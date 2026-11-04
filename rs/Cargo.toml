@@ -16,3 +16,7 @@ path = "src/cmd/iconf/main.rs"
 [[bin]]
 name = "ifres"
 path = "src/cmd/ifres/main.rs"
+
+[[bin]]
+name = "lvt"
+path = "src/cmd/lvt/main.rs"
