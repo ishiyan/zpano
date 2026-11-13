@@ -634,11 +634,25 @@ pub fn create_indicator(
 
         // ── john ehlers ──────────────────────────────────────────────────
         Identifier::SuperSmoother => {
-            let mut p = SuperSmootherParams::default();
-            if let Some(v) = get_i64(&params, "shortestCyclePeriod") {
-                p.shortest_cycle_period = v;
+            let mut options = SuperSmootherParams::default();
+            if !is_empty_object(&params) {
+                if let Some(raw) = params.get("shortestCyclePeriod") {
+                    match raw {
+                        JsonValue::Number(number) => options.shortest_cycle_period = *number,
+                        _ => return Err("shortestCyclePeriod must be a number".to_string()),
+                    }
+                }
+                if let Some(number) = get_f64(&params, "barComponent") {
+                    options.bar_component = Some(lvt_bar_component(number)?);
+                }
+                if let Some(number) = get_f64(&params, "quoteComponent") {
+                    options.quote_component = Some(lvt_quote_component(number)?);
+                }
+                if let Some(number) = get_f64(&params, "tradeComponent") {
+                    options.trade_component = Some(lvt_trade_component(number)?);
+                }
             }
-            Ok(Box::new(SuperSmoother::new(&p)?))
+            Ok(Box::new(SuperSmoother::new(&options)?))
         }
 
         Identifier::CenterOfGravityOscillator => {
@@ -2342,6 +2356,16 @@ mod tests {
             vigor_custom.metadata().mnemonic,
             "ctv(50, 20, -10, 10, 30, offset=-1)"
         );
+
+        let smoother_default = create_indicator(Identifier::SuperSmoother, "{}").unwrap();
+        assert_eq!(smoother_default.metadata().mnemonic, "ss(10)");
+
+        let smoother_custom =
+            create_indicator(Identifier::SuperSmoother, r#"{"shortestCyclePeriod": 10.5}"#).unwrap();
+        assert_eq!(smoother_custom.metadata().mnemonic, "ss(10.5)");
+
+        assert!(create_indicator(Identifier::SuperSmoother, r#"{"shortestCyclePeriod": "bad"}"#).is_err());
+        assert!(create_indicator(Identifier::SuperSmoother, r#"{"shortestCyclePeriod": 0}"#).is_err());
     }
 }
 

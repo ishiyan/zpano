@@ -1,77 +1,231 @@
-import { } from 'jasmine';
+import {} from 'jasmine';
 
-import { SuperSmoother } from './super-smoother';
-import { SuperSmootherParams } from './params';
+import { Bar } from '../../../entities/bar';
+import { BarComponent } from '../../../entities/bar-component';
+import { Quote } from '../../../entities/quote';
+import { QuoteComponent } from '../../../entities/quote-component';
+import { Scalar } from '../../../entities/scalar';
+import { Trade } from '../../../entities/trade';
+import { TradeComponent } from '../../../entities/trade-component';
 import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { Shape } from '../../core/outputs/shape/shape';
+import { createIndicator } from '../../factory/factory';
 import { SuperSmootherOutput } from './output';
-import { input, expected } from './testdata';
+import { SuperSmootherParams, defaultParams, superSmootherMnemonic } from './params';
+import { SuperSmoother } from './super-smoother';
+import * as testdata from './testdata';
 
-// Test data: first 500 rows from test_3-3_Supersmoother.csv
-// (Julia reference implementation, 10-period super smoother).
+interface ReferenceCase {
+    readonly params: SuperSmootherParams;
+    readonly expected: number[];
+    readonly warmup: number;
+}
+
+const referenceCases: ReferenceCase[] = [
+    { params: { shortestCyclePeriod: 2 }, expected: testdata.expectedP2, warmup: 2 },
+    { params: { shortestCyclePeriod: 3 }, expected: testdata.expectedP3, warmup: 2 },
+    { params: { shortestCyclePeriod: 5 }, expected: testdata.expectedP5, warmup: 2 },
+    { params: { shortestCyclePeriod: 8 }, expected: testdata.expectedP8, warmup: 2 },
+    { params: { shortestCyclePeriod: 10 }, expected: testdata.expectedP10, warmup: 2 },
+    { params: { shortestCyclePeriod: 10.5 }, expected: testdata.expectedP10_5, warmup: 2 },
+    { params: { shortestCyclePeriod: 20 }, expected: testdata.expectedP20, warmup: 2 },
+    { params: { shortestCyclePeriod: 40 }, expected: testdata.expectedP40, warmup: 2 },
+    { params: { shortestCyclePeriod: 80 }, expected: testdata.expectedP80, warmup: 2 },
+    { params: { shortestCyclePeriod: 252 }, expected: testdata.expectedP252, warmup: 2 },
+];
 
 describe('SuperSmoother', () => {
-  const skipRows = 60;
-  const tolerance = 2.5; // MBST seeds filter to first sample, Julia to zero; convergence takes many samples.
+    it('matches all ten 252-bar reference configurations', () => {
+        expect(testdata.testInput.length).toBe(252);
+        for (const item of referenceCases) {
+            const indicator = new SuperSmoother(item.params);
+            expect(indicator.warmupBars()).toBe(item.warmup);
+            expect(indicator.isPrimed()).toBeFalse();
+            expect(Number.isNaN(indicator.value())).toBeTrue();
+            expect(item.expected.length).toBe(252);
 
-  it('should return expected mnemonic', () => {
-    const ss = new SuperSmoother({ shortestCyclePeriod: 10 });
-    expect(ss.metadata().mnemonic).toBe('ss(10, hl/2)');
-  });
+            for (let index = 0; index < testdata.testInput.length; index++) {
+                const actual = indicator.update(testdata.testInput[index]);
+                const target = item.expected[index];
+                if (index < item.warmup) {
+                    expect(indicator.isPrimed()).toBeFalse();
+                    expect(Number.isNaN(actual)).toBeTrue();
+                    expect(Number.isNaN(indicator.value())).toBeTrue();
+                } else {
+                    expect(indicator.isPrimed()).toBeTrue();
+                    expect(Number.isNaN(target)).toBeFalse();
+                    const bound = Math.max(1e-11, Math.abs(target) * 1e-11);
+                    expect(Math.abs(actual - target)).toBeLessThanOrEqual(bound);
+                    expect(Math.abs(indicator.value() - actual)).toBeLessThanOrEqual(1e-15);
+                }
+            }
+        }
+    });
 
-  it('should throw if shortest cycle period is less than 2', () => {
-    expect(() => { new SuperSmoother({ shortestCyclePeriod: 1 }); }).toThrow();
-  });
+    it('skips NaN without mutating state and reset reproduces initial stream', () => {
+        for (const item of referenceCases) {
+            const first = new SuperSmoother(item.params);
+            const second = new SuperSmoother(item.params);
+            for (const sample of testdata.testInput) {
+                expect(Number.isNaN(first.update(Number.NaN))).toBeTrue();
+                const left = first.update(sample);
+                const right = second.update(sample);
+                expect(first.isPrimed()).toBe(second.isPrimed());
+                if (Number.isNaN(right)) {
+                    expect(Number.isNaN(left)).toBeTrue();
+                } else {
+                    expect(Math.abs(left - right)).toBeLessThanOrEqual(1e-15);
+                }
+            }
 
-  it('should calculate expected output with CSV reference data', () => {
-    const ss = new SuperSmoother({ shortestCyclePeriod: 10 });
+            first.reset();
+            expect(first.isPrimed()).toBeFalse();
+            expect(Number.isNaN(first.value())).toBeTrue();
+            const third = new SuperSmoother(item.params);
+            for (const sample of testdata.testInput) {
+                const left = first.update(sample);
+                const right = third.update(sample);
+                if (Number.isNaN(right)) {
+                    expect(Number.isNaN(left)).toBeTrue();
+                } else {
+                    expect(Math.abs(left - right)).toBeLessThanOrEqual(1e-15);
+                }
+            }
+        }
+    });
 
-    for (let i = 0; i < input.length; i++) {
-      const act = ss.update(input[i]);
+    it('preserves constant input and suppresses alternating Nyquist input', () => {
+        const constantIndicator = SuperSmoother.default();
+        const constantOutputs: number[] = [];
+        for (let index = 0; index < 500; index++) {
+            constantOutputs.push(constantIndicator.update(7.0));
+        }
+        const firstFinite = constantOutputs.findIndex((entry) => Number.isFinite(entry));
+        expect(firstFinite).toBe(constantIndicator.warmupBars());
+        expect(Math.abs(constantOutputs[constantOutputs.length - 1] - 7.0)).toBeLessThanOrEqual(1e-12);
 
-      if (i < 2) {
-        expect(act).toBeNaN();
-        expect(ss.isPrimed()).toBe(false);
-        continue;
-      }
+        const nyquistIndicator = SuperSmoother.fromParams();
+        let lastNyquist = Number.NaN;
+        for (let index = 0; index < 500; index++) {
+            lastNyquist = nyquistIndicator.update(index % 2 === 0 ? 1.0 : -1.0);
+        }
+        expect(Math.abs(lastNyquist)).toBeLessThanOrEqual(1e-12);
+    });
 
-      expect(ss.isPrimed()).toBe(true);
+    it('rejects invalid parameters and infinite samples without mutating state', () => {
+        const invalidParams: SuperSmootherParams[] = [
+            { shortestCyclePeriod: 1 },
+            { shortestCyclePeriod: 1.999 },
+            { shortestCyclePeriod: 0 },
+            { shortestCyclePeriod: -2 },
+            { shortestCyclePeriod: Number.NaN },
+            { shortestCyclePeriod: Number.POSITIVE_INFINITY },
+            { shortestCyclePeriod: Number.NEGATIVE_INFINITY },
+            { shortestCyclePeriod: true as unknown as number },
+        ];
+        for (const badParams of invalidParams) {
+            expect(() => new SuperSmoother(badParams)).toThrow();
+        }
 
-      // Skip early rows where MBST and Julia priming differ.
-      if (i < skipRows) {
-        continue;
-      }
+        const indicator = new SuperSmoother();
+        expect(() => indicator.update(Number.POSITIVE_INFINITY)).toThrow();
+        expect(() => indicator.update(Number.NEGATIVE_INFINITY)).toThrow();
+        expect(() => indicator.update(true as unknown as number)).toThrow();
+        expect(indicator.isPrimed()).toBeFalse();
+    });
 
-      expect(Math.abs(act - expected[i])).toBeLessThan(tolerance);
-    }
+    it('produces expected metadata and mnemonics across component combinations', () => {
+        const indicator = new SuperSmoother(defaultParams());
+        const meta = indicator.metadata();
+        expect(meta.identifier).toBe(IndicatorIdentifier.SuperSmoother);
+        expect(meta.mnemonic).toBe('ss(10)');
+        expect(meta.description).toBe('Super Smoother ss(10)');
+        expect(meta.outputs.length).toBe(1);
+        expect(meta.outputs[0].kind).toBe(SuperSmootherOutput.SuperSmootherValue);
+        expect(meta.outputs[0].shape).toBe(Shape.Scalar);
+        expect(meta.outputs[0].mnemonic).toBe('ss(10)');
+        expect(meta.outputs[0].description).toBe('Super Smoother ss(10)');
 
-    expect(ss.update(Number.NaN)).toBeNaN();
-  });
+        const mnemonicCases: Array<[SuperSmootherParams | undefined, string]> = [
+            [undefined, 'ss(10)'],
+            [{}, 'ss(10)'],
+            [{ shortestCyclePeriod: 10.5 }, 'ss(10.5)'],
+            [{ barComponent: BarComponent.Median }, 'ss(10, hl/2)'],
+            [{ quoteComponent: QuoteComponent.Bid }, 'ss(10, b)'],
+            [{ tradeComponent: TradeComponent.Volume }, 'ss(10, v)'],
+            [{ barComponent: BarComponent.Open, quoteComponent: QuoteComponent.Ask }, 'ss(10, o, a)'],
+            [{ barComponent: BarComponent.Typical, tradeComponent: TradeComponent.Volume }, 'ss(10, hlc/3, v)'],
+            [{ quoteComponent: QuoteComponent.Weighted, tradeComponent: TradeComponent.Volume }, 'ss(10, (bbs+aas)/(bs+as), v)'],
+        ];
+        for (const [candidate, expectedMnemonic] of mnemonicCases) {
+            expect(superSmootherMnemonic(candidate)).toBe(expectedMnemonic);
+            expect(new SuperSmoother(candidate).metadata().mnemonic).toBe(expectedMnemonic);
+        }
+    });
 
-  it('should report correct primed state', () => {
-    const ss = new SuperSmoother({ shortestCyclePeriod: 10 });
+    it('updates entities via default components and instantiates through factory', () => {
+        const barIndicator = new SuperSmoother();
+        const scalarIndicator = new SuperSmoother();
+        const timestamp = new Date(Date.UTC(2024, 0, 2));
 
-    expect(ss.isPrimed()).toBe(false);
+        for (let index = 0; index < 10; index++) {
+            const bar = new Bar();
+            bar.time = timestamp;
+            bar.open = testdata.testOpen[index];
+            bar.high = testdata.testHigh[index];
+            bar.low = testdata.testLow[index];
+            bar.close = testdata.testInput[index];
+            bar.volume = 1000;
 
-    ss.update(100);
-    expect(ss.isPrimed()).toBe(false);
+            const scalar = new Scalar();
+            scalar.time = timestamp;
+            scalar.value = testdata.testInput[index];
 
-    ss.update(100);
-    expect(ss.isPrimed()).toBe(false);
+            const barOut = barIndicator.updateBar(bar);
+            const scalarOut = scalarIndicator.updateScalar(scalar);
+            expect(barOut.length).toBe(1);
+            const barScalar = barOut[0] as Scalar;
+            const refScalar = scalarOut[0] as Scalar;
+            expect(barScalar.time).toBe(timestamp);
+            if (Number.isNaN(refScalar.value)) {
+                expect(Number.isNaN(barScalar.value)).toBeTrue();
+            } else {
+                expect(Math.abs(barScalar.value - refScalar.value)).toBeLessThanOrEqual(1e-15);
+            }
+        }
 
-    ss.update(100);
-    expect(ss.isPrimed()).toBe(true);
-  });
+        const quoteIndicator = new SuperSmoother();
+        let quoteResult: Scalar | undefined;
+        for (let index = 0; index < 5; index++) {
+            const quote = new Quote();
+            quote.time = timestamp;
+            quote.bidPrice = 99;
+            quote.askPrice = 101;
+            quote.bidSize = 1;
+            quote.askSize = 1;
+            quoteResult = quoteIndicator.updateQuote(quote)[0] as Scalar;
+        }
+        expect(quoteResult).toBeDefined();
+        expect(Number.isNaN(quoteResult!.value)).toBeFalse();
 
-  it('should return correct metadata', () => {
-    const ss = new SuperSmoother({ shortestCyclePeriod: 10 });
-    const meta = ss.metadata();
+        const tradeIndicator = new SuperSmoother();
+        let tradeResult: Scalar | undefined;
+        for (let index = 0; index < 5; index++) {
+            const trade = new Trade();
+            trade.time = timestamp;
+            trade.price = 100;
+            trade.volume = 50;
+            tradeResult = tradeIndicator.updateTrade(trade)[0] as Scalar;
+        }
+        expect(tradeResult).toBeDefined();
+        expect(Number.isNaN(tradeResult!.value)).toBeFalse();
 
-    expect(meta.identifier).toBe(IndicatorIdentifier.SuperSmoother);
-    expect(meta.mnemonic).toBe('ss(10, hl/2)');
-    expect(meta.description).toBe('Super Smoother ss(10, hl/2)');
-    expect(meta.outputs.length).toBe(1);
-    expect(meta.outputs[0].kind).toBe(SuperSmootherOutput.SuperSmootherValue);
-    expect(meta.outputs[0].shape).toBe(Shape.Scalar);
-  });
+        const createdDefault = createIndicator(IndicatorIdentifier.SuperSmoother);
+        expect(createdDefault.metadata().mnemonic).toBe('ss(10)');
+
+        const createdCustom = createIndicator(IndicatorIdentifier.SuperSmoother, {
+            shortestCyclePeriod: 10.5,
+        });
+        expect(createdCustom.metadata().mnemonic).toBe('ss(10.5)');
+    });
 });

@@ -1,42 +1,57 @@
 """SuperSmoother parameters."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass
 from typing import Optional
 
-from ....entities.bar_component import BarComponent
-from ....entities.quote_component import QuoteComponent
-from ....entities.trade_component import TradeComponent
+from ....entities.bar_component import BarComponent, DEFAULT_BAR_COMPONENT
+from ....entities.quote_component import QuoteComponent, DEFAULT_QUOTE_COMPONENT
+from ....entities.trade_component import TradeComponent, DEFAULT_TRADE_COMPONENT
+from ...core.component_triple_mnemonic import component_triple_mnemonic
 
 
 @dataclass
 class SuperSmootherParams:
     """Parameters for the SuperSmoother indicator."""
-    shortest_cycle_period: int = 10
-    """The shortest cycle period in bars.
-    The Super Smoother attenuates all cycle periods shorter than this one.
 
-    The value should be greater than 1. The default value is 10.
-    """
+    shortest_cycle_period: float = 10.0
+    """The shortest cycle period in bars (>= 2.0). Default 10.0."""
 
     bar_component: Optional[BarComponent] = None
-    """A component of a bar to use when updating the indicator with a bar sample.
-
-    If not set, the bar component defaults to ClosePrice and is not shown in the indicator mnemonic.
-    """
+    """Bar component used by update_bar(); None defaults to Close and is omitted from the mnemonic."""
 
     quote_component: Optional[QuoteComponent] = None
-    """A component of a quote to use when updating the indicator with a quote sample.
-
-    If not set, the quote component defaults to MidPrice and is not shown in the indicator mnemonic.
-    """
+    """Quote component used by update_quote(); None defaults to Mid and is omitted from the mnemonic."""
 
     trade_component: Optional[TradeComponent] = None
-    """A component of a trade to use when updating the indicator with a trade sample.
+    """Trade component used by update_trade(); None defaults to Price and is omitted from the mnemonic."""
 
-    If not set, the trade component defaults to Price and is not shown in the indicator mnemonic.
-    """
+
+Params = SuperSmootherParams
 
 
 def default_params() -> SuperSmootherParams:
-    """Returns default SuperSmoother parameters."""
+    """Return default Ehlers SuperSmoother parameters."""
     return SuperSmootherParams()
+
+
+def format_number(value: float) -> str:
+    """Format a float parameter cleanly for mnemonics without '-0'."""
+    normalized = 0.0 if value == 0.0 else float(value)
+    return f"{normalized:g}"
+
+
+def super_smoother_mnemonic(params: Optional[SuperSmootherParams] = None) -> str:
+    """Build the SuperSmoother mnemonic string."""
+    source = default_params() if params is None else params
+    bar_comp = source.bar_component if source.bar_component is not None else DEFAULT_BAR_COMPONENT
+    quote_comp = (
+        source.quote_component if source.quote_component is not None else DEFAULT_QUOTE_COMPONENT
+    )
+    trade_comp = (
+        source.trade_component if source.trade_component is not None else DEFAULT_TRADE_COMPONENT
+    )
+    suffix = component_triple_mnemonic(bar_comp, quote_comp, trade_comp)
+    shortest_text = format_number(source.shortest_cycle_period)
+    return f"ss({shortest_text}{suffix})"

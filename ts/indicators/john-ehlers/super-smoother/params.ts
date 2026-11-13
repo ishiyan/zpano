@@ -1,40 +1,39 @@
-import { BarComponent } from '../../../entities/bar-component';
-import { QuoteComponent } from '../../../entities/quote-component';
-import { TradeComponent } from '../../../entities/trade-component';
+import { BarComponent, DefaultBarComponent } from '../../../entities/bar-component';
+import { DefaultQuoteComponent, QuoteComponent } from '../../../entities/quote-component';
+import { DefaultTradeComponent, TradeComponent } from '../../../entities/trade-component';
+import { componentTripleMnemonic } from '../../core/component-triple-mnemonic';
 
-/** Describes parameters to create an instance of the Super Smoother indicator. */
+/** Describes parameters to create an instance of Ehlers' SuperSmoother indicator. */
 export interface SuperSmootherParams {
-    /**
-     * The shortest cycle period in bars.
-     * The Super Smoother attenuates all cycle periods shorter than this one.
-     *
-     * The value should be greater than 1. The default value is 10.
-     */
-    shortestCyclePeriod: number;
+    /** Shortest cycle period in bars (>= 2). Default: 10. */
+    shortestCyclePeriod?: number;
 
-    /**
-     * A component of a bar to use when updating the indicator with a bar sample.
-     *
-     * If _undefined_, the bar component will have a default value (MedianPrice)
-     * and will not be shown in the indicator mnemonic.
-     */
+    /** Bar component used when updating with a bar sample; undefined defaults to Close. */
     barComponent?: BarComponent;
 
-    /**
-     * A component of a quote to use when updating the indicator with a quote sample.
-     *
-     * If _undefined_, the quote component will have a default value and will not be shown in the indicator mnemonic.
-     */
+    /** Quote component used when updating with a quote sample; undefined defaults to Mid. */
     quoteComponent?: QuoteComponent;
 
-    /**
-     * A component of a trade to use when updating the indicator with a trade sample.
-     *
-     * If _undefined_, the trade component will have a default value and will not be shown in the indicator mnemonic.
-     */
+    /** Trade component used when updating with a trade sample; undefined defaults to Price. */
     tradeComponent?: TradeComponent;
 }
 
+export type Params = SuperSmootherParams;
+
 export function defaultParams(): SuperSmootherParams {
     return { shortestCyclePeriod: 10 };
+}
+
+export function formatNumber(value: number): string {
+    const normalized = Object.is(value, -0) ? 0 : value;
+    return String(normalized);
+}
+
+export function superSmootherMnemonic(params?: SuperSmootherParams): string {
+    const shortest = params?.shortestCyclePeriod ?? 10;
+    const barComp = params?.barComponent ?? DefaultBarComponent;
+    const quoteComp = params?.quoteComponent ?? DefaultQuoteComponent;
+    const tradeComp = params?.tradeComponent ?? DefaultTradeComponent;
+    const suffix = componentTripleMnemonic(barComp, quoteComp, tradeComp);
+    return `ss(${formatNumber(shortest)}${suffix})`;
 }

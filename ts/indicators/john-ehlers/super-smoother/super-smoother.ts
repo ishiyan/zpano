@@ -1,139 +1,116 @@
 import { buildMetadata } from '../../core/build-metadata';
-import { BarComponent } from '../../../entities/bar-component';
-import { componentTripleMnemonic } from '../../core/component-triple-mnemonic';
-import { IndicatorMetadata } from '../../core/indicator-metadata';
 import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { IndicatorMetadata } from '../../core/indicator-metadata';
 import { LineIndicator } from '../../core/line-indicator';
-import { SuperSmootherParams } from './params';
+import { SuperSmootherParams, defaultParams, superSmootherMnemonic } from './params';
 
-/** Function to calculate mnemonic of a __SuperSmoother__ indicator. */
-export const superSmootherMnemonic = (params: SuperSmootherParams): string => {
-  const cm = componentTripleMnemonic(
-    params.barComponent ?? BarComponent.Median,
-    params.quoteComponent,
-    params.tradeComponent,
-  );
+export { SuperSmootherParams, defaultParams, superSmootherMnemonic };
 
-  return `ss(${params.shortestCyclePeriod}${cm})`;
-};
+function smootherCoefficients(period: number): [number, number, number] {
+    const smootherAngle = (Math.SQRT2 * Math.PI) / period;
+    const a1 = Math.exp(-smootherAngle);
+    const c2 = 2 * a1 * Math.cos(smootherAngle);
+    const c3 = -a1 * a1;
+    return [1 - c2 - c3, c2, c3];
+}
 
 /**
- * SuperSmoother (Ehler's Super Smoother, SS) is described in Ehler's book
- * "Cybernetic Analysis for Stocks and Futures" (2004)
- * and in his presentation "Spectral Dilation" (2013)
- *
- * Given the shortest (λ) cycle period in bars, the Super Smoother filter
- * attenuates cycle periods shorter than this shortest one.
- *
- *	β = √2·π / λ
- *	α = exp(-β)
- *	γ₂ = 2α·cos(β)
- *	γ₃ = -α²
- *	γ₁ = (1 - γ₂ - γ₃) / 2
- *
- *	SSᵢ = γ₁·(xᵢ + xᵢ₋₁) + γ₂·SSᵢ₋₁ + γ₃·SSᵢ₋₂
- *
- * The indicator is not primed during the first 2 updates.
- *
- * Reference:
- * 
- * Ehlers, John F. (2004). Cybernetic Analysis for Stocks and Futures. Wiley. pp 201-205.
- * Ehlers, John F. (2013). Spectral dilation: Presented to the MTA in March 2013. Retrieved from www.mesasoftware.com/seminars/SpectralDilation.pdf
+ * Ehlers' two-pole SuperSmoother low-pass filter with a zero at the two-bar Nyquist period.
  */
 export class SuperSmoother extends LineIndicator {
-  private coeff1: number;
-  private coeff2: number;
-  private coeff3: number;
-  private count: number;
-  private samplePrevious: number;
-  private filterPrevious: number;
-  private filterPrevious2: number;
-  private value: number;
+    private readonly warmupCount = 2;
+    private readonly c1: number;
+    private readonly c2: number;
+    private readonly c3: number;
 
-  /**
-   * Constructs an instance given a shortest cycle period in bars.
-   * The shortest cycle period should be an integer greater than 1.
-   */
-  public constructor(params: SuperSmootherParams) {
-    super();
-    const period = Math.floor(params.shortestCyclePeriod);
-    if (period < 2) {
-      throw new Error('shortest cycle period should be greater than 1');
+    private count = 0;
+    private input1 = 0;
+    private output1 = 0;
+    private output2 = 0;
+    private currentValue = Number.NaN;
+
+    public static default(): SuperSmoother {
+        return new SuperSmoother(defaultParams());
     }
 
-    this.mnemonic = superSmootherMnemonic(params);
-    this.description = 'Super Smoother ' + this.mnemonic;
-    this.barComponent = params.barComponent;
-    this.quoteComponent = params.quoteComponent;
-    this.tradeComponent = params.tradeComponent;
-
-    // Calculate coefficients.
-    const beta = Math.SQRT2 * Math.PI / period;
-    const alpha = Math.exp(-beta);
-    const gamma2 = 2 * alpha * Math.cos(beta);
-    const gamma3 = -alpha * alpha;
-    const gamma1 = (1 - gamma2 - gamma3) / 2;
-
-    this.coeff1 = gamma1;
-    this.coeff2 = gamma2;
-    this.coeff3 = gamma3;
-    this.count = 0;
-    this.samplePrevious = 0;
-    this.filterPrevious = 0;
-    this.filterPrevious2 = 0;
-    this.value = Number.NaN;
-    this.primed = false;
-  }
-
-  /** Describes the output data of the indicator. */
-  public metadata(): IndicatorMetadata {
-    return buildMetadata(
-      IndicatorIdentifier.SuperSmoother,
-      this.mnemonic,
-      this.description,
-      [
-        { mnemonic: this.mnemonic, description: this.description },
-      ],
-    );
-  }
-
-  /** Updates the value of the indicator given the next sample. */
-  public update(sample: number): number {
-    if (Number.isNaN(sample)) {
-      return sample;
+    public static fromParams(params?: SuperSmootherParams): SuperSmoother {
+        return new SuperSmoother(params);
     }
 
-    if (this.primed) {
-      const filter = this.coeff1 * (sample + this.samplePrevious) +
-        this.coeff2 * this.filterPrevious + this.coeff3 * this.filterPrevious2;
-      this.value = filter;
-      this.samplePrevious = sample;
-      this.filterPrevious2 = this.filterPrevious;
-      this.filterPrevious = filter;
+    public constructor(params?: SuperSmootherParams) {
+        super();
 
-      return this.value;
+        const shortest = params?.shortestCyclePeriod ?? 10;
+        if (typeof shortest !== 'number' || !Number.isFinite(shortest) || shortest < 2) {
+            throw new Error('shortestCyclePeriod must be finite and at least 2 bars');
+        }
+
+        this.mnemonic = superSmootherMnemonic(params);
+        this.description = 'Super Smoother ' + this.mnemonic;
+        this.barComponent = params?.barComponent;
+        this.quoteComponent = params?.quoteComponent;
+        this.tradeComponent = params?.tradeComponent;
+
+        [this.c1, this.c2, this.c3] = smootherCoefficients(shortest);
+        this.reset();
     }
 
-    this.count++;
-
-    if (this.count === 1) {
-      this.samplePrevious = sample;
-      this.filterPrevious = sample;
-      this.filterPrevious2 = sample;
+    /** Clears all streaming histories and priming state while preserving configuration. */
+    public reset(): void {
+        this.count = 0;
+        this.input1 = 0;
+        this.output1 = 0;
+        this.output2 = 0;
+        this.currentValue = Number.NaN;
+        this.primed = false;
     }
 
-    const filter = this.coeff1 * (sample + this.samplePrevious) +
-      this.coeff2 * this.filterPrevious + this.coeff3 * this.filterPrevious2;
-
-    if (this.count === 3) {
-      this.primed = true;
-      this.value = filter;
+    /** Returns the number of initial NaN outputs before priming. */
+    public warmupBars(): number {
+        return this.warmupCount;
     }
 
-    this.samplePrevious = sample;
-    this.filterPrevious2 = this.filterPrevious;
-    this.filterPrevious = filter;
+    /** Returns the latest calculated scalar value (NaN before priming). */
+    public value(): number {
+        return this.currentValue;
+    }
 
-    return this.value;
-  }
+    /** Describes the output data of the indicator. */
+    public metadata(): IndicatorMetadata {
+        return buildMetadata(IndicatorIdentifier.SuperSmoother, this.mnemonic, this.description, [
+            { mnemonic: this.mnemonic, description: this.description },
+        ]);
+    }
+
+    /** Consumes one scalar sample and returns the current SuperSmoother value. */
+    public update(sample: number): number {
+        if (typeof sample !== 'number') {
+            throw new Error('sample must be finite or NaN');
+        }
+        if (Number.isNaN(sample)) {
+            return Number.NaN;
+        }
+        if (!Number.isFinite(sample)) {
+            throw new Error('sample must be finite or NaN');
+        }
+
+        if (this.count === 0) {
+            this.input1 = sample;
+            this.output1 = sample;
+            this.output2 = sample;
+        }
+
+        const output = (this.c1 * (sample + this.input1)) / 2 + this.c2 * this.output1 + this.c3 * this.output2;
+        this.input1 = sample;
+        this.output2 = this.output1;
+        this.output1 = output;
+        this.count += 1;
+
+        if (this.count > this.warmupCount) {
+            this.primed = true;
+            this.currentValue = output;
+            return output;
+        }
+        return Number.NaN;
+    }
 }

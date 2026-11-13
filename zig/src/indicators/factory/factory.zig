@@ -550,12 +550,19 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
 
         // ── john ehlers ──────────────────────────────────────────────────
 
-        .super_smoother => createWithParams(ss_mod.SuperSmoother, allocator, ss_mod.SuperSmoother.init(.{
-            .shortest_cycle_period = @as(i32, @intCast(getUsize(obj, "shortestCyclePeriod", 10))),
-            .bar_component = getBarComponent(obj),
-            .quote_component = getQuoteComponent(obj),
-            .trade_component = getTradeComponent(obj),
-        })),
+        .super_smoother => blk: {
+            const shortest: f64 = if (obj.get("shortestCyclePeriod")) |raw| switch (raw) {
+                .float => |number| number,
+                .integer => |number| @floatFromInt(number),
+                else => return FactoryError.InvalidParams,
+            } else 10.0;
+            break :blk createWithParams(ss_mod.SuperSmoother, allocator, ss_mod.SuperSmoother.init(.{
+                .shortest_cycle_period = shortest,
+                .bar_component = getBarComponent(obj),
+                .quote_component = getQuoteComponent(obj),
+                .trade_component = getTradeComponent(obj),
+            }));
+        },
 
         .center_of_gravity_oscillator => blk: {
             const p = cog_mod.Params{
@@ -1810,6 +1817,33 @@ test "create corona indicators with defaults, explicit zero threshold, and inval
         FactoryError.IndicatorInitFailed,
         create(allocator, .roofing_filter,
             \\{"highpassPoles": 2, "zeroMean": true}
+        ),
+    );
+
+    const smoother_default = try create(allocator, .super_smoother, "{}");
+    defer smoother_default.deinit(allocator);
+    var md_smoother_default: metadata_mod.Metadata = undefined;
+    smoother_default.indicator.metadata(&md_smoother_default);
+    try std.testing.expectEqualStrings("ss(10)", md_smoother_default.mnemonic);
+
+    const smoother_custom = try create(allocator, .super_smoother,
+        \\{"shortestCyclePeriod": 10.5}
+    );
+    defer smoother_custom.deinit(allocator);
+    var md_smoother_custom: metadata_mod.Metadata = undefined;
+    smoother_custom.indicator.metadata(&md_smoother_custom);
+    try std.testing.expectEqualStrings("ss(10.5)", md_smoother_custom.mnemonic);
+
+    try std.testing.expectError(
+        FactoryError.InvalidParams,
+        create(allocator, .super_smoother,
+            \\{"shortestCyclePeriod": "bad"}
+        ),
+    );
+    try std.testing.expectError(
+        FactoryError.IndicatorInitFailed,
+        create(allocator, .super_smoother,
+            \\{"shortestCyclePeriod": 0}
         ),
     );
 }
