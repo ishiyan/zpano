@@ -925,22 +925,22 @@
     ]
   }
 
-[41] roof1hp(10, 48, hl/2)
+[41] roof2hp(10, 48)
   Identifier:  RoofingFilter
-  Description: Roofing Filter roof1hp(10, 48, hl/2)
+  Description: Roofing Filter roof2hp(10, 48)
   Outputs (1):
-    [0] kind=0 shape=0 mnemonic="roof1hp(10, 48, hl/2)" description="Roofing Filter roof1hp(10, 48, hl/2)"
+    [0] kind=0 shape=0 mnemonic="roof2hp(10, 48)" description="Roofing Filter roof2hp(10, 48)"
   Full metadata JSON:
   {
     "identifier": 38,
-    "mnemonic": "roof1hp(10, 48, hl/2)",
-    "description": "Roofing Filter roof1hp(10, 48, hl/2)",
+    "mnemonic": "roof2hp(10, 48)",
+    "description": "Roofing Filter roof2hp(10, 48)",
     "outputs": [
       {
         "kind": 0,
         "shape": 0,
-        "mnemonic": "roof1hp(10, 48, hl/2)",
-        "description": "Roofing Filter roof1hp(10, 48, hl/2)"
+        "mnemonic": "roof2hp(10, 48)",
+        "description": "Roofing Filter roof2hp(10, 48)"
       }
     ]
   }
@@ -4124,7 +4124,7 @@ Bar[  0] 2020-01-02  O=91.5000 H=93.2500 L=90.7500 C=91.5000 V=4077500
   ss(10, hl/2)                                  primed=false ss(10, hl/2)=NaN
   zema(0.25, 0.5, 3)                            primed=false zema(0.25, 0.5, 3)=NaN
   zecema(0.095, 5, 0.1)                         primed=false zecema(0.095, 5, 0.1)=NaN
-  roof1hp(10, 48, hl/2)                         primed=false roof1hp(10, 48, hl/2)=NaN
+  roof2hp(10, 48)                               primed=false roof2hp(10, 48)=NaN
   tr                                            primed=false tr=NaN
   atr                                           primed=false atr=NaN
   natr                                          primed=false natr=NaN
@@ -4268,7 +4268,7 @@ Bar[  1] 2020-01-03  O=91.5000 H=94.9400 L=91.4050 C=94.8150 V=4955900
   ss(10, hl/2)                                  primed=false ss(10, hl/2)=NaN
   zema(0.25, 0.5, 3)                            primed=false zema(0.25, 0.5, 3)=NaN
   zecema(0.095, 5, 0.1)                         primed=false zecema(0.095, 5, 0.1)=NaN
-  roof1hp(10, 48, hl/2)                         primed=false roof1hp(10, 48, hl/2)=NaN
+  roof2hp(10, 48)                               primed=false roof2hp(10, 48)=NaN
   tr                                            primed=true  tr=3.5350
   atr                                           primed=false atr=NaN
   natr                                          primed=false natr=NaN
@@ -4412,7 +4412,7 @@ Bar[  2] 2020-01-04  O=94.8150 H=96.3750 L=94.2500 C=94.3750 V=4775300
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=92.7696
   zema(0.25, 0.5, 3)                            primed=false zema(0.25, 0.5, 3)=NaN
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=93.0541
-  roof1hp(10, 48, hl/2)                         primed=false roof1hp(10, 48, hl/2)=NaN
+  roof2hp(10, 48)                               primed=false roof2hp(10, 48)=NaN
   tr                                            primed=true  tr=2.1250
   atr                                           primed=false atr=NaN
   natr                                          primed=false natr=NaN
@@ -4556,7 +4556,7 @@ Bar[  3] 2020-01-05  O=94.3750 H=96.1900 L=93.5000 C=95.0950 V=4155300
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=93.6168
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=95.0044
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=93.9563
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=1.7972
+  roof2hp(10, 48)                               primed=false roof2hp(10, 48)=NaN
   tr                                            primed=true  tr=2.6900
   atr                                           primed=false atr=NaN
   natr                                          primed=false natr=NaN
@@ -4700,7 +4700,7 @@ Bar[  4] 2020-01-06  O=95.0950 H=96.0000 L=92.8150 C=93.7800 V=4593100
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=94.1730
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=94.5689
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=93.7795
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=2.0982
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-3.3984
   tr                                            primed=true  tr=3.1850
   atr                                           primed=false atr=NaN
   natr                                          primed=false natr=NaN
@@ -4844,7 +4844,7 @@ Bar[  5] 2020-01-07  O=93.7800 H=94.7200 L=93.5000 C=94.6250 V=3631300
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=94.4092
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=94.6142
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=94.0772
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=2.0618
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-5.5129
   tr                                            primed=true  tr=1.2200
   atr                                           primed=false atr=NaN
   natr                                          primed=false natr=NaN
@@ -4988,7 +4988,7 @@ Bar[  6] 2020-01-08  O=94.6250 H=95.0000 L=92.0000 C=92.5300 V=3382800
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=94.2957
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=93.7725
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=93.2088
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=1.7018
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-7.7101
   tr                                            primed=true  tr=3.0000
   atr                                           primed=false atr=NaN
   natr                                          primed=false natr=NaN
@@ -5132,7 +5132,7 @@ Bar[  7] 2020-01-09  O=92.5300 H=93.7200 L=89.7500 C=92.7500 V=4954200
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=93.8299
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=93.3881
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=92.9405
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=1.0554
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-9.8433
   tr                                            primed=true  tr=3.9700
   atr                                           primed=false atr=NaN
   natr                                          primed=false natr=NaN
@@ -5276,7 +5276,7 @@ Bar[  8] 2020-01-10  O=92.7500 H=92.4700 L=89.4400 C=90.3150 V=4500000
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=93.0566
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=92.0811
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=91.6472
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=0.2000
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-11.8051
   tr                                            primed=true  tr=3.3100
   atr                                           primed=false atr=NaN
   natr                                          primed=false natr=NaN
@@ -5420,7 +5420,7 @@ Bar[  9] 2020-01-11  O=90.3150 H=92.7500 L=90.6250 C=92.4700 V=3397500
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=92.3173
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=92.1708
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=92.1149
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-0.5184
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-13.2763
   tr                                            primed=true  tr=2.4350
   atr                                           primed=false atr=NaN
   natr                                          primed=false natr=NaN
@@ -5564,7 +5564,7 @@ Bar[ 10] 2020-01-12  O=92.4700 H=96.2500 L=92.7500 C=96.1250 V=4204500
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=92.5146
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=93.5812
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=94.0852
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-0.2697
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-13.5038
   tr                                            primed=true  tr=3.7800
   atr                                           primed=false atr=NaN
   natr                                          primed=false natr=NaN
@@ -5708,7 +5708,7 @@ Bar[ 11] 2020-01-13  O=96.1250 H=99.6250 L=96.3150 C=97.2500 V=6321400
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=93.6523
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=95.3653
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=95.5069
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=0.8309
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-12.7019
   tr                                            primed=true  tr=3.5000
   atr                                           primed=false atr=NaN
   natr                                          primed=false natr=NaN
@@ -5852,7 +5852,7 @@ Bar[ 12] 2020-01-14  O=97.2500 H=99.1250 L=96.0300 C=98.5000 V=10203600
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=95.1893
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=96.9027
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=96.7596
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=2.1709
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-11.5556
   tr                                            primed=true  tr=3.0950
   atr                                           primed=false atr=NaN
   natr                                          primed=false natr=NaN
@@ -5996,7 +5996,7 @@ Bar[ 13] 2020-01-15  O=98.5000 H=92.7500 L=88.8150 C=89.8750 V=19043900
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=95.5678
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=94.3645
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=93.1666
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=2.2592
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-11.5634
   tr                                            primed=true  tr=9.6850
   atr                                           primed=false atr=NaN
   natr                                          primed=false natr=NaN
@@ -6140,7 +6140,7 @@ Bar[ 14] 2020-01-16  O=89.8750 H=91.3150 L=86.7500 C=91.0000 V=11692000
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=94.4244
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=92.7422
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=92.1347
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=0.9087
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-12.8671
   tr                                            primed=true  tr=4.5650
   atr                                           primed=true  atr=3.5782
   natr                                          primed=true  natr=3.9321
@@ -6284,7 +6284,7 @@ Bar[ 15] 2020-01-17  O=91.0000 H=93.2500 L=90.9400 C=92.8150 V=9553300
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=93.3170
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=92.0497
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=92.5502
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-0.2422
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-13.8170
   tr                                            primed=true  tr=2.3100
   atr                                           primed=true  atr=3.4876
   natr                                          primed=true  natr=3.7576
@@ -6428,7 +6428,7 @@ Bar[ 16] 2020-01-18  O=92.8150 H=93.4050 L=88.9050 C=89.1550 V=8920300
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=92.2711
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=91.2361
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=90.9547
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-1.1939
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-14.4432
   tr                                            primed=true  tr=4.5000
   atr                                           primed=true  atr=3.5599
   natr                                          primed=true  natr=3.9930
@@ -6572,7 +6572,7 @@ Bar[ 17] 2020-01-19  O=89.1550 H=90.6550 L=88.7800 C=89.3450 V=5970900
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=91.0761
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=90.5564
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=90.3283
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-2.1685
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-14.9880
   tr                                            primed=true  tr=1.8750
   atr                                           primed=true  atr=3.4396
   natr                                          primed=true  natr=3.8498
@@ -6716,7 +6716,7 @@ Bar[ 18] 2020-01-20  O=89.3450 H=91.9700 L=89.2500 C=91.6250 V=5062300
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=90.4350
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=90.6748
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=91.1349
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-2.5035
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-14.8183
   tr                                            primed=true  tr=2.7200
   atr                                           primed=true  atr=3.3882
   natr                                          primed=true  natr=3.6979
@@ -6860,7 +6860,7 @@ Bar[ 19] 2020-01-21  O=91.6250 H=92.2500 L=89.7500 C=89.8750 V=3705600
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=90.2511
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=90.5649
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=90.6282
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-2.3683
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-14.1443
   tr                                            primed=true  tr=2.5000
   atr                                           primed=true  atr=3.3247
   natr                                          primed=true  natr=3.6993
@@ -7004,7 +7004,7 @@ Bar[ 20] 2020-01-22  O=89.8750 H=90.3450 L=87.5000 C=88.3750 V=5865600
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=89.8903
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=89.8961
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=89.6643
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-2.4155
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-13.6353
   tr                                            primed=true  tr=2.8450
   atr                                           primed=true  atr=3.2905
   natr                                          primed=true  natr=3.7233
@@ -7148,7 +7148,7 @@ Bar[ 21] 2020-01-23  O=88.3750 H=88.5000 L=86.5300 C=87.6250 V=5603000
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=89.2634
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=88.8284
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=88.8563
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-2.7067
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-13.3490
   tr                                            primed=true  tr=1.9700
   atr                                           primed=true  atr=3.1962
   natr                                          primed=true  natr=3.6475
@@ -7292,7 +7292,7 @@ Bar[ 22] 2020-01-24  O=87.6250 H=88.2500 L=84.6250 C=84.7800 V=5811900
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=88.2305
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=87.1794
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=87.0982
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-3.3429
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-13.3772
   tr                                            primed=true  tr=3.6250
   atr                                           primed=true  atr=3.2268
   natr                                          primed=true  natr=3.8061
@@ -7436,7 +7436,7 @@ Bar[ 23] 2020-01-25  O=84.7800 H=85.5000 L=82.2800 C=83.0000 V=8483800
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=86.7068
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=85.4627
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=85.4269
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-4.3615
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-13.7441
   tr                                            primed=true  tr=3.2200
   atr                                           primed=true  atr=3.2263
   natr                                          primed=true  natr=3.8871
@@ -7580,7 +7580,7 @@ Bar[ 24] 2020-01-26  O=83.0000 H=84.4400 L=81.5650 C=83.5000 V=5995200
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=85.2049
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=84.4564
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=84.8871
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-5.2344
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-13.9212
   tr                                            primed=true  tr=2.8750
   atr                                           primed=true  atr=3.2012
   natr                                          primed=true  natr=3.8338
@@ -7724,7 +7724,7 @@ Bar[ 25] 2020-01-27  O=83.5000 H=84.7500 L=80.8750 C=81.3750 V=5408800
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=83.8866
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=83.2604
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=83.5734
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-5.8277
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-13.7915
   tr                                            primed=true  tr=3.8750
   atr                                           primed=true  atr=3.2493
   natr                                          primed=true  natr=3.9930
@@ -7868,7 +7868,7 @@ Bar[ 26] 2020-01-28  O=81.3750 H=84.4400 L=81.2500 C=84.4400 V=5430500
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=83.0965
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=83.7353
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=84.4266
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-5.8523
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-13.0931
   tr                                            primed=true  tr=3.1900
   atr                                           primed=true  atr=3.2451
   natr                                          primed=true  natr=3.8431
@@ -8012,7 +8012,7 @@ Bar[ 27] 2020-01-29  O=84.4400 H=89.4050 L=84.0650 C=89.2500 V=6283800
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=83.7207
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=85.8327
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=87.0876
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-4.5469
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-11.1184
   tr                                            primed=true  tr=5.3400
   atr                                           primed=true  atr=3.3947
   natr                                          primed=true  natr=3.8036
@@ -8156,7 +8156,7 @@ Bar[ 28] 2020-01-30  O=89.2500 H=88.1250 L=85.5950 C=86.3750 V=5834800
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=85.0134
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=86.5933
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=86.8486
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-2.7747
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-8.7801
   tr                                            primed=true  tr=3.6550
   atr                                           primed=true  atr=3.4133
   natr                                          primed=true  natr=3.9518
@@ -8300,7 +8300,7 @@ Bar[ 29] 2020-01-31  O=86.3750 H=89.1250 L=85.9700 C=86.2500 V=4515500
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=85.8740
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=86.7337
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=86.6695
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-1.6258
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-7.1635
   tr                                            primed=true  tr=3.1550
   atr                                           primed=true  atr=3.3949
   natr                                          primed=true  natr=3.9361
@@ -8444,7 +8444,7 @@ Bar[ 30] 2020-02-01  O=86.2500 H=87.1550 L=84.4050 C=85.2500 V=4493300
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=86.1965
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=85.8628
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=86.0930
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-1.1230
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-6.2557
   tr                                            primed=true  tr=2.7500
   atr                                           primed=true  atr=3.3488
   natr                                          primed=true  natr=3.9282
@@ -8588,7 +8588,7 @@ Bar[ 31] 2020-02-02  O=85.2500 H=87.2500 L=85.0950 C=87.1250 V=4346100
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=86.3268
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=86.2721
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=86.7306
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-0.8624
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-5.6280
   tr                                            primed=true  tr=2.1550
   atr                                           primed=true  atr=3.2635
   natr                                          primed=true  natr=3.7458
@@ -8732,7 +8732,7 @@ Bar[ 32] 2020-02-03  O=87.1250 H=87.3750 L=85.5000 C=85.8150 V=3700300
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=86.4167
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=86.1034
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=86.3660
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-0.6718
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-5.0994
   tr                                            primed=true  tr=1.8750
   atr                                           primed=true  atr=3.1644
   natr                                          primed=true  natr=3.6874
@@ -8876,7 +8876,7 @@ Bar[ 33] 2020-02-04  O=85.8150 H=88.9700 L=85.5300 C=88.9700 V=4600200
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=86.7007
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=87.2851
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=87.7213
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-0.3226
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-4.4430
   tr                                            primed=true  tr=3.4400
   atr                                           primed=true  atr=3.1840
   natr                                          primed=true  natr=3.5788
@@ -9020,7 +9020,7 @@ Bar[ 34] 2020-02-05  O=88.9700 H=90.0000 L=87.8750 C=88.4700 V=4557200
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=87.3288
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=87.7494
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=88.0744
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=0.3064
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-3.5485
   tr                                            primed=true  tr=2.1250
   atr                                           primed=true  atr=3.1084
   natr                                          primed=true  natr=3.5135
@@ -9164,7 +9164,7 @@ Bar[ 35] 2020-02-06  O=88.4700 H=89.8450 L=86.5650 C=86.8750 V=4323600
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=87.6741
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=87.6633
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=87.4612
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=0.5928
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-3.0359
   tr                                            primed=true  tr=3.2800
   atr                                           primed=true  atr=3.1207
   natr                                          primed=true  natr=3.5921
@@ -9308,7 +9308,7 @@ Bar[ 36] 2020-02-07  O=86.8750 H=86.9700 L=84.6550 C=86.8150 V=5237500
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=87.6062
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=87.1819
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=87.1618
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=0.4562
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-2.9636
   tr                                            primed=true  tr=2.3150
   atr                                           primed=true  atr=3.0631
   natr                                          primed=true  natr=3.5283
@@ -9452,7 +9452,7 @@ Bar[ 37] 2020-02-08  O=86.8150 H=85.9400 L=83.2500 C=84.8750 V=7404100
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=87.1323
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=86.1558
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=86.0875
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-0.0444
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-3.2512
   tr                                            primed=true  tr=3.5650
   atr                                           primed=true  atr=3.0990
   natr                                          primed=true  natr=3.6512
@@ -9596,7 +9596,7 @@ Bar[ 38] 2020-02-09  O=84.8750 H=84.7500 L=82.5650 C=84.1900 V=4798400
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=86.2792
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=85.3287
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=85.2722
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-0.8395
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-3.8111
   tr                                            primed=true  tr=2.3100
   atr                                           primed=true  atr=3.0426
   natr                                          primed=true  natr=3.6140
@@ -9740,7 +9740,7 @@ Bar[ 39] 2020-02-10  O=84.1900 H=85.4700 L=83.4400 C=83.8750 V=4372800
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=85.3595
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=84.5978
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=84.7439
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-1.5993
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-4.3072
   tr                                            primed=true  tr=2.0300
   atr                                           primed=true  atr=2.9703
   natr                                          primed=true  natr=3.5413
@@ -9884,7 +9884,7 @@ Bar[ 40] 2020-02-11  O=83.8750 H=84.4700 L=82.5300 C=83.3750 V=3872300
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=84.5421
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=84.1046
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=84.2492
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-2.1696
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-4.5921
   tr                                            primed=true  tr=1.9400
   atr                                           primed=true  atr=2.8967
   natr                                          primed=true  natr=3.4743
@@ -10028,7 +10028,7 @@ Bar[ 41] 2020-02-12  O=83.3750 H=88.5000 L=85.0650 C=85.5000 V=10750800
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=84.1795
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=84.6172
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=85.0379
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-2.2432
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-4.3774
   tr                                            primed=true  tr=5.1250
   atr                                           primed=true  atr=3.0559
   natr                                          primed=true  natr=3.5741
@@ -10172,7 +10172,7 @@ Bar[ 42] 2020-02-13  O=85.5000 H=89.4700 L=86.8750 C=89.1900 V=5804800
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=84.8319
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=86.4248
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=87.1559
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-1.3553
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-3.2376
   tr                                            primed=true  tr=3.9700
   atr                                           primed=true  atr=3.1211
   natr                                          primed=true  natr=3.4994
@@ -10316,7 +10316,7 @@ Bar[ 43] 2020-02-14  O=89.1900 H=90.0000 L=88.5300 C=89.4400 V=3785500
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=86.2352
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=87.9367
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=88.2113
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=0.1282
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-1.5794
   tr                                            primed=true  tr=1.4700
   atr                                           primed=true  atr=3.0032
   natr                                          primed=true  natr=3.3578
@@ -10460,7 +10460,7 @@ Bar[ 44] 2020-02-15  O=89.4400 H=92.4400 L=89.2800 C=91.0950 V=5014800
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=87.8333
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=89.4257
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=89.4896
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=1.6120
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-0.0115
   tr                                            primed=true  tr=3.1600
   atr                                           primed=true  atr=3.0144
   natr                                          primed=true  natr=3.3091
@@ -10604,7 +10604,7 @@ Bar[ 45] 2020-02-16  O=91.0950 H=91.4400 L=90.1250 C=90.7500 V=3507700
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=89.2727
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=89.9517
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=89.9070
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=2.7645
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=1.1462
   tr                                            primed=true  tr=1.3150
   atr                                           primed=true  atr=2.8930
   natr                                          primed=true  natr=3.1879
@@ -10748,7 +10748,7 @@ Bar[ 46] 2020-02-17  O=90.7500 H=92.9700 L=90.7500 C=91.4400 V=4298800
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=90.3260
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=90.5738
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=90.4490
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=3.4131
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=1.7464
   tr                                            primed=true  tr=2.2200
   atr                                           primed=true  atr=2.8449
   natr                                          primed=true  natr=3.1113
@@ -10892,7 +10892,7 @@ Bar[ 47] 2020-02-18  O=91.4400 H=91.7200 L=89.0000 C=89.0000 V=4842500
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=90.7323
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=89.9185
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=89.5326
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=3.3748
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=1.6404
   tr                                            primed=true  tr=2.7200
   atr                                           primed=true  atr=2.8360
   natr                                          primed=true  natr=3.1865
@@ -11036,7 +11036,7 @@ Bar[ 48] 2020-02-19  O=89.0000 H=91.1550 L=88.5650 C=91.0000 V=3952200
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=90.7140
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=90.2201
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=90.1152
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=2.9426
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=1.1516
   tr                                            primed=true  tr=2.5900
   atr                                           primed=true  atr=2.8185
   natr                                          primed=true  natr=3.0972
@@ -11180,7 +11180,7 @@ Bar[ 49] 2020-02-20  O=91.0000 H=91.7500 L=90.0950 C=90.5000 V=3304700
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=90.7156
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=90.1726
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=90.1478
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=2.5822
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=0.7546
   tr                                            primed=true  tr=1.6550
   atr                                           primed=true  atr=2.7353
   natr                                          primed=true  natr=3.0225
@@ -11324,7 +11324,7 @@ Bar[ 50] 2020-02-21  O=90.5000 H=90.0000 L=89.0000 C=89.0300 V=3462000
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=90.4756
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=89.8907
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=89.4681
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=2.0393
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=0.1982
   tr                                            primed=true  tr=1.5000
   atr                                           primed=true  atr=2.6471
   natr                                          primed=true  natr=2.9733
@@ -11468,7 +11468,7 @@ Bar[ 51] 2020-02-22  O=89.0300 H=88.8750 L=86.4700 C=88.8150 V=7253900
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=89.9836
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=89.3486
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=89.0757
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=1.3268
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-0.4957
   tr                                            primed=true  tr=2.5600
   atr                                           primed=true  atr=2.6409
   natr                                          primed=true  natr=2.9735
@@ -11612,7 +11612,7 @@ Bar[ 52] 2020-02-23  O=88.8150 H=89.0000 L=84.0000 C=84.2800 V=9753100
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=88.9113
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=87.3040
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=86.7139
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=0.1574
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-1.5985
   tr                                            primed=true  tr=5.0000
   atr                                           primed=true  atr=2.8094
   natr                                          primed=true  natr=3.3334
@@ -11756,7 +11756,7 @@ Bar[ 53] 2020-02-24  O=84.2800 H=85.2500 L=83.3150 C=83.5000 V=5953000
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=87.1990
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=85.6617
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=85.2855
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-1.4688
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-3.0867
   tr                                            primed=true  tr=1.9350
   atr                                           primed=true  atr=2.7469
   natr                                          primed=true  natr=3.2897
@@ -11900,7 +11900,7 @@ Bar[ 54] 2020-02-25  O=83.5000 H=83.8150 L=82.0000 C=82.6900 V=5011700
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=85.4557
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=84.1532
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=84.2408
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-2.9241
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-4.3272
   tr                                            primed=true  tr=1.8150
   atr                                           primed=true  atr=2.6804
   natr                                          primed=true  natr=3.2415
@@ -12044,7 +12044,7 @@ Bar[ 55] 2020-02-26  O=82.6900 H=85.2500 L=83.2500 C=84.7500 V=5910800
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=84.2993
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=84.3611
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=84.7474
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-3.6497
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-4.7877
   tr                                            primed=true  tr=2.5600
   atr                                           primed=true  atr=2.6718
   natr                                          primed=true  natr=3.1525
@@ -12188,7 +12188,7 @@ Bar[ 56] 2020-02-27  O=84.7500 H=86.6250 L=84.7500 C=85.6550 V=4916900
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=84.0524
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=84.9540
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=85.3828
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-3.4327
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-4.3020
   tr                                            primed=true  tr=1.8750
   atr                                           primed=true  atr=2.6149
   natr                                          primed=true  natr=3.0528
@@ -12332,7 +12332,7 @@ Bar[ 57] 2020-02-28  O=85.6550 H=87.9400 L=85.2800 C=86.1900 V=4135000
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=84.4244
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=85.7005
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=85.9037
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-2.6616
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-3.2996
   tr                                            primed=true  tr=2.6600
   atr                                           primed=true  atr=2.6181
   natr                                          primed=true  natr=3.0376
@@ -12476,7 +12476,7 @@ Bar[ 58] 2020-02-29  O=86.1900 H=89.3750 L=87.1900 C=88.9400 V=4054200
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=85.3726
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=87.0341
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=87.4530
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-1.4446
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-1.9146
   tr                                            primed=true  tr=3.1850
   atr                                           primed=true  atr=2.6586
   natr                                          primed=true  natr=2.9892
@@ -12620,7 +12620,7 @@ Bar[ 59] 2020-03-01  O=88.9400 H=90.6250 L=88.4400 C=89.2800 V=3735300
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=86.7088
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=88.0487
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=88.3010
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-0.0130
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-0.3944
   tr                                            primed=true  tr=2.1850
   atr                                           primed=true  atr=2.6248
   natr                                          primed=true  natr=2.9399
@@ -12764,7 +12764,7 @@ Bar[ 60] 2020-03-02  O=89.2800 H=90.7500 L=88.2500 C=88.6250 V=2921900
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=87.8264
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=88.4972
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=88.3670
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=1.0374
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=0.6718
   tr                                            primed=true  tr=2.5000
   atr                                           primed=true  atr=2.6158
   natr                                          primed=true  natr=2.9516
@@ -12908,7 +12908,7 @@ Bar[ 61] 2020-03-03  O=88.6250 H=88.8450 L=87.3450 C=88.5000 V=2658400
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=88.4724
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=88.4429
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=88.3461
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=1.5162
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=1.1216
   tr                                            primed=true  tr=1.5000
   atr                                           primed=true  atr=2.5361
   natr                                          primed=true  natr=2.8657
@@ -13052,7 +13052,7 @@ Bar[ 62] 2020-03-04  O=88.5000 H=91.9700 L=89.2800 C=91.9700 V=4624400
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=89.1843
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=89.6609
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=90.0259
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=1.9979
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=1.5468
   tr                                            primed=true  tr=3.4700
   atr                                           primed=true  atr=2.6028
   natr                                          primed=true  natr=2.8301
@@ -13196,7 +13196,7 @@ Bar[ 63] 2020-03-05  O=91.9700 H=93.3750 L=91.0950 C=91.5000 V=4372200
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=90.1229
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=90.4801
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=90.5574
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=2.6330
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=2.0949
   tr                                            primed=true  tr=2.2800
   atr                                           primed=true  atr=2.5798
   natr                                          primed=true  natr=2.8194
@@ -13340,7 +13340,7 @@ Bar[ 64] 2020-03-06  O=91.5000 H=93.8150 L=89.5300 C=93.2500 V=5831600
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=91.0791
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=91.7663
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=91.6623
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=3.2065
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=2.5499
   tr                                            primed=true  tr=4.2850
   atr                                           primed=true  atr=2.7016
   natr                                          primed=true  natr=2.8971
@@ -13484,7 +13484,7 @@ Bar[ 65] 2020-03-07  O=93.2500 H=94.0300 L=91.1550 C=93.5000 V=4268600
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=92.0537
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=92.3910
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=92.2992
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=3.7266
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=2.9247
   tr                                            primed=true  tr=2.8750
   atr                                           primed=true  atr=2.7140
   natr                                          primed=true  natr=2.9026
@@ -13628,7 +13628,7 @@ Bar[ 66] 2020-03-08  O=93.5000 H=94.0300 L=92.0000 C=93.1550 V=3059200
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=92.7770
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=92.7888
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=92.4451
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=3.9470
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=2.9837
   tr                                            primed=true  tr=2.0300
   atr                                           primed=true  atr=2.6651
   natr                                          primed=true  natr=2.8609
@@ -13772,7 +13772,7 @@ Bar[ 67] 2020-03-09  O=93.1550 H=91.8150 L=90.5300 C=91.7200 V=4495500
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=92.9885
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=92.3304
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=91.8458
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=3.6600
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=2.5418
   tr                                            primed=true  tr=2.6250
   atr                                           primed=true  atr=2.6622
   natr                                          primed=true  natr=2.9026
@@ -13916,7 +13916,7 @@ Bar[ 68] 2020-03-10  O=91.7200 H=92.0000 L=89.9700 C=90.0000 V=3425000
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=92.5365
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=91.3103
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=90.7732
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=2.7858
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=1.5488
   tr                                            primed=true  tr=2.0300
   atr                                           primed=true  atr=2.6171
   natr                                          primed=true  natr=2.9079
@@ -14060,7 +14060,7 @@ Bar[ 69] 2020-03-11  O=90.0000 H=91.9400 L=88.8150 C=89.6900 V=3630800
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=91.6692
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=90.4721
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=90.1639
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=1.6293
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=0.3322
   tr                                            primed=true  tr=3.1250
   atr                                           primed=true  atr=2.6534
   natr                                          primed=true  natr=2.9584
@@ -14204,7 +14204,7 @@ Bar[ 70] 2020-03-12  O=89.6900 H=89.7500 L=86.7500 C=88.8750 V=4168100
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=90.7082
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=89.7172
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=89.5066
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=0.5271
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-0.7667
   tr                                            primed=true  tr=3.0000
   atr                                           primed=true  atr=2.6781
   natr                                          primed=true  natr=3.0134
@@ -14348,7 +14348,7 @@ Bar[ 71] 2020-03-13  O=88.8750 H=88.7500 L=85.0650 C=85.1900 V=5966900
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=89.3823
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=87.9841
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=87.4330
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-0.7820
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-2.0069
   tr                                            primed=true  tr=3.8100
   atr                                           primed=true  atr=2.7590
   natr                                          primed=true  natr=3.2386
@@ -14492,7 +14492,7 @@ Bar[ 72] 2020-03-14  O=85.1900 H=86.1550 L=82.0300 C=83.3750 V=7692800
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=87.5458
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=86.0425
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=85.6261
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-2.4092
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-3.4879
   tr                                            primed=true  tr=4.1250
   atr                                           primed=true  atr=2.8565
   natr                                          primed=true  natr=3.4261
@@ -14636,7 +14636,7 @@ Bar[ 73] 2020-03-15  O=83.3750 H=84.8750 L=81.5000 C=84.8750 V=7362500
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=85.9245
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=85.2506
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=85.5271
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-3.6344
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-4.4945
   tr                                            primed=true  tr=3.3750
   atr                                           primed=true  atr=2.8936
   natr                                          primed=true  natr=3.4092
@@ -14780,7 +14780,7 @@ Bar[ 74] 2020-03-16  O=84.8750 H=85.9400 L=82.5650 C=85.9400 V=6581300
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=85.1268
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=85.5167
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=85.9413
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-3.9361
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-4.5432
   tr                                            primed=true  tr=3.3750
   atr                                           primed=true  atr=2.9280
   natr                                          primed=true  natr=3.4070
@@ -14924,7 +14924,7 @@ Bar[ 75] 2020-03-17  O=85.9400 H=99.3750 L=96.3450 C=97.2500 V=19587700
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=86.4365
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=90.1844
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=91.6016
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-2.2234
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-2.6230
   tr                                            primed=true  tr=13.4350
   atr                                           primed=true  atr=3.6785
   natr                                          primed=true  natr=3.7825
@@ -15068,7 +15068,7 @@ Bar[ 76] 2020-03-18  O=97.2500 H=103.2800 L=96.4700 C=99.8750 V=10378600
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=90.0453
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=94.4821
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=95.3807
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=1.4362
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=1.0929
   tr                                            primed=true  tr=6.8100
   atr                                           primed=true  atr=3.9022
   natr                                          primed=true  natr=3.9070
@@ -15212,7 +15212,7 @@ Bar[ 77] 2020-03-19  O=99.8750 H=105.3750 L=101.1550 C=104.9400 V=9334700
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=94.6595
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=99.4715
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=99.5463
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=5.5893
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=5.0897
   tr                                            primed=true  tr=5.5000
   atr                                           primed=true  atr=4.0163
   natr                                          primed=true  natr=3.8272
@@ -15356,7 +15356,7 @@ Bar[ 78] 2020-03-20  O=104.9400 H=107.6250 L=104.2500 C=106.0000 V=10467200
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=99.2942
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=102.1974
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=101.9725
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=9.2511
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=8.3890
   tr                                            primed=true  tr=3.3750
   atr                                           primed=true  atr=3.9705
   natr                                          primed=true  natr=3.7457
@@ -15500,7 +15500,7 @@ Bar[ 79] 2020-03-21  O=106.0000 H=105.2500 L=101.7500 C=102.5000 V=5671400
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=102.4549
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=102.6012
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=101.4406
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=11.0796
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=9.7180
   tr                                            primed=true  tr=4.2500
   atr                                           primed=true  atr=3.9904
   natr                                          primed=true  natr=3.8931
@@ -15644,7 +15644,7 @@ Bar[ 80] 2020-03-22  O=102.5000 H=104.5000 L=101.7200 C=102.4050 V=5645000
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=103.7541
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=102.2353
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=101.2450
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=10.9366
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=9.0456
   tr                                            primed=true  tr=2.7800
   atr                                           primed=true  atr=3.9040
   natr                                          primed=true  natr=3.8123
@@ -15788,7 +15788,7 @@ Bar[ 81] 2020-03-23  O=102.4050 H=105.5000 L=101.7200 C=104.5950 V=4518600
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=104.2241
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=102.6496
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=102.2918
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=10.0327
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=7.6586
   tr                                            primed=true  tr=3.7800
   atr                                           primed=true  atr=3.8951
   natr                                          primed=true  natr=3.7240
@@ -15932,7 +15932,7 @@ Bar[ 82] 2020-03-24  O=104.5950 H=106.1250 L=103.1550 C=106.1250 V=4519500
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=104.7050
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=103.9716
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=103.5644
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=9.2500
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=6.4562
   tr                                            primed=true  tr=2.9700
   atr                                           primed=true  atr=3.8290
   natr                                          primed=true  natr=3.6081
@@ -16076,7 +16076,7 @@ Bar[ 83] 2020-03-25  O=106.1250 H=107.9400 L=105.6900 C=106.0000 V=5569700
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=105.2464
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=104.9280
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=104.1378
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=8.6202
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=5.4620
   tr                                            primed=true  tr=2.2500
   atr                                           primed=true  atr=3.7163
   natr                                          primed=true  natr=3.5059
@@ -16220,7 +16220,7 @@ Bar[ 84] 2020-03-26  O=106.0000 H=106.2500 L=103.6550 C=106.0650 V=4239700
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=105.6681
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=105.3960
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=104.4932
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=7.9555
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=4.4839
   tr                                            primed=true  tr=2.5950
   atr                                           primed=true  atr=3.6362
   natr                                          primed=true  natr=3.4282
@@ -16364,7 +16364,7 @@ Bar[ 85] 2020-03-27  O=106.0650 H=107.0000 L=104.0000 C=104.6250 V=4175300
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=105.7597
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=105.0158
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=104.0196
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=7.0628
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=3.3346
   tr                                            primed=true  tr=3.0000
   atr                                           primed=true  atr=3.5907
   natr                                          primed=true  natr=3.4320
@@ -16508,7 +16508,7 @@ Bar[ 86] 2020-03-28  O=104.6250 H=108.7500 L=105.5300 C=108.6250 V=4995300
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=106.0165
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=106.2462
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=105.8042
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=6.4348
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=2.5045
   tr                                            primed=true  tr=4.1250
   atr                                           primed=true  atr=3.6289
   natr                                          primed=true  natr=3.3407
@@ -16652,7 +16652,7 @@ Bar[ 87] 2020-03-29  O=108.6250 H=110.9400 L=108.5300 C=109.3150 V=4776600
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=106.8699
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=107.4197
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=106.9854
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=6.4439
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=2.3403
   tr                                            primed=true  tr=2.4100
   atr                                           primed=true  atr=3.5418
   natr                                          primed=true  natr=3.2400
@@ -16796,7 +16796,7 @@ Bar[ 88] 2020-03-30  O=109.3150 H=110.9400 L=108.7500 C=110.5000 V=4190000
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=107.9900
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=108.9241
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=108.1448
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=6.7021
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=2.4291
   tr                                            primed=true  tr=2.1900
   atr                                           primed=true  atr=3.4453
   natr                                          primed=true  natr=3.1179
@@ -16940,7 +16940,7 @@ Bar[ 89] 2020-03-31  O=110.5000 H=114.2200 L=107.7500 C=112.7500 V=6035300
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=109.3709
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=110.3962
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=109.8126
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=7.1735
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=2.7221
   tr                                            primed=true  tr=6.4700
   atr                                           primed=true  atr=3.6613
   natr                                          primed=true  natr=3.2473
@@ -17084,7 +17084,7 @@ Bar[ 90] 2020-04-01  O=112.7500 H=123.0000 L=117.0000 C=123.0000 V=12168900
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=112.0920
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=115.2578
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=115.5819
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=8.8444
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=4.1684
   tr                                            primed=true  tr=10.2500
   atr                                           primed=true  atr=4.1319
   natr                                          primed=true  natr=3.3593
@@ -17228,7 +17228,7 @@ Bar[ 91] 2020-04-02  O=123.0000 H=121.7500 L=118.0000 C=119.6250 V=9040800
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=115.5456
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=117.4902
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=116.5951
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=10.9972
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=6.0063
   tr                                            primed=true  tr=5.0000
   atr                                           primed=true  atr=4.1939
   natr                                          primed=true  natr=3.5059
@@ -17372,7 +17372,7 @@ Bar[ 92] 2020-04-03  O=119.6250 H=119.8150 L=116.0000 C=118.7500 V=5780300
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=117.8880
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=118.5552
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=116.7300
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=11.8427
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=6.4711
   tr                                            primed=true  tr=3.8150
   atr                                           primed=true  atr=4.1669
   natr                                          primed=true  natr=3.5089
@@ -17516,7 +17516,7 @@ Bar[ 93] 2020-04-04  O=118.7500 H=120.3150 L=118.5000 C=119.2500 V=4320800
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=119.1328
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=118.2601
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=117.1338
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=11.5544
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=5.8040
   tr                                            primed=true  tr=1.8150
   atr                                           primed=true  atr=3.9989
   natr                                          primed=true  natr=3.3534
@@ -17660,7 +17660,7 @@ Bar[ 94] 2020-04-05  O=119.2500 H=119.3750 L=116.5300 C=117.9400 V=3899100
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=119.5086
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=117.9695
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=116.7715
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=10.4859
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=4.4105
   tr                                            primed=true  tr=2.8450
   atr                                           primed=true  atr=3.9165
   natr                                          primed=true  natr=3.3207
@@ -17804,7 +17804,7 @@ Bar[ 95] 2020-04-06  O=117.9400 H=118.1900 L=116.2500 C=116.4400 V=3221400
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=119.0760
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=117.2983
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=116.2827
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=8.7904
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=2.4799
   tr                                            primed=true  tr=1.9400
   atr                                           primed=true  atr=3.7753
   natr                                          primed=true  natr=3.2423
@@ -17948,7 +17948,7 @@ Bar[ 96] 2020-04-07  O=116.4400 H=116.6900 L=114.5950 C=115.1900 V=3455500
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=118.0725
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=116.2638
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=115.2110
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=6.7674
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=0.3350
   tr                                            primed=true  tr=2.0950
   atr                                           primed=true  atr=3.6553
   natr                                          primed=true  natr=3.1733
@@ -18092,7 +18092,7 @@ Bar[ 97] 2020-04-08  O=115.1900 H=115.3450 L=110.8750 C=111.8750 V=4304200
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=116.5103
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=114.4084
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=113.1882
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=4.4689
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-1.9599
   tr                                            primed=true  tr=4.4700
   atr                                           primed=true  atr=3.7135
   natr                                          primed=true  natr=3.3193
@@ -18236,7 +18236,7 @@ Bar[ 98] 2020-04-09  O=111.8750 H=113.0000 L=110.5000 C=110.5950 V=4703900
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=114.5322
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=112.7245
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=111.7104
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=2.0629
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-4.2310
   tr                                            primed=true  tr=2.5000
   atr                                           primed=true  atr=3.6268
   natr                                          primed=true  natr=3.2793
@@ -18380,7 +18380,7 @@ Bar[ 99] 2020-04-10  O=110.5950 H=118.3150 L=110.7200 C=118.1250 V=8316300
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=113.6751
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=114.4415
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=114.7196
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=1.0045
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-5.0607
   tr                                            primed=true  tr=7.7200
   atr                                           primed=true  atr=3.9192
   natr                                          primed=true  natr=3.3178
@@ -18524,7 +18524,7 @@ Bar[100] 2020-04-11  O=118.1250 H=116.8700 L=112.6200 C=116.0000 V=10553900
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=114.1803
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=115.3467
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=115.0465
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=1.3546
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-4.4659
   tr                                            primed=true  tr=5.5050
   atr                                           primed=true  atr=4.0324
   natr                                          primed=true  natr=3.4762
@@ -18668,7 +18668,7 @@ Bar[101] 2020-04-12  O=116.0000 H=116.7500 L=114.1900 C=116.0000 V=6384800
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=114.8488
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=116.1857
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=115.2253
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=1.8150
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-3.7876
   tr                                            primed=true  tr=2.5600
   atr                                           primed=true  atr=3.9273
   natr                                          primed=true  natr=3.3856
@@ -18812,7 +18812,7 @@ Bar[102] 2020-04-13  O=116.0000 H=113.8700 L=111.1900 C=112.0000 V=7163300
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=114.9088
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=114.3736
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=113.4008
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=1.6481
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-3.7503
   tr                                            primed=true  tr=4.8100
   atr                                           primed=true  atr=3.9903
   natr                                          primed=true  natr=3.5628
@@ -18956,7 +18956,7 @@ Bar[103] 2020-04-14  O=112.0000 H=114.6200 L=109.4400 C=113.7500 V=7007800
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=114.4185
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=113.9365
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=113.4619
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=0.9854
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-4.1925
   tr                                            primed=true  tr=5.1800
   atr                                           primed=true  atr=4.0753
   natr                                          primed=true  natr=3.5827
@@ -19100,7 +19100,7 @@ Bar[104] 2020-04-15  O=113.7500 H=115.3100 L=111.5600 C=112.9400 V=5114100
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=113.9451
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=113.3049
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=113.1093
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=0.4199
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-4.5117
   tr                                            primed=true  tr=3.7500
   atr                                           primed=true  atr=4.0521
   natr                                          primed=true  natr=3.5878
@@ -19244,7 +19244,7 @@ Bar[105] 2020-04-16  O=112.9400 H=116.0000 L=112.4400 C=116.0000 V=5263800
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=113.8833
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=114.4786
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=114.4440
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=0.3103
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-4.3654
   tr                                            primed=true  tr=3.5600
   atr                                           primed=true  atr=4.0169
   natr                                          primed=true  natr=3.4629
@@ -19388,7 +19388,7 @@ Bar[106] 2020-04-17  O=116.0000 H=121.6900 L=117.5000 C=120.5000 V=6666100
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=114.9635
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=116.8277
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=117.2258
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=1.2856
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-3.1666
   tr                                            primed=true  tr=5.6900
   atr                                           primed=true  atr=4.1364
   natr                                          primed=true  natr=3.4327
@@ -19532,7 +19532,7 @@ Bar[107] 2020-04-18  O=120.5000 H=119.8700 L=116.0600 C=116.6200 V=7398400
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=116.3184
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=117.2358
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=116.6191
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=2.3987
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-1.8949
   tr                                            primed=true  tr=4.4400
   atr                                           primed=true  atr=4.1581
   natr                                          primed=true  natr=3.5655
@@ -19676,7 +19676,7 @@ Bar[108] 2020-04-19  O=116.6200 H=120.8700 L=116.5600 C=117.0000 V=5575000
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=117.0000
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=117.3018
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=116.5566
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=2.7434
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-1.4386
   tr                                            primed=true  tr=4.3100
   atr                                           primed=true  atr=4.1689
   natr                                          primed=true  natr=3.5632
@@ -19820,7 +19820,7 @@ Bar[109] 2020-04-20  O=117.0000 H=116.7500 L=113.3100 C=115.2500 V=4852300
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=117.0588
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=116.1326
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=115.7092
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=2.4613
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-1.6171
   tr                                            primed=true  tr=3.6900
   atr                                           primed=true  atr=4.1347
   natr                                          primed=true  natr=3.5876
@@ -19964,7 +19964,7 @@ Bar[110] 2020-04-21  O=115.2500 H=116.5000 L=112.5600 C=114.3100 V=4298100
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=116.5060
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=115.3882
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=114.8996
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=1.6399
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-2.3113
   tr                                            primed=true  tr=3.9400
   atr                                           primed=true  atr=4.1208
   natr                                          primed=true  natr=3.6050
@@ -20108,7 +20108,7 @@ Bar[111] 2020-04-22  O=114.3100 H=116.0000 L=114.0000 C=115.5000 V=4900500
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=115.8733
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=115.2287
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=115.1286
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=0.8445
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-2.9430
   tr                                            primed=true  tr=2.0000
   atr                                           primed=true  atr=3.9693
   natr                                          primed=true  natr=3.4367
@@ -20252,7 +20252,7 @@ Bar[112] 2020-04-23  O=115.5000 H=118.3100 L=114.7500 C=115.8700 V=4887700
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=115.5654
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=115.4665
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=115.4169
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=0.4517
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-3.1480
   tr                                            primed=true  tr=3.5600
   atr                                           primed=true  atr=3.9401
   natr                                          primed=true  natr=3.4005
@@ -20396,7 +20396,7 @@ Bar[113] 2020-04-24  O=115.8700 H=121.5000 L=118.8700 C=120.6900 V=6964800
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=116.1261
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=117.5699
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=117.8867
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=0.9221
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-2.5002
   tr                                            primed=true  tr=5.6300
   atr                                           primed=true  atr=4.0608
   natr                                          primed=true  natr=3.3647
@@ -20540,7 +20540,7 @@ Bar[114] 2020-04-25  O=120.6900 H=122.0000 L=119.0000 C=120.1900 V=4679200
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=117.4490
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=118.8112
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=118.7575
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=2.0498
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-1.2463
   tr                                            primed=true  tr=3.0000
   atr                                           primed=true  atr=3.9850
   natr                                          primed=true  natr=3.3156
@@ -20684,7 +20684,7 @@ Bar[115] 2020-04-26  O=120.1900 H=121.4400 L=119.7500 C=120.7500 V=9165000
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=118.7579
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=119.9059
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=119.4451
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=3.0259
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-0.2076
   tr                                            primed=true  tr=1.6900
   atr                                           primed=true  atr=3.8211
   natr                                          primed=true  natr=3.1645
@@ -20828,7 +20828,7 @@ Bar[116] 2020-04-27  O=120.7500 H=125.7500 L=122.6200 C=124.7500 V=6469800
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=120.3069
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=121.6244
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=121.7194
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=4.1073
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=0.8764
   tr                                            primed=true  tr=5.0000
   atr                                           primed=true  atr=3.9053
   natr                                          primed=true  natr=3.1305
@@ -20972,7 +20972,7 @@ Bar[117] 2020-04-28  O=124.7500 H=127.7500 L=123.0000 C=123.3700 V=6792000
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=121.8942
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=122.4583
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=122.1006
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=5.0917
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=1.8050
   tr                                            primed=true  tr=4.7500
   atr                                           primed=true  atr=3.9656
   natr                                          primed=true  natr=3.2144
@@ -21116,7 +21116,7 @@ Bar[118] 2020-04-29  O=123.3700 H=124.1900 L=121.7500 C=122.9400 V=4423800
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=122.8662
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=122.8525
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=122.1095
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=5.3776
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=2.0003
   tr                                            primed=true  tr=2.4400
   atr                                           primed=true  atr=3.8567
   natr                                          primed=true  natr=3.1370
@@ -21260,7 +21260,7 @@ Bar[119] 2020-04-30  O=122.9400 H=124.4400 L=121.5600 C=122.5600 V=5231900
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=123.2365
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=122.5056
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=121.9741
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=5.0638
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=1.5972
   tr                                            primed=true  tr=2.8800
   atr                                           primed=true  atr=3.7869
   natr                                          primed=true  natr=3.0898
@@ -21404,7 +21404,7 @@ Bar[120] 2020-05-01  O=122.5600 H=125.7500 L=123.1200 C=123.1200 V=4565600
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=123.2884
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=122.6280
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=122.2241
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=4.4897
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=0.9590
   tr                                            primed=true  tr=3.1900
   atr                                           primed=true  atr=3.7443
   natr                                          primed=true  natr=3.0412
@@ -21548,7 +21548,7 @@ Bar[121] 2020-05-02  O=123.1200 H=124.6900 L=122.1900 C=122.5600 V=6235200
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=123.1962
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=122.5635
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=122.0989
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=3.8509
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=0.2897
   tr                                            primed=true  tr=2.5000
   atr                                           primed=true  atr=3.6554
   natr                                          primed=true  natr=2.9825
@@ -21692,7 +21692,7 @@ Bar[122] 2020-05-03  O=122.5600 H=125.3100 L=122.7500 C=124.6200 V=5225900
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=123.2580
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=123.3351
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=123.0722
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=3.4352
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-0.1280
   tr                                            primed=true  tr=2.7500
   atr                                           primed=true  atr=3.5907
   natr                                          primed=true  natr=2.8813
@@ -21836,7 +21836,7 @@ Bar[123] 2020-05-04  O=124.6200 H=132.0000 L=124.3700 C=129.2500 V=8261400
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=124.2144
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=125.5801
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=125.7758
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=3.9099
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=0.3432
   tr                                            primed=true  tr=7.6300
   atr                                           primed=true  atr=3.8792
   natr                                          primed=true  natr=3.0014
@@ -21980,7 +21980,7 @@ Bar[124] 2020-05-05  O=129.2500 H=131.3100 L=128.0000 C=131.0000 V=5912500
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=126.1043
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=127.9901
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=127.8631
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=5.2022
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=1.5846
   tr                                            primed=true  tr=3.3100
   atr                                           primed=true  atr=3.8386
   natr                                          primed=true  natr=2.9302
@@ -22124,7 +22124,7 @@ Bar[125] 2020-05-06  O=131.0000 H=132.2500 L=129.5000 C=132.2500 V=3545600
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=128.2793
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=130.0088
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=129.4503
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=6.6032
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=2.8639
   tr                                            primed=true  tr=2.7500
   atr                                           primed=true  atr=3.7608
   natr                                          primed=true  natr=2.8437
@@ -22268,7 +22268,7 @@ Bar[126] 2020-05-07  O=132.2500 H=133.8800 L=130.8100 C=131.0000 V=5714500
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=130.0208
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=130.4753
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=129.6145
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=7.4253
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=3.5085
   tr                                            primed=true  tr=3.0700
   atr                                           primed=true  atr=3.7115
   natr                                          primed=true  natr=2.8332
@@ -22412,7 +22412,7 @@ Bar[127] 2020-05-08  O=131.0000 H=133.5000 L=130.6300 C=132.8100 V=6653900
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=131.2141
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=131.2853
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=130.6295
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=7.6318
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=3.5156
   tr                                            primed=true  tr=2.8700
   atr                                           primed=true  atr=3.6514
   natr                                          primed=true  natr=2.7493
@@ -22556,7 +22556,7 @@ Bar[128] 2020-05-09  O=132.8100 H=135.5000 L=132.1300 C=134.0000 V=6094500
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=132.2595
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=132.1827
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=131.7186
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=7.6742
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=3.3589
   tr                                            primed=true  tr=3.3700
   atr                                           primed=true  atr=3.6313
   natr                                          primed=true  natr=2.7099
@@ -22700,7 +22700,7 @@ Bar[129] 2020-05-10  O=134.0000 H=137.4400 L=133.8800 C=137.3800 V=4799200
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=133.5580
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=134.2795
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=133.9019
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=7.9488
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=3.4336
   tr                                            primed=true  tr=3.5600
   atr                                           primed=true  atr=3.6262
   natr                                          primed=true  natr=2.6395
@@ -22844,7 +22844,7 @@ Bar[130] 2020-05-11  O=137.3800 H=138.6900 L=135.3800 C=137.8100 V=5050800
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=135.1142
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=135.7871
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=135.1480
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=8.4312
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=3.7041
   tr                                            primed=true  tr=3.3100
   atr                                           primed=true  atr=3.6036
   natr                                          primed=true  natr=2.6149
@@ -22988,7 +22988,7 @@ Bar[131] 2020-05-12  O=137.8100 H=139.1900 L=135.7500 C=137.8800 V=5648900
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=136.4456
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=136.7954
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=135.8110
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=8.6435
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=3.6945
   tr                                            primed=true  tr=3.4400
   atr                                           primed=true  atr=3.5919
   natr                                          primed=true  natr=2.6051
@@ -23132,7 +23132,7 @@ Bar[132] 2020-05-13  O=137.8800 H=138.5000 L=136.1900 C=137.2500 V=4726300
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=137.2765
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=136.8928
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=135.8761
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=8.3601
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=3.2004
   tr                                            primed=true  tr=2.3100
   atr                                           primed=true  atr=3.5004
   natr                                          primed=true  natr=2.5503
@@ -23276,7 +23276,7 @@ Bar[133] 2020-05-14  O=137.2500 H=138.1300 L=134.5000 C=136.3100 V=5585600
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=137.4925
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=136.5596
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=135.5208
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=7.5345
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=2.2031
   tr                                            primed=true  tr=3.6300
   atr                                           primed=true  atr=3.5096
   natr                                          primed=true  natr=2.5747
@@ -23420,7 +23420,7 @@ Bar[134] 2020-05-15  O=136.3100 H=137.5000 L=135.3800 C=136.2500 V=5124800
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=137.2743
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=136.2784
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=135.3963
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=6.4030
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=0.9608
   tr                                            primed=true  tr=2.1200
   atr                                           primed=true  atr=3.4104
   natr                                          primed=true  natr=2.5030
@@ -23564,7 +23564,7 @@ Bar[135] 2020-05-16  O=136.2500 H=138.8800 L=133.6900 C=134.6300 V=7630200
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=136.7202
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=135.5388
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=134.6317
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=5.0954
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-0.3858
   tr                                            primed=true  tr=5.1900
   atr                                           primed=true  atr=3.5375
   natr                                          primed=true  natr=2.6276
@@ -23708,7 +23708,7 @@ Bar[136] 2020-05-17  O=134.6300 H=132.1300 L=126.0600 C=128.2500 V=14311600
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=135.1554
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=132.7091
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=131.2263
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=3.0002
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-2.4246
   tr                                            primed=true  tr=8.5700
   atr                                           primed=true  atr=3.8969
   natr                                          primed=true  natr=3.0385
@@ -23852,7 +23852,7 @@ Bar[137] 2020-05-18  O=128.2500 H=129.7500 L=126.8700 C=129.0000 V=8793600
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=132.8584
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=130.8756
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=130.1029
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=0.4757
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-4.7682
   tr                                            primed=true  tr=2.8800
   atr                                           primed=true  atr=3.8243
   natr                                          primed=true  natr=2.9646
@@ -23996,7 +23996,7 @@ Bar[138] 2020-05-19  O=129.0000 H=128.5000 L=123.5000 C=123.8700 V=8874200
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=130.2874
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=127.7792
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=127.1230
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-1.9955
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-6.9282
   tr                                            primed=true  tr=5.5000
   atr                                           primed=true  atr=3.9440
   natr                                          primed=true  natr=3.1840
@@ -24140,7 +24140,7 @@ Bar[139] 2020-05-20  O=123.8700 H=125.4400 L=122.6200 C=124.8100 V=6966600
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=127.7243
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=126.6069
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=126.2422
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-4.1554
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-8.6612
   tr                                            primed=true  tr=2.8200
   atr                                           primed=true  atr=3.8637
   natr                                          primed=true  natr=3.0957
@@ -24284,7 +24284,7 @@ Bar[140] 2020-05-21  O=124.8100 H=125.1200 L=122.7500 C=123.0000 V=5525500
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=125.7032
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=124.9552
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=124.9458
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-5.5411
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-9.5380
   tr                                            primed=true  tr=2.3700
   atr                                           primed=true  atr=3.7570
   natr                                          primed=true  natr=3.0545
@@ -24428,7 +24428,7 @@ Bar[141] 2020-05-22  O=123.0000 H=126.5000 L=123.5600 C=126.2500 V=6515500
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=124.5990
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=125.5764
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=125.9090
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-5.8960
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-9.3540
   tr                                            primed=true  tr=3.5000
   atr                                           primed=true  atr=3.7387
   natr                                          primed=true  natr=2.9613
@@ -24572,7 +24572,7 @@ Bar[142] 2020-05-23  O=126.2500 H=128.6900 L=125.8100 C=128.3800 V=5291900
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=124.8326
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=126.7235
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=127.3333
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-4.9519
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-7.9060
   tr                                            primed=true  tr=2.8800
   atr                                           primed=true  atr=3.6773
   natr                                          primed=true  natr=2.8644
@@ -24716,7 +24716,7 @@ Bar[143] 2020-05-24  O=128.3800 H=126.6200 L=124.6200 C=125.3700 V=5711700
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=125.4458
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=126.6814
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=126.4873
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-3.7675
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-6.2943
   tr                                            primed=true  tr=3.7600
   atr                                           primed=true  atr=3.6832
   natr                                          primed=true  natr=2.9379
@@ -24860,7 +24860,7 @@ Bar[144] 2020-05-25  O=125.3700 H=126.6900 L=124.3700 C=125.6900 V=4327700
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=125.7193
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=126.3635
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=126.2525
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-3.0474
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-5.2163
   tr                                            primed=true  tr=2.3200
   atr                                           primed=true  atr=3.5859
   natr                                          primed=true  natr=2.8529
@@ -25004,7 +25004,7 @@ Bar[145] 2020-05-26  O=125.6900 H=126.0000 L=121.8100 C=122.2500 V=4568000
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=125.3888
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=124.5689
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=124.4656
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-2.9824
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-4.8314
   tr                                            primed=true  tr=4.1900
   atr                                           primed=true  atr=3.6290
   natr                                          primed=true  natr=2.9685
@@ -25148,7 +25148,7 @@ Bar[146] 2020-05-27  O=122.2500 H=123.1200 L=118.1900 C=119.3700 V=6859200
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=124.0936
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=122.5192
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=122.2562
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-3.8307
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-5.3551
   tr                                            primed=true  tr=4.9300
   atr                                           primed=true  atr=3.7219
   natr                                          primed=true  natr=3.1180
@@ -25292,7 +25292,7 @@ Bar[147] 2020-05-28  O=119.3700 H=121.8700 L=118.0600 C=118.5000 V=5757500
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=122.2548
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=120.6156
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=120.8191
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-5.0849
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-6.2448
   tr                                            primed=true  tr=3.8100
   atr                                           primed=true  atr=3.7282
   natr                                          primed=true  natr=3.1462
@@ -25436,7 +25436,7 @@ Bar[148] 2020-05-29  O=118.5000 H=124.0000 L=117.5600 C=123.1900 V=7367000
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=121.1417
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=121.3767
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=122.4043
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-5.5040
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-6.2721
   tr                                            primed=true  tr=6.4400
   atr                                           primed=true  atr=3.9219
   natr                                          primed=true  natr=3.1836
@@ -25580,7 +25580,7 @@ Bar[149] 2020-05-30  O=123.1900 H=127.0000 L=121.0000 C=123.5000 V=6144100
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=121.2418
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=122.4238
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=123.2138
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-4.7332
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-5.1374
   tr                                            primed=true  tr=6.0000
   atr                                           primed=true  atr=4.0704
   natr                                          primed=true  natr=3.2958
@@ -25724,7 +25724,7 @@ Bar[150] 2020-05-31  O=123.5000 H=124.4400 L=121.1200 C=122.1900 V=4052700
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=121.6889
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=122.8266
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=122.9102
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-3.7316
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-3.8375
   tr                                            primed=true  tr=3.3200
   atr                                           primed=true  atr=4.0168
   natr                                          primed=true  natr=3.2873
@@ -25868,7 +25868,7 @@ Bar[151] 2020-06-01  O=122.1900 H=122.5000 L=118.9400 C=119.3100 V=5849700
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=121.6350
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=121.4624
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=121.3591
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-3.3231
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-3.1851
   tr                                            primed=true  tr=3.5600
   atr                                           primed=true  atr=3.9841
   natr                                          primed=true  natr=3.3393
@@ -26012,7 +26012,7 @@ Bar[152] 2020-06-02  O=119.3100 H=123.7500 L=119.8100 C=123.3100 V=5544700
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=121.5306
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=121.9006
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=122.5806
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-3.0123
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-2.6643
   tr                                            primed=true  tr=4.4400
   atr                                           primed=true  atr=4.0167
   natr                                          primed=true  natr=3.2574
@@ -26156,7 +26156,7 @@ Bar[153] 2020-06-03  O=123.3100 H=123.8100 L=121.0000 C=121.1200 V=5032200
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=121.6609
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=121.5717
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=122.0355
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-2.5194
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-1.9963
   tr                                            primed=true  tr=2.8100
   atr                                           primed=true  atr=3.9305
   natr                                          primed=true  natr=3.2451
@@ -26300,7 +26300,7 @@ Bar[154] 2020-06-04  O=121.1200 H=124.5000 L=122.0000 C=123.3700 V=4400600
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=121.8624
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=122.5288
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=122.8628
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-2.0204
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-1.3607
   tr                                            primed=true  tr=3.3800
   atr                                           primed=true  atr=3.8912
   natr                                          primed=true  natr=3.1541
@@ -26444,7 +26444,7 @@ Bar[155] 2020-06-05  O=123.3700 H=127.8700 L=124.5000 C=127.3700 V=4894100
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=122.8334
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=124.2466
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=125.1483
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-0.8607
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-0.1192
   tr                                            primed=true  tr=4.5000
   atr                                           primed=true  atr=3.9347
   natr                                          primed=true  natr=3.0892
@@ -26588,7 +26588,7 @@ Bar[156] 2020-06-06  O=127.3700 H=128.5600 L=126.5600 C=128.5000 V=5140000
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=124.5244
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=126.2324
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=126.7050
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=0.8319
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=1.5710
   tr                                            primed=true  tr=2.0000
   atr                                           primed=true  atr=3.7965
   natr                                          primed=true  natr=2.9545
@@ -26732,7 +26732,7 @@ Bar[157] 2020-06-07  O=128.5000 H=129.6300 L=123.5000 C=123.8700 V=6610900
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=125.6402
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=125.7043
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=125.1669
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=1.7768
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=2.4374
   tr                                            primed=true  tr=6.1300
   atr                                           primed=true  atr=3.9632
   natr                                          primed=true  natr=3.1995
@@ -26876,7 +26876,7 @@ Bar[158] 2020-06-08  O=123.8700 H=124.8700 L=121.2500 C=122.9400 V=7585200
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=125.5332
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=124.4595
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=124.0480
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=1.4581
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=2.0211
   tr                                            primed=true  tr=3.6200
   atr                                           primed=true  atr=3.9386
   natr                                          primed=true  natr=3.2037
@@ -27020,7 +27020,7 @@ Bar[159] 2020-06-09  O=122.9400 H=124.3700 L=121.0600 C=121.7500 V=5963100
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=124.6819
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=122.9384
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=122.9766
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=0.4801
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=0.9796
   tr                                            primed=true  tr=3.3100
   atr                                           primed=true  atr=3.8937
   natr                                          primed=true  natr=3.1981
@@ -27164,7 +27164,7 @@ Bar[160] 2020-06-10  O=121.7500 H=124.8700 L=122.3100 C=124.4400 V=6045500
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=123.9301
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=123.3850
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=123.7953
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-0.2844
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=0.1975
   tr                                            primed=true  tr=3.1200
   atr                                           primed=true  atr=3.8385
   natr                                          primed=true  natr=3.0846
@@ -27308,7 +27308,7 @@ Bar[161] 2020-06-11  O=124.4400 H=123.6200 L=121.0000 C=122.0000 V=8443300
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=123.4411
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=122.9213
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=122.9677
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-0.7084
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-0.2137
   tr                                            primed=true  tr=3.4400
   atr                                           primed=true  atr=3.8100
   natr                                          primed=true  natr=3.1230
@@ -27452,7 +27452,7 @@ Bar[162] 2020-06-12  O=122.0000 H=124.0600 L=120.8700 C=122.3700 V=6464700
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=122.9219
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=122.8610
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=122.7724
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-1.1084
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-0.5812
   tr                                            primed=true  tr=3.1900
   atr                                           primed=true  atr=3.7657
   natr                                          primed=true  natr=3.0773
@@ -27596,7 +27596,7 @@ Bar[163] 2020-06-13  O=122.3700 H=125.8700 L=122.0600 C=122.9400 V=6248300
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=122.6409
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=122.6932
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=122.9393
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-1.2360
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-0.6645
   tr                                            primed=true  tr=3.8100
   atr                                           primed=true  atr=3.7689
   natr                                          primed=true  natr=3.0656
@@ -27740,7 +27740,7 @@ Bar[164] 2020-06-14  O=122.9400 H=125.1900 L=122.7500 C=124.0000 V=4357200
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=122.7352
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=123.2699
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=123.5275
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-0.9955
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-0.3856
   tr                                            primed=true  tr=2.4400
   atr                                           primed=true  atr=3.6740
   natr                                          primed=true  natr=2.9629
@@ -27884,7 +27884,7 @@ Bar[165] 2020-06-15  O=124.0000 H=125.6200 L=122.6900 C=123.1900 V=4774700
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=122.9917
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=123.3524
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=123.3899
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-0.6324
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-0.0028
   tr                                            primed=true  tr=2.9300
   atr                                           primed=true  atr=3.6208
   natr                                          primed=true  natr=2.9392
@@ -28028,7 +28028,7 @@ Bar[166] 2020-06-16  O=123.1900 H=126.0000 L=122.8700 C=124.5600 V=6216900
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=123.3208
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=123.8568
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=123.9886
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-0.2458
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=0.3817
   tr                                            primed=true  tr=3.1300
   atr                                           primed=true  atr=3.5858
   natr                                          primed=true  natr=2.8787
@@ -28172,7 +28172,7 @@ Bar[167] 2020-06-17  O=124.5600 H=128.5000 L=125.5000 C=127.2500 V=6266900
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=124.1105
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=125.1114
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=125.5546
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=0.5254
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=1.1187
   tr                                            primed=true  tr=3.9400
   atr                                           primed=true  atr=3.6111
   natr                                          primed=true  natr=2.8378
@@ -28316,7 +28316,7 @@ Bar[168] 2020-06-18  O=127.2500 H=126.7500 L=124.2500 C=125.8700 V=5584800
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=125.0554
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=125.6360
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=125.5879
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=1.3475
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=1.8641
   tr                                            primed=true  tr=3.0000
   atr                                           primed=true  atr=3.5674
   natr                                          primed=true  natr=2.8342
@@ -28460,7 +28460,7 @@ Bar[169] 2020-06-19  O=125.8700 H=129.7500 L=128.0000 C=128.8600 V=5284500
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=126.0288
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=126.9795
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=127.0633
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=2.0952
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=2.4948
   tr                                            primed=true  tr=3.8800
   atr                                           primed=true  atr=3.5898
   natr                                          primed=true  natr=2.7858
@@ -28604,7 +28604,7 @@ Bar[170] 2020-06-20  O=128.8600 H=132.6900 L=128.3800 C=132.0000 V=7554500
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=127.5434
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=128.8284
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=129.2546
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=3.2588
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=3.4936
   tr                                            primed=true  tr=4.3100
   atr                                           primed=true  atr=3.6412
   natr                                          primed=true  natr=2.7585
@@ -28748,7 +28748,7 @@ Bar[171] 2020-06-21  O=132.0000 H=133.9400 L=130.6900 C=130.7500 V=7209500
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=129.1365
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=129.9188
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=129.6510
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=4.3529
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=4.3676
   tr                                            primed=true  tr=3.2500
   atr                                           primed=true  atr=3.6133
   natr                                          primed=true  natr=2.7635
@@ -28892,7 +28892,7 @@ Bar[172] 2020-06-22  O=130.7500 H=136.5000 L=131.6300 C=134.7500 V=8424800
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=130.7065
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=131.8628
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=131.8009
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=5.2908
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=5.0384
   tr                                            primed=true  tr=5.7500
   atr                                           primed=true  atr=3.7659
   natr                                          primed=true  natr=2.7947
@@ -29036,7 +29036,7 @@ Bar[173] 2020-06-23  O=134.7500 H=137.6900 L=134.3800 C=135.0000 V=5094500
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=132.4076
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=133.0221
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=132.9182
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=6.2364
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=5.6760
   tr                                            primed=true  tr=3.3100
   atr                                           primed=true  atr=3.7333
   natr                                          primed=true  natr=2.7654
@@ -29180,7 +29180,7 @@ Bar[174] 2020-06-24  O=135.0000 H=135.5600 L=132.0000 C=132.3800 V=4443600
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=133.4319
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=133.0653
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=132.3816
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=6.4306
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=5.5430
   tr                                            primed=true  tr=3.5600
   atr                                           primed=true  atr=3.7209
   natr                                          primed=true  natr=2.8108
@@ -29324,7 +29324,7 @@ Bar[175] 2020-06-25  O=132.3800 H=133.5600 L=131.9400 C=133.3100 V=4591100
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=133.7045
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=132.9465
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=132.4563
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=5.8956
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=4.7025
   tr                                            primed=true  tr=1.6200
   atr                                           primed=true  atr=3.5709
   natr                                          primed=true  natr=2.6786
@@ -29468,7 +29468,7 @@ Bar[176] 2020-06-26  O=133.3100 H=135.0000 L=131.9400 C=131.9400 V=5658400
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=133.5433
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=132.3124
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=131.9421
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=5.0192
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=3.5710
   tr                                            primed=true  tr=3.0600
   atr                                           primed=true  atr=3.5344
   natr                                          primed=true  natr=2.6788
@@ -29612,7 +29612,7 @@ Bar[177] 2020-06-27  O=131.9400 H=132.3800 L=129.5600 C=130.0000 V=6094100
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=132.8254
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=131.4368
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=130.7362
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=3.7282
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=2.0946
   tr                                            primed=true  tr=2.8200
   atr                                           primed=true  atr=3.4834
   natr                                          primed=true  natr=2.6795
@@ -29756,7 +29756,7 @@ Bar[178] 2020-06-28  O=130.0000 H=131.4400 L=123.7500 C=125.3700 V=14862200
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=131.2287
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=128.9276
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=127.9861
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=1.7713
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=0.0488
   tr                                            primed=true  tr=7.6900
   atr                                           primed=true  atr=3.7838
   natr                                          primed=true  natr=3.0181
@@ -29900,7 +29900,7 @@ Bar[179] 2020-06-29  O=125.3700 H=130.8800 L=126.0000 C=130.1300 V=7544700
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=129.6913
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=129.0019
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=129.0782
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=0.1106
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-1.5970
   tr                                            primed=true  tr=5.5100
   atr                                           primed=true  atr=3.9071
   natr                                          primed=true  natr=3.0025
@@ -30044,7 +30044,7 @@ Bar[180] 2020-06-30  O=130.1300 H=129.6300 L=126.2500 C=127.1200 V=6985600
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=128.7890
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=128.1715
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=128.1032
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-0.7499
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-2.3716
   tr                                            primed=true  tr=3.8800
   atr                                           primed=true  atr=3.9052
   natr                                          primed=true  natr=3.0720
@@ -30188,7 +30188,7 @@ Bar[181] 2020-07-01  O=127.1200 H=127.2500 L=124.3700 C=125.1900 V=8093000
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=127.7511
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=127.4036
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=126.7364
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-1.6318
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-3.1205
   tr                                            primed=true  tr=2.8800
   atr                                           primed=true  atr=3.8320
   natr                                          primed=true  natr=3.0609
@@ -30332,7 +30332,7 @@ Bar[182] 2020-07-02  O=125.1900 H=127.8100 L=121.4400 C=122.0000 V=7590000
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=126.2719
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=125.0364
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=124.5767
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-2.8192
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-4.1213
   tr                                            primed=true  tr=6.3700
   atr                                           primed=true  atr=4.0132
   natr                                          primed=true  natr=3.2895
@@ -30476,7 +30476,7 @@ Bar[183] 2020-07-03  O=122.0000 H=125.0000 L=120.4400 C=125.0000 V=7451300
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=124.9618
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=124.7623
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=125.0005
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-3.7019
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-4.7660
   tr                                            primed=true  tr=4.5600
   atr                                           primed=true  atr=4.0523
   natr                                          primed=true  natr=3.2418
@@ -30620,7 +30620,7 @@ Bar[184] 2020-07-04  O=125.0000 H=126.8100 L=121.3700 C=123.0000 V=7078000
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=124.1795
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=124.0480
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=124.2411
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-3.9808
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-4.7821
   tr                                            primed=true  tr=5.4400
   atr                                           primed=true  atr=4.1514
   natr                                          primed=true  natr=3.3751
@@ -30764,7 +30764,7 @@ Bar[185] 2020-07-05  O=123.0000 H=124.7500 L=121.6900 C=123.5000 V=7105300
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=123.6224
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=124.0985
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=124.1203
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-4.0140
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-4.5523
   tr                                            primed=true  tr=3.0600
   atr                                           primed=true  atr=4.0735
   natr                                          primed=true  natr=3.2984
@@ -30908,7 +30908,7 @@ Bar[186] 2020-07-06  O=123.5000 H=122.8100 L=120.0000 C=120.0600 V=8778800
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=122.9269
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=122.4714
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=122.3747
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-4.1730
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-4.4522
   tr                                            primed=true  tr=3.5000
   atr                                           primed=true  atr=4.0325
   natr                                          primed=true  natr=3.3587
@@ -31052,7 +31052,7 @@ Bar[187] 2020-07-07  O=120.0600 H=122.2500 L=119.6200 C=121.0000 V=6643900
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=122.0339
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=121.8535
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=122.0251
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-4.4976
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-4.5144
   tr                                            primed=true  tr=2.6300
   atr                                           primed=true  atr=3.9323
   natr                                          primed=true  natr=3.2499
@@ -31196,7 +31196,7 @@ Bar[188] 2020-07-08  O=121.0000 H=121.0600 L=115.5000 C=117.7500 V=10563900
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=120.9935
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=120.1089
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=120.2604
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-4.9206
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-4.6655
   tr                                            primed=true  tr=5.5600
   atr                                           primed=true  atr=4.0486
   natr                                          primed=true  natr=3.4383
@@ -31340,7 +31340,7 @@ Bar[189] 2020-07-09  O=117.7500 H=120.0000 L=116.7500 C=119.8700 V=7043100
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=120.0128
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=120.0254
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=120.4639
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-5.2356
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-4.6999
   tr                                            primed=true  tr=3.2500
   atr                                           primed=true  atr=3.9915
   natr                                          primed=true  natr=3.3299
@@ -31484,7 +31484,7 @@ Bar[190] 2020-07-10  O=119.8700 H=123.2500 L=119.0600 C=122.0000 V=6438900
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=119.8430
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=120.6441
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=121.5419
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-4.7511
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-3.9509
   tr                                            primed=true  tr=4.1900
   atr                                           primed=true  atr=4.0057
   natr                                          primed=true  natr=3.2834
@@ -31628,7 +31628,7 @@ Bar[191] 2020-07-11  O=122.0000 H=122.7500 L=119.0600 C=119.1900 V=8057700
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=119.9635
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=120.4606
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=120.6261
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-4.0536
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-3.0325
   tr                                            primed=true  tr=3.6900
   atr                                           primed=true  atr=3.9832
   natr                                          primed=true  natr=3.3419
@@ -31772,7 +31772,7 @@ Bar[192] 2020-07-12  O=119.1900 H=119.1900 L=115.0600 C=116.3700 V=14240000
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=119.4603
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=119.0004
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=118.8270
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-4.0271
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-2.8155
   tr                                            primed=true  tr=4.1300
   atr                                           primed=true  atr=3.9937
   natr                                          primed=true  natr=3.4319
@@ -31916,7 +31916,7 @@ Bar[193] 2020-07-13  O=116.3700 H=115.0600 L=111.0600 C=113.5000 V=17872300
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=118.1075
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=116.5628
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=116.6047
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-4.8010
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-3.3891
   tr                                            primed=true  tr=5.3100
   atr                                           primed=true  atr=4.0877
   natr                                          primed=true  natr=3.6015
@@ -32060,7 +32060,7 @@ Bar[194] 2020-07-14  O=113.5000 H=116.6900 L=113.1200 C=114.2500 V=7831100
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=116.4796
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=115.3671
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=115.9347
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-5.7380
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-4.0905
   tr                                            primed=true  tr=3.5700
   atr                                           primed=true  atr=4.0507
   natr                                          primed=true  natr=3.5455
@@ -32204,7 +32204,7 @@ Bar[195] 2020-07-15  O=114.2500 H=114.8700 L=110.0000 C=110.0000 V=8277700
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=114.7075
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=113.2291
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=113.5257
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-6.6950
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-4.7728
   tr                                            primed=true  tr=4.8700
   atr                                           primed=true  atr=4.1092
   natr                                          primed=true  natr=3.7357
@@ -32348,7 +32348,7 @@ Bar[196] 2020-07-16  O=110.0000 H=110.8700 L=105.0000 C=105.0600 V=15017800
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=112.1615
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=110.1318
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=110.0062
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-8.2606
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-6.0092
   tr                                            primed=true  tr=5.8700
   atr                                           primed=true  atr=4.2350
   natr                                          primed=true  natr=4.0310
@@ -32492,7 +32492,7 @@ Bar[197] 2020-07-17  O=105.0600 H=107.2500 L=104.6900 C=107.0000 V=14183300
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=109.5620
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=108.4426
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=109.3078
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-9.6838
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-7.0381
   tr                                            primed=true  tr=2.5600
   atr                                           primed=true  atr=4.1154
   natr                                          primed=true  natr=3.8461
@@ -32636,7 +32636,7 @@ Bar[198] 2020-07-18  O=107.0000 H=108.8700 L=103.8700 C=107.8700 V=13921100
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=107.9544
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=108.0332
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=109.3321
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-10.0014
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-6.9317
   tr                                            primed=true  tr=5.0000
   atr                                           primed=true  atr=4.1785
   natr                                          primed=true  natr=3.8737
@@ -32780,7 +32780,7 @@ Bar[199] 2020-07-19  O=107.8700 H=109.0000 L=104.6900 C=107.0000 V=9683000
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=107.1618
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=108.0174
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=108.8413
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-9.5152
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-6.0446
   tr                                            primed=true  tr=4.3100
   atr                                           primed=true  atr=4.1879
   natr                                          primed=true  natr=3.9140
@@ -32924,7 +32924,7 @@ Bar[200] 2020-07-20  O=107.0000 H=108.5000 L=105.4400 C=107.1200 V=9187300
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=106.8101
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=107.8081
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=108.6087
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-8.6749
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-4.8575
   tr                                            primed=true  tr=3.0600
   atr                                           primed=true  atr=4.1074
   natr                                          primed=true  natr=3.8344
@@ -33068,7 +33068,7 @@ Bar[201] 2020-07-21  O=107.1200 H=113.0600 L=107.0000 C=107.0000 V=11380500
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=106.7287
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=107.4973
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=108.3795
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-7.6842
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-3.5862
   tr                                            primed=true  tr=6.0600
   atr                                           primed=true  atr=4.2468
   natr                                          primed=true  natr=3.9690
@@ -33212,7 +33212,7 @@ Bar[202] 2020-07-22  O=107.0000 H=93.0000 L=89.0000 C=91.0000 V=69447300
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=104.7384
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=101.3730
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=100.4712
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-8.6064
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-4.2457
   tr                                            primed=true  tr=18.0000
   atr                                           primed=true  atr=5.2292
   natr                                          primed=true  natr=5.7464
@@ -33356,7 +33356,7 @@ Bar[203] 2020-07-23  O=91.0000 H=94.6200 L=92.5000 C=93.9400 V=26673600
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=100.8136
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=97.8672
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=98.3038
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-11.2304
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-6.5273
   tr                                            primed=true  tr=3.6200
   atr                                           primed=true  atr=5.1143
   natr                                          primed=true  natr=5.4442
@@ -33500,7 +33500,7 @@ Bar[204] 2020-07-24  O=93.9400 H=95.1200 L=92.1200 C=93.8700 V=13768400
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=97.4503
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=95.2267
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=97.1902
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-13.0049
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-7.8587
   tr                                            primed=true  tr=3.0000
   atr                                           primed=true  atr=4.9632
   natr                                          primed=true  natr=5.2874
@@ -33644,7 +33644,7 @@ Bar[205] 2020-07-25  O=93.8700 H=96.0000 L=94.6200 C=95.5000 V=11371600
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=95.3671
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=95.8575
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=97.3660
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-13.3604
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-7.7341
   tr                                            primed=true  tr=2.1300
   atr                                           primed=true  atr=4.7609
   natr                                          primed=true  natr=4.9852
@@ -33788,7 +33788,7 @@ Bar[206] 2020-07-26  O=95.5000 H=95.5600 L=92.8100 C=93.0000 V=9872200
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=94.2275
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=95.0256
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=96.1234
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-12.7866
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-6.7079
   tr                                            primed=true  tr=2.7500
   atr                                           primed=true  atr=4.6172
   natr                                          primed=true  natr=4.9648
@@ -33932,7 +33932,7 @@ Bar[207] 2020-07-27  O=93.0000 H=95.3100 L=94.2500 C=94.9400 V=9450500
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=93.6937
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=95.1380
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=96.4096
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-11.7149
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-5.2495
   tr                                            primed=true  tr=2.3100
   atr                                           primed=true  atr=4.4524
   natr                                          primed=true  natr=4.6897
@@ -34076,7 +34076,7 @@ Bar[208] 2020-07-28  O=94.9400 H=99.0000 L=96.2500 C=98.2500 V=11083300
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=94.2087
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=96.2597
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=98.0436
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-9.7907
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-3.0387
   tr                                            primed=true  tr=4.0600
   atr                                           primed=true  atr=4.4244
   natr                                          primed=true  natr=4.5032
@@ -34220,7 +34220,7 @@ Bar[209] 2020-07-29  O=98.2500 H=98.8100 L=96.3700 C=96.7500 V=9552800
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=95.2539
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=96.8510
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=97.9646
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-7.6056
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-0.6940
   tr                                            primed=true  tr=2.4400
   atr                                           primed=true  atr=4.2827
   natr                                          primed=true  natr=4.4265
@@ -34364,7 +34364,7 @@ Bar[210] 2020-07-30  O=96.7500 H=96.8100 L=93.6900 C=94.8100 V=11108400
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=95.8169
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=96.3245
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=96.9291
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-6.1415
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=0.8191
   tr                                            primed=true  tr=3.1200
   atr                                           primed=true  atr=4.1996
   natr                                          primed=true  natr=4.4295
@@ -34508,7 +34508,7 @@ Bar[211] 2020-07-31  O=94.8100 H=95.9400 L=93.5000 C=94.3700 V=10374200
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=95.7378
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=95.3509
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=96.1984
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-5.4600
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=1.4831
   tr                                            primed=true  tr=2.4400
   atr                                           primed=true  atr=4.0739
   natr                                          primed=true  natr=4.3170
@@ -34652,7 +34652,7 @@ Bar[212] 2020-08-01  O=94.3700 H=94.4400 L=90.0000 C=91.5600 V=16701900
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=95.0032
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=93.7544
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=94.4549
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-5.4774
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=1.4244
   tr                                            primed=true  tr=4.4400
   atr                                           primed=true  atr=4.1001
   natr                                          primed=true  natr=4.4780
@@ -34796,7 +34796,7 @@ Bar[213] 2020-08-02  O=91.5600 H=92.9400 L=90.1900 C=90.2500 V=13741900
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=93.6635
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=92.3083
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=92.9856
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-6.0606
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=0.8117
   tr                                            primed=true  tr=2.7500
   atr                                           primed=true  atr=4.0036
   natr                                          primed=true  natr=4.4362
@@ -34940,7 +34940,7 @@ Bar[214] 2020-08-03  O=90.2500 H=93.9400 L=90.5000 C=93.9400 V=8523600
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=92.7154
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=92.6625
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=93.9429
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-6.2047
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=0.6541
   tr                                            primed=true  tr=3.6900
   atr                                           primed=true  atr=3.9812
   natr                                          primed=true  natr=4.2381
@@ -35084,7 +35084,7 @@ Bar[215] 2020-08-04  O=93.9400 H=95.5000 L=92.1200 C=93.6200 V=9551900
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=92.5950
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=93.1594
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=94.2589
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-5.5545
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=1.2741
   tr                                            primed=true  tr=3.3800
   atr                                           primed=true  atr=3.9383
   natr                                          primed=true  natr=4.2067
@@ -35228,7 +35228,7 @@ Bar[216] 2020-08-05  O=93.6200 H=97.0600 L=94.1200 C=97.0000 V=8680500
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=93.2330
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=94.9633
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=95.9833
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-4.2728
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=2.4718
   tr                                            primed=true  tr=3.4400
   atr                                           primed=true  atr=3.9027
   natr                                          primed=true  natr=4.0234
@@ -35372,7 +35372,7 @@ Bar[217] 2020-08-06  O=97.0000 H=97.5000 L=94.8700 C=95.0000 V=7151700
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=94.1959
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=95.1050
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=95.7413
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-2.8437
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=3.7444
   tr                                            primed=true  tr=2.6300
   atr                                           primed=true  atr=3.8118
   natr                                          primed=true  natr=4.0124
@@ -35516,7 +35516,7 @@ Bar[218] 2020-08-07  O=95.0000 H=96.2500 L=93.0000 C=95.8700 V=9673100
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=94.9056
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=95.5775
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=95.9059
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-1.8278
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=4.5410
   tr                                            primed=true  tr=3.2500
   atr                                           primed=true  atr=3.7717
   natr                                          primed=true  natr=3.9341
@@ -35660,7 +35660,7 @@ Bar[219] 2020-08-08  O=95.8700 H=96.3700 L=93.8700 C=94.0600 V=6264700
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=95.2125
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=94.8306
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=95.2025
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-1.3148
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=4.7993
   tr                                            primed=true  tr=2.5000
   atr                                           primed=true  atr=3.6808
   natr                                          primed=true  natr=3.9133
@@ -35804,7 +35804,7 @@ Bar[220] 2020-08-09  O=94.0600 H=95.0000 L=93.0000 C=94.6200 V=8541600
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=95.1178
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=94.7305
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=95.1380
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-1.2418
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=4.6094
   tr                                            primed=true  tr=2.0000
   atr                                           primed=true  atr=3.5608
   natr                                          primed=true  natr=3.7632
@@ -35948,7 +35948,7 @@ Bar[221] 2020-08-10  O=94.6200 H=94.8700 L=92.6200 C=93.7500 V=8358000
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=94.8427
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=94.2203
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=94.6637
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-1.3471
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=4.2507
   tr                                            primed=true  tr=2.2500
   atr                                           primed=true  atr=3.4671
   natr                                          primed=true  natr=3.6983
@@ -36092,7 +36092,7 @@ Bar[222] 2020-08-11  O=93.7500 H=98.2500 L=93.5600 C=98.0000 V=18720800
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=94.9909
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=95.6578
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=96.4868
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-1.0423
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=4.3061
   tr                                            primed=true  tr=4.6900
   atr                                           primed=true  atr=3.5545
   natr                                          primed=true  natr=3.6270
@@ -36236,7 +36236,7 @@ Bar[223] 2020-08-12  O=98.0000 H=105.1200 L=98.3700 C=103.9400 V=19683100
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=96.5657
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=98.8933
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=100.1533
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=0.5636
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=5.6214
   tr                                            primed=true  tr=7.1200
   atr                                           primed=true  atr=3.8092
   natr                                          primed=true  natr=3.6648
@@ -36380,7 +36380,7 @@ Bar[224] 2020-08-13  O=103.9400 H=108.4400 L=104.4400 C=107.8700 V=13682500
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=99.5780
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=102.9025
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=103.6874
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=3.3207
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=7.9832
   tr                                            primed=true  tr=4.5000
   atr                                           primed=true  atr=3.8585
   natr                                          primed=true  natr=3.5770
@@ -36524,7 +36524,7 @@ Bar[225] 2020-08-14  O=107.8700 H=109.8700 L=106.0000 C=106.0600 V=10668100
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=102.6871
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=104.6994
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=104.4131
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=5.8298
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=9.9712
   tr                                            primed=true  tr=3.8700
   atr                                           primed=true  atr=3.8593
   natr                                          primed=true  natr=3.6388
@@ -36668,7 +36668,7 @@ Bar[226] 2020-08-15  O=106.0600 H=105.0000 L=101.8100 C=104.5000 V=9710600
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=104.6222
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=104.7195
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=104.0296
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=6.9288
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=10.4723
   tr                                            primed=true  tr=4.2500
   atr                                           primed=true  atr=3.8872
   natr                                          primed=true  natr=3.7198
@@ -36812,7 +36812,7 @@ Bar[227] 2020-08-16  O=104.5000 H=106.0000 L=104.1200 C=105.0000 V=3113100
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=105.4504
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=104.4309
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=104.1478
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=6.8540
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=9.7954
   tr                                            primed=true  tr=1.8800
   atr                                           primed=true  atr=3.7439
   natr                                          primed=true  natr=3.5656
@@ -36956,7 +36956,7 @@ Bar[228] 2020-08-17  O=105.0000 H=104.9400 L=103.3700 C=104.1900 V=5682000
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=105.5744
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=104.1369
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=103.8479
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=6.1276
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=8.5130
   tr                                            primed=true  tr=1.6300
   atr                                           primed=true  atr=3.5929
   natr                                          primed=true  natr=3.4484
@@ -37100,7 +37100,7 @@ Bar[229] 2020-08-18  O=104.1900 H=104.5000 L=102.1200 C=103.0600 V=5763600
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=105.1318
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=103.6877
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=103.2028
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=4.9587
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=6.8634
   tr                                            primed=true  tr=2.3800
   atr                                           primed=true  atr=3.5062
   natr                                          primed=true  natr=3.4021
@@ -37244,7 +37244,7 @@ Bar[230] 2020-08-19  O=103.0600 H=104.4400 L=102.2500 C=103.4200 V=5340000
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=104.4708
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=103.4233
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=103.1183
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=3.7285
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=5.2397
   tr                                            primed=true  tr=2.1900
   atr                                           primed=true  atr=3.4122
   natr                                          primed=true  natr=3.2994
@@ -37388,7 +37388,7 @@ Bar[231] 2020-08-20  O=103.4200 H=106.3100 L=103.3700 C=105.2700 V=6220800
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=104.1671
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=104.0200
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=103.9971
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=2.9847
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=4.1760
   tr                                            primed=true  tr=2.9400
   atr                                           primed=true  atr=3.3785
   natr                                          primed=true  natr=3.2094
@@ -37532,7 +37532,7 @@ Bar[232] 2020-08-21  O=105.2700 H=112.8700 L=107.9400 C=111.8700 V=14680500
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=105.1570
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=107.0837
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=107.6027
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=3.5462
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=4.4413
   tr                                            primed=true  tr=7.6000
   atr                                           primed=true  atr=3.6800
   natr                                          primed=true  natr=3.2896
@@ -37676,7 +37676,7 @@ Bar[233] 2020-08-22  O=111.8700 H=116.5000 L=112.5000 C=116.0000 V=9933000
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=107.7866
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=110.8853
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=111.2358
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=5.5772
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=6.1246
   tr                                            primed=true  tr=4.6300
   atr                                           primed=true  atr=3.7479
   natr                                          primed=true  natr=3.2309
@@ -37820,7 +37820,7 @@ Bar[234] 2020-08-23  O=116.0000 H=119.1900 L=115.4400 C=116.6200 V=11329500
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=111.0261
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=113.7377
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=113.2078
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=7.9309
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=8.0321
   tr                                            primed=true  tr=3.7500
   atr                                           primed=true  atr=3.7480
   natr                                          primed=true  natr=3.2139
@@ -37964,7 +37964,7 @@ Bar[235] 2020-08-24  O=116.6200 H=121.0000 L=115.5000 C=118.2800 V=8145300
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=113.9848
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=115.6745
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=114.9634
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=9.7318
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=9.2974
   tr                                            primed=true  tr=5.5000
   atr                                           primed=true  atr=3.8732
   natr                                          primed=true  natr=3.2746
@@ -38108,7 +38108,7 @@ Bar[236] 2020-08-25  O=118.2800 H=122.1200 L=112.2500 C=113.3700 V=16644700
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=115.6675
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=114.7697
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=113.4496
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=10.1140
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=9.1102
   tr                                            primed=true  tr=9.8700
   atr                                           primed=true  atr=4.3015
   natr                                          primed=true  natr=3.7942
@@ -38252,7 +38252,7 @@ Bar[237] 2020-08-26  O=113.3700 H=111.9400 L=107.5600 C=109.0000 V=12593800
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=115.2245
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=112.3747
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=110.7411
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=8.4547
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=6.9416
   tr                                            primed=true  tr=5.8100
   atr                                           primed=true  atr=4.4093
   natr                                          primed=true  natr=4.0452
@@ -38396,7 +38396,7 @@ Bar[238] 2020-08-27  O=109.0000 H=112.7500 L=106.5600 C=109.7000 V=7138100
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=113.5550
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=110.6336
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=109.9315
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=5.8484
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=3.9652
   tr                                            primed=true  tr=6.1900
   atr                                           primed=true  atr=4.5365
   natr                                          primed=true  natr=4.1353
@@ -38540,7 +38540,7 @@ Bar[239] 2020-08-28  O=109.7000 H=110.1900 L=106.8700 C=109.2500 V=7442300
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=111.8353
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=109.7727
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=109.3862
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=3.5153
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=1.4156
   tr                                            primed=true  tr=3.3200
   atr                                           primed=true  atr=4.4496
   natr                                          primed=true  natr=4.0728
@@ -38684,7 +38684,7 @@ Bar[240] 2020-08-29  O=109.2500 H=107.9400 L=104.5000 C=107.0000 V=9442300
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=110.1887
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=108.8295
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=108.0775
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=1.5376
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-0.6469
   tr                                            primed=true  tr=4.7500
   atr                                           primed=true  atr=4.4710
   natr                                          primed=true  natr=4.1785
@@ -38828,7 +38828,7 @@ Bar[241] 2020-08-30  O=107.0000 H=109.6900 L=105.7500 C=109.1900 V=7123600
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=108.9815
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=108.8559
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=108.5699
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=0.2152
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-1.9541
   tr                                            primed=true  tr=3.9400
   atr                                           primed=true  atr=4.4331
   natr                                          primed=true  natr=4.0600
@@ -38972,7 +38972,7 @@ Bar[242] 2020-08-31  O=109.1900 H=111.0600 L=108.6200 C=110.0000 V=7680600
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=108.6403
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=109.2357
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=109.1872
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-0.1317
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-2.2336
   tr                                            primed=true  tr=2.4400
   atr                                           primed=true  atr=4.2907
   natr                                          primed=true  natr=3.9007
@@ -39116,7 +39116,7 @@ Bar[243] 2020-09-01  O=110.0000 H=110.4400 L=107.7500 C=109.2000 V=4839800
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=108.7430
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=109.5017
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=109.0842
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=-0.0194
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-2.0429
   tr                                            primed=true  tr=2.6900
   atr                                           primed=true  atr=4.1764
   natr                                          primed=true  natr=3.8245
@@ -39260,7 +39260,7 @@ Bar[244] 2020-09-02  O=109.2000 H=110.1200 L=108.0600 C=110.1200 V=4775500
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=109.0174
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=109.7726
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=109.4957
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=0.2403
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-1.7116
   tr                                            primed=true  tr=2.0600
   atr                                           primed=true  atr=4.0252
   natr                                          primed=true  natr=3.6553
@@ -39404,7 +39404,7 @@ Bar[245] 2020-09-03  O=110.1200 H=110.3100 L=108.0000 C=108.0000 V=4008800
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=109.1411
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=109.0794
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=108.6635
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=0.3268
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-1.5606
   tr                                            primed=true  tr=2.3100
   atr                                           primed=true  atr=3.9027
   natr                                          primed=true  natr=3.6136
@@ -39548,7 +39548,7 @@ Bar[246] 2020-09-04  O=108.0000 H=110.4400 L=108.1900 C=108.6200 V=4533600
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=108.9815
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=108.8921
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=108.6199
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=0.1369
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-1.6817
   tr                                            primed=true  tr=2.4400
   atr                                           primed=true  atr=3.7982
   natr                                          primed=true  natr=3.4968
@@ -39692,7 +39692,7 @@ Bar[247] 2020-09-05  O=108.6200 H=110.0000 L=108.1200 C=109.7500 V=3741100
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=108.9674
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=109.0603
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=109.1353
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=0.1069
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-1.6362
   tr                                            primed=true  tr=1.8800
   atr                                           primed=true  atr=3.6612
   natr                                          primed=true  natr=3.3360
@@ -39836,7 +39836,7 @@ Bar[248] 2020-09-06  O=109.7500 H=110.7500 L=109.0600 C=109.8100 V=4084800
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=109.1673
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=109.4740
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=109.3982
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=0.2813
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-1.3901
   tr                                            primed=true  tr=1.6900
   atr                                           primed=true  atr=3.5204
   natr                                          primed=true  natr=3.2059
@@ -39980,7 +39980,7 @@ Bar[249] 2020-09-07  O=109.8100 H=110.5000 L=108.7500 C=109.0000 V=2685200
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=109.3097
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=109.4030
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=109.1308
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=0.3804
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-1.2273
   tr                                            primed=true  tr=1.7500
   atr                                           primed=true  atr=3.3940
   natr                                          primed=true  natr=3.1137
@@ -40124,7 +40124,7 @@ Bar[250] 2020-09-08  O=109.0000 H=110.5000 L=108.5600 C=108.7500 V=3438000
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=109.2582
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=109.1147
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=108.8986
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=0.2853
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-1.2595
   tr                                            primed=true  tr=1.9400
   atr                                           primed=true  atr=3.2901
   natr                                          primed=true  natr=3.0254
@@ -40268,7 +40268,7 @@ Bar[251] 2020-09-09  O=108.7500 H=109.5000 L=106.6200 C=107.8700 V=2870500
   ss(10, hl/2)                                  primed=true  ss(10, hl/2)=108.9970
   zema(0.25, 0.5, 3)                            primed=true  zema(0.25, 0.5, 3)=108.5611
   zecema(0.095, 5, 0.1)                         primed=true  zecema(0.095, 5, 0.1)=108.3743
-  roof1hp(10, 48, hl/2)                         primed=true  roof1hp(10, 48, hl/2)=0.0051
+  roof2hp(10, 48)                               primed=true  roof2hp(10, 48)=-1.4681
   tr                                            primed=true  tr=2.8800
   atr                                           primed=true  atr=3.2608
   natr                                          primed=true  natr=3.0229

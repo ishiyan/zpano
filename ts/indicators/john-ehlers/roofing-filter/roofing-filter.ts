@@ -1,235 +1,168 @@
 import { buildMetadata } from '../../core/build-metadata';
-import { BarComponent } from '../../../entities/bar-component';
-import { componentTripleMnemonic } from '../../core/component-triple-mnemonic';
-import { IndicatorMetadata } from '../../core/indicator-metadata';
 import { IndicatorIdentifier } from '../../core/indicator-identifier';
+import { IndicatorMetadata } from '../../core/indicator-metadata';
 import { LineIndicator } from '../../core/line-indicator';
-import { RoofingFilterParams } from './params';
+import { RoofingFilterParams, defaultParams, roofingFilterMnemonic } from './params';
 
-/** Function to calculate mnemonic of a __RoofingFilter__ indicator. */
-export const roofingFilterMnemonic = (params: RoofingFilterParams): string => {
-  const cm = componentTripleMnemonic(
-    params.barComponent ?? BarComponent.Median,
-    params.quoteComponent,
-    params.tradeComponent,
-  );
-  const poles = params.hasTwoPoleHighpassFilter ? 2 : 1;
-  const zm = (params.hasZeroMean && !params.hasTwoPoleHighpassFilter) ? 'zm' : '';
+export { RoofingFilterParams, defaultParams, roofingFilterMnemonic };
 
-  return `roof${poles}hp${zm}(${params.shortestCyclePeriod}, ${params.longestCyclePeriod}${cm})`;
-};
+function smootherCoefficients(period: number): [number, number, number] {
+    const smootherAngle = (Math.SQRT2 * Math.PI) / period;
+    const a1 = Math.exp(-smootherAngle);
+    const c2 = 2 * a1 * Math.cos(smootherAngle);
+    const c3 = -a1 * a1;
+    return [1 - c2 - c3, c2, c3];
+}
 
 /**
- * RoofingFilter (Ehler's Roofing Filter) is described in Ehler's book
- * "Cycle Analytics for Traders" (2013).
- *
- * The Roofing Filter is comprised of a high-pass filter and a Super Smoother.
- * Given the longest (Λ) and the shortest (λ) cycle periods in bars,
- * the high-pass filter passes cyclic components whose periods are shorter than the longest one,
- * and the Super Smoother filter attenuates cycle periods shorter than the shortest one.
- *
- * Three flavours are available:
- *   - 1-pole high-pass filter (default)
- *   - 1-pole high-pass filter with zero-mean
- *   - 2-pole high-pass filter
- *
- * Reference:
- *
- * Ehlers, John F. (2013). Cycle Analytics for Traders. Wiley.
+ * Ehlers' Roofing Filter: high-pass detrending followed by a two-pole SuperSmoother.
  */
 export class RoofingFilter extends LineIndicator {
-  private hpCoeff1: number;
-  private hpCoeff2: number;
-  private hpCoeff3: number;
-  private ssCoeff1: number;
-  private ssCoeff2: number;
-  private ssCoeff3: number;
+    private readonly poles: number;
+    private readonly zeroMean: boolean;
+    private readonly warmupCount: number;
+    private readonly gain: number;
+    private readonly decay: number;
+    private readonly c1: number;
+    private readonly c2: number;
+    private readonly c3: number;
 
-  private hasTwoPole: boolean;
-  private hasZeroMeanFilter: boolean;
+    private count = 0;
+    private input1 = 0;
+    private input2 = 0;
+    private hp1 = 0;
+    private hp2 = 0;
+    private filt1 = 0;
+    private filt2 = 0;
+    private zero1 = 0;
+    private currentValue = Number.NaN;
 
-  private count: number;
-  private samplePrevious: number;
-  private samplePrevious2: number;
-  private hpPrevious: number;
-  private hpPrevious2: number;
-  private ssPrevious: number;
-  private ssPrevious2: number;
-  private zmPrevious: number;
-  private value: number;
-
-  /**
-   * Constructs an instance given the parameters.
-   */
-  public constructor(params: RoofingFilterParams) {
-    super();
-
-    const shortest = Math.floor(params.shortestCyclePeriod);
-    if (shortest < 2) {
-      throw new Error('shortest cycle period should be greater than 1');
+    public static default(): RoofingFilter {
+        return new RoofingFilter(defaultParams());
     }
 
-    const longest = Math.floor(params.longestCyclePeriod);
-    if (longest <= shortest) {
-      throw new Error('longest cycle period should be greater than shortest');
+    public static fromParams(params?: RoofingFilterParams): RoofingFilter {
+        return new RoofingFilter(params);
     }
 
-    this.hasTwoPole = params.hasTwoPoleHighpassFilter ?? false;
-    this.hasZeroMeanFilter = (params.hasZeroMean ?? false) && !this.hasTwoPole;
+    public constructor(params?: RoofingFilterParams) {
+        super();
 
-    this.mnemonic = roofingFilterMnemonic(params);
-    this.description = 'Roofing Filter ' + this.mnemonic;
-    this.barComponent = params.barComponent;
-    this.quoteComponent = params.quoteComponent;
-    this.tradeComponent = params.tradeComponent;
+        const shortest = params?.shortestCyclePeriod ?? 10;
+        if (typeof shortest !== 'number' || !Number.isFinite(shortest) || shortest < 2) {
+            throw new Error('shortestCyclePeriod must be finite and at least 2 bars');
+        }
 
-    // Calculate high-pass filter coefficients.
-    this.hpCoeff3 = 0;
-    if (this.hasTwoPole) {
-      const angle = (Math.SQRT2 / 2) * 2 * Math.PI / longest;
-      const cosAngle = Math.cos(angle);
-      const alpha = (Math.sin(angle) + cosAngle - 1) / cosAngle;
-      const beta = 1 - alpha / 2;
-      this.hpCoeff1 = beta * beta;
-      const beta2 = 1 - alpha;
-      this.hpCoeff2 = 2 * beta2;
-      this.hpCoeff3 = beta2 * beta2;
-    } else {
-      const angle = 2 * Math.PI / longest;
-      const cosAngle = Math.cos(angle);
-      const alpha = (Math.sin(angle) + cosAngle - 1) / cosAngle;
-      this.hpCoeff1 = 1 - alpha / 2;
-      this.hpCoeff2 = 1 - alpha;
+        const longest = params?.longestCyclePeriod ?? 48;
+        if (typeof longest !== 'number' || !Number.isFinite(longest) || longest <= shortest) {
+            throw new Error('longestCyclePeriod must be finite and greater than shortestCyclePeriod');
+        }
+
+        const poles = params?.highpassPoles ?? 2;
+        if (typeof poles !== 'number' || !Number.isInteger(poles) || (poles !== 1 && poles !== 2)) {
+            throw new Error('highpassPoles must be integer 1 or 2');
+        }
+
+        const zeroMean = params?.zeroMean ?? false;
+        if (typeof zeroMean !== 'boolean' || (zeroMean && poles !== 1)) {
+            throw new Error('zeroMean must be a boolean and requires highpassPoles === 1');
+        }
+
+        this.mnemonic = roofingFilterMnemonic(params);
+        this.description = 'Roofing Filter ' + this.mnemonic;
+        this.barComponent = params?.barComponent;
+        this.quoteComponent = params?.quoteComponent;
+        this.tradeComponent = params?.tradeComponent;
+
+        this.poles = poles;
+        this.zeroMean = zeroMean;
+        this.warmupCount = poles === 2 || zeroMean ? 4 : 3;
+
+        const angle = poles === 1 ? (2 * Math.PI) / longest : (Math.SQRT2 * Math.PI) / longest;
+        const tangent = Math.tan(angle / 2);
+        const alpha = (2 * tangent) / (1 + tangent);
+        this.gain = 1 - alpha / 2;
+        this.decay = 1 - alpha;
+        [this.c1, this.c2, this.c3] = smootherCoefficients(shortest);
+
+        this.reset();
     }
 
-    // Calculate super smoother coefficients (uses literal 1.414).
-    const beta = 1.414 * Math.PI / shortest;
-    const alpha = Math.exp(-beta);
-    this.ssCoeff2 = 2 * alpha * Math.cos(beta);
-    this.ssCoeff3 = -alpha * alpha;
-    this.ssCoeff1 = (1 - this.ssCoeff2 - this.ssCoeff3) / 2;
-
-    this.count = 0;
-    this.samplePrevious = 0;
-    this.samplePrevious2 = 0;
-    this.hpPrevious = 0;
-    this.hpPrevious2 = 0;
-    this.ssPrevious = 0;
-    this.ssPrevious2 = 0;
-    this.zmPrevious = 0;
-    this.value = Number.NaN;
-    this.primed = false;
-  }
-
-  /** Describes the output data of the indicator. */
-  public metadata(): IndicatorMetadata {
-    return buildMetadata(
-      IndicatorIdentifier.RoofingFilter,
-      this.mnemonic,
-      this.description,
-      [
-        { mnemonic: this.mnemonic, description: this.description },
-      ],
-    );
-  }
-
-  /** Updates the value of the indicator given the next sample. */
-  public update(sample: number): number {
-    if (Number.isNaN(sample)) {
-      return sample;
+    /** Clears all streaming histories and priming state while preserving configuration. */
+    public reset(): void {
+        this.count = 0;
+        this.input1 = 0;
+        this.input2 = 0;
+        this.hp1 = 0;
+        this.hp2 = 0;
+        this.filt1 = 0;
+        this.filt2 = 0;
+        this.zero1 = 0;
+        this.currentValue = Number.NaN;
+        this.primed = false;
     }
 
-    if (this.hasTwoPole) {
-      return this.update2Pole(sample);
+    /** Returns the number of initial NaN outputs before priming. */
+    public warmupBars(): number {
+        return this.warmupCount;
     }
 
-    return this.update1Pole(sample);
-  }
+    /** Returns the latest calculated scalar value (NaN before priming). */
+    public value(): number {
+        return this.currentValue;
+    }
 
-  private update1Pole(sample: number): number {
-    let hp = 0;
-    let ss = 0;
-    let zm = 0;
+    /** Describes the output data of the indicator. */
+    public metadata(): IndicatorMetadata {
+        return buildMetadata(IndicatorIdentifier.RoofingFilter, this.mnemonic, this.description, [
+            { mnemonic: this.mnemonic, description: this.description },
+        ]);
+    }
 
-    if (this.primed) {
-      hp = this.hpCoeff1 * (sample - this.samplePrevious) + this.hpCoeff2 * this.hpPrevious;
-      ss = this.ssCoeff1 * (hp + this.hpPrevious) + this.ssCoeff2 * this.ssPrevious + this.ssCoeff3 * this.ssPrevious2;
+    /** Consumes one scalar sample and returns the current RoofingFilter value. */
+    public update(sample: number): number {
+        if (typeof sample !== 'number') {
+            throw new Error('sample must be finite or NaN');
+        }
+        if (Number.isNaN(sample)) {
+            return Number.NaN;
+        }
+        if (!Number.isFinite(sample)) {
+            throw new Error('sample must be finite or NaN');
+        }
 
-      if (this.hasZeroMeanFilter) {
-        zm = this.hpCoeff1 * (ss - this.ssPrevious) + this.hpCoeff2 * this.zmPrevious;
-        this.value = zm;
-      } else {
-        this.value = ss;
-      }
-    } else {
-      this.count++;
+        let hp = 0;
+        let filt = 0;
+        let zero = 0;
 
-      if (this.count === 1) {
-        hp = 0;
-        ss = 0;
-      } else {
-        hp = this.hpCoeff1 * (sample - this.samplePrevious) + this.hpCoeff2 * this.hpPrevious;
-        ss = this.ssCoeff1 * (hp + this.hpPrevious) + this.ssCoeff2 * this.ssPrevious + this.ssCoeff3 * this.ssPrevious2;
+        if (this.count >= this.poles) {
+            if (this.poles === 2) {
+                const difference = sample - 2 * this.input1 + this.input2;
+                hp = this.gain * this.gain * difference + 2 * this.decay * this.hp1 - this.decay * this.decay * this.hp2;
+            } else {
+                hp = this.gain * (sample - this.input1) + this.decay * this.hp1;
+            }
+            filt = (this.c1 * (hp + this.hp1)) / 2 + this.c2 * this.filt1 + this.c3 * this.filt2;
+            if (this.zeroMean) {
+                zero = this.gain * (filt - this.filt1) + this.decay * this.zero1;
+            }
+        }
 
-        if (this.hasZeroMeanFilter) {
-          zm = this.hpCoeff1 * (ss - this.ssPrevious) + this.hpCoeff2 * this.zmPrevious;
-          if (this.count === 5) {
+        this.input2 = this.input1;
+        this.input1 = sample;
+        this.hp2 = this.hp1;
+        this.hp1 = hp;
+        this.filt2 = this.filt1;
+        this.filt1 = filt;
+        this.zero1 = zero;
+        this.count += 1;
+
+        const output = this.zeroMean ? zero : filt;
+        if (this.count > this.warmupCount) {
             this.primed = true;
-            this.value = zm;
-          }
-        } else if (this.count === 4) {
-          this.primed = true;
-          this.value = ss;
+            this.currentValue = output;
+            return output;
         }
-      }
+        return Number.NaN;
     }
-
-    this.samplePrevious = sample;
-    this.hpPrevious = hp;
-    this.ssPrevious2 = this.ssPrevious;
-    this.ssPrevious = ss;
-
-    if (this.hasZeroMeanFilter) {
-      this.zmPrevious = zm;
-    }
-
-    return this.value;
-  }
-
-  private update2Pole(sample: number): number {
-    let hp = 0;
-    let ss = 0;
-
-    if (this.primed) {
-      hp = this.hpCoeff1 * (sample - 2 * this.samplePrevious + this.samplePrevious2) +
-        this.hpCoeff2 * this.hpPrevious - this.hpCoeff3 * this.hpPrevious2;
-      ss = this.ssCoeff1 * (hp + this.hpPrevious) + this.ssCoeff2 * this.ssPrevious + this.ssCoeff3 * this.ssPrevious2;
-      this.value = ss;
-    } else {
-      this.count++;
-
-      if (this.count < 4) {
-        hp = 0;
-        ss = 0;
-      } else {
-        hp = this.hpCoeff1 * (sample - 2 * this.samplePrevious + this.samplePrevious2) +
-          this.hpCoeff2 * this.hpPrevious - this.hpCoeff3 * this.hpPrevious2;
-        ss = this.ssCoeff1 * (hp + this.hpPrevious) + this.ssCoeff2 * this.ssPrevious + this.ssCoeff3 * this.ssPrevious2;
-
-        if (this.count === 5) {
-          this.primed = true;
-          this.value = ss;
-        }
-      }
-    }
-
-    this.samplePrevious2 = this.samplePrevious;
-    this.samplePrevious = sample;
-    this.hpPrevious2 = this.hpPrevious;
-    this.hpPrevious = hp;
-    this.ssPrevious2 = this.ssPrevious;
-    this.ssPrevious = ss;
-
-    return this.value;
-  }
 }

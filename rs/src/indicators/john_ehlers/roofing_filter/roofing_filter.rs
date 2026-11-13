@@ -1,8 +1,10 @@
 use std::any::Any;
-use std::f64::consts::PI;
+use std::f64::consts::{PI, SQRT_2};
 
 use crate::entities::bar::Bar;
-use crate::entities::bar_component::{component_value as bar_component_value, BarComponent};
+use crate::entities::bar_component::{
+    component_value as bar_component_value, BarComponent, DEFAULT_BAR_COMPONENT,
+};
 use crate::entities::quote::Quote;
 use crate::entities::quote_component::{
     component_value as quote_component_value, QuoteComponent, DEFAULT_QUOTE_COMPONENT,
@@ -18,42 +20,32 @@ use crate::indicators::core::identifier::Identifier;
 use crate::indicators::core::indicator::{Indicator, Output};
 use crate::indicators::core::metadata::Metadata;
 
-// ---------------------------------------------------------------------------
-// Output
-// ---------------------------------------------------------------------------
-
 #[repr(u8)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RoofingFilterOutput {
     Value = 1,
 }
 
-// ---------------------------------------------------------------------------
-// Params
-// ---------------------------------------------------------------------------
-
-/// Parameters to create a Roofing Filter instance.
+#[derive(Debug, Clone, Copy)]
 pub struct RoofingFilterParams {
-    /// Shortest cycle period in bars. Must be > 1. Default 10.
-    pub shortest_cycle_period: usize,
-    /// Longest cycle period in bars. Must be > shortest. Default 48.
-    pub longest_cycle_period: usize,
-    /// Use 2-pole high-pass filter instead of 1-pole. Default false.
-    pub has_two_pole_highpass_filter: bool,
-    /// Apply zero-mean filter (only with 1-pole HP). Default false.
-    pub has_zero_mean: bool,
+    pub shortest_cycle_period: f64,
+    pub longest_cycle_period: f64,
+    pub highpass_poles: i32,
+    pub zero_mean: bool,
     pub bar_component: Option<BarComponent>,
     pub quote_component: Option<QuoteComponent>,
     pub trade_component: Option<TradeComponent>,
 }
 
+pub type Params = RoofingFilterParams;
+
 impl Default for RoofingFilterParams {
     fn default() -> Self {
         Self {
-            shortest_cycle_period: 10,
-            longest_cycle_period: 48,
-            has_two_pole_highpass_filter: false,
-            has_zero_mean: false,
+            shortest_cycle_period: 10.0,
+            longest_cycle_period: 48.0,
+            highpass_poles: 2,
+            zero_mean: false,
             bar_component: None,
             quote_component: None,
             trade_component: None,
@@ -61,239 +53,240 @@ impl Default for RoofingFilterParams {
     }
 }
 
-// ---------------------------------------------------------------------------
-// Indicator
-// ---------------------------------------------------------------------------
+pub fn default_params() -> RoofingFilterParams {
+    RoofingFilterParams::default()
+}
 
-/// Ehlers' Roofing Filter: high-pass + Super Smoother band-pass filter.
+fn format_number(number: f64) -> String {
+    let normalized = if number == 0.0 { 0.0 } else { number };
+    format!("{normalized}")
+}
+
+fn smoother_coefficients(period: f64) -> (f64, f64, f64) {
+    let smoother_angle = SQRT_2 * PI / period;
+    let a1 = (-smoother_angle).exp();
+    let c2 = 2.0 * a1 * smoother_angle.cos();
+    let c3 = -a1 * a1;
+    (1.0 - c2 - c3, c2, c3)
+}
+
+pub fn mnemonic(params: &RoofingFilterParams) -> String {
+    let bar_comp = params.bar_component.unwrap_or(DEFAULT_BAR_COMPONENT);
+    let quote_comp = params.quote_component.unwrap_or(DEFAULT_QUOTE_COMPONENT);
+    let trade_comp = params.trade_component.unwrap_or(DEFAULT_TRADE_COMPONENT);
+    let suffix = component_triple_mnemonic(bar_comp, quote_comp, trade_comp);
+    let zm_tag = if params.zero_mean { "zm" } else { "" };
+    let shortest_text = format_number(params.shortest_cycle_period);
+    let longest_text = format_number(params.longest_cycle_period);
+    format!(
+        "roof{}hp{}({}, {}{})",
+        params.highpass_poles, zm_tag, shortest_text, longest_text, suffix
+    )
+}
+
 pub struct RoofingFilter {
-    mnemonic: String,
-    description: String,
-    hp_coeff1: f64,
-    hp_coeff2: f64,
-    hp_coeff3: f64,
-    ss_coeff1: f64,
-    ss_coeff2: f64,
-    ss_coeff3: f64,
-    has_two_pole: bool,
-    has_zero_mean: bool,
+    metadata: Metadata,
+    poles: usize,
+    zero_mean: bool,
+    warmup_count: usize,
+    gain: f64,
+    decay: f64,
+    c1: f64,
+    c2: f64,
+    c3: f64,
     count: usize,
-    sample_previous: f64,
-    sample_previous2: f64,
-    hp_previous: f64,
-    hp_previous2: f64,
-    ss_previous: f64,
-    ss_previous2: f64,
-    zm_previous: f64,
-    value: f64,
-    primed: bool,
+    input1: f64,
+    input2: f64,
+    hp1: f64,
+    hp2: f64,
+    filt1: f64,
+    filt2: f64,
+    zero1: f64,
+    current_value: f64,
     bar_func: fn(&Bar) -> f64,
     quote_func: fn(&Quote) -> f64,
     trade_func: fn(&Trade) -> f64,
 }
 
 impl RoofingFilter {
-    pub fn new(p: &RoofingFilterParams) -> Result<Self, String> {
-        let shortest = p.shortest_cycle_period;
-        if shortest < 2 {
-            return Err("invalid roofing filter parameters: shortest cycle period should be greater than 1".to_string());
+    pub fn default_instance() -> Result<Self, String> {
+        Self::new(&RoofingFilterParams::default())
+    }
+
+    pub fn new(params: &RoofingFilterParams) -> Result<Self, String> {
+        let shortest = params.shortest_cycle_period;
+        if !shortest.is_finite() || shortest < 2.0 {
+            return Err(
+                "invalid roofing filter parameters: shortest_cycle_period must be finite and at least 2 bars"
+                    .to_string(),
+            );
         }
 
-        let longest = p.longest_cycle_period;
-        if longest <= shortest {
-            return Err("invalid roofing filter parameters: longest cycle period should be greater than shortest".to_string());
+        let longest = params.longest_cycle_period;
+        if !longest.is_finite() || longest <= shortest {
+            return Err(
+                "invalid roofing filter parameters: longest_cycle_period must be finite and greater than shortest"
+                    .to_string(),
+            );
         }
 
-        let bc = p.bar_component.unwrap_or(BarComponent::Median);
-        let qc = p.quote_component.unwrap_or(DEFAULT_QUOTE_COMPONENT);
-        let tc = p.trade_component.unwrap_or(DEFAULT_TRADE_COMPONENT);
+        let poles_raw = params.highpass_poles;
+        if poles_raw != 1 && poles_raw != 2 {
+            return Err(
+                "invalid roofing filter parameters: highpass_poles must be integer 1 or 2"
+                    .to_string(),
+            );
+        }
+        let poles = poles_raw as usize;
 
-        let bar_func = bar_component_value(bc);
-        let quote_func = quote_component_value(qc);
-        let trade_func = trade_component_value(tc);
+        if params.zero_mean && poles != 1 {
+            return Err(
+                "invalid roofing filter parameters: zero_mean requires highpass_poles=1"
+                    .to_string(),
+            );
+        }
 
-        // High-pass filter coefficients.
-        let (hp_coeff1, hp_coeff2, hp_coeff3);
+        let bar_comp = params.bar_component.unwrap_or(DEFAULT_BAR_COMPONENT);
+        let quote_comp = params.quote_component.unwrap_or(DEFAULT_QUOTE_COMPONENT);
+        let trade_comp = params.trade_component.unwrap_or(DEFAULT_TRADE_COMPONENT);
 
-        if p.has_two_pole_highpass_filter {
-            let angle = std::f64::consts::SQRT_2 / 2.0 * 2.0 * PI / longest as f64;
-            let cos_angle = angle.cos();
-            let alpha = (angle.sin() + cos_angle - 1.0) / cos_angle;
-            let beta = 1.0 - alpha / 2.0;
-            hp_coeff1 = beta * beta;
-            let beta2 = 1.0 - alpha;
-            hp_coeff2 = 2.0 * beta2;
-            hp_coeff3 = beta2 * beta2;
+        let bar_func = bar_component_value(bar_comp);
+        let quote_func = quote_component_value(quote_comp);
+        let trade_func = trade_component_value(trade_comp);
+
+        let angle = if poles == 1 {
+            2.0 * PI / longest
         } else {
-            let angle = 2.0 * PI / longest as f64;
-            let cos_angle = angle.cos();
-            let alpha = (angle.sin() + cos_angle - 1.0) / cos_angle;
-            hp_coeff1 = 1.0 - alpha / 2.0;
-            hp_coeff2 = 1.0 - alpha;
-            hp_coeff3 = 0.0;
-        }
+            SQRT_2 * PI / longest
+        };
+        let tangent = (angle / 2.0).tan();
+        let alpha = 2.0 * tangent / (1.0 + tangent);
+        let gain = 1.0 - alpha / 2.0;
+        let decay = 1.0 - alpha;
+        let (c1, c2, c3) = smoother_coefficients(shortest);
+        let warmup_count = if poles == 2 || params.zero_mean { 4 } else { 3 };
 
-        // Super Smoother coefficients. Uses 1.414 (not SQRT_2) to match C# reference.
-        let beta = 1.414 * PI / shortest as f64;
-        let alpha = (-beta).exp();
-        let ss_coeff2 = 2.0 * alpha * beta.cos();
-        let ss_coeff3 = -alpha * alpha;
-        let ss_coeff1 = (1.0 - ss_coeff2 - ss_coeff3) / 2.0;
-
-        // Mnemonic.
-        let poles = if p.has_two_pole_highpass_filter { 2 } else { 1 };
-        let zm = if p.has_zero_mean && !p.has_two_pole_highpass_filter { "zm" } else { "" };
-        let cm = component_triple_mnemonic(bc, qc, tc);
-        let mnemonic = format!("roof{poles}hp{zm}({shortest}, {longest}{cm})");
-        let description = format!("Roofing Filter {mnemonic}");
+        let mnemonic_text = mnemonic(params);
+        let description_text = format!("Roofing Filter {mnemonic_text}");
+        let metadata = build_metadata(
+            Identifier::RoofingFilter,
+            &mnemonic_text,
+            &description_text,
+            &[OutputText {
+                mnemonic: mnemonic_text.clone(),
+                description: description_text.clone(),
+            }],
+        );
 
         Ok(Self {
-            mnemonic,
-            description,
-            hp_coeff1,
-            hp_coeff2,
-            hp_coeff3,
-            ss_coeff1,
-            ss_coeff2,
-            ss_coeff3,
-            has_two_pole: p.has_two_pole_highpass_filter,
-            has_zero_mean: p.has_zero_mean && !p.has_two_pole_highpass_filter,
+            metadata,
+            poles,
+            zero_mean: params.zero_mean,
+            warmup_count,
+            gain,
+            decay,
+            c1,
+            c2,
+            c3,
             count: 0,
-            sample_previous: 0.0,
-            sample_previous2: 0.0,
-            hp_previous: 0.0,
-            hp_previous2: 0.0,
-            ss_previous: 0.0,
-            ss_previous2: 0.0,
-            zm_previous: 0.0,
-            value: f64::NAN,
-            primed: false,
+            input1: 0.0,
+            input2: 0.0,
+            hp1: 0.0,
+            hp2: 0.0,
+            filt1: 0.0,
+            filt2: 0.0,
+            zero1: 0.0,
+            current_value: f64::NAN,
             bar_func,
             quote_func,
             trade_func,
         })
     }
 
-    pub fn update(&mut self, sample: f64) -> f64 {
+    pub fn reset(&mut self) {
+        self.count = 0;
+        self.input1 = 0.0;
+        self.input2 = 0.0;
+        self.hp1 = 0.0;
+        self.hp2 = 0.0;
+        self.filt1 = 0.0;
+        self.filt2 = 0.0;
+        self.zero1 = 0.0;
+        self.current_value = f64::NAN;
+    }
+
+    pub fn warmup_bars(&self) -> usize {
+        self.warmup_count
+    }
+
+    pub fn value(&self) -> f64 {
+        self.current_value
+    }
+
+    pub fn try_update(&mut self, sample: f64) -> Result<f64, String> {
         if sample.is_nan() {
-            return sample;
+            return Ok(f64::NAN);
+        }
+        if sample.is_infinite() {
+            return Err("sample must be finite or NaN".to_string());
         }
 
-        if self.has_two_pole {
-            self.update_2pole(sample)
+        let (hp, filt, zero) = if self.count < self.poles {
+            (0.0, 0.0, 0.0)
         } else {
-            self.update_1pole(sample)
+            let hp_next = if self.poles == 2 {
+                let difference = sample - 2.0 * self.input1 + self.input2;
+                self.gain * self.gain * difference + 2.0 * self.decay * self.hp1
+                    - self.decay * self.decay * self.hp2
+            } else {
+                self.gain * (sample - self.input1) + self.decay * self.hp1
+            };
+            let filt_next =
+                self.c1 * (hp_next + self.hp1) / 2.0 + self.c2 * self.filt1 + self.c3 * self.filt2;
+            let zero_next = if self.zero_mean {
+                self.gain * (filt_next - self.filt1) + self.decay * self.zero1
+            } else {
+                0.0
+            };
+            (hp_next, filt_next, zero_next)
+        };
+
+        self.input2 = self.input1;
+        self.input1 = sample;
+        self.hp2 = self.hp1;
+        self.hp1 = hp;
+        self.filt2 = self.filt1;
+        self.filt1 = filt;
+        self.zero1 = zero;
+        self.count += 1;
+
+        let output = if self.zero_mean { zero } else { filt };
+        if self.count > self.warmup_count {
+            self.current_value = output;
+            Ok(output)
+        } else {
+            Ok(f64::NAN)
         }
     }
 
-    fn update_1pole(&mut self, sample: f64) -> f64 {
-        let hp;
-        let ss;
-        let mut zm = 0.0;
-
-        if self.primed {
-            hp = self.hp_coeff1 * (sample - self.sample_previous) + self.hp_coeff2 * self.hp_previous;
-            ss = self.ss_coeff1 * (hp + self.hp_previous) + self.ss_coeff2 * self.ss_previous + self.ss_coeff3 * self.ss_previous2;
-
-            if self.has_zero_mean {
-                zm = self.hp_coeff1 * (ss - self.ss_previous) + self.hp_coeff2 * self.zm_previous;
-                self.value = zm;
-            } else {
-                self.value = ss;
-            }
-        } else {
-            self.count += 1;
-
-            if self.count == 1 {
-                hp = 0.0;
-                ss = 0.0;
-            } else {
-                hp = self.hp_coeff1 * (sample - self.sample_previous) + self.hp_coeff2 * self.hp_previous;
-                ss = self.ss_coeff1 * (hp + self.hp_previous) + self.ss_coeff2 * self.ss_previous + self.ss_coeff3 * self.ss_previous2;
-
-                if self.has_zero_mean {
-                    zm = self.hp_coeff1 * (ss - self.ss_previous) + self.hp_coeff2 * self.zm_previous;
-                    if self.count == 5 {
-                        self.primed = true;
-                        self.value = zm;
-                    }
-                } else if self.count == 4 {
-                    self.primed = true;
-                    self.value = ss;
-                }
-            }
-        }
-
-        self.sample_previous = sample;
-        self.hp_previous = hp;
-        self.ss_previous2 = self.ss_previous;
-        self.ss_previous = ss;
-
-        if self.has_zero_mean {
-            self.zm_previous = zm;
-        }
-
-        self.value
-    }
-
-    fn update_2pole(&mut self, sample: f64) -> f64 {
-        let hp;
-        let ss;
-
-        if self.primed {
-            hp = self.hp_coeff1 * (sample - 2.0 * self.sample_previous + self.sample_previous2)
-                + self.hp_coeff2 * self.hp_previous - self.hp_coeff3 * self.hp_previous2;
-            ss = self.ss_coeff1 * (hp + self.hp_previous) + self.ss_coeff2 * self.ss_previous + self.ss_coeff3 * self.ss_previous2;
-            self.value = ss;
-        } else {
-            self.count += 1;
-
-            if self.count < 4 {
-                hp = 0.0;
-                ss = 0.0;
-            } else {
-                hp = self.hp_coeff1 * (sample - 2.0 * self.sample_previous + self.sample_previous2)
-                    + self.hp_coeff2 * self.hp_previous - self.hp_coeff3 * self.hp_previous2;
-                ss = self.ss_coeff1 * (hp + self.hp_previous) + self.ss_coeff2 * self.ss_previous + self.ss_coeff3 * self.ss_previous2;
-
-                if self.count == 5 {
-                    self.primed = true;
-                    self.value = ss;
-                }
-            }
-        }
-
-        self.sample_previous2 = self.sample_previous;
-        self.sample_previous = sample;
-        self.hp_previous2 = self.hp_previous;
-        self.hp_previous = hp;
-        self.ss_previous2 = self.ss_previous;
-        self.ss_previous = ss;
-
-        self.value
+    pub fn update(&mut self, sample: f64) -> f64 {
+        self.try_update(sample)
+            .expect("RoofingFilter::update: sample must be finite or NaN")
     }
 
     fn update_entity(&mut self, time: i64, sample: f64) -> Output {
-        let v = self.update(sample);
-        vec![Box::new(Scalar::new(time, v)) as Box<dyn Any>]
+        let output = self.update(sample);
+        vec![Box::new(Scalar::new(time, output)) as Box<dyn Any>]
     }
 }
 
 impl Indicator for RoofingFilter {
     fn is_primed(&self) -> bool {
-        self.primed
+        self.count > self.warmup_count
     }
 
     fn metadata(&self) -> Metadata {
-        build_metadata(
-            Identifier::RoofingFilter,
-            &self.mnemonic,
-            &self.description,
-            &[OutputText {
-                mnemonic: self.mnemonic.clone(),
-                description: self.description.clone(),
-            }],
-        )
+        self.metadata.clone()
     }
 
     fn update_scalar(&mut self, sample: &Scalar) -> Output {
@@ -301,232 +294,492 @@ impl Indicator for RoofingFilter {
     }
 
     fn update_bar(&mut self, sample: &Bar) -> Output {
-        let v = (self.bar_func)(sample);
-        self.update_entity(sample.time, v)
+        let extracted = (self.bar_func)(sample);
+        self.update_entity(sample.time, extracted)
     }
 
     fn update_quote(&mut self, sample: &Quote) -> Output {
-        let v = (self.quote_func)(sample);
-        self.update_entity(sample.time, v)
+        let extracted = (self.quote_func)(sample);
+        self.update_entity(sample.time, extracted)
     }
 
     fn update_trade(&mut self, sample: &Trade) -> Output {
-        let v = (self.trade_func)(sample);
-        self.update_entity(sample.time, v)
+        let extracted = (self.trade_func)(sample);
+        self.update_entity(sample.time, extracted)
     }
 }
-
-// ===========================================================================
-// Tests
-// ===========================================================================
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use super::super::testdata::testdata;
+    use crate::indicators::core::outputs::shape::Shape;
+    use crate::indicators::factory::create_indicator;
+    use crate::indicators::john_ehlers::roofing_filter::testdata;
 
-    const TOLERANCE: f64 = 0.5;
-    const SKIP_ROWS: usize = 30;
-    fn create_1pole() -> RoofingFilter {
-        RoofingFilter::new(&RoofingFilterParams {
-            shortest_cycle_period: 10,
-            longest_cycle_period: 48,
-            ..Default::default()
-        }).unwrap()
-    }
-
-    fn create_1pole_zm() -> RoofingFilter {
-        RoofingFilter::new(&RoofingFilterParams {
-            shortest_cycle_period: 10,
-            longest_cycle_period: 48,
-            has_zero_mean: true,
-            ..Default::default()
-        }).unwrap()
-    }
-
-    fn create_2pole() -> RoofingFilter {
-        RoofingFilter::new(&RoofingFilterParams {
-            shortest_cycle_period: 40,
-            longest_cycle_period: 80,
-            has_two_pole_highpass_filter: true,
-            ..Default::default()
-        }).unwrap()
+    fn reference_cases() -> Vec<(RoofingFilterParams, Vec<f64>, usize)> {
+        vec![
+            (
+                RoofingFilterParams {
+                    shortest_cycle_period: 10.0,
+                    longest_cycle_period: 48.0,
+                    highpass_poles: 2,
+                    zero_mean: false,
+                    ..Default::default()
+                },
+                testdata::expected_lp10_hp48_po2_zm0(),
+                4,
+            ),
+            (
+                RoofingFilterParams {
+                    shortest_cycle_period: 40.0,
+                    longest_cycle_period: 80.0,
+                    highpass_poles: 2,
+                    zero_mean: false,
+                    ..Default::default()
+                },
+                testdata::expected_lp40_hp80_po2_zm0(),
+                4,
+            ),
+            (
+                RoofingFilterParams {
+                    shortest_cycle_period: 2.0,
+                    longest_cycle_period: 3.0,
+                    highpass_poles: 2,
+                    zero_mean: false,
+                    ..Default::default()
+                },
+                testdata::expected_lp2_hp3_po2_zm0(),
+                4,
+            ),
+            (
+                RoofingFilterParams {
+                    shortest_cycle_period: 5.0,
+                    longest_cycle_period: 24.0,
+                    highpass_poles: 2,
+                    zero_mean: false,
+                    ..Default::default()
+                },
+                testdata::expected_lp5_hp24_po2_zm0(),
+                4,
+            ),
+            (
+                RoofingFilterParams {
+                    shortest_cycle_period: 10.5,
+                    longest_cycle_period: 48.0,
+                    highpass_poles: 2,
+                    zero_mean: false,
+                    ..Default::default()
+                },
+                testdata::expected_lp10_5_hp48_po2_zm0(),
+                4,
+            ),
+            (
+                RoofingFilterParams {
+                    shortest_cycle_period: 10.0,
+                    longest_cycle_period: 11.0,
+                    highpass_poles: 2,
+                    zero_mean: false,
+                    ..Default::default()
+                },
+                testdata::expected_lp10_hp11_po2_zm0(),
+                4,
+            ),
+            (
+                RoofingFilterParams {
+                    shortest_cycle_period: 20.0,
+                    longest_cycle_period: 80.0,
+                    highpass_poles: 2,
+                    zero_mean: false,
+                    ..Default::default()
+                },
+                testdata::expected_lp20_hp80_po2_zm0(),
+                4,
+            ),
+            (
+                RoofingFilterParams {
+                    shortest_cycle_period: 40.0,
+                    longest_cycle_period: 252.0,
+                    highpass_poles: 2,
+                    zero_mean: false,
+                    ..Default::default()
+                },
+                testdata::expected_lp40_hp252_po2_zm0(),
+                4,
+            ),
+            (
+                RoofingFilterParams {
+                    shortest_cycle_period: 10.0,
+                    longest_cycle_period: 48.0,
+                    highpass_poles: 1,
+                    zero_mean: false,
+                    ..Default::default()
+                },
+                testdata::expected_lp10_hp48_po1_zm0(),
+                3,
+            ),
+            (
+                RoofingFilterParams {
+                    shortest_cycle_period: 2.0,
+                    longest_cycle_period: 4.0,
+                    highpass_poles: 1,
+                    zero_mean: false,
+                    ..Default::default()
+                },
+                testdata::expected_lp2_hp4_po1_zm0(),
+                3,
+            ),
+            (
+                RoofingFilterParams {
+                    shortest_cycle_period: 10.0,
+                    longest_cycle_period: 48.0,
+                    highpass_poles: 1,
+                    zero_mean: true,
+                    ..Default::default()
+                },
+                testdata::expected_lp10_hp48_po1_zm1(),
+                4,
+            ),
+            (
+                RoofingFilterParams {
+                    shortest_cycle_period: 2.0,
+                    longest_cycle_period: 4.0,
+                    highpass_poles: 1,
+                    zero_mean: true,
+                    ..Default::default()
+                },
+                testdata::expected_lp2_hp4_po1_zm1(),
+                4,
+            ),
+        ]
     }
 
     #[test]
-    fn test_update_1pole() {
-        let mut rf = create_1pole();
-        let inp = testdata::input();
-        let exp = testdata::expected_1pole();
+    fn test_all_twelve_reference_cases() {
+        let inputs = testdata::testdata::test_input();
+        assert_eq!(inputs.len(), 252);
+        for (params, expected, expected_warmup) in reference_cases() {
+            let mut filter = RoofingFilter::new(&params).unwrap();
+            assert_eq!(filter.warmup_bars(), expected_warmup);
+            assert!(!filter.is_primed());
+            assert!(filter.value().is_nan());
+            assert_eq!(expected.len(), 252);
 
-        for i in 0..inp.len() {
-            let act = rf.update(inp[i]);
-            if i < 3 {
-                assert!(act.is_nan(), "[{i}] expected NaN");
-                continue;
+            for (index, &sample) in inputs.iter().enumerate() {
+                let actual = filter.update(sample);
+                let target = expected[index];
+                if index < expected_warmup {
+                    assert!(!filter.is_primed());
+                    assert!(actual.is_nan());
+                    assert!(filter.value().is_nan());
+                } else {
+                    assert!(filter.is_primed());
+                    assert!(!target.is_nan());
+                    let bound = 1e-11_f64.max(target.abs() * 1e-11);
+                    assert!(
+                        (actual - target).abs() <= bound,
+                        "bar {index} ({}) actual={actual} target={target}",
+                        mnemonic(&params)
+                    );
+                    assert!((filter.value() - actual).abs() <= 1e-15);
+                }
             }
-            if i < SKIP_ROWS { continue; }
-            assert!(
-                (act - exp[i]).abs() < TOLERANCE,
-                "[{i}] expected {}, actual {act}", exp[i]
+        }
+    }
+
+    #[test]
+    fn test_nan_skips_state_and_reset_reproduces_start() {
+        let inputs = testdata::testdata::test_input();
+        for (params, _, _) in reference_cases() {
+            let mut first = RoofingFilter::new(&params).unwrap();
+            let mut second = RoofingFilter::new(&params).unwrap();
+            for &sample in &inputs {
+                assert!(first.update(f64::NAN).is_nan());
+                let left = first.update(sample);
+                let right = second.update(sample);
+                assert_eq!(first.is_primed(), second.is_primed());
+                if right.is_nan() {
+                    assert!(left.is_nan());
+                } else {
+                    assert!((left - right).abs() <= 1e-15);
+                }
+            }
+
+            first.reset();
+            assert!(!first.is_primed());
+            assert!(first.value().is_nan());
+            let mut third = RoofingFilter::new(&params).unwrap();
+            for &sample in &inputs {
+                let left = first.update(sample);
+                let right = third.update(sample);
+                if right.is_nan() {
+                    assert!(left.is_nan());
+                } else {
+                    assert!((left - right).abs() <= 1e-15);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn test_constant_ramp_and_period_four_boundary() {
+        let mut constant_filter = RoofingFilter::default_instance().unwrap();
+        let mut first_finite: Option<usize> = None;
+        let mut last_constant = f64::NAN;
+        for index in 0..500 {
+            let output = constant_filter.update(7.0);
+            if first_finite.is_none() && output.is_finite() {
+                first_finite = Some(index);
+            }
+            last_constant = output;
+        }
+        assert_eq!(first_finite, Some(constant_filter.warmup_bars()));
+        assert!(last_constant.abs() <= 1e-12);
+
+        let mut ramp_filter = RoofingFilter::default_instance().unwrap();
+        let mut last_ramp = f64::NAN;
+        for index in 0..1000 {
+            last_ramp = ramp_filter.update(index as f64);
+        }
+        assert!(last_ramp.abs() <= 1e-12);
+
+        let boundary = RoofingFilter::new(&RoofingFilterParams {
+            shortest_cycle_period: 2.0,
+            longest_cycle_period: 4.0,
+            highpass_poles: 1,
+            zero_mean: false,
+            ..Default::default()
+        })
+        .unwrap();
+        assert!((boundary.gain - 0.5).abs() <= 1e-15);
+        assert!((boundary.decay - 0.0).abs() <= 1e-15);
+    }
+
+    #[test]
+    fn test_invalid_parameters_and_infinite_samples() {
+        let invalid_cases = [
+            RoofingFilterParams {
+                shortest_cycle_period: 1.0,
+                ..Default::default()
+            },
+            RoofingFilterParams {
+                shortest_cycle_period: 0.0,
+                ..Default::default()
+            },
+            RoofingFilterParams {
+                shortest_cycle_period: -2.0,
+                ..Default::default()
+            },
+            RoofingFilterParams {
+                shortest_cycle_period: f64::NAN,
+                ..Default::default()
+            },
+            RoofingFilterParams {
+                shortest_cycle_period: f64::INFINITY,
+                ..Default::default()
+            },
+            RoofingFilterParams {
+                shortest_cycle_period: 10.0,
+                longest_cycle_period: 10.0,
+                ..Default::default()
+            },
+            RoofingFilterParams {
+                shortest_cycle_period: 10.0,
+                longest_cycle_period: 5.0,
+                ..Default::default()
+            },
+            RoofingFilterParams {
+                shortest_cycle_period: 10.0,
+                longest_cycle_period: f64::NAN,
+                ..Default::default()
+            },
+            RoofingFilterParams {
+                shortest_cycle_period: 10.0,
+                longest_cycle_period: f64::INFINITY,
+                ..Default::default()
+            },
+            RoofingFilterParams {
+                highpass_poles: 0,
+                ..Default::default()
+            },
+            RoofingFilterParams {
+                highpass_poles: 3,
+                ..Default::default()
+            },
+            RoofingFilterParams {
+                highpass_poles: 2,
+                zero_mean: true,
+                ..Default::default()
+            },
+        ];
+        for bad_params in invalid_cases {
+            assert!(RoofingFilter::new(&bad_params).is_err());
+        }
+
+        let mut filter = RoofingFilter::default_instance().unwrap();
+        assert!(filter.try_update(f64::INFINITY).is_err());
+        assert!(filter.try_update(f64::NEG_INFINITY).is_err());
+        assert!(!filter.is_primed());
+    }
+
+    #[test]
+    fn test_metadata_mnemonics_entities_and_factory() {
+        let filter = RoofingFilter::new(&default_params()).unwrap();
+        let meta = filter.metadata();
+        assert_eq!(meta.identifier, Identifier::RoofingFilter);
+        assert_eq!(meta.mnemonic, "roof2hp(10, 48)");
+        assert_eq!(meta.description, "Roofing Filter roof2hp(10, 48)");
+        assert_eq!(meta.outputs.len(), 1);
+        assert_eq!(meta.outputs[0].kind, RoofingFilterOutput::Value as i32);
+        assert_eq!(meta.outputs[0].shape, Shape::Scalar);
+        assert_eq!(meta.outputs[0].mnemonic, "roof2hp(10, 48)");
+        assert_eq!(meta.outputs[0].description, "Roofing Filter roof2hp(10, 48)");
+
+        let mnemonic_cases = [
+            (RoofingFilterParams::default(), "roof2hp(10, 48)"),
+            (
+                RoofingFilterParams {
+                    shortest_cycle_period: 10.5,
+                    longest_cycle_period: 48.0,
+                    highpass_poles: 2,
+                    zero_mean: false,
+                    ..Default::default()
+                },
+                "roof2hp(10.5, 48)",
+            ),
+            (
+                RoofingFilterParams {
+                    shortest_cycle_period: 10.0,
+                    longest_cycle_period: 48.0,
+                    highpass_poles: 1,
+                    zero_mean: false,
+                    ..Default::default()
+                },
+                "roof1hp(10, 48)",
+            ),
+            (
+                RoofingFilterParams {
+                    shortest_cycle_period: 10.0,
+                    longest_cycle_period: 48.0,
+                    highpass_poles: 1,
+                    zero_mean: true,
+                    ..Default::default()
+                },
+                "roof1hpzm(10, 48)",
+            ),
+            (
+                RoofingFilterParams {
+                    bar_component: Some(BarComponent::Median),
+                    ..Default::default()
+                },
+                "roof2hp(10, 48, hl/2)",
+            ),
+            (
+                RoofingFilterParams {
+                    quote_component: Some(QuoteComponent::Bid),
+                    ..Default::default()
+                },
+                "roof2hp(10, 48, b)",
+            ),
+            (
+                RoofingFilterParams {
+                    trade_component: Some(TradeComponent::Volume),
+                    ..Default::default()
+                },
+                "roof2hp(10, 48, v)",
+            ),
+            (
+                RoofingFilterParams {
+                    bar_component: Some(BarComponent::Open),
+                    quote_component: Some(QuoteComponent::Ask),
+                    ..Default::default()
+                },
+                "roof2hp(10, 48, o, a)",
+            ),
+            (
+                RoofingFilterParams {
+                    bar_component: Some(BarComponent::Typical),
+                    trade_component: Some(TradeComponent::Volume),
+                    ..Default::default()
+                },
+                "roof2hp(10, 48, hlc/3, v)",
+            ),
+            (
+                RoofingFilterParams {
+                    quote_component: Some(QuoteComponent::Weighted),
+                    trade_component: Some(TradeComponent::Volume),
+                    ..Default::default()
+                },
+                "roof2hp(10, 48, (bbs+aas)/(bs+as), v)",
+            ),
+        ];
+        for (candidate, expected_mnemonic) in mnemonic_cases {
+            assert_eq!(mnemonic(&candidate), expected_mnemonic);
+            assert_eq!(
+                RoofingFilter::new(&candidate).unwrap().metadata().mnemonic,
+                expected_mnemonic
             );
         }
 
-        assert!(rf.update(f64::NAN).is_nan());
-    }
+        let closes = testdata::testdata::test_input();
+        let opens = testdata::testdata::test_open();
+        let highs = testdata::testdata::test_high();
+        let lows = testdata::testdata::test_low();
 
-    #[test]
-    fn test_update_1pole_zm() {
-        let mut rf = create_1pole_zm();
-        let inp = testdata::input();
-        let exp = testdata::expected_1pole_zm();
-
-        for i in 0..inp.len() {
-            let act = rf.update(inp[i]);
-            if i < 4 {
-                assert!(act.is_nan(), "[{i}] expected NaN");
-                continue;
-            }
-            if i < SKIP_ROWS { continue; }
-            assert!(
-                (act - exp[i]).abs() < TOLERANCE,
-                "[{i}] expected {}, actual {act}", exp[i]
+        let mut bar_filter = RoofingFilter::default_instance().unwrap();
+        let mut scalar_filter = RoofingFilter::default_instance().unwrap();
+        for index in 0..10 {
+            let timestamp = 1000 + index as i64;
+            let bar = Bar::new(
+                timestamp,
+                opens[index],
+                highs[index],
+                lows[index],
+                closes[index],
+                1000.0,
             );
-        }
-    }
-
-    #[test]
-    fn test_update_2pole() {
-        let mut rf = create_2pole();
-        let inp = testdata::input();
-        let exp = testdata::expected_2pole();
-
-        for i in 0..inp.len() {
-            let act = rf.update(inp[i]);
-            if i < 4 {
-                assert!(act.is_nan(), "[{i}] expected NaN");
-                continue;
+            let scalar = Scalar::new(timestamp, closes[index]);
+            let bar_out = bar_filter.update_bar(&bar);
+            let scalar_out = scalar_filter.update_scalar(&scalar);
+            assert_eq!(bar_out.len(), 1);
+            let bar_scalar = bar_out[0].downcast_ref::<Scalar>().unwrap();
+            let ref_scalar = scalar_out[0].downcast_ref::<Scalar>().unwrap();
+            assert_eq!(bar_scalar.time, timestamp);
+            if ref_scalar.value.is_nan() {
+                assert!(bar_scalar.value.is_nan());
+            } else {
+                assert!((bar_scalar.value - ref_scalar.value).abs() <= 1e-15);
             }
-            if i < SKIP_ROWS { continue; }
-            assert!(
-                (act - exp[i]).abs() < TOLERANCE,
-                "[{i}] expected {}, actual {act}", exp[i]
-            );
         }
-    }
 
-    #[test]
-    fn test_is_primed_1pole() {
-        let mut rf = create_1pole();
-        let inp = testdata::input();
-        assert!(!rf.is_primed());
-        for i in 0..3 {
-            rf.update(inp[i]);
-            assert!(!rf.is_primed());
+        let mut quote_filter = RoofingFilter::default_instance().unwrap();
+        let mut quote_out = Vec::new();
+        for _ in 0..5 {
+            let quote = Quote::new(2000, 99.0, 101.0, 1.0, 1.0);
+            quote_out = quote_filter.update_quote(&quote);
         }
-        rf.update(inp[3]);
-        assert!(rf.is_primed());
-    }
+        assert_eq!(quote_out.len(), 1);
+        assert!(!quote_out[0].downcast_ref::<Scalar>().unwrap().value.is_nan());
 
-    #[test]
-    fn test_is_primed_1pole_zm() {
-        let mut rf = create_1pole_zm();
-        let inp = testdata::input();
-        for i in 0..4 {
-            rf.update(inp[i]);
-            assert!(!rf.is_primed());
+        let mut trade_filter = RoofingFilter::default_instance().unwrap();
+        let mut trade_out = Vec::new();
+        for _ in 0..5 {
+            let trade = Trade::new(3000, 100.0, 50.0);
+            trade_out = trade_filter.update_trade(&trade);
         }
-        rf.update(inp[4]);
-        assert!(rf.is_primed());
-    }
+        assert_eq!(trade_out.len(), 1);
+        assert!(!trade_out[0].downcast_ref::<Scalar>().unwrap().value.is_nan());
 
-    #[test]
-    fn test_is_primed_2pole() {
-        let mut rf = create_2pole();
-        let inp = testdata::input();
-        for i in 0..4 {
-            rf.update(inp[i]);
-            assert!(!rf.is_primed());
-        }
-        rf.update(inp[4]);
-        assert!(rf.is_primed());
-    }
+        let created_default = create_indicator(Identifier::RoofingFilter, "{}").unwrap();
+        assert_eq!(created_default.metadata().mnemonic, "roof2hp(10, 48)");
 
-    #[test]
-    fn test_update_entity() {
-        let time: i64 = 1617235200;
-        let inp = 100.0;
+        let created_custom = create_indicator(
+            Identifier::RoofingFilter,
+            r#"{"shortestCyclePeriod": 10.5, "longestCyclePeriod": 48, "highpassPoles": 1, "zeroMean": true}"#,
+        )
+        .unwrap();
+        assert_eq!(created_custom.metadata().mnemonic, "roof1hpzm(10.5, 48)");
 
-        let mut rf = create_1pole();
-        for _ in 0..4 { rf.update(inp); }
-
-        let s = Scalar::new(time, inp);
-        let out = rf.update_scalar(&s);
-        assert_eq!(out.len(), 1);
-        let s0 = out[0].downcast_ref::<Scalar>().unwrap();
-        assert_eq!(s0.time, time);
-        assert!(!s0.value.is_nan());
-    }
-
-    #[test]
-    fn test_metadata() {
-        let rf = create_1pole();
-        let m = rf.metadata();
-        assert_eq!(m.identifier, Identifier::RoofingFilter);
-        assert_eq!(m.mnemonic, "roof1hp(10, 48, hl/2)");
-        assert_eq!(m.description, "Roofing Filter roof1hp(10, 48, hl/2)");
-        assert_eq!(m.outputs.len(), 1);
-        assert_eq!(m.outputs[0].kind, RoofingFilterOutput::Value as i32);
-        assert_eq!(m.outputs[0].mnemonic, "roof1hp(10, 48, hl/2)");
-    }
-
-    #[test]
-    fn test_new_errors() {
-        // shortest < 2
-        assert!(RoofingFilter::new(&RoofingFilterParams {
-            shortest_cycle_period: 1,
-            longest_cycle_period: 48,
-            ..Default::default()
-        }).is_err());
-
-        // longest <= shortest
-        assert!(RoofingFilter::new(&RoofingFilterParams {
-            shortest_cycle_period: 10,
-            longest_cycle_period: 10,
-            ..Default::default()
-        }).is_err());
-
-        // valid
-        assert!(RoofingFilter::new(&RoofingFilterParams::default()).is_ok());
-    }
-
-    #[test]
-    fn test_mnemonics() {
-        // 2-pole
-        let rf = RoofingFilter::new(&RoofingFilterParams {
-            shortest_cycle_period: 10,
-            longest_cycle_period: 48,
-            has_two_pole_highpass_filter: true,
-            ..Default::default()
-        }).unwrap();
-        assert_eq!(rf.mnemonic, "roof2hp(10, 48, hl/2)");
-
-        // zero-mean
-        let rf = RoofingFilter::new(&RoofingFilterParams {
-            shortest_cycle_period: 10,
-            longest_cycle_period: 48,
-            has_zero_mean: true,
-            ..Default::default()
-        }).unwrap();
-        assert_eq!(rf.mnemonic, "roof1hpzm(10, 48, hl/2)");
-
-        // non-default bar component
-        let rf = RoofingFilter::new(&RoofingFilterParams {
-            shortest_cycle_period: 10,
-            longest_cycle_period: 48,
-            bar_component: Some(BarComponent::Open),
-            ..Default::default()
-        }).unwrap();
-        assert_eq!(rf.mnemonic, "roof1hp(10, 48, o)");
+        assert!(create_indicator(Identifier::RoofingFilter, r#"{"highpassPoles": 1.5}"#).is_err());
+        assert!(create_indicator(Identifier::RoofingFilter, r#"{"highpassPoles": 2, "zeroMean": true}"#).is_err());
     }
 }

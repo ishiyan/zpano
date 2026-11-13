@@ -1,7 +1,7 @@
 package roofingfilter
 
-//nolint: gofumpt
 import (
+	"errors"
 	"fmt"
 	"math"
 	"sync"
@@ -10,174 +10,183 @@ import (
 	"zpano/indicators/core"
 )
 
-// RoofingFilter is Ehler's Roofing Filter described in Ehler's book
-// "Cycle Analytics for Traders" (2013).
-//
-// The Roofing Filter is comprised of a high-pass filter and a Super Smoother.
-// Given the longest (Λ) and the shortest (λ) cycle periods in bars,
-// the high-pass filter passes cyclic components whose periods are shorter than the longest one,
-// and the Super Smoother filter attenuates cycle periods shorter than the shortest one.
-//
-// Three flavours are available:
-//   - 1-pole high-pass filter (default)
-//   - 1-pole high-pass filter with zero-mean
-//   - 2-pole high-pass filter
-//
-// Reference:
-//
-// Ehlers, John F. (2013). Cycle Analytics for Traders. Wiley.
+// RoofingFilter implements Ehlers' Roofing Filter: high-pass detrending followed by a two-pole SuperSmoother.
 type RoofingFilter struct {
 	mu sync.RWMutex
 	core.LineIndicator
-	hpCoeff1 float64
-	hpCoeff2 float64
-	hpCoeff3 float64
-	ssCoeff1 float64
-	ssCoeff2 float64
-	ssCoeff3 float64
 
-	hasTwoPole  bool
-	hasZeroMean bool
+	poles      int
+	zeroMean   bool
+	warmupBars int
 
-	count           int
-	samplePrevious  float64
-	samplePrevious2 float64
-	hpPrevious      float64
-	hpPrevious2     float64
-	ssPrevious      float64
-	ssPrevious2     float64
-	zmPrevious      float64
-	value           float64
-	primed          bool
+	gain  float64
+	decay float64
+	c1    float64
+	c2    float64
+	c3    float64
+
+	count        int
+	input1       float64
+	input2       float64
+	hp1          float64
+	hp2          float64
+	filt1        float64
+	filt2        float64
+	zero1        float64
+	currentValue float64
+}
+
+func smootherCoefficients(period float64) (float64, float64, float64) {
+	smootherAngle := math.Sqrt2 * math.Pi / period
+	a1 := math.Exp(-smootherAngle)
+	c2 := 2.0 * a1 * math.Cos(smootherAngle)
+	c3 := -a1 * a1
+	return 1.0 - c2 - c3, c2, c3
+}
+
+// NewRoofingFilterDefault creates a RoofingFilter with Ehlers' default parameters.
+func NewRoofingFilterDefault() (*RoofingFilter, error) {
+	return NewRoofingFilter(DefaultParams())
 }
 
 // NewRoofingFilter returns an instance of the indicator created using supplied parameters.
-//
-//nolint:funlen,cyclop
-func NewRoofingFilter(p *Params) (*RoofingFilter, error) {
+func NewRoofingFilter(params *Params) (*RoofingFilter, error) {
 	const (
 		invalid = "invalid roofing filter parameters"
 		fmts    = "%s: %s"
 		fmtw    = "%s: %w"
-		minPer  = 2
 	)
 
-	shortest := p.ShortestCyclePeriod
-	if shortest < minPer {
-		return nil, fmt.Errorf(fmts, invalid, "shortest cycle period should be greater than 1")
+	if params == nil {
+		params = DefaultParams()
 	}
 
-	longest := p.LongestCyclePeriod
-	if longest <= shortest {
-		return nil, fmt.Errorf(fmts, invalid, "longest cycle period should be greater than shortest")
+	shortest := params.ShortestCyclePeriod
+	if math.IsNaN(shortest) || math.IsInf(shortest, 0) || shortest < 2.0 {
+		return nil, fmt.Errorf(fmts, invalid, "shortest_cycle_period must be finite and at least 2 bars")
 	}
 
-	// Resolve defaults for component functions.
-	// RoofingFilter default bar component is MedianPrice, not ClosePrice.
-	bc := p.BarComponent
-	if bc == 0 {
-		bc = entities.BarMedianPrice
+	longest := params.LongestCyclePeriod
+	if math.IsNaN(longest) || math.IsInf(longest, 0) || longest <= shortest {
+		return nil, fmt.Errorf(fmts, invalid, "longest_cycle_period must be finite and greater than shortest")
 	}
 
-	qc := p.QuoteComponent
-	if qc == 0 {
-		qc = entities.DefaultQuoteComponent
+	poles := params.HighpassPoles
+	if poles != 1 && poles != 2 {
+		return nil, fmt.Errorf(fmts, invalid, "highpass_poles must be integer 1 or 2")
 	}
 
-	tc := p.TradeComponent
-	if tc == 0 {
-		tc = entities.DefaultTradeComponent
+	if params.ZeroMean && poles != 1 {
+		return nil, fmt.Errorf(fmts, invalid, "zero_mean requires highpass_poles=1")
 	}
 
-	var (
-		err       error
-		barFunc   entities.BarFunc
-		quoteFunc entities.QuoteFunc
-		tradeFunc entities.TradeFunc
+	barComp := params.BarComponent
+	if barComp == 0 {
+		barComp = entities.DefaultBarComponent
+	}
+	quoteComp := params.QuoteComponent
+	if quoteComp == 0 {
+		quoteComp = entities.DefaultQuoteComponent
+	}
+	tradeComp := params.TradeComponent
+	if tradeComp == 0 {
+		tradeComp = entities.DefaultTradeComponent
+	}
+
+	barFunc, err := entities.BarComponentFunc(barComp)
+	if err != nil {
+		return nil, fmt.Errorf(fmtw, invalid, err)
+	}
+	quoteFunc, err := entities.QuoteComponentFunc(quoteComp)
+	if err != nil {
+		return nil, fmt.Errorf(fmtw, invalid, err)
+	}
+	tradeFunc, err := entities.TradeComponentFunc(tradeComp)
+	if err != nil {
+		return nil, fmt.Errorf(fmtw, invalid, err)
+	}
+
+	angle := math.Sqrt2 * math.Pi / longest
+	if poles == 1 {
+		angle = 2.0 * math.Pi / longest
+	}
+	tangent := math.Tan(angle / 2.0)
+	alpha := 2.0 * tangent / (1.0 + tangent)
+	gain := 1.0 - alpha/2.0
+	decay := 1.0 - alpha
+	c1, c2, c3 := smootherCoefficients(shortest)
+
+	warmupBars := 3
+	if poles == 2 || params.ZeroMean {
+		warmupBars = 4
+	}
+
+	mnemonic := params.Mnemonic()
+	description := "Roofing Filter " + mnemonic
+
+	filter := &RoofingFilter{
+		poles:        poles,
+		zeroMean:     params.ZeroMean,
+		warmupBars:   warmupBars,
+		gain:         gain,
+		decay:        decay,
+		c1:           c1,
+		c2:           c2,
+		c3:           c3,
+		currentValue: math.NaN(),
+	}
+	filter.LineIndicator = core.NewLineIndicator(
+		mnemonic,
+		description,
+		barFunc,
+		quoteFunc,
+		tradeFunc,
+		filter.Update,
 	)
-
-	if barFunc, err = entities.BarComponentFunc(bc); err != nil {
-		return nil, fmt.Errorf(fmtw, invalid, err)
-	}
-
-	if quoteFunc, err = entities.QuoteComponentFunc(qc); err != nil {
-		return nil, fmt.Errorf(fmtw, invalid, err)
-	}
-
-	if tradeFunc, err = entities.TradeComponentFunc(tc); err != nil {
-		return nil, fmt.Errorf(fmtw, invalid, err)
-	}
-
-	// Calculate high-pass filter coefficients.
-	var hpCoeff1, hpCoeff2, hpCoeff3 float64
-
-	if p.HasTwoPoleHighpassFilter {
-		// 2-pole high-pass: α = (cos(π√2/Λ) + sin(π√2/Λ) - 1) / cos(π√2/Λ)
-		angle := math.Sqrt2 / 2 * 2 * math.Pi / float64(longest) // = π√2/Λ
-		cosAngle := math.Cos(angle)
-		alpha := (math.Sin(angle) + cosAngle - 1) / cosAngle
-		beta := 1 - alpha/2
-		hpCoeff1 = beta * beta
-		beta2 := 1 - alpha
-		hpCoeff2 = 2 * beta2
-		hpCoeff3 = beta2 * beta2
-	} else {
-		// 1-pole high-pass: α = (cos(2π/Λ) + sin(2π/Λ) - 1) / cos(2π/Λ)
-		angle := 2 * math.Pi / float64(longest)
-		cosAngle := math.Cos(angle)
-		alpha := (math.Sin(angle) + cosAngle - 1) / cosAngle
-		hpCoeff1 = 1 - alpha/2
-		hpCoeff2 = 1 - alpha
-	}
-
-	// Calculate super smoother coefficients.
-	// Uses literal 1.414 (not math.Sqrt2) to match C# reference.
-	beta := 1.414 * math.Pi / float64(shortest)
-	alpha := math.Exp(-beta)
-	ssCoeff2 := 2 * alpha * math.Cos(beta)
-	ssCoeff3 := -alpha * alpha
-	ssCoeff1 := (1 - ssCoeff2 - ssCoeff3) / 2
-
-	// Build mnemonic.
-	poles := 1
-	if p.HasTwoPoleHighpassFilter {
-		poles = 2
-	}
-
-	zm := ""
-	if p.HasZeroMean && !p.HasTwoPoleHighpassFilter {
-		zm = "zm"
-	}
-
-	mnemonic := fmt.Sprintf("roof%dhp%s(%d, %d%s)", poles, zm, shortest, longest, core.ComponentTripleMnemonic(bc, qc, tc))
-	desc := "Roofing Filter " + mnemonic
-
-	rf := &RoofingFilter{
-		hpCoeff1:    hpCoeff1,
-		hpCoeff2:    hpCoeff2,
-		hpCoeff3:    hpCoeff3,
-		ssCoeff1:    ssCoeff1,
-		ssCoeff2:    ssCoeff2,
-		ssCoeff3:    ssCoeff3,
-		hasTwoPole:  p.HasTwoPoleHighpassFilter,
-		hasZeroMean: p.HasZeroMean && !p.HasTwoPoleHighpassFilter,
-		value:       math.NaN(),
-	}
-
-	rf.LineIndicator = core.NewLineIndicator(mnemonic, desc, barFunc, quoteFunc, tradeFunc, rf.Update)
-
-	return rf, nil
+	return filter, nil
 }
 
-// IsPrimed indicates whether an indicator is primed.
+// Reset clears all streaming histories and priming state while preserving configuration.
+func (s *RoofingFilter) Reset() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	s.count = 0
+	s.input1 = 0
+	s.input2 = 0
+	s.hp1 = 0
+	s.hp2 = 0
+	s.filt1 = 0
+	s.filt2 = 0
+	s.zero1 = 0
+	s.currentValue = math.NaN()
+}
+
+// WarmupBars returns the number of initial NaN outputs before priming.
+func (s *RoofingFilter) WarmupBars() int {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	return s.warmupBars
+}
+
+// Value returns the latest calculated scalar value (NaN before priming).
+func (s *RoofingFilter) Value() float64 {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	return s.currentValue
+}
+
+// IsPrimed indicates whether the indicator has produced at least one primed output.
 func (s *RoofingFilter) IsPrimed() bool {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
-	return s.primed
+	return s.count > s.warmupBars
 }
 
-// Metadata describes an output data of the indicator.
+// Metadata describes the output data of the indicator.
 func (s *RoofingFilter) Metadata() core.Metadata {
 	return core.BuildMetadata(
 		core.RoofingFilter,
@@ -189,102 +198,57 @@ func (s *RoofingFilter) Metadata() core.Metadata {
 	)
 }
 
-// Update updates the value of the roofing filter given the next sample.
-func (s *RoofingFilter) Update(sample float64) float64 {
-	if math.IsNaN(sample) {
-		return sample
-	}
-
+// TryUpdate consumes one scalar sample and returns an error if sample is infinite.
+func (s *RoofingFilter) TryUpdate(sample float64) (float64, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	if s.hasTwoPole {
-		return s.update2Pole(sample)
+	if math.IsNaN(sample) {
+		return math.NaN(), nil
+	}
+	if math.IsInf(sample, 0) {
+		return math.NaN(), errors.New("sample must be finite or NaN")
 	}
 
-	return s.update1Pole(sample)
+	var hp, filt, zero float64
+	if s.count >= s.poles {
+		if s.poles == 2 {
+			difference := sample - 2.0*s.input1 + s.input2
+			hp = s.gain*s.gain*difference + 2.0*s.decay*s.hp1 - s.decay*s.decay*s.hp2
+		} else {
+			hp = s.gain*(sample-s.input1) + s.decay*s.hp1
+		}
+		filt = s.c1*(hp+s.hp1)/2.0 + s.c2*s.filt1 + s.c3*s.filt2
+		if s.zeroMean {
+			zero = s.gain*(filt-s.filt1) + s.decay*s.zero1
+		}
+	}
+
+	s.input2 = s.input1
+	s.input1 = sample
+	s.hp2 = s.hp1
+	s.hp1 = hp
+	s.filt2 = s.filt1
+	s.filt1 = filt
+	s.zero1 = zero
+	s.count++
+
+	output := filt
+	if s.zeroMean {
+		output = zero
+	}
+	if s.count > s.warmupBars {
+		s.currentValue = output
+		return output, nil
+	}
+	return math.NaN(), nil
 }
 
-func (s *RoofingFilter) update1Pole(sample float64) float64 {
-	var hp, ss, zm float64
-
-	if s.primed {
-		hp = s.hpCoeff1*(sample-s.samplePrevious) + s.hpCoeff2*s.hpPrevious
-		ss = s.ssCoeff1*(hp+s.hpPrevious) + s.ssCoeff2*s.ssPrevious + s.ssCoeff3*s.ssPrevious2
-
-		if s.hasZeroMean {
-			zm = s.hpCoeff1*(ss-s.ssPrevious) + s.hpCoeff2*s.zmPrevious
-			s.value = zm
-		} else {
-			s.value = ss
-		}
-	} else {
-		s.count++
-
-		if s.count == 1 {
-			hp = 0
-			ss = 0
-		} else {
-			hp = s.hpCoeff1*(sample-s.samplePrevious) + s.hpCoeff2*s.hpPrevious
-			ss = s.ssCoeff1*(hp+s.hpPrevious) + s.ssCoeff2*s.ssPrevious + s.ssCoeff3*s.ssPrevious2
-
-			if s.hasZeroMean {
-				zm = s.hpCoeff1*(ss-s.ssPrevious) + s.hpCoeff2*s.zmPrevious
-				if s.count == 5 { //nolint:mnd
-					s.primed = true
-					s.value = zm
-				}
-			} else if s.count == 4 { //nolint:mnd
-				s.primed = true
-				s.value = ss
-			}
-		}
+// Update updates the value of the roofing filter given the next sample and panics on infinite input.
+func (s *RoofingFilter) Update(sample float64) float64 {
+	result, err := s.TryUpdate(sample)
+	if err != nil {
+		panic(err)
 	}
-
-	s.samplePrevious = sample
-	s.hpPrevious = hp
-	s.ssPrevious2 = s.ssPrevious
-	s.ssPrevious = ss
-
-	if s.hasZeroMean {
-		s.zmPrevious = zm
-	}
-
-	return s.value
-}
-
-func (s *RoofingFilter) update2Pole(sample float64) float64 {
-	var hp, ss float64
-
-	if s.primed {
-		hp = s.hpCoeff1*(sample-2*s.samplePrevious+s.samplePrevious2) +
-			s.hpCoeff2*s.hpPrevious - s.hpCoeff3*s.hpPrevious2
-		ss = s.ssCoeff1*(hp+s.hpPrevious) + s.ssCoeff2*s.ssPrevious + s.ssCoeff3*s.ssPrevious2
-		s.value = ss
-	} else {
-		s.count++
-
-		if s.count < 4 { //nolint:mnd
-			hp = 0
-			ss = 0
-		} else {
-			hp = s.hpCoeff1*(sample-2*s.samplePrevious+s.samplePrevious2) +
-				s.hpCoeff2*s.hpPrevious - s.hpCoeff3*s.hpPrevious2
-			ss = s.ssCoeff1*(hp+s.hpPrevious) + s.ssCoeff2*s.ssPrevious + s.ssCoeff3*s.ssPrevious2
-
-			if s.count == 5 { //nolint:mnd
-				s.primed = true
-				s.value = ss
-			}
-		}
-	}
-
-	s.samplePrevious2 = s.samplePrevious
-	s.samplePrevious = sample
-	s.hpPrevious2 = s.hpPrevious
-	s.hpPrevious = hp
-	s.ssPrevious2 = s.ssPrevious
-	s.ssPrevious = ss
-
-	return s.value
+	return result
 }

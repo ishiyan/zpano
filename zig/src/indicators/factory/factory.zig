@@ -631,15 +631,36 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
             .trade_component = getTradeComponent(obj),
         })),
 
-        .roofing_filter => createWithParams(rf_mod.RoofingFilter, allocator, rf_mod.RoofingFilter.init(.{
-            .shortest_cycle_period = getInt(obj, "shortestCyclePeriod", 10),
-            .longest_cycle_period = getInt(obj, "longestCyclePeriod", 48),
-            .has_two_pole_highpass_filter = getBool(obj, "hasTwoPoleHighpassFilter", false),
-            .has_zero_mean = getBool(obj, "hasZeroMean", false),
-            .bar_component = getBarComponent(obj),
-            .quote_component = getQuoteComponent(obj),
-            .trade_component = getTradeComponent(obj),
-        })),
+        .roofing_filter => blk: {
+            const shortest: f64 = if (obj.get("shortestCyclePeriod")) |raw| switch (raw) {
+                .float => |number| number,
+                .integer => |number| @floatFromInt(number),
+                else => return FactoryError.InvalidParams,
+            } else 10.0;
+            const longest: f64 = if (obj.get("longestCyclePeriod")) |raw| switch (raw) {
+                .float => |number| number,
+                .integer => |number| @floatFromInt(number),
+                else => return FactoryError.InvalidParams,
+            } else 48.0;
+            const poles: i32 = if (obj.get("highpassPoles")) |raw| switch (raw) {
+                .integer => |number| if (number >= std.math.minInt(i32) and number <= std.math.maxInt(i32)) @intCast(number) else return FactoryError.InvalidParams,
+                .float => |number| if (std.math.isFinite(number) and @trunc(number) == number and number >= @as(f64, @floatFromInt(std.math.minInt(i32))) and number <= @as(f64, @floatFromInt(std.math.maxInt(i32)))) @intFromFloat(number) else return FactoryError.InvalidParams,
+                else => return FactoryError.InvalidParams,
+            } else 2;
+            const zero_mean: bool = if (obj.get("zeroMean")) |raw| switch (raw) {
+                .bool => |flag| flag,
+                else => return FactoryError.InvalidParams,
+            } else false;
+            break :blk createWithParams(rf_mod.RoofingFilter, allocator, rf_mod.RoofingFilter.init(.{
+                .shortest_cycle_period = shortest,
+                .longest_cycle_period = longest,
+                .highpass_poles = poles,
+                .zero_mean = zero_mean,
+                .bar_component = getBarComponent(obj),
+                .quote_component = getQuoteComponent(obj),
+                .trade_component = getTradeComponent(obj),
+            }));
+        },
 
         .mesa_adaptive_moving_average => blk: {
             if (hasKey(obj, "fastLimitSmoothingFactor") or hasKey(obj, "slowLimitSmoothingFactor")) {
@@ -1764,6 +1785,33 @@ test "create corona indicators with defaults, explicit zero threshold, and inval
     var md_vigor: metadata_mod.Metadata = undefined;
     vigor_custom.indicator.metadata(&md_vigor);
     try std.testing.expectEqualStrings("ctv(50, 20, -10, 10, 30, offset=-1)", md_vigor.mnemonic);
+
+    const roof_default = try create(allocator, .roofing_filter, "{}");
+    defer roof_default.deinit(allocator);
+    var md_roof_default: metadata_mod.Metadata = undefined;
+    roof_default.indicator.metadata(&md_roof_default);
+    try std.testing.expectEqualStrings("roof2hp(10, 48)", md_roof_default.mnemonic);
+
+    const roof_custom = try create(allocator, .roofing_filter,
+        \\{"shortestCyclePeriod": 10.5, "longestCyclePeriod": 48, "highpassPoles": 1, "zeroMean": true}
+    );
+    defer roof_custom.deinit(allocator);
+    var md_roof_custom: metadata_mod.Metadata = undefined;
+    roof_custom.indicator.metadata(&md_roof_custom);
+    try std.testing.expectEqualStrings("roof1hpzm(10.5, 48)", md_roof_custom.mnemonic);
+
+    try std.testing.expectError(
+        FactoryError.InvalidParams,
+        create(allocator, .roofing_filter,
+            \\{"highpassPoles": 1.5}
+        ),
+    );
+    try std.testing.expectError(
+        FactoryError.IndicatorInitFailed,
+        create(allocator, .roofing_filter,
+            \\{"highpassPoles": 2, "zeroMean": true}
+        ),
+    );
 }
 
 test "create true range no params" {

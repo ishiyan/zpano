@@ -1,428 +1,364 @@
-//nolint:testpackage
 package roofingfilter
 
-//nolint: gofumpt
 import (
 	"math"
 	"testing"
+	"time"
 
 	"zpano/entities"
 	"zpano/indicators/core"
 	"zpano/indicators/core/outputs/shape"
 )
 
-func TestRoofingFilterUpdate1Pole(t *testing.T) {
+type referenceCase struct {
+	params         Params
+	expected       []float64
+	expectedWarmup int
+}
+
+func allReferenceCases() []referenceCase {
+	return []referenceCase{
+		{Params{ShortestCyclePeriod: 10, LongestCyclePeriod: 48, HighpassPoles: 2, ZeroMean: false}, expectedLP10_HP48_PO2_ZM0, 4},
+		{Params{ShortestCyclePeriod: 40, LongestCyclePeriod: 80, HighpassPoles: 2, ZeroMean: false}, expectedLP40_HP80_PO2_ZM0, 4},
+		{Params{ShortestCyclePeriod: 2, LongestCyclePeriod: 3, HighpassPoles: 2, ZeroMean: false}, expectedLP2_HP3_PO2_ZM0, 4},
+		{Params{ShortestCyclePeriod: 5, LongestCyclePeriod: 24, HighpassPoles: 2, ZeroMean: false}, expectedLP5_HP24_PO2_ZM0, 4},
+		{Params{ShortestCyclePeriod: 10.5, LongestCyclePeriod: 48, HighpassPoles: 2, ZeroMean: false}, expectedLP10_5_HP48_PO2_ZM0, 4},
+		{Params{ShortestCyclePeriod: 10, LongestCyclePeriod: 11, HighpassPoles: 2, ZeroMean: false}, expectedLP10_HP11_PO2_ZM0, 4},
+		{Params{ShortestCyclePeriod: 20, LongestCyclePeriod: 80, HighpassPoles: 2, ZeroMean: false}, expectedLP20_HP80_PO2_ZM0, 4},
+		{Params{ShortestCyclePeriod: 40, LongestCyclePeriod: 252, HighpassPoles: 2, ZeroMean: false}, expectedLP40_HP252_PO2_ZM0, 4},
+		{Params{ShortestCyclePeriod: 10, LongestCyclePeriod: 48, HighpassPoles: 1, ZeroMean: false}, expectedLP10_HP48_PO1_ZM0, 3},
+		{Params{ShortestCyclePeriod: 2, LongestCyclePeriod: 4, HighpassPoles: 1, ZeroMean: false}, expectedLP2_HP4_PO1_ZM0, 3},
+		{Params{ShortestCyclePeriod: 10, LongestCyclePeriod: 48, HighpassPoles: 1, ZeroMean: true}, expectedLP10_HP48_PO1_ZM1, 4},
+		{Params{ShortestCyclePeriod: 2, LongestCyclePeriod: 4, HighpassPoles: 1, ZeroMean: true}, expectedLP2_HP4_PO1_ZM1, 4},
+	}
+}
+
+func TestRoofingFilterReferenceCases(t *testing.T) {
 	t.Parallel()
 
-	const (
-		skipRows  = 30 // Julia/C# priming differs; skip early rows.
-		tolerance = 0.5
-	)
+	if len(testInput) != 252 {
+		t.Fatalf("expected 252 input bars, got %d", len(testInput))
+	}
 
-	input := testInput()
-	expected := testExpected71()
-	rf := testCreate1Pole()
+	for _, tc := range allReferenceCases() {
+		caseItem := tc
+		t.Run(caseItem.params.Mnemonic(), func(t *testing.T) {
+			t.Parallel()
 
-	for i := range input {
-		act := rf.Update(input[i])
-
-		if i < 3 {
-			if !math.IsNaN(act) {
-				t.Errorf("[%d] expected NaN, got %v", i, act)
+			filter, err := NewRoofingFilter(&caseItem.params)
+			if err != nil {
+				t.Fatalf("unexpected constructor error: %v", err)
+			}
+			if filter.WarmupBars() != caseItem.expectedWarmup {
+				t.Fatalf("expected warmup %d, got %d", caseItem.expectedWarmup, filter.WarmupBars())
+			}
+			if filter.IsPrimed() {
+				t.Fatal("expected unprimed before updates")
+			}
+			if !math.IsNaN(filter.Value()) {
+				t.Fatalf("expected NaN initial value, got %v", filter.Value())
 			}
 
-			continue
-		}
+			for index, sample := range testInput {
+				actual := filter.Update(sample)
+				target := caseItem.expected[index]
 
-		if i < skipRows {
-			continue
-		}
+				if index < caseItem.expectedWarmup {
+					if filter.IsPrimed() {
+						t.Fatalf("bar %d: unexpectedly primed", index)
+					}
+					if !math.IsNaN(actual) {
+						t.Fatalf("bar %d: expected NaN, got %v", index, actual)
+					}
+					if !math.IsNaN(filter.Value()) {
+						t.Fatalf("bar %d: expected NaN Value(), got %v", index, filter.Value())
+					}
+					continue
+				}
 
-		if math.Abs(act-expected[i]) > tolerance {
-			t.Errorf("[%d] expected %v, got %v", i, expected[i], act)
-		}
-	}
-
-	if !math.IsNaN(rf.Update(math.NaN())) {
-		t.Error("expected NaN passthrough")
+				if !filter.IsPrimed() {
+					t.Fatalf("bar %d: expected primed", index)
+				}
+				if math.IsNaN(target) {
+					t.Fatalf("bar %d: fixture target unexpectedly NaN", index)
+				}
+				bound := math.Max(1e-12, math.Abs(target)*1e-12)
+				if math.Abs(actual-target) > bound {
+					t.Fatalf("bar %d: expected %v, got %v", index, target, actual)
+				}
+				if math.Abs(filter.Value()-actual) > 1e-15 {
+					t.Fatalf("bar %d: Value() %v != actual %v", index, filter.Value(), actual)
+				}
+			}
+		})
 	}
 }
 
-func TestRoofingFilterUpdate1PoleZeroMean(t *testing.T) {
+func TestRoofingFilterNaNAndReset(t *testing.T) {
 	t.Parallel()
 
-	const (
-		skipRows  = 30
-		tolerance = 0.5
-	)
+	for _, tc := range allReferenceCases() {
+		caseItem := tc
+		t.Run(caseItem.params.Mnemonic(), func(t *testing.T) {
+			t.Parallel()
 
-	input := testInput()
-	expected := testExpected72()
-	rf := testCreate1PoleZeroMean()
-
-	for i := range input {
-		act := rf.Update(input[i])
-
-		if i < 4 {
-			if !math.IsNaN(act) {
-				t.Errorf("[%d] expected NaN, got %v", i, act)
+			first, err := NewRoofingFilter(&caseItem.params)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			second, err := NewRoofingFilter(&caseItem.params)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
 			}
 
-			continue
-		}
-
-		if i < skipRows {
-			continue
-		}
-
-		if math.Abs(act-expected[i]) > tolerance {
-			t.Errorf("[%d] expected %v, got %v", i, expected[i], act)
-		}
-	}
-}
-
-func TestRoofingFilterUpdate2Pole(t *testing.T) {
-	t.Parallel()
-
-	const (
-		skipRows  = 30
-		tolerance = 0.5
-	)
-
-	input := testInput()
-	expected := testExpected73()
-	rf := testCreate2Pole()
-
-	for i := range input {
-		act := rf.Update(input[i])
-
-		if i < 4 {
-			if !math.IsNaN(act) {
-				t.Errorf("[%d] expected NaN, got %v", i, act)
+			for index, sample := range testInput {
+				if !math.IsNaN(first.Update(math.NaN())) {
+					t.Fatalf("bar %d: expected NaN for NaN input", index)
+				}
+				left := first.Update(sample)
+				right := second.Update(sample)
+				if first.IsPrimed() != second.IsPrimed() {
+					t.Fatalf("bar %d: primed mismatch", index)
+				}
+				if math.IsNaN(right) {
+					if !math.IsNaN(left) {
+						t.Fatalf("bar %d: expected NaN, got %v", index, left)
+					}
+				} else if math.Abs(left-right) > 1e-15 {
+					t.Fatalf("bar %d: %v != %v", index, left, right)
+				}
 			}
 
-			continue
-		}
-
-		if i < skipRows {
-			continue
-		}
-
-		if math.Abs(act-expected[i]) > tolerance {
-			t.Errorf("[%d] expected %v, got %v", i, expected[i], act)
-		}
+			first.Reset()
+			if first.IsPrimed() || !math.IsNaN(first.Value()) {
+				t.Fatal("expected unprimed NaN state after Reset()")
+			}
+			third, err := NewRoofingFilter(&caseItem.params)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			for index, sample := range testInput {
+				left := first.Update(sample)
+				right := third.Update(sample)
+				if math.IsNaN(right) {
+					if !math.IsNaN(left) {
+						t.Fatalf("bar %d after reset: expected NaN, got %v", index, left)
+					}
+				} else if math.Abs(left-right) > 1e-15 {
+					t.Fatalf("bar %d after reset: %v != %v", index, left, right)
+				}
+			}
+		})
 	}
 }
 
-func TestRoofingFilterIsPrimed1Pole(t *testing.T) {
+func TestRoofingFilterInvariants(t *testing.T) {
 	t.Parallel()
 
-	input := testInput()
-	rf := testCreate1Pole()
-
-	if rf.IsPrimed() {
-		t.Error("should not be primed before any updates")
+	constantFilter, err := NewRoofingFilterDefault()
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
 	}
-
-	for i := 0; i < 3; i++ {
-		rf.Update(input[i])
-
-		if rf.IsPrimed() {
-			t.Errorf("[%d] should not be primed", i)
+	firstFinite := -1
+	var lastConstant float64
+	for index := range 500 {
+		out := constantFilter.Update(7.0)
+		if firstFinite == -1 && !math.IsNaN(out) {
+			firstFinite = index
 		}
+		lastConstant = out
+	}
+	if firstFinite != constantFilter.WarmupBars() {
+		t.Fatalf("expected first finite at %d, got %d", constantFilter.WarmupBars(), firstFinite)
+	}
+	if math.Abs(lastConstant) > 1e-12 {
+		t.Fatalf("expected constant input decay to 0, got %v", lastConstant)
 	}
 
-	rf.Update(input[3])
+	rampFilter, err := NewRoofingFilterDefault()
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	var lastRamp float64
+	for index := range 1000 {
+		lastRamp = rampFilter.Update(float64(index))
+	}
+	if math.Abs(lastRamp) > 1e-12 {
+		t.Fatalf("expected 2-pole linear ramp rejection, got %v", lastRamp)
+	}
 
-	if !rf.IsPrimed() {
-		t.Error("[3] should be primed")
+	boundary, err := NewRoofingFilter(&Params{
+		ShortestCyclePeriod: 2,
+		LongestCyclePeriod:  4,
+		HighpassPoles:       1,
+	})
+	if err != nil {
+		t.Fatalf("unexpected boundary error: %v", err)
+	}
+	if math.Abs(boundary.gain-0.5) > 1e-15 {
+		t.Fatalf("expected gain 0.5, got %v", boundary.gain)
+	}
+	if math.Abs(boundary.decay) > 1e-15 {
+		t.Fatalf("expected decay 0, got %v", boundary.decay)
 	}
 }
 
-func TestRoofingFilterIsPrimed1PoleZeroMean(t *testing.T) {
+func TestRoofingFilterValidationAndInf(t *testing.T) {
 	t.Parallel()
 
-	input := testInput()
-	rf := testCreate1PoleZeroMean()
+	invalidCases := []Params{
+		{ShortestCyclePeriod: 1, LongestCyclePeriod: 48, HighpassPoles: 2},
+		{ShortestCyclePeriod: 0, LongestCyclePeriod: 48, HighpassPoles: 2},
+		{ShortestCyclePeriod: -2, LongestCyclePeriod: 48, HighpassPoles: 2},
+		{ShortestCyclePeriod: math.NaN(), LongestCyclePeriod: 48, HighpassPoles: 2},
+		{ShortestCyclePeriod: math.Inf(1), LongestCyclePeriod: 48, HighpassPoles: 2},
+		{ShortestCyclePeriod: 10, LongestCyclePeriod: 10, HighpassPoles: 2},
+		{ShortestCyclePeriod: 10, LongestCyclePeriod: 5, HighpassPoles: 2},
+		{ShortestCyclePeriod: 10, LongestCyclePeriod: math.Inf(1), HighpassPoles: 2},
+		{ShortestCyclePeriod: 10, LongestCyclePeriod: math.NaN(), HighpassPoles: 2},
+		{ShortestCyclePeriod: 10, LongestCyclePeriod: 48, HighpassPoles: 0},
+		{ShortestCyclePeriod: 10, LongestCyclePeriod: 48, HighpassPoles: 3},
+		{ShortestCyclePeriod: 10, LongestCyclePeriod: 48, HighpassPoles: 2, ZeroMean: true},
+		{ShortestCyclePeriod: 10, LongestCyclePeriod: 48, HighpassPoles: 2, BarComponent: entities.BarComponent(9999)},
+		{ShortestCyclePeriod: 10, LongestCyclePeriod: 48, HighpassPoles: 2, QuoteComponent: entities.QuoteComponent(9999)},
+		{ShortestCyclePeriod: 10, LongestCyclePeriod: 48, HighpassPoles: 2, TradeComponent: entities.TradeComponent(9999)},
+	}
 
-	for i := 0; i < 4; i++ {
-		rf.Update(input[i])
-
-		if rf.IsPrimed() {
-			t.Errorf("[%d] should not be primed", i)
+	for index, params := range invalidCases {
+		filter, err := NewRoofingFilter(&params)
+		if err == nil || filter != nil {
+			t.Fatalf("case %d: expected validation error, got filter=%v err=%v", index, filter, err)
 		}
 	}
 
-	rf.Update(input[4])
+	filter, err := NewRoofingFilter(nil)
+	if err != nil {
+		t.Fatalf("expected nil params to use DefaultParams, got %v", err)
+	}
+	if _, infErr := filter.TryUpdate(math.Inf(1)); infErr == nil {
+		t.Fatal("expected error on +Inf TryUpdate")
+	}
+	if _, negInfErr := filter.TryUpdate(math.Inf(-1)); negInfErr == nil {
+		t.Fatal("expected error on -Inf TryUpdate")
+	}
+	if filter.IsPrimed() {
+		t.Fatal("expected filter to remain unprimed after rejected infinite inputs")
+	}
 
-	if !rf.IsPrimed() {
-		t.Error("[4] should be primed")
+	didPanic := false
+	func() {
+		defer func() {
+			if recover() != nil {
+				didPanic = true
+			}
+		}()
+		filter.Update(math.Inf(1))
+	}()
+	if !didPanic {
+		t.Fatal("expected Update(+Inf) to panic")
 	}
 }
 
-func TestRoofingFilterIsPrimed2Pole(t *testing.T) {
+func TestRoofingFilterMetadataMnemonicsAndEntities(t *testing.T) {
 	t.Parallel()
 
-	input := testInput()
-	rf := testCreate2Pole()
+	filter, err := NewRoofingFilterDefault()
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	meta := filter.Metadata()
+	if meta.Identifier != core.RoofingFilter {
+		t.Fatalf("expected Identifier %v, got %v", core.RoofingFilter, meta.Identifier)
+	}
+	if meta.Mnemonic != "roof2hp(10, 48)" {
+		t.Fatalf("expected mnemonic roof2hp(10, 48), got %s", meta.Mnemonic)
+	}
+	if meta.Description != "Roofing Filter roof2hp(10, 48)" {
+		t.Fatalf("unexpected description: %s", meta.Description)
+	}
+	if len(meta.Outputs) != 1 {
+		t.Fatalf("expected 1 output, got %d", len(meta.Outputs))
+	}
+	if meta.Outputs[0].Kind != int(Value) {
+		t.Fatalf("expected Kind %d, got %d", int(Value), meta.Outputs[0].Kind)
+	}
+	if meta.Outputs[0].Shape != shape.Scalar {
+		t.Fatalf("expected Shape %v, got %v", shape.Scalar, meta.Outputs[0].Shape)
+	}
+	if meta.Outputs[0].Mnemonic != "roof2hp(10, 48)" {
+		t.Fatalf("unexpected output mnemonic: %s", meta.Outputs[0].Mnemonic)
+	}
 
-	for i := 0; i < 4; i++ {
-		rf.Update(input[i])
+	mnemonicCases := []struct {
+		params   Params
+		expected string
+	}{
+		{*DefaultParams(), "roof2hp(10, 48)"},
+		{Params{ShortestCyclePeriod: 10.5, LongestCyclePeriod: 48, HighpassPoles: 2}, "roof2hp(10.5, 48)"},
+		{Params{ShortestCyclePeriod: 10, LongestCyclePeriod: 48, HighpassPoles: 1}, "roof1hp(10, 48)"},
+		{Params{ShortestCyclePeriod: 10, LongestCyclePeriod: 48, HighpassPoles: 1, ZeroMean: true}, "roof1hpzm(10, 48)"},
+		{Params{ShortestCyclePeriod: 10, LongestCyclePeriod: 48, HighpassPoles: 2, BarComponent: entities.BarMedianPrice}, "roof2hp(10, 48, hl/2)"},
+		{Params{ShortestCyclePeriod: 10, LongestCyclePeriod: 48, HighpassPoles: 2, QuoteComponent: entities.QuoteBidPrice}, "roof2hp(10, 48, b)"},
+		{Params{ShortestCyclePeriod: 10, LongestCyclePeriod: 48, HighpassPoles: 2, TradeComponent: entities.TradeVolume}, "roof2hp(10, 48, v)"},
+		{Params{ShortestCyclePeriod: 10, LongestCyclePeriod: 48, HighpassPoles: 2, BarComponent: entities.BarOpenPrice, QuoteComponent: entities.QuoteAskPrice}, "roof2hp(10, 48, o, a)"},
+		{Params{ShortestCyclePeriod: 10, LongestCyclePeriod: 48, HighpassPoles: 2, BarComponent: entities.BarTypicalPrice, TradeComponent: entities.TradeVolume}, "roof2hp(10, 48, hlc/3, v)"},
+		{Params{ShortestCyclePeriod: 10, LongestCyclePeriod: 48, HighpassPoles: 2, QuoteComponent: entities.QuoteWeightedPrice, TradeComponent: entities.TradeVolume}, "roof2hp(10, 48, (bbs+aas)/(bs+as), v)"},
+	}
 
-		if rf.IsPrimed() {
-			t.Errorf("[%d] should not be primed", i)
+	for _, mc := range mnemonicCases {
+		inst, createErr := NewRoofingFilter(&mc.params)
+		if createErr != nil {
+			t.Fatalf("unexpected error for %s: %v", mc.expected, createErr)
+		}
+		if inst.LineIndicator.Mnemonic != mc.expected {
+			t.Fatalf("expected %s, got %s", mc.expected, inst.LineIndicator.Mnemonic)
 		}
 	}
 
-	rf.Update(input[4])
-
-	if !rf.IsPrimed() {
-		t.Error("[4] should be primed")
-	}
-}
-
-func TestRoofingFilterUpdateEntity(t *testing.T) {
-	t.Parallel()
-
-	const inp = 100.
-
-	time := testTime()
-	rf := testCreate1Pole()
-
-	// Prime the indicator.
-	for i := 0; i < 4; i++ {
-		rf.Update(inp)
-	}
-
-	check := func(act core.Output) {
-		t.Helper()
-
-		if len(act) != 1 {
-			t.Errorf("len(output) is incorrect: expected 1, actual %v", len(act))
+	barFilter, _ := NewRoofingFilterDefault()
+	scalarFilter, _ := NewRoofingFilterDefault()
+	timestamp := time.Date(2024, time.January, 2, 0, 0, 0, 0, time.UTC)
+	for index := range 10 {
+		bar := entities.Bar{
+			Time:   timestamp,
+			Open:   testOpen[index],
+			High:   testHigh[index],
+			Low:    testLow[index],
+			Close:  testInput[index],
+			Volume: 1000,
 		}
-
-		s, ok := act[0].(entities.Scalar)
-		if !ok {
-			t.Error("output is not scalar")
-		}
-
-		if s.Time != time {
-			t.Errorf("time is incorrect: expected %v, actual %v", time, s.Time)
-		}
-
-		if math.IsNaN(s.Value) {
-			t.Error("value should not be NaN after priming")
+		barOut := barFilter.UpdateBar(&bar)
+		scalarOut := scalarFilter.UpdateScalar(&entities.Scalar{Time: timestamp, Value: testInput[index]})
+		barScalar := barOut[0].(entities.Scalar)
+		directScalar := scalarOut[0].(entities.Scalar)
+		if math.IsNaN(directScalar.Value) {
+			if !math.IsNaN(barScalar.Value) {
+				t.Fatalf("bar %d: expected NaN bar output", index)
+			}
+		} else if math.Abs(barScalar.Value-directScalar.Value) > 1e-15 {
+			t.Fatalf("bar %d: bar Close output %v != scalar %v", index, barScalar.Value, directScalar.Value)
 		}
 	}
 
-	t.Run("update scalar", func(t *testing.T) {
-		t.Parallel()
-
-		s := entities.Scalar{Time: time, Value: inp}
-		rf2 := testCreate1Pole()
-		for i := 0; i < 4; i++ {
-			rf2.Update(inp)
-		}
-		check(rf2.UpdateScalar(&s))
-	})
-
-	t.Run("update bar", func(t *testing.T) {
-		t.Parallel()
-
-		b := entities.Bar{Time: time, High: inp, Low: inp}
-		rf2 := testCreate1Pole()
-		for i := 0; i < 4; i++ {
-			rf2.Update(inp)
-		}
-		check(rf2.UpdateBar(&b))
-	})
-
-	t.Run("update quote", func(t *testing.T) {
-		t.Parallel()
-
-		q := entities.Quote{Time: time, Bid: inp, Ask: inp}
-		rf2 := testCreate1Pole()
-		for i := 0; i < 4; i++ {
-			rf2.Update(inp)
-		}
-		check(rf2.UpdateQuote(&q))
-	})
-
-	t.Run("update trade", func(t *testing.T) {
-		t.Parallel()
-
-		r := entities.Trade{Time: time, Price: inp}
-		rf2 := testCreate1Pole()
-		for i := 0; i < 4; i++ {
-			rf2.Update(inp)
-		}
-		check(rf2.UpdateTrade(&r))
-	})
-}
-
-func TestRoofingFilterMetadata(t *testing.T) {
-	t.Parallel()
-
-	rf := testCreate1Pole()
-	act := rf.Metadata()
-
-	check := func(what string, exp, act any) {
-		t.Helper()
-
-		if exp != act {
-			t.Errorf("%s is incorrect: expected %v, actual %v", what, exp, act)
-		}
+	quoteFilter, _ := NewRoofingFilterDefault()
+	var quoteOut core.Output
+	for range 5 {
+		quoteOut = quoteFilter.UpdateQuote(&entities.Quote{
+			Time: timestamp, Bid: 99, Ask: 101, BidSize: 1, AskSize: 1,
+		})
+	}
+	if math.IsNaN(quoteOut[0].(entities.Scalar).Value) {
+		t.Fatal("expected primed quote output")
 	}
 
-	check("Identifier", core.RoofingFilter, act.Identifier)
-	check("len(Outputs)", 1, len(act.Outputs))
-	check("Outputs[0].Kind", int(Value), act.Outputs[0].Kind)
-	check("Outputs[0].Shape", shape.Scalar, act.Outputs[0].Shape)
-	check("Outputs[0].Mnemonic", "roof1hp(10, 48, hl/2)", act.Outputs[0].Mnemonic)
-	check("Outputs[0].Description", "Roofing Filter roof1hp(10, 48, hl/2)", act.Outputs[0].Description)
-}
-
-func TestNewRoofingFilter(t *testing.T) { //nolint: funlen
-	t.Parallel()
-
-	const (
-		bc entities.BarComponent   = entities.BarMedianPrice
-		qc entities.QuoteComponent = entities.QuoteMidPrice
-		tc entities.TradeComponent = entities.TradePrice
-
-		shortest = 10
-		longest  = 48
-		errshort = "invalid roofing filter parameters: shortest cycle period should be greater than 1"
-		errlong  = "invalid roofing filter parameters: longest cycle period should be greater than shortest"
-		errbc    = "invalid roofing filter parameters: 9999: unknown bar component"
-		errqc    = "invalid roofing filter parameters: 9999: unknown quote component"
-		errtc    = "invalid roofing filter parameters: 9999: unknown trade component"
-	)
-
-	check := func(name string, exp, act any) {
-		t.Helper()
-
-		if exp != act {
-			t.Errorf("%s is incorrect: expected %v, actual %v", name, exp, act)
-		}
+	tradeFilter, _ := NewRoofingFilterDefault()
+	var tradeOut core.Output
+	for range 5 {
+		tradeOut = tradeFilter.UpdateTrade(&entities.Trade{
+			Time: timestamp, Price: 100, Volume: 50,
+		})
 	}
-
-	t.Run("valid params", func(t *testing.T) {
-		t.Parallel()
-		params := Params{
-			ShortestCyclePeriod: shortest, LongestCyclePeriod: longest,
-			BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
-		}
-
-		rf, err := NewRoofingFilter(&params)
-		check("err == nil", true, err == nil)
-		check("mnemonic", "roof1hp(10, 48, hl/2)", rf.LineIndicator.Mnemonic)
-		check("description", "Roofing Filter roof1hp(10, 48, hl/2)", rf.LineIndicator.Description)
-		check("primed", false, rf.primed)
-	})
-
-	t.Run("2-pole mnemonic", func(t *testing.T) {
-		t.Parallel()
-		params := Params{
-			ShortestCyclePeriod: shortest, LongestCyclePeriod: longest,
-			HasTwoPoleHighpassFilter: true,
-		}
-
-		rf, err := NewRoofingFilter(&params)
-		check("err == nil", true, err == nil)
-		check("mnemonic", "roof2hp(10, 48, hl/2)", rf.LineIndicator.Mnemonic)
-	})
-
-	t.Run("zero-mean mnemonic", func(t *testing.T) {
-		t.Parallel()
-		params := Params{
-			ShortestCyclePeriod: shortest, LongestCyclePeriod: longest,
-			HasZeroMean: true,
-		}
-
-		rf, err := NewRoofingFilter(&params)
-		check("err == nil", true, err == nil)
-		check("mnemonic", "roof1hpzm(10, 48, hl/2)", rf.LineIndicator.Mnemonic)
-	})
-
-	t.Run("shortest < 2", func(t *testing.T) {
-		t.Parallel()
-		params := Params{
-			ShortestCyclePeriod: 1, LongestCyclePeriod: longest,
-			BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
-		}
-
-		rf, err := NewRoofingFilter(&params)
-		check("rf == nil", true, rf == nil)
-		check("err", errshort, err.Error())
-	})
-
-	t.Run("longest <= shortest", func(t *testing.T) {
-		t.Parallel()
-		params := Params{
-			ShortestCyclePeriod: shortest, LongestCyclePeriod: shortest,
-			BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
-		}
-
-		rf, err := NewRoofingFilter(&params)
-		check("rf == nil", true, rf == nil)
-		check("err", errlong, err.Error())
-	})
-
-	t.Run("invalid bar component", func(t *testing.T) {
-		t.Parallel()
-		params := Params{
-			ShortestCyclePeriod: shortest, LongestCyclePeriod: longest,
-			BarComponent: entities.BarComponent(9999), QuoteComponent: qc, TradeComponent: tc,
-		}
-
-		rf, err := NewRoofingFilter(&params)
-		check("rf == nil", true, rf == nil)
-		check("err", errbc, err.Error())
-	})
-
-	t.Run("invalid quote component", func(t *testing.T) {
-		t.Parallel()
-		params := Params{
-			ShortestCyclePeriod: shortest, LongestCyclePeriod: longest,
-			BarComponent: bc, QuoteComponent: entities.QuoteComponent(9999), TradeComponent: tc,
-		}
-
-		rf, err := NewRoofingFilter(&params)
-		check("rf == nil", true, rf == nil)
-		check("err", errqc, err.Error())
-	})
-
-	t.Run("invalid trade component", func(t *testing.T) {
-		t.Parallel()
-		params := Params{
-			ShortestCyclePeriod: shortest, LongestCyclePeriod: longest,
-			BarComponent: bc, QuoteComponent: qc, TradeComponent: entities.TradeComponent(9999),
-		}
-
-		rf, err := NewRoofingFilter(&params)
-		check("rf == nil", true, rf == nil)
-		check("err", errtc, err.Error())
-	})
-
-	t.Run("all components zero", func(t *testing.T) {
-		t.Parallel()
-		params := Params{ShortestCyclePeriod: shortest, LongestCyclePeriod: longest}
-
-		rf, err := NewRoofingFilter(&params)
-		check("err == nil", true, err == nil)
-		check("mnemonic", "roof1hp(10, 48, hl/2)", rf.LineIndicator.Mnemonic)
-	})
-
-	t.Run("bar component set to open", func(t *testing.T) {
-		t.Parallel()
-		params := Params{
-			ShortestCyclePeriod: shortest, LongestCyclePeriod: longest,
-			BarComponent: entities.BarOpenPrice,
-		}
-
-		rf, err := NewRoofingFilter(&params)
-		check("err == nil", true, err == nil)
-		check("mnemonic", "roof1hp(10, 48, o)", rf.LineIndicator.Mnemonic)
-	})
+	if math.IsNaN(tradeOut[0].(entities.Scalar).Value) {
+		t.Fatal("expected primed trade output")
+	}
 }

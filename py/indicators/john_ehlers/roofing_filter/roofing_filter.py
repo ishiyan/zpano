@@ -1,72 +1,149 @@
-"""Ehler's Roofing Filter indicator."""
+"""Ehlers' Roofing Filter indicator."""
+
+from __future__ import annotations
 
 import math
+from typing import Optional
 
+from ...core.build_metadata import OutputText, build_metadata
+from ...core.identifier import Identifier
 from ...core.indicator import Indicator
 from ...core.line_indicator import LineIndicator
 from ...core.metadata import Metadata
-from ...core.build_metadata import build_metadata, OutputText
-from ...core.identifier import Identifier
-from ...core.component_triple_mnemonic import component_triple_mnemonic
 from ...core.output import Output
 from ....entities.bar import Bar
+from ....entities.bar_component import DEFAULT_BAR_COMPONENT, bar_component_value
 from ....entities.quote import Quote
-from ....entities.trade import Trade
+from ....entities.quote_component import DEFAULT_QUOTE_COMPONENT, quote_component_value
 from ....entities.scalar import Scalar
-from ....entities.bar_component import BarComponent, bar_component_value
-from ....entities.quote_component import QuoteComponent, DEFAULT_QUOTE_COMPONENT, quote_component_value
-from ....entities.trade_component import TradeComponent, DEFAULT_TRADE_COMPONENT, trade_component_value
-from .params import RoofingFilterParams
+from ....entities.trade import Trade
+from ....entities.trade_component import DEFAULT_TRADE_COMPONENT, trade_component_value
+from .params import RoofingFilterParams, default_params, roofing_filter_mnemonic
+
+
+def _smoother_coefficients(period: float) -> tuple[float, float, float]:
+    """Compute SuperSmoother (equation 3-3) coefficients at full binary64 precision."""
+    smoother_angle = math.sqrt(2.0) * math.pi / period
+    a1 = math.exp(-smoother_angle)
+    c2 = 2.0 * a1 * math.cos(smoother_angle)
+    c3 = -a1 * a1
+    return 1.0 - c2 - c3, c2, c3
 
 
 class RoofingFilter(Indicator):
-    """Ehler's Roofing Filter.
+    """Ehlers' Roofing Filter: high-pass detrending followed by two-pole SuperSmoother."""
 
-    The Roofing Filter is comprised of a high-pass filter and a Super Smoother.
-    Given the longest and the shortest cycle periods in bars,
-    the high-pass filter passes cyclic components whose periods are shorter than the longest one,
-    and the Super Smoother filter attenuates cycle periods shorter than the shortest one.
+    def __init__(self, params: Optional[RoofingFilterParams] = None) -> None:
+        source = default_params() if params is None else params
 
-    Three flavours are available:
-      - 1-pole high-pass filter (default)
-      - 1-pole high-pass filter with zero-mean
-      - 2-pole high-pass filter
-    """
+        if isinstance(source.shortest_cycle_period, bool) or not isinstance(
+            source.shortest_cycle_period, (int, float)
+        ):
+            raise ValueError("shortest_cycle_period must be finite and at least 2 bars")
+        shortest = float(source.shortest_cycle_period)
+        if not math.isfinite(shortest) or shortest < 2.0:
+            raise ValueError("shortest_cycle_period must be finite and at least 2 bars")
 
-    def __init__(self, hp_coeff1: float, hp_coeff2: float, hp_coeff3: float,
-                 ss_coeff1: float, ss_coeff2: float, ss_coeff3: float,
-                 has_two_pole: bool, has_zero_mean: bool,
-                 mnemonic: str, description: str,
-                 bar_func, quote_func, trade_func) -> None:
-        self._line = LineIndicator(mnemonic, description, bar_func, quote_func, trade_func, self.update)
-        self._hp_coeff1 = hp_coeff1
-        self._hp_coeff2 = hp_coeff2
-        self._hp_coeff3 = hp_coeff3
-        self._ss_coeff1 = ss_coeff1
-        self._ss_coeff2 = ss_coeff2
-        self._ss_coeff3 = ss_coeff3
-        self._has_two_pole = has_two_pole
-        self._has_zero_mean = has_zero_mean
+        if isinstance(source.longest_cycle_period, bool) or not isinstance(
+            source.longest_cycle_period, (int, float)
+        ):
+            raise ValueError("longest_cycle_period must be finite and greater than shortest")
+        longest = float(source.longest_cycle_period)
+        if not math.isfinite(longest) or longest <= shortest:
+            raise ValueError("longest_cycle_period must be finite and greater than shortest")
+
+        if (
+            isinstance(source.highpass_poles, bool)
+            or not isinstance(source.highpass_poles, int)
+            or source.highpass_poles not in (1, 2)
+        ):
+            raise ValueError("highpass_poles must be integer 1 or 2")
+
+        if not isinstance(source.zero_mean, bool) or (
+            source.zero_mean and source.highpass_poles != 1
+        ):
+            raise ValueError("zero_mean must be a bool and requires highpass_poles=1")
+
+        bar_comp = source.bar_component if source.bar_component is not None else DEFAULT_BAR_COMPONENT
+        quote_comp = (
+            source.quote_component if source.quote_component is not None else DEFAULT_QUOTE_COMPONENT
+        )
+        trade_comp = (
+            source.trade_component if source.trade_component is not None else DEFAULT_TRADE_COMPONENT
+        )
+
+        bar_func = bar_component_value(bar_comp)
+        quote_func = quote_component_value(quote_comp)
+        trade_func = trade_component_value(trade_comp)
+
+        mnemonic = roofing_filter_mnemonic(source)
+        description = f"Roofing Filter {mnemonic}"
+        self._line = LineIndicator(
+            mnemonic, description, bar_func, quote_func, trade_func, self.update
+        )
+
+        self._poles = source.highpass_poles
+        self._zero_mean = source.zero_mean
+        self._warmup_bars = 4 if self._poles == 2 or self._zero_mean else 3
+
+        angle = (
+            2.0 * math.pi / longest
+            if self._poles == 1
+            else math.sqrt(2.0) * math.pi / longest
+        )
+        tangent = math.tan(angle / 2.0)
+        alpha = 2.0 * tangent / (1.0 + tangent)
+        self._gain = 1.0 - alpha / 2.0
+        self._decay = 1.0 - alpha
+        self._c1, self._c2, self._c3 = _smoother_coefficients(shortest)
+
         self._count = 0
-        self._sample_previous = 0.0
-        self._sample_previous2 = 0.0
-        self._hp_previous = 0.0
-        self._hp_previous2 = 0.0
-        self._ss_previous = 0.0
-        self._ss_previous2 = 0.0
-        self._zm_previous = 0.0
-        self._value = math.nan
-        self._primed = False
+        self._input1 = 0.0
+        self._input2 = 0.0
+        self._hp1 = 0.0
+        self._hp2 = 0.0
+        self._filt1 = 0.0
+        self._filt2 = 0.0
+        self._zero1 = 0.0
+        self._current_value = math.nan
+        self.reset()
 
     @staticmethod
-    def create(params: RoofingFilterParams) -> 'RoofingFilter':
-        """Creates a new RoofingFilter from parameters."""
-        return _new_roofing_filter(params)
+    def create(params: Optional[RoofingFilterParams] = None) -> "RoofingFilter":
+        """Create a new RoofingFilter from parameters."""
+        return RoofingFilter(params)
+
+    @staticmethod
+    def create_default() -> "RoofingFilter":
+        """Create a new RoofingFilter with default parameters."""
+        return RoofingFilter()
+
+    def reset(self) -> None:
+        """Reset all streaming histories and priming state."""
+        self._count = 0
+        self._input1 = 0.0
+        self._input2 = 0.0
+        self._hp1 = 0.0
+        self._hp2 = 0.0
+        self._filt1 = 0.0
+        self._filt2 = 0.0
+        self._zero1 = 0.0
+        self._current_value = math.nan
+
+    def warmup_bars(self) -> int:
+        """Return the number of initial NaN outputs before priming."""
+        return self._warmup_bars
+
+    def value(self) -> float:
+        """Return the latest calculated value (NaN before priming)."""
+        return self._current_value
 
     def is_primed(self) -> bool:
-        return self._primed
+        """Return whether the indicator has produced at least one primed sample."""
+        return self._count > self._warmup_bars
 
     def metadata(self) -> Metadata:
+        """Return metadata describing this indicator and its scalar output."""
         return build_metadata(
             Identifier.ROOFING_FILTER,
             self._line.mnemonic,
@@ -75,97 +152,55 @@ class RoofingFilter(Indicator):
         )
 
     def update(self, sample: float) -> float:
-        if math.isnan(sample):
-            return sample
+        """Consume one scalar observation and return the current RoofingFilter value."""
+        if isinstance(sample, bool) or not isinstance(sample, (int, float)):
+            raise ValueError("sample must be finite or NaN")
+        numeric = float(sample)
+        if math.isnan(numeric):
+            return math.nan
+        if not math.isfinite(numeric):
+            raise ValueError("sample must be finite or NaN")
 
-        if self._has_two_pole:
-            return self._update_2pole(sample)
-
-        return self._update_1pole(sample)
-
-    def _update_1pole(self, sample: float) -> float:
-        hp = 0.0
-        ss = 0.0
-        zm = 0.0
-
-        if self._primed:
-            hp = self._hp_coeff1 * (sample - self._sample_previous) + \
-                self._hp_coeff2 * self._hp_previous
-            ss = self._ss_coeff1 * (hp + self._hp_previous) + \
-                self._ss_coeff2 * self._ss_previous + self._ss_coeff3 * self._ss_previous2
-
-            if self._has_zero_mean:
-                zm = self._hp_coeff1 * (ss - self._ss_previous) + \
-                    self._hp_coeff2 * self._zm_previous
-                self._value = zm
-            else:
-                self._value = ss
+        if self._count < self._poles:
+            hp = 0.0
+            filt = 0.0
+            zero = 0.0
         else:
-            self._count += 1
-
-            if self._count == 1:
-                hp = 0.0
-                ss = 0.0
+            if self._poles == 2:
+                difference = numeric - 2.0 * self._input1 + self._input2
+                hp = (
+                    self._gain * self._gain * difference
+                    + 2.0 * self._decay * self._hp1
+                    - self._decay * self._decay * self._hp2
+                )
             else:
-                hp = self._hp_coeff1 * (sample - self._sample_previous) + \
-                    self._hp_coeff2 * self._hp_previous
-                ss = self._ss_coeff1 * (hp + self._hp_previous) + \
-                    self._ss_coeff2 * self._ss_previous + self._ss_coeff3 * self._ss_previous2
+                hp = self._gain * (numeric - self._input1) + self._decay * self._hp1
 
-                if self._has_zero_mean:
-                    zm = self._hp_coeff1 * (ss - self._ss_previous) + \
-                        self._hp_coeff2 * self._zm_previous
-                    if self._count == 5:
-                        self._primed = True
-                        self._value = zm
-                elif self._count == 4:
-                    self._primed = True
-                    self._value = ss
+            filt = (
+                self._c1 * (hp + self._hp1) / 2.0
+                + self._c2 * self._filt1
+                + self._c3 * self._filt2
+            )
+            zero = (
+                self._gain * (filt - self._filt1) + self._decay * self._zero1
+                if self._zero_mean
+                else 0.0
+            )
 
-        self._sample_previous = sample
-        self._hp_previous = hp
-        self._ss_previous2 = self._ss_previous
-        self._ss_previous = ss
+        self._input2 = self._input1
+        self._input1 = numeric
+        self._hp2 = self._hp1
+        self._hp1 = hp
+        self._filt2 = self._filt1
+        self._filt1 = filt
+        self._zero1 = zero
+        self._count += 1
 
-        if self._has_zero_mean:
-            self._zm_previous = zm
-
-        return self._value
-
-    def _update_2pole(self, sample: float) -> float:
-        hp = 0.0
-        ss = 0.0
-
-        if self._primed:
-            hp = self._hp_coeff1 * (sample - 2 * self._sample_previous + self._sample_previous2) + \
-                self._hp_coeff2 * self._hp_previous - self._hp_coeff3 * self._hp_previous2
-            ss = self._ss_coeff1 * (hp + self._hp_previous) + \
-                self._ss_coeff2 * self._ss_previous + self._ss_coeff3 * self._ss_previous2
-            self._value = ss
-        else:
-            self._count += 1
-
-            if self._count < 4:
-                hp = 0.0
-                ss = 0.0
-            else:
-                hp = self._hp_coeff1 * (sample - 2 * self._sample_previous + self._sample_previous2) + \
-                    self._hp_coeff2 * self._hp_previous - self._hp_coeff3 * self._hp_previous2
-                ss = self._ss_coeff1 * (hp + self._hp_previous) + \
-                    self._ss_coeff2 * self._ss_previous + self._ss_coeff3 * self._ss_previous2
-
-                if self._count == 5:
-                    self._primed = True
-                    self._value = ss
-
-        self._sample_previous2 = self._sample_previous
-        self._sample_previous = sample
-        self._hp_previous2 = self._hp_previous
-        self._hp_previous = hp
-        self._ss_previous2 = self._ss_previous
-        self._ss_previous = ss
-
-        return self._value
+        output = zero if self._zero_mean else filt
+        if self._count > self._warmup_bars:
+            self._current_value = output
+            return output
+        return math.nan
 
     def update_scalar(self, sample: Scalar) -> Output:
         return self._line.update_scalar(sample)
@@ -178,67 +213,3 @@ class RoofingFilter(Indicator):
 
     def update_trade(self, sample: Trade) -> Output:
         return self._line.update_trade(sample)
-
-
-def _new_roofing_filter(p: RoofingFilterParams) -> RoofingFilter:
-    invalid = "invalid roofing filter parameters"
-
-    shortest = p.shortest_cycle_period
-    if shortest < 2:
-        raise ValueError(f"{invalid}: shortest cycle period should be greater than 1")
-
-    longest = p.longest_cycle_period
-    if longest <= shortest:
-        raise ValueError(f"{invalid}: longest cycle period should be greater than shortest")
-
-    # Default bar component is MedianPrice, not ClosePrice.
-    bc = p.bar_component if p.bar_component is not None else BarComponent.MEDIAN
-    qc = p.quote_component if p.quote_component is not None else DEFAULT_QUOTE_COMPONENT
-    tc = p.trade_component if p.trade_component is not None else DEFAULT_TRADE_COMPONENT
-
-    bar_func = bar_component_value(bc)
-    quote_func = quote_component_value(qc)
-    trade_func = trade_component_value(tc)
-
-    # Calculate high-pass filter coefficients.
-    if p.has_two_pole_highpass_filter:
-        # 2-pole high-pass.
-        angle = math.sqrt(2) / 2 * 2 * math.pi / longest
-        cos_angle = math.cos(angle)
-        alpha = (math.sin(angle) + cos_angle - 1) / cos_angle
-        beta = 1 - alpha / 2
-        hp_coeff1 = beta * beta
-        beta2 = 1 - alpha
-        hp_coeff2 = 2 * beta2
-        hp_coeff3 = beta2 * beta2
-    else:
-        # 1-pole high-pass.
-        angle = 2 * math.pi / longest
-        cos_angle = math.cos(angle)
-        alpha = (math.sin(angle) + cos_angle - 1) / cos_angle
-        hp_coeff1 = 1 - alpha / 2
-        hp_coeff2 = 1 - alpha
-        hp_coeff3 = 0.0
-
-    # Calculate super smoother coefficients.
-    # Uses literal 1.414 (not math.sqrt(2)) to match C# reference.
-    beta_ss = 1.414 * math.pi / shortest
-    alpha_ss = math.exp(-beta_ss)
-    ss_coeff2 = 2 * alpha_ss * math.cos(beta_ss)
-    ss_coeff3 = -alpha_ss * alpha_ss
-    ss_coeff1 = (1 - ss_coeff2 - ss_coeff3) / 2
-
-    # Build mnemonic.
-    poles = 2 if p.has_two_pole_highpass_filter else 1
-    zm = "zm" if p.has_zero_mean and not p.has_two_pole_highpass_filter else ""
-    mnemonic = f"roof{poles}hp{zm}({shortest}, {longest}{component_triple_mnemonic(bc, qc, tc)})"
-    desc = f"Roofing Filter {mnemonic}"
-
-    has_zero_mean = p.has_zero_mean and not p.has_two_pole_highpass_filter
-
-    return RoofingFilter(
-        hp_coeff1, hp_coeff2, hp_coeff3,
-        ss_coeff1, ss_coeff2, ss_coeff3,
-        p.has_two_pole_highpass_filter, has_zero_mean,
-        mnemonic, desc, bar_func, quote_func, trade_func,
-    )

@@ -718,14 +718,50 @@ pub fn create_indicator(
         }
 
         Identifier::RoofingFilter => {
-            let mut p = RoofingFilterParams::default();
-            if let Some(v) = get_usize(&params, "shortestCyclePeriod") {
-                p.shortest_cycle_period = v;
+            let mut options = RoofingFilterParams::default();
+            if !is_empty_object(&params) {
+                if let Some(raw) = params.get("shortestCyclePeriod") {
+                    match raw {
+                        JsonValue::Number(number) => options.shortest_cycle_period = *number,
+                        _ => return Err("shortestCyclePeriod must be a number".to_string()),
+                    }
+                }
+                if let Some(raw) = params.get("longestCyclePeriod") {
+                    match raw {
+                        JsonValue::Number(number) => options.longest_cycle_period = *number,
+                        _ => return Err("longestCyclePeriod must be a number".to_string()),
+                    }
+                }
+                if let Some(raw) = params.get("highpassPoles") {
+                    match raw {
+                        JsonValue::Number(number)
+                            if number.is_finite()
+                                && number.fract() == 0.0
+                                && *number >= i32::MIN as f64
+                                && *number <= i32::MAX as f64 =>
+                        {
+                            options.highpass_poles = *number as i32;
+                        }
+                        _ => return Err("highpassPoles must be integer 1 or 2".to_string()),
+                    }
+                }
+                if let Some(raw) = params.get("zeroMean") {
+                    match raw {
+                        JsonValue::Bool(flag) => options.zero_mean = *flag,
+                        _ => return Err("zeroMean must be a boolean".to_string()),
+                    }
+                }
+                if let Some(number) = get_f64(&params, "barComponent") {
+                    options.bar_component = Some(lvt_bar_component(number)?);
+                }
+                if let Some(number) = get_f64(&params, "quoteComponent") {
+                    options.quote_component = Some(lvt_quote_component(number)?);
+                }
+                if let Some(number) = get_f64(&params, "tradeComponent") {
+                    options.trade_component = Some(lvt_trade_component(number)?);
+                }
             }
-            if let Some(v) = get_usize(&params, "longestCyclePeriod") {
-                p.longest_cycle_period = v;
-            }
-            Ok(Box::new(RoofingFilter::new(&p)?))
+            Ok(Box::new(RoofingFilter::new(&options)?))
         }
 
         Identifier::MesaAdaptiveMovingAverage => {
