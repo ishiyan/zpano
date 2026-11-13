@@ -1,93 +1,118 @@
 """Ehlers' Corona Spectrum heatmap indicator."""
 
-import math
+from __future__ import annotations
+
 import datetime
+import math
+from typing import NamedTuple, Optional
 
 from ....entities.bar import Bar
-from ....entities.bar_component import BarComponent, bar_component_value, DEFAULT_BAR_COMPONENT
+from ....entities.bar_component import DEFAULT_BAR_COMPONENT, bar_component_value
 from ....entities.quote import Quote
-from ....entities.quote_component import QuoteComponent, quote_component_value, DEFAULT_QUOTE_COMPONENT
-from ....entities.trade import Trade
-from ....entities.trade_component import TradeComponent, trade_component_value, DEFAULT_TRADE_COMPONENT
+from ....entities.quote_component import DEFAULT_QUOTE_COMPONENT, quote_component_value
 from ....entities.scalar import Scalar
-from ...core.identifier import Identifier
-from ...core.metadata import Metadata
-from ...core.build_metadata import build_metadata, OutputText
+from ....entities.trade import Trade
+from ....entities.trade_component import DEFAULT_TRADE_COMPONENT, trade_component_value
+from ...core.build_metadata import OutputText, build_metadata
 from ...core.component_triple_mnemonic import component_triple_mnemonic
+from ...core.identifier import Identifier
+from ...core.indicator import Indicator
+from ...core.metadata import Metadata
+from ...core.output import Output
 from ...core.outputs.heatmap import Heatmap
-from ..corona.corona import Corona
+from ..corona.corona import (
+    FIRST_BANK_SAMPLE,
+    Corona,
+    CoronaSnapshot,
+    accept_snapshot,
+    format_number,
+    validate_finite_parameter,
+    validate_integer_parameter,
+)
 from ..corona.params import CoronaParams
-from .params import Params
+from .params import CoronaSpectrumParams, default_params
 
 
-class CoronaSpectrum:
-    """Ehlers' Corona Spectrum heatmap indicator.
+class CoronaSpectrumSnapshot(NamedTuple):
+    """Full 9-field numerical snapshot for CoronaSpectrum."""
 
-    Outputs:
-    - Value: per-bar heatmap column (decibels across filter bank)
-    - DominantCycle: weighted-center-of-gravity dominant cycle estimate
-    - DominantCycleMedian: 5-sample median of DominantCycle
-    """
+    heatmap: Heatmap
+    dominant_cycle: float
+    dominant_cycle_median: float
+    maximum_power: float
+    normalization_power: float
+    selected_bins: float
+    has_cycle_estimate: float
+    power: tuple[float, ...]
+    relative_power: tuple[float, ...]
 
-    def __init__(self, params: Params) -> None:
-        invalid = "invalid corona spectrum parameters"
 
-        cfg_min_raster = params.min_raster_value if params.min_raster_value != 0 else 6.0
-        cfg_max_raster = params.max_raster_value if params.max_raster_value != 0 else 20.0
-        cfg_min_param = params.min_parameter_value if params.min_parameter_value != 0 else 6.0
-        cfg_max_param = params.max_parameter_value if params.max_parameter_value != 0 else 30.0
-        cfg_hp_cutoff = params.high_pass_filter_cutoff if params.high_pass_filter_cutoff != 0 else 30
+Snapshot = CoronaSpectrumSnapshot
+SpectrumOutput = CoronaSpectrumSnapshot
 
-        if cfg_min_raster < 0:
-            raise ValueError(f"{invalid}: MinRasterValue should be >= 0")
-        if cfg_max_raster <= cfg_min_raster:
-            raise ValueError(f"{invalid}: MaxRasterValue should be > MinRasterValue")
 
-        min_param = math.ceil(cfg_min_param)
-        max_param = math.floor(cfg_max_param)
+class CoronaSpectrum(Indicator):
+    """Ehlers' Corona Spectrum heatmap indicator."""
 
-        if min_param < 2:
-            raise ValueError(f"{invalid}: MinParameterValue should be >= 2")
-        if max_param <= min_param:
-            raise ValueError(f"{invalid}: MaxParameterValue should be > MinParameterValue")
-        if cfg_hp_cutoff < 2:
-            raise ValueError(f"{invalid}: HighPassFilterCutoff should be >= 2")
+    def __init__(self, params: Optional[CoronaSpectrumParams] = None) -> None:
+        source = default_params() if params is None else params
+        min_raster = validate_finite_parameter("min_raster_value", source.min_raster_value)
+        max_raster = validate_finite_parameter("max_raster_value", source.max_raster_value)
+        min_param_raw = validate_finite_parameter("min_parameter_value", source.min_parameter_value)
+        max_param_raw = validate_finite_parameter("max_parameter_value", source.max_parameter_value)
+        validate_integer_parameter("high_pass_filter_cutoff", source.high_pass_filter_cutoff, 5)
 
-        bc = params.bar_component if params.bar_component is not None else BarComponent.MEDIAN
-        qc = params.quote_component if params.quote_component is not None else DEFAULT_QUOTE_COMPONENT
-        tc = params.trade_component if params.trade_component is not None else DEFAULT_TRADE_COMPONENT
+        min_period = int(math.ceil(min_param_raw))
+        max_period = int(math.floor(max_param_raw))
+        if min_period < 6:
+            raise ValueError("min_parameter_value must ceil to an integer >= 6")
+        if max_period <= min_period:
+            raise ValueError("max_parameter_value floor must be > min_parameter_value ceil")
+        if not 0.0 <= min_raster < max_raster or max_raster <= 0.0:
+            raise ValueError("require 0 <= min_raster_value < max_raster_value")
+
+        bc = source.bar_component if source.bar_component is not None else DEFAULT_BAR_COMPONENT
+        qc = source.quote_component if source.quote_component is not None else DEFAULT_QUOTE_COMPONENT
+        tc = source.trade_component if source.trade_component is not None else DEFAULT_TRADE_COMPONENT
 
         self._bar_func = bar_component_value(bc)
         self._quote_func = quote_component_value(qc)
         self._trade_func = trade_component_value(tc)
 
-        self._corona = Corona(CoronaParams(
-            high_pass_filter_cutoff=cfg_hp_cutoff,
-            minimal_period=int(min_param),
-            maximal_period=int(max_param),
-            decibels_lower_threshold=cfg_min_raster,
-            decibels_upper_threshold=cfg_max_raster,
-        ))
+        self._corona = Corona(
+            CoronaParams(
+                high_pass_filter_cutoff=source.high_pass_filter_cutoff,
+                minimal_period=min_period,
+                maximal_period=max_period,
+                decibels_lower_threshold=min_raster,
+                decibels_upper_threshold=max_raster,
+            )
+        )
+        self._corona_parameters = self._corona.parameters
+        self._sample_count: int = 0
 
-        self._min_parameter_value = float(min_param)
-        self._max_parameter_value = float(max_param)
-        self._parameter_resolution = float(self._corona.filter_bank_length - 1) / \
-            (float(max_param) - float(min_param))
-        self._min_raster_value = cfg_min_raster
-        self._max_raster_value = cfg_max_raster
+        self._min_parameter_value: float = float(min_period)
+        self._max_parameter_value: float = float(max_period)
+        self._parameter_resolution: float = 2.0
 
-        comp_mn = component_triple_mnemonic(bc, qc, tc)
-        self.mnemonic = f"cspect({cfg_min_raster:g}, {cfg_max_raster:g}, " \
-            f"{min_param:g}, {max_param:g}, {cfg_hp_cutoff}{comp_mn})"
-        self.description = "Corona spectrum " + self.mnemonic
+        comp = component_triple_mnemonic(bc, qc, tc)
+        self.mnemonic: str = (
+            f"cspect({format_number(min_raster)}, {format_number(max_raster)}, "
+            f"{min_period}, {max_period}, {source.high_pass_filter_cutoff}{comp})"
+        )
+        self.description: str = "Corona spectrum " + self.mnemonic
+        self._mnemonic_dc: str = f"cspect-dc({source.high_pass_filter_cutoff}{comp})"
+        self._description_dc: str = "Corona spectrum dominant cycle " + self._mnemonic_dc
+        self._mnemonic_dcm: str = f"cspect-dcm({source.high_pass_filter_cutoff}{comp})"
+        self._description_dcm: str = "Corona spectrum dominant cycle median " + self._mnemonic_dcm
 
-        self._mnemonic_dc = f"cspect-dc({cfg_hp_cutoff}{comp_mn})"
-        self._description_dc = "Corona spectrum dominant cycle " + self._mnemonic_dc
-        self._mnemonic_dcm = f"cspect-dcm({cfg_hp_cutoff}{comp_mn})"
-        self._description_dcm = "Corona spectrum dominant cycle median " + self._mnemonic_dcm
+    def reset(self) -> None:
+        """Reset streaming state while preserving configuration."""
+        self._corona.reset()
+        self._sample_count = 0
 
     def is_primed(self) -> bool:
-        return self._corona.is_primed()
+        return self._sample_count >= FIRST_BANK_SAMPLE
 
     def metadata(self) -> Metadata:
         return build_metadata(
@@ -101,49 +126,76 @@ class CoronaSpectrum:
             ],
         )
 
-    def update(self, sample: float, t: datetime.datetime) -> tuple:
-        """Returns (heatmap, dominant_cycle, dominant_cycle_median)."""
-        if math.isnan(sample):
-            return (Heatmap.empty(t, self._min_parameter_value,
-                                  self._max_parameter_value, self._parameter_resolution),
-                    math.nan, math.nan)
+    def _empty(self, time: Optional[datetime.datetime]) -> CoronaSpectrumSnapshot:
+        cells = (math.nan,) * self._corona.filter_bank_length
+        heatmap = Heatmap.empty(
+            time,
+            self._min_parameter_value,
+            self._max_parameter_value,
+            self._parameter_resolution,
+        )
+        return CoronaSpectrumSnapshot(
+            heatmap,
+            math.nan,
+            math.nan,
+            math.nan,
+            math.nan,
+            math.nan,
+            math.nan,
+            cells,
+            cells,
+        )
 
-        primed = self._corona.update(sample)
-        if not primed:
-            return (Heatmap.empty(t, self._min_parameter_value,
-                                  self._max_parameter_value, self._parameter_resolution),
-                    math.nan, math.nan)
+    def update(
+        self, sample: float, time: Optional[datetime.datetime] = None
+    ) -> CoronaSpectrumSnapshot:
+        """Advance standalone engine with one price sample and return full snapshot."""
+        return self.update_from_snapshot(self._corona.update(sample, time))
 
-        bank = self._corona.filter_bank
-        values = [0.0] * len(bank)
-        value_min = math.inf
-        value_max = -math.inf
+    def update_from_snapshot(self, snapshot: CoronaSnapshot) -> CoronaSpectrumSnapshot:
+        """Consume one shared CoronaSnapshot in accepted-sample order."""
+        if not accept_snapshot(snapshot, self._corona_parameters, self._sample_count + 1):
+            return self._empty(snapshot.time)
+        self._sample_count = snapshot.sample_count
+        if not snapshot.primed:
+            return self._empty(snapshot.time)
+        values = list(snapshot.decibels)
+        heatmap = Heatmap(
+            snapshot.time,
+            self._min_parameter_value,
+            self._max_parameter_value,
+            self._parameter_resolution,
+            min(values),
+            max(values),
+            values,
+        )
+        return CoronaSpectrumSnapshot(
+            heatmap=heatmap,
+            dominant_cycle=snapshot.dominant_cycle,
+            dominant_cycle_median=snapshot.dominant_cycle_median,
+            maximum_power=snapshot.maximum_power,
+            normalization_power=snapshot.normalization_power,
+            selected_bins=float(snapshot.selected_bins),
+            has_cycle_estimate=float(snapshot.has_cycle_estimate),
+            power=snapshot.power,
+            relative_power=snapshot.relative_power,
+        )
 
-        for i, f in enumerate(bank):
-            v = f.decibels
-            values[i] = v
-            if v < value_min:
-                value_min = v
-            if v > value_max:
-                value_max = v
+    def _wrap(self, time: datetime.datetime, result: CoronaSpectrumSnapshot) -> Output:
+        return [
+            result.heatmap,
+            Scalar(time, result.dominant_cycle),
+            Scalar(time, result.dominant_cycle_median),
+        ]
 
-        heatmap = Heatmap(t, self._min_parameter_value, self._max_parameter_value,
-                          self._parameter_resolution, value_min, value_max, values)
+    def update_scalar(self, sample: Scalar) -> Output:
+        return self._wrap(sample.time, self.update(sample.value, sample.time))
 
-        return heatmap, self._corona.dominant_cycle, self._corona.dominant_cycle_median
+    def update_bar(self, sample: Bar) -> Output:
+        return self._wrap(sample.time, self.update(self._bar_func(sample), sample.time))
 
-    def update_scalar(self, sample: Scalar) -> list:
-        return self._update_entity(sample.time, sample.value)
+    def update_quote(self, sample: Quote) -> Output:
+        return self._wrap(sample.time, self.update(self._quote_func(sample), sample.time))
 
-    def update_bar(self, sample: Bar) -> list:
-        return self._update_entity(sample.time, self._bar_func(sample))
-
-    def update_quote(self, sample: Quote) -> list:
-        return self._update_entity(sample.time, self._quote_func(sample))
-
-    def update_trade(self, sample: Trade) -> list:
-        return self._update_entity(sample.time, self._trade_func(sample))
-
-    def _update_entity(self, t: datetime.datetime, sample: float) -> list:
-        heatmap, dc, dcm = self.update(sample, t)
-        return [heatmap, Scalar(t, dc), Scalar(t, dcm)]
+    def update_trade(self, sample: Trade) -> Output:
+        return self._wrap(sample.time, self.update(self._trade_func(sample), sample.time))

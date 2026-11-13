@@ -1,7 +1,9 @@
 use std::any::Any;
 
 use crate::entities::bar::Bar;
-use crate::entities::bar_component::{component_value as bar_component_value, BarComponent};
+use crate::entities::bar_component::{
+    component_value as bar_component_value, BarComponent, DEFAULT_BAR_COMPONENT,
+};
 use crate::entities::quote::Quote;
 use crate::entities::quote_component::{
     component_value as quote_component_value, QuoteComponent, DEFAULT_QUOTE_COMPONENT,
@@ -17,31 +19,24 @@ use crate::indicators::core::identifier::Identifier;
 use crate::indicators::core::indicator::{Indicator, Output};
 use crate::indicators::core::metadata::Metadata;
 use crate::indicators::core::outputs::heatmap::Heatmap;
-use crate::indicators::john_ehlers::corona::corona::{Corona, CoronaParams};
+use crate::indicators::john_ehlers::corona::{
+    accept_snapshot, format_number, validate_finite, validate_integer, Corona, CoronaParams,
+    CoronaSnapshot, FIRST_BANK_SAMPLE,
+};
 
-// ---------------------------------------------------------------------------
-// Params
-// ---------------------------------------------------------------------------
-
-/// Parameters for the Corona Spectrum indicator.
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct CoronaSpectrumParams {
-    /// Minimal raster value (z) of the heatmap, in decibels. Default 6.
     pub min_raster_value: f64,
-    /// Maximal raster value (z) of the heatmap, in decibels. Default 20.
     pub max_raster_value: f64,
-    /// Minimal ordinate (y) value — minimal cycle period. Default 6.
     pub min_parameter_value: f64,
-    /// Maximal ordinate (y) value — maximal cycle period. Default 30.
     pub max_parameter_value: f64,
-    /// High-pass filter cutoff (de-trending period). Default 30.
     pub high_pass_filter_cutoff: i32,
-    /// Bar component. `None` → Median (hl/2).
     pub bar_component: Option<BarComponent>,
-    /// Quote component. `None` → Mid.
     pub quote_component: Option<QuoteComponent>,
-    /// Trade component. `None` → Price.
     pub trade_component: Option<TradeComponent>,
 }
+
+pub type Params = CoronaSpectrumParams;
 
 impl Default for CoronaSpectrumParams {
     fn default() -> Self {
@@ -58,9 +53,27 @@ impl Default for CoronaSpectrumParams {
     }
 }
 
-// ---------------------------------------------------------------------------
-// Output enum
-// ---------------------------------------------------------------------------
+pub fn default_params() -> CoronaSpectrumParams {
+    CoronaSpectrumParams::default()
+}
+
+pub fn mnemonic(params: &CoronaSpectrumParams) -> String {
+    let bc = params.bar_component.unwrap_or(DEFAULT_BAR_COMPONENT);
+    let qc = params.quote_component.unwrap_or(DEFAULT_QUOTE_COMPONENT);
+    let tc = params.trade_component.unwrap_or(DEFAULT_TRADE_COMPONENT);
+    let comp = component_triple_mnemonic(bc, qc, tc);
+    let min_period = params.min_parameter_value.ceil() as i32;
+    let max_period = params.max_parameter_value.floor() as i32;
+    format!(
+        "cspect({}, {}, {}, {}, {}{})",
+        format_number(params.min_raster_value),
+        format_number(params.max_raster_value),
+        min_period,
+        max_period,
+        params.high_pass_filter_cutoff,
+        comp
+    )
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
@@ -70,23 +83,31 @@ pub enum CoronaSpectrumOutput {
     DominantCycleMedian = 3,
 }
 
-// ---------------------------------------------------------------------------
-// Indicator
-// ---------------------------------------------------------------------------
+#[derive(Debug, Clone)]
+pub struct CoronaSpectrumSnapshot {
+    pub heatmap: Heatmap,
+    pub dominant_cycle: f64,
+    pub dominant_cycle_median: f64,
+    pub maximum_power: f64,
+    pub normalization_power: f64,
+    pub selected_bins: f64,
+    pub has_cycle_estimate: f64,
+    pub power: Vec<f64>,
+    pub relative_power: Vec<f64>,
+}
 
-/// Ehlers' Corona Spectrum heatmap indicator.
-///
-/// Measures cyclic activity over a cycle period range in a bank of contiguous
-/// bandpass filters. Outputs a heatmap column (decibels), dominant cycle, and
-/// dominant cycle median.
+pub type Snapshot = CoronaSpectrumSnapshot;
+
 pub struct CoronaSpectrum {
-    mnemonic: String,
-    description: String,
+    mnemonic_text: String,
+    description_text: String,
     mnemonic_dc: String,
     description_dc: String,
     mnemonic_dcm: String,
     description_dcm: String,
-    corona: Corona,
+    engine: Corona,
+    engine_params: CoronaParams,
+    sample_count: usize,
     min_parameter_value: f64,
     max_parameter_value: f64,
     parameter_resolution: f64,
@@ -96,342 +117,405 @@ pub struct CoronaSpectrum {
 }
 
 impl CoronaSpectrum {
-    pub fn new(p: &CoronaSpectrumParams) -> Result<Self, String> {
-        let invalid = "invalid corona spectrum parameters";
-
-        let min_raster = if p.min_raster_value == 0.0 { 6.0 } else { p.min_raster_value };
-        let max_raster = if p.max_raster_value == 0.0 { 20.0 } else { p.max_raster_value };
-        let min_pv = if p.min_parameter_value == 0.0 { 6.0 } else { p.min_parameter_value };
-        let max_pv = if p.max_parameter_value == 0.0 { 30.0 } else { p.max_parameter_value };
-        let hp = if p.high_pass_filter_cutoff == 0 { 30 } else { p.high_pass_filter_cutoff };
-
-        if min_raster < 0.0 {
-            return Err(format!("{}: MinRasterValue should be >= 0", invalid));
+    pub fn new(params: &CoronaSpectrumParams) -> Result<Self, String> {
+        let min_raster = validate_finite("min_raster_value", params.min_raster_value)?;
+        let max_raster = validate_finite("max_raster_value", params.max_raster_value)?;
+        if min_raster < 0.0 || max_raster <= 0.0 || max_raster <= min_raster {
+            return Err("invalid corona spectrum parameters: require 0 <= min_raster_value < max_raster_value".to_string());
         }
-        if max_raster <= min_raster {
-            return Err(format!("{}: MaxRasterValue should be > MinRasterValue", invalid));
+        let min_pv = validate_finite("min_parameter_value", params.min_parameter_value)?;
+        let max_pv = validate_finite("max_parameter_value", params.max_parameter_value)?;
+        let min_param_f = min_pv.ceil();
+        let max_param_f = max_pv.floor();
+        if min_param_f < 6.0 {
+            return Err("invalid corona spectrum parameters: min_parameter_value must round up to >= 6".to_string());
         }
-
-        let min_param = min_pv.ceil();
-        let max_param = max_pv.floor();
-
-        if min_param < 2.0 {
-            return Err(format!("{}: MinParameterValue should be >= 2", invalid));
+        if max_param_f <= min_param_f {
+            return Err("invalid corona spectrum parameters: max_parameter_value must exceed min_parameter_value".to_string());
         }
-        if max_param <= min_param {
-            return Err(format!("{}: MaxParameterValue should be > MinParameterValue", invalid));
-        }
-        if hp < 2 {
-            return Err(format!("{}: HighPassFilterCutoff should be >= 2", invalid));
-        }
+        validate_integer("high_pass_filter_cutoff", params.high_pass_filter_cutoff, 5)?;
 
-        let bc = p.bar_component.unwrap_or(BarComponent::Median);
-        let qc = p.quote_component.unwrap_or(DEFAULT_QUOTE_COMPONENT);
-        let tc = p.trade_component.unwrap_or(DEFAULT_TRADE_COMPONENT);
-
-        let corona = Corona::new(&CoronaParams {
-            high_pass_filter_cutoff: hp,
-            minimal_period: min_param as i32,
-            maximal_period: max_param as i32,
+        let min_period = min_param_f as i32;
+        let max_period = max_param_f as i32;
+        let engine = Corona::new(&CoronaParams {
+            high_pass_filter_cutoff: params.high_pass_filter_cutoff,
+            minimal_period: min_period,
+            maximal_period: max_period,
             decibels_lower_threshold: min_raster,
             decibels_upper_threshold: max_raster,
         })?;
+        let engine_params = engine.parameters();
 
-        let comp_mn = component_triple_mnemonic(bc, qc, tc);
-        let parameter_resolution =
-            (corona.filter_bank_length() as f64 - 1.0) / (max_param - min_param);
+        let bc = params.bar_component.unwrap_or(DEFAULT_BAR_COMPONENT);
+        let qc = params.quote_component.unwrap_or(DEFAULT_QUOTE_COMPONENT);
+        let tc = params.trade_component.unwrap_or(DEFAULT_TRADE_COMPONENT);
+        let comp = component_triple_mnemonic(bc, qc, tc);
 
-        let mnemonic = format!(
+        let mnemonic_text = format!(
             "cspect({}, {}, {}, {}, {}{})",
-            min_raster, max_raster, min_param, max_param, hp, comp_mn
+            format_number(min_raster),
+            format_number(max_raster),
+            min_period,
+            max_period,
+            params.high_pass_filter_cutoff,
+            comp
         );
-        let mnemonic_dc = format!("cspect-dc({}{})", hp, comp_mn);
-        let mnemonic_dcm = format!("cspect-dcm({}{})", hp, comp_mn);
+        let mnemonic_dc = format!("cspect-dc({}{})", params.high_pass_filter_cutoff, comp);
+        let mnemonic_dcm = format!("cspect-dcm({}{})", params.high_pass_filter_cutoff, comp);
 
         Ok(Self {
-            description: format!("Corona spectrum {}", mnemonic),
-            mnemonic,
-            description_dc: format!("Corona spectrum dominant cycle {}", mnemonic_dc),
+            description_text: format!("Corona spectrum {mnemonic_text}"),
+            mnemonic_text,
+            description_dc: format!("Corona spectrum dominant cycle {mnemonic_dc}"),
             mnemonic_dc,
-            description_dcm: format!("Corona spectrum dominant cycle median {}", mnemonic_dcm),
+            description_dcm: format!("Corona spectrum dominant cycle median {mnemonic_dcm}"),
             mnemonic_dcm,
-            corona,
-            min_parameter_value: min_param,
-            max_parameter_value: max_param,
-            parameter_resolution,
+            engine,
+            engine_params,
+            sample_count: 0,
+            min_parameter_value: min_param_f,
+            max_parameter_value: max_param_f,
+            parameter_resolution: 2.0,
             bar_func: bar_component_value(bc),
             quote_func: quote_component_value(qc),
             trade_func: trade_component_value(tc),
         })
     }
 
-    /// Feed the next sample and return (heatmap, dominant_cycle, dominant_cycle_median).
-    pub fn update(&mut self, sample: f64, time: i64) -> (Heatmap, f64, f64) {
-        if sample.is_nan() {
-            return (
-                Heatmap::empty(time, self.min_parameter_value, self.max_parameter_value, self.parameter_resolution),
-                f64::NAN,
-                f64::NAN,
-            );
+    pub fn new_default() -> Result<Self, String> {
+        Self::new(&CoronaSpectrumParams::default())
+    }
+
+    pub fn reset(&mut self) {
+        self.engine.reset();
+        self.sample_count = 0;
+    }
+
+    fn empty_snapshot(&self, time: i64) -> CoronaSpectrumSnapshot {
+        let bank_len = self.engine.filter_bank_length();
+        CoronaSpectrumSnapshot {
+            heatmap: Heatmap::empty(
+                time,
+                self.min_parameter_value,
+                self.max_parameter_value,
+                self.parameter_resolution,
+            ),
+            dominant_cycle: f64::NAN,
+            dominant_cycle_median: f64::NAN,
+            maximum_power: f64::NAN,
+            normalization_power: f64::NAN,
+            selected_bins: f64::NAN,
+            has_cycle_estimate: f64::NAN,
+            power: vec![f64::NAN; bank_len],
+            relative_power: vec![f64::NAN; bank_len],
+        }
+    }
+
+    pub fn try_update_from_snapshot(
+        &mut self,
+        snapshot: &CoronaSnapshot,
+    ) -> Result<CoronaSpectrumSnapshot, String> {
+        let accepted = accept_snapshot(snapshot, &self.engine_params, self.sample_count + 1)?;
+        if !accepted {
+            return Ok(self.empty_snapshot(snapshot.time));
+        }
+        self.sample_count = snapshot.sample_count;
+        if !snapshot.primed {
+            return Ok(self.empty_snapshot(snapshot.time));
         }
 
-        let primed = self.corona.update(sample);
-        if !primed {
-            return (
-                Heatmap::empty(time, self.min_parameter_value, self.max_parameter_value, self.parameter_resolution),
-                f64::NAN,
-                f64::NAN,
-            );
+        let values = snapshot.decibels.clone();
+        let mut minimum = values[0];
+        let mut maximum = values[0];
+        for &item in &values[1..] {
+            if item < minimum {
+                minimum = item;
+            }
+            if item > maximum {
+                maximum = item;
+            }
         }
-
-        let bank = self.corona.filter_bank();
-        let mut values = Vec::with_capacity(bank.len());
-        let mut value_min = f64::INFINITY;
-        let mut value_max = f64::NEG_INFINITY;
-
-        for f in bank {
-            let v = f.decibels;
-            values.push(v);
-            if v < value_min { value_min = v; }
-            if v > value_max { value_max = v; }
-        }
-
         let heatmap = Heatmap::new(
-            time,
+            snapshot.time,
             self.min_parameter_value,
             self.max_parameter_value,
             self.parameter_resolution,
-            value_min,
-            value_max,
+            minimum,
+            maximum,
             values,
         );
 
-        (heatmap, self.corona.dominant_cycle(), self.corona.dominant_cycle_median())
+        Ok(CoronaSpectrumSnapshot {
+            heatmap,
+            dominant_cycle: snapshot.dominant_cycle,
+            dominant_cycle_median: snapshot.dominant_cycle_median,
+            maximum_power: snapshot.maximum_power,
+            normalization_power: snapshot.normalization_power,
+            selected_bins: snapshot.selected_bins as f64,
+            has_cycle_estimate: if snapshot.has_cycle_estimate { 1.0 } else { 0.0 },
+            power: snapshot.power.clone(),
+            relative_power: snapshot.relative_power.clone(),
+        })
+    }
+
+    pub fn update_from_snapshot(&mut self, snapshot: &CoronaSnapshot) -> CoronaSpectrumSnapshot {
+        self.try_update_from_snapshot(snapshot)
+            .unwrap_or_else(|err| panic!("CoronaSpectrum::update_from_snapshot failed: {err}"))
+    }
+
+    pub fn try_update(&mut self, sample: f64, time: i64) -> Result<CoronaSpectrumSnapshot, String> {
+        let engine_snap = self.engine.try_update(sample, time)?;
+        self.try_update_from_snapshot(&engine_snap)
+    }
+
+    pub fn update(&mut self, sample: f64, time: i64) -> CoronaSpectrumSnapshot {
+        self.try_update(sample, time)
+            .unwrap_or_else(|err| panic!("CoronaSpectrum::update failed: {err}"))
+    }
+
+    fn wrap_output(time: i64, snapshot: CoronaSpectrumSnapshot) -> Output {
+        vec![
+            Box::new(snapshot.heatmap) as Box<dyn Any>,
+            Box::new(Scalar::new(time, snapshot.dominant_cycle)),
+            Box::new(Scalar::new(time, snapshot.dominant_cycle_median)),
+        ]
     }
 }
 
 impl Indicator for CoronaSpectrum {
     fn is_primed(&self) -> bool {
-        self.corona.is_primed()
+        self.sample_count >= FIRST_BANK_SAMPLE
     }
 
     fn metadata(&self) -> Metadata {
         build_metadata(
             Identifier::CoronaSpectrum,
-            &self.mnemonic,
-            &self.description,
+            &self.mnemonic_text,
+            &self.description_text,
             &[
-                OutputText { mnemonic: self.mnemonic.clone(), description: self.description.clone() },
-                OutputText { mnemonic: self.mnemonic_dc.clone(), description: self.description_dc.clone() },
-                OutputText { mnemonic: self.mnemonic_dcm.clone(), description: self.description_dcm.clone() },
+                OutputText {
+                    mnemonic: self.mnemonic_text.clone(),
+                    description: self.description_text.clone(),
+                },
+                OutputText {
+                    mnemonic: self.mnemonic_dc.clone(),
+                    description: self.description_dc.clone(),
+                },
+                OutputText {
+                    mnemonic: self.mnemonic_dcm.clone(),
+                    description: self.description_dcm.clone(),
+                },
             ],
         )
     }
 
+    fn update_scalar(&mut self, sample: &Scalar) -> Output {
+        Self::wrap_output(sample.time, self.update(sample.value, sample.time))
+    }
+
     fn update_bar(&mut self, bar: &Bar) -> Output {
         let sample = (self.bar_func)(bar);
-        let (h, dc, dcm) = self.update(sample, bar.time);
-        vec![
-            Box::new(h) as Box<dyn Any>,
-            Box::new(Scalar::new(bar.time, dc)),
-            Box::new(Scalar::new(bar.time, dcm)),
-        ]
+        Self::wrap_output(bar.time, self.update(sample, bar.time))
     }
 
     fn update_quote(&mut self, quote: &Quote) -> Output {
         let sample = (self.quote_func)(quote);
-        let (h, dc, dcm) = self.update(sample, quote.time);
-        vec![
-            Box::new(h) as Box<dyn Any>,
-            Box::new(Scalar::new(quote.time, dc)),
-            Box::new(Scalar::new(quote.time, dcm)),
-        ]
+        Self::wrap_output(quote.time, self.update(sample, quote.time))
     }
 
     fn update_trade(&mut self, trade: &Trade) -> Output {
         let sample = (self.trade_func)(trade);
-        let (h, dc, dcm) = self.update(sample, trade.time);
-        vec![
-            Box::new(h) as Box<dyn Any>,
-            Box::new(Scalar::new(trade.time, dc)),
-            Box::new(Scalar::new(trade.time, dcm)),
-        ]
-    }
-
-    fn update_scalar(&mut self, scalar: &Scalar) -> Output {
-        let (h, dc, dcm) = self.update(scalar.value, scalar.time);
-        vec![
-            Box::new(h) as Box<dyn Any>,
-            Box::new(Scalar::new(scalar.time, dc)),
-            Box::new(Scalar::new(scalar.time, dcm)),
-        ]
+        Self::wrap_output(trade.time, self.update(sample, trade.time))
     }
 }
-
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use super::super::testdata::testdata;
-    const TOLERANCE: f64 = 1e-4;
+    use super::super::testdata::{expected_data, testdata};
+    use crate::indicators::core::outputs::shape::Shape;
 
-    #[test]
-    fn test_corona_spectrum_update() {
-        let input = testdata::talib_input();
+    const TOLERANCE: f64 = 1e-10;
 
-        struct Snap { i: usize, dc: f64, dcm: f64 }
-        let snapshots = [
-            Snap { i: 11,  dc: 17.7604672565, dcm: 17.7604672565 },
-            Snap { i: 12,  dc: 6.0000000000,  dcm: 6.0000000000 },
-            Snap { i: 50,  dc: 15.9989078712, dcm: 15.9989078712 },
-            Snap { i: 100, dc: 14.7455497547, dcm: 14.7455497547 },
-            Snap { i: 150, dc: 17.5000000000, dcm: 17.2826036069 },
-            Snap { i: 200, dc: 19.7557338512, dcm: 20.0000000000 },
-            Snap { i: 251, dc: 6.0000000000,  dcm: 6.0000000000 },
-        ];
+    fn assert_close(actual: f64, expected: f64, label: &str) {
+        if expected.is_nan() {
+            assert!(actual.is_nan(), "{label}: expected NaN, got {actual}");
+            return;
+        }
+        if expected.is_infinite() {
+            assert_eq!(actual, expected, "{label}: expected {expected}, got {actual}");
+            return;
+        }
+        assert!(actual.is_finite(), "{label}: expected finite {expected}, got {actual}");
+        let bound = TOLERANCE.max(expected.abs() * TOLERANCE);
+        assert!(
+            (actual - expected).abs() <= bound,
+            "{label}: actual={actual}, expected={expected}, diff={}",
+            (actual - expected).abs()
+        );
+    }
 
-        let mut x = CoronaSpectrum::new(&CoronaSpectrumParams::default()).unwrap();
+    #[allow(clippy::too_many_arguments)]
+    fn verify_case(
+        case_name: &str,
+        hp_cutoff: i32,
+        min_period: i32,
+        max_period: i32,
+        db_threshold: f64,
+        expected_heatmap: &[Vec<f64>],
+        expected_min: &[f64],
+        expected_max: &[f64],
+        expected_dc: &[f64],
+        expected_dcm: &[f64],
+        expected_max_power: &[f64],
+        expected_norm_power: &[f64],
+        expected_selected: &[f64],
+        expected_has_est: &[f64],
+        expected_power: &[Vec<f64>],
+        expected_rel_power: &[Vec<f64>],
+    ) {
+        let mut indicator = CoronaSpectrum::new(&CoronaSpectrumParams {
+            min_raster_value: db_threshold,
+            max_raster_value: 20.0,
+            min_parameter_value: min_period as f64,
+            max_parameter_value: max_period as f64,
+            high_pass_filter_cutoff: hp_cutoff,
+            ..Default::default()
+        })
+        .unwrap();
 
-        let mut si = 0;
-        for (i, &v) in input.iter().enumerate() {
-            let (h, dc, dcm) = x.update(v, i as i64);
+        let prices = testdata::test_input();
+        let bank_len = (2 * (max_period - min_period) + 1) as usize;
+        for (index, &price) in prices.iter().enumerate() {
+            let snap = indicator.update(price, index as i64);
+            assert_close(snap.heatmap.parameter_first, min_period as f64, &format!("{case_name}[{index}].first"));
+            assert_close(snap.heatmap.parameter_last, max_period as f64, &format!("{case_name}[{index}].last"));
+            assert_close(snap.heatmap.parameter_resolution, 2.0, &format!("{case_name}[{index}].res"));
 
-            // Heatmap axis invariants.
-            assert_eq!(h.parameter_first, 6.0, "[{}] parameter_first", i);
-            assert_eq!(h.parameter_last, 30.0, "[{}] parameter_last", i);
-            assert_eq!(h.parameter_resolution, 2.0, "[{}] parameter_resolution", i);
-
-            if !x.is_primed() {
-                assert!(h.is_empty(), "[{}] expected empty heatmap before priming", i);
-                assert!(dc.is_nan(), "[{}] expected NaN dc before priming", i);
-                assert!(dcm.is_nan(), "[{}] expected NaN dcm before priming", i);
-                continue;
+            let row_empty = expected_dc[index].is_nan();
+            assert_eq!(indicator.is_primed(), !row_empty, "{case_name}[{index}].primed");
+            if row_empty {
+                assert!(snap.heatmap.is_empty(), "{case_name}[{index}] expected empty heatmap");
+            } else {
+                assert_eq!(snap.heatmap.values.len(), bank_len);
+                for bin_index in 0..bank_len {
+                    assert_close(
+                        snap.heatmap.values[bin_index],
+                        expected_heatmap[index][bin_index],
+                        &format!("{case_name}[{index}].hm[{bin_index}]"),
+                    );
+                }
             }
-
-            assert_eq!(h.values.len(), 49, "[{}] heatmap values length", i);
-
-            if si < snapshots.len() && snapshots[si].i == i {
-                assert!(
-                    (snapshots[si].dc - dc).abs() < TOLERANCE,
-                    "[{}] dc: expected {}, got {}", i, snapshots[si].dc, dc
-                );
-                assert!(
-                    (snapshots[si].dcm - dcm).abs() < TOLERANCE,
-                    "[{}] dcm: expected {}, got {}", i, snapshots[si].dcm, dcm
-                );
-                si += 1;
+            assert_close(snap.heatmap.value_min, expected_min[index], &format!("{case_name}[{index}].min"));
+            assert_close(snap.heatmap.value_max, expected_max[index], &format!("{case_name}[{index}].max"));
+            assert_close(snap.dominant_cycle, expected_dc[index], &format!("{case_name}[{index}].dc"));
+            assert_close(snap.dominant_cycle_median, expected_dcm[index], &format!("{case_name}[{index}].dcm"));
+            assert_close(snap.maximum_power, expected_max_power[index], &format!("{case_name}[{index}].mp"));
+            assert_close(snap.normalization_power, expected_norm_power[index], &format!("{case_name}[{index}].np"));
+            assert_close(snap.selected_bins, expected_selected[index], &format!("{case_name}[{index}].sb"));
+            assert_close(snap.has_cycle_estimate, expected_has_est[index], &format!("{case_name}[{index}].hce"));
+            for bin_index in 0..bank_len {
+                assert_close(snap.power[bin_index], expected_power[index][bin_index], &format!("{case_name}[{index}].pw[{bin_index}]"));
+                assert_close(snap.relative_power[bin_index], expected_rel_power[index][bin_index], &format!("{case_name}[{index}].rp[{bin_index}]"));
             }
         }
-
-        assert_eq!(si, snapshots.len(), "did not hit all snapshots");
     }
 
     #[test]
-    fn test_corona_spectrum_primes_at_bar_11() {
-        let mut x = CoronaSpectrum::new(&CoronaSpectrumParams::default()).unwrap();
-        assert!(!x.is_primed());
-
-        let input = testdata::talib_input();
-        let mut primed_at: Option<usize> = None;
-
-        for (i, &v) in input.iter().enumerate() {
-            x.update(v, i as i64);
-            if x.is_primed() && primed_at.is_none() {
-                primed_at = Some(i);
-            }
-        }
-
-        assert_eq!(primed_at, Some(11), "expected priming at index 11");
+    fn test_reference_cases() {
+        verify_case("h30_pmin6_pmax30_db6", 30, 6, 30, 6.0, &expected_data::expected_h30_pmin6_pmax30_db6_heatmap(), &expected_data::expected_h30_pmin6_pmax30_db6_heatmap_min(), &expected_data::expected_h30_pmin6_pmax30_db6_heatmap_max(), &expected_data::expected_h30_pmin6_pmax30_db6_dominant_cycle(), &expected_data::expected_h30_pmin6_pmax30_db6_dominant_cycle_median(), &expected_data::expected_h30_pmin6_pmax30_db6_maximum_power(), &expected_data::expected_h30_pmin6_pmax30_db6_normalization_power(), &expected_data::expected_h30_pmin6_pmax30_db6_selected_bins(), &expected_data::expected_h30_pmin6_pmax30_db6_has_cycle_estimate(), &expected_data::expected_h30_pmin6_pmax30_db6_power(), &expected_data::expected_h30_pmin6_pmax30_db6_relative_power());
+        verify_case("h30_pmin6_pmax30_db3", 30, 6, 30, 3.0, &expected_data::expected_h30_pmin6_pmax30_db3_heatmap(), &expected_data::expected_h30_pmin6_pmax30_db3_heatmap_min(), &expected_data::expected_h30_pmin6_pmax30_db3_heatmap_max(), &expected_data::expected_h30_pmin6_pmax30_db3_dominant_cycle(), &expected_data::expected_h30_pmin6_pmax30_db3_dominant_cycle_median(), &expected_data::expected_h30_pmin6_pmax30_db3_maximum_power(), &expected_data::expected_h30_pmin6_pmax30_db3_normalization_power(), &expected_data::expected_h30_pmin6_pmax30_db3_selected_bins(), &expected_data::expected_h30_pmin6_pmax30_db3_has_cycle_estimate(), &expected_data::expected_h30_pmin6_pmax30_db3_power(), &expected_data::expected_h30_pmin6_pmax30_db3_relative_power());
+        verify_case("h30_pmin6_pmax20_db6", 30, 6, 20, 6.0, &expected_data::expected_h30_pmin6_pmax20_db6_heatmap(), &expected_data::expected_h30_pmin6_pmax20_db6_heatmap_min(), &expected_data::expected_h30_pmin6_pmax20_db6_heatmap_max(), &expected_data::expected_h30_pmin6_pmax20_db6_dominant_cycle(), &expected_data::expected_h30_pmin6_pmax20_db6_dominant_cycle_median(), &expected_data::expected_h30_pmin6_pmax20_db6_maximum_power(), &expected_data::expected_h30_pmin6_pmax20_db6_normalization_power(), &expected_data::expected_h30_pmin6_pmax20_db6_selected_bins(), &expected_data::expected_h30_pmin6_pmax20_db6_has_cycle_estimate(), &expected_data::expected_h30_pmin6_pmax20_db6_power(), &expected_data::expected_h30_pmin6_pmax20_db6_relative_power());
+        verify_case("h30_pmin6_pmax20_db3", 30, 6, 20, 3.0, &expected_data::expected_h30_pmin6_pmax20_db3_heatmap(), &expected_data::expected_h30_pmin6_pmax20_db3_heatmap_min(), &expected_data::expected_h30_pmin6_pmax20_db3_heatmap_max(), &expected_data::expected_h30_pmin6_pmax20_db3_dominant_cycle(), &expected_data::expected_h30_pmin6_pmax20_db3_dominant_cycle_median(), &expected_data::expected_h30_pmin6_pmax20_db3_maximum_power(), &expected_data::expected_h30_pmin6_pmax20_db3_normalization_power(), &expected_data::expected_h30_pmin6_pmax20_db3_selected_bins(), &expected_data::expected_h30_pmin6_pmax20_db3_has_cycle_estimate(), &expected_data::expected_h30_pmin6_pmax20_db3_power(), &expected_data::expected_h30_pmin6_pmax20_db3_relative_power());
+        verify_case("h30_pmin10_pmax30_db6", 30, 10, 30, 6.0, &expected_data::expected_h30_pmin10_pmax30_db6_heatmap(), &expected_data::expected_h30_pmin10_pmax30_db6_heatmap_min(), &expected_data::expected_h30_pmin10_pmax30_db6_heatmap_max(), &expected_data::expected_h30_pmin10_pmax30_db6_dominant_cycle(), &expected_data::expected_h30_pmin10_pmax30_db6_dominant_cycle_median(), &expected_data::expected_h30_pmin10_pmax30_db6_maximum_power(), &expected_data::expected_h30_pmin10_pmax30_db6_normalization_power(), &expected_data::expected_h30_pmin10_pmax30_db6_selected_bins(), &expected_data::expected_h30_pmin10_pmax30_db6_has_cycle_estimate(), &expected_data::expected_h30_pmin10_pmax30_db6_power(), &expected_data::expected_h30_pmin10_pmax30_db6_relative_power());
+        verify_case("h30_pmin10_pmax30_db3", 30, 10, 30, 3.0, &expected_data::expected_h30_pmin10_pmax30_db3_heatmap(), &expected_data::expected_h30_pmin10_pmax30_db3_heatmap_min(), &expected_data::expected_h30_pmin10_pmax30_db3_heatmap_max(), &expected_data::expected_h30_pmin10_pmax30_db3_dominant_cycle(), &expected_data::expected_h30_pmin10_pmax30_db3_dominant_cycle_median(), &expected_data::expected_h30_pmin10_pmax30_db3_maximum_power(), &expected_data::expected_h30_pmin10_pmax30_db3_normalization_power(), &expected_data::expected_h30_pmin10_pmax30_db3_selected_bins(), &expected_data::expected_h30_pmin10_pmax30_db3_has_cycle_estimate(), &expected_data::expected_h30_pmin10_pmax30_db3_power(), &expected_data::expected_h30_pmin10_pmax30_db3_relative_power());
+        verify_case("h30_pmin10_pmax48_db6", 30, 10, 48, 6.0, &expected_data::expected_h30_pmin10_pmax48_db6_heatmap(), &expected_data::expected_h30_pmin10_pmax48_db6_heatmap_min(), &expected_data::expected_h30_pmin10_pmax48_db6_heatmap_max(), &expected_data::expected_h30_pmin10_pmax48_db6_dominant_cycle(), &expected_data::expected_h30_pmin10_pmax48_db6_dominant_cycle_median(), &expected_data::expected_h30_pmin10_pmax48_db6_maximum_power(), &expected_data::expected_h30_pmin10_pmax48_db6_normalization_power(), &expected_data::expected_h30_pmin10_pmax48_db6_selected_bins(), &expected_data::expected_h30_pmin10_pmax48_db6_has_cycle_estimate(), &expected_data::expected_h30_pmin10_pmax48_db6_power(), &expected_data::expected_h30_pmin10_pmax48_db6_relative_power());
+        verify_case("h30_pmin10_pmax48_db3", 30, 10, 48, 3.0, &expected_data::expected_h30_pmin10_pmax48_db3_heatmap(), &expected_data::expected_h30_pmin10_pmax48_db3_heatmap_min(), &expected_data::expected_h30_pmin10_pmax48_db3_heatmap_max(), &expected_data::expected_h30_pmin10_pmax48_db3_dominant_cycle(), &expected_data::expected_h30_pmin10_pmax48_db3_dominant_cycle_median(), &expected_data::expected_h30_pmin10_pmax48_db3_maximum_power(), &expected_data::expected_h30_pmin10_pmax48_db3_normalization_power(), &expected_data::expected_h30_pmin10_pmax48_db3_selected_bins(), &expected_data::expected_h30_pmin10_pmax48_db3_has_cycle_estimate(), &expected_data::expected_h30_pmin10_pmax48_db3_power(), &expected_data::expected_h30_pmin10_pmax48_db3_relative_power());
+        verify_case("h48_pmin6_pmax30_db6", 48, 6, 30, 6.0, &expected_data::expected_h48_pmin6_pmax30_db6_heatmap(), &expected_data::expected_h48_pmin6_pmax30_db6_heatmap_min(), &expected_data::expected_h48_pmin6_pmax30_db6_heatmap_max(), &expected_data::expected_h48_pmin6_pmax30_db6_dominant_cycle(), &expected_data::expected_h48_pmin6_pmax30_db6_dominant_cycle_median(), &expected_data::expected_h48_pmin6_pmax30_db6_maximum_power(), &expected_data::expected_h48_pmin6_pmax30_db6_normalization_power(), &expected_data::expected_h48_pmin6_pmax30_db6_selected_bins(), &expected_data::expected_h48_pmin6_pmax30_db6_has_cycle_estimate(), &expected_data::expected_h48_pmin6_pmax30_db6_power(), &expected_data::expected_h48_pmin6_pmax30_db6_relative_power());
+        verify_case("h48_pmin6_pmax30_db3", 48, 6, 30, 3.0, &expected_data::expected_h48_pmin6_pmax30_db3_heatmap(), &expected_data::expected_h48_pmin6_pmax30_db3_heatmap_min(), &expected_data::expected_h48_pmin6_pmax30_db3_heatmap_max(), &expected_data::expected_h48_pmin6_pmax30_db3_dominant_cycle(), &expected_data::expected_h48_pmin6_pmax30_db3_dominant_cycle_median(), &expected_data::expected_h48_pmin6_pmax30_db3_maximum_power(), &expected_data::expected_h48_pmin6_pmax30_db3_normalization_power(), &expected_data::expected_h48_pmin6_pmax30_db3_selected_bins(), &expected_data::expected_h48_pmin6_pmax30_db3_has_cycle_estimate(), &expected_data::expected_h48_pmin6_pmax30_db3_power(), &expected_data::expected_h48_pmin6_pmax30_db3_relative_power());
+        verify_case("h48_pmin6_pmax20_db6", 48, 6, 20, 6.0, &expected_data::expected_h48_pmin6_pmax20_db6_heatmap(), &expected_data::expected_h48_pmin6_pmax20_db6_heatmap_min(), &expected_data::expected_h48_pmin6_pmax20_db6_heatmap_max(), &expected_data::expected_h48_pmin6_pmax20_db6_dominant_cycle(), &expected_data::expected_h48_pmin6_pmax20_db6_dominant_cycle_median(), &expected_data::expected_h48_pmin6_pmax20_db6_maximum_power(), &expected_data::expected_h48_pmin6_pmax20_db6_normalization_power(), &expected_data::expected_h48_pmin6_pmax20_db6_selected_bins(), &expected_data::expected_h48_pmin6_pmax20_db6_has_cycle_estimate(), &expected_data::expected_h48_pmin6_pmax20_db6_power(), &expected_data::expected_h48_pmin6_pmax20_db6_relative_power());
+        verify_case("h48_pmin6_pmax20_db3", 48, 6, 20, 3.0, &expected_data::expected_h48_pmin6_pmax20_db3_heatmap(), &expected_data::expected_h48_pmin6_pmax20_db3_heatmap_min(), &expected_data::expected_h48_pmin6_pmax20_db3_heatmap_max(), &expected_data::expected_h48_pmin6_pmax20_db3_dominant_cycle(), &expected_data::expected_h48_pmin6_pmax20_db3_dominant_cycle_median(), &expected_data::expected_h48_pmin6_pmax20_db3_maximum_power(), &expected_data::expected_h48_pmin6_pmax20_db3_normalization_power(), &expected_data::expected_h48_pmin6_pmax20_db3_selected_bins(), &expected_data::expected_h48_pmin6_pmax20_db3_has_cycle_estimate(), &expected_data::expected_h48_pmin6_pmax20_db3_power(), &expected_data::expected_h48_pmin6_pmax20_db3_relative_power());
+        verify_case("h48_pmin10_pmax30_db6", 48, 10, 30, 6.0, &expected_data::expected_h48_pmin10_pmax30_db6_heatmap(), &expected_data::expected_h48_pmin10_pmax30_db6_heatmap_min(), &expected_data::expected_h48_pmin10_pmax30_db6_heatmap_max(), &expected_data::expected_h48_pmin10_pmax30_db6_dominant_cycle(), &expected_data::expected_h48_pmin10_pmax30_db6_dominant_cycle_median(), &expected_data::expected_h48_pmin10_pmax30_db6_maximum_power(), &expected_data::expected_h48_pmin10_pmax30_db6_normalization_power(), &expected_data::expected_h48_pmin10_pmax30_db6_selected_bins(), &expected_data::expected_h48_pmin10_pmax30_db6_has_cycle_estimate(), &expected_data::expected_h48_pmin10_pmax30_db6_power(), &expected_data::expected_h48_pmin10_pmax30_db6_relative_power());
+        verify_case("h48_pmin10_pmax30_db3", 48, 10, 30, 3.0, &expected_data::expected_h48_pmin10_pmax30_db3_heatmap(), &expected_data::expected_h48_pmin10_pmax30_db3_heatmap_min(), &expected_data::expected_h48_pmin10_pmax30_db3_heatmap_max(), &expected_data::expected_h48_pmin10_pmax30_db3_dominant_cycle(), &expected_data::expected_h48_pmin10_pmax30_db3_dominant_cycle_median(), &expected_data::expected_h48_pmin10_pmax30_db3_maximum_power(), &expected_data::expected_h48_pmin10_pmax30_db3_normalization_power(), &expected_data::expected_h48_pmin10_pmax30_db3_selected_bins(), &expected_data::expected_h48_pmin10_pmax30_db3_has_cycle_estimate(), &expected_data::expected_h48_pmin10_pmax30_db3_power(), &expected_data::expected_h48_pmin10_pmax30_db3_relative_power());
+        verify_case("h48_pmin10_pmax48_db6", 48, 10, 48, 6.0, &expected_data::expected_h48_pmin10_pmax48_db6_heatmap(), &expected_data::expected_h48_pmin10_pmax48_db6_heatmap_min(), &expected_data::expected_h48_pmin10_pmax48_db6_heatmap_max(), &expected_data::expected_h48_pmin10_pmax48_db6_dominant_cycle(), &expected_data::expected_h48_pmin10_pmax48_db6_dominant_cycle_median(), &expected_data::expected_h48_pmin10_pmax48_db6_maximum_power(), &expected_data::expected_h48_pmin10_pmax48_db6_normalization_power(), &expected_data::expected_h48_pmin10_pmax48_db6_selected_bins(), &expected_data::expected_h48_pmin10_pmax48_db6_has_cycle_estimate(), &expected_data::expected_h48_pmin10_pmax48_db6_power(), &expected_data::expected_h48_pmin10_pmax48_db6_relative_power());
+        verify_case("h48_pmin10_pmax48_db3", 48, 10, 48, 3.0, &expected_data::expected_h48_pmin10_pmax48_db3_heatmap(), &expected_data::expected_h48_pmin10_pmax48_db3_heatmap_min(), &expected_data::expected_h48_pmin10_pmax48_db3_heatmap_max(), &expected_data::expected_h48_pmin10_pmax48_db3_dominant_cycle(), &expected_data::expected_h48_pmin10_pmax48_db3_dominant_cycle_median(), &expected_data::expected_h48_pmin10_pmax48_db3_maximum_power(), &expected_data::expected_h48_pmin10_pmax48_db3_normalization_power(), &expected_data::expected_h48_pmin10_pmax48_db3_selected_bins(), &expected_data::expected_h48_pmin10_pmax48_db3_has_cycle_estimate(), &expected_data::expected_h48_pmin10_pmax48_db3_power(), &expected_data::expected_h48_pmin10_pmax48_db3_relative_power());
     }
 
     #[test]
-    fn test_corona_spectrum_nan_input() {
-        let mut x = CoronaSpectrum::new(&CoronaSpectrumParams::default()).unwrap();
-        let (h, dc, dcm) = x.update(f64::NAN, 0);
-        assert!(h.is_empty());
-        assert!(dc.is_nan());
-        assert!(dcm.is_nan());
-        assert!(!x.is_primed());
-    }
-
-    #[test]
-    fn test_corona_spectrum_metadata() {
-        let x = CoronaSpectrum::new(&CoronaSpectrumParams::default()).unwrap();
-        let md = x.metadata();
-
+    fn test_metadata_mnemonics_entities_and_validation() {
+        let mut instance = CoronaSpectrum::new_default().unwrap();
+        let md = instance.metadata();
         assert_eq!(md.identifier, Identifier::CoronaSpectrum);
-        assert_eq!(md.mnemonic, "cspect(6, 20, 6, 30, 30, hl/2)");
-        assert_eq!(md.description, "Corona spectrum cspect(6, 20, 6, 30, 30, hl/2)");
+        assert_eq!(md.mnemonic, "cspect(6, 20, 6, 30, 30)");
         assert_eq!(md.outputs.len(), 3);
+        assert_eq!(md.outputs[0].shape, Shape::Heatmap);
+        assert_eq!(md.outputs[1].shape, Shape::Scalar);
+        assert_eq!(md.outputs[1].mnemonic, "cspect-dc(30)");
+        assert_eq!(md.outputs[2].shape, Shape::Scalar);
+        assert_eq!(md.outputs[2].mnemonic, "cspect-dcm(30)");
 
-        assert_eq!(md.outputs[0].kind, 1); // Value
-        assert_eq!(md.outputs[0].mnemonic, "cspect(6, 20, 6, 30, 30, hl/2)");
-        assert_eq!(md.outputs[1].kind, 2); // DominantCycle
-        assert_eq!(md.outputs[1].mnemonic, "cspect-dc(30, hl/2)");
-        assert_eq!(md.outputs[2].kind, 3); // DominantCycleMedian
-        assert_eq!(md.outputs[2].mnemonic, "cspect-dcm(30, hl/2)");
-    }
+        let zero_min = CoronaSpectrum::new(&CoronaSpectrumParams {
+            min_raster_value: 0.0,
+            ..Default::default()
+        })
+        .unwrap();
+        assert_eq!(zero_min.metadata().mnemonic, "cspect(0, 20, 6, 30, 30)");
 
-    #[test]
-    fn test_corona_spectrum_update_bar() {
-        let input = testdata::talib_input();
-        let mut x = CoronaSpectrum::new(&CoronaSpectrumParams::default()).unwrap();
-
-        // Prime with 50 samples.
-        for (i, &v) in input.iter().take(50).enumerate() {
-            x.update(v, i as i64);
+        let combos = [
+            (None, None, None),
+            (Some(BarComponent::Open), None, None),
+            (None, Some(QuoteComponent::Bid), None),
+            (None, None, Some(TradeComponent::Volume)),
+            (Some(BarComponent::Median), Some(QuoteComponent::Ask), None),
+            (Some(BarComponent::Median), None, Some(TradeComponent::Volume)),
+            (None, Some(QuoteComponent::Ask), Some(TradeComponent::Volume)),
+            (Some(BarComponent::Open), Some(QuoteComponent::Bid), Some(TradeComponent::Volume)),
+        ];
+        for (bc, qc, tc) in combos {
+            let cfg = CoronaSpectrumParams {
+                bar_component: bc,
+                quote_component: qc,
+                trade_component: tc,
+                ..Default::default()
+            };
+            let ind = CoronaSpectrum::new(&cfg).unwrap();
+            assert_eq!(ind.metadata().mnemonic, mnemonic(&cfg));
         }
 
-        let bar = Bar::new(100, 100.0, 100.0, 100.0, 100.0, 0.0);
-        let out = x.update_bar(&bar);
-        assert_eq!(out.len(), 3);
-    }
-
-    #[test]
-    fn test_corona_spectrum_invalid_params() {
-        // MaxRasterValue <= MinRasterValue
         assert!(CoronaSpectrum::new(&CoronaSpectrumParams {
-            min_raster_value: 10.0,
-            max_raster_value: 10.0,
-            ..CoronaSpectrumParams::default()
-        }).is_err());
-
-        // MinParameterValue < 2
+            high_pass_filter_cutoff: 0,
+            ..Default::default()
+        })
+        .is_err());
         assert!(CoronaSpectrum::new(&CoronaSpectrumParams {
-            min_parameter_value: 1.0,
-            ..CoronaSpectrumParams::default()
-        }).is_err());
-
-        // MaxParameterValue <= MinParameterValue
+            min_parameter_value: 5.0,
+            ..Default::default()
+        })
+        .is_err());
         assert!(CoronaSpectrum::new(&CoronaSpectrumParams {
-            min_parameter_value: 20.0,
-            max_parameter_value: 20.0,
-            ..CoronaSpectrumParams::default()
-        }).is_err());
+            min_raster_value: -1.0,
+            ..Default::default()
+        })
+        .is_err());
 
-        // HighPassFilterCutoff < 2
-        assert!(CoronaSpectrum::new(&CoronaSpectrumParams {
-            high_pass_filter_cutoff: 1,
-            ..CoronaSpectrumParams::default()
-        }).is_err());
-    }
-
-    #[test]
-    fn test_corona_spectrum_custom_ranges() {
-        let x = CoronaSpectrum::new(&CoronaSpectrumParams {
-            min_raster_value: 4.0,
-            max_raster_value: 25.0,
-            min_parameter_value: 8.7,  // ceils to 9
-            max_parameter_value: 40.4, // floors to 40
-            high_pass_filter_cutoff: 20,
-            ..CoronaSpectrumParams::default()
-        }).unwrap();
-
-        assert_eq!(x.min_parameter_value, 9.0);
-        assert_eq!(x.max_parameter_value, 40.0);
-        assert_eq!(x.mnemonic, "cspect(4, 25, 9, 40, 20, hl/2)");
+        let prices = testdata::test_input();
+        let highs = testdata::test_high();
+        let lows = testdata::test_low();
+        let opens = testdata::test_open();
+        let mut scalar_ind = CoronaSpectrum::new_default().unwrap();
+        for index in 0..20 {
+            let t = index as i64;
+            let bar_out = instance.update_bar(&Bar::new(t, opens[index], highs[index], lows[index], prices[index], 100.0));
+            let scalar_out = scalar_ind.update_scalar(&Scalar::new(t, prices[index]));
+            let bar_dc = bar_out[1].downcast_ref::<Scalar>().unwrap().value;
+            let scalar_dc = scalar_out[1].downcast_ref::<Scalar>().unwrap().value;
+            if bar_dc.is_nan() {
+                assert!(scalar_dc.is_nan());
+            } else {
+                assert_eq!(bar_dc.to_bits(), scalar_dc.to_bits());
+            }
+        }
+        instance.reset();
+        assert!(!instance.is_primed());
     }
 }

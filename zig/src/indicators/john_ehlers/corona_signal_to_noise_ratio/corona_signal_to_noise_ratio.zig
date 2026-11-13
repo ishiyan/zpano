@@ -14,424 +14,451 @@ const build_metadata_mod = @import("../../core/build_metadata.zig");
 const component_triple_mnemonic_mod = @import("../../core/component_triple_mnemonic.zig");
 const identifier_mod = @import("../../core/identifier.zig");
 const metadata_mod = @import("../../core/metadata.zig");
+const shape_mod = @import("../../core/outputs/shape.zig");
 const heatmap_mod = @import("../../core/outputs/heatmap.zig");
 const corona_mod = @import("../corona/corona.zig");
 
 const OutputArray = indicator_mod.OutputArray;
-const OutputValue = indicator_mod.OutputValue;
 const Identifier = identifier_mod.Identifier;
 const Metadata = metadata_mod.Metadata;
 const Heatmap = heatmap_mod.Heatmap;
 const Corona = corona_mod.Corona;
+const CoronaSnapshot = corona_mod.CoronaSnapshot;
+const Raster = corona_mod.Raster;
 
-/// Enumerates the outputs of the CoronaSignalToNoiseRatio indicator.
 pub const CoronaSignalToNoiseRatioOutput = enum(u8) {
     value = 1,
     signal_to_noise_ratio = 2,
 };
 
-/// Parameters to create a CoronaSignalToNoiseRatio indicator.
 pub const Params = struct {
-    /// Number of elements in the heatmap raster. Default: 50.
-    raster_length: i32 = 0,
-    /// Maximal raster value (z) of the heatmap. Default: 20.
-    max_raster_value: f64 = 0,
-    /// Minimal ordinate (y) value of the heatmap. Default: 1.
-    min_parameter_value: f64 = 0,
-    /// Maximal ordinate (y) value of the heatmap. Default: 11.
-    max_parameter_value: f64 = 0,
-    /// High-pass filter cutoff. Default: 30.
-    high_pass_filter_cutoff: i32 = 0,
-    /// Minimal period of the inner Corona engine. Default: 6.
-    minimal_period: i32 = 0,
-    /// Maximal period of the inner Corona engine. Default: 30.
-    maximal_period: i32 = 0,
+    raster_length: i32 = 50,
+    max_raster_value: f64 = 20.0,
+    min_parameter_value: f64 = 1.0,
+    max_parameter_value: f64 = 11.0,
+    high_pass_filter_cutoff: i32 = 30,
+    minimal_period: i32 = 6,
+    maximal_period: i32 = 30,
     bar_component: ?bar_component.BarComponent = null,
     quote_component: ?quote_component.QuoteComponent = null,
     trade_component: ?trade_component.TradeComponent = null,
 };
 
-pub const Error = error{
-    InvalidRasterLength,
-    InvalidMaxRasterValue,
-    InvalidMinParameterValue,
-    InvalidMaxParameterValue,
-    InvalidHighPassFilterCutoff,
-    InvalidMinimalPeriod,
-    InvalidMaximalPeriod,
-    MnemonicTooLong,
-    OutOfMemory,
+pub fn defaultParams() Params {
+    return .{};
+}
+
+pub const Error = corona_mod.Error;
+
+pub const CoronaSignalToNoiseRatioSnapshot = struct {
+    heatmap: Heatmap,
+    signal_to_noise_ratio: f64,
+    physical_decibels: f64,
+    calibrated_decibels: f64,
+    normalized_position: f64,
+    signal: f64,
+    noise: f64,
+    median_bar_range: f64,
+    width: f64,
+    dominant_cycle: f64,
+    dominant_cycle_median: f64,
+    has_cycle_estimate: f64,
+    ratio_is_finite: f64,
 };
 
-// SNR-specific constants.
-const high_low_buffer_size = 5;
-const high_low_buffer_size_min_one = high_low_buffer_size - 1;
-const high_low_median_index = 2;
-const average_sample_alpha = 0.1;
-const average_sample_one_minus = 0.9;
-const signal_ema_alpha = 0.2;
-const signal_ema_one_minus = 0.9; // Intentional: sums to 1.1, per Ehlers.
-const noise_ema_alpha = 0.1;
-const noise_ema_one_minus = 0.9;
-const ratio_offset_db = 3.5;
-const ratio_upper_db = 10.0;
-const db_gain = 20.0;
-const width_low_ratio_threshold = 0.5;
-const width_baseline = 0.2;
-const width_slope = 0.4;
-const raster_blend_exponent = 0.8;
-const raster_blend_half = 0.5;
-const raster_negative_arg_cutoff = 1.0;
+pub const Snapshot = CoronaSignalToNoiseRatioSnapshot;
 
-/// Ehlers' Corona Signal-to-Noise Ratio heatmap indicator.
+fn validateHighLow(low: f64, high: f64) Error!f64 {
+    if (math.isNan(low) or math.isNan(high)) return math.nan(f64);
+    if (math.isInf(low) or math.isInf(high) or high < low) return error.InvalidBarRange;
+    return corona_mod.checked(high - low);
+}
+
+fn validateBarRange(bar_range: f64) Error!f64 {
+    if (math.isNan(bar_range)) return math.nan(f64);
+    if (math.isInf(bar_range) or bar_range < 0.0) return error.InvalidBarRange;
+    return bar_range;
+}
+
+fn formatSnrFlags(buffer: []u8, params: Params) Error![]const u8 {
+    var pos: usize = 0;
+    if (params.minimal_period != 6) {
+        const chunk = std.fmt.bufPrint(buffer[pos..], ", pmin={d}", .{params.minimal_period}) catch return error.MnemonicTooLong;
+        pos += chunk.len;
+    }
+    if (params.maximal_period != 30) {
+        const chunk = std.fmt.bufPrint(buffer[pos..], ", pmax={d}", .{params.maximal_period}) catch return error.MnemonicTooLong;
+        pos += chunk.len;
+    }
+    return buffer[0..pos];
+}
+
+pub fn formatMnemonic(buffer: []u8, params: Params) Error![]const u8 {
+    const bc = params.bar_component orelse bar_component.default_bar_component;
+    const qc = params.quote_component orelse quote_component.default_quote_component;
+    const tc = params.trade_component orelse trade_component.default_trade_component;
+
+    var triple_buffer: [64]u8 = undefined;
+    const triple = component_triple_mnemonic_mod.componentTripleMnemonic(&triple_buffer, bc, qc, tc);
+    var flags_buffer: [64]u8 = undefined;
+    const flags = try formatSnrFlags(&flags_buffer, params);
+
+    return std.fmt.bufPrint(buffer, "csnr({d}, {d}, {d}, {d}, {d}{s}{s})", .{
+        params.raster_length,
+        corona_mod.normalizeZero(params.max_raster_value),
+        corona_mod.normalizeZero(params.min_parameter_value),
+        corona_mod.normalizeZero(params.max_parameter_value),
+        params.high_pass_filter_cutoff,
+        flags,
+        triple,
+    }) catch return error.MnemonicTooLong;
+}
+
 pub const CoronaSignalToNoiseRatio = struct {
-    allocator: std.mem.Allocator,
-    corona: Corona,
-    raster_length: usize,
-    raster_step: f64,
-    max_raster_value: f64,
-    min_parameter_value: f64,
-    max_parameter_value: f64,
-    parameter_resolution: f64,
-    raster: []f64,
-    high_low_buffer: [high_low_buffer_size]f64,
-    hl_sorted: [high_low_buffer_size]f64,
-    average_sample_previous: f64,
-    signal_previous: f64,
-    noise_previous: f64,
-    signal_to_noise_ratio: f64,
-    is_started: bool,
+    engine: Corona,
+    engine_params: corona_mod.Params,
+    raster: Raster,
+    sample_count: usize,
+    average_price: f64,
+    signal: f64,
+    noise: f64,
+    ranges: [5]f64,
     bar_func: bar_component.BarFunc,
     quote_func: quote_component.QuoteFunc,
     trade_func: trade_component.TradeFunc,
-    mnemonic_buf: [256]u8,
+    mnemonic_storage: [256]u8,
     mnemonic_len: usize,
-    description_buf: [320]u8,
+    description_storage: [320]u8,
     description_len: usize,
-    mnemonic_snr_buf: [128]u8,
+    mnemonic_snr_storage: [160]u8,
     mnemonic_snr_len: usize,
-    description_snr_buf: [256]u8,
+    description_snr_storage: [256]u8,
     description_snr_len: usize,
 
     pub fn init(allocator: std.mem.Allocator, params: Params) Error!CoronaSignalToNoiseRatio {
-        const def_raster_length: i32 = 50;
-        const def_max_raster_value = 20.0;
-        const def_min_param = 1.0;
-        const def_max_param = 11.0;
-        const def_hp_cutoff: i32 = 30;
-        const def_min_period: i32 = 6;
-        const def_max_period: i32 = 30;
+        if (!corona_mod.validateFinite(params.max_raster_value) or params.max_raster_value <= 6.0) {
+            return error.InvalidMaxRasterValue;
+        }
 
-        var raster_length = params.raster_length;
-        if (raster_length == 0) raster_length = def_raster_length;
+        var raster = try Raster.init(
+            allocator,
+            params.raster_length,
+            params.min_parameter_value,
+            params.max_parameter_value,
+            params.max_raster_value,
+        );
+        errdefer raster.deinit();
 
-        var max_raster_value = params.max_raster_value;
-        if (max_raster_value == 0) max_raster_value = def_max_raster_value;
+        var engine = try Corona.init(allocator, .{
+            .high_pass_filter_cutoff = params.high_pass_filter_cutoff,
+            .minimal_period = params.minimal_period,
+            .maximal_period = params.maximal_period,
+            .decibels_lower_threshold = 6.0,
+            .decibels_upper_threshold = raster.ceiling,
+        });
+        errdefer engine.deinit();
 
-        var min_param = params.min_parameter_value;
-        if (min_param == 0) min_param = def_min_param;
-
-        var max_param = params.max_parameter_value;
-        if (max_param == 0) max_param = def_max_param;
-
-        var hp_cutoff = params.high_pass_filter_cutoff;
-        if (hp_cutoff == 0) hp_cutoff = def_hp_cutoff;
-
-        var min_period = params.minimal_period;
-        if (min_period == 0) min_period = def_min_period;
-
-        var max_period = params.maximal_period;
-        if (max_period == 0) max_period = def_max_period;
-
-        if (raster_length < 2) return error.InvalidRasterLength;
-        if (max_raster_value <= 0) return error.InvalidMaxRasterValue;
-        if (min_param < 0) return error.InvalidMinParameterValue;
-        if (max_param <= min_param) return error.InvalidMaxParameterValue;
-        if (hp_cutoff < 2) return error.InvalidHighPassFilterCutoff;
-        if (min_period < 2) return error.InvalidMinimalPeriod;
-        if (max_period <= min_period) return error.InvalidMaximalPeriod;
-
-        const bc = params.bar_component orelse bar_component.BarComponent.median;
+        const bc = params.bar_component orelse bar_component.default_bar_component;
         const qc = params.quote_component orelse quote_component.default_quote_component;
         const tc = params.trade_component orelse trade_component.default_trade_component;
 
-        var corona = Corona.init(allocator, .{
-            .high_pass_filter_cutoff = hp_cutoff,
-            .minimal_period = min_period,
-            .maximal_period = max_period,
-        }) catch return error.OutOfMemory;
-        errdefer corona.deinit();
+        var triple_buffer: [64]u8 = undefined;
+        const triple = component_triple_mnemonic_mod.componentTripleMnemonic(&triple_buffer, bc, qc, tc);
+        var flags_buffer: [64]u8 = undefined;
+        const flags = try formatSnrFlags(&flags_buffer, params);
 
-        const raster_len_usize: usize = @intCast(raster_length);
-        const raster = allocator.alloc(f64, raster_len_usize) catch {
-            corona.deinit();
-            return error.OutOfMemory;
-        };
-        @memset(raster, 0);
-
-        // Build component mnemonic.
-        var triple_buf: [64]u8 = undefined;
-        const triple = component_triple_mnemonic_mod.componentTripleMnemonic(
-            &triple_buf,
-            bc,
-            qc,
-            tc,
-        );
-
-        // parameterResolution = (rasterLength-1) / (maxParam - minParam).
-        const parameter_resolution = @as(f64, @floatFromInt(raster_length - 1)) / (max_param - min_param);
-
-        // Build mnemonics.
-        var mnemonic_buf: [256]u8 = undefined;
-        const mn = std.fmt.bufPrint(&mnemonic_buf, "csnr({d}, {d}, {d}, {d}, {d}{s})", .{
-            raster_length,
-            max_raster_value,
-            min_param,
-            max_param,
-            hp_cutoff,
+        var mnemonic_storage: [256]u8 = undefined;
+        const mn = std.fmt.bufPrint(&mnemonic_storage, "csnr({d}, {d}, {d}, {d}, {d}{s}{s})", .{
+            raster.length,
+            corona_mod.normalizeZero(raster.ceiling),
+            corona_mod.normalizeZero(raster.lower),
+            corona_mod.normalizeZero(raster.upper),
+            params.high_pass_filter_cutoff,
+            flags,
             triple,
         }) catch return error.MnemonicTooLong;
-        const mnemonic_len = mn.len;
 
-        var description_buf: [320]u8 = undefined;
-        const desc = std.fmt.bufPrint(&description_buf, "Corona signal to noise ratio {s}", .{mn}) catch
+        var description_storage: [320]u8 = undefined;
+        const desc = std.fmt.bufPrint(&description_storage, "Corona signal to noise ratio {s}", .{mn}) catch
             return error.MnemonicTooLong;
-        const description_len = desc.len;
 
-        var mnemonic_snr_buf: [128]u8 = undefined;
-        const mn_snr = std.fmt.bufPrint(&mnemonic_snr_buf, "csnr-snr({d}{s})", .{
-            hp_cutoff,
+        var mnemonic_snr_storage: [160]u8 = undefined;
+        const mn_snr = std.fmt.bufPrint(&mnemonic_snr_storage, "csnr-snr({d}{s}{s})", .{
+            params.high_pass_filter_cutoff,
+            flags,
             triple,
         }) catch return error.MnemonicTooLong;
-        const mnemonic_snr_len = mn_snr.len;
 
-        var description_snr_buf: [256]u8 = undefined;
-        const desc_snr = std.fmt.bufPrint(&description_snr_buf, "Corona signal to noise ratio scalar {s}", .{mn_snr}) catch
+        var description_snr_storage: [256]u8 = undefined;
+        const desc_snr = std.fmt.bufPrint(&description_snr_storage, "Corona signal to noise ratio scalar {s}", .{mn_snr}) catch
             return error.MnemonicTooLong;
-        const description_snr_len = desc_snr.len;
 
         return .{
-            .allocator = allocator,
-            .corona = corona,
-            .raster_length = raster_len_usize,
-            .raster_step = max_raster_value / @as(f64, @floatFromInt(raster_length)),
-            .max_raster_value = max_raster_value,
-            .min_parameter_value = min_param,
-            .max_parameter_value = max_param,
-            .parameter_resolution = parameter_resolution,
+            .engine = engine,
+            .engine_params = engine.parameters,
             .raster = raster,
-            .high_low_buffer = .{ 0, 0, 0, 0, 0 },
-            .hl_sorted = .{ 0, 0, 0, 0, 0 },
-            .average_sample_previous = 0,
-            .signal_previous = 0,
-            .noise_previous = 0,
-            .signal_to_noise_ratio = math.nan(f64),
-            .is_started = false,
+            .sample_count = 0,
+            .average_price = 0.0,
+            .signal = 0.0,
+            .noise = 0.0,
+            .ranges = [_]f64{0.0} ** 5,
             .bar_func = bar_component.componentValue(bc),
             .quote_func = quote_component.componentValue(qc),
             .trade_func = trade_component.componentValue(tc),
-            .mnemonic_buf = mnemonic_buf,
-            .mnemonic_len = mnemonic_len,
-            .description_buf = description_buf,
-            .description_len = description_len,
-            .mnemonic_snr_buf = mnemonic_snr_buf,
-            .mnemonic_snr_len = mnemonic_snr_len,
-            .description_snr_buf = description_snr_buf,
-            .description_snr_len = description_snr_len,
+            .mnemonic_storage = mnemonic_storage,
+            .mnemonic_len = mn.len,
+            .description_storage = description_storage,
+            .description_len = desc.len,
+            .mnemonic_snr_storage = mnemonic_snr_storage,
+            .mnemonic_snr_len = mn_snr.len,
+            .description_snr_storage = description_snr_storage,
+            .description_snr_len = desc_snr.len,
         };
     }
 
     pub fn deinit(self: *CoronaSignalToNoiseRatio) void {
-        self.allocator.free(self.raster);
-        self.corona.deinit();
+        self.engine.deinit();
+        self.raster.deinit();
+    }
+
+    pub fn reset(self: *CoronaSignalToNoiseRatio) void {
+        self.engine.reset();
+        self.raster.reset();
+        self.sample_count = 0;
+        self.average_price = 0.0;
+        self.signal = 0.0;
+        self.noise = 0.0;
+        self.ranges = [_]f64{0.0} ** 5;
     }
 
     pub fn fixSlices(self: *CoronaSignalToNoiseRatio) void {
         _ = self;
     }
 
-    fn mnemonic(self: *const CoronaSignalToNoiseRatio) []const u8 {
-        return self.mnemonic_buf[0..self.mnemonic_len];
+    pub fn mnemonic(self: *const CoronaSignalToNoiseRatio) []const u8 {
+        return self.mnemonic_storage[0..self.mnemonic_len];
     }
 
     fn description(self: *const CoronaSignalToNoiseRatio) []const u8 {
-        return self.description_buf[0..self.description_len];
+        return self.description_storage[0..self.description_len];
     }
 
     fn mnemonicSNR(self: *const CoronaSignalToNoiseRatio) []const u8 {
-        return self.mnemonic_snr_buf[0..self.mnemonic_snr_len];
+        return self.mnemonic_snr_storage[0..self.mnemonic_snr_len];
     }
 
     fn descriptionSNR(self: *const CoronaSignalToNoiseRatio) []const u8 {
-        return self.description_snr_buf[0..self.description_snr_len];
+        return self.description_snr_storage[0..self.description_snr_len];
     }
 
-    /// Update with a new sample plus bar extremes. Returns heatmap and SNR scalar.
-    pub fn updateSample(self: *CoronaSignalToNoiseRatio, sample: f64, sample_low: f64, sample_high: f64, time: i64) struct { heatmap: Heatmap, snr: f64 } {
-        if (math.isNan(sample)) {
-            return .{
-                .heatmap = Heatmap.empty(time, self.min_parameter_value, self.max_parameter_value, self.parameter_resolution),
-                .snr = math.nan(f64),
-            };
-        }
-
-        const primed = self.corona.update(sample);
-
-        if (!self.is_started) {
-            self.average_sample_previous = sample;
-            self.high_low_buffer[high_low_buffer_size_min_one] = sample_high - sample_low;
-            self.is_started = true;
-
-            return .{
-                .heatmap = Heatmap.empty(time, self.min_parameter_value, self.max_parameter_value, self.parameter_resolution),
-                .snr = math.nan(f64),
-            };
-        }
-
-        const max_amp_sq = self.corona.getMaximalAmplitudeSquared();
-
-        const average_sample = average_sample_alpha * sample + average_sample_one_minus * self.average_sample_previous;
-        self.average_sample_previous = average_sample;
-
-        if (@abs(average_sample) > 0 or max_amp_sq > 0) {
-            self.signal_previous = signal_ema_alpha * @sqrt(max_amp_sq) + signal_ema_one_minus * self.signal_previous;
-        }
-
-        // Shift H-L ring buffer left; push new value.
-        for (0..high_low_buffer_size_min_one) |i| {
-            self.high_low_buffer[i] = self.high_low_buffer[i + 1];
-        }
-        self.high_low_buffer[high_low_buffer_size_min_one] = sample_high - sample_low;
-
-        var ratio: f64 = 0.0;
-        if (@abs(average_sample) > 0) {
-            for (0..high_low_buffer_size) |i| {
-                self.hl_sorted[i] = self.high_low_buffer[i];
-            }
-
-            std.mem.sort(f64, &self.hl_sorted, {}, std.sort.asc(f64));
-            self.noise_previous = noise_ema_alpha * self.hl_sorted[high_low_median_index] + noise_ema_one_minus * self.noise_previous;
-
-            if (@abs(self.noise_previous) > 0) {
-                ratio = db_gain * math.log10(self.signal_previous / self.noise_previous) + ratio_offset_db;
-                if (ratio < 0) {
-                    ratio = 0;
-                } else if (ratio > ratio_upper_db) {
-                    ratio = ratio_upper_db;
-                }
-
-                ratio /= ratio_upper_db; // ∈ [0, 1]
-            }
-        }
-
-        self.signal_to_noise_ratio = (self.max_parameter_value - self.min_parameter_value) * ratio + self.min_parameter_value;
-
-        // Raster update.
-        var width: f64 = 0.0;
-        if (ratio <= width_low_ratio_threshold) {
-            width = width_baseline - width_slope * ratio;
-        }
-
-        const ratio_scaled_to_raster_length: i64 = @intFromFloat(@round(ratio * @as(f64, @floatFromInt(self.raster_length))));
-        const ratio_scaled_to_max_raster_value = ratio * self.max_raster_value;
-
-        for (0..self.raster_length) |i| {
-            var value = self.raster[i];
-            const i_i64: i64 = @intCast(i);
-
-            if (i_i64 == ratio_scaled_to_raster_length) {
-                value *= 0.5;
-            } else if (width == 0) {
-                // Above the high-ratio threshold: handled by the ratio>0.5 override below.
-            } else {
-                const argument_base = (ratio_scaled_to_max_raster_value - self.raster_step * @as(f64, @floatFromInt(i))) / width;
-                if (i_i64 < ratio_scaled_to_raster_length) {
-                    value = raster_blend_half * (math.pow(f64, argument_base, raster_blend_exponent) + value);
-                } else {
-                    const argument = -argument_base;
-                    if (argument > raster_negative_arg_cutoff) {
-                        value = raster_blend_half * (math.pow(f64, argument, raster_blend_exponent) + value);
-                    } else {
-                        value = self.max_raster_value;
-                    }
-                }
-            }
-
-            if (value < 0) {
-                value = 0;
-            } else if (value > self.max_raster_value) {
-                value = self.max_raster_value;
-            }
-
-            if (ratio > width_low_ratio_threshold) {
-                value = self.max_raster_value;
-            }
-
-            self.raster[i] = value;
-        }
-
-        if (!primed) {
-            return .{
-                .heatmap = Heatmap.empty(time, self.min_parameter_value, self.max_parameter_value, self.parameter_resolution),
-                .snr = math.nan(f64),
-            };
-        }
-
-        var values: [heatmap_mod.max_heatmap_values]f64 = undefined;
-        var value_min: f64 = math.inf(f64);
-        var value_max: f64 = -math.inf(f64);
-
-        for (0..self.raster_length) |i| {
-            const v = self.raster[i];
-            values[i] = v;
-            if (v < value_min) value_min = v;
-            if (v > value_max) value_max = v;
-        }
-
+    fn emptySnapshot(self: *const CoronaSignalToNoiseRatio, time: i64) CoronaSignalToNoiseRatioSnapshot {
+        const nan = math.nan(f64);
         return .{
-            .heatmap = Heatmap.new(
-                time,
-                self.min_parameter_value,
-                self.max_parameter_value,
-                self.parameter_resolution,
-                value_min,
-                value_max,
-                values[0..self.raster_length],
-            ),
-            .snr = self.signal_to_noise_ratio,
+            .heatmap = self.raster.empty(time),
+            .signal_to_noise_ratio = nan,
+            .physical_decibels = nan,
+            .calibrated_decibels = nan,
+            .normalized_position = nan,
+            .signal = nan,
+            .noise = nan,
+            .median_bar_range = nan,
+            .width = nan,
+            .dominant_cycle = nan,
+            .dominant_cycle_median = nan,
+            .has_cycle_estimate = nan,
+            .ratio_is_finite = nan,
         };
     }
 
-    // --- Entity update methods ---
+    pub fn tryUpdateFromSnapshotRange(
+        self: *CoronaSignalToNoiseRatio,
+        snapshot: CoronaSnapshot,
+        bar_range: f64,
+    ) Error!CoronaSignalToNoiseRatioSnapshot {
+        const accepted = try corona_mod.acceptSnapshot(snapshot, self.engine_params, self.sample_count + 1);
+        if (!accepted) {
+            return self.emptySnapshot(snapshot.time);
+        }
+        const range_value = try validateBarRange(bar_range);
+        if (math.isNan(range_value)) {
+            return error.InvalidBarRange;
+        }
+        self.sample_count = snapshot.sample_count;
 
-    pub fn updateBar(self: *CoronaSignalToNoiseRatio, sample: *const Bar) OutputArray {
-        return self.updateEntity(sample.time, self.bar_func(sample.*), sample.low, sample.high);
+        std.mem.copyForwards(f64, self.ranges[0..4], self.ranges[1..5]);
+        self.ranges[4] = range_value;
+        var sorted_ranges = self.ranges;
+        std.mem.sort(f64, &sorted_ranges, {}, std.sort.asc(f64));
+        const median_range = sorted_ranges[2];
+
+        if (snapshot.sample_count == 1) {
+            self.average_price = snapshot.price;
+        } else {
+            self.average_price = try corona_mod.checked(0.1 * snapshot.price + 0.9 * self.average_price);
+            if (self.average_price != 0.0 or snapshot.maximum_power > 0.0) {
+                self.signal = try corona_mod.checked(0.2 * @sqrt(snapshot.maximum_power) + 0.9 * self.signal);
+            }
+            if (self.average_price != 0.0 and snapshot.sample_count > 5) {
+                self.noise = try corona_mod.checked(0.1 * median_range + 0.9 * self.noise);
+            }
+        }
+
+        var physical_decibels: f64 = undefined;
+        if (self.signal > 0.0 and self.noise > 0.0) {
+            physical_decibels = 20.0 * (@log10(self.signal) - @log10(self.noise));
+        } else if (self.signal > 0.0) {
+            physical_decibels = math.inf(f64);
+        } else if (self.noise > 0.0) {
+            physical_decibels = -math.inf(f64);
+        } else {
+            physical_decibels = math.nan(f64);
+        }
+
+        const calibrated_decibels = physical_decibels + 3.5;
+        const position = if (math.isNan(calibrated_decibels))
+            0.0
+        else
+            corona_mod.clip(calibrated_decibels, 0.0, 10.0) / 10.0;
+        const width = @max(0.0, 0.2 - 0.4 * position);
+        self.raster.update(position, width, .snr, position > 0.5);
+
+        if (!snapshot.primed) {
+            return self.emptySnapshot(snapshot.time);
+        }
+
+        const mapped = self.raster.lower + (self.raster.upper - self.raster.lower) * position;
+        return .{
+            .heatmap = self.raster.column(snapshot.time),
+            .signal_to_noise_ratio = mapped,
+            .physical_decibels = physical_decibels,
+            .calibrated_decibels = calibrated_decibels,
+            .normalized_position = position,
+            .signal = self.signal,
+            .noise = self.noise,
+            .median_bar_range = median_range,
+            .width = width,
+            .dominant_cycle = snapshot.dominant_cycle,
+            .dominant_cycle_median = snapshot.dominant_cycle_median,
+            .has_cycle_estimate = if (snapshot.has_cycle_estimate) 1.0 else 0.0,
+            .ratio_is_finite = if (corona_mod.validateFinite(physical_decibels)) 1.0 else 0.0,
+        };
     }
 
-    pub fn updateQuote(self: *CoronaSignalToNoiseRatio, sample: *const Quote) OutputArray {
-        const v = self.quote_func(sample.*);
-        return self.updateEntity(sample.time, v, v, v);
+    pub fn updateFromSnapshotRange(
+        self: *CoronaSignalToNoiseRatio,
+        snapshot: CoronaSnapshot,
+        bar_range: f64,
+    ) CoronaSignalToNoiseRatioSnapshot {
+        return self.tryUpdateFromSnapshotRange(snapshot, bar_range) catch |err| {
+            std.debug.panic("CoronaSignalToNoiseRatio.updateFromSnapshotRange failed: {s}", .{@errorName(err)});
+        };
     }
 
-    pub fn updateTrade(self: *CoronaSignalToNoiseRatio, sample: *const Trade) OutputArray {
-        const v = self.trade_func(sample.*);
-        return self.updateEntity(sample.time, v, v, v);
+    pub fn tryUpdateFromSnapshot(
+        self: *CoronaSignalToNoiseRatio,
+        snapshot: CoronaSnapshot,
+        low: f64,
+        high: f64,
+    ) Error!CoronaSignalToNoiseRatioSnapshot {
+        if (!snapshot.accepted) {
+            return self.tryUpdateFromSnapshotRange(snapshot, 0.0);
+        }
+        const range_value = try validateHighLow(low, high);
+        return self.tryUpdateFromSnapshotRange(snapshot, range_value);
     }
 
-    pub fn updateScalar(self: *CoronaSignalToNoiseRatio, sample: *const Scalar) OutputArray {
-        return self.updateEntity(sample.time, sample.value, sample.value, sample.value);
+    pub fn updateFromSnapshot(
+        self: *CoronaSignalToNoiseRatio,
+        snapshot: CoronaSnapshot,
+        low: f64,
+        high: f64,
+    ) CoronaSignalToNoiseRatioSnapshot {
+        return self.tryUpdateFromSnapshot(snapshot, low, high) catch |err| {
+            std.debug.panic("CoronaSignalToNoiseRatio.updateFromSnapshot failed: {s}", .{@errorName(err)});
+        };
     }
 
-    fn updateEntity(self: *CoronaSignalToNoiseRatio, time: i64, sample: f64, low: f64, high: f64) OutputArray {
-        const result = self.updateSample(sample, low, high, time);
+    pub fn tryUpdateRange(
+        self: *CoronaSignalToNoiseRatio,
+        sample: f64,
+        bar_range: f64,
+        time: i64,
+    ) Error!CoronaSignalToNoiseRatioSnapshot {
+        const ok = try corona_mod.validPrice(sample);
+        if (!ok) return self.emptySnapshot(time);
+        const range_value = try validateBarRange(bar_range);
+        if (math.isNan(range_value)) return self.emptySnapshot(time);
+        const engine_snap = try self.engine.tryUpdate(sample, time);
+        return self.tryUpdateFromSnapshotRange(engine_snap, range_value);
+    }
+
+    pub fn updateRange(
+        self: *CoronaSignalToNoiseRatio,
+        sample: f64,
+        bar_range: f64,
+        time: i64,
+    ) CoronaSignalToNoiseRatioSnapshot {
+        return self.tryUpdateRange(sample, bar_range, time) catch |err| {
+            std.debug.panic("CoronaSignalToNoiseRatio.updateRange failed: {s}", .{@errorName(err)});
+        };
+    }
+
+    pub fn tryUpdate(
+        self: *CoronaSignalToNoiseRatio,
+        sample: f64,
+        low: f64,
+        high: f64,
+        time: i64,
+    ) Error!CoronaSignalToNoiseRatioSnapshot {
+        const ok = try corona_mod.validPrice(sample);
+        if (!ok) return self.emptySnapshot(time);
+        const range_value = try validateHighLow(low, high);
+        if (math.isNan(range_value)) return self.emptySnapshot(time);
+        const engine_snap = try self.engine.tryUpdate(sample, time);
+        return self.tryUpdateFromSnapshotRange(engine_snap, range_value);
+    }
+
+    pub fn update(
+        self: *CoronaSignalToNoiseRatio,
+        sample: f64,
+        low: f64,
+        high: f64,
+        time: i64,
+    ) CoronaSignalToNoiseRatioSnapshot {
+        return self.tryUpdate(sample, low, high, time) catch |err| {
+            std.debug.panic("CoronaSignalToNoiseRatio.update failed: {s}", .{@errorName(err)});
+        };
+    }
+
+    pub const updateSample = update;
+
+    fn wrapEntity(time: i64, snapshot: CoronaSignalToNoiseRatioSnapshot) OutputArray {
         var out = OutputArray{};
-        out.append(.{ .heatmap = result.heatmap });
-        out.append(.{ .scalar = .{ .time = time, .value = result.snr } });
+        out.append(.{ .heatmap = snapshot.heatmap });
+        out.append(.{ .scalar = .{ .time = time, .value = snapshot.signal_to_noise_ratio } });
         return out;
     }
 
+    pub fn updateScalar(self: *CoronaSignalToNoiseRatio, sample: *const Scalar) OutputArray {
+        return wrapEntity(sample.time, self.update(sample.value, sample.value, sample.value, sample.time));
+    }
+
+    pub fn updateBar(self: *CoronaSignalToNoiseRatio, sample: *const Bar) OutputArray {
+        return wrapEntity(sample.time, self.update(self.bar_func(sample.*), sample.low, sample.high, sample.time));
+    }
+
+    pub fn updateQuote(self: *CoronaSignalToNoiseRatio, sample: *const Quote) OutputArray {
+        const value = self.quote_func(sample.*);
+        return wrapEntity(sample.time, self.update(value, value, value, sample.time));
+    }
+
+    pub fn updateTrade(self: *CoronaSignalToNoiseRatio, sample: *const Trade) OutputArray {
+        const value = self.trade_func(sample.*);
+        return wrapEntity(sample.time, self.update(value, value, value, sample.time));
+    }
+
     pub fn isPrimed(self: *const CoronaSignalToNoiseRatio) bool {
-        return self.corona.isPrimed();
+        return self.sample_count >= corona_mod.first_bank_sample;
     }
 
     pub fn getMetadata(self: *const CoronaSignalToNoiseRatio, out: *Metadata) void {
@@ -444,7 +471,6 @@ pub const CoronaSignalToNoiseRatio = struct {
         build_metadata_mod.buildMetadata(out, .corona_signal_to_noise_ratio, mn, desc, &texts);
     }
 
-    /// Returns an Indicator interface backed by this instance.
     pub fn indicator(self: *CoronaSignalToNoiseRatio) indicator_mod.Indicator {
         return .{
             .ptr = @ptrCast(self),
@@ -459,187 +485,179 @@ pub const CoronaSignalToNoiseRatio = struct {
 const testing = std.testing;
 const testdata = @import("testdata.zig");
 
-const tolerance = 1e-4;
+const test_tolerance: f64 = 1e-10;
 
-fn almostEqual(a: f64, b: f64, eps: f64) bool {
-    return @abs(a - b) <= eps;
+fn expectClose(actual: f64, expected: f64) !void {
+    if (math.isNan(expected)) {
+        try testing.expect(math.isNan(actual));
+        return;
+    }
+    if (math.isInf(expected)) {
+        try testing.expectEqual(expected, actual);
+        return;
+    }
+    try testing.expect(!math.isNan(actual) and !math.isInf(actual));
+    const bound = @max(test_tolerance, @abs(expected) * test_tolerance);
+    try testing.expect(@abs(actual - expected) <= bound);
 }
 
-/// Produce synthetic High/Low around the sample.
-fn makeHL(i: usize, sample: f64) struct { low: f64, high: f64 } {
-    const frac = 0.005 + 0.03 * (1.0 + @sin(@as(f64, @floatFromInt(i)) * 0.37));
-    const half = sample * frac;
-    return .{ .low = sample - half, .high = sample + half };
-}
+fn verifySnrCase(
+    comptime raster_len: usize,
+    hp_cutoff: i32,
+    min_period: i32,
+    max_period: i32,
+    expected_heatmap: *const [252][raster_len]f64,
+    expected_min: *const [252]f64,
+    expected_max: *const [252]f64,
+    expected_snr: *const [252]f64,
+    expected_phys: *const [252]f64,
+    expected_cal: *const [252]f64,
+    expected_norm: *const [252]f64,
+    expected_signal: *const [252]f64,
+    expected_noise: *const [252]f64,
+    expected_median_range: *const [252]f64,
+    expected_width: *const [252]f64,
+    expected_dc: *const [252]f64,
+    expected_dcm: *const [252]f64,
+    expected_has_est: *const [252]f64,
+    expected_finite: *const [252]f64,
+) !void {
+    var instance = try CoronaSignalToNoiseRatio.init(testing.allocator, .{
+        .raster_length = @intCast(raster_len),
+        .high_pass_filter_cutoff = hp_cutoff,
+        .minimal_period = min_period,
+        .maximal_period = max_period,
+    });
+    defer instance.deinit();
 
-test "CoronaSignalToNoiseRatio update" {
-    const Snap = struct { i: usize, snr: f64, vmn: f64, vmx: f64 };
-    const snapshots = [_]Snap{
-        .{ .i = 11, .snr = 1.0, .vmn = 0.0, .vmx = 20.0 },
-        .{ .i = 12, .snr = 1.0, .vmn = 0.0, .vmx = 20.0 },
-        .{ .i = 50, .snr = 1.0, .vmn = 0.0, .vmx = 20.0 },
-        .{ .i = 100, .snr = 2.9986583538, .vmn = 4.2011609652, .vmx = 20.0 },
-        .{ .i = 150, .snr = 1.0, .vmn = 0.0000000035, .vmx = 20.0 },
-        .{ .i = 200, .snr = 1.0, .vmn = 0.0, .vmx = 20.0 },
-        .{ .i = 251, .snr = 1.0, .vmn = 0.0000000026, .vmx = 20.0 },
-    };
+    const step = 10.0 / @as(f64, @floatFromInt(raster_len));
+    const expected_first = 1.0 + step;
+    const expected_resolution = 1.0 / step;
+    const prices = testdata.testInput();
+    const highs = testdata.testHigh();
+    const lows = testdata.testLow();
 
-    var x = try CoronaSignalToNoiseRatio.init(testing.allocator, .{});
-    defer x.deinit();
+    for (prices, 0..) |price, index| {
+        const snap = instance.update(price, lows[index], highs[index], @intCast(index));
+        try expectClose(snap.heatmap.parameter_first, expected_first);
+        try expectClose(snap.heatmap.parameter_last, 11.0);
+        try expectClose(snap.heatmap.parameter_resolution, expected_resolution);
 
-    var si: usize = 0;
-    for (0..testdata.test_input.len) |i| {
-        const hl = makeHL(i, testdata.test_input[i]);
-        const result = x.updateSample(testdata.test_input[i], hl.low, hl.high, @intCast(i));
-
-        try testing.expectEqual(@as(f64, 1.0), result.heatmap.parameter_first);
-        try testing.expectEqual(@as(f64, 11.0), result.heatmap.parameter_last);
-        try testing.expect(almostEqual(4.9, result.heatmap.parameter_resolution, 1e-9));
-
-        if (!x.isPrimed()) {
-            try testing.expect(result.heatmap.isEmpty());
-            try testing.expect(math.isNan(result.snr));
-            continue;
+        const row_empty = math.isNan(expected_snr[index]);
+        try testing.expectEqual(!row_empty, instance.isPrimed());
+        if (row_empty) {
+            try testing.expect(snap.heatmap.isEmpty());
+        } else {
+            const values = snap.heatmap.valuesSlice();
+            try testing.expectEqual(raster_len, values.len);
+            for (0..raster_len) |bin_index| {
+                try expectClose(values[bin_index], expected_heatmap[index][bin_index]);
+            }
         }
 
-        try testing.expectEqual(@as(usize, 50), result.heatmap.values_len);
-
-        if (si < snapshots.len and snapshots[si].i == i) {
-            try testing.expect(almostEqual(snapshots[si].snr, result.snr, tolerance));
-            try testing.expect(almostEqual(snapshots[si].vmn, result.heatmap.value_min, tolerance));
-            try testing.expect(almostEqual(snapshots[si].vmx, result.heatmap.value_max, tolerance));
-            si += 1;
-        }
+        try expectClose(snap.heatmap.value_min, expected_min[index]);
+        try expectClose(snap.heatmap.value_max, expected_max[index]);
+        try expectClose(snap.signal_to_noise_ratio, expected_snr[index]);
+        try expectClose(snap.physical_decibels, expected_phys[index]);
+        try expectClose(snap.calibrated_decibels, expected_cal[index]);
+        try expectClose(snap.normalized_position, expected_norm[index]);
+        try expectClose(snap.signal, expected_signal[index]);
+        try expectClose(snap.noise, expected_noise[index]);
+        try expectClose(snap.median_bar_range, expected_median_range[index]);
+        try expectClose(snap.width, expected_width[index]);
+        try expectClose(snap.dominant_cycle, expected_dc[index]);
+        try expectClose(snap.dominant_cycle_median, expected_dcm[index]);
+        try expectClose(snap.has_cycle_estimate, expected_has_est[index]);
+        try expectClose(snap.ratio_is_finite, expected_finite[index]);
     }
 
-    try testing.expectEqual(snapshots.len, si);
+    instance.reset();
+    try testing.expect(!instance.isPrimed());
 }
 
-test "CoronaSignalToNoiseRatio primes at bar 11" {
-    var x = try CoronaSignalToNoiseRatio.init(testing.allocator, .{});
-    defer x.deinit();
-
-    try testing.expect(!x.isPrimed());
-
-    var primed_at: ?usize = null;
-    for (0..testdata.test_input.len) |i| {
-        const hl = makeHL(i, testdata.test_input[i]);
-        _ = x.updateSample(testdata.test_input[i], hl.low, hl.high, @intCast(i));
-        if (x.isPrimed() and primed_at == null) {
-            primed_at = i;
-        }
-    }
-
-    try testing.expectEqual(@as(usize, 11), primed_at.?);
+test "CoronaSignalToNoiseRatio matches all 16 reference cases" {
+    try verifySnrCase(50, 30, 6, 30, &testdata.expectedH30_PMIN6_PMAX30_R50_HEATMAP(), &testdata.expectedH30_PMIN6_PMAX30_R50_HEATMAP_MIN(), &testdata.expectedH30_PMIN6_PMAX30_R50_HEATMAP_MAX(), &testdata.expectedH30_PMIN6_PMAX30_R50_SIGNAL_TO_NOISE_RATIO(), &testdata.expectedH30_PMIN6_PMAX30_R50_PHYSICAL_DECIBELS(), &testdata.expectedH30_PMIN6_PMAX30_R50_CALIBRATED_DECIBELS(), &testdata.expectedH30_PMIN6_PMAX30_R50_NORMALIZED_POSITION(), &testdata.expectedH30_PMIN6_PMAX30_R50_SIGNAL(), &testdata.expectedH30_PMIN6_PMAX30_R50_NOISE(), &testdata.expectedH30_PMIN6_PMAX30_R50_MEDIAN_BAR_RANGE(), &testdata.expectedH30_PMIN6_PMAX30_R50_WIDTH(), &testdata.expectedH30_PMIN6_PMAX30_R50_DOMINANT_CYCLE(), &testdata.expectedH30_PMIN6_PMAX30_R50_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH30_PMIN6_PMAX30_R50_HAS_CYCLE_ESTIMATE(), &testdata.expectedH30_PMIN6_PMAX30_R50_RATIO_IS_FINITE());
+    try verifySnrCase(25, 30, 6, 30, &testdata.expectedH30_PMIN6_PMAX30_R25_HEATMAP(), &testdata.expectedH30_PMIN6_PMAX30_R25_HEATMAP_MIN(), &testdata.expectedH30_PMIN6_PMAX30_R25_HEATMAP_MAX(), &testdata.expectedH30_PMIN6_PMAX30_R25_SIGNAL_TO_NOISE_RATIO(), &testdata.expectedH30_PMIN6_PMAX30_R25_PHYSICAL_DECIBELS(), &testdata.expectedH30_PMIN6_PMAX30_R25_CALIBRATED_DECIBELS(), &testdata.expectedH30_PMIN6_PMAX30_R25_NORMALIZED_POSITION(), &testdata.expectedH30_PMIN6_PMAX30_R25_SIGNAL(), &testdata.expectedH30_PMIN6_PMAX30_R25_NOISE(), &testdata.expectedH30_PMIN6_PMAX30_R25_MEDIAN_BAR_RANGE(), &testdata.expectedH30_PMIN6_PMAX30_R25_WIDTH(), &testdata.expectedH30_PMIN6_PMAX30_R25_DOMINANT_CYCLE(), &testdata.expectedH30_PMIN6_PMAX30_R25_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH30_PMIN6_PMAX30_R25_HAS_CYCLE_ESTIMATE(), &testdata.expectedH30_PMIN6_PMAX30_R25_RATIO_IS_FINITE());
+    try verifySnrCase(50, 30, 6, 20, &testdata.expectedH30_PMIN6_PMAX20_R50_HEATMAP(), &testdata.expectedH30_PMIN6_PMAX20_R50_HEATMAP_MIN(), &testdata.expectedH30_PMIN6_PMAX20_R50_HEATMAP_MAX(), &testdata.expectedH30_PMIN6_PMAX20_R50_SIGNAL_TO_NOISE_RATIO(), &testdata.expectedH30_PMIN6_PMAX20_R50_PHYSICAL_DECIBELS(), &testdata.expectedH30_PMIN6_PMAX20_R50_CALIBRATED_DECIBELS(), &testdata.expectedH30_PMIN6_PMAX20_R50_NORMALIZED_POSITION(), &testdata.expectedH30_PMIN6_PMAX20_R50_SIGNAL(), &testdata.expectedH30_PMIN6_PMAX20_R50_NOISE(), &testdata.expectedH30_PMIN6_PMAX20_R50_MEDIAN_BAR_RANGE(), &testdata.expectedH30_PMIN6_PMAX20_R50_WIDTH(), &testdata.expectedH30_PMIN6_PMAX20_R50_DOMINANT_CYCLE(), &testdata.expectedH30_PMIN6_PMAX20_R50_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH30_PMIN6_PMAX20_R50_HAS_CYCLE_ESTIMATE(), &testdata.expectedH30_PMIN6_PMAX20_R50_RATIO_IS_FINITE());
+    try verifySnrCase(25, 30, 6, 20, &testdata.expectedH30_PMIN6_PMAX20_R25_HEATMAP(), &testdata.expectedH30_PMIN6_PMAX20_R25_HEATMAP_MIN(), &testdata.expectedH30_PMIN6_PMAX20_R25_HEATMAP_MAX(), &testdata.expectedH30_PMIN6_PMAX20_R25_SIGNAL_TO_NOISE_RATIO(), &testdata.expectedH30_PMIN6_PMAX20_R25_PHYSICAL_DECIBELS(), &testdata.expectedH30_PMIN6_PMAX20_R25_CALIBRATED_DECIBELS(), &testdata.expectedH30_PMIN6_PMAX20_R25_NORMALIZED_POSITION(), &testdata.expectedH30_PMIN6_PMAX20_R25_SIGNAL(), &testdata.expectedH30_PMIN6_PMAX20_R25_NOISE(), &testdata.expectedH30_PMIN6_PMAX20_R25_MEDIAN_BAR_RANGE(), &testdata.expectedH30_PMIN6_PMAX20_R25_WIDTH(), &testdata.expectedH30_PMIN6_PMAX20_R25_DOMINANT_CYCLE(), &testdata.expectedH30_PMIN6_PMAX20_R25_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH30_PMIN6_PMAX20_R25_HAS_CYCLE_ESTIMATE(), &testdata.expectedH30_PMIN6_PMAX20_R25_RATIO_IS_FINITE());
+    try verifySnrCase(50, 30, 10, 30, &testdata.expectedH30_PMIN10_PMAX30_R50_HEATMAP(), &testdata.expectedH30_PMIN10_PMAX30_R50_HEATMAP_MIN(), &testdata.expectedH30_PMIN10_PMAX30_R50_HEATMAP_MAX(), &testdata.expectedH30_PMIN10_PMAX30_R50_SIGNAL_TO_NOISE_RATIO(), &testdata.expectedH30_PMIN10_PMAX30_R50_PHYSICAL_DECIBELS(), &testdata.expectedH30_PMIN10_PMAX30_R50_CALIBRATED_DECIBELS(), &testdata.expectedH30_PMIN10_PMAX30_R50_NORMALIZED_POSITION(), &testdata.expectedH30_PMIN10_PMAX30_R50_SIGNAL(), &testdata.expectedH30_PMIN10_PMAX30_R50_NOISE(), &testdata.expectedH30_PMIN10_PMAX30_R50_MEDIAN_BAR_RANGE(), &testdata.expectedH30_PMIN10_PMAX30_R50_WIDTH(), &testdata.expectedH30_PMIN10_PMAX30_R50_DOMINANT_CYCLE(), &testdata.expectedH30_PMIN10_PMAX30_R50_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH30_PMIN10_PMAX30_R50_HAS_CYCLE_ESTIMATE(), &testdata.expectedH30_PMIN10_PMAX30_R50_RATIO_IS_FINITE());
+    try verifySnrCase(25, 30, 10, 30, &testdata.expectedH30_PMIN10_PMAX30_R25_HEATMAP(), &testdata.expectedH30_PMIN10_PMAX30_R25_HEATMAP_MIN(), &testdata.expectedH30_PMIN10_PMAX30_R25_HEATMAP_MAX(), &testdata.expectedH30_PMIN10_PMAX30_R25_SIGNAL_TO_NOISE_RATIO(), &testdata.expectedH30_PMIN10_PMAX30_R25_PHYSICAL_DECIBELS(), &testdata.expectedH30_PMIN10_PMAX30_R25_CALIBRATED_DECIBELS(), &testdata.expectedH30_PMIN10_PMAX30_R25_NORMALIZED_POSITION(), &testdata.expectedH30_PMIN10_PMAX30_R25_SIGNAL(), &testdata.expectedH30_PMIN10_PMAX30_R25_NOISE(), &testdata.expectedH30_PMIN10_PMAX30_R25_MEDIAN_BAR_RANGE(), &testdata.expectedH30_PMIN10_PMAX30_R25_WIDTH(), &testdata.expectedH30_PMIN10_PMAX30_R25_DOMINANT_CYCLE(), &testdata.expectedH30_PMIN10_PMAX30_R25_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH30_PMIN10_PMAX30_R25_HAS_CYCLE_ESTIMATE(), &testdata.expectedH30_PMIN10_PMAX30_R25_RATIO_IS_FINITE());
+    try verifySnrCase(50, 30, 10, 48, &testdata.expectedH30_PMIN10_PMAX48_R50_HEATMAP(), &testdata.expectedH30_PMIN10_PMAX48_R50_HEATMAP_MIN(), &testdata.expectedH30_PMIN10_PMAX48_R50_HEATMAP_MAX(), &testdata.expectedH30_PMIN10_PMAX48_R50_SIGNAL_TO_NOISE_RATIO(), &testdata.expectedH30_PMIN10_PMAX48_R50_PHYSICAL_DECIBELS(), &testdata.expectedH30_PMIN10_PMAX48_R50_CALIBRATED_DECIBELS(), &testdata.expectedH30_PMIN10_PMAX48_R50_NORMALIZED_POSITION(), &testdata.expectedH30_PMIN10_PMAX48_R50_SIGNAL(), &testdata.expectedH30_PMIN10_PMAX48_R50_NOISE(), &testdata.expectedH30_PMIN10_PMAX48_R50_MEDIAN_BAR_RANGE(), &testdata.expectedH30_PMIN10_PMAX48_R50_WIDTH(), &testdata.expectedH30_PMIN10_PMAX48_R50_DOMINANT_CYCLE(), &testdata.expectedH30_PMIN10_PMAX48_R50_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH30_PMIN10_PMAX48_R50_HAS_CYCLE_ESTIMATE(), &testdata.expectedH30_PMIN10_PMAX48_R50_RATIO_IS_FINITE());
+    try verifySnrCase(25, 30, 10, 48, &testdata.expectedH30_PMIN10_PMAX48_R25_HEATMAP(), &testdata.expectedH30_PMIN10_PMAX48_R25_HEATMAP_MIN(), &testdata.expectedH30_PMIN10_PMAX48_R25_HEATMAP_MAX(), &testdata.expectedH30_PMIN10_PMAX48_R25_SIGNAL_TO_NOISE_RATIO(), &testdata.expectedH30_PMIN10_PMAX48_R25_PHYSICAL_DECIBELS(), &testdata.expectedH30_PMIN10_PMAX48_R25_CALIBRATED_DECIBELS(), &testdata.expectedH30_PMIN10_PMAX48_R25_NORMALIZED_POSITION(), &testdata.expectedH30_PMIN10_PMAX48_R25_SIGNAL(), &testdata.expectedH30_PMIN10_PMAX48_R25_NOISE(), &testdata.expectedH30_PMIN10_PMAX48_R25_MEDIAN_BAR_RANGE(), &testdata.expectedH30_PMIN10_PMAX48_R25_WIDTH(), &testdata.expectedH30_PMIN10_PMAX48_R25_DOMINANT_CYCLE(), &testdata.expectedH30_PMIN10_PMAX48_R25_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH30_PMIN10_PMAX48_R25_HAS_CYCLE_ESTIMATE(), &testdata.expectedH30_PMIN10_PMAX48_R25_RATIO_IS_FINITE());
+    try verifySnrCase(50, 48, 6, 30, &testdata.expectedH48_PMIN6_PMAX30_R50_HEATMAP(), &testdata.expectedH48_PMIN6_PMAX30_R50_HEATMAP_MIN(), &testdata.expectedH48_PMIN6_PMAX30_R50_HEATMAP_MAX(), &testdata.expectedH48_PMIN6_PMAX30_R50_SIGNAL_TO_NOISE_RATIO(), &testdata.expectedH48_PMIN6_PMAX30_R50_PHYSICAL_DECIBELS(), &testdata.expectedH48_PMIN6_PMAX30_R50_CALIBRATED_DECIBELS(), &testdata.expectedH48_PMIN6_PMAX30_R50_NORMALIZED_POSITION(), &testdata.expectedH48_PMIN6_PMAX30_R50_SIGNAL(), &testdata.expectedH48_PMIN6_PMAX30_R50_NOISE(), &testdata.expectedH48_PMIN6_PMAX30_R50_MEDIAN_BAR_RANGE(), &testdata.expectedH48_PMIN6_PMAX30_R50_WIDTH(), &testdata.expectedH48_PMIN6_PMAX30_R50_DOMINANT_CYCLE(), &testdata.expectedH48_PMIN6_PMAX30_R50_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH48_PMIN6_PMAX30_R50_HAS_CYCLE_ESTIMATE(), &testdata.expectedH48_PMIN6_PMAX30_R50_RATIO_IS_FINITE());
+    try verifySnrCase(25, 48, 6, 30, &testdata.expectedH48_PMIN6_PMAX30_R25_HEATMAP(), &testdata.expectedH48_PMIN6_PMAX30_R25_HEATMAP_MIN(), &testdata.expectedH48_PMIN6_PMAX30_R25_HEATMAP_MAX(), &testdata.expectedH48_PMIN6_PMAX30_R25_SIGNAL_TO_NOISE_RATIO(), &testdata.expectedH48_PMIN6_PMAX30_R25_PHYSICAL_DECIBELS(), &testdata.expectedH48_PMIN6_PMAX30_R25_CALIBRATED_DECIBELS(), &testdata.expectedH48_PMIN6_PMAX30_R25_NORMALIZED_POSITION(), &testdata.expectedH48_PMIN6_PMAX30_R25_SIGNAL(), &testdata.expectedH48_PMIN6_PMAX30_R25_NOISE(), &testdata.expectedH48_PMIN6_PMAX30_R25_MEDIAN_BAR_RANGE(), &testdata.expectedH48_PMIN6_PMAX30_R25_WIDTH(), &testdata.expectedH48_PMIN6_PMAX30_R25_DOMINANT_CYCLE(), &testdata.expectedH48_PMIN6_PMAX30_R25_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH48_PMIN6_PMAX30_R25_HAS_CYCLE_ESTIMATE(), &testdata.expectedH48_PMIN6_PMAX30_R25_RATIO_IS_FINITE());
+    try verifySnrCase(50, 48, 6, 20, &testdata.expectedH48_PMIN6_PMAX20_R50_HEATMAP(), &testdata.expectedH48_PMIN6_PMAX20_R50_HEATMAP_MIN(), &testdata.expectedH48_PMIN6_PMAX20_R50_HEATMAP_MAX(), &testdata.expectedH48_PMIN6_PMAX20_R50_SIGNAL_TO_NOISE_RATIO(), &testdata.expectedH48_PMIN6_PMAX20_R50_PHYSICAL_DECIBELS(), &testdata.expectedH48_PMIN6_PMAX20_R50_CALIBRATED_DECIBELS(), &testdata.expectedH48_PMIN6_PMAX20_R50_NORMALIZED_POSITION(), &testdata.expectedH48_PMIN6_PMAX20_R50_SIGNAL(), &testdata.expectedH48_PMIN6_PMAX20_R50_NOISE(), &testdata.expectedH48_PMIN6_PMAX20_R50_MEDIAN_BAR_RANGE(), &testdata.expectedH48_PMIN6_PMAX20_R50_WIDTH(), &testdata.expectedH48_PMIN6_PMAX20_R50_DOMINANT_CYCLE(), &testdata.expectedH48_PMIN6_PMAX20_R50_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH48_PMIN6_PMAX20_R50_HAS_CYCLE_ESTIMATE(), &testdata.expectedH48_PMIN6_PMAX20_R50_RATIO_IS_FINITE());
+    try verifySnrCase(25, 48, 6, 20, &testdata.expectedH48_PMIN6_PMAX20_R25_HEATMAP(), &testdata.expectedH48_PMIN6_PMAX20_R25_HEATMAP_MIN(), &testdata.expectedH48_PMIN6_PMAX20_R25_HEATMAP_MAX(), &testdata.expectedH48_PMIN6_PMAX20_R25_SIGNAL_TO_NOISE_RATIO(), &testdata.expectedH48_PMIN6_PMAX20_R25_PHYSICAL_DECIBELS(), &testdata.expectedH48_PMIN6_PMAX20_R25_CALIBRATED_DECIBELS(), &testdata.expectedH48_PMIN6_PMAX20_R25_NORMALIZED_POSITION(), &testdata.expectedH48_PMIN6_PMAX20_R25_SIGNAL(), &testdata.expectedH48_PMIN6_PMAX20_R25_NOISE(), &testdata.expectedH48_PMIN6_PMAX20_R25_MEDIAN_BAR_RANGE(), &testdata.expectedH48_PMIN6_PMAX20_R25_WIDTH(), &testdata.expectedH48_PMIN6_PMAX20_R25_DOMINANT_CYCLE(), &testdata.expectedH48_PMIN6_PMAX20_R25_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH48_PMIN6_PMAX20_R25_HAS_CYCLE_ESTIMATE(), &testdata.expectedH48_PMIN6_PMAX20_R25_RATIO_IS_FINITE());
+    try verifySnrCase(50, 48, 10, 30, &testdata.expectedH48_PMIN10_PMAX30_R50_HEATMAP(), &testdata.expectedH48_PMIN10_PMAX30_R50_HEATMAP_MIN(), &testdata.expectedH48_PMIN10_PMAX30_R50_HEATMAP_MAX(), &testdata.expectedH48_PMIN10_PMAX30_R50_SIGNAL_TO_NOISE_RATIO(), &testdata.expectedH48_PMIN10_PMAX30_R50_PHYSICAL_DECIBELS(), &testdata.expectedH48_PMIN10_PMAX30_R50_CALIBRATED_DECIBELS(), &testdata.expectedH48_PMIN10_PMAX30_R50_NORMALIZED_POSITION(), &testdata.expectedH48_PMIN10_PMAX30_R50_SIGNAL(), &testdata.expectedH48_PMIN10_PMAX30_R50_NOISE(), &testdata.expectedH48_PMIN10_PMAX30_R50_MEDIAN_BAR_RANGE(), &testdata.expectedH48_PMIN10_PMAX30_R50_WIDTH(), &testdata.expectedH48_PMIN10_PMAX30_R50_DOMINANT_CYCLE(), &testdata.expectedH48_PMIN10_PMAX30_R50_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH48_PMIN10_PMAX30_R50_HAS_CYCLE_ESTIMATE(), &testdata.expectedH48_PMIN10_PMAX30_R50_RATIO_IS_FINITE());
+    try verifySnrCase(25, 48, 10, 30, &testdata.expectedH48_PMIN10_PMAX30_R25_HEATMAP(), &testdata.expectedH48_PMIN10_PMAX30_R25_HEATMAP_MIN(), &testdata.expectedH48_PMIN10_PMAX30_R25_HEATMAP_MAX(), &testdata.expectedH48_PMIN10_PMAX30_R25_SIGNAL_TO_NOISE_RATIO(), &testdata.expectedH48_PMIN10_PMAX30_R25_PHYSICAL_DECIBELS(), &testdata.expectedH48_PMIN10_PMAX30_R25_CALIBRATED_DECIBELS(), &testdata.expectedH48_PMIN10_PMAX30_R25_NORMALIZED_POSITION(), &testdata.expectedH48_PMIN10_PMAX30_R25_SIGNAL(), &testdata.expectedH48_PMIN10_PMAX30_R25_NOISE(), &testdata.expectedH48_PMIN10_PMAX30_R25_MEDIAN_BAR_RANGE(), &testdata.expectedH48_PMIN10_PMAX30_R25_WIDTH(), &testdata.expectedH48_PMIN10_PMAX30_R25_DOMINANT_CYCLE(), &testdata.expectedH48_PMIN10_PMAX30_R25_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH48_PMIN10_PMAX30_R25_HAS_CYCLE_ESTIMATE(), &testdata.expectedH48_PMIN10_PMAX30_R25_RATIO_IS_FINITE());
+    try verifySnrCase(50, 48, 10, 48, &testdata.expectedH48_PMIN10_PMAX48_R50_HEATMAP(), &testdata.expectedH48_PMIN10_PMAX48_R50_HEATMAP_MIN(), &testdata.expectedH48_PMIN10_PMAX48_R50_HEATMAP_MAX(), &testdata.expectedH48_PMIN10_PMAX48_R50_SIGNAL_TO_NOISE_RATIO(), &testdata.expectedH48_PMIN10_PMAX48_R50_PHYSICAL_DECIBELS(), &testdata.expectedH48_PMIN10_PMAX48_R50_CALIBRATED_DECIBELS(), &testdata.expectedH48_PMIN10_PMAX48_R50_NORMALIZED_POSITION(), &testdata.expectedH48_PMIN10_PMAX48_R50_SIGNAL(), &testdata.expectedH48_PMIN10_PMAX48_R50_NOISE(), &testdata.expectedH48_PMIN10_PMAX48_R50_MEDIAN_BAR_RANGE(), &testdata.expectedH48_PMIN10_PMAX48_R50_WIDTH(), &testdata.expectedH48_PMIN10_PMAX48_R50_DOMINANT_CYCLE(), &testdata.expectedH48_PMIN10_PMAX48_R50_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH48_PMIN10_PMAX48_R50_HAS_CYCLE_ESTIMATE(), &testdata.expectedH48_PMIN10_PMAX48_R50_RATIO_IS_FINITE());
+    try verifySnrCase(25, 48, 10, 48, &testdata.expectedH48_PMIN10_PMAX48_R25_HEATMAP(), &testdata.expectedH48_PMIN10_PMAX48_R25_HEATMAP_MIN(), &testdata.expectedH48_PMIN10_PMAX48_R25_HEATMAP_MAX(), &testdata.expectedH48_PMIN10_PMAX48_R25_SIGNAL_TO_NOISE_RATIO(), &testdata.expectedH48_PMIN10_PMAX48_R25_PHYSICAL_DECIBELS(), &testdata.expectedH48_PMIN10_PMAX48_R25_CALIBRATED_DECIBELS(), &testdata.expectedH48_PMIN10_PMAX48_R25_NORMALIZED_POSITION(), &testdata.expectedH48_PMIN10_PMAX48_R25_SIGNAL(), &testdata.expectedH48_PMIN10_PMAX48_R25_NOISE(), &testdata.expectedH48_PMIN10_PMAX48_R25_MEDIAN_BAR_RANGE(), &testdata.expectedH48_PMIN10_PMAX48_R25_WIDTH(), &testdata.expectedH48_PMIN10_PMAX48_R25_DOMINANT_CYCLE(), &testdata.expectedH48_PMIN10_PMAX48_R25_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH48_PMIN10_PMAX48_R25_HAS_CYCLE_ESTIMATE(), &testdata.expectedH48_PMIN10_PMAX48_R25_RATIO_IS_FINITE());
 }
 
-test "CoronaSignalToNoiseRatio NaN input" {
-    var x = try CoronaSignalToNoiseRatio.init(testing.allocator, .{});
-    defer x.deinit();
-
-    const result = x.updateSample(math.nan(f64), math.nan(f64), math.nan(f64), 0);
-    try testing.expect(result.heatmap.isEmpty());
-    try testing.expect(math.isNan(result.snr));
-    try testing.expect(!x.isPrimed());
-}
-
-test "CoronaSignalToNoiseRatio metadata" {
-    var x = try CoronaSignalToNoiseRatio.init(testing.allocator, .{});
-    defer x.deinit();
+test "CoronaSignalToNoiseRatio metadata, mnemonics, negative min, validation, and entities" {
+    var instance = try CoronaSignalToNoiseRatio.init(testing.allocator, defaultParams());
+    defer instance.deinit();
 
     var md: Metadata = undefined;
-    x.getMetadata(&md);
-
-    const mn_value = "csnr(50, 20, 1, 11, 30, hl/2)";
-    const mn_snr = "csnr-snr(30, hl/2)";
-
-    try testing.expectEqualStrings(mn_value, x.mnemonic());
+    instance.getMetadata(&md);
     try testing.expectEqual(Identifier.corona_signal_to_noise_ratio, md.identifier);
-    try testing.expectEqualStrings(mn_value, md.mnemonic);
+    try testing.expectEqualStrings("csnr(50, 20, 1, 11, 30)", md.mnemonic);
     try testing.expectEqual(@as(usize, 2), md.outputs_len);
+    try testing.expectEqual(shape_mod.Shape.heatmap, md.outputs_buf[0].shape);
+    try testing.expectEqual(shape_mod.Shape.scalar, md.outputs_buf[1].shape);
+    try testing.expectEqualStrings("csnr-snr(30)", md.outputs_buf[1].mnemonic);
 
-    const outputs = md.outputs_buf[0..md.outputs_len];
-    try testing.expectEqualStrings(mn_value, outputs[0].mnemonic);
-    try testing.expectEqualStrings(mn_snr, outputs[1].mnemonic);
-}
+    var neg_bounds = try CoronaSignalToNoiseRatio.init(testing.allocator, .{
+        .min_parameter_value = -5.0,
+        .max_parameter_value = 5.0,
+    });
+    defer neg_bounds.deinit();
+    try testing.expectEqualStrings("csnr(50, 20, -5, 5, 30)", neg_bounds.mnemonic());
 
-test "CoronaSignalToNoiseRatio validation" {
-    try testing.expectError(error.InvalidRasterLength, CoronaSignalToNoiseRatio.init(testing.allocator, .{
-        .raster_length = 1,
-    }));
-    try testing.expectError(error.InvalidMaxRasterValue, CoronaSignalToNoiseRatio.init(testing.allocator, .{
-        .max_raster_value = -1,
-    }));
-    try testing.expectError(error.InvalidMaxParameterValue, CoronaSignalToNoiseRatio.init(testing.allocator, .{
-        .min_parameter_value = 5,
-        .max_parameter_value = 5,
-    }));
-    try testing.expectError(error.InvalidHighPassFilterCutoff, CoronaSignalToNoiseRatio.init(testing.allocator, .{
-        .high_pass_filter_cutoff = 1,
-    }));
-    try testing.expectError(error.InvalidMinimalPeriod, CoronaSignalToNoiseRatio.init(testing.allocator, .{
-        .minimal_period = 1,
-    }));
-    try testing.expectError(error.InvalidMaximalPeriod, CoronaSignalToNoiseRatio.init(testing.allocator, .{
+    var flagged = try CoronaSignalToNoiseRatio.init(testing.allocator, .{
         .minimal_period = 10,
-        .maximal_period = 10,
-    }));
-}
+        .maximal_period = 48,
+        .bar_component = .median,
+    });
+    defer flagged.deinit();
+    var flagged_md: Metadata = undefined;
+    flagged.getMetadata(&flagged_md);
+    try testing.expectEqualStrings("csnr(50, 20, 1, 11, 30, pmin=10, pmax=48, hl/2)", flagged_md.mnemonic);
+    try testing.expectEqualStrings("csnr-snr(30, pmin=10, pmax=48, hl/2)", flagged_md.outputs_buf[1].mnemonic);
 
-test "CoronaSignalToNoiseRatio updateEntity" {
-    const prime_count = 50;
-    const inp: f64 = 100.0;
-    const time: i64 = 0;
+    try testing.expectError(error.InvalidRasterLength, CoronaSignalToNoiseRatio.init(testing.allocator, .{ .raster_length = 1 }));
+    try testing.expectError(error.InvalidMaxRasterValue, CoronaSignalToNoiseRatio.init(testing.allocator, .{ .max_raster_value = 6.0 }));
+    try testing.expectError(error.InvalidMaxParameterValue, CoronaSignalToNoiseRatio.init(testing.allocator, .{ .min_parameter_value = 11.0, .max_parameter_value = 11.0 }));
+    try testing.expectError(error.InvalidHighPassFilterCutoff, CoronaSignalToNoiseRatio.init(testing.allocator, .{ .high_pass_filter_cutoff = 4 }));
+    try testing.expectError(error.InvalidMinimalPeriod, CoronaSignalToNoiseRatio.init(testing.allocator, .{ .minimal_period = 5 }));
+    try testing.expectError(error.InvalidMaximalPeriod, CoronaSignalToNoiseRatio.init(testing.allocator, .{ .minimal_period = 10, .maximal_period = 10 }));
+    try testing.expectError(error.InvalidBarRange, instance.tryUpdate(100.0, 101.0, 99.0, 0));
+    try testing.expectError(error.InvalidBarRange, instance.tryUpdateRange(100.0, -1.0, 0));
+    try testing.expect(!instance.isPrimed());
 
-    // Update scalar
-    {
-        var x = try CoronaSignalToNoiseRatio.init(testing.allocator, .{});
-        defer x.deinit();
-        for (0..prime_count) |idx| {
-            const hl = makeHL(idx, testdata.test_input[idx % testdata.test_input.len]);
-            _ = x.updateSample(testdata.test_input[idx % testdata.test_input.len], hl.low, hl.high, time);
-        }
-        const s = Scalar{ .time = time, .value = inp };
-        const out = x.updateScalar(&s);
-        try testing.expectEqual(@as(usize, 2), out.len);
+    const prices = testdata.testInput();
+    const opens = testdata.testOpen();
+    const highs = testdata.testHigh();
+    const lows = testdata.testLow();
+    var bar_ind = try CoronaSignalToNoiseRatio.init(testing.allocator, defaultParams());
+    defer bar_ind.deinit();
+    var scalar_ind = try CoronaSignalToNoiseRatio.init(testing.allocator, defaultParams());
+    defer scalar_ind.deinit();
+    var quote_ind = try CoronaSignalToNoiseRatio.init(testing.allocator, defaultParams());
+    defer quote_ind.deinit();
+    var trade_ind = try CoronaSignalToNoiseRatio.init(testing.allocator, defaultParams());
+    defer trade_ind.deinit();
+    for (0..15) |index| {
+        const bar = Bar{ .time = @intCast(index), .open = opens[index], .high = highs[index], .low = lows[index], .close = prices[index], .volume = 1000.0 };
+        const scalar = Scalar{ .time = @intCast(index), .value = prices[index] };
+        const quote = Quote{ .time = @intCast(index), .bid_price = prices[index] - 0.5, .ask_price = prices[index] + 0.5, .bid_size = 10.0, .ask_size = 10.0 };
+        const trade = Trade{ .time = @intCast(index), .price = prices[index], .volume = 10.0 };
+        try testing.expectEqual(@as(usize, 2), bar_ind.updateBar(&bar).len);
+        try testing.expectEqual(@as(usize, 2), scalar_ind.updateScalar(&scalar).len);
+        try testing.expectEqual(@as(usize, 2), quote_ind.updateQuote(&quote).len);
+        try testing.expectEqual(@as(usize, 2), trade_ind.updateTrade(&trade).len);
     }
-
-    // Update bar
-    {
-        var x = try CoronaSignalToNoiseRatio.init(testing.allocator, .{});
-        defer x.deinit();
-        for (0..prime_count) |idx| {
-            const hl = makeHL(idx, testdata.test_input[idx % testdata.test_input.len]);
-            _ = x.updateSample(testdata.test_input[idx % testdata.test_input.len], hl.low, hl.high, time);
-        }
-        const b = Bar{ .time = time, .open = inp, .high = inp, .low = inp, .close = inp, .volume = 0 };
-        const out = x.updateBar(&b);
-        try testing.expectEqual(@as(usize, 2), out.len);
-    }
-
-    // Update quote
-    {
-        var x = try CoronaSignalToNoiseRatio.init(testing.allocator, .{});
-        defer x.deinit();
-        for (0..prime_count) |idx| {
-            const hl = makeHL(idx, testdata.test_input[idx % testdata.test_input.len]);
-            _ = x.updateSample(testdata.test_input[idx % testdata.test_input.len], hl.low, hl.high, time);
-        }
-        const q = Quote{ .time = time, .bid_price = inp, .ask_price = inp, .bid_size = 0, .ask_size = 0 };
-        const out = x.updateQuote(&q);
-        try testing.expectEqual(@as(usize, 2), out.len);
-    }
-
-    // Update trade
-    {
-        var x = try CoronaSignalToNoiseRatio.init(testing.allocator, .{});
-        defer x.deinit();
-        for (0..prime_count) |idx| {
-            const hl = makeHL(idx, testdata.test_input[idx % testdata.test_input.len]);
-            _ = x.updateSample(testdata.test_input[idx % testdata.test_input.len], hl.low, hl.high, time);
-        }
-        const t = Trade{ .time = time, .price = inp, .volume = 0 };
-        const out = x.updateTrade(&t);
-        try testing.expectEqual(@as(usize, 2), out.len);
-    }
+    const final_scalar = Scalar{ .time = 15, .value = 100.0 };
+    const final_out = scalar_ind.updateScalar(&final_scalar);
+    try testing.expectEqual(@as(f64, 11.0), final_out.slice()[1].scalar.value);
 }

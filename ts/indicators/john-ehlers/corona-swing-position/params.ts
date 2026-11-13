@@ -1,43 +1,61 @@
-import { BarComponent } from '../../../entities/bar-component';
-import { QuoteComponent } from '../../../entities/quote-component';
-import { TradeComponent } from '../../../entities/trade-component';
+import { BarComponent, DefaultBarComponent } from '../../../entities/bar-component';
+import { DefaultQuoteComponent, QuoteComponent } from '../../../entities/quote-component';
+import { DefaultTradeComponent, TradeComponent } from '../../../entities/trade-component';
+import { componentTripleMnemonic } from '../../core/component-triple-mnemonic';
+import { formatNumber } from '../corona/corona';
 
-/** Describes parameters to create an instance of the CoronaSwingPosition indicator. */
 export interface CoronaSwingPositionParams {
-  /** Length of the heatmap raster. Default 50. A zero value is treated as "use default". */
-  rasterLength?: number;
-
-  /** Maximum raster intensity value. Default 20. A zero value is treated as "use default". */
-  maxRasterValue?: number;
-
-  /** Minimum ordinate (y) value of the heatmap — lower bound of the mapped swing position.
-   *  Default -5. Only substituted when both Min and Max are 0 (unconfigured). */
-  minParameterValue?: number;
-
-  /** Maximum ordinate (y) value of the heatmap — upper bound of the mapped swing position.
-   *  Default 5. Only substituted when both Min and Max are 0 (unconfigured). */
-  maxParameterValue?: number;
-
-  /** High-pass filter cutoff. Default 30. A zero value is treated as "use default". */
-  highPassFilterCutoff?: number;
-
-  /** Minimal cycle period. Default 6. A zero value is treated as "use default". */
-  minimalPeriod?: number;
-
-  /** Maximal cycle period. Default 30. A zero value is treated as "use default". */
-  maximalPeriod?: number;
-
-  /** A component of a bar to use when updating the indicator with a bar sample.
-   *  Default BarComponent.Median (hl/2). */
-  barComponent?: BarComponent;
-
-  /** A component of a quote to use when updating the indicator with a quote sample. */
-  quoteComponent?: QuoteComponent;
-
-  /** A component of a trade to use when updating the indicator with a trade sample. */
-  tradeComponent?: TradeComponent;
+    rasterLength?: number;
+    maxRasterValue?: number;
+    minParameterValue?: number;
+    maxParameterValue?: number;
+    highPassFilterCutoff?: number;
+    minimalPeriod?: number;
+    maximalPeriod?: number;
+    leadWindow?: number;
+    positionWindow?: number;
+    barComponent?: BarComponent;
+    quoteComponent?: QuoteComponent;
+    tradeComponent?: TradeComponent;
 }
 
 export function defaultParams(): CoronaSwingPositionParams {
-    return { rasterLength: 50, maxRasterValue: 20, minParameterValue: -5, maxParameterValue: 5, highPassFilterCutoff: 30, minimalPeriod: 6, maximalPeriod: 30 };
+    return {
+        rasterLength: 50,
+        maxRasterValue: 20,
+        minParameterValue: -5,
+        maxParameterValue: 5,
+        highPassFilterCutoff: 30,
+        minimalPeriod: 6,
+        maximalPeriod: 30,
+        leadWindow: 51,
+        positionWindow: 21,
+    };
+}
+
+export function swingFlags(params?: CoronaSwingPositionParams): string {
+    const minPeriod = params?.minimalPeriod ?? 6;
+    const maxPeriod = params?.maximalPeriod ?? 30;
+    const leadWindow = params?.leadWindow ?? 51;
+    const positionWindow = params?.positionWindow ?? 21;
+    const parts: string[] = [];
+    if (minPeriod !== 6) parts.push(`, pmin=${minPeriod}`);
+    if (maxPeriod !== 30) parts.push(`, pmax=${maxPeriod}`);
+    if (leadWindow !== 51) parts.push(`, lead=${leadWindow}`);
+    if (positionWindow !== 21) parts.push(`, pos=${positionWindow}`);
+    return parts.join('');
+}
+
+export function coronaSwingPositionMnemonic(params?: CoronaSwingPositionParams): string {
+    const rasterLength = params?.rasterLength ?? 50;
+    const maxRaster = params?.maxRasterValue ?? 20;
+    const minParam = params?.minParameterValue ?? -5;
+    const maxParam = params?.maxParameterValue ?? 5;
+    const hpCutoff = params?.highPassFilterCutoff ?? 30;
+    const bc = params?.barComponent ?? DefaultBarComponent;
+    const qc = params?.quoteComponent ?? DefaultQuoteComponent;
+    const tc = params?.tradeComponent ?? DefaultTradeComponent;
+    const comp = componentTripleMnemonic(bc, qc, tc);
+    const flags = swingFlags(params);
+    return `cswing(${rasterLength}, ${formatNumber(maxRaster)}, ${formatNumber(minParam)}, ${formatNumber(maxParam)}, ${hpCutoff}${flags}${comp})`;
 }

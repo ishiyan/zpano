@@ -553,7 +553,7 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 			return coronaspectrum.NewCoronaSpectrumDefault()
 		}
 
-		p := &coronaspectrum.Params{}
+		p := coronaspectrum.DefaultParams()
 		if err := unmarshal(b, p); err != nil {
 			return nil, err
 		}
@@ -565,7 +565,7 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 			return coronasignaltonoiseratio.NewCoronaSignalToNoiseRatioDefault()
 		}
 
-		p := &coronasignaltonoiseratio.Params{}
+		p := coronasignaltonoiseratio.DefaultParams()
 		if err := unmarshal(b, p); err != nil {
 			return nil, err
 		}
@@ -577,7 +577,7 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 			return coronaswingposition.NewCoronaSwingPositionDefault()
 		}
 
-		p := &coronaswingposition.Params{}
+		p := coronaswingposition.DefaultParams()
 		if err := unmarshal(b, p); err != nil {
 			return nil, err
 		}
@@ -589,7 +589,7 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 			return coronatrendvigor.NewCoronaTrendVigorDefault()
 		}
 
-		p := &coronatrendvigor.Params{}
+		p := coronatrendvigor.DefaultParams()
 		if err := unmarshal(b, p); err != nil {
 			return nil, err
 		}

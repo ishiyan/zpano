@@ -1,7 +1,9 @@
 use std::any::Any;
 
 use crate::entities::bar::Bar;
-use crate::entities::bar_component::{component_value as bar_component_value, BarComponent};
+use crate::entities::bar_component::{
+    component_value as bar_component_value, BarComponent, DEFAULT_BAR_COMPONENT,
+};
 use crate::entities::quote::Quote;
 use crate::entities::quote_component::{
     component_value as quote_component_value, QuoteComponent, DEFAULT_QUOTE_COMPONENT,
@@ -17,35 +19,12 @@ use crate::indicators::core::identifier::Identifier;
 use crate::indicators::core::indicator::{Indicator, Output};
 use crate::indicators::core::metadata::Metadata;
 use crate::indicators::core::outputs::heatmap::Heatmap;
-use crate::indicators::john_ehlers::corona::corona::{Corona, CoronaParams};
+use crate::indicators::john_ehlers::corona::{
+    accept_snapshot, clip, format_number, rolling_append, validate_finite, validate_integer,
+    AdaptiveBandPass, Corona, CoronaParams, CoronaSnapshot, Raster, RasterKind, FIRST_BANK_SAMPLE,
+};
 
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
-
-const MAX_LEAD_LIST_COUNT: usize = 50;
-const MAX_POSITION_LIST_COUNT: usize = 20;
-
-/// 60° phase-lead coefficients: lead60 = 0.5·BP + sin(60°)·Q ≈ 0.5·BP + 0.866·Q.
-const LEAD60_COEF_BP: f64 = 0.5;
-const LEAD60_COEF_Q: f64 = 0.866;
-
-/// Bandpass filter delta factor in γ = 1/cos(ω · 2 · 0.1).
-const BP_DELTA: f64 = 0.1;
-
-const WIDTH_HIGH_THRESHOLD: f64 = 0.85;
-const WIDTH_HIGH_SATURATE: f64 = 0.8;
-const WIDTH_NARROW: f64 = 0.01;
-const WIDTH_SCALE: f64 = 0.15;
-
-const RASTER_BLEND_EXPONENT: f64 = 0.95;
-const RASTER_BLEND_HALF: f64 = 0.5;
-
-// ---------------------------------------------------------------------------
-// Params
-// ---------------------------------------------------------------------------
-
-/// Parameters for the Corona Swing Position indicator.
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct CoronaSwingPositionParams {
     pub raster_length: i32,
     pub max_raster_value: f64,
@@ -54,21 +33,27 @@ pub struct CoronaSwingPositionParams {
     pub high_pass_filter_cutoff: i32,
     pub minimal_period: i32,
     pub maximal_period: i32,
+    pub lead_window: i32,
+    pub position_window: i32,
     pub bar_component: Option<BarComponent>,
     pub quote_component: Option<QuoteComponent>,
     pub trade_component: Option<TradeComponent>,
 }
+
+pub type Params = CoronaSwingPositionParams;
 
 impl Default for CoronaSwingPositionParams {
     fn default() -> Self {
         Self {
             raster_length: 50,
             max_raster_value: 20.0,
-            min_parameter_value: 0.0,
-            max_parameter_value: 0.0,
+            min_parameter_value: -5.0,
+            max_parameter_value: 5.0,
             high_pass_filter_cutoff: 30,
             minimal_period: 6,
             maximal_period: 30,
+            lead_window: 51,
+            position_window: 21,
             bar_component: None,
             quote_component: None,
             trade_component: None,
@@ -76,354 +61,270 @@ impl Default for CoronaSwingPositionParams {
     }
 }
 
-// ---------------------------------------------------------------------------
-// Output enum (1-based, matching Go iota+1)
-// ---------------------------------------------------------------------------
+pub fn default_params() -> CoronaSwingPositionParams {
+    CoronaSwingPositionParams::default()
+}
 
-/// Output indices for the Corona Swing Position indicator.
-#[repr(u8)]
+fn swing_flags(params: &CoronaSwingPositionParams) -> String {
+    let mut flags = String::new();
+    if params.minimal_period != 6 {
+        flags.push_str(&format!(", pmin={}", params.minimal_period));
+    }
+    if params.maximal_period != 30 {
+        flags.push_str(&format!(", pmax={}", params.maximal_period));
+    }
+    if params.lead_window != 51 {
+        flags.push_str(&format!(", lead={}", params.lead_window));
+    }
+    if params.position_window != 21 {
+        flags.push_str(&format!(", pos={}", params.position_window));
+    }
+    flags
+}
+
+pub fn mnemonic(params: &CoronaSwingPositionParams) -> String {
+    let bc = params.bar_component.unwrap_or(DEFAULT_BAR_COMPONENT);
+    let qc = params.quote_component.unwrap_or(DEFAULT_QUOTE_COMPONENT);
+    let tc = params.trade_component.unwrap_or(DEFAULT_TRADE_COMPONENT);
+    let comp = component_triple_mnemonic(bc, qc, tc);
+    let flags = swing_flags(params);
+    format!(
+        "cswing({}, {}, {}, {}, {}{}{})",
+        params.raster_length,
+        format_number(params.max_raster_value),
+        format_number(params.min_parameter_value),
+        format_number(params.max_parameter_value),
+        params.high_pass_filter_cutoff,
+        flags,
+        comp
+    )
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[repr(u8)]
 pub enum CoronaSwingPositionOutput {
-    /// The Corona swing position heatmap column.
     Value = 1,
-    /// The scalar swing position in [MinParameterValue, MaxParameterValue].
     SwingPosition = 2,
 }
 
-// ---------------------------------------------------------------------------
-// Indicator struct
-// ---------------------------------------------------------------------------
+#[derive(Debug, Clone)]
+pub struct CoronaSwingPositionSnapshot {
+    pub heatmap: Heatmap,
+    pub swing_position: f64,
+    pub normalized_position: f64,
+    pub dominant_cycle: f64,
+    pub dominant_cycle_median: f64,
+    pub band_pass: f64,
+    pub quadrature: f64,
+    pub cycle_amplitude: f64,
+    pub lead60: f64,
+    pub position_span: f64,
+    pub width: f64,
+    pub has_cycle_estimate: f64,
+}
 
-/// Ehlers' Corona Swing Position heatmap indicator.
+pub type Snapshot = CoronaSwingPositionSnapshot;
+
 pub struct CoronaSwingPosition {
-    mnemonic: String,
-    description: String,
+    mnemonic_text: String,
+    description_text: String,
     mnemonic_sp: String,
     description_sp: String,
-    c: Corona,
-    raster_length: usize,
-    raster_step: f64,
-    max_raster_value: f64,
-    min_parameter_value: f64,
-    max_parameter_value: f64,
-    parameter_resolution: f64,
-    raster: Vec<f64>,
-    lead_list: Vec<f64>,
-    position_list: Vec<f64>,
-    sample_previous: f64,
-    sample_previous2: f64,
-    band_pass_previous: f64,
-    band_pass_previous2: f64,
-    swing_position: f64,
-    is_started: bool,
+    engine: Corona,
+    engine_params: CoronaParams,
+    bandpass: AdaptiveBandPass,
+    raster: Raster,
+    lead_window: usize,
+    position_window: usize,
+    sample_count: usize,
+    leads: Vec<f64>,
+    positions: Vec<f64>,
     bar_func: fn(&Bar) -> f64,
     quote_func: fn(&Quote) -> f64,
     trade_func: fn(&Trade) -> f64,
 }
 
 impl CoronaSwingPosition {
-    /// Creates a new Corona Swing Position indicator with the given parameters.
-    pub fn new(p: &CoronaSwingPositionParams) -> Result<Self, String> {
-        let invalid = "invalid corona swing position parameters";
-
-        let mut raster_length = p.raster_length;
-        if raster_length == 0 {
-            raster_length = 50;
+    pub fn new(params: &CoronaSwingPositionParams) -> Result<Self, String> {
+        validate_integer("lead_window", params.lead_window, 2)?;
+        validate_integer("position_window", params.position_window, 2)?;
+        let ceiling = validate_finite("max_raster_value", params.max_raster_value)?;
+        if ceiling <= 6.0 {
+            return Err("invalid corona swing position parameters: max_raster_value must exceed 6".to_string());
         }
 
-        let mut max_raster_value = p.max_raster_value;
-        if max_raster_value == 0.0 {
-            max_raster_value = 20.0;
-        }
+        let raster = Raster::new(
+            params.raster_length,
+            params.min_parameter_value,
+            params.max_parameter_value,
+            ceiling,
+        )?;
+        let engine = Corona::new(&CoronaParams {
+            high_pass_filter_cutoff: params.high_pass_filter_cutoff,
+            minimal_period: params.minimal_period,
+            maximal_period: params.maximal_period,
+            decibels_lower_threshold: 6.0,
+            decibels_upper_threshold: raster.ceiling(),
+        })?;
+        let engine_params = engine.parameters();
 
-        // MinParameterValue and MaxParameterValue default only when BOTH are zero.
-        let mut min_parameter_value = p.min_parameter_value;
-        let mut max_parameter_value = p.max_parameter_value;
-        if min_parameter_value == 0.0 && max_parameter_value == 0.0 {
-            min_parameter_value = -5.0;
-            max_parameter_value = 5.0;
-        }
+        let bc = params.bar_component.unwrap_or(DEFAULT_BAR_COMPONENT);
+        let qc = params.quote_component.unwrap_or(DEFAULT_QUOTE_COMPONENT);
+        let tc = params.trade_component.unwrap_or(DEFAULT_TRADE_COMPONENT);
+        let comp = component_triple_mnemonic(bc, qc, tc);
+        let flags = swing_flags(params);
 
-        let mut high_pass_filter_cutoff = p.high_pass_filter_cutoff;
-        if high_pass_filter_cutoff == 0 {
-            high_pass_filter_cutoff = 30;
-        }
-
-        let mut minimal_period = p.minimal_period;
-        if minimal_period == 0 {
-            minimal_period = 6;
-        }
-
-        let mut maximal_period = p.maximal_period;
-        if maximal_period == 0 {
-            maximal_period = 30;
-        }
-
-        if raster_length < 2 {
-            return Err(format!("{}: RasterLength should be >= 2", invalid));
-        }
-        if max_raster_value <= 0.0 {
-            return Err(format!("{}: MaxRasterValue should be > 0", invalid));
-        }
-        if max_parameter_value <= min_parameter_value {
-            return Err(format!(
-                "{}: MaxParameterValue should be > MinParameterValue",
-                invalid
-            ));
-        }
-        if high_pass_filter_cutoff < 2 {
-            return Err(format!(
-                "{}: HighPassFilterCutoff should be >= 2",
-                invalid
-            ));
-        }
-        if minimal_period < 2 {
-            return Err(format!("{}: MinimalPeriod should be >= 2", invalid));
-        }
-        if maximal_period <= minimal_period {
-            return Err(format!(
-                "{}: MaximalPeriod should be > MinimalPeriod",
-                invalid
-            ));
-        }
-
-        let bc = p.bar_component.unwrap_or(BarComponent::Median);
-        let qc = p.quote_component.unwrap_or(DEFAULT_QUOTE_COMPONENT);
-        let tc = p.trade_component.unwrap_or(DEFAULT_TRADE_COMPONENT);
-
-        let c = Corona::new(&CoronaParams {
-            high_pass_filter_cutoff,
-            minimal_period,
-            maximal_period,
-            ..CoronaParams::default()
-        })
-        .map_err(|e| format!("{}: {}", invalid, e))?;
-
-        let bar_func = bar_component_value(bc);
-        let quote_func = quote_component_value(qc);
-        let trade_func = trade_component_value(tc);
-
-        let component_mnemonic = component_triple_mnemonic(bc, qc, tc);
-
-        let mnemonic = format!(
-            "cswing({}, {}, {}, {}, {}{})",
-            raster_length, max_raster_value, min_parameter_value,
-            max_parameter_value, high_pass_filter_cutoff, component_mnemonic,
+        let mnemonic_text = format!(
+            "cswing({}, {}, {}, {}, {}{}{})",
+            raster.length(),
+            format_number(raster.ceiling()),
+            format_number(raster.lower()),
+            format_number(raster.upper()),
+            params.high_pass_filter_cutoff,
+            flags,
+            comp
         );
-        let mnemonic_sp = format!(
-            "cswing-sp({}{})",
-            high_pass_filter_cutoff, component_mnemonic,
-        );
-        let description = format!("Corona swing position {}", mnemonic);
-        let description_sp = format!("Corona swing position scalar {}", mnemonic_sp);
-
-        let rl = raster_length as usize;
-        let parameter_resolution =
-            (rl as f64 - 1.0) / (max_parameter_value - min_parameter_value);
+        let mnemonic_sp = format!("cswing-sp({}{}{})", params.high_pass_filter_cutoff, flags, comp);
+        let lead_window = params.lead_window as usize;
+        let position_window = params.position_window as usize;
 
         Ok(Self {
-            mnemonic,
-            description,
+            description_text: format!("Corona swing position {mnemonic_text}"),
+            mnemonic_text,
+            description_sp: format!("Corona swing position scalar {mnemonic_sp}"),
             mnemonic_sp,
-            description_sp,
-            c,
-            raster_length: rl,
-            raster_step: max_raster_value / rl as f64,
-            max_raster_value,
-            min_parameter_value,
-            max_parameter_value,
-            parameter_resolution,
-            raster: vec![0.0; rl],
-            lead_list: Vec::with_capacity(MAX_LEAD_LIST_COUNT),
-            position_list: Vec::with_capacity(MAX_POSITION_LIST_COUNT),
-            sample_previous: 0.0,
-            sample_previous2: 0.0,
-            band_pass_previous: 0.0,
-            band_pass_previous2: 0.0,
-            swing_position: f64::NAN,
-            is_started: false,
-            bar_func,
-            quote_func,
-            trade_func,
+            engine,
+            engine_params,
+            bandpass: AdaptiveBandPass::new(),
+            raster,
+            lead_window,
+            position_window,
+            sample_count: 0,
+            leads: vec![0.0; lead_window],
+            positions: vec![0.0; position_window],
+            bar_func: bar_component_value(bc),
+            quote_func: quote_component_value(qc),
+            trade_func: trade_component_value(tc),
         })
     }
 
-    /// Feeds the next sample and returns (heatmap, swing_position).
-    /// On unprimed bars the heatmap is empty and swing_position is NaN.
-    pub fn update(&mut self, sample: f64, time: i64) -> (Heatmap, f64) {
-        if sample.is_nan() {
-            return (
-                Heatmap::empty(
-                    time,
-                    self.min_parameter_value,
-                    self.max_parameter_value,
-                    self.parameter_resolution,
-                ),
-                f64::NAN,
-            );
+    pub fn new_default() -> Result<Self, String> {
+        Self::new(&CoronaSwingPositionParams::default())
+    }
+
+    pub fn reset(&mut self) {
+        self.engine.reset();
+        self.bandpass.reset();
+        self.raster.reset();
+        self.sample_count = 0;
+        self.leads = vec![0.0; self.lead_window];
+        self.positions = vec![0.0; self.position_window];
+    }
+
+    fn empty_snapshot(&self, time: i64) -> CoronaSwingPositionSnapshot {
+        CoronaSwingPositionSnapshot {
+            heatmap: self.raster.empty(time),
+            swing_position: f64::NAN,
+            normalized_position: f64::NAN,
+            dominant_cycle: f64::NAN,
+            dominant_cycle_median: f64::NAN,
+            band_pass: f64::NAN,
+            quadrature: f64::NAN,
+            cycle_amplitude: f64::NAN,
+            lead60: f64::NAN,
+            position_span: f64::NAN,
+            width: f64::NAN,
+            has_cycle_estimate: f64::NAN,
         }
+    }
 
-        let primed = self.c.update(sample);
-
-        if !self.is_started {
-            self.sample_previous = sample;
-            self.is_started = true;
-
-            return (
-                Heatmap::empty(
-                    time,
-                    self.min_parameter_value,
-                    self.max_parameter_value,
-                    self.parameter_resolution,
-                ),
-                f64::NAN,
-            );
+    pub fn try_update_from_snapshot(
+        &mut self,
+        snapshot: &CoronaSnapshot,
+    ) -> Result<CoronaSwingPositionSnapshot, String> {
+        let accepted = accept_snapshot(snapshot, &self.engine_params, self.sample_count + 1)?;
+        if !accepted {
+            return Ok(self.empty_snapshot(snapshot.time));
         }
+        let cycle = self.bandpass.update(snapshot.price, snapshot.dominant_cycle_median)?;
+        self.sample_count = snapshot.sample_count;
 
-        // Bandpass InPhase filter at the dominant cycle median period.
-        let omega = 2.0 * std::f64::consts::PI / self.c.dominant_cycle_median();
-        let beta2 = omega.cos();
-        let gamma2 = 1.0 / (omega * 2.0 * BP_DELTA).cos();
-        let alpha2 = gamma2 - (gamma2 * gamma2 - 1.0).sqrt();
-        let band_pass = 0.5 * (1.0 - alpha2) * (sample - self.sample_previous2)
-            + beta2 * (1.0 + alpha2) * self.band_pass_previous
-            - alpha2 * self.band_pass_previous2;
-
-        // Quadrature = derivative / omega.
-        let quadrature2 = (band_pass - self.band_pass_previous) / omega;
-
-        self.band_pass_previous2 = self.band_pass_previous;
-        self.band_pass_previous = band_pass;
-        self.sample_previous2 = self.sample_previous;
-        self.sample_previous = sample;
-
-        // 60° lead: lead60 = 0.5·BP_previous2 + 0.866·Q
-        let lead60 =
-            LEAD60_COEF_BP * self.band_pass_previous2 + LEAD60_COEF_Q * quadrature2;
-
-        let (lowest_lead, highest_lead) =
-            append_rolling(&mut self.lead_list, MAX_LEAD_LIST_COUNT, lead60);
-
-        // Normalised lead position ∈ [0, 1].
-        let range_lead = highest_lead - lowest_lead;
-        let position = if range_lead > 0.0 {
-            (lead60 - lowest_lead) / range_lead
+        let (lowest, highest) = rolling_append(&mut self.leads, cycle.lead60, self.lead_window);
+        let flat = highest == lowest;
+        let raw_position = if flat {
+            0.5
         } else {
-            range_lead
+            (cycle.lead60 - lowest) / (highest - lowest)
         };
-
-        let (lowest_pos, highest_pos) =
-            append_rolling(&mut self.position_list, MAX_POSITION_LIST_COUNT, position);
-        let highest = highest_pos - lowest_pos;
-
-        let width = if highest > WIDTH_HIGH_THRESHOLD {
-            WIDTH_NARROW
-        } else {
-            WIDTH_SCALE * highest
-        };
-
-        self.swing_position = (self.max_parameter_value - self.min_parameter_value) * position
-            + self.min_parameter_value;
-
-        let position_scaled_to_raster_length =
-            (position * self.raster_length as f64).round() as i32;
-        let position_scaled_to_max_raster_value = position * self.max_raster_value;
-
-        for i in 0..self.raster_length {
-            let mut value = self.raster[i];
-
-            if i as i32 == position_scaled_to_raster_length {
-                value *= RASTER_BLEND_HALF;
-            } else {
-                let mut argument =
-                    position_scaled_to_max_raster_value - self.raster_step * i as f64;
-                if (i as i32) > position_scaled_to_raster_length {
-                    argument = -argument;
-                }
-
-                if width > 0.0 {
-                    value = RASTER_BLEND_HALF
-                        * ((argument / width).powf(RASTER_BLEND_EXPONENT)
-                            + RASTER_BLEND_HALF * value);
-                }
-            }
-
-            if value < 0.0 {
-                value = 0.0;
-            } else if value > self.max_raster_value {
-                value = self.max_raster_value;
-            }
-
-            if highest > WIDTH_HIGH_SATURATE {
-                value = self.max_raster_value;
-            }
-
-            if value.is_nan() {
-                value = 0.0;
-            }
-
-            self.raster[i] = value;
+        let position = clip(raw_position, 0.0, 1.0);
+        let (low_position, high_position) =
+            rolling_append(&mut self.positions, position, self.position_window);
+        let span = high_position - low_position;
+        let mut width = if span > 0.85 { 0.01 } else { 0.15 * span };
+        if width == 0.0 {
+            width = 0.01;
         }
 
-        if !primed {
-            return (
-                Heatmap::empty(
-                    time,
-                    self.min_parameter_value,
-                    self.max_parameter_value,
-                    self.parameter_resolution,
-                ),
-                f64::NAN,
-            );
+        self.raster
+            .update(position, width, RasterKind::Swing, span > 0.8 || flat);
+        if !snapshot.primed {
+            return Ok(self.empty_snapshot(snapshot.time));
         }
 
-        let mut value_min = f64::INFINITY;
-        let mut value_max = f64::NEG_INFINITY;
-        let mut values = vec![0.0; self.raster_length];
+        let mapped = self.raster.lower() + (self.raster.upper() - self.raster.lower()) * position;
+        Ok(CoronaSwingPositionSnapshot {
+            heatmap: self.raster.column(snapshot.time),
+            swing_position: mapped,
+            normalized_position: position,
+            dominant_cycle: snapshot.dominant_cycle,
+            dominant_cycle_median: snapshot.dominant_cycle_median,
+            band_pass: cycle.band_pass,
+            quadrature: cycle.quadrature,
+            cycle_amplitude: cycle.amplitude,
+            lead60: cycle.lead60,
+            position_span: span,
+            width,
+            has_cycle_estimate: if snapshot.has_cycle_estimate { 1.0 } else { 0.0 },
+        })
+    }
 
-        for i in 0..self.raster_length {
-            let v = self.raster[i];
-            values[i] = v;
-            if v < value_min {
-                value_min = v;
-            }
-            if v > value_max {
-                value_max = v;
-            }
-        }
+    pub fn update_from_snapshot(&mut self, snapshot: &CoronaSnapshot) -> CoronaSwingPositionSnapshot {
+        self.try_update_from_snapshot(snapshot)
+            .unwrap_or_else(|err| panic!("CoronaSwingPosition::update_from_snapshot failed: {err}"))
+    }
 
-        let heatmap = Heatmap::new(
-            time,
-            self.min_parameter_value,
-            self.max_parameter_value,
-            self.parameter_resolution,
-            value_min,
-            value_max,
-            values,
-        );
+    pub fn try_update(&mut self, sample: f64, time: i64) -> Result<CoronaSwingPositionSnapshot, String> {
+        let engine_snap = self.engine.try_update(sample, time)?;
+        self.try_update_from_snapshot(&engine_snap)
+    }
 
-        (heatmap, self.swing_position)
+    pub fn update(&mut self, sample: f64, time: i64) -> CoronaSwingPositionSnapshot {
+        self.try_update(sample, time)
+            .unwrap_or_else(|err| panic!("CoronaSwingPosition::update failed: {err}"))
+    }
+
+    fn wrap_output(time: i64, snapshot: CoronaSwingPositionSnapshot) -> Output {
+        vec![
+            Box::new(snapshot.heatmap) as Box<dyn Any>,
+            Box::new(Scalar::new(time, snapshot.swing_position)),
+        ]
     }
 }
 
-// ---------------------------------------------------------------------------
-// Indicator trait
-// ---------------------------------------------------------------------------
-
 impl Indicator for CoronaSwingPosition {
     fn is_primed(&self) -> bool {
-        self.c.is_primed()
+        self.sample_count >= FIRST_BANK_SAMPLE
     }
 
     fn metadata(&self) -> Metadata {
         build_metadata(
             Identifier::CoronaSwingPosition,
-            &self.mnemonic,
-            &self.description,
+            &self.mnemonic_text,
+            &self.description_text,
             &[
                 OutputText {
-                    mnemonic: self.mnemonic.clone(),
-                    description: self.description.clone(),
+                    mnemonic: self.mnemonic_text.clone(),
+                    description: self.description_text.clone(),
                 },
                 OutputText {
                     mnemonic: self.mnemonic_sp.clone(),
@@ -433,311 +334,203 @@ impl Indicator for CoronaSwingPosition {
         )
     }
 
+    fn update_scalar(&mut self, sample: &Scalar) -> Output {
+        Self::wrap_output(sample.time, self.update(sample.value, sample.time))
+    }
+
     fn update_bar(&mut self, bar: &Bar) -> Output {
         let sample = (self.bar_func)(bar);
-        let time = bar.time;
-        let (heatmap, sp) = self.update(sample, time);
-        vec![
-            Box::new(heatmap) as Box<dyn Any>,
-            Box::new(Scalar::new(time, sp)) as Box<dyn Any>,
-        ]
+        Self::wrap_output(bar.time, self.update(sample, bar.time))
     }
 
     fn update_quote(&mut self, quote: &Quote) -> Output {
         let sample = (self.quote_func)(quote);
-        let time = quote.time;
-        let (heatmap, sp) = self.update(sample, time);
-        vec![
-            Box::new(heatmap) as Box<dyn Any>,
-            Box::new(Scalar::new(time, sp)) as Box<dyn Any>,
-        ]
+        Self::wrap_output(quote.time, self.update(sample, quote.time))
     }
 
     fn update_trade(&mut self, trade: &Trade) -> Output {
         let sample = (self.trade_func)(trade);
-        let time = trade.time;
-        let (heatmap, sp) = self.update(sample, time);
-        vec![
-            Box::new(heatmap) as Box<dyn Any>,
-            Box::new(Scalar::new(time, sp)) as Box<dyn Any>,
-        ]
-    }
-
-    fn update_scalar(&mut self, scalar: &Scalar) -> Output {
-        let time = scalar.time;
-        let (heatmap, sp) = self.update(scalar.value, time);
-        vec![
-            Box::new(heatmap) as Box<dyn Any>,
-            Box::new(Scalar::new(time, sp)) as Box<dyn Any>,
-        ]
+        Self::wrap_output(trade.time, self.update(sample, trade.time))
     }
 }
-
-// ---------------------------------------------------------------------------
-// Helper: appendRolling
-// ---------------------------------------------------------------------------
-
-/// Appends v to the list, drops the oldest element once the list reaches
-/// max_count, and returns the current (lowest, highest) values.
-fn append_rolling(list: &mut Vec<f64>, max_count: usize, v: f64) -> (f64, f64) {
-    if list.len() >= max_count {
-        list.remove(0);
-    }
-    list.push(v);
-
-    let mut lowest = v;
-    let mut highest = v;
-    for &x in list.iter() {
-        if x < lowest {
-            lowest = x;
-        }
-        if x > highest {
-            highest = x;
-        }
-    }
-
-    (lowest, highest)
-}
-
-// ===========================================================================
-// Tests
-// ===========================================================================
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use super::super::testdata::testdata;
-    const TOLERANCE: f64 = 1e-4;
+    use super::super::testdata::{expected_data, testdata};
+    use crate::indicators::core::outputs::shape::Shape;
 
-    #[test]
-    fn test_update_snapshots() {
-        let input = testdata::test_input();
-        let mut x =
-            CoronaSwingPosition::new(&CoronaSwingPositionParams::default()).unwrap();
+    const TOLERANCE: f64 = 5e-12;
 
-        struct Snap {
-            i: usize,
-            sp: f64,
-            vmn: f64,
-            vmx: f64,
+    fn assert_close(actual: f64, expected: f64, label: &str) {
+        if expected.is_nan() {
+            assert!(actual.is_nan(), "{label}: expected NaN, got {actual}");
+            return;
         }
-
-        let snapshots = vec![
-            Snap { i: 11, sp: 5.0, vmn: 20.0, vmx: 20.0 },
-            Snap { i: 12, sp: 5.0, vmn: 20.0, vmx: 20.0 },
-            Snap { i: 50, sp: 4.5384908349, vmn: 20.0, vmx: 20.0 },
-            Snap { i: 100, sp: -3.8183742675, vmn: 3.4957777081, vmx: 20.0 },
-            Snap { i: 150, sp: -1.8516194371, vmn: 5.3792287864, vmx: 20.0 },
-            Snap { i: 200, sp: -3.6944428668, vmn: 4.2580825738, vmx: 20.0 },
-            Snap { i: 251, sp: -0.8524812061, vmn: 4.4822539784, vmx: 20.0 },
-        ];
-
-        let mut si = 0;
-        for i in 0..input.len() {
-            let (h, sp) = x.update(input[i], i as i64);
-
-            assert_eq!(h.parameter_first, -5.0, "[{}] parameter_first", i);
-            assert_eq!(h.parameter_last, 5.0, "[{}] parameter_last", i);
-            assert!(
-                (h.parameter_resolution - 4.9).abs() < 1e-9,
-                "[{}] parameter_resolution: {}",
-                i,
-                h.parameter_resolution
-            );
-
-            if !x.is_primed() {
-                assert!(h.is_empty(), "[{}] expected empty heatmap before priming", i);
-                assert!(sp.is_nan(), "[{}] expected NaN sp before priming", i);
-                continue;
-            }
-
-            assert_eq!(
-                h.values.len(),
-                50,
-                "[{}] heatmap values length",
-                i
-            );
-
-            if si < snapshots.len() && snapshots[si].i == i {
-                assert!(
-                    (snapshots[si].sp - sp).abs() < TOLERANCE,
-                    "[{}] sp: expected {}, got {}",
-                    i,
-                    snapshots[si].sp,
-                    sp
-                );
-                assert!(
-                    (snapshots[si].vmn - h.value_min).abs() < TOLERANCE,
-                    "[{}] vmin: expected {}, got {}",
-                    i,
-                    snapshots[si].vmn,
-                    h.value_min
-                );
-                assert!(
-                    (snapshots[si].vmx - h.value_max).abs() < TOLERANCE,
-                    "[{}] vmax: expected {}, got {}",
-                    i,
-                    snapshots[si].vmx,
-                    h.value_max
-                );
-                si += 1;
-            }
+        if expected.is_infinite() {
+            assert_eq!(actual, expected, "{label}: expected {expected}, got {actual}");
+            return;
         }
-
-        assert_eq!(si, snapshots.len(), "did not hit all snapshots");
-    }
-
-    #[test]
-    fn test_primes_at_bar_11() {
-        let input = testdata::test_input();
-        let mut x =
-            CoronaSwingPosition::new(&CoronaSwingPositionParams::default()).unwrap();
-
-        assert!(!x.is_primed());
-
-        let mut primed_at: Option<usize> = None;
-        for i in 0..input.len() {
-            x.update(input[i], i as i64);
-            if x.is_primed() && primed_at.is_none() {
-                primed_at = Some(i);
-            }
-        }
-
-        assert_eq!(primed_at, Some(11), "expected priming at index 11");
-    }
-
-    #[test]
-    fn test_nan_input() {
-        let mut x =
-            CoronaSwingPosition::new(&CoronaSwingPositionParams::default()).unwrap();
-
-        let (h, sp) = x.update(f64::NAN, 0);
-        assert!(h.is_empty());
-        assert!(sp.is_nan());
-        assert!(!x.is_primed());
-    }
-
-    #[test]
-    fn test_metadata() {
-        let x =
-            CoronaSwingPosition::new(&CoronaSwingPositionParams::default()).unwrap();
-        let md = x.metadata();
-
-        let mn_value = "cswing(50, 20, -5, 5, 30, hl/2)";
-        let mn_sp = "cswing-sp(30, hl/2)";
-
-        assert_eq!(md.identifier, Identifier::CoronaSwingPosition);
-        assert_eq!(md.mnemonic, mn_value);
-        assert_eq!(md.description, format!("Corona swing position {}", mn_value));
-        assert_eq!(md.outputs.len(), 2);
-
-        assert_eq!(md.outputs[0].kind, CoronaSwingPositionOutput::Value as i32);
-        assert_eq!(md.outputs[0].mnemonic, mn_value);
-
-        assert_eq!(
-            md.outputs[1].kind,
-            CoronaSwingPositionOutput::SwingPosition as i32
+        assert!(actual.is_finite(), "{label}: expected finite {expected}, got {actual}");
+        let bound = TOLERANCE.max(expected.abs() * TOLERANCE);
+        assert!(
+            (actual - expected).abs() <= bound,
+            "{label}: actual={actual}, expected={expected}, diff={}",
+            (actual - expected).abs()
         );
-        assert_eq!(md.outputs[1].mnemonic, mn_sp);
     }
 
-    #[test]
-    fn test_update_entity() {
-        let input = testdata::test_input();
-        let time = 1000i64;
+    #[allow(clippy::too_many_arguments)]
+    fn verify_case(
+        case_name: &str,
+        raster_len: usize,
+        hp_cutoff: i32,
+        min_period: i32,
+        max_period: i32,
+        expected_heatmap: &[Vec<f64>],
+        expected_min: &[f64],
+        expected_max: &[f64],
+        expected_sp: &[f64],
+        expected_norm: &[f64],
+        expected_dc: &[f64],
+        expected_dcm: &[f64],
+        expected_bp: &[f64],
+        expected_quad: &[f64],
+        expected_amp: &[f64],
+        expected_lead: &[f64],
+        expected_span: &[f64],
+        expected_width: &[f64],
+        expected_has_est: &[f64],
+    ) {
+        let mut indicator = CoronaSwingPosition::new(&CoronaSwingPositionParams {
+            raster_length: raster_len as i32,
+            high_pass_filter_cutoff: hp_cutoff,
+            minimal_period: min_period,
+            maximal_period: max_period,
+            ..Default::default()
+        })
+        .unwrap();
 
-        // Helper to prime an indicator.
-        let prime = |x: &mut CoronaSwingPosition| {
-            for i in 0..50 {
-                x.update(input[i % input.len()], time);
+        let step = 10.0 / (raster_len as f64);
+        let expected_first = -5.0 + step;
+        let expected_resolution = 1.0 / step;
+        let prices = testdata::test_input();
+
+        for (index, &price) in prices.iter().enumerate() {
+            let snap = indicator.update(price, index as i64);
+            assert_close(snap.heatmap.parameter_first, expected_first, &format!("{case_name}[{index}].first"));
+            assert_close(snap.heatmap.parameter_last, 5.0, &format!("{case_name}[{index}].last"));
+            assert_close(snap.heatmap.parameter_resolution, expected_resolution, &format!("{case_name}[{index}].res"));
+
+            let row_empty = expected_sp[index].is_nan();
+            assert_eq!(indicator.is_primed(), !row_empty);
+            if row_empty {
+                assert!(snap.heatmap.is_empty());
+            } else {
+                assert_eq!(snap.heatmap.values.len(), raster_len);
+                for bin_index in 0..raster_len {
+                    assert_close(
+                        snap.heatmap.values[bin_index],
+                        expected_heatmap[index][bin_index],
+                        &format!("{case_name}[{index}].hm[{bin_index}]"),
+                    );
+                }
             }
-        };
-
-        // Scalar
-        {
-            let mut x =
-                CoronaSwingPosition::new(&CoronaSwingPositionParams::default()).unwrap();
-            prime(&mut x);
-            let out = x.update_scalar(&Scalar::new(time, 100.0));
-            assert_eq!(out.len(), 2);
-            assert!(out[0].downcast_ref::<Heatmap>().is_some());
-            assert!(out[1].downcast_ref::<Scalar>().is_some());
-        }
-
-        // Bar
-        {
-            let mut x =
-                CoronaSwingPosition::new(&CoronaSwingPositionParams::default()).unwrap();
-            prime(&mut x);
-            let bar = Bar::new(time, 0.0, 100.5, 99.5, 100.0, 0.0);
-            let out = x.update_bar(&bar);
-            assert_eq!(out.len(), 2);
-            assert!(out[0].downcast_ref::<Heatmap>().is_some());
-            assert!(out[1].downcast_ref::<Scalar>().is_some());
-        }
-
-        // Quote
-        {
-            let mut x =
-                CoronaSwingPosition::new(&CoronaSwingPositionParams::default()).unwrap();
-            prime(&mut x);
-            let quote = Quote::new(time, 100.0, 100.0, 0.0, 0.0);
-            let out = x.update_quote(&quote);
-            assert_eq!(out.len(), 2);
-            assert!(out[0].downcast_ref::<Heatmap>().is_some());
-            assert!(out[1].downcast_ref::<Scalar>().is_some());
-        }
-
-        // Trade
-        {
-            let mut x =
-                CoronaSwingPosition::new(&CoronaSwingPositionParams::default()).unwrap();
-            prime(&mut x);
-            let trade = Trade::new(time, 100.0, 0.0);
-            let out = x.update_trade(&trade);
-            assert_eq!(out.len(), 2);
-            assert!(out[0].downcast_ref::<Heatmap>().is_some());
-            assert!(out[1].downcast_ref::<Scalar>().is_some());
+            assert_close(snap.heatmap.value_min, expected_min[index], &format!("{case_name}[{index}].min"));
+            assert_close(snap.heatmap.value_max, expected_max[index], &format!("{case_name}[{index}].max"));
+            assert_close(snap.swing_position, expected_sp[index], &format!("{case_name}[{index}].sp"));
+            assert_close(snap.normalized_position, expected_norm[index], &format!("{case_name}[{index}].norm"));
+            assert_close(snap.dominant_cycle, expected_dc[index], &format!("{case_name}[{index}].dc"));
+            assert_close(snap.dominant_cycle_median, expected_dcm[index], &format!("{case_name}[{index}].dcm"));
+            assert_close(snap.band_pass, expected_bp[index], &format!("{case_name}[{index}].bp"));
+            assert_close(snap.quadrature, expected_quad[index], &format!("{case_name}[{index}].quad"));
+            assert_close(snap.cycle_amplitude, expected_amp[index], &format!("{case_name}[{index}].amp"));
+            assert_close(snap.lead60, expected_lead[index], &format!("{case_name}[{index}].lead"));
+            assert_close(snap.position_span, expected_span[index], &format!("{case_name}[{index}].span"));
+            assert_close(snap.width, expected_width[index], &format!("{case_name}[{index}].width"));
+            assert_close(snap.has_cycle_estimate, expected_has_est[index], &format!("{case_name}[{index}].hce"));
         }
     }
 
     #[test]
-    fn test_validation_errors() {
-        // RasterLength < 2
-        assert!(CoronaSwingPosition::new(&CoronaSwingPositionParams {
-            raster_length: 1,
-            ..Default::default()
-        })
-        .is_err());
+    fn test_reference_cases() {
+        verify_case("h30_pmin6_pmax30_r50", 50, 30, 6, 30, &expected_data::expected_h30_pmin6_pmax30_r50_heatmap(), &expected_data::expected_h30_pmin6_pmax30_r50_heatmap_min(), &expected_data::expected_h30_pmin6_pmax30_r50_heatmap_max(), &expected_data::expected_h30_pmin6_pmax30_r50_swing_position(), &expected_data::expected_h30_pmin6_pmax30_r50_normalized_position(), &expected_data::expected_h30_pmin6_pmax30_r50_dominant_cycle(), &expected_data::expected_h30_pmin6_pmax30_r50_dominant_cycle_median(), &expected_data::expected_h30_pmin6_pmax30_r50_band_pass(), &expected_data::expected_h30_pmin6_pmax30_r50_quadrature(), &expected_data::expected_h30_pmin6_pmax30_r50_cycle_amplitude(), &expected_data::expected_h30_pmin6_pmax30_r50_lead60(), &expected_data::expected_h30_pmin6_pmax30_r50_position_span(), &expected_data::expected_h30_pmin6_pmax30_r50_width(), &expected_data::expected_h30_pmin6_pmax30_r50_has_cycle_estimate());
+        verify_case("h30_pmin6_pmax30_r25", 25, 30, 6, 30, &expected_data::expected_h30_pmin6_pmax30_r25_heatmap(), &expected_data::expected_h30_pmin6_pmax30_r25_heatmap_min(), &expected_data::expected_h30_pmin6_pmax30_r25_heatmap_max(), &expected_data::expected_h30_pmin6_pmax30_r25_swing_position(), &expected_data::expected_h30_pmin6_pmax30_r25_normalized_position(), &expected_data::expected_h30_pmin6_pmax30_r25_dominant_cycle(), &expected_data::expected_h30_pmin6_pmax30_r25_dominant_cycle_median(), &expected_data::expected_h30_pmin6_pmax30_r25_band_pass(), &expected_data::expected_h30_pmin6_pmax30_r25_quadrature(), &expected_data::expected_h30_pmin6_pmax30_r25_cycle_amplitude(), &expected_data::expected_h30_pmin6_pmax30_r25_lead60(), &expected_data::expected_h30_pmin6_pmax30_r25_position_span(), &expected_data::expected_h30_pmin6_pmax30_r25_width(), &expected_data::expected_h30_pmin6_pmax30_r25_has_cycle_estimate());
+        verify_case("h30_pmin6_pmax20_r50", 50, 30, 6, 20, &expected_data::expected_h30_pmin6_pmax20_r50_heatmap(), &expected_data::expected_h30_pmin6_pmax20_r50_heatmap_min(), &expected_data::expected_h30_pmin6_pmax20_r50_heatmap_max(), &expected_data::expected_h30_pmin6_pmax20_r50_swing_position(), &expected_data::expected_h30_pmin6_pmax20_r50_normalized_position(), &expected_data::expected_h30_pmin6_pmax20_r50_dominant_cycle(), &expected_data::expected_h30_pmin6_pmax20_r50_dominant_cycle_median(), &expected_data::expected_h30_pmin6_pmax20_r50_band_pass(), &expected_data::expected_h30_pmin6_pmax20_r50_quadrature(), &expected_data::expected_h30_pmin6_pmax20_r50_cycle_amplitude(), &expected_data::expected_h30_pmin6_pmax20_r50_lead60(), &expected_data::expected_h30_pmin6_pmax20_r50_position_span(), &expected_data::expected_h30_pmin6_pmax20_r50_width(), &expected_data::expected_h30_pmin6_pmax20_r50_has_cycle_estimate());
+        verify_case("h30_pmin6_pmax20_r25", 25, 30, 6, 20, &expected_data::expected_h30_pmin6_pmax20_r25_heatmap(), &expected_data::expected_h30_pmin6_pmax20_r25_heatmap_min(), &expected_data::expected_h30_pmin6_pmax20_r25_heatmap_max(), &expected_data::expected_h30_pmin6_pmax20_r25_swing_position(), &expected_data::expected_h30_pmin6_pmax20_r25_normalized_position(), &expected_data::expected_h30_pmin6_pmax20_r25_dominant_cycle(), &expected_data::expected_h30_pmin6_pmax20_r25_dominant_cycle_median(), &expected_data::expected_h30_pmin6_pmax20_r25_band_pass(), &expected_data::expected_h30_pmin6_pmax20_r25_quadrature(), &expected_data::expected_h30_pmin6_pmax20_r25_cycle_amplitude(), &expected_data::expected_h30_pmin6_pmax20_r25_lead60(), &expected_data::expected_h30_pmin6_pmax20_r25_position_span(), &expected_data::expected_h30_pmin6_pmax20_r25_width(), &expected_data::expected_h30_pmin6_pmax20_r25_has_cycle_estimate());
+        verify_case("h30_pmin10_pmax30_r50", 50, 30, 10, 30, &expected_data::expected_h30_pmin10_pmax30_r50_heatmap(), &expected_data::expected_h30_pmin10_pmax30_r50_heatmap_min(), &expected_data::expected_h30_pmin10_pmax30_r50_heatmap_max(), &expected_data::expected_h30_pmin10_pmax30_r50_swing_position(), &expected_data::expected_h30_pmin10_pmax30_r50_normalized_position(), &expected_data::expected_h30_pmin10_pmax30_r50_dominant_cycle(), &expected_data::expected_h30_pmin10_pmax30_r50_dominant_cycle_median(), &expected_data::expected_h30_pmin10_pmax30_r50_band_pass(), &expected_data::expected_h30_pmin10_pmax30_r50_quadrature(), &expected_data::expected_h30_pmin10_pmax30_r50_cycle_amplitude(), &expected_data::expected_h30_pmin10_pmax30_r50_lead60(), &expected_data::expected_h30_pmin10_pmax30_r50_position_span(), &expected_data::expected_h30_pmin10_pmax30_r50_width(), &expected_data::expected_h30_pmin10_pmax30_r50_has_cycle_estimate());
+        verify_case("h30_pmin10_pmax30_r25", 25, 30, 10, 30, &expected_data::expected_h30_pmin10_pmax30_r25_heatmap(), &expected_data::expected_h30_pmin10_pmax30_r25_heatmap_min(), &expected_data::expected_h30_pmin10_pmax30_r25_heatmap_max(), &expected_data::expected_h30_pmin10_pmax30_r25_swing_position(), &expected_data::expected_h30_pmin10_pmax30_r25_normalized_position(), &expected_data::expected_h30_pmin10_pmax30_r25_dominant_cycle(), &expected_data::expected_h30_pmin10_pmax30_r25_dominant_cycle_median(), &expected_data::expected_h30_pmin10_pmax30_r25_band_pass(), &expected_data::expected_h30_pmin10_pmax30_r25_quadrature(), &expected_data::expected_h30_pmin10_pmax30_r25_cycle_amplitude(), &expected_data::expected_h30_pmin10_pmax30_r25_lead60(), &expected_data::expected_h30_pmin10_pmax30_r25_position_span(), &expected_data::expected_h30_pmin10_pmax30_r25_width(), &expected_data::expected_h30_pmin10_pmax30_r25_has_cycle_estimate());
+        verify_case("h30_pmin10_pmax48_r50", 50, 30, 10, 48, &expected_data::expected_h30_pmin10_pmax48_r50_heatmap(), &expected_data::expected_h30_pmin10_pmax48_r50_heatmap_min(), &expected_data::expected_h30_pmin10_pmax48_r50_heatmap_max(), &expected_data::expected_h30_pmin10_pmax48_r50_swing_position(), &expected_data::expected_h30_pmin10_pmax48_r50_normalized_position(), &expected_data::expected_h30_pmin10_pmax48_r50_dominant_cycle(), &expected_data::expected_h30_pmin10_pmax48_r50_dominant_cycle_median(), &expected_data::expected_h30_pmin10_pmax48_r50_band_pass(), &expected_data::expected_h30_pmin10_pmax48_r50_quadrature(), &expected_data::expected_h30_pmin10_pmax48_r50_cycle_amplitude(), &expected_data::expected_h30_pmin10_pmax48_r50_lead60(), &expected_data::expected_h30_pmin10_pmax48_r50_position_span(), &expected_data::expected_h30_pmin10_pmax48_r50_width(), &expected_data::expected_h30_pmin10_pmax48_r50_has_cycle_estimate());
+        verify_case("h30_pmin10_pmax48_r25", 25, 30, 10, 48, &expected_data::expected_h30_pmin10_pmax48_r25_heatmap(), &expected_data::expected_h30_pmin10_pmax48_r25_heatmap_min(), &expected_data::expected_h30_pmin10_pmax48_r25_heatmap_max(), &expected_data::expected_h30_pmin10_pmax48_r25_swing_position(), &expected_data::expected_h30_pmin10_pmax48_r25_normalized_position(), &expected_data::expected_h30_pmin10_pmax48_r25_dominant_cycle(), &expected_data::expected_h30_pmin10_pmax48_r25_dominant_cycle_median(), &expected_data::expected_h30_pmin10_pmax48_r25_band_pass(), &expected_data::expected_h30_pmin10_pmax48_r25_quadrature(), &expected_data::expected_h30_pmin10_pmax48_r25_cycle_amplitude(), &expected_data::expected_h30_pmin10_pmax48_r25_lead60(), &expected_data::expected_h30_pmin10_pmax48_r25_position_span(), &expected_data::expected_h30_pmin10_pmax48_r25_width(), &expected_data::expected_h30_pmin10_pmax48_r25_has_cycle_estimate());
+        verify_case("h48_pmin6_pmax30_r50", 50, 48, 6, 30, &expected_data::expected_h48_pmin6_pmax30_r50_heatmap(), &expected_data::expected_h48_pmin6_pmax30_r50_heatmap_min(), &expected_data::expected_h48_pmin6_pmax30_r50_heatmap_max(), &expected_data::expected_h48_pmin6_pmax30_r50_swing_position(), &expected_data::expected_h48_pmin6_pmax30_r50_normalized_position(), &expected_data::expected_h48_pmin6_pmax30_r50_dominant_cycle(), &expected_data::expected_h48_pmin6_pmax30_r50_dominant_cycle_median(), &expected_data::expected_h48_pmin6_pmax30_r50_band_pass(), &expected_data::expected_h48_pmin6_pmax30_r50_quadrature(), &expected_data::expected_h48_pmin6_pmax30_r50_cycle_amplitude(), &expected_data::expected_h48_pmin6_pmax30_r50_lead60(), &expected_data::expected_h48_pmin6_pmax30_r50_position_span(), &expected_data::expected_h48_pmin6_pmax30_r50_width(), &expected_data::expected_h48_pmin6_pmax30_r50_has_cycle_estimate());
+        verify_case("h48_pmin6_pmax30_r25", 25, 48, 6, 30, &expected_data::expected_h48_pmin6_pmax30_r25_heatmap(), &expected_data::expected_h48_pmin6_pmax30_r25_heatmap_min(), &expected_data::expected_h48_pmin6_pmax30_r25_heatmap_max(), &expected_data::expected_h48_pmin6_pmax30_r25_swing_position(), &expected_data::expected_h48_pmin6_pmax30_r25_normalized_position(), &expected_data::expected_h48_pmin6_pmax30_r25_dominant_cycle(), &expected_data::expected_h48_pmin6_pmax30_r25_dominant_cycle_median(), &expected_data::expected_h48_pmin6_pmax30_r25_band_pass(), &expected_data::expected_h48_pmin6_pmax30_r25_quadrature(), &expected_data::expected_h48_pmin6_pmax30_r25_cycle_amplitude(), &expected_data::expected_h48_pmin6_pmax30_r25_lead60(), &expected_data::expected_h48_pmin6_pmax30_r25_position_span(), &expected_data::expected_h48_pmin6_pmax30_r25_width(), &expected_data::expected_h48_pmin6_pmax30_r25_has_cycle_estimate());
+        verify_case("h48_pmin6_pmax20_r50", 50, 48, 6, 20, &expected_data::expected_h48_pmin6_pmax20_r50_heatmap(), &expected_data::expected_h48_pmin6_pmax20_r50_heatmap_min(), &expected_data::expected_h48_pmin6_pmax20_r50_heatmap_max(), &expected_data::expected_h48_pmin6_pmax20_r50_swing_position(), &expected_data::expected_h48_pmin6_pmax20_r50_normalized_position(), &expected_data::expected_h48_pmin6_pmax20_r50_dominant_cycle(), &expected_data::expected_h48_pmin6_pmax20_r50_dominant_cycle_median(), &expected_data::expected_h48_pmin6_pmax20_r50_band_pass(), &expected_data::expected_h48_pmin6_pmax20_r50_quadrature(), &expected_data::expected_h48_pmin6_pmax20_r50_cycle_amplitude(), &expected_data::expected_h48_pmin6_pmax20_r50_lead60(), &expected_data::expected_h48_pmin6_pmax20_r50_position_span(), &expected_data::expected_h48_pmin6_pmax20_r50_width(), &expected_data::expected_h48_pmin6_pmax20_r50_has_cycle_estimate());
+        verify_case("h48_pmin6_pmax20_r25", 25, 48, 6, 20, &expected_data::expected_h48_pmin6_pmax20_r25_heatmap(), &expected_data::expected_h48_pmin6_pmax20_r25_heatmap_min(), &expected_data::expected_h48_pmin6_pmax20_r25_heatmap_max(), &expected_data::expected_h48_pmin6_pmax20_r25_swing_position(), &expected_data::expected_h48_pmin6_pmax20_r25_normalized_position(), &expected_data::expected_h48_pmin6_pmax20_r25_dominant_cycle(), &expected_data::expected_h48_pmin6_pmax20_r25_dominant_cycle_median(), &expected_data::expected_h48_pmin6_pmax20_r25_band_pass(), &expected_data::expected_h48_pmin6_pmax20_r25_quadrature(), &expected_data::expected_h48_pmin6_pmax20_r25_cycle_amplitude(), &expected_data::expected_h48_pmin6_pmax20_r25_lead60(), &expected_data::expected_h48_pmin6_pmax20_r25_position_span(), &expected_data::expected_h48_pmin6_pmax20_r25_width(), &expected_data::expected_h48_pmin6_pmax20_r25_has_cycle_estimate());
+        verify_case("h48_pmin10_pmax30_r50", 50, 48, 10, 30, &expected_data::expected_h48_pmin10_pmax30_r50_heatmap(), &expected_data::expected_h48_pmin10_pmax30_r50_heatmap_min(), &expected_data::expected_h48_pmin10_pmax30_r50_heatmap_max(), &expected_data::expected_h48_pmin10_pmax30_r50_swing_position(), &expected_data::expected_h48_pmin10_pmax30_r50_normalized_position(), &expected_data::expected_h48_pmin10_pmax30_r50_dominant_cycle(), &expected_data::expected_h48_pmin10_pmax30_r50_dominant_cycle_median(), &expected_data::expected_h48_pmin10_pmax30_r50_band_pass(), &expected_data::expected_h48_pmin10_pmax30_r50_quadrature(), &expected_data::expected_h48_pmin10_pmax30_r50_cycle_amplitude(), &expected_data::expected_h48_pmin10_pmax30_r50_lead60(), &expected_data::expected_h48_pmin10_pmax30_r50_position_span(), &expected_data::expected_h48_pmin10_pmax30_r50_width(), &expected_data::expected_h48_pmin10_pmax30_r50_has_cycle_estimate());
+        verify_case("h48_pmin10_pmax30_r25", 25, 48, 10, 30, &expected_data::expected_h48_pmin10_pmax30_r25_heatmap(), &expected_data::expected_h48_pmin10_pmax30_r25_heatmap_min(), &expected_data::expected_h48_pmin10_pmax30_r25_heatmap_max(), &expected_data::expected_h48_pmin10_pmax30_r25_swing_position(), &expected_data::expected_h48_pmin10_pmax30_r25_normalized_position(), &expected_data::expected_h48_pmin10_pmax30_r25_dominant_cycle(), &expected_data::expected_h48_pmin10_pmax30_r25_dominant_cycle_median(), &expected_data::expected_h48_pmin10_pmax30_r25_band_pass(), &expected_data::expected_h48_pmin10_pmax30_r25_quadrature(), &expected_data::expected_h48_pmin10_pmax30_r25_cycle_amplitude(), &expected_data::expected_h48_pmin10_pmax30_r25_lead60(), &expected_data::expected_h48_pmin10_pmax30_r25_position_span(), &expected_data::expected_h48_pmin10_pmax30_r25_width(), &expected_data::expected_h48_pmin10_pmax30_r25_has_cycle_estimate());
+        verify_case("h48_pmin10_pmax48_r50", 50, 48, 10, 48, &expected_data::expected_h48_pmin10_pmax48_r50_heatmap(), &expected_data::expected_h48_pmin10_pmax48_r50_heatmap_min(), &expected_data::expected_h48_pmin10_pmax48_r50_heatmap_max(), &expected_data::expected_h48_pmin10_pmax48_r50_swing_position(), &expected_data::expected_h48_pmin10_pmax48_r50_normalized_position(), &expected_data::expected_h48_pmin10_pmax48_r50_dominant_cycle(), &expected_data::expected_h48_pmin10_pmax48_r50_dominant_cycle_median(), &expected_data::expected_h48_pmin10_pmax48_r50_band_pass(), &expected_data::expected_h48_pmin10_pmax48_r50_quadrature(), &expected_data::expected_h48_pmin10_pmax48_r50_cycle_amplitude(), &expected_data::expected_h48_pmin10_pmax48_r50_lead60(), &expected_data::expected_h48_pmin10_pmax48_r50_position_span(), &expected_data::expected_h48_pmin10_pmax48_r50_width(), &expected_data::expected_h48_pmin10_pmax48_r50_has_cycle_estimate());
+        verify_case("h48_pmin10_pmax48_r25", 25, 48, 10, 48, &expected_data::expected_h48_pmin10_pmax48_r25_heatmap(), &expected_data::expected_h48_pmin10_pmax48_r25_heatmap_min(), &expected_data::expected_h48_pmin10_pmax48_r25_heatmap_max(), &expected_data::expected_h48_pmin10_pmax48_r25_swing_position(), &expected_data::expected_h48_pmin10_pmax48_r25_normalized_position(), &expected_data::expected_h48_pmin10_pmax48_r25_dominant_cycle(), &expected_data::expected_h48_pmin10_pmax48_r25_dominant_cycle_median(), &expected_data::expected_h48_pmin10_pmax48_r25_band_pass(), &expected_data::expected_h48_pmin10_pmax48_r25_quadrature(), &expected_data::expected_h48_pmin10_pmax48_r25_cycle_amplitude(), &expected_data::expected_h48_pmin10_pmax48_r25_lead60(), &expected_data::expected_h48_pmin10_pmax48_r25_position_span(), &expected_data::expected_h48_pmin10_pmax48_r25_width(), &expected_data::expected_h48_pmin10_pmax48_r25_has_cycle_estimate());
+    }
 
-        // MaxParameterValue <= MinParameterValue
-        assert!(CoronaSwingPosition::new(&CoronaSwingPositionParams {
-            min_parameter_value: 5.0,
-            max_parameter_value: 5.0,
-            ..Default::default()
-        })
-        .is_err());
+    #[test]
+    fn test_metadata_mnemonics_validation_and_entities() {
+        let mut instance = CoronaSwingPosition::new_default().unwrap();
+        let md = instance.metadata();
+        assert_eq!(md.identifier, Identifier::CoronaSwingPosition);
+        assert_eq!(md.mnemonic, "cswing(50, 20, -5, 5, 30)");
+        assert_eq!(md.outputs.len(), 2);
+        assert_eq!(md.outputs[0].shape, Shape::Heatmap);
+        assert_eq!(md.outputs[1].shape, Shape::Scalar);
+        assert_eq!(md.outputs[1].mnemonic, "cswing-sp(30)");
 
-        // HighPassFilterCutoff < 2
-        assert!(CoronaSwingPosition::new(&CoronaSwingPositionParams {
-            high_pass_filter_cutoff: 1,
-            ..Default::default()
-        })
-        .is_err());
-
-        // MinimalPeriod < 2
-        assert!(CoronaSwingPosition::new(&CoronaSwingPositionParams {
-            minimal_period: 1,
-            ..Default::default()
-        })
-        .is_err());
-
-        // MaximalPeriod <= MinimalPeriod
-        assert!(CoronaSwingPosition::new(&CoronaSwingPositionParams {
+        let flagged = CoronaSwingPosition::new(&CoronaSwingPositionParams {
             minimal_period: 10,
-            maximal_period: 10,
+            maximal_period: 48,
+            lead_window: 25,
+            position_window: 15,
+            bar_component: Some(BarComponent::Median),
             ..Default::default()
         })
-        .is_err());
+        .unwrap();
+        assert_eq!(flagged.metadata().mnemonic, "cswing(50, 20, -5, 5, 30, pmin=10, pmax=48, lead=25, pos=15, hl/2)");
+        assert_eq!(flagged.metadata().outputs[1].mnemonic, "cswing-sp(30, pmin=10, pmax=48, lead=25, pos=15, hl/2)");
+
+        let combos = [
+            (None, None, None),
+            (Some(BarComponent::Open), None, None),
+            (None, Some(QuoteComponent::Bid), None),
+            (None, None, Some(TradeComponent::Volume)),
+            (Some(BarComponent::Median), Some(QuoteComponent::Ask), None),
+            (Some(BarComponent::Median), None, Some(TradeComponent::Volume)),
+            (None, Some(QuoteComponent::Ask), Some(TradeComponent::Volume)),
+            (Some(BarComponent::Open), Some(QuoteComponent::Bid), Some(TradeComponent::Volume)),
+        ];
+        for (bc, qc, tc) in combos {
+            let cfg = CoronaSwingPositionParams {
+                bar_component: bc,
+                quote_component: qc,
+                trade_component: tc,
+                ..Default::default()
+            };
+            let ind = CoronaSwingPosition::new(&cfg).unwrap();
+            assert_eq!(ind.metadata().mnemonic, mnemonic(&cfg));
+        }
+
+        assert!(CoronaSwingPosition::new(&CoronaSwingPositionParams { lead_window: 1, ..Default::default() }).is_err());
+        assert!(CoronaSwingPosition::new(&CoronaSwingPositionParams { position_window: 1, ..Default::default() }).is_err());
+        assert!(CoronaSwingPosition::new(&CoronaSwingPositionParams { max_raster_value: 6.0, ..Default::default() }).is_err());
+        assert!(CoronaSwingPosition::new(&CoronaSwingPositionParams { raster_length: 0, ..Default::default() }).is_err());
+
+        for index in 0..20 {
+            let out = instance.update_scalar(&Scalar::new(index as i64, 100.0));
+            if index >= 12 {
+                let sp = out[1].downcast_ref::<Scalar>().unwrap().value;
+                assert_close(sp, 0.0, "flat swing scalar");
+                let hm = out[0].downcast_ref::<Heatmap>().unwrap();
+                assert!(hm.values.iter().all(|&cell| cell == 20.0));
+            }
+        }
+        instance.reset();
+        assert!(!instance.is_primed());
     }
 }

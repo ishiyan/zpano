@@ -1,110 +1,152 @@
-"""Ehlers' Corona Signal-to-Noise Ratio heatmap indicator."""
+"""Ehlers' Corona Signal-to-Noise Ratio indicator."""
 
-import math
+from __future__ import annotations
+
 import datetime
+import math
+from typing import NamedTuple, Optional
 
 from ....entities.bar import Bar
-from ....entities.bar_component import BarComponent, bar_component_value, DEFAULT_BAR_COMPONENT
+from ....entities.bar_component import DEFAULT_BAR_COMPONENT, bar_component_value
 from ....entities.quote import Quote
-from ....entities.quote_component import QuoteComponent, quote_component_value, DEFAULT_QUOTE_COMPONENT
-from ....entities.trade import Trade
-from ....entities.trade_component import TradeComponent, trade_component_value, DEFAULT_TRADE_COMPONENT
+from ....entities.quote_component import DEFAULT_QUOTE_COMPONENT, quote_component_value
 from ....entities.scalar import Scalar
-from ...core.identifier import Identifier
-from ...core.metadata import Metadata
-from ...core.build_metadata import build_metadata, OutputText
+from ....entities.trade import Trade
+from ....entities.trade_component import DEFAULT_TRADE_COMPONENT, trade_component_value
+from ...core.build_metadata import OutputText, build_metadata
 from ...core.component_triple_mnemonic import component_triple_mnemonic
+from ...core.identifier import Identifier
+from ...core.indicator import Indicator
+from ...core.metadata import Metadata
+from ...core.output import Output
 from ...core.outputs.heatmap import Heatmap
-from ..corona.corona import Corona
+from ..corona.corona import (
+    FIRST_BANK_SAMPLE,
+    Corona,
+    CoronaSnapshot,
+    Raster,
+    accept_snapshot,
+    clip,
+    format_number,
+    valid_price,
+)
 from ..corona.params import CoronaParams
-from .params import Params
-
-_HL_BUFFER_SIZE = 5
-_HL_MEDIAN_INDEX = 2
-_AVG_SAMPLE_ALPHA = 0.1
-_AVG_SAMPLE_ONE_MINUS = 0.9
-_SIGNAL_EMA_ALPHA = 0.2
-_SIGNAL_EMA_ONE_MINUS = 0.9  # Intentional: sums to 1.1 per Ehlers
-_NOISE_EMA_ALPHA = 0.1
-_NOISE_EMA_ONE_MINUS = 0.9
-_RATIO_OFFSET_DB = 3.5
-_RATIO_UPPER_DB = 10.0
-_DB_GAIN = 20.0
-_WIDTH_LOW_RATIO_THRESHOLD = 0.5
-_WIDTH_BASELINE = 0.2
-_WIDTH_SLOPE = 0.4
-_RASTER_BLEND_EXPONENT = 0.8
-_RASTER_BLEND_HALF = 0.5
-_RASTER_NEGATIVE_ARG_CUTOFF = 1.0
+from .params import CoronaSignalToNoiseRatioParams, default_params, snr_flags
 
 
-class CoronaSignalToNoiseRatio:
-    """Ehlers' Corona Signal-to-Noise Ratio heatmap indicator."""
+class CoronaSignalToNoiseRatioSnapshot(NamedTuple):
+    """Full 13-field numerical snapshot for CoronaSignalToNoiseRatio."""
 
-    def __init__(self, params: Params) -> None:
-        invalid = "invalid corona signal to noise ratio parameters"
+    heatmap: Heatmap
+    signal_to_noise_ratio: float
+    physical_decibels: float
+    calibrated_decibels: float
+    normalized_position: float
+    signal: float
+    noise: float
+    median_bar_range: float
+    width: float
+    dominant_cycle: float
+    dominant_cycle_median: float
+    has_cycle_estimate: float
+    ratio_is_finite: float
 
-        cfg_raster_len = params.raster_length if params.raster_length != 0 else 50
-        cfg_max_raster = params.max_raster_value if params.max_raster_value != 0 else 20.0
-        cfg_min_param = params.min_parameter_value if params.min_parameter_value != 0 else 1.0
-        cfg_max_param = params.max_parameter_value if params.max_parameter_value != 0 else 11.0
-        cfg_hp_cutoff = params.high_pass_filter_cutoff if params.high_pass_filter_cutoff != 0 else 30
-        cfg_min_period = params.minimal_period if params.minimal_period != 0 else 6
-        cfg_max_period = params.maximal_period if params.maximal_period != 0 else 30
 
-        if cfg_raster_len < 2:
-            raise ValueError(f"{invalid}: RasterLength should be >= 2")
-        if cfg_max_raster <= 0:
-            raise ValueError(f"{invalid}: MaxRasterValue should be > 0")
-        if cfg_min_param < 0:
-            raise ValueError(f"{invalid}: MinParameterValue should be >= 0")
-        if cfg_max_param <= cfg_min_param:
-            raise ValueError(f"{invalid}: MaxParameterValue should be > MinParameterValue")
-        if cfg_hp_cutoff < 2:
-            raise ValueError(f"{invalid}: HighPassFilterCutoff should be >= 2")
-        if cfg_min_period < 2:
-            raise ValueError(f"{invalid}: MinimalPeriod should be >= 2")
-        if cfg_max_period <= cfg_min_period:
-            raise ValueError(f"{invalid}: MaximalPeriod should be > MinimalPeriod")
+Snapshot = CoronaSignalToNoiseRatioSnapshot
+SignalToNoiseOutput = CoronaSignalToNoiseRatioSnapshot
 
-        bc = params.bar_component if params.bar_component is not None else BarComponent.MEDIAN
-        qc = params.quote_component if params.quote_component is not None else DEFAULT_QUOTE_COMPONENT
-        tc = params.trade_component if params.trade_component is not None else DEFAULT_TRADE_COMPONENT
+
+def _validate_range_input(
+    high: Optional[float],
+    low: Optional[float],
+    bar_range: Optional[float],
+) -> float:
+    """Validate and compute nonnegative bar height before mutating state."""
+    if bar_range is not None:
+        if high is not None or low is not None:
+            raise ValueError("supply bar_range OR both high and low")
+        if isinstance(bar_range, bool) or not isinstance(bar_range, (int, float)):
+            raise ValueError("bar_range must be numeric")
+        value = float(bar_range)
+    else:
+        if high is None or low is None:
+            raise ValueError("SNR requires both high and low, or an explicit bar_range")
+        if (
+            isinstance(high, bool)
+            or isinstance(low, bool)
+            or not isinstance(high, (int, float))
+            or not isinstance(low, (int, float))
+        ):
+            raise ValueError("high and low must be numeric")
+        if math.isnan(high) or math.isnan(low):
+            return math.nan
+        if not math.isfinite(high) or not math.isfinite(low):
+            raise ValueError("high and low must be finite")
+        value = float(high) - float(low)
+    if math.isnan(value):
+        return math.nan
+    if not math.isfinite(value) or value < 0.0:
+        raise ValueError("bar_range must be finite and nonnegative; require high >= low")
+    return value
+
+
+class CoronaSignalToNoiseRatio(Indicator):
+    """Ehlers' Corona Signal-to-Noise Ratio indicator."""
+
+    def __init__(self, params: Optional[CoronaSignalToNoiseRatioParams] = None) -> None:
+        source = default_params() if params is None else params
+        self._raster = Raster(
+            source.raster_length,
+            source.min_parameter_value,
+            source.max_parameter_value,
+            source.max_raster_value,
+        )
+        self._corona = Corona(
+            CoronaParams(
+                high_pass_filter_cutoff=source.high_pass_filter_cutoff,
+                minimal_period=source.minimal_period,
+                maximal_period=source.maximal_period,
+                decibels_lower_threshold=6.0,
+                decibels_upper_threshold=self._raster.ceiling,
+            )
+        )
+        self._corona_parameters = self._corona.parameters
+
+        bc = source.bar_component if source.bar_component is not None else DEFAULT_BAR_COMPONENT
+        qc = source.quote_component if source.quote_component is not None else DEFAULT_QUOTE_COMPONENT
+        tc = source.trade_component if source.trade_component is not None else DEFAULT_TRADE_COMPONENT
 
         self._bar_func = bar_component_value(bc)
         self._quote_func = quote_component_value(qc)
         self._trade_func = trade_component_value(tc)
 
-        self._corona = Corona(CoronaParams(
-            high_pass_filter_cutoff=cfg_hp_cutoff,
-            minimal_period=cfg_min_period,
-            maximal_period=cfg_max_period,
-        ))
+        comp = component_triple_mnemonic(bc, qc, tc)
+        flags = snr_flags(source)
+        self.mnemonic: str = (
+            f"csnr({self._raster.length}, {format_number(self._raster.ceiling)}, "
+            f"{format_number(self._raster.lower)}, {format_number(self._raster.upper)}, "
+            f"{source.high_pass_filter_cutoff}{flags}{comp})"
+        )
+        self.description: str = "Corona signal to noise ratio " + self.mnemonic
+        self._mnemonic_snr: str = f"csnr-snr({source.high_pass_filter_cutoff}{flags}{comp})"
+        self._description_snr: str = (
+            "Corona signal to noise ratio scalar " + self._mnemonic_snr
+        )
 
-        self._raster_length = cfg_raster_len
-        self._raster_step = cfg_max_raster / cfg_raster_len
-        self._max_raster_value = cfg_max_raster
-        self._min_parameter_value = cfg_min_param
-        self._max_parameter_value = cfg_max_param
-        self._parameter_resolution = (cfg_raster_len - 1) / (cfg_max_param - cfg_min_param)
-        self._raster = [0.0] * cfg_raster_len
+        self.reset()
 
-        self._hl_buffer = [0.0] * _HL_BUFFER_SIZE
-        self._avg_sample_previous = 0.0
-        self._signal_previous = 0.0
-        self._noise_previous = 0.0
-        self._signal_to_noise_ratio = math.nan
-        self._is_started = False
-
-        comp_mn = component_triple_mnemonic(bc, qc, tc)
-        self.mnemonic = f"csnr({cfg_raster_len}, {cfg_max_raster:g}, " \
-            f"{cfg_min_param:g}, {cfg_max_param:g}, {cfg_hp_cutoff}{comp_mn})"
-        self.description = "Corona signal to noise ratio " + self.mnemonic
-        self._mnemonic_snr = f"csnr-snr({cfg_hp_cutoff}{comp_mn})"
-        self._description_snr = "Corona signal to noise ratio scalar " + self._mnemonic_snr
+    def reset(self) -> None:
+        """Reset streaming state while preserving configuration."""
+        self._corona.reset()
+        self._sample_count: int = 0
+        self._raster.reset()
+        self._ranges: list[float] = [0.0] * 5
+        self._average: float = 0.0
+        self._signal: float = 0.0
+        self._noise: float = 0.0
 
     def is_primed(self) -> bool:
-        return self._corona.is_primed()
+        return self._sample_count >= FIRST_BANK_SAMPLE
 
     def metadata(self) -> Metadata:
         return build_metadata(
@@ -117,121 +159,136 @@ class CoronaSignalToNoiseRatio:
             ],
         )
 
-    def update(self, sample: float, sample_low: float, sample_high: float,
-               t: datetime.datetime) -> tuple:
-        """Returns (heatmap, signal_to_noise_ratio)."""
-        if math.isnan(sample):
-            return (Heatmap.empty(t, self._min_parameter_value,
-                                  self._max_parameter_value, self._parameter_resolution),
-                    math.nan)
+    def _empty(self, time: Optional[datetime.datetime]) -> CoronaSignalToNoiseRatioSnapshot:
+        return CoronaSignalToNoiseRatioSnapshot(
+            self._raster.empty(time),
+            math.nan,
+            math.nan,
+            math.nan,
+            math.nan,
+            math.nan,
+            math.nan,
+            math.nan,
+            math.nan,
+            math.nan,
+            math.nan,
+            math.nan,
+            math.nan,
+        )
 
-        primed = self._corona.update(sample)
+    def update(
+        self,
+        sample: float,
+        time: Optional[datetime.datetime] = None,
+        *,
+        high: Optional[float] = None,
+        low: Optional[float] = None,
+        bar_range: Optional[float] = None,
+    ) -> CoronaSignalToNoiseRatioSnapshot:
+        """Advance standalone engine with price + bar range (or high & low)."""
+        if not valid_price(sample):
+            return self._empty(time)
+        range_value = _validate_range_input(high, low, bar_range)
+        if math.isnan(range_value):
+            return self._empty(time)
+        return self.update_from_snapshot(
+            self._corona.update(sample, time), bar_range=range_value
+        )
 
-        if not self._is_started:
-            self._avg_sample_previous = sample
-            self._hl_buffer[_HL_BUFFER_SIZE - 1] = sample_high - sample_low
-            self._is_started = True
-            return (Heatmap.empty(t, self._min_parameter_value,
-                                  self._max_parameter_value, self._parameter_resolution),
-                    math.nan)
+    def update_from_snapshot(
+        self,
+        snapshot: CoronaSnapshot,
+        *,
+        high: Optional[float] = None,
+        low: Optional[float] = None,
+        bar_range: Optional[float] = None,
+    ) -> CoronaSignalToNoiseRatioSnapshot:
+        """Consume one shared CoronaSnapshot in accepted-sample order."""
+        if not snapshot.accepted:
+            # Validate snapshot parameter compatibility even on skipped bars.
+            accept_snapshot(snapshot, self._corona_parameters, self._sample_count + 1)
+            return self._empty(snapshot.time)
+        range_value = _validate_range_input(high, low, bar_range)
+        if math.isnan(range_value):
+            raise ValueError("accepted shared snapshot requires a finite bar range")
+        accept_snapshot(snapshot, self._corona_parameters, self._sample_count + 1)
+        self._sample_count = snapshot.sample_count
 
-        max_amp_sq = self._corona.maximal_amplitude_squared
+        self._ranges = self._ranges[1:] + [range_value]
+        median_range = sorted(self._ranges)[2]
+        if self._sample_count == 1:
+            self._average = snapshot.price
+        else:
+            self._average = 0.1 * snapshot.price + 0.9 * self._average
+            if self._average != 0.0 or snapshot.maximum_power > 0.0:
+                self._signal = 0.2 * math.sqrt(snapshot.maximum_power) + 0.9 * self._signal
+            if self._average != 0.0 and self._sample_count > 5:
+                self._noise = 0.1 * median_range + 0.9 * self._noise
 
-        avg_sample = _AVG_SAMPLE_ALPHA * sample + _AVG_SAMPLE_ONE_MINUS * self._avg_sample_previous
-        self._avg_sample_previous = avg_sample
+        if self._signal > 0.0 and self._noise > 0.0:
+            physical = 20.0 * (math.log10(self._signal) - math.log10(self._noise))
+        elif self._signal > 0.0:
+            physical = math.inf
+        elif self._noise > 0.0:
+            physical = -math.inf
+        else:
+            physical = math.nan
 
-        if abs(avg_sample) > 0 or max_amp_sq > 0:
-            self._signal_previous = _SIGNAL_EMA_ALPHA * math.sqrt(max_amp_sq) + \
-                _SIGNAL_EMA_ONE_MINUS * self._signal_previous
+        calibrated = physical + 3.5
+        position = 0.0 if math.isnan(calibrated) else clip(calibrated, 0.0, 10.0) / 10.0
+        width = max(0.0, 0.2 - 0.4 * position)
+        self._raster.update(position, width, "snr", suppress=position > 0.5)
 
-        # Shift H-L ring buffer left; push new value.
-        for i in range(_HL_BUFFER_SIZE - 1):
-            self._hl_buffer[i] = self._hl_buffer[i + 1]
-        self._hl_buffer[_HL_BUFFER_SIZE - 1] = sample_high - sample_low
+        if not snapshot.primed:
+            return self._empty(snapshot.time)
 
-        ratio = 0.0
-        if abs(avg_sample) > 0:
-            hl_sorted = sorted(self._hl_buffer)
-            self._noise_previous = _NOISE_EMA_ALPHA * hl_sorted[_HL_MEDIAN_INDEX] + \
-                _NOISE_EMA_ONE_MINUS * self._noise_previous
+        mapped = self._raster.lower + (self._raster.upper - self._raster.lower) * position
+        return CoronaSignalToNoiseRatioSnapshot(
+            heatmap=self._raster.column(snapshot.time),
+            signal_to_noise_ratio=mapped,
+            physical_decibels=physical,
+            calibrated_decibels=calibrated,
+            normalized_position=position,
+            signal=self._signal,
+            noise=self._noise,
+            median_bar_range=median_range,
+            width=width,
+            dominant_cycle=snapshot.dominant_cycle,
+            dominant_cycle_median=snapshot.dominant_cycle_median,
+            has_cycle_estimate=float(snapshot.has_cycle_estimate),
+            ratio_is_finite=float(math.isfinite(physical)),
+        )
 
-            if abs(self._noise_previous) > 0:
-                ratio = _DB_GAIN * math.log10(self._signal_previous / self._noise_previous) + \
-                    _RATIO_OFFSET_DB
-                if ratio < 0:
-                    ratio = 0
-                elif ratio > _RATIO_UPPER_DB:
-                    ratio = _RATIO_UPPER_DB
-                ratio /= _RATIO_UPPER_DB  # in [0, 1]
+    def _wrap(
+        self, time: datetime.datetime, result: CoronaSignalToNoiseRatioSnapshot
+    ) -> Output:
+        return [result.heatmap, Scalar(time, result.signal_to_noise_ratio)]
 
-        self._signal_to_noise_ratio = (self._max_parameter_value - self._min_parameter_value) * \
-            ratio + self._min_parameter_value
+    def update_scalar(self, sample: Scalar) -> Output:
+        value = sample.value
+        return self._wrap(
+            sample.time, self.update(value, sample.time, low=value, high=value)
+        )
 
-        # Raster update.
-        width = 0.0
-        if ratio <= _WIDTH_LOW_RATIO_THRESHOLD:
-            width = _WIDTH_BASELINE - _WIDTH_SLOPE * ratio
+    def update_bar(self, sample: Bar) -> Output:
+        return self._wrap(
+            sample.time,
+            self.update(
+                self._bar_func(sample),
+                sample.time,
+                high=sample.high,
+                low=sample.low,
+            ),
+        )
 
-        ratio_scaled_to_raster_length = round(ratio * self._raster_length)
-        ratio_scaled_to_max_raster_value = ratio * self._max_raster_value
+    def update_quote(self, sample: Quote) -> Output:
+        value = self._quote_func(sample)
+        return self._wrap(
+            sample.time, self.update(value, sample.time, low=value, high=value)
+        )
 
-        for i in range(self._raster_length):
-            value = self._raster[i]
-
-            if i == ratio_scaled_to_raster_length:
-                value *= 0.5
-            elif width == 0:
-                pass  # Above high-ratio threshold: handled by ratio>0.5 override below.
-            else:
-                argument = (ratio_scaled_to_max_raster_value - self._raster_step * i) / width
-                if i < ratio_scaled_to_raster_length:
-                    value = _RASTER_BLEND_HALF * (math.pow(argument, _RASTER_BLEND_EXPONENT) + value)
-                else:
-                    argument = -argument
-                    if argument > _RASTER_NEGATIVE_ARG_CUTOFF:
-                        value = _RASTER_BLEND_HALF * (math.pow(argument, _RASTER_BLEND_EXPONENT) + value)
-                    else:
-                        value = self._max_raster_value
-
-            if value < 0:
-                value = 0
-            elif value > self._max_raster_value:
-                value = self._max_raster_value
-
-            if ratio > _WIDTH_LOW_RATIO_THRESHOLD:
-                value = self._max_raster_value
-
-            self._raster[i] = value
-
-        if not primed:
-            return (Heatmap.empty(t, self._min_parameter_value,
-                                  self._max_parameter_value, self._parameter_resolution),
-                    math.nan)
-
-        values = list(self._raster)
-        value_min = min(values)
-        value_max = max(values)
-
-        heatmap = Heatmap(t, self._min_parameter_value, self._max_parameter_value,
-                          self._parameter_resolution, value_min, value_max, values)
-
-        return heatmap, self._signal_to_noise_ratio
-
-    def update_scalar(self, sample: Scalar) -> list:
-        return self._update_entity(sample.time, sample.value, sample.value, sample.value)
-
-    def update_bar(self, sample: Bar) -> list:
-        return self._update_entity(sample.time, self._bar_func(sample), sample.low, sample.high)
-
-    def update_quote(self, sample: Quote) -> list:
-        v = self._quote_func(sample)
-        return self._update_entity(sample.time, v, v, v)
-
-    def update_trade(self, sample: Trade) -> list:
-        v = self._trade_func(sample)
-        return self._update_entity(sample.time, v, v, v)
-
-    def _update_entity(self, t: datetime.datetime, sample: float,
-                       low: float, high: float) -> list:
-        heatmap, snr = self.update(sample, low, high, t)
-        return [heatmap, Scalar(t, snr)]
+    def update_trade(self, sample: Trade) -> Output:
+        value = self._trade_func(sample)
+        return self._wrap(
+            sample.time, self.update(value, sample.time, low=value, high=value)
+        )

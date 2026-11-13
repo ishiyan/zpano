@@ -1,68 +1,94 @@
 """Parameters for the CoronaSwingPosition indicator."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass
 from typing import Optional
 
-from ....entities.bar_component import BarComponent
-from ....entities.quote_component import QuoteComponent
-from ....entities.trade_component import TradeComponent
+from ....entities.bar_component import BarComponent, DEFAULT_BAR_COMPONENT
+from ....entities.quote_component import QuoteComponent, DEFAULT_QUOTE_COMPONENT
+from ....entities.trade_component import TradeComponent, DEFAULT_TRADE_COMPONENT
+from ...core.component_triple_mnemonic import component_triple_mnemonic
+from ..corona.corona import format_number
 
 
 @dataclass
-class Params:
-    """Configuration for the Corona Swing Position indicator."""
-    raster_length: int = 0
-    """Length of the heatmap raster. Default 50. A zero value is treated as "use default"."""
+class CoronaSwingPositionParams:
+    """Configuration for the Corona Swing Position indicator.
 
-    max_raster_value: float = 0.0
-    """Maximum raster intensity value. Default 20. A zero value is treated as "use default"."""
-
-    min_parameter_value: float = 0.0
-    """Minimum ordinate (y) value of the heatmap — lower bound of the mapped swing position.
-    Default -5. Only substituted when both Min and Max are 0 (unconfigured).
+    All fields default to Ehlers' TASC settings. Explicit zero values are NOT
+    substituted with defaults.
     """
 
-    max_parameter_value: float = 0.0
-    """Maximum ordinate (y) value of the heatmap — upper bound of the mapped swing position.
-    Default 5. Only substituted when both Min and Max are 0 (unconfigured).
-    """
+    raster_length: int = 50
+    """Length of the heatmap raster (`>= 2`). Default 50."""
 
-    high_pass_filter_cutoff: int = 0
-    """High-pass filter cutoff. Default 30. A zero value is treated as "use default"."""
+    max_raster_value: float = 20.0
+    """Maximum raster intensity value (`> 6`). Default 20."""
 
-    minimal_period: int = 0
-    """Minimal cycle period. Default 6. A zero value is treated as "use default"."""
+    min_parameter_value: float = -5.0
+    """Minimum ordinate (y) value. Default -5."""
 
-    maximal_period: int = 0
-    """Maximal cycle period. Default 30. A zero value is treated as "use default"."""
+    max_parameter_value: float = 5.0
+    """Maximum ordinate (y) value (`> min_parameter_value`). Default 5."""
+
+    high_pass_filter_cutoff: int = 30
+    """High-pass filter cutoff (`>= 5`). Default 30."""
+
+    minimal_period: int = 6
+    """Minimal cycle period (`>= 6`). Default 6."""
+
+    maximal_period: int = 30
+    """Maximal cycle period (`> minimal_period`). Default 30."""
+
+    lead_window: int = 51
+    """Window length for 60-degree leading signal normalization (`>= 2`). Default 51."""
+
+    position_window: int = 21
+    """Window length for position span fuzz/suppression (`>= 2`). Default 21."""
 
     bar_component: Optional[BarComponent] = None
-    """A component of a bar to use when updating the indicator with a bar sample.
-
-    If not set, the bar component defaults to ClosePrice and is not shown in the indicator mnemonic.
-    """
+    """Bar component used by update_bar(); None defaults to Close."""
 
     quote_component: Optional[QuoteComponent] = None
-    """A component of a quote to use when updating the indicator with a quote sample.
-
-    If not set, the quote component defaults to MidPrice and is not shown in the indicator mnemonic.
-    """
+    """Quote component used by update_quote(); None defaults to Mid."""
 
     trade_component: Optional[TradeComponent] = None
-    """A component of a trade to use when updating the indicator with a trade sample.
-
-    If not set, the trade component defaults to Price and is not shown in the indicator mnemonic.
-    """
+    """Trade component used by update_trade(); None defaults to Price."""
 
 
-def default_params() -> Params:
+Params = CoronaSwingPositionParams
+
+
+def default_params() -> CoronaSwingPositionParams:
     """Return default Ehlers parameters."""
-    return Params(
-        raster_length=50,
-        max_raster_value=20.0,
-        min_parameter_value=-5.0,
-        max_parameter_value=5.0,
-        high_pass_filter_cutoff=30,
-        minimal_period=6,
-        maximal_period=30,
+    return CoronaSwingPositionParams()
+
+
+def swing_flags(params: CoronaSwingPositionParams) -> str:
+    """Build optional override flags when period or window parameters differ from defaults."""
+    parts: list[str] = []
+    if params.minimal_period != 6:
+        parts.append(f", pmin={params.minimal_period}")
+    if params.maximal_period != 30:
+        parts.append(f", pmax={params.maximal_period}")
+    if params.lead_window != 51:
+        parts.append(f", lead={params.lead_window}")
+    if params.position_window != 21:
+        parts.append(f", pos={params.position_window}")
+    return "".join(parts)
+
+
+def corona_swing_position_mnemonic(params: CoronaSwingPositionParams) -> str:
+    """Build the primary CoronaSwingPosition mnemonic."""
+    bc = params.bar_component if params.bar_component is not None else DEFAULT_BAR_COMPONENT
+    qc = params.quote_component if params.quote_component is not None else DEFAULT_QUOTE_COMPONENT
+    tc = params.trade_component if params.trade_component is not None else DEFAULT_TRADE_COMPONENT
+    comp = component_triple_mnemonic(bc, qc, tc)
+    flags = swing_flags(params)
+    return (
+        f"cswing({params.raster_length}, {format_number(params.max_raster_value)}, "
+        f"{format_number(params.min_parameter_value)}, "
+        f"{format_number(params.max_parameter_value)}, "
+        f"{params.high_pass_filter_cutoff}{flags}{comp})"
     )

@@ -1,40 +1,57 @@
-import { BarComponent } from '../../../entities/bar-component';
-import { QuoteComponent } from '../../../entities/quote-component';
-import { TradeComponent } from '../../../entities/trade-component';
+import { BarComponent, DefaultBarComponent } from '../../../entities/bar-component';
+import { DefaultQuoteComponent, QuoteComponent } from '../../../entities/quote-component';
+import { DefaultTradeComponent, TradeComponent } from '../../../entities/trade-component';
+import { componentTripleMnemonic } from '../../core/component-triple-mnemonic';
+import { formatNumber } from '../corona/corona';
 
-/** Describes parameters to create an instance of the CoronaTrendVigor indicator. */
 export interface CoronaTrendVigorParams {
-  /** Length of the heatmap raster. Default 50. A zero value is treated as "use default". */
-  rasterLength?: number;
-
-  /** Maximum raster intensity value. Default 20. A zero value is treated as "use default". */
-  maxRasterValue?: number;
-
-  /** Minimum ordinate (y) value. Default -10. Only substituted when both Min and Max are 0 (unconfigured). */
-  minParameterValue?: number;
-
-  /** Maximum ordinate (y) value. Default 10. Only substituted when both Min and Max are 0 (unconfigured). */
-  maxParameterValue?: number;
-
-  /** High-pass filter cutoff. Default 30. A zero value is treated as "use default". */
-  highPassFilterCutoff?: number;
-
-  /** Minimal cycle period. Default 6. A zero value is treated as "use default". */
-  minimalPeriod?: number;
-
-  /** Maximal cycle period. Default 30. A zero value is treated as "use default". */
-  maximalPeriod?: number;
-
-  /** A component of a bar to use (default BarComponent.Median). */
-  barComponent?: BarComponent;
-
-  /** A component of a quote to use. */
-  quoteComponent?: QuoteComponent;
-
-  /** A component of a trade to use. */
-  tradeComponent?: TradeComponent;
+    rasterLength?: number;
+    maxRasterValue?: number;
+    minParameterValue?: number;
+    maxParameterValue?: number;
+    highPassFilterCutoff?: number;
+    minimalPeriod?: number;
+    maximalPeriod?: number;
+    lookbackOffset?: number;
+    barComponent?: BarComponent;
+    quoteComponent?: QuoteComponent;
+    tradeComponent?: TradeComponent;
 }
 
 export function defaultParams(): CoronaTrendVigorParams {
-    return { rasterLength: 50, maxRasterValue: 20, minParameterValue: -10, maxParameterValue: 10, highPassFilterCutoff: 30, minimalPeriod: 6, maximalPeriod: 30 };
+    return {
+        rasterLength: 50,
+        maxRasterValue: 20,
+        minParameterValue: -10,
+        maxParameterValue: 10,
+        highPassFilterCutoff: 30,
+        minimalPeriod: 6,
+        maximalPeriod: 30,
+        lookbackOffset: 0,
+    };
+}
+
+export function trendFlags(params?: CoronaTrendVigorParams): string {
+    const minPeriod = params?.minimalPeriod ?? 6;
+    const maxPeriod = params?.maximalPeriod ?? 30;
+    const lookbackOffset = params?.lookbackOffset ?? 0;
+    const parts: string[] = [];
+    if (minPeriod !== 6) parts.push(`, pmin=${minPeriod}`);
+    if (maxPeriod !== 30) parts.push(`, pmax=${maxPeriod}`);
+    if (lookbackOffset !== 0) parts.push(`, offset=${lookbackOffset}`);
+    return parts.join('');
+}
+
+export function coronaTrendVigorMnemonic(params?: CoronaTrendVigorParams): string {
+    const rasterLength = params?.rasterLength ?? 50;
+    const maxRaster = params?.maxRasterValue ?? 20;
+    const minParam = params?.minParameterValue ?? -10;
+    const maxParam = params?.maxParameterValue ?? 10;
+    const hpCutoff = params?.highPassFilterCutoff ?? 30;
+    const bc = params?.barComponent ?? DefaultBarComponent;
+    const qc = params?.quoteComponent ?? DefaultQuoteComponent;
+    const tc = params?.tradeComponent ?? DefaultTradeComponent;
+    const comp = componentTripleMnemonic(bc, qc, tc);
+    const flags = trendFlags(params);
+    return `ctv(${rasterLength}, ${formatNumber(maxRaster)}, ${formatNumber(minParam)}, ${formatNumber(maxParam)}, ${hpCutoff}${flags}${comp})`;
 }

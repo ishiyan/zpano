@@ -470,7 +470,7 @@ pub static DESCRIPTORS: &[Descriptor] = &[
         identifier: CoronaSignalToNoiseRatio,
         family: "John Ehlers",
         adaptivity: Adaptive,
-        input_requirement: ScalarInput,
+        input_requirement: BarInput,
         volume_usage: NoVolume,
         outputs: &[
             OutputDescriptor {

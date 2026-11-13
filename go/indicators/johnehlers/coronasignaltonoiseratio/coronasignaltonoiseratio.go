@@ -1,19 +1,10 @@
-// Package coronasignaltonoiseratio implements Ehlers' Corona Signal-to-Noise
-// Ratio heatmap indicator.
-//
-// The Corona Signal to Noise Ratio is a measure of the cycle amplitude relative
-// to noise. The "noise" is chosen to be the average bar height because there is
-// not much trade information within the bar.
-//
-// Reference: John Ehlers, "Measuring Cycle Periods", Stocks & Commodities,
-// November 2008.
 package coronasignaltonoiseratio
 
-//nolint: gofumpt
 import (
+	"errors"
 	"fmt"
 	"math"
-	"sort"
+	"slices"
 	"sync"
 	"time"
 
@@ -23,226 +14,175 @@ import (
 	"zpano/indicators/johnehlers/corona"
 )
 
-const (
-	highLowBufferSize       = 5
-	highLowBufferSizeMinOne = highLowBufferSize - 1
-	highLowMedianIndex      = 2
-	averageSampleAlpha      = 0.1
-	averageSampleOneMinus   = 0.9
-	signalEmaAlpha          = 0.2
-	signalEmaOneMinus       = 0.9 // Intentional: sums to 1.1, per Ehlers.
-	noiseEmaAlpha           = 0.1
-	noiseEmaOneMinus        = 0.9
-	ratioOffsetDb           = 3.5
-	ratioUpperDb            = 10.
-	dbGain                  = 20.
-	widthLowRatioThreshold  = 0.5
-	widthBaseline           = 0.2
-	widthSlope              = 0.4
-	rasterBlendExponent     = 0.8
-	rasterBlendHalf         = 0.5
-	rasterNegativeArgCutoff = 1.
-)
+// Snapshot owns all 13 diagnostic fields for one CoronaSignalToNoiseRatio update.
+type Snapshot struct {
+	Heatmap             *outputs.Heatmap
+	SignalToNoiseRatio  float64
+	PhysicalDecibels    float64
+	CalibratedDecibels  float64
+	NormalizedPosition  float64
+	Signal              float64
+	Noise               float64
+	MedianBarRange      float64
+	Width               float64
+	DominantCycle       float64
+	DominantCycleMedian float64
+	HasCycleEstimate    float64
+	RatioIsFinite       float64
+}
+
+// SignalToNoiseOutput aliases [Snapshot].
+type SignalToNoiseOutput = Snapshot
+
+func validateHighLow(low, high float64) (float64, error) {
+	if math.IsNaN(low) || math.IsNaN(high) {
+		return math.NaN(), nil
+	}
+	if math.IsInf(low, 0) || math.IsInf(high, 0) {
+		return 0, errors.New("high and low must be finite")
+	}
+	return validateBarRange(high - low)
+}
+
+func validateBarRange(barRange float64) (float64, error) {
+	if math.IsNaN(barRange) {
+		return math.NaN(), nil
+	}
+	if math.IsInf(barRange, 0) || barRange < 0.0 {
+		return 0, errors.New("barRange must be finite and nonnegative; require high >= low")
+	}
+	return barRange, nil
+}
 
 // CoronaSignalToNoiseRatio is Ehlers' Corona Signal-to-Noise Ratio indicator.
-//
-// It owns a private Corona spectral-analysis engine and exposes two outputs:
-//
-//   - Value: a per-bar heatmap column (intensity raster).
-//   - SignalToNoiseRatio: the current SNR value mapped into
-//     [MinParameterValue, MaxParameterValue].
 type CoronaSignalToNoiseRatio struct {
-	mu                    sync.RWMutex
-	mnemonic              string
-	description           string
-	mnemonicSNR           string
-	descriptionSNR        string
-	c                     *corona.Corona
-	rasterLength          int
-	rasterStep            float64
-	maxRasterValue        float64
-	minParameterValue     float64
-	maxParameterValue     float64
-	parameterResolution   float64
-	raster                []float64
-	highLowBuffer         [highLowBufferSize]float64
-	hlSorted              [highLowBufferSize]float64
-	averageSamplePrevious float64
-	signalPrevious        float64
-	noisePrevious         float64
-	signalToNoiseRatio    float64
-	isStarted             bool
-	barFunc               entities.BarFunc
-	quoteFunc             entities.QuoteFunc
-	tradeFunc             entities.TradeFunc
+	mu             sync.RWMutex
+	mnemonic       string
+	description    string
+	mnemonicSNR    string
+	descriptionSNR string
+	engine         *corona.Corona
+	engineParams   corona.Params
+	raster         *corona.Raster
+	sampleCount    int
+	ranges         [5]float64
+	average        float64
+	signal         float64
+	noise          float64
+	barFunc        entities.BarFunc
+	quoteFunc      entities.QuoteFunc
+	tradeFunc      entities.TradeFunc
 }
 
 // NewCoronaSignalToNoiseRatioDefault returns an instance created with default parameters.
 func NewCoronaSignalToNoiseRatioDefault() (*CoronaSignalToNoiseRatio, error) {
-	return NewCoronaSignalToNoiseRatioParams(&Params{})
+	return NewCoronaSignalToNoiseRatioParams(DefaultParams())
+}
+
+// NewCoronaSignalToNoiseRatio aliases [NewCoronaSignalToNoiseRatioParams].
+func NewCoronaSignalToNoiseRatio(p *Params) (*CoronaSignalToNoiseRatio, error) {
+	return NewCoronaSignalToNoiseRatioParams(p)
 }
 
 // NewCoronaSignalToNoiseRatioParams returns an instance created with the supplied parameters.
-//
-//nolint:funlen,cyclop
 func NewCoronaSignalToNoiseRatioParams(p *Params) (*CoronaSignalToNoiseRatio, error) {
-	const (
-		invalid      = "invalid corona signal to noise ratio parameters"
-		fmtRaster    = "%s: RasterLength should be >= 2"
-		fmtMaxRaster = "%s: MaxRasterValue should be > 0"
-		fmtMinParam  = "%s: MinParameterValue should be >= 0"
-		fmtMaxParam  = "%s: MaxParameterValue should be > MinParameterValue"
-		fmtHP        = "%s: HighPassFilterCutoff should be >= 2"
-		fmtMinP      = "%s: MinimalPeriod should be >= 2"
-		fmtMaxP      = "%s: MaximalPeriod should be > MinimalPeriod"
-		fmtw         = "%s: %w"
-		fmtnValue    = "csnr(%d, %g, %g, %g, %d%s)"
-		fmtnSNR      = "csnr-snr(%d%s)"
-		descrValue   = "Corona signal to noise ratio "
-		descrSNR     = "Corona signal to noise ratio scalar "
-		defRaster    = 50
-		defMaxRast   = 20.0
-		defMinParam  = 1.0
-		defMaxParam  = 11.0
-		defHPCutoff  = 30
-		defMinPer    = 6
-		defMaxPer    = 30
-	)
+	const invalid = "invalid corona signal to noise ratio parameters"
 
-	cfg := *p
-
-	if cfg.RasterLength == 0 {
-		cfg.RasterLength = defRaster
+	source := DefaultParams()
+	if p != nil {
+		copied := *p
+		source = &copied
+	}
+	raster, err := corona.NewRaster(source.RasterLength, source.MinParameterValue, source.MaxParameterValue, source.MaxRasterValue)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", invalid, err)
+	}
+	engine, err := corona.NewCorona(&corona.Params{
+		HighPassFilterCutoff:   source.HighPassFilterCutoff,
+		MinimalPeriod:          source.MinimalPeriod,
+		MaximalPeriod:          source.MaximalPeriod,
+		DecibelsLowerThreshold: 6.0,
+		DecibelsUpperThreshold: raster.Ceiling(),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", invalid, err)
 	}
 
-	if cfg.MaxRasterValue == 0 {
-		cfg.MaxRasterValue = defMaxRast
-	}
-
-	if cfg.MinParameterValue == 0 {
-		cfg.MinParameterValue = defMinParam
-	}
-
-	if cfg.MaxParameterValue == 0 {
-		cfg.MaxParameterValue = defMaxParam
-	}
-
-	if cfg.HighPassFilterCutoff == 0 {
-		cfg.HighPassFilterCutoff = defHPCutoff
-	}
-
-	if cfg.MinimalPeriod == 0 {
-		cfg.MinimalPeriod = defMinPer
-	}
-
-	if cfg.MaximalPeriod == 0 {
-		cfg.MaximalPeriod = defMaxPer
-	}
-
-	if cfg.RasterLength < 2 {
-		return nil, fmt.Errorf(fmtRaster, invalid)
-	}
-
-	if cfg.MaxRasterValue <= 0 {
-		return nil, fmt.Errorf(fmtMaxRaster, invalid)
-	}
-
-	if cfg.MinParameterValue < 0 {
-		return nil, fmt.Errorf(fmtMinParam, invalid)
-	}
-
-	if cfg.MaxParameterValue <= cfg.MinParameterValue {
-		return nil, fmt.Errorf(fmtMaxParam, invalid)
-	}
-
-	if cfg.HighPassFilterCutoff < 2 {
-		return nil, fmt.Errorf(fmtHP, invalid)
-	}
-
-	if cfg.MinimalPeriod < 2 {
-		return nil, fmt.Errorf(fmtMinP, invalid)
-	}
-
-	if cfg.MaximalPeriod <= cfg.MinimalPeriod {
-		return nil, fmt.Errorf(fmtMaxP, invalid)
-	}
-
-	// Ehlers reference uses (High+Low)/2.
-	bc := cfg.BarComponent
+	bc, qc, tc := source.BarComponent, source.QuoteComponent, source.TradeComponent
 	if bc == 0 {
-		bc = entities.BarMedianPrice
+		bc = entities.DefaultBarComponent
 	}
-
-	qc := cfg.QuoteComponent
 	if qc == 0 {
 		qc = entities.DefaultQuoteComponent
 	}
-
-	tc := cfg.TradeComponent
 	if tc == 0 {
 		tc = entities.DefaultTradeComponent
 	}
 
-	c, err := corona.NewCorona(&corona.Params{
-		HighPassFilterCutoff: cfg.HighPassFilterCutoff,
-		MinimalPeriod:        cfg.MinimalPeriod,
-		MaximalPeriod:        cfg.MaximalPeriod,
-	})
-	if err != nil {
-		return nil, fmt.Errorf(fmtw, invalid, err)
-	}
-
 	barFunc, err := entities.BarComponentFunc(bc)
 	if err != nil {
-		return nil, fmt.Errorf(fmtw, invalid, err)
+		return nil, fmt.Errorf("%s: %w", invalid, err)
 	}
-
 	quoteFunc, err := entities.QuoteComponentFunc(qc)
 	if err != nil {
-		return nil, fmt.Errorf(fmtw, invalid, err)
+		return nil, fmt.Errorf("%s: %w", invalid, err)
 	}
-
 	tradeFunc, err := entities.TradeComponentFunc(tc)
 	if err != nil {
-		return nil, fmt.Errorf(fmtw, invalid, err)
+		return nil, fmt.Errorf("%s: %w", invalid, err)
 	}
 
-	componentMnemonic := core.ComponentTripleMnemonic(bc, qc, tc)
+	comp := core.ComponentTripleMnemonic(bc, qc, tc)
+	flags := snrFlags(*source)
+	mnemonicValue := fmt.Sprintf("csnr(%d, %s, %s, %s, %d%s%s)",
+		raster.Length(),
+		corona.FormatNumber(raster.Ceiling()),
+		corona.FormatNumber(raster.Lower()),
+		corona.FormatNumber(raster.Upper()),
+		source.HighPassFilterCutoff,
+		flags,
+		comp,
+	)
+	mnemonicSNR := fmt.Sprintf("csnr-snr(%d%s%s)", source.HighPassFilterCutoff, flags, comp)
 
-	mnemonicValue := fmt.Sprintf(fmtnValue,
-		cfg.RasterLength, cfg.MaxRasterValue, cfg.MinParameterValue, cfg.MaxParameterValue,
-		cfg.HighPassFilterCutoff, componentMnemonic)
-	mnemonicSNR := fmt.Sprintf(fmtnSNR, cfg.HighPassFilterCutoff, componentMnemonic)
+	instance := &CoronaSignalToNoiseRatio{
+		mnemonic:       mnemonicValue,
+		description:    "Corona signal to noise ratio " + mnemonicValue,
+		mnemonicSNR:    mnemonicSNR,
+		descriptionSNR: "Corona signal to noise ratio scalar " + mnemonicSNR,
+		engine:         engine,
+		engineParams:   engine.Parameters(),
+		raster:         raster,
+		barFunc:        barFunc,
+		quoteFunc:      quoteFunc,
+		tradeFunc:      tradeFunc,
+	}
+	instance.resetLocked()
+	return instance, nil
+}
 
-	// Resolution satisfies: min + (rasterLength-1)/resolution = max.
-	parameterResolution := float64(cfg.RasterLength-1) / (cfg.MaxParameterValue - cfg.MinParameterValue)
+func (s *CoronaSignalToNoiseRatio) resetLocked() {
+	s.engine.Reset()
+	s.sampleCount = 0
+	s.raster.Reset()
+	s.ranges = [5]float64{}
+	s.average = 0
+	s.signal = 0
+	s.noise = 0
+}
 
-	return &CoronaSignalToNoiseRatio{
-		mnemonic:            mnemonicValue,
-		description:         descrValue + mnemonicValue,
-		mnemonicSNR:         mnemonicSNR,
-		descriptionSNR:      descrSNR + mnemonicSNR,
-		c:                   c,
-		rasterLength:        cfg.RasterLength,
-		rasterStep:          cfg.MaxRasterValue / float64(cfg.RasterLength),
-		maxRasterValue:      cfg.MaxRasterValue,
-		minParameterValue:   cfg.MinParameterValue,
-		maxParameterValue:   cfg.MaxParameterValue,
-		parameterResolution: parameterResolution,
-		raster:              make([]float64, cfg.RasterLength),
-		signalToNoiseRatio:  math.NaN(),
-		barFunc:             barFunc,
-		quoteFunc:           quoteFunc,
-		tradeFunc:           tradeFunc,
-	}, nil
+// Reset clears streaming state while retaining parameters.
+func (s *CoronaSignalToNoiseRatio) Reset() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.resetLocked()
 }
 
 // IsPrimed indicates whether the indicator is primed.
 func (s *CoronaSignalToNoiseRatio) IsPrimed() bool {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-
-	return s.c.IsPrimed()
+	return s.sampleCount >= corona.FirstBankSample
 }
 
 // Metadata describes the output data of the indicator.
@@ -258,171 +198,247 @@ func (s *CoronaSignalToNoiseRatio) Metadata() core.Metadata {
 	)
 }
 
-// Update feeds the next sample plus bar extremes and returns the heatmap column
-// and the current SignalToNoiseRatio. On unprimed bars the heatmap is empty and
-// the scalar is NaN. On NaN sample input state is left unchanged.
-//
-//nolint:funlen,cyclop,gocognit
-func (s *CoronaSignalToNoiseRatio) Update(sample, sampleLow, sampleHigh float64, t time.Time) (*outputs.Heatmap, float64) {
+func (s *CoronaSignalToNoiseRatio) emptySnapshot(t time.Time) Snapshot {
+	nan := math.NaN()
+	return Snapshot{
+		Heatmap:             s.raster.Empty(t),
+		SignalToNoiseRatio:  nan,
+		PhysicalDecibels:    nan,
+		CalibratedDecibels:  nan,
+		NormalizedPosition:  nan,
+		Signal:              nan,
+		Noise:               nan,
+		MedianBarRange:      nan,
+		Width:               nan,
+		DominantCycle:       nan,
+		DominantCycleMedian: nan,
+		HasCycleEstimate:    nan,
+		RatioIsFinite:       nan,
+	}
+}
+
+func (s *CoronaSignalToNoiseRatio) updateFromSnapshotRangeLocked(snapshot corona.Snapshot, barRange float64) (Snapshot, error) {
+	if !snapshot.Accepted {
+		if _, err := corona.AcceptSnapshot(snapshot, s.engineParams, s.sampleCount+1); err != nil {
+			return Snapshot{}, err
+		}
+		return s.emptySnapshot(snapshot.Time), nil
+	}
+	rangeValue, err := validateBarRange(barRange)
+	if err != nil {
+		return Snapshot{}, err
+	}
+	if math.IsNaN(rangeValue) {
+		return Snapshot{}, errors.New("accepted shared snapshot requires a finite bar range")
+	}
+	if _, err := corona.AcceptSnapshot(snapshot, s.engineParams, s.sampleCount+1); err != nil {
+		return Snapshot{}, err
+	}
+	s.sampleCount = snapshot.SampleCount
+
+	copy(s.ranges[:4], s.ranges[1:])
+	s.ranges[4] = rangeValue
+	sortedRanges := s.ranges
+	slices.Sort(sortedRanges[:])
+	medianRange := sortedRanges[2]
+
+	if s.sampleCount == 1 {
+		s.average = snapshot.Price
+	} else {
+		s.average = 0.1*snapshot.Price + 0.9*s.average
+		if s.average != 0.0 || snapshot.MaximumPower > 0.0 {
+			s.signal = 0.2*math.Sqrt(snapshot.MaximumPower) + 0.9*s.signal
+		}
+		if s.average != 0.0 && s.sampleCount > 5 {
+			s.noise = 0.1*medianRange + 0.9*s.noise
+		}
+	}
+
+	var physical float64
+	switch {
+	case s.signal > 0.0 && s.noise > 0.0:
+		physical = 20.0 * (math.Log10(s.signal) - math.Log10(s.noise))
+	case s.signal > 0.0:
+		physical = math.Inf(1)
+	case s.noise > 0.0:
+		physical = math.Inf(-1)
+	default:
+		physical = math.NaN()
+	}
+
+	calibrated := physical + 3.5
+	position := 0.0
+	if !math.IsNaN(calibrated) {
+		position = corona.Clip(calibrated, 0.0, 10.0) / 10.0
+	}
+	width := max(0.0, 0.2-0.4*position)
+	s.raster.Update(position, width, corona.RasterSNR, position > 0.5)
+
+	if !snapshot.Primed {
+		return s.emptySnapshot(snapshot.Time), nil
+	}
+
+	mapped := s.raster.Lower() + (s.raster.Upper()-s.raster.Lower())*position
+	hasEstimate := 0.0
+	if snapshot.HasCycleEstimate {
+		hasEstimate = 1.0
+	}
+	ratioIsFinite := 0.0
+	if !math.IsNaN(physical) && !math.IsInf(physical, 0) {
+		ratioIsFinite = 1.0
+	}
+	return Snapshot{
+		Heatmap:             s.raster.Column(snapshot.Time),
+		SignalToNoiseRatio:  mapped,
+		PhysicalDecibels:    physical,
+		CalibratedDecibels:  calibrated,
+		NormalizedPosition:  position,
+		Signal:              s.signal,
+		Noise:               s.noise,
+		MedianBarRange:      medianRange,
+		Width:               width,
+		DominantCycle:       snapshot.DominantCycle,
+		DominantCycleMedian: snapshot.DominantCycleMedian,
+		HasCycleEstimate:    hasEstimate,
+		RatioIsFinite:       ratioIsFinite,
+	}, nil
+}
+
+// TryUpdate feeds price and (low, high) to the standalone engine before mutating state on error.
+func (s *CoronaSignalToNoiseRatio) TryUpdate(sample, low, high float64, t time.Time) (Snapshot, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	if math.IsNaN(sample) {
-		return outputs.NewEmptyHeatmap(t, s.minParameterValue, s.maxParameterValue, s.parameterResolution), math.NaN()
+	ok, err := corona.ValidPrice(sample)
+	if err != nil {
+		return Snapshot{}, err
 	}
-
-	primed := s.c.Update(sample)
-
-	if !s.isStarted {
-		s.averageSamplePrevious = sample
-		s.highLowBuffer[highLowBufferSizeMinOne] = sampleHigh - sampleLow
-		s.isStarted = true
-
-		return outputs.NewEmptyHeatmap(t, s.minParameterValue, s.maxParameterValue, s.parameterResolution), math.NaN()
+	if !ok {
+		return s.emptySnapshot(t), nil
 	}
-
-	maxAmpSq := s.c.MaximalAmplitudeSquared()
-
-	averageSample := averageSampleAlpha*sample + averageSampleOneMinus*s.averageSamplePrevious
-	s.averageSamplePrevious = averageSample
-
-	if math.Abs(averageSample) > 0 || maxAmpSq > 0 {
-		s.signalPrevious = signalEmaAlpha*math.Sqrt(maxAmpSq) + signalEmaOneMinus*s.signalPrevious
+	rangeValue, err := validateHighLow(low, high)
+	if err != nil {
+		return Snapshot{}, err
 	}
-
-	// Shift H-L ring buffer left; push new value.
-	for i := 0; i < highLowBufferSizeMinOne; i++ {
-		s.highLowBuffer[i] = s.highLowBuffer[i+1]
+	if math.IsNaN(rangeValue) {
+		return s.emptySnapshot(t), nil
 	}
-	s.highLowBuffer[highLowBufferSizeMinOne] = sampleHigh - sampleLow
-
-	ratio := 0.0
-	if math.Abs(averageSample) > 0 {
-		for i := 0; i < highLowBufferSize; i++ {
-			s.hlSorted[i] = s.highLowBuffer[i]
-		}
-
-		sort.Float64s(s.hlSorted[:])
-		s.noisePrevious = noiseEmaAlpha*s.hlSorted[highLowMedianIndex] + noiseEmaOneMinus*s.noisePrevious
-
-		if math.Abs(s.noisePrevious) > 0 {
-			ratio = dbGain*math.Log10(s.signalPrevious/s.noisePrevious) + ratioOffsetDb
-			if ratio < 0 {
-				ratio = 0
-			} else if ratio > ratioUpperDb {
-				ratio = ratioUpperDb
-			}
-
-			ratio /= ratioUpperDb // ∈ [0, 1]
-		}
+	snapshot, err := s.engine.TryUpdate(sample, t)
+	if err != nil {
+		return Snapshot{}, err
 	}
-
-	s.signalToNoiseRatio = (s.maxParameterValue-s.minParameterValue)*ratio + s.minParameterValue
-
-	// Raster update.
-	width := 0.0
-	if ratio <= widthLowRatioThreshold {
-		width = widthBaseline - widthSlope*ratio
-	}
-
-	ratioScaledToRasterLength := int(math.Round(ratio * float64(s.rasterLength)))
-	ratioScaledToMaxRasterValue := ratio * s.maxRasterValue
-
-	for i := 0; i < s.rasterLength; i++ {
-		value := s.raster[i]
-
-		switch {
-		case i == ratioScaledToRasterLength:
-			value *= 0.5
-		case width == 0:
-			// Above the high-ratio threshold: handled by the ratio>0.5 override below.
-		default:
-			argument := (ratioScaledToMaxRasterValue - s.rasterStep*float64(i)) / width
-			if i < ratioScaledToRasterLength {
-				value = rasterBlendHalf * (math.Pow(argument, rasterBlendExponent) + value)
-			} else {
-				argument = -argument
-				if argument > rasterNegativeArgCutoff {
-					value = rasterBlendHalf * (math.Pow(argument, rasterBlendExponent) + value)
-				} else {
-					value = s.maxRasterValue
-				}
-			}
-		}
-
-		if value < 0 {
-			value = 0
-		} else if value > s.maxRasterValue {
-			value = s.maxRasterValue
-		}
-
-		if ratio > widthLowRatioThreshold {
-			value = s.maxRasterValue
-		}
-
-		s.raster[i] = value
-	}
-
-	if !primed {
-		return outputs.NewEmptyHeatmap(t, s.minParameterValue, s.maxParameterValue, s.parameterResolution), math.NaN()
-	}
-
-	values := make([]float64, s.rasterLength)
-	valueMin := math.Inf(1)
-	valueMax := math.Inf(-1)
-
-	for i := 0; i < s.rasterLength; i++ {
-		v := s.raster[i]
-		values[i] = v
-
-		if v < valueMin {
-			valueMin = v
-		}
-
-		if v > valueMax {
-			valueMax = v
-		}
-	}
-
-	heatmap := outputs.NewHeatmap(t, s.minParameterValue, s.maxParameterValue, s.parameterResolution,
-		valueMin, valueMax, values)
-
-	return heatmap, s.signalToNoiseRatio
+	return s.updateFromSnapshotRangeLocked(snapshot, rangeValue)
 }
 
-// UpdateScalar updates the indicator given the next scalar sample. Since no
-// High/Low is available, the sample is used for both, yielding zero noise.
+// Update feeds price and (low, high) to the standalone engine and returns a full snapshot.
+func (s *CoronaSignalToNoiseRatio) Update(sample, low, high float64, t time.Time) Snapshot {
+	result, err := s.TryUpdate(sample, low, high, t)
+	if err != nil {
+		panic(err)
+	}
+	return result
+}
+
+// TryUpdateRange feeds price and an explicit barRange to the standalone engine.
+func (s *CoronaSignalToNoiseRatio) TryUpdateRange(sample, barRange float64, t time.Time) (Snapshot, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	ok, err := corona.ValidPrice(sample)
+	if err != nil {
+		return Snapshot{}, err
+	}
+	if !ok {
+		return s.emptySnapshot(t), nil
+	}
+	rangeValue, err := validateBarRange(barRange)
+	if err != nil {
+		return Snapshot{}, err
+	}
+	if math.IsNaN(rangeValue) {
+		return s.emptySnapshot(t), nil
+	}
+	snapshot, err := s.engine.TryUpdate(sample, t)
+	if err != nil {
+		return Snapshot{}, err
+	}
+	return s.updateFromSnapshotRangeLocked(snapshot, rangeValue)
+}
+
+// UpdateRange feeds price and an explicit barRange to the standalone engine.
+func (s *CoronaSignalToNoiseRatio) UpdateRange(sample, barRange float64, t time.Time) Snapshot {
+	result, err := s.TryUpdateRange(sample, barRange, t)
+	if err != nil {
+		panic(err)
+	}
+	return result
+}
+
+// TryUpdateFromSnapshot consumes a shared engine snapshot alongside (low, high).
+func (s *CoronaSignalToNoiseRatio) TryUpdateFromSnapshot(snapshot corona.Snapshot, low, high float64) (Snapshot, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if !snapshot.Accepted {
+		return s.updateFromSnapshotRangeLocked(snapshot, 0)
+	}
+	rangeValue, err := validateHighLow(low, high)
+	if err != nil {
+		return Snapshot{}, err
+	}
+	return s.updateFromSnapshotRangeLocked(snapshot, rangeValue)
+}
+
+// UpdateFromSnapshot consumes a shared engine snapshot alongside (low, high).
+func (s *CoronaSignalToNoiseRatio) UpdateFromSnapshot(snapshot corona.Snapshot, low, high float64) Snapshot {
+	result, err := s.TryUpdateFromSnapshot(snapshot, low, high)
+	if err != nil {
+		panic(err)
+	}
+	return result
+}
+
+// TryUpdateFromSnapshotRange consumes a shared engine snapshot alongside an explicit barRange.
+func (s *CoronaSignalToNoiseRatio) TryUpdateFromSnapshotRange(snapshot corona.Snapshot, barRange float64) (Snapshot, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.updateFromSnapshotRangeLocked(snapshot, barRange)
+}
+
+// UpdateFromSnapshotRange consumes a shared engine snapshot alongside an explicit barRange.
+func (s *CoronaSignalToNoiseRatio) UpdateFromSnapshotRange(snapshot corona.Snapshot, barRange float64) Snapshot {
+	result, err := s.TryUpdateFromSnapshotRange(snapshot, barRange)
+	if err != nil {
+		panic(err)
+	}
+	return result
+}
+
+func (s *CoronaSignalToNoiseRatio) wrapEntity(t time.Time, result Snapshot) core.Output {
+	return core.Output{
+		result.Heatmap,
+		entities.Scalar{Time: t, Value: result.SignalToNoiseRatio},
+	}
+}
+
+// UpdateScalar updates the indicator given a scalar sample (zero bar range).
 func (s *CoronaSignalToNoiseRatio) UpdateScalar(sample *entities.Scalar) core.Output {
-	return s.updateEntity(sample.Time, sample.Value, sample.Value, sample.Value)
+	value := sample.Value
+	return s.wrapEntity(sample.Time, s.Update(value, value, value, sample.Time))
 }
 
 // UpdateBar updates the indicator given the next bar sample.
 func (s *CoronaSignalToNoiseRatio) UpdateBar(sample *entities.Bar) core.Output {
-	return s.updateEntity(sample.Time, s.barFunc(sample), sample.Low, sample.High)
+	return s.wrapEntity(sample.Time, s.Update(s.barFunc(sample), sample.Low, sample.High, sample.Time))
 }
 
-// UpdateQuote updates the indicator given the next quote sample.
+// UpdateQuote updates the indicator given a quote sample (zero bar range).
 func (s *CoronaSignalToNoiseRatio) UpdateQuote(sample *entities.Quote) core.Output {
-	v := s.quoteFunc(sample)
-
-	return s.updateEntity(sample.Time, v, v, v)
+	value := s.quoteFunc(sample)
+	return s.wrapEntity(sample.Time, s.Update(value, value, value, sample.Time))
 }
 
-// UpdateTrade updates the indicator given the next trade sample.
+// UpdateTrade updates the indicator given a trade sample (zero bar range).
 func (s *CoronaSignalToNoiseRatio) UpdateTrade(sample *entities.Trade) core.Output {
-	v := s.tradeFunc(sample)
-
-	return s.updateEntity(sample.Time, v, v, v)
-}
-
-func (s *CoronaSignalToNoiseRatio) updateEntity(t time.Time, sample, low, high float64) core.Output {
-	const length = 2
-
-	heatmap, snr := s.Update(sample, low, high, t)
-
-	output := make([]any, length)
-	output[0] = heatmap
-	output[1] = entities.Scalar{Time: t, Value: snr}
-
-	return output
+	value := s.tradeFunc(sample)
+	return s.wrapEntity(sample.Time, s.Update(value, value, value, sample.Time))
 }

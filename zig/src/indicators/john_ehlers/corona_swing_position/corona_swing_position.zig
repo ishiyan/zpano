@@ -14,444 +14,370 @@ const build_metadata_mod = @import("../../core/build_metadata.zig");
 const component_triple_mnemonic_mod = @import("../../core/component_triple_mnemonic.zig");
 const identifier_mod = @import("../../core/identifier.zig");
 const metadata_mod = @import("../../core/metadata.zig");
+const shape_mod = @import("../../core/outputs/shape.zig");
 const heatmap_mod = @import("../../core/outputs/heatmap.zig");
 const corona_mod = @import("../corona/corona.zig");
 
 const OutputArray = indicator_mod.OutputArray;
-const OutputValue = indicator_mod.OutputValue;
 const Identifier = identifier_mod.Identifier;
 const Metadata = metadata_mod.Metadata;
 const Heatmap = heatmap_mod.Heatmap;
 const Corona = corona_mod.Corona;
+const CoronaSnapshot = corona_mod.CoronaSnapshot;
+const AdaptiveBandPass = corona_mod.AdaptiveBandPass;
+const Raster = corona_mod.Raster;
 
-// Constants.
-const max_lead_list_count = 50;
-const max_position_list_count = 20;
-
-const lead60_coef_bp: f64 = 0.5;
-const lead60_coef_q: f64 = 0.866;
-const bp_delta: f64 = 0.1;
-
-const width_high_threshold: f64 = 0.85;
-const width_high_saturate: f64 = 0.8;
-const width_narrow: f64 = 0.01;
-const width_scale: f64 = 0.15;
-
-const raster_blend_exponent: f64 = 0.95;
-const raster_blend_half: f64 = 0.5;
-
-/// Enumerates the outputs of the CoronaSwingPosition indicator.
 pub const CoronaSwingPositionOutput = enum(u8) {
     value = 1,
     swing_position = 2,
 };
 
-/// Parameters to create a CoronaSwingPosition indicator.
 pub const Params = struct {
-    /// Number of elements in the heatmap raster. Default: 50.
-    raster_length: i32 = 0,
-    /// Maximal raster value (z) of the heatmap. Default: 20.
-    max_raster_value: f64 = 0,
-    /// Minimal ordinate (y) value. Default: -5.
-    min_parameter_value: f64 = 0,
-    /// Maximal ordinate (y) value. Default: 5.
-    max_parameter_value: f64 = 0,
-    /// High-pass filter cutoff. Default: 30.
-    high_pass_filter_cutoff: i32 = 0,
-    /// Minimal period. Default: 6.
-    minimal_period: i32 = 0,
-    /// Maximal period. Default: 30.
-    maximal_period: i32 = 0,
+    raster_length: i32 = 50,
+    max_raster_value: f64 = 20.0,
+    min_parameter_value: f64 = -5.0,
+    max_parameter_value: f64 = 5.0,
+    high_pass_filter_cutoff: i32 = 30,
+    minimal_period: i32 = 6,
+    maximal_period: i32 = 30,
+    lead_window: i32 = 51,
+    position_window: i32 = 21,
     bar_component: ?bar_component.BarComponent = null,
     quote_component: ?quote_component.QuoteComponent = null,
     trade_component: ?trade_component.TradeComponent = null,
 };
 
-pub const Error = error{
-    InvalidRasterLength,
-    InvalidMaxRasterValue,
-    InvalidMaxParameterValue,
-    InvalidHighPassFilterCutoff,
-    InvalidMinimalPeriod,
-    InvalidMaximalPeriod,
-    MnemonicTooLong,
-    OutOfMemory,
+pub fn defaultParams() Params {
+    return .{};
+}
+
+pub const Error = corona_mod.Error;
+
+pub const CoronaSwingPositionSnapshot = struct {
+    heatmap: Heatmap,
+    swing_position: f64,
+    normalized_position: f64,
+    dominant_cycle: f64,
+    dominant_cycle_median: f64,
+    band_pass: f64,
+    quadrature: f64,
+    cycle_amplitude: f64,
+    lead60: f64,
+    position_span: f64,
+    width: f64,
+    has_cycle_estimate: f64,
 };
 
-/// Ehlers' Corona Swing Position heatmap indicator.
+pub const Snapshot = CoronaSwingPositionSnapshot;
+
+fn formatSwingFlags(buffer: []u8, params: Params) Error![]const u8 {
+    var pos: usize = 0;
+    if (params.minimal_period != 6) {
+        const chunk = std.fmt.bufPrint(buffer[pos..], ", pmin={d}", .{params.minimal_period}) catch return error.MnemonicTooLong;
+        pos += chunk.len;
+    }
+    if (params.maximal_period != 30) {
+        const chunk = std.fmt.bufPrint(buffer[pos..], ", pmax={d}", .{params.maximal_period}) catch return error.MnemonicTooLong;
+        pos += chunk.len;
+    }
+    if (params.lead_window != 51) {
+        const chunk = std.fmt.bufPrint(buffer[pos..], ", lead={d}", .{params.lead_window}) catch return error.MnemonicTooLong;
+        pos += chunk.len;
+    }
+    if (params.position_window != 21) {
+        const chunk = std.fmt.bufPrint(buffer[pos..], ", pos={d}", .{params.position_window}) catch return error.MnemonicTooLong;
+        pos += chunk.len;
+    }
+    return buffer[0..pos];
+}
+
+pub fn formatMnemonic(buffer: []u8, params: Params) Error![]const u8 {
+    const bc = params.bar_component orelse bar_component.default_bar_component;
+    const qc = params.quote_component orelse quote_component.default_quote_component;
+    const tc = params.trade_component orelse trade_component.default_trade_component;
+
+    var triple_buffer: [64]u8 = undefined;
+    const triple = component_triple_mnemonic_mod.componentTripleMnemonic(&triple_buffer, bc, qc, tc);
+    var flags_buffer: [96]u8 = undefined;
+    const flags = try formatSwingFlags(&flags_buffer, params);
+
+    return std.fmt.bufPrint(buffer, "cswing({d}, {d}, {d}, {d}, {d}{s}{s})", .{
+        params.raster_length,
+        corona_mod.normalizeZero(params.max_raster_value),
+        corona_mod.normalizeZero(params.min_parameter_value),
+        corona_mod.normalizeZero(params.max_parameter_value),
+        params.high_pass_filter_cutoff,
+        flags,
+        triple,
+    }) catch return error.MnemonicTooLong;
+}
+
 pub const CoronaSwingPosition = struct {
     allocator: std.mem.Allocator,
-    corona: Corona,
-    raster_length: usize,
-    raster_step: f64,
-    max_raster_value: f64,
-    min_parameter_value: f64,
-    max_parameter_value: f64,
-    parameter_resolution: f64,
-    raster: []f64,
-    lead_list: [max_lead_list_count]f64,
-    lead_list_len: usize,
-    position_list: [max_position_list_count]f64,
-    position_list_len: usize,
-    sample_previous: f64,
-    sample_previous2: f64,
-    band_pass_previous: f64,
-    band_pass_previous2: f64,
-    swing_position: f64,
-    is_started: bool,
+    engine: Corona,
+    engine_params: corona_mod.Params,
+    bandpass: AdaptiveBandPass,
+    raster: Raster,
+    sample_count: usize,
+    leads: []f64,
+    leads_len: usize,
+    positions: []f64,
+    positions_len: usize,
     bar_func: bar_component.BarFunc,
     quote_func: quote_component.QuoteFunc,
     trade_func: trade_component.TradeFunc,
-    mnemonic_buf: [256]u8,
+    mnemonic_storage: [256]u8,
     mnemonic_len: usize,
-    description_buf: [320]u8,
+    description_storage: [320]u8,
     description_len: usize,
-    mnemonic_sp_buf: [128]u8,
+    mnemonic_sp_storage: [160]u8,
     mnemonic_sp_len: usize,
-    description_sp_buf: [256]u8,
+    description_sp_storage: [256]u8,
     description_sp_len: usize,
 
     pub fn init(allocator: std.mem.Allocator, params: Params) Error!CoronaSwingPosition {
-        const def_raster_length: i32 = 50;
-        const def_max_raster: f64 = 20.0;
-        const def_min_param: f64 = -5.0;
-        const def_max_param: f64 = 5.0;
-        const def_hp_cutoff: i32 = 30;
-        const def_min_per: i32 = 6;
-        const def_max_per: i32 = 30;
-
-        var raster_length = params.raster_length;
-        if (raster_length == 0) raster_length = def_raster_length;
-
-        var max_raster = params.max_raster_value;
-        if (max_raster == 0) max_raster = def_max_raster;
-
-        // "Both zero" default: only substitute when both are zero.
-        var min_param = params.min_parameter_value;
-        var max_param = params.max_parameter_value;
-        if (min_param == 0 and max_param == 0) {
-            min_param = def_min_param;
-            max_param = def_max_param;
+        if (params.lead_window < 2) return error.InvalidLeadWindow;
+        if (params.position_window < 2) return error.InvalidPositionWindow;
+        if (!corona_mod.validateFinite(params.max_raster_value) or params.max_raster_value <= 6.0) {
+            return error.InvalidMaxRasterValue;
         }
 
-        var hp_cutoff = params.high_pass_filter_cutoff;
-        if (hp_cutoff == 0) hp_cutoff = def_hp_cutoff;
+        var raster = try Raster.init(
+            allocator,
+            params.raster_length,
+            params.min_parameter_value,
+            params.max_parameter_value,
+            params.max_raster_value,
+        );
+        errdefer raster.deinit();
 
-        var min_per = params.minimal_period;
-        if (min_per == 0) min_per = def_min_per;
+        var engine = try Corona.init(allocator, .{
+            .high_pass_filter_cutoff = params.high_pass_filter_cutoff,
+            .minimal_period = params.minimal_period,
+            .maximal_period = params.maximal_period,
+            .decibels_lower_threshold = 6.0,
+            .decibels_upper_threshold = raster.ceiling,
+        });
+        errdefer engine.deinit();
 
-        var max_per = params.maximal_period;
-        if (max_per == 0) max_per = def_max_per;
+        const lead_cap: usize = @intCast(params.lead_window);
+        const pos_cap: usize = @intCast(params.position_window);
+        const leads = allocator.alloc(f64, lead_cap) catch return error.OutOfMemory;
+        errdefer allocator.free(leads);
+        @memset(leads, 0.0);
+        const positions = allocator.alloc(f64, pos_cap) catch return error.OutOfMemory;
+        errdefer allocator.free(positions);
+        @memset(positions, 0.0);
 
-        // Validation.
-        if (raster_length < 2) return error.InvalidRasterLength;
-        if (max_raster <= 0) return error.InvalidMaxRasterValue;
-        if (max_param <= min_param) return error.InvalidMaxParameterValue;
-        if (hp_cutoff < 2) return error.InvalidHighPassFilterCutoff;
-        if (min_per < 2) return error.InvalidMinimalPeriod;
-        if (max_per <= min_per) return error.InvalidMaximalPeriod;
-
-        const bc = params.bar_component orelse bar_component.BarComponent.median;
+        const bc = params.bar_component orelse bar_component.default_bar_component;
         const qc = params.quote_component orelse quote_component.default_quote_component;
         const tc = params.trade_component orelse trade_component.default_trade_component;
 
-        var corona = Corona.init(allocator, .{
-            .high_pass_filter_cutoff = hp_cutoff,
-            .minimal_period = min_per,
-            .maximal_period = max_per,
-        }) catch return error.OutOfMemory;
-        errdefer corona.deinit();
+        var triple_buffer: [64]u8 = undefined;
+        const triple = component_triple_mnemonic_mod.componentTripleMnemonic(&triple_buffer, bc, qc, tc);
+        var flags_buffer: [96]u8 = undefined;
+        const flags = try formatSwingFlags(&flags_buffer, params);
 
-        var triple_buf: [64]u8 = undefined;
-        const triple = component_triple_mnemonic_mod.componentTripleMnemonic(
-            &triple_buf,
-            bc,
-            qc,
-            tc,
-        );
-
-        const rl_usize: usize = @intCast(raster_length);
-        const parameter_resolution = @as(f64, @floatFromInt(raster_length - 1)) / (max_param - min_param);
-        const raster_step = max_raster / @as(f64, @floatFromInt(raster_length));
-
-        // Build mnemonics.
-        var mnemonic_buf: [256]u8 = undefined;
-        const mn = std.fmt.bufPrint(&mnemonic_buf, "cswing({d}, {d}, {d}, {d}, {d}{s})", .{
-            raster_length,
-            max_raster,
-            min_param,
-            max_param,
-            hp_cutoff,
+        var mnemonic_storage: [256]u8 = undefined;
+        const mn = std.fmt.bufPrint(&mnemonic_storage, "cswing({d}, {d}, {d}, {d}, {d}{s}{s})", .{
+            raster.length,
+            corona_mod.normalizeZero(raster.ceiling),
+            corona_mod.normalizeZero(raster.lower),
+            corona_mod.normalizeZero(raster.upper),
+            params.high_pass_filter_cutoff,
+            flags,
             triple,
         }) catch return error.MnemonicTooLong;
-        const mnemonic_len = mn.len;
 
-        var description_buf: [320]u8 = undefined;
-        const desc = std.fmt.bufPrint(&description_buf, "Corona swing position {s}", .{mn}) catch
+        var description_storage: [320]u8 = undefined;
+        const desc = std.fmt.bufPrint(&description_storage, "Corona swing position {s}", .{mn}) catch
             return error.MnemonicTooLong;
-        const description_len = desc.len;
 
-        var mnemonic_sp_buf: [128]u8 = undefined;
-        const mn_sp = std.fmt.bufPrint(&mnemonic_sp_buf, "cswing-sp({d}{s})", .{
-            hp_cutoff,
+        var mnemonic_sp_storage: [160]u8 = undefined;
+        const mn_sp = std.fmt.bufPrint(&mnemonic_sp_storage, "cswing-sp({d}{s}{s})", .{
+            params.high_pass_filter_cutoff,
+            flags,
             triple,
         }) catch return error.MnemonicTooLong;
-        const mnemonic_sp_len = mn_sp.len;
 
-        var description_sp_buf: [256]u8 = undefined;
-        const desc_sp = std.fmt.bufPrint(&description_sp_buf, "Corona swing position scalar {s}", .{mn_sp}) catch
+        var description_sp_storage: [256]u8 = undefined;
+        const desc_sp = std.fmt.bufPrint(&description_sp_storage, "Corona swing position scalar {s}", .{mn_sp}) catch
             return error.MnemonicTooLong;
-        const description_sp_len = desc_sp.len;
-
-        // Allocate raster on heap.
-        const raster = allocator.alloc(f64, rl_usize) catch return error.OutOfMemory;
-        errdefer allocator.free(raster);
-        @memset(raster, 0);
 
         return .{
             .allocator = allocator,
-            .corona = corona,
-            .raster_length = rl_usize,
-            .raster_step = raster_step,
-            .max_raster_value = max_raster,
-            .min_parameter_value = min_param,
-            .max_parameter_value = max_param,
-            .parameter_resolution = parameter_resolution,
+            .engine = engine,
+            .engine_params = engine.parameters,
+            .bandpass = .{},
             .raster = raster,
-            .lead_list = undefined,
-            .lead_list_len = 0,
-            .position_list = undefined,
-            .position_list_len = 0,
-            .sample_previous = 0,
-            .sample_previous2 = 0,
-            .band_pass_previous = 0,
-            .band_pass_previous2 = 0,
-            .swing_position = math.nan(f64),
-            .is_started = false,
+            .sample_count = 0,
+            .leads = leads,
+            .leads_len = leads.len,
+            .positions = positions,
+            .positions_len = positions.len,
             .bar_func = bar_component.componentValue(bc),
             .quote_func = quote_component.componentValue(qc),
             .trade_func = trade_component.componentValue(tc),
-            .mnemonic_buf = mnemonic_buf,
-            .mnemonic_len = mnemonic_len,
-            .description_buf = description_buf,
-            .description_len = description_len,
-            .mnemonic_sp_buf = mnemonic_sp_buf,
-            .mnemonic_sp_len = mnemonic_sp_len,
-            .description_sp_buf = description_sp_buf,
-            .description_sp_len = description_sp_len,
+            .mnemonic_storage = mnemonic_storage,
+            .mnemonic_len = mn.len,
+            .description_storage = description_storage,
+            .description_len = desc.len,
+            .mnemonic_sp_storage = mnemonic_sp_storage,
+            .mnemonic_sp_len = mn_sp.len,
+            .description_sp_storage = description_sp_storage,
+            .description_sp_len = desc_sp.len,
         };
     }
 
     pub fn deinit(self: *CoronaSwingPosition) void {
-        self.allocator.free(self.raster);
-        self.corona.deinit();
+        self.engine.deinit();
+        self.raster.deinit();
+        self.allocator.free(self.leads);
+        self.allocator.free(self.positions);
+    }
+
+    pub fn reset(self: *CoronaSwingPosition) void {
+        self.engine.reset();
+        self.bandpass.reset();
+        self.raster.reset();
+        self.sample_count = 0;
+        @memset(self.leads, 0.0);
+        self.leads_len = self.leads.len;
+        @memset(self.positions, 0.0);
+        self.positions_len = self.positions.len;
     }
 
     pub fn fixSlices(self: *CoronaSwingPosition) void {
         _ = self;
     }
 
-    fn mnemonicSlice(self: *const CoronaSwingPosition) []const u8 {
-        return self.mnemonic_buf[0..self.mnemonic_len];
+    pub fn mnemonic(self: *const CoronaSwingPosition) []const u8 {
+        return self.mnemonic_storage[0..self.mnemonic_len];
     }
 
-    fn descriptionSlice(self: *const CoronaSwingPosition) []const u8 {
-        return self.description_buf[0..self.description_len];
+    fn description(self: *const CoronaSwingPosition) []const u8 {
+        return self.description_storage[0..self.description_len];
     }
 
     fn mnemonicSP(self: *const CoronaSwingPosition) []const u8 {
-        return self.mnemonic_sp_buf[0..self.mnemonic_sp_len];
+        return self.mnemonic_sp_storage[0..self.mnemonic_sp_len];
     }
 
     fn descriptionSP(self: *const CoronaSwingPosition) []const u8 {
-        return self.description_sp_buf[0..self.description_sp_len];
+        return self.description_sp_storage[0..self.description_sp_len];
     }
 
-    /// Appends v to a fixed-size rolling list, returns (lowest, highest).
-    fn appendRolling(buf: []f64, len_ptr: *usize, max_count: usize, v: f64) struct { lowest: f64, highest: f64 } {
-        var current_len = len_ptr.*;
-        if (current_len >= max_count) {
-            // Shift left by 1.
-            for (0..current_len - 1) |i| {
-                buf[i] = buf[i + 1];
-            }
-            current_len -= 1;
-        }
-        buf[current_len] = v;
-        current_len += 1;
-        len_ptr.* = current_len;
-
-        var lowest = v;
-        var highest = v;
-        for (0..current_len) |i| {
-            if (buf[i] < lowest) lowest = buf[i];
-            if (buf[i] > highest) highest = buf[i];
-        }
-        return .{ .lowest = lowest, .highest = highest };
-    }
-
-    /// Update with a new sample. Returns heatmap and swing position.
-    pub fn updateSample(self: *CoronaSwingPosition, sample: f64, time: i64) struct { heatmap: Heatmap, sp: f64 } {
-        if (math.isNan(sample)) {
-            return .{
-                .heatmap = Heatmap.empty(time, self.min_parameter_value, self.max_parameter_value, self.parameter_resolution),
-                .sp = math.nan(f64),
-            };
-        }
-
-        const primed = self.corona.update(sample);
-
-        if (!self.is_started) {
-            self.sample_previous = sample;
-            self.is_started = true;
-            return .{
-                .heatmap = Heatmap.empty(time, self.min_parameter_value, self.max_parameter_value, self.parameter_resolution),
-                .sp = math.nan(f64),
-            };
-        }
-
-        // Bandpass filter at dominant cycle median.
-        const omega = 2.0 * math.pi / self.corona.getDominantCycleMedian();
-        const beta2 = @cos(omega);
-        const gamma2 = 1.0 / @cos(omega * 2.0 * bp_delta);
-        const alpha2 = gamma2 - @sqrt(gamma2 * gamma2 - 1.0);
-        const band_pass = 0.5 * (1.0 - alpha2) * (sample - self.sample_previous2) +
-            beta2 * (1.0 + alpha2) * self.band_pass_previous -
-            alpha2 * self.band_pass_previous2;
-
-        // Quadrature.
-        const quadrature2 = (band_pass - self.band_pass_previous) / omega;
-
-        self.band_pass_previous2 = self.band_pass_previous;
-        self.band_pass_previous = band_pass;
-        self.sample_previous2 = self.sample_previous;
-        self.sample_previous = sample;
-
-        // 60-degree lead.
-        const lead60 = lead60_coef_bp * self.band_pass_previous2 + lead60_coef_q * quadrature2;
-
-        const lead_result = appendRolling(&self.lead_list, &self.lead_list_len, max_lead_list_count, lead60);
-
-        // Normalised lead position in [0, 1].
-        var position: f64 = lead_result.highest - lead_result.lowest;
-        if (position > 0) {
-            position = (lead60 - lead_result.lowest) / position;
-        }
-
-        const pos_result = appendRolling(&self.position_list, &self.position_list_len, max_position_list_count, position);
-        const highest = pos_result.highest - pos_result.lowest;
-
-        var width = width_scale * highest;
-        if (highest > width_high_threshold) {
-            width = width_narrow;
-        }
-
-        self.swing_position = (self.max_parameter_value - self.min_parameter_value) * position + self.min_parameter_value;
-
-        const position_scaled_to_raster_length: i64 = @intFromFloat(@round(position * @as(f64, @floatFromInt(self.raster_length))));
-        const position_scaled_to_max_raster_value = position * self.max_raster_value;
-
-        for (0..self.raster_length) |i| {
-            var value = self.raster[i];
-            const i_i64: i64 = @intCast(i);
-
-            if (i_i64 == position_scaled_to_raster_length) {
-                value *= raster_blend_half;
-            } else {
-                var argument = position_scaled_to_max_raster_value - self.raster_step * @as(f64, @floatFromInt(i));
-                if (i_i64 > position_scaled_to_raster_length) {
-                    argument = -argument;
-                }
-
-                if (width > 0) {
-                    value = raster_blend_half *
-                        (math.pow(f64, argument / width, raster_blend_exponent) + raster_blend_half * value);
-                }
-            }
-
-            if (value < 0) {
-                value = 0;
-            } else if (value > self.max_raster_value) {
-                value = self.max_raster_value;
-            }
-
-            if (highest > width_high_saturate) {
-                value = self.max_raster_value;
-            }
-
-            if (math.isNan(value)) {
-                value = 0;
-            }
-
-            self.raster[i] = value;
-        }
-
-        if (!primed) {
-            return .{
-                .heatmap = Heatmap.empty(time, self.min_parameter_value, self.max_parameter_value, self.parameter_resolution),
-                .sp = math.nan(f64),
-            };
-        }
-
-        // Build heatmap from raster.
-        var values: [heatmap_mod.max_heatmap_values]f64 = undefined;
-        var value_min: f64 = math.inf(f64);
-        var value_max: f64 = -math.inf(f64);
-
-        for (0..self.raster_length) |i| {
-            const v = self.raster[i];
-            values[i] = v;
-            if (v < value_min) value_min = v;
-            if (v > value_max) value_max = v;
-        }
-
+    fn emptySnapshot(self: *const CoronaSwingPosition, time: i64) CoronaSwingPositionSnapshot {
+        const nan = math.nan(f64);
         return .{
-            .heatmap = Heatmap.new(
-                time,
-                self.min_parameter_value,
-                self.max_parameter_value,
-                self.parameter_resolution,
-                value_min,
-                value_max,
-                values[0..self.raster_length],
-            ),
-            .sp = self.swing_position,
+            .heatmap = self.raster.empty(time),
+            .swing_position = nan,
+            .normalized_position = nan,
+            .dominant_cycle = nan,
+            .dominant_cycle_median = nan,
+            .band_pass = nan,
+            .quadrature = nan,
+            .cycle_amplitude = nan,
+            .lead60 = nan,
+            .position_span = nan,
+            .width = nan,
+            .has_cycle_estimate = nan,
         };
     }
 
-    // --- Entity update methods ---
+    pub fn tryUpdateFromSnapshot(self: *CoronaSwingPosition, snapshot: CoronaSnapshot) Error!CoronaSwingPositionSnapshot {
+        const accepted = try corona_mod.acceptSnapshot(snapshot, self.engine_params, self.sample_count + 1);
+        if (!accepted) {
+            return self.emptySnapshot(snapshot.time);
+        }
+        const cycle = try self.bandpass.update(snapshot.price, snapshot.dominant_cycle_median);
+        self.sample_count = snapshot.sample_count;
 
-    pub fn updateBar(self: *CoronaSwingPosition, sample: *const Bar) OutputArray {
-        return self.updateEntity(sample.time, self.bar_func(sample.*));
+        const lead_bounds = corona_mod.rollingAppend(self.leads, &self.leads_len, cycle.lead60);
+        const flat = lead_bounds.maximum == lead_bounds.minimum;
+        const position = corona_mod.clip(
+            if (flat) 0.5 else (cycle.lead60 - lead_bounds.minimum) / (lead_bounds.maximum - lead_bounds.minimum),
+            0.0,
+            1.0,
+        );
+        const pos_bounds = corona_mod.rollingAppend(self.positions, &self.positions_len, position);
+        const span = pos_bounds.maximum - pos_bounds.minimum;
+        var width = if (span > 0.85) 0.01 else 0.15 * span;
+        if (width == 0.0) {
+            width = 0.01;
+        }
+
+        self.raster.update(position, width, .swing, span > 0.8 or flat);
+        if (!snapshot.primed) {
+            return self.emptySnapshot(snapshot.time);
+        }
+
+        const mapped = self.raster.lower + (self.raster.upper - self.raster.lower) * position;
+        return .{
+            .heatmap = self.raster.column(snapshot.time),
+            .swing_position = mapped,
+            .normalized_position = position,
+            .dominant_cycle = snapshot.dominant_cycle,
+            .dominant_cycle_median = snapshot.dominant_cycle_median,
+            .band_pass = cycle.band_pass,
+            .quadrature = cycle.quadrature,
+            .cycle_amplitude = cycle.amplitude,
+            .lead60 = cycle.lead60,
+            .position_span = span,
+            .width = width,
+            .has_cycle_estimate = if (snapshot.has_cycle_estimate) 1.0 else 0.0,
+        };
     }
 
-    pub fn updateQuote(self: *CoronaSwingPosition, sample: *const Quote) OutputArray {
-        return self.updateEntity(sample.time, self.quote_func(sample.*));
+    pub fn updateFromSnapshot(self: *CoronaSwingPosition, snapshot: CoronaSnapshot) CoronaSwingPositionSnapshot {
+        return self.tryUpdateFromSnapshot(snapshot) catch |err| {
+            std.debug.panic("CoronaSwingPosition.updateFromSnapshot failed: {s}", .{@errorName(err)});
+        };
     }
 
-    pub fn updateTrade(self: *CoronaSwingPosition, sample: *const Trade) OutputArray {
-        return self.updateEntity(sample.time, self.trade_func(sample.*));
+    pub fn tryUpdate(self: *CoronaSwingPosition, sample: f64, time: i64) Error!CoronaSwingPositionSnapshot {
+        const engine_snap = try self.engine.tryUpdate(sample, time);
+        return self.tryUpdateFromSnapshot(engine_snap);
     }
 
-    pub fn updateScalar(self: *CoronaSwingPosition, sample: *const Scalar) OutputArray {
-        return self.updateEntity(sample.time, sample.value);
+    pub fn update(self: *CoronaSwingPosition, sample: f64, time: i64) CoronaSwingPositionSnapshot {
+        return self.tryUpdate(sample, time) catch |err| {
+            std.debug.panic("CoronaSwingPosition.update failed: {s}", .{@errorName(err)});
+        };
     }
 
-    fn updateEntity(self: *CoronaSwingPosition, time: i64, sample: f64) OutputArray {
-        const result = self.updateSample(sample, time);
+    pub const updateSample = update;
+
+    fn wrapEntity(time: i64, snapshot: CoronaSwingPositionSnapshot) OutputArray {
         var out = OutputArray{};
-        out.append(.{ .heatmap = result.heatmap });
-        out.append(.{ .scalar = .{ .time = time, .value = result.sp } });
+        out.append(.{ .heatmap = snapshot.heatmap });
+        out.append(.{ .scalar = .{ .time = time, .value = snapshot.swing_position } });
         return out;
     }
 
+    pub fn updateScalar(self: *CoronaSwingPosition, sample: *const Scalar) OutputArray {
+        return wrapEntity(sample.time, self.update(sample.value, sample.time));
+    }
+
+    pub fn updateBar(self: *CoronaSwingPosition, sample: *const Bar) OutputArray {
+        return wrapEntity(sample.time, self.update(self.bar_func(sample.*), sample.time));
+    }
+
+    pub fn updateQuote(self: *CoronaSwingPosition, sample: *const Quote) OutputArray {
+        return wrapEntity(sample.time, self.update(self.quote_func(sample.*), sample.time));
+    }
+
+    pub fn updateTrade(self: *CoronaSwingPosition, sample: *const Trade) OutputArray {
+        return wrapEntity(sample.time, self.update(self.trade_func(sample.*), sample.time));
+    }
+
     pub fn isPrimed(self: *const CoronaSwingPosition) bool {
-        return self.corona.isPrimed();
+        return self.sample_count >= corona_mod.first_bank_sample;
     }
 
     pub fn getMetadata(self: *const CoronaSwingPosition, out: *Metadata) void {
-        const mn = self.mnemonicSlice();
-        const desc = self.descriptionSlice();
+        const mn = self.mnemonic();
+        const desc = self.description();
         const texts = [_]build_metadata_mod.OutputText{
             .{ .mnemonic = mn, .description = desc },
             .{ .mnemonic = self.mnemonicSP(), .description = self.descriptionSP() },
@@ -459,7 +385,6 @@ pub const CoronaSwingPosition = struct {
         build_metadata_mod.buildMetadata(out, .corona_swing_position, mn, desc, &texts);
     }
 
-    /// Returns an Indicator interface backed by this instance.
     pub fn indicator(self: *CoronaSwingPosition) indicator_mod.Indicator {
         return .{
             .ptr = @ptrCast(self),
@@ -474,174 +399,189 @@ pub const CoronaSwingPosition = struct {
 const testing = std.testing;
 const testdata = @import("testdata.zig");
 
-const tolerance = 1e-4;
+const test_tolerance: f64 = 5e-12;
 
-fn almostEqual(a: f64, b: f64, eps: f64) bool {
-    return @abs(a - b) <= eps;
+fn expectClose(actual: f64, expected: f64) !void {
+    if (math.isNan(expected)) {
+        try testing.expect(math.isNan(actual));
+        return;
+    }
+    if (math.isInf(expected)) {
+        try testing.expectEqual(expected, actual);
+        return;
+    }
+    try testing.expect(!math.isNan(actual) and !math.isInf(actual));
+    const bound = @max(test_tolerance, @abs(expected) * test_tolerance);
+    try testing.expect(@abs(actual - expected) <= bound);
 }
 
-test "CoronaSwingPosition update" {
-    const Snap = struct { i: usize, sp: f64, vmin: f64, vmax: f64 };
-    const snapshots = [_]Snap{
-        .{ .i = 11, .sp = 5.0, .vmin = 20.0, .vmax = 20.0 },
-        .{ .i = 12, .sp = 5.0, .vmin = 20.0, .vmax = 20.0 },
-        .{ .i = 50, .sp = 4.5384908349, .vmin = 20.0, .vmax = 20.0 },
-        .{ .i = 100, .sp = -3.8183742675, .vmin = 3.4957777081, .vmax = 20.0 },
-        .{ .i = 150, .sp = -1.8516194371, .vmin = 5.3792287864, .vmax = 20.0 },
-        .{ .i = 200, .sp = -3.6944428668, .vmin = 4.2580825738, .vmax = 20.0 },
-        .{ .i = 251, .sp = -0.8524812061, .vmin = 4.4822539784, .vmax = 20.0 },
-    };
+fn verifySwingCase(
+    comptime raster_len: usize,
+    hp_cutoff: i32,
+    min_period: i32,
+    max_period: i32,
+    expected_heatmap: *const [252][raster_len]f64,
+    expected_min: *const [252]f64,
+    expected_max: *const [252]f64,
+    expected_sp: *const [252]f64,
+    expected_norm: *const [252]f64,
+    expected_dc: *const [252]f64,
+    expected_dcm: *const [252]f64,
+    expected_bp: *const [252]f64,
+    expected_quad: *const [252]f64,
+    expected_amp: *const [252]f64,
+    expected_lead: *const [252]f64,
+    expected_span: *const [252]f64,
+    expected_width: *const [252]f64,
+    expected_has_est: *const [252]f64,
+) !void {
+    var instance = try CoronaSwingPosition.init(testing.allocator, .{
+        .raster_length = @intCast(raster_len),
+        .high_pass_filter_cutoff = hp_cutoff,
+        .minimal_period = min_period,
+        .maximal_period = max_period,
+    });
+    defer instance.deinit();
 
-    var x = try CoronaSwingPosition.init(testing.allocator, .{});
-    defer x.deinit();
+    const step = 10.0 / @as(f64, @floatFromInt(raster_len));
+    const expected_first = -5.0 + step;
+    const expected_resolution = 1.0 / step;
+    const prices = testdata.testInput();
 
-    var si: usize = 0;
-    for (0..testdata.test_input.len) |i| {
-        const result = x.updateSample(testdata.test_input[i], @intCast(i));
+    for (prices, 0..) |price, index| {
+        const snap = instance.update(price, @intCast(index));
+        try expectClose(snap.heatmap.parameter_first, expected_first);
+        try expectClose(snap.heatmap.parameter_last, 5.0);
+        try expectClose(snap.heatmap.parameter_resolution, expected_resolution);
 
-        try testing.expectEqual(@as(f64, -5.0), result.heatmap.parameter_first);
-        try testing.expectEqual(@as(f64, 5.0), result.heatmap.parameter_last);
-        try testing.expect(almostEqual(4.9, result.heatmap.parameter_resolution, 1e-9));
-
-        if (!x.isPrimed()) {
-            try testing.expect(result.heatmap.isEmpty());
-            try testing.expect(math.isNan(result.sp));
-            continue;
+        const row_empty = math.isNan(expected_sp[index]);
+        try testing.expectEqual(!row_empty, instance.isPrimed());
+        if (row_empty) {
+            try testing.expect(snap.heatmap.isEmpty());
+        } else {
+            const values = snap.heatmap.valuesSlice();
+            try testing.expectEqual(raster_len, values.len);
+            for (0..raster_len) |bin_index| {
+                try expectClose(values[bin_index], expected_heatmap[index][bin_index]);
+            }
         }
 
-        try testing.expectEqual(@as(usize, 50), result.heatmap.values_len);
-
-        if (si < snapshots.len and snapshots[si].i == i) {
-            try testing.expect(almostEqual(snapshots[si].sp, result.sp, tolerance));
-            try testing.expect(almostEqual(snapshots[si].vmin, result.heatmap.value_min, tolerance));
-            try testing.expect(almostEqual(snapshots[si].vmax, result.heatmap.value_max, tolerance));
-            si += 1;
-        }
+        try expectClose(snap.heatmap.value_min, expected_min[index]);
+        try expectClose(snap.heatmap.value_max, expected_max[index]);
+        try expectClose(snap.swing_position, expected_sp[index]);
+        try expectClose(snap.normalized_position, expected_norm[index]);
+        try expectClose(snap.dominant_cycle, expected_dc[index]);
+        try expectClose(snap.dominant_cycle_median, expected_dcm[index]);
+        try expectClose(snap.band_pass, expected_bp[index]);
+        try expectClose(snap.quadrature, expected_quad[index]);
+        try expectClose(snap.cycle_amplitude, expected_amp[index]);
+        try expectClose(snap.lead60, expected_lead[index]);
+        try expectClose(snap.position_span, expected_span[index]);
+        try expectClose(snap.width, expected_width[index]);
+        try expectClose(snap.has_cycle_estimate, expected_has_est[index]);
     }
 
-    try testing.expectEqual(snapshots.len, si);
+    instance.reset();
+    try testing.expect(!instance.isPrimed());
 }
 
-test "CoronaSwingPosition primes at bar 11" {
-    var x = try CoronaSwingPosition.init(testing.allocator, .{});
-    defer x.deinit();
-
-    try testing.expect(!x.isPrimed());
-
-    var primed_at: ?usize = null;
-    for (0..testdata.test_input.len) |i| {
-        _ = x.updateSample(testdata.test_input[i], @intCast(i));
-        if (x.isPrimed() and primed_at == null) {
-            primed_at = i;
-        }
-    }
-
-    try testing.expectEqual(@as(usize, 11), primed_at.?);
+test "CoronaSwingPosition matches all 16 reference cases" {
+    try verifySwingCase(50, 30, 6, 30, &testdata.expectedH30_PMIN6_PMAX30_R50_HEATMAP(), &testdata.expectedH30_PMIN6_PMAX30_R50_HEATMAP_MIN(), &testdata.expectedH30_PMIN6_PMAX30_R50_HEATMAP_MAX(), &testdata.expectedH30_PMIN6_PMAX30_R50_SWING_POSITION(), &testdata.expectedH30_PMIN6_PMAX30_R50_NORMALIZED_POSITION(), &testdata.expectedH30_PMIN6_PMAX30_R50_DOMINANT_CYCLE(), &testdata.expectedH30_PMIN6_PMAX30_R50_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH30_PMIN6_PMAX30_R50_BAND_PASS(), &testdata.expectedH30_PMIN6_PMAX30_R50_QUADRATURE(), &testdata.expectedH30_PMIN6_PMAX30_R50_CYCLE_AMPLITUDE(), &testdata.expectedH30_PMIN6_PMAX30_R50_LEAD60(), &testdata.expectedH30_PMIN6_PMAX30_R50_POSITION_SPAN(), &testdata.expectedH30_PMIN6_PMAX30_R50_WIDTH(), &testdata.expectedH30_PMIN6_PMAX30_R50_HAS_CYCLE_ESTIMATE());
+    try verifySwingCase(25, 30, 6, 30, &testdata.expectedH30_PMIN6_PMAX30_R25_HEATMAP(), &testdata.expectedH30_PMIN6_PMAX30_R25_HEATMAP_MIN(), &testdata.expectedH30_PMIN6_PMAX30_R25_HEATMAP_MAX(), &testdata.expectedH30_PMIN6_PMAX30_R25_SWING_POSITION(), &testdata.expectedH30_PMIN6_PMAX30_R25_NORMALIZED_POSITION(), &testdata.expectedH30_PMIN6_PMAX30_R25_DOMINANT_CYCLE(), &testdata.expectedH30_PMIN6_PMAX30_R25_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH30_PMIN6_PMAX30_R25_BAND_PASS(), &testdata.expectedH30_PMIN6_PMAX30_R25_QUADRATURE(), &testdata.expectedH30_PMIN6_PMAX30_R25_CYCLE_AMPLITUDE(), &testdata.expectedH30_PMIN6_PMAX30_R25_LEAD60(), &testdata.expectedH30_PMIN6_PMAX30_R25_POSITION_SPAN(), &testdata.expectedH30_PMIN6_PMAX30_R25_WIDTH(), &testdata.expectedH30_PMIN6_PMAX30_R25_HAS_CYCLE_ESTIMATE());
+    try verifySwingCase(50, 30, 6, 20, &testdata.expectedH30_PMIN6_PMAX20_R50_HEATMAP(), &testdata.expectedH30_PMIN6_PMAX20_R50_HEATMAP_MIN(), &testdata.expectedH30_PMIN6_PMAX20_R50_HEATMAP_MAX(), &testdata.expectedH30_PMIN6_PMAX20_R50_SWING_POSITION(), &testdata.expectedH30_PMIN6_PMAX20_R50_NORMALIZED_POSITION(), &testdata.expectedH30_PMIN6_PMAX20_R50_DOMINANT_CYCLE(), &testdata.expectedH30_PMIN6_PMAX20_R50_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH30_PMIN6_PMAX20_R50_BAND_PASS(), &testdata.expectedH30_PMIN6_PMAX20_R50_QUADRATURE(), &testdata.expectedH30_PMIN6_PMAX20_R50_CYCLE_AMPLITUDE(), &testdata.expectedH30_PMIN6_PMAX20_R50_LEAD60(), &testdata.expectedH30_PMIN6_PMAX20_R50_POSITION_SPAN(), &testdata.expectedH30_PMIN6_PMAX20_R50_WIDTH(), &testdata.expectedH30_PMIN6_PMAX20_R50_HAS_CYCLE_ESTIMATE());
+    try verifySwingCase(25, 30, 6, 20, &testdata.expectedH30_PMIN6_PMAX20_R25_HEATMAP(), &testdata.expectedH30_PMIN6_PMAX20_R25_HEATMAP_MIN(), &testdata.expectedH30_PMIN6_PMAX20_R25_HEATMAP_MAX(), &testdata.expectedH30_PMIN6_PMAX20_R25_SWING_POSITION(), &testdata.expectedH30_PMIN6_PMAX20_R25_NORMALIZED_POSITION(), &testdata.expectedH30_PMIN6_PMAX20_R25_DOMINANT_CYCLE(), &testdata.expectedH30_PMIN6_PMAX20_R25_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH30_PMIN6_PMAX20_R25_BAND_PASS(), &testdata.expectedH30_PMIN6_PMAX20_R25_QUADRATURE(), &testdata.expectedH30_PMIN6_PMAX20_R25_CYCLE_AMPLITUDE(), &testdata.expectedH30_PMIN6_PMAX20_R25_LEAD60(), &testdata.expectedH30_PMIN6_PMAX20_R25_POSITION_SPAN(), &testdata.expectedH30_PMIN6_PMAX20_R25_WIDTH(), &testdata.expectedH30_PMIN6_PMAX20_R25_HAS_CYCLE_ESTIMATE());
+    try verifySwingCase(50, 30, 10, 30, &testdata.expectedH30_PMIN10_PMAX30_R50_HEATMAP(), &testdata.expectedH30_PMIN10_PMAX30_R50_HEATMAP_MIN(), &testdata.expectedH30_PMIN10_PMAX30_R50_HEATMAP_MAX(), &testdata.expectedH30_PMIN10_PMAX30_R50_SWING_POSITION(), &testdata.expectedH30_PMIN10_PMAX30_R50_NORMALIZED_POSITION(), &testdata.expectedH30_PMIN10_PMAX30_R50_DOMINANT_CYCLE(), &testdata.expectedH30_PMIN10_PMAX30_R50_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH30_PMIN10_PMAX30_R50_BAND_PASS(), &testdata.expectedH30_PMIN10_PMAX30_R50_QUADRATURE(), &testdata.expectedH30_PMIN10_PMAX30_R50_CYCLE_AMPLITUDE(), &testdata.expectedH30_PMIN10_PMAX30_R50_LEAD60(), &testdata.expectedH30_PMIN10_PMAX30_R50_POSITION_SPAN(), &testdata.expectedH30_PMIN10_PMAX30_R50_WIDTH(), &testdata.expectedH30_PMIN10_PMAX30_R50_HAS_CYCLE_ESTIMATE());
+    try verifySwingCase(25, 30, 10, 30, &testdata.expectedH30_PMIN10_PMAX30_R25_HEATMAP(), &testdata.expectedH30_PMIN10_PMAX30_R25_HEATMAP_MIN(), &testdata.expectedH30_PMIN10_PMAX30_R25_HEATMAP_MAX(), &testdata.expectedH30_PMIN10_PMAX30_R25_SWING_POSITION(), &testdata.expectedH30_PMIN10_PMAX30_R25_NORMALIZED_POSITION(), &testdata.expectedH30_PMIN10_PMAX30_R25_DOMINANT_CYCLE(), &testdata.expectedH30_PMIN10_PMAX30_R25_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH30_PMIN10_PMAX30_R25_BAND_PASS(), &testdata.expectedH30_PMIN10_PMAX30_R25_QUADRATURE(), &testdata.expectedH30_PMIN10_PMAX30_R25_CYCLE_AMPLITUDE(), &testdata.expectedH30_PMIN10_PMAX30_R25_LEAD60(), &testdata.expectedH30_PMIN10_PMAX30_R25_POSITION_SPAN(), &testdata.expectedH30_PMIN10_PMAX30_R25_WIDTH(), &testdata.expectedH30_PMIN10_PMAX30_R25_HAS_CYCLE_ESTIMATE());
+    try verifySwingCase(50, 30, 10, 48, &testdata.expectedH30_PMIN10_PMAX48_R50_HEATMAP(), &testdata.expectedH30_PMIN10_PMAX48_R50_HEATMAP_MIN(), &testdata.expectedH30_PMIN10_PMAX48_R50_HEATMAP_MAX(), &testdata.expectedH30_PMIN10_PMAX48_R50_SWING_POSITION(), &testdata.expectedH30_PMIN10_PMAX48_R50_NORMALIZED_POSITION(), &testdata.expectedH30_PMIN10_PMAX48_R50_DOMINANT_CYCLE(), &testdata.expectedH30_PMIN10_PMAX48_R50_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH30_PMIN10_PMAX48_R50_BAND_PASS(), &testdata.expectedH30_PMIN10_PMAX48_R50_QUADRATURE(), &testdata.expectedH30_PMIN10_PMAX48_R50_CYCLE_AMPLITUDE(), &testdata.expectedH30_PMIN10_PMAX48_R50_LEAD60(), &testdata.expectedH30_PMIN10_PMAX48_R50_POSITION_SPAN(), &testdata.expectedH30_PMIN10_PMAX48_R50_WIDTH(), &testdata.expectedH30_PMIN10_PMAX48_R50_HAS_CYCLE_ESTIMATE());
+    try verifySwingCase(25, 30, 10, 48, &testdata.expectedH30_PMIN10_PMAX48_R25_HEATMAP(), &testdata.expectedH30_PMIN10_PMAX48_R25_HEATMAP_MIN(), &testdata.expectedH30_PMIN10_PMAX48_R25_HEATMAP_MAX(), &testdata.expectedH30_PMIN10_PMAX48_R25_SWING_POSITION(), &testdata.expectedH30_PMIN10_PMAX48_R25_NORMALIZED_POSITION(), &testdata.expectedH30_PMIN10_PMAX48_R25_DOMINANT_CYCLE(), &testdata.expectedH30_PMIN10_PMAX48_R25_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH30_PMIN10_PMAX48_R25_BAND_PASS(), &testdata.expectedH30_PMIN10_PMAX48_R25_QUADRATURE(), &testdata.expectedH30_PMIN10_PMAX48_R25_CYCLE_AMPLITUDE(), &testdata.expectedH30_PMIN10_PMAX48_R25_LEAD60(), &testdata.expectedH30_PMIN10_PMAX48_R25_POSITION_SPAN(), &testdata.expectedH30_PMIN10_PMAX48_R25_WIDTH(), &testdata.expectedH30_PMIN10_PMAX48_R25_HAS_CYCLE_ESTIMATE());
+    try verifySwingCase(50, 48, 6, 30, &testdata.expectedH48_PMIN6_PMAX30_R50_HEATMAP(), &testdata.expectedH48_PMIN6_PMAX30_R50_HEATMAP_MIN(), &testdata.expectedH48_PMIN6_PMAX30_R50_HEATMAP_MAX(), &testdata.expectedH48_PMIN6_PMAX30_R50_SWING_POSITION(), &testdata.expectedH48_PMIN6_PMAX30_R50_NORMALIZED_POSITION(), &testdata.expectedH48_PMIN6_PMAX30_R50_DOMINANT_CYCLE(), &testdata.expectedH48_PMIN6_PMAX30_R50_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH48_PMIN6_PMAX30_R50_BAND_PASS(), &testdata.expectedH48_PMIN6_PMAX30_R50_QUADRATURE(), &testdata.expectedH48_PMIN6_PMAX30_R50_CYCLE_AMPLITUDE(), &testdata.expectedH48_PMIN6_PMAX30_R50_LEAD60(), &testdata.expectedH48_PMIN6_PMAX30_R50_POSITION_SPAN(), &testdata.expectedH48_PMIN6_PMAX30_R50_WIDTH(), &testdata.expectedH48_PMIN6_PMAX30_R50_HAS_CYCLE_ESTIMATE());
+    try verifySwingCase(25, 48, 6, 30, &testdata.expectedH48_PMIN6_PMAX30_R25_HEATMAP(), &testdata.expectedH48_PMIN6_PMAX30_R25_HEATMAP_MIN(), &testdata.expectedH48_PMIN6_PMAX30_R25_HEATMAP_MAX(), &testdata.expectedH48_PMIN6_PMAX30_R25_SWING_POSITION(), &testdata.expectedH48_PMIN6_PMAX30_R25_NORMALIZED_POSITION(), &testdata.expectedH48_PMIN6_PMAX30_R25_DOMINANT_CYCLE(), &testdata.expectedH48_PMIN6_PMAX30_R25_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH48_PMIN6_PMAX30_R25_BAND_PASS(), &testdata.expectedH48_PMIN6_PMAX30_R25_QUADRATURE(), &testdata.expectedH48_PMIN6_PMAX30_R25_CYCLE_AMPLITUDE(), &testdata.expectedH48_PMIN6_PMAX30_R25_LEAD60(), &testdata.expectedH48_PMIN6_PMAX30_R25_POSITION_SPAN(), &testdata.expectedH48_PMIN6_PMAX30_R25_WIDTH(), &testdata.expectedH48_PMIN6_PMAX30_R25_HAS_CYCLE_ESTIMATE());
+    try verifySwingCase(50, 48, 6, 20, &testdata.expectedH48_PMIN6_PMAX20_R50_HEATMAP(), &testdata.expectedH48_PMIN6_PMAX20_R50_HEATMAP_MIN(), &testdata.expectedH48_PMIN6_PMAX20_R50_HEATMAP_MAX(), &testdata.expectedH48_PMIN6_PMAX20_R50_SWING_POSITION(), &testdata.expectedH48_PMIN6_PMAX20_R50_NORMALIZED_POSITION(), &testdata.expectedH48_PMIN6_PMAX20_R50_DOMINANT_CYCLE(), &testdata.expectedH48_PMIN6_PMAX20_R50_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH48_PMIN6_PMAX20_R50_BAND_PASS(), &testdata.expectedH48_PMIN6_PMAX20_R50_QUADRATURE(), &testdata.expectedH48_PMIN6_PMAX20_R50_CYCLE_AMPLITUDE(), &testdata.expectedH48_PMIN6_PMAX20_R50_LEAD60(), &testdata.expectedH48_PMIN6_PMAX20_R50_POSITION_SPAN(), &testdata.expectedH48_PMIN6_PMAX20_R50_WIDTH(), &testdata.expectedH48_PMIN6_PMAX20_R50_HAS_CYCLE_ESTIMATE());
+    try verifySwingCase(25, 48, 6, 20, &testdata.expectedH48_PMIN6_PMAX20_R25_HEATMAP(), &testdata.expectedH48_PMIN6_PMAX20_R25_HEATMAP_MIN(), &testdata.expectedH48_PMIN6_PMAX20_R25_HEATMAP_MAX(), &testdata.expectedH48_PMIN6_PMAX20_R25_SWING_POSITION(), &testdata.expectedH48_PMIN6_PMAX20_R25_NORMALIZED_POSITION(), &testdata.expectedH48_PMIN6_PMAX20_R25_DOMINANT_CYCLE(), &testdata.expectedH48_PMIN6_PMAX20_R25_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH48_PMIN6_PMAX20_R25_BAND_PASS(), &testdata.expectedH48_PMIN6_PMAX20_R25_QUADRATURE(), &testdata.expectedH48_PMIN6_PMAX20_R25_CYCLE_AMPLITUDE(), &testdata.expectedH48_PMIN6_PMAX20_R25_LEAD60(), &testdata.expectedH48_PMIN6_PMAX20_R25_POSITION_SPAN(), &testdata.expectedH48_PMIN6_PMAX20_R25_WIDTH(), &testdata.expectedH48_PMIN6_PMAX20_R25_HAS_CYCLE_ESTIMATE());
+    try verifySwingCase(50, 48, 10, 30, &testdata.expectedH48_PMIN10_PMAX30_R50_HEATMAP(), &testdata.expectedH48_PMIN10_PMAX30_R50_HEATMAP_MIN(), &testdata.expectedH48_PMIN10_PMAX30_R50_HEATMAP_MAX(), &testdata.expectedH48_PMIN10_PMAX30_R50_SWING_POSITION(), &testdata.expectedH48_PMIN10_PMAX30_R50_NORMALIZED_POSITION(), &testdata.expectedH48_PMIN10_PMAX30_R50_DOMINANT_CYCLE(), &testdata.expectedH48_PMIN10_PMAX30_R50_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH48_PMIN10_PMAX30_R50_BAND_PASS(), &testdata.expectedH48_PMIN10_PMAX30_R50_QUADRATURE(), &testdata.expectedH48_PMIN10_PMAX30_R50_CYCLE_AMPLITUDE(), &testdata.expectedH48_PMIN10_PMAX30_R50_LEAD60(), &testdata.expectedH48_PMIN10_PMAX30_R50_POSITION_SPAN(), &testdata.expectedH48_PMIN10_PMAX30_R50_WIDTH(), &testdata.expectedH48_PMIN10_PMAX30_R50_HAS_CYCLE_ESTIMATE());
+    try verifySwingCase(25, 48, 10, 30, &testdata.expectedH48_PMIN10_PMAX30_R25_HEATMAP(), &testdata.expectedH48_PMIN10_PMAX30_R25_HEATMAP_MIN(), &testdata.expectedH48_PMIN10_PMAX30_R25_HEATMAP_MAX(), &testdata.expectedH48_PMIN10_PMAX30_R25_SWING_POSITION(), &testdata.expectedH48_PMIN10_PMAX30_R25_NORMALIZED_POSITION(), &testdata.expectedH48_PMIN10_PMAX30_R25_DOMINANT_CYCLE(), &testdata.expectedH48_PMIN10_PMAX30_R25_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH48_PMIN10_PMAX30_R25_BAND_PASS(), &testdata.expectedH48_PMIN10_PMAX30_R25_QUADRATURE(), &testdata.expectedH48_PMIN10_PMAX30_R25_CYCLE_AMPLITUDE(), &testdata.expectedH48_PMIN10_PMAX30_R25_LEAD60(), &testdata.expectedH48_PMIN10_PMAX30_R25_POSITION_SPAN(), &testdata.expectedH48_PMIN10_PMAX30_R25_WIDTH(), &testdata.expectedH48_PMIN10_PMAX30_R25_HAS_CYCLE_ESTIMATE());
+    try verifySwingCase(50, 48, 10, 48, &testdata.expectedH48_PMIN10_PMAX48_R50_HEATMAP(), &testdata.expectedH48_PMIN10_PMAX48_R50_HEATMAP_MIN(), &testdata.expectedH48_PMIN10_PMAX48_R50_HEATMAP_MAX(), &testdata.expectedH48_PMIN10_PMAX48_R50_SWING_POSITION(), &testdata.expectedH48_PMIN10_PMAX48_R50_NORMALIZED_POSITION(), &testdata.expectedH48_PMIN10_PMAX48_R50_DOMINANT_CYCLE(), &testdata.expectedH48_PMIN10_PMAX48_R50_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH48_PMIN10_PMAX48_R50_BAND_PASS(), &testdata.expectedH48_PMIN10_PMAX48_R50_QUADRATURE(), &testdata.expectedH48_PMIN10_PMAX48_R50_CYCLE_AMPLITUDE(), &testdata.expectedH48_PMIN10_PMAX48_R50_LEAD60(), &testdata.expectedH48_PMIN10_PMAX48_R50_POSITION_SPAN(), &testdata.expectedH48_PMIN10_PMAX48_R50_WIDTH(), &testdata.expectedH48_PMIN10_PMAX48_R50_HAS_CYCLE_ESTIMATE());
+    try verifySwingCase(25, 48, 10, 48, &testdata.expectedH48_PMIN10_PMAX48_R25_HEATMAP(), &testdata.expectedH48_PMIN10_PMAX48_R25_HEATMAP_MIN(), &testdata.expectedH48_PMIN10_PMAX48_R25_HEATMAP_MAX(), &testdata.expectedH48_PMIN10_PMAX48_R25_SWING_POSITION(), &testdata.expectedH48_PMIN10_PMAX48_R25_NORMALIZED_POSITION(), &testdata.expectedH48_PMIN10_PMAX48_R25_DOMINANT_CYCLE(), &testdata.expectedH48_PMIN10_PMAX48_R25_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH48_PMIN10_PMAX48_R25_BAND_PASS(), &testdata.expectedH48_PMIN10_PMAX48_R25_QUADRATURE(), &testdata.expectedH48_PMIN10_PMAX48_R25_CYCLE_AMPLITUDE(), &testdata.expectedH48_PMIN10_PMAX48_R25_LEAD60(), &testdata.expectedH48_PMIN10_PMAX48_R25_POSITION_SPAN(), &testdata.expectedH48_PMIN10_PMAX48_R25_WIDTH(), &testdata.expectedH48_PMIN10_PMAX48_R25_HAS_CYCLE_ESTIMATE());
 }
 
-test "CoronaSwingPosition NaN input" {
-    var x = try CoronaSwingPosition.init(testing.allocator, .{});
-    defer x.deinit();
-
-    const result = x.updateSample(math.nan(f64), 0);
-    try testing.expect(result.heatmap.isEmpty());
-    try testing.expect(math.isNan(result.sp));
-    try testing.expect(!x.isPrimed());
-}
-
-test "CoronaSwingPosition metadata" {
-    var x = try CoronaSwingPosition.init(testing.allocator, .{});
-    defer x.deinit();
+test "CoronaSwingPosition metadata, mnemonics, validation, and entities" {
+    var instance = try CoronaSwingPosition.init(testing.allocator, defaultParams());
+    defer instance.deinit();
 
     var md: Metadata = undefined;
-    x.getMetadata(&md);
-
-    const mn_value = "cswing(50, 20, -5, 5, 30, hl/2)";
-    const mn_sp = "cswing-sp(30, hl/2)";
-
-    try testing.expectEqualStrings(mn_value, x.mnemonicSlice());
+    instance.getMetadata(&md);
     try testing.expectEqual(Identifier.corona_swing_position, md.identifier);
-    try testing.expectEqualStrings(mn_value, md.mnemonic);
+    try testing.expectEqualStrings("cswing(50, 20, -5, 5, 30)", md.mnemonic);
     try testing.expectEqual(@as(usize, 2), md.outputs_len);
+    try testing.expectEqual(shape_mod.Shape.heatmap, md.outputs_buf[0].shape);
+    try testing.expectEqual(shape_mod.Shape.scalar, md.outputs_buf[1].shape);
+    try testing.expectEqualStrings("cswing-sp(30)", md.outputs_buf[1].mnemonic);
 
-    const outputs = md.outputs_buf[0..md.outputs_len];
-    try testing.expectEqualStrings(mn_value, outputs[0].mnemonic);
-    try testing.expectEqualStrings(mn_sp, outputs[1].mnemonic);
-}
-
-test "CoronaSwingPosition validation" {
-    try testing.expectError(error.InvalidRasterLength, CoronaSwingPosition.init(testing.allocator, .{
-        .raster_length = 1,
-    }));
-    try testing.expectError(error.InvalidMaxRasterValue, CoronaSwingPosition.init(testing.allocator, .{
-        .max_raster_value = -1,
-    }));
-    try testing.expectError(error.InvalidMaxParameterValue, CoronaSwingPosition.init(testing.allocator, .{
-        .min_parameter_value = 5,
-        .max_parameter_value = 5,
-    }));
-    try testing.expectError(error.InvalidHighPassFilterCutoff, CoronaSwingPosition.init(testing.allocator, .{
-        .high_pass_filter_cutoff = 1,
-    }));
-    try testing.expectError(error.InvalidMinimalPeriod, CoronaSwingPosition.init(testing.allocator, .{
-        .minimal_period = 1,
-    }));
-    try testing.expectError(error.InvalidMaximalPeriod, CoronaSwingPosition.init(testing.allocator, .{
+    var flagged = try CoronaSwingPosition.init(testing.allocator, .{
         .minimal_period = 10,
-        .maximal_period = 10,
-    }));
-}
+        .maximal_period = 48,
+        .lead_window = 25,
+        .position_window = 15,
+        .bar_component = .median,
+    });
+    defer flagged.deinit();
+    var flagged_md: Metadata = undefined;
+    flagged.getMetadata(&flagged_md);
+    try testing.expectEqualStrings("cswing(50, 20, -5, 5, 30, pmin=10, pmax=48, lead=25, pos=15, hl/2)", flagged_md.mnemonic);
+    try testing.expectEqualStrings("cswing-sp(30, pmin=10, pmax=48, lead=25, pos=15, hl/2)", flagged_md.outputs_buf[1].mnemonic);
 
-test "CoronaSwingPosition updateEntity" {
-    const prime_count = 50;
-    const inp: f64 = 100.0;
-    const time: i64 = 0;
-
-    // Update scalar
-    {
-        var x = try CoronaSwingPosition.init(testing.allocator, .{});
-        defer x.deinit();
-        for (0..prime_count) |idx| {
-            _ = x.updateSample(testdata.test_input[idx % testdata.test_input.len], time);
-        }
-        const s = Scalar{ .time = time, .value = inp };
-        const out = x.updateScalar(&s);
-        try testing.expectEqual(@as(usize, 2), out.len);
+    const combos = [_]struct {
+        bc: ?bar_component.BarComponent,
+        qc: ?quote_component.QuoteComponent,
+        tc: ?trade_component.TradeComponent,
+    }{
+        .{ .bc = null, .qc = null, .tc = null },
+        .{ .bc = .open, .qc = null, .tc = null },
+        .{ .bc = null, .qc = .bid, .tc = null },
+        .{ .bc = null, .qc = null, .tc = .volume },
+        .{ .bc = .median, .qc = .ask, .tc = null },
+        .{ .bc = .median, .qc = null, .tc = .volume },
+        .{ .bc = null, .qc = .ask, .tc = .volume },
+        .{ .bc = .open, .qc = .bid, .tc = .volume },
+    };
+    for (combos) |combo| {
+        const p = Params{ .bar_component = combo.bc, .quote_component = combo.qc, .trade_component = combo.tc };
+        var inst = try CoronaSwingPosition.init(testing.allocator, p);
+        defer inst.deinit();
+        var mn_buffer: [160]u8 = undefined;
+        const formatted = try formatMnemonic(&mn_buffer, p);
+        try testing.expectEqualStrings(formatted, inst.mnemonic());
     }
 
-    // Update bar
-    {
-        var x = try CoronaSwingPosition.init(testing.allocator, .{});
-        defer x.deinit();
-        for (0..prime_count) |idx| {
-            _ = x.updateSample(testdata.test_input[idx % testdata.test_input.len], time);
-        }
-        const b = Bar{ .time = time, .open = inp, .high = inp, .low = inp, .close = inp, .volume = 0 };
-        const out = x.updateBar(&b);
-        try testing.expectEqual(@as(usize, 2), out.len);
-    }
+    try testing.expectError(error.InvalidRasterLength, CoronaSwingPosition.init(testing.allocator, .{ .raster_length = 1 }));
+    try testing.expectError(error.InvalidMaxRasterValue, CoronaSwingPosition.init(testing.allocator, .{ .max_raster_value = 6.0 }));
+    try testing.expectError(error.InvalidMaxParameterValue, CoronaSwingPosition.init(testing.allocator, .{ .min_parameter_value = 5.0, .max_parameter_value = 5.0 }));
+    try testing.expectError(error.InvalidHighPassFilterCutoff, CoronaSwingPosition.init(testing.allocator, .{ .high_pass_filter_cutoff = 4 }));
+    try testing.expectError(error.InvalidMinimalPeriod, CoronaSwingPosition.init(testing.allocator, .{ .minimal_period = 5 }));
+    try testing.expectError(error.InvalidMaximalPeriod, CoronaSwingPosition.init(testing.allocator, .{ .minimal_period = 10, .maximal_period = 10 }));
+    try testing.expectError(error.InvalidLeadWindow, CoronaSwingPosition.init(testing.allocator, .{ .lead_window = 1 }));
+    try testing.expectError(error.InvalidPositionWindow, CoronaSwingPosition.init(testing.allocator, .{ .position_window = 1 }));
 
-    // Update quote
-    {
-        var x = try CoronaSwingPosition.init(testing.allocator, .{});
-        defer x.deinit();
-        for (0..prime_count) |idx| {
-            _ = x.updateSample(testdata.test_input[idx % testdata.test_input.len], time);
-        }
-        const q = Quote{ .time = time, .bid_price = inp, .ask_price = inp, .bid_size = 0, .ask_size = 0 };
-        const out = x.updateQuote(&q);
-        try testing.expectEqual(@as(usize, 2), out.len);
-    }
-
-    // Update trade
-    {
-        var x = try CoronaSwingPosition.init(testing.allocator, .{});
-        defer x.deinit();
-        for (0..prime_count) |idx| {
-            _ = x.updateSample(testdata.test_input[idx % testdata.test_input.len], time);
-        }
-        const t = Trade{ .time = time, .price = inp, .volume = 0 };
-        const out = x.updateTrade(&t);
-        try testing.expectEqual(@as(usize, 2), out.len);
+    const prices = testdata.testInput();
+    const opens = testdata.testOpen();
+    const highs = testdata.testHigh();
+    const lows = testdata.testLow();
+    var bar_ind = try CoronaSwingPosition.init(testing.allocator, defaultParams());
+    defer bar_ind.deinit();
+    var scalar_ind = try CoronaSwingPosition.init(testing.allocator, defaultParams());
+    defer scalar_ind.deinit();
+    var quote_ind = try CoronaSwingPosition.init(testing.allocator, defaultParams());
+    defer quote_ind.deinit();
+    var trade_ind = try CoronaSwingPosition.init(testing.allocator, defaultParams());
+    defer trade_ind.deinit();
+    for (0..15) |index| {
+        const bar = Bar{ .time = @intCast(index), .open = opens[index], .high = highs[index], .low = lows[index], .close = prices[index], .volume = 1000.0 };
+        const scalar = Scalar{ .time = @intCast(index), .value = prices[index] };
+        const quote = Quote{ .time = @intCast(index), .bid_price = prices[index] - 0.5, .ask_price = prices[index] + 0.5, .bid_size = 10.0, .ask_size = 10.0 };
+        const trade = Trade{ .time = @intCast(index), .price = prices[index], .volume = 10.0 };
+        try testing.expectEqual(@as(usize, 2), bar_ind.updateBar(&bar).len);
+        try testing.expectEqual(@as(usize, 2), scalar_ind.updateScalar(&scalar).len);
+        try testing.expectEqual(@as(usize, 2), quote_ind.updateQuote(&quote).len);
+        try testing.expectEqual(@as(usize, 2), trade_ind.updateTrade(&trade).len);
     }
 }

@@ -844,109 +844,154 @@ pub fn create_indicator(
         }
 
         Identifier::CoronaSpectrum => {
-            let mut p = CoronaSpectrumParams::default();
+            let mut options = CoronaSpectrumParams::default();
             if !is_empty_object(&params) {
-                if let Some(v) = get_f64(&params, "minRasterValue") {
-                    p.min_raster_value = v;
+                if let Some(value) = get_f64(&params, "minRasterValue") {
+                    options.min_raster_value = value;
                 }
-                if let Some(v) = get_f64(&params, "maxRasterValue") {
-                    p.max_raster_value = v;
+                if let Some(value) = get_f64(&params, "maxRasterValue") {
+                    options.max_raster_value = value;
                 }
-                if let Some(v) = get_f64(&params, "minParameterValue") {
-                    p.min_parameter_value = v;
+                if let Some(value) = get_f64(&params, "minParameterValue") {
+                    options.min_parameter_value = value;
                 }
-                if let Some(v) = get_f64(&params, "maxParameterValue") {
-                    p.max_parameter_value = v;
+                if let Some(value) = get_f64(&params, "maxParameterValue") {
+                    options.max_parameter_value = value;
                 }
-                if let Some(v) = get_i32(&params, "highPassFilterCutoff") {
-                    p.high_pass_filter_cutoff = v;
+                if let Some(value) = get_i32(&params, "highPassFilterCutoff") {
+                    options.high_pass_filter_cutoff = value;
+                }
+                if let Some(value) = get_f64(&params, "barComponent") {
+                    options.bar_component = Some(lvt_bar_component(value)?);
+                }
+                if let Some(value) = get_f64(&params, "quoteComponent") {
+                    options.quote_component = Some(lvt_quote_component(value)?);
+                }
+                if let Some(value) = get_f64(&params, "tradeComponent") {
+                    options.trade_component = Some(lvt_trade_component(value)?);
                 }
             }
-            Ok(Box::new(CoronaSpectrum::new(&p)?))
+            Ok(Box::new(CoronaSpectrum::new(&options)?))
         }
 
         Identifier::CoronaSignalToNoiseRatio => {
-            let mut p = CoronaSignalToNoiseRatioParams::default();
+            let mut options = CoronaSignalToNoiseRatioParams::default();
             if !is_empty_object(&params) {
-                if let Some(v) = get_i32(&params, "rasterLength") {
-                    p.raster_length = v;
+                if let Some(value) = get_i32(&params, "rasterLength") {
+                    options.raster_length = value;
                 }
-                if let Some(v) = get_f64(&params, "maxRasterValue") {
-                    p.max_raster_value = v;
+                if let Some(value) = get_f64(&params, "maxRasterValue") {
+                    options.max_raster_value = value;
                 }
-                if let Some(v) = get_f64(&params, "minParameterValue") {
-                    p.min_parameter_value = v;
+                if let Some(value) = get_f64(&params, "minParameterValue") {
+                    options.min_parameter_value = value;
                 }
-                if let Some(v) = get_f64(&params, "maxParameterValue") {
-                    p.max_parameter_value = v;
+                if let Some(value) = get_f64(&params, "maxParameterValue") {
+                    options.max_parameter_value = value;
                 }
-                if let Some(v) = get_i32(&params, "highPassFilterCutoff") {
-                    p.high_pass_filter_cutoff = v;
+                if let Some(value) = get_i32(&params, "highPassFilterCutoff") {
+                    options.high_pass_filter_cutoff = value;
                 }
-                if let Some(v) = get_i32(&params, "minimalPeriod") {
-                    p.minimal_period = v;
+                if let Some(value) = get_i32(&params, "minimalPeriod") {
+                    options.minimal_period = value;
                 }
-                if let Some(v) = get_i32(&params, "maximalPeriod") {
-                    p.maximal_period = v;
+                if let Some(value) = get_i32(&params, "maximalPeriod") {
+                    options.maximal_period = value;
+                }
+                if let Some(value) = get_f64(&params, "barComponent") {
+                    options.bar_component = Some(lvt_bar_component(value)?);
+                }
+                if let Some(value) = get_f64(&params, "quoteComponent") {
+                    options.quote_component = Some(lvt_quote_component(value)?);
+                }
+                if let Some(value) = get_f64(&params, "tradeComponent") {
+                    options.trade_component = Some(lvt_trade_component(value)?);
                 }
             }
-            Ok(Box::new(CoronaSignalToNoiseRatio::new(&p)?))
+            Ok(Box::new(CoronaSignalToNoiseRatio::new(&options)?))
         }
 
         Identifier::CoronaSwingPosition => {
-            let mut p = CoronaSwingPositionParams::default();
+            let mut options = CoronaSwingPositionParams::default();
             if !is_empty_object(&params) {
-                if let Some(v) = get_i32(&params, "rasterLength") {
-                    p.raster_length = v;
+                if let Some(value) = get_i32(&params, "rasterLength") {
+                    options.raster_length = value;
                 }
-                if let Some(v) = get_f64(&params, "maxRasterValue") {
-                    p.max_raster_value = v;
+                if let Some(value) = get_f64(&params, "maxRasterValue") {
+                    options.max_raster_value = value;
                 }
-                if let Some(v) = get_f64(&params, "minParameterValue") {
-                    p.min_parameter_value = v;
+                if let Some(value) = get_f64(&params, "minParameterValue") {
+                    options.min_parameter_value = value;
                 }
-                if let Some(v) = get_f64(&params, "maxParameterValue") {
-                    p.max_parameter_value = v;
+                if let Some(value) = get_f64(&params, "maxParameterValue") {
+                    options.max_parameter_value = value;
                 }
-                if let Some(v) = get_i32(&params, "highPassFilterCutoff") {
-                    p.high_pass_filter_cutoff = v;
+                if let Some(value) = get_i32(&params, "highPassFilterCutoff") {
+                    options.high_pass_filter_cutoff = value;
                 }
-                if let Some(v) = get_i32(&params, "minimalPeriod") {
-                    p.minimal_period = v;
+                if let Some(value) = get_i32(&params, "minimalPeriod") {
+                    options.minimal_period = value;
                 }
-                if let Some(v) = get_i32(&params, "maximalPeriod") {
-                    p.maximal_period = v;
+                if let Some(value) = get_i32(&params, "maximalPeriod") {
+                    options.maximal_period = value;
+                }
+                if let Some(value) = get_i32(&params, "leadWindow") {
+                    options.lead_window = value;
+                }
+                if let Some(value) = get_i32(&params, "positionWindow") {
+                    options.position_window = value;
+                }
+                if let Some(value) = get_f64(&params, "barComponent") {
+                    options.bar_component = Some(lvt_bar_component(value)?);
+                }
+                if let Some(value) = get_f64(&params, "quoteComponent") {
+                    options.quote_component = Some(lvt_quote_component(value)?);
+                }
+                if let Some(value) = get_f64(&params, "tradeComponent") {
+                    options.trade_component = Some(lvt_trade_component(value)?);
                 }
             }
-            Ok(Box::new(CoronaSwingPosition::new(&p)?))
+            Ok(Box::new(CoronaSwingPosition::new(&options)?))
         }
 
         Identifier::CoronaTrendVigor => {
-            let mut p = CoronaTrendVigorParams::default();
+            let mut options = CoronaTrendVigorParams::default();
             if !is_empty_object(&params) {
-                if let Some(v) = get_i32(&params, "rasterLength") {
-                    p.raster_length = v;
+                if let Some(value) = get_i32(&params, "rasterLength") {
+                    options.raster_length = value;
                 }
-                if let Some(v) = get_f64(&params, "maxRasterValue") {
-                    p.max_raster_value = v;
+                if let Some(value) = get_f64(&params, "maxRasterValue") {
+                    options.max_raster_value = value;
                 }
-                if let Some(v) = get_f64(&params, "minParameterValue") {
-                    p.min_parameter_value = v;
+                if let Some(value) = get_f64(&params, "minParameterValue") {
+                    options.min_parameter_value = value;
                 }
-                if let Some(v) = get_f64(&params, "maxParameterValue") {
-                    p.max_parameter_value = v;
+                if let Some(value) = get_f64(&params, "maxParameterValue") {
+                    options.max_parameter_value = value;
                 }
-                if let Some(v) = get_i32(&params, "highPassFilterCutoff") {
-                    p.high_pass_filter_cutoff = v;
+                if let Some(value) = get_i32(&params, "highPassFilterCutoff") {
+                    options.high_pass_filter_cutoff = value;
                 }
-                if let Some(v) = get_i32(&params, "minimalPeriod") {
-                    p.minimal_period = v;
+                if let Some(value) = get_i32(&params, "minimalPeriod") {
+                    options.minimal_period = value;
                 }
-                if let Some(v) = get_i32(&params, "maximalPeriod") {
-                    p.maximal_period = v;
+                if let Some(value) = get_i32(&params, "maximalPeriod") {
+                    options.maximal_period = value;
+                }
+                if let Some(value) = get_i32(&params, "lookbackOffset") {
+                    options.lookback_offset = value;
+                }
+                if let Some(value) = get_f64(&params, "barComponent") {
+                    options.bar_component = Some(lvt_bar_component(value)?);
+                }
+                if let Some(value) = get_f64(&params, "quoteComponent") {
+                    options.quote_component = Some(lvt_quote_component(value)?);
+                }
+                if let Some(value) = get_f64(&params, "tradeComponent") {
+                    options.trade_component = Some(lvt_trade_component(value)?);
                 }
             }
-            Ok(Box::new(CoronaTrendVigor::new(&p)?))
+            Ok(Box::new(CoronaTrendVigor::new(&options)?))
         }
 
         Identifier::AutoCorrelationIndicator => {
@@ -2233,6 +2278,34 @@ mod tests {
     fn test_invalid_json() {
         let result = create_indicator(Identifier::SimpleMovingAverage, "not json");
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_create_corona_indicators() {
+        let spectrum_zero = create_indicator(Identifier::CoronaSpectrum, r#"{"minRasterValue": 0}"#).unwrap();
+        assert_eq!(spectrum_zero.metadata().mnemonic, "cspect(0, 20, 6, 30, 30)");
+
+        let spectrum_invalid = create_indicator(Identifier::CoronaSpectrum, r#"{"highPassFilterCutoff": 0}"#);
+        assert!(spectrum_invalid.is_err());
+
+        let snr_default = create_indicator(Identifier::CoronaSignalToNoiseRatio, "{}").unwrap();
+        assert_eq!(snr_default.metadata().mnemonic, "csnr(50, 20, 1, 11, 30)");
+
+        let swing_custom = create_indicator(
+            Identifier::CoronaSwingPosition,
+            r#"{"leadWindow": 25, "positionWindow": 15}"#,
+        )
+        .unwrap();
+        assert_eq!(
+            swing_custom.metadata().mnemonic,
+            "cswing(50, 20, -5, 5, 30, lead=25, pos=15)"
+        );
+
+        let vigor_custom = create_indicator(Identifier::CoronaTrendVigor, r#"{"lookbackOffset": -1}"#).unwrap();
+        assert_eq!(
+            vigor_custom.metadata().mnemonic,
+            "ctv(50, 20, -10, 10, 30, offset=-1)"
+        );
     }
 }
 

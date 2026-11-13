@@ -1,19 +1,10 @@
-// Package coronaspectrum implements Ehlers' Corona Spectrum heatmap indicator.
-//
-// The Corona Spectrum measures cyclic activity over a cycle period range
-// (default 6..30 bars) in a bank of contiguous bandpass filters. The amplitude
-// of each filter output is compared to the strongest signal and displayed, in
-// decibels, as a heatmap column. The filter having the strongest output is
-// selected as the current dominant cycle period.
-//
-// Reference: John Ehlers, "Measuring Cycle Periods", Stocks & Commodities,
-// November 2008.
 package coronaspectrum
 
-//nolint: gofumpt
 import (
+	"errors"
 	"fmt"
 	"math"
+	"slices"
 	"sync"
 	"time"
 
@@ -23,13 +14,23 @@ import (
 	"zpano/indicators/johnehlers/corona"
 )
 
+// Snapshot owns all 9 diagnostic fields for one CoronaSpectrum update.
+type Snapshot struct {
+	Heatmap             *outputs.Heatmap
+	DominantCycle       float64
+	DominantCycleMedian float64
+	MaximumPower        float64
+	NormalizationPower  float64
+	SelectedBins        float64
+	HasCycleEstimate    float64
+	Power               []float64
+	RelativePower       []float64
+}
+
+// SpectrumOutput aliases [Snapshot].
+type SpectrumOutput = Snapshot
+
 // CoronaSpectrum is Ehlers' Corona Spectrum heatmap indicator.
-//
-// It owns a private Corona spectral-analysis engine and exposes three outputs:
-//
-//   - Value: a per-bar heatmap column (decibels across the filter bank).
-//   - DominantCycle: the weighted-center-of-gravity dominant cycle estimate.
-//   - DominantCycleMedian: the 5-sample median of DominantCycle.
 type CoronaSpectrum struct {
 	mu                  sync.RWMutex
 	mnemonic            string
@@ -38,12 +39,12 @@ type CoronaSpectrum struct {
 	descriptionDC       string
 	mnemonicDCM         string
 	descriptionDCM      string
-	c                   *corona.Corona
+	engine              *corona.Corona
+	engineParams        corona.Params
+	sampleCount         int
 	minParameterValue   float64
 	maxParameterValue   float64
 	parameterResolution float64
-	minRasterValue      float64
-	maxRasterValue      float64
 	barFunc             entities.BarFunc
 	quoteFunc           entities.QuoteFunc
 	tradeFunc           entities.TradeFunc
@@ -51,160 +52,129 @@ type CoronaSpectrum struct {
 
 // NewCoronaSpectrumDefault returns an instance created with default parameters.
 func NewCoronaSpectrumDefault() (*CoronaSpectrum, error) {
-	return NewCoronaSpectrumParams(&Params{})
+	return NewCoronaSpectrumParams(DefaultParams())
+}
+
+// NewCoronaSpectrum aliases [NewCoronaSpectrumParams].
+func NewCoronaSpectrum(p *Params) (*CoronaSpectrum, error) {
+	return NewCoronaSpectrumParams(p)
 }
 
 // NewCoronaSpectrumParams returns an instance created with the supplied parameters.
-//
-//nolint:funlen,cyclop
 func NewCoronaSpectrumParams(p *Params) (*CoronaSpectrum, error) {
-	const (
-		invalid      = "invalid corona spectrum parameters"
-		fmtMinRaster = "%s: MinRasterValue should be >= 0"
-		fmtMaxRaster = "%s: MaxRasterValue should be > MinRasterValue"
-		fmtMinParam  = "%s: MinParameterValue should be >= 2"
-		fmtMaxParam  = "%s: MaxParameterValue should be > MinParameterValue"
-		fmtHP        = "%s: HighPassFilterCutoff should be >= 2"
-		fmtw         = "%s: %w"
-		fmtnValue    = "cspect(%g, %g, %g, %g, %d%s)"
-		fmtnDC       = "cspect-dc(%d%s)"
-		fmtnDCM      = "cspect-dcm(%d%s)"
-		descrValue   = "Corona spectrum "
-		descrDC      = "Corona spectrum dominant cycle "
-		descrDCM     = "Corona spectrum dominant cycle median "
-		defMinRaster = 6.0
-		defMaxRaster = 20.0
-		defMinParam  = 6.0
-		defMaxParam  = 30.0
-		defHPCutoff  = 30
-	)
+	const invalid = "invalid corona spectrum parameters"
 
-	cfg := *p
-
-	if cfg.MinRasterValue == 0 {
-		cfg.MinRasterValue = defMinRaster
+	source := DefaultParams()
+	if p != nil {
+		copied := *p
+		source = &copied
+	}
+	if err := corona.ValidateFinite("MinRasterValue", source.MinRasterValue); err != nil {
+		return nil, fmt.Errorf("%s: %w", invalid, err)
+	}
+	if err := corona.ValidateFinite("MaxRasterValue", source.MaxRasterValue); err != nil {
+		return nil, fmt.Errorf("%s: %w", invalid, err)
+	}
+	if err := corona.ValidateFinite("MinParameterValue", source.MinParameterValue); err != nil {
+		return nil, fmt.Errorf("%s: %w", invalid, err)
+	}
+	if err := corona.ValidateFinite("MaxParameterValue", source.MaxParameterValue); err != nil {
+		return nil, fmt.Errorf("%s: %w", invalid, err)
+	}
+	if err := corona.ValidateInteger("HighPassFilterCutoff", source.HighPassFilterCutoff, 5); err != nil {
+		return nil, fmt.Errorf("%s: %w", invalid, err)
+	}
+	if !(0.0 <= source.MinRasterValue && source.MinRasterValue < source.MaxRasterValue && source.MaxRasterValue > 0.0) {
+		return nil, fmt.Errorf("%s: %w", invalid, errors.New("require 0 <= MinRasterValue < MaxRasterValue"))
 	}
 
-	if cfg.MaxRasterValue == 0 {
-		cfg.MaxRasterValue = defMaxRaster
+	minPeriod := int(math.Ceil(source.MinParameterValue))
+	maxPeriod := int(math.Floor(source.MaxParameterValue))
+	if minPeriod < 6 {
+		return nil, fmt.Errorf("%s: MinParameterValue must ceil to >= 6", invalid)
+	}
+	if maxPeriod <= minPeriod {
+		return nil, fmt.Errorf("%s: MaxParameterValue floor must be > MinParameterValue ceil", invalid)
 	}
 
-	if cfg.MinParameterValue == 0 {
-		cfg.MinParameterValue = defMinParam
-	}
-
-	if cfg.MaxParameterValue == 0 {
-		cfg.MaxParameterValue = defMaxParam
-	}
-
-	if cfg.HighPassFilterCutoff == 0 {
-		cfg.HighPassFilterCutoff = defHPCutoff
-	}
-
-	if cfg.MinRasterValue < 0 {
-		return nil, fmt.Errorf(fmtMinRaster, invalid)
-	}
-
-	if cfg.MaxRasterValue <= cfg.MinRasterValue {
-		return nil, fmt.Errorf(fmtMaxRaster, invalid)
-	}
-
-	// MBST rounds min up and max down to integers.
-	minParam := math.Ceil(cfg.MinParameterValue)
-	maxParam := math.Floor(cfg.MaxParameterValue)
-
-	if minParam < 2 {
-		return nil, fmt.Errorf(fmtMinParam, invalid)
-	}
-
-	if maxParam <= minParam {
-		return nil, fmt.Errorf(fmtMaxParam, invalid)
-	}
-
-	if cfg.HighPassFilterCutoff < 2 {
-		return nil, fmt.Errorf(fmtHP, invalid)
-	}
-
-	// CoronaSpectrum mirrors Ehlers' reference: BarMedianPrice default.
-	bc := cfg.BarComponent
+	bc, qc, tc := source.BarComponent, source.QuoteComponent, source.TradeComponent
 	if bc == 0 {
-		bc = entities.BarMedianPrice
+		bc = entities.DefaultBarComponent
 	}
-
-	qc := cfg.QuoteComponent
 	if qc == 0 {
 		qc = entities.DefaultQuoteComponent
 	}
-
-	tc := cfg.TradeComponent
 	if tc == 0 {
 		tc = entities.DefaultTradeComponent
 	}
 
-	c, err := corona.NewCorona(&corona.Params{
-		HighPassFilterCutoff:   cfg.HighPassFilterCutoff,
-		MinimalPeriod:          int(minParam),
-		MaximalPeriod:          int(maxParam),
-		DecibelsLowerThreshold: cfg.MinRasterValue,
-		DecibelsUpperThreshold: cfg.MaxRasterValue,
-	})
-	if err != nil {
-		return nil, fmt.Errorf(fmtw, invalid, err)
-	}
-
 	barFunc, err := entities.BarComponentFunc(bc)
 	if err != nil {
-		return nil, fmt.Errorf(fmtw, invalid, err)
+		return nil, fmt.Errorf("%s: %w", invalid, err)
 	}
-
 	quoteFunc, err := entities.QuoteComponentFunc(qc)
 	if err != nil {
-		return nil, fmt.Errorf(fmtw, invalid, err)
+		return nil, fmt.Errorf("%s: %w", invalid, err)
 	}
-
 	tradeFunc, err := entities.TradeComponentFunc(tc)
 	if err != nil {
-		return nil, fmt.Errorf(fmtw, invalid, err)
+		return nil, fmt.Errorf("%s: %w", invalid, err)
 	}
 
-	componentMnemonic := core.ComponentTripleMnemonic(bc, qc, tc)
+	engine, err := corona.NewCorona(&corona.Params{
+		HighPassFilterCutoff:   source.HighPassFilterCutoff,
+		MinimalPeriod:          minPeriod,
+		MaximalPeriod:          maxPeriod,
+		DecibelsLowerThreshold: source.MinRasterValue,
+		DecibelsUpperThreshold: source.MaxRasterValue,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", invalid, err)
+	}
 
-	mnemonicValue := fmt.Sprintf(fmtnValue,
-		cfg.MinRasterValue, cfg.MaxRasterValue, minParam, maxParam, cfg.HighPassFilterCutoff, componentMnemonic)
-	mnemonicDC := fmt.Sprintf(fmtnDC, cfg.HighPassFilterCutoff, componentMnemonic)
-	mnemonicDCM := fmt.Sprintf(fmtnDCM, cfg.HighPassFilterCutoff, componentMnemonic)
-
-	// Parameter resolution: 2 samples per period (half-period stepping).
-	// Values slice length = (maxParam*2 - minParam*2 + 1). The first sample sits
-	// at minParam, the last at maxParam. Resolution satisfies:
-	//   min + (length-1)/resolution = max  =>  resolution = (length-1) / (max - min).
-	parameterResolution := float64(c.FilterBankLength()-1) / (maxParam - minParam)
+	comp := core.ComponentTripleMnemonic(bc, qc, tc)
+	mnemonicValue := fmt.Sprintf("cspect(%s, %s, %d, %d, %d%s)",
+		corona.FormatNumber(source.MinRasterValue),
+		corona.FormatNumber(source.MaxRasterValue),
+		minPeriod,
+		maxPeriod,
+		source.HighPassFilterCutoff,
+		comp,
+	)
+	mnemonicDC := fmt.Sprintf("cspect-dc(%d%s)", source.HighPassFilterCutoff, comp)
+	mnemonicDCM := fmt.Sprintf("cspect-dcm(%d%s)", source.HighPassFilterCutoff, comp)
 
 	return &CoronaSpectrum{
 		mnemonic:            mnemonicValue,
-		description:         descrValue + mnemonicValue,
+		description:         "Corona spectrum " + mnemonicValue,
 		mnemonicDC:          mnemonicDC,
-		descriptionDC:       descrDC + mnemonicDC,
+		descriptionDC:       "Corona spectrum dominant cycle " + mnemonicDC,
 		mnemonicDCM:         mnemonicDCM,
-		descriptionDCM:      descrDCM + mnemonicDCM,
-		c:                   c,
-		minParameterValue:   minParam,
-		maxParameterValue:   maxParam,
-		parameterResolution: parameterResolution,
-		minRasterValue:      cfg.MinRasterValue,
-		maxRasterValue:      cfg.MaxRasterValue,
+		descriptionDCM:      "Corona spectrum dominant cycle median " + mnemonicDCM,
+		engine:              engine,
+		engineParams:        engine.Parameters(),
+		minParameterValue:   float64(minPeriod),
+		maxParameterValue:   float64(maxPeriod),
+		parameterResolution: 2.0,
 		barFunc:             barFunc,
 		quoteFunc:           quoteFunc,
 		tradeFunc:           tradeFunc,
 	}, nil
 }
 
+// Reset clears streaming state while retaining parameters.
+func (s *CoronaSpectrum) Reset() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.engine.Reset()
+	s.sampleCount = 0
+}
+
 // IsPrimed indicates whether the indicator is primed.
 func (s *CoronaSpectrum) IsPrimed() bool {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-
-	return s.c.IsPrimed()
+	return s.sampleCount >= corona.FirstBankSample
 }
 
 // Metadata describes the output data of the indicator.
@@ -221,80 +191,129 @@ func (s *CoronaSpectrum) Metadata() core.Metadata {
 	)
 }
 
-// Update feeds the next sample to the engine and returns the heatmap column
-// plus the current DominantCycle and DominantCycleMedian estimates.
-//
-// On unprimed bars the heatmap is an empty heatmap (with the indicator's
-// parameter axis) and both scalar values are NaN. On a NaN input sample,
-// state is left unchanged and all outputs are NaN / empty heatmap.
-func (s *CoronaSpectrum) Update(sample float64, t time.Time) (*outputs.Heatmap, float64, float64) {
+func (s *CoronaSpectrum) emptySnapshot(t time.Time) Snapshot {
+	nan := math.NaN()
+	bankLength := s.engine.FilterBankLength()
+	power := make([]float64, bankLength)
+	relativePower := make([]float64, bankLength)
+	for i := range bankLength {
+		power[i] = nan
+		relativePower[i] = nan
+	}
+	return Snapshot{
+		Heatmap:             outputs.NewEmptyHeatmap(t, s.minParameterValue, s.maxParameterValue, s.parameterResolution),
+		DominantCycle:       nan,
+		DominantCycleMedian: nan,
+		MaximumPower:        nan,
+		NormalizationPower:  nan,
+		SelectedBins:        nan,
+		HasCycleEstimate:    nan,
+		Power:               power,
+		RelativePower:       relativePower,
+	}
+}
+
+func (s *CoronaSpectrum) updateFromSnapshotLocked(snapshot corona.Snapshot) (Snapshot, error) {
+	accepted, err := corona.AcceptSnapshot(snapshot, s.engineParams, s.sampleCount+1)
+	if err != nil {
+		return Snapshot{}, err
+	}
+	if !accepted {
+		return s.emptySnapshot(snapshot.Time), nil
+	}
+	s.sampleCount = snapshot.SampleCount
+	if !snapshot.Primed {
+		return s.emptySnapshot(snapshot.Time), nil
+	}
+
+	values := slices.Clone(snapshot.Decibels)
+	valueMin := values[0]
+	valueMax := values[0]
+	for _, value := range values[1:] {
+		if value < valueMin {
+			valueMin = value
+		}
+		if value > valueMax {
+			valueMax = value
+		}
+	}
+	hasEstimate := 0.0
+	if snapshot.HasCycleEstimate {
+		hasEstimate = 1.0
+	}
+	return Snapshot{
+		Heatmap:             outputs.NewHeatmap(snapshot.Time, s.minParameterValue, s.maxParameterValue, s.parameterResolution, valueMin, valueMax, values),
+		DominantCycle:       snapshot.DominantCycle,
+		DominantCycleMedian: snapshot.DominantCycleMedian,
+		MaximumPower:        snapshot.MaximumPower,
+		NormalizationPower:  snapshot.NormalizationPower,
+		SelectedBins:        float64(snapshot.SelectedBins),
+		HasCycleEstimate:    hasEstimate,
+		Power:               slices.Clone(snapshot.Power),
+		RelativePower:       slices.Clone(snapshot.RelativePower),
+	}, nil
+}
+
+// TryUpdate feeds the next sample to the standalone engine and returns a full snapshot or error.
+func (s *CoronaSpectrum) TryUpdate(sample float64, t time.Time) (Snapshot, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-
-	if math.IsNaN(sample) {
-		return outputs.NewEmptyHeatmap(t, s.minParameterValue, s.maxParameterValue, s.parameterResolution),
-			math.NaN(), math.NaN()
+	snapshot, err := s.engine.TryUpdate(sample, t)
+	if err != nil {
+		return Snapshot{}, err
 	}
+	return s.updateFromSnapshotLocked(snapshot)
+}
 
-	primed := s.c.Update(sample)
-	if !primed {
-		return outputs.NewEmptyHeatmap(t, s.minParameterValue, s.maxParameterValue, s.parameterResolution),
-			math.NaN(), math.NaN()
+// Update feeds the next sample to the standalone engine and returns a full snapshot.
+func (s *CoronaSpectrum) Update(sample float64, t time.Time) Snapshot {
+	result, err := s.TryUpdate(sample, t)
+	if err != nil {
+		panic(err)
 	}
+	return result
+}
 
-	bank := s.c.FilterBank()
-	values := make([]float64, len(bank))
-	valueMin := math.Inf(1)
-	valueMax := math.Inf(-1)
+// TryUpdateFromSnapshot consumes one shared engine snapshot in accepted-sample order.
+func (s *CoronaSpectrum) TryUpdateFromSnapshot(snapshot corona.Snapshot) (Snapshot, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.updateFromSnapshotLocked(snapshot)
+}
 
-	for i := range bank {
-		v := bank[i].Decibels
-		values[i] = v
-
-		if v < valueMin {
-			valueMin = v
-		}
-
-		if v > valueMax {
-			valueMax = v
-		}
+// UpdateFromSnapshot consumes one shared engine snapshot and panics on invalid ordering/parameters.
+func (s *CoronaSpectrum) UpdateFromSnapshot(snapshot corona.Snapshot) Snapshot {
+	result, err := s.TryUpdateFromSnapshot(snapshot)
+	if err != nil {
+		panic(err)
 	}
+	return result
+}
 
-	heatmap := outputs.NewHeatmap(t, s.minParameterValue, s.maxParameterValue, s.parameterResolution,
-		valueMin, valueMax, values)
-
-	return heatmap, s.c.DominantCycle(), s.c.DominantCycleMedian()
+func (s *CoronaSpectrum) wrapEntity(t time.Time, result Snapshot) core.Output {
+	return core.Output{
+		result.Heatmap,
+		entities.Scalar{Time: t, Value: result.DominantCycle},
+		entities.Scalar{Time: t, Value: result.DominantCycleMedian},
+	}
 }
 
 // UpdateScalar updates the indicator given the next scalar sample.
 func (s *CoronaSpectrum) UpdateScalar(sample *entities.Scalar) core.Output {
-	return s.updateEntity(sample.Time, sample.Value)
+	return s.wrapEntity(sample.Time, s.Update(sample.Value, sample.Time))
 }
 
 // UpdateBar updates the indicator given the next bar sample.
 func (s *CoronaSpectrum) UpdateBar(sample *entities.Bar) core.Output {
-	return s.updateEntity(sample.Time, s.barFunc(sample))
+	return s.wrapEntity(sample.Time, s.Update(s.barFunc(sample), sample.Time))
 }
 
 // UpdateQuote updates the indicator given the next quote sample.
 func (s *CoronaSpectrum) UpdateQuote(sample *entities.Quote) core.Output {
-	return s.updateEntity(sample.Time, s.quoteFunc(sample))
+	return s.wrapEntity(sample.Time, s.Update(s.quoteFunc(sample), sample.Time))
 }
 
 // UpdateTrade updates the indicator given the next trade sample.
 func (s *CoronaSpectrum) UpdateTrade(sample *entities.Trade) core.Output {
-	return s.updateEntity(sample.Time, s.tradeFunc(sample))
-}
-
-func (s *CoronaSpectrum) updateEntity(t time.Time, sample float64) core.Output {
-	const length = 3
-
-	heatmap, dc, dcm := s.Update(sample, t)
-
-	output := make([]any, length)
-	output[0] = heatmap
-	output[1] = entities.Scalar{Time: t, Value: dc}
-	output[2] = entities.Scalar{Time: t, Value: dcm}
-
-	return output
+	return s.wrapEntity(sample.Time, s.Update(s.tradeFunc(sample), sample.Time))
 }

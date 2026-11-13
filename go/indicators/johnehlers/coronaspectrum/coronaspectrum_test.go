@@ -2,371 +2,526 @@
 package coronaspectrum
 
 import (
+	"fmt"
 	"math"
 	"testing"
 	"time"
 
 	"zpano/entities"
 	"zpano/indicators/core"
-	"zpano/indicators/core/outputs"
 	"zpano/indicators/core/outputs/shape"
 )
 
-func TestCoronaSpectrumUpdate(t *testing.T) {
+const testRelTolerance = 1e-10
+const testAbsTolerance = 1e-10
+
+func assertClose(t *testing.T, actual, expected float64, label string) {
+	t.Helper()
+	if math.IsNaN(expected) {
+		if !math.IsNaN(actual) {
+			t.Fatalf("%s: expected NaN, got %v", label, actual)
+		}
+		return
+	}
+	if math.IsInf(expected, 0) {
+		if actual != expected {
+			t.Fatalf("%s: expected %v, got %v", label, expected, actual)
+		}
+		return
+	}
+	if math.IsNaN(actual) || math.IsInf(actual, 0) {
+		t.Fatalf("%s: expected %v, got %v", label, expected, actual)
+	}
+	bound := max(testAbsTolerance, math.Abs(expected)*testRelTolerance)
+	if math.Abs(actual-expected) > bound {
+		t.Fatalf("%s: expected %.15g, got %.15g (diff %.3e > %.3e)", label, expected, actual, math.Abs(actual-expected), bound)
+	}
+}
+
+func TestReferenceCases(t *testing.T) {
 	t.Parallel()
 
-	input := testCSInput()
-	t0 := testCSTime()
-
-	// Snapshot values captured from a first run and locked in here.
-	type snap struct {
-		i   int
-		dc  float64
-		dcm float64
+	type refCase struct {
+		name          string
+		hpCutoff      int
+		minPeriod     int
+		maxPeriod     int
+		threshold     float64
+		heatmap       [][]float64
+		heatmapMin    []float64
+		heatmapMax    []float64
+		dc            []float64
+		dcm           []float64
+		maxPower      []float64
+		normPower     []float64
+		selectedBins  []float64
+		hasEstimate   []float64
+		power         [][]float64
+		relativePower [][]float64
 	}
-	snapshots := []snap{
-		{11, 17.7604672565, 17.7604672565},
-		{12, 6.0000000000, 6.0000000000},
-		{50, 15.9989078712, 15.9989078712},
-		{100, 14.7455497547, 14.7455497547},
-		{150, 17.5000000000, 17.2826036069},
-		{200, 19.7557338512, 20.0000000000},
-		{251, 6.0000000000, 6.0000000000},
+
+	cases := []refCase{
+		{
+			name:          "H30_PMIN6_PMAX30_DB6",
+			hpCutoff:      30,
+			minPeriod:     6,
+			maxPeriod:     30,
+			threshold:     6,
+			heatmap:       expectedH30_PMIN6_PMAX30_DB6_HEATMAP,
+			heatmapMin:    expectedH30_PMIN6_PMAX30_DB6_HEATMAP_MIN,
+			heatmapMax:    expectedH30_PMIN6_PMAX30_DB6_HEATMAP_MAX,
+			dc:            expectedH30_PMIN6_PMAX30_DB6_DOMINANT_CYCLE,
+			dcm:           expectedH30_PMIN6_PMAX30_DB6_DOMINANT_CYCLE_MEDIAN,
+			maxPower:      expectedH30_PMIN6_PMAX30_DB6_MAXIMUM_POWER,
+			normPower:     expectedH30_PMIN6_PMAX30_DB6_NORMALIZATION_POWER,
+			selectedBins:  expectedH30_PMIN6_PMAX30_DB6_SELECTED_BINS,
+			hasEstimate:   expectedH30_PMIN6_PMAX30_DB6_HAS_CYCLE_ESTIMATE,
+			power:         expectedH30_PMIN6_PMAX30_DB6_POWER,
+			relativePower: expectedH30_PMIN6_PMAX30_DB6_RELATIVE_POWER,
+		},
+		{
+			name:          "H30_PMIN6_PMAX30_DB3",
+			hpCutoff:      30,
+			minPeriod:     6,
+			maxPeriod:     30,
+			threshold:     3,
+			heatmap:       expectedH30_PMIN6_PMAX30_DB3_HEATMAP,
+			heatmapMin:    expectedH30_PMIN6_PMAX30_DB3_HEATMAP_MIN,
+			heatmapMax:    expectedH30_PMIN6_PMAX30_DB3_HEATMAP_MAX,
+			dc:            expectedH30_PMIN6_PMAX30_DB3_DOMINANT_CYCLE,
+			dcm:           expectedH30_PMIN6_PMAX30_DB3_DOMINANT_CYCLE_MEDIAN,
+			maxPower:      expectedH30_PMIN6_PMAX30_DB3_MAXIMUM_POWER,
+			normPower:     expectedH30_PMIN6_PMAX30_DB3_NORMALIZATION_POWER,
+			selectedBins:  expectedH30_PMIN6_PMAX30_DB3_SELECTED_BINS,
+			hasEstimate:   expectedH30_PMIN6_PMAX30_DB3_HAS_CYCLE_ESTIMATE,
+			power:         expectedH30_PMIN6_PMAX30_DB3_POWER,
+			relativePower: expectedH30_PMIN6_PMAX30_DB3_RELATIVE_POWER,
+		},
+		{
+			name:          "H30_PMIN6_PMAX20_DB6",
+			hpCutoff:      30,
+			minPeriod:     6,
+			maxPeriod:     20,
+			threshold:     6,
+			heatmap:       expectedH30_PMIN6_PMAX20_DB6_HEATMAP,
+			heatmapMin:    expectedH30_PMIN6_PMAX20_DB6_HEATMAP_MIN,
+			heatmapMax:    expectedH30_PMIN6_PMAX20_DB6_HEATMAP_MAX,
+			dc:            expectedH30_PMIN6_PMAX20_DB6_DOMINANT_CYCLE,
+			dcm:           expectedH30_PMIN6_PMAX20_DB6_DOMINANT_CYCLE_MEDIAN,
+			maxPower:      expectedH30_PMIN6_PMAX20_DB6_MAXIMUM_POWER,
+			normPower:     expectedH30_PMIN6_PMAX20_DB6_NORMALIZATION_POWER,
+			selectedBins:  expectedH30_PMIN6_PMAX20_DB6_SELECTED_BINS,
+			hasEstimate:   expectedH30_PMIN6_PMAX20_DB6_HAS_CYCLE_ESTIMATE,
+			power:         expectedH30_PMIN6_PMAX20_DB6_POWER,
+			relativePower: expectedH30_PMIN6_PMAX20_DB6_RELATIVE_POWER,
+		},
+		{
+			name:          "H30_PMIN6_PMAX20_DB3",
+			hpCutoff:      30,
+			minPeriod:     6,
+			maxPeriod:     20,
+			threshold:     3,
+			heatmap:       expectedH30_PMIN6_PMAX20_DB3_HEATMAP,
+			heatmapMin:    expectedH30_PMIN6_PMAX20_DB3_HEATMAP_MIN,
+			heatmapMax:    expectedH30_PMIN6_PMAX20_DB3_HEATMAP_MAX,
+			dc:            expectedH30_PMIN6_PMAX20_DB3_DOMINANT_CYCLE,
+			dcm:           expectedH30_PMIN6_PMAX20_DB3_DOMINANT_CYCLE_MEDIAN,
+			maxPower:      expectedH30_PMIN6_PMAX20_DB3_MAXIMUM_POWER,
+			normPower:     expectedH30_PMIN6_PMAX20_DB3_NORMALIZATION_POWER,
+			selectedBins:  expectedH30_PMIN6_PMAX20_DB3_SELECTED_BINS,
+			hasEstimate:   expectedH30_PMIN6_PMAX20_DB3_HAS_CYCLE_ESTIMATE,
+			power:         expectedH30_PMIN6_PMAX20_DB3_POWER,
+			relativePower: expectedH30_PMIN6_PMAX20_DB3_RELATIVE_POWER,
+		},
+		{
+			name:          "H30_PMIN10_PMAX30_DB6",
+			hpCutoff:      30,
+			minPeriod:     10,
+			maxPeriod:     30,
+			threshold:     6,
+			heatmap:       expectedH30_PMIN10_PMAX30_DB6_HEATMAP,
+			heatmapMin:    expectedH30_PMIN10_PMAX30_DB6_HEATMAP_MIN,
+			heatmapMax:    expectedH30_PMIN10_PMAX30_DB6_HEATMAP_MAX,
+			dc:            expectedH30_PMIN10_PMAX30_DB6_DOMINANT_CYCLE,
+			dcm:           expectedH30_PMIN10_PMAX30_DB6_DOMINANT_CYCLE_MEDIAN,
+			maxPower:      expectedH30_PMIN10_PMAX30_DB6_MAXIMUM_POWER,
+			normPower:     expectedH30_PMIN10_PMAX30_DB6_NORMALIZATION_POWER,
+			selectedBins:  expectedH30_PMIN10_PMAX30_DB6_SELECTED_BINS,
+			hasEstimate:   expectedH30_PMIN10_PMAX30_DB6_HAS_CYCLE_ESTIMATE,
+			power:         expectedH30_PMIN10_PMAX30_DB6_POWER,
+			relativePower: expectedH30_PMIN10_PMAX30_DB6_RELATIVE_POWER,
+		},
+		{
+			name:          "H30_PMIN10_PMAX30_DB3",
+			hpCutoff:      30,
+			minPeriod:     10,
+			maxPeriod:     30,
+			threshold:     3,
+			heatmap:       expectedH30_PMIN10_PMAX30_DB3_HEATMAP,
+			heatmapMin:    expectedH30_PMIN10_PMAX30_DB3_HEATMAP_MIN,
+			heatmapMax:    expectedH30_PMIN10_PMAX30_DB3_HEATMAP_MAX,
+			dc:            expectedH30_PMIN10_PMAX30_DB3_DOMINANT_CYCLE,
+			dcm:           expectedH30_PMIN10_PMAX30_DB3_DOMINANT_CYCLE_MEDIAN,
+			maxPower:      expectedH30_PMIN10_PMAX30_DB3_MAXIMUM_POWER,
+			normPower:     expectedH30_PMIN10_PMAX30_DB3_NORMALIZATION_POWER,
+			selectedBins:  expectedH30_PMIN10_PMAX30_DB3_SELECTED_BINS,
+			hasEstimate:   expectedH30_PMIN10_PMAX30_DB3_HAS_CYCLE_ESTIMATE,
+			power:         expectedH30_PMIN10_PMAX30_DB3_POWER,
+			relativePower: expectedH30_PMIN10_PMAX30_DB3_RELATIVE_POWER,
+		},
+		{
+			name:          "H30_PMIN10_PMAX48_DB6",
+			hpCutoff:      30,
+			minPeriod:     10,
+			maxPeriod:     48,
+			threshold:     6,
+			heatmap:       expectedH30_PMIN10_PMAX48_DB6_HEATMAP,
+			heatmapMin:    expectedH30_PMIN10_PMAX48_DB6_HEATMAP_MIN,
+			heatmapMax:    expectedH30_PMIN10_PMAX48_DB6_HEATMAP_MAX,
+			dc:            expectedH30_PMIN10_PMAX48_DB6_DOMINANT_CYCLE,
+			dcm:           expectedH30_PMIN10_PMAX48_DB6_DOMINANT_CYCLE_MEDIAN,
+			maxPower:      expectedH30_PMIN10_PMAX48_DB6_MAXIMUM_POWER,
+			normPower:     expectedH30_PMIN10_PMAX48_DB6_NORMALIZATION_POWER,
+			selectedBins:  expectedH30_PMIN10_PMAX48_DB6_SELECTED_BINS,
+			hasEstimate:   expectedH30_PMIN10_PMAX48_DB6_HAS_CYCLE_ESTIMATE,
+			power:         expectedH30_PMIN10_PMAX48_DB6_POWER,
+			relativePower: expectedH30_PMIN10_PMAX48_DB6_RELATIVE_POWER,
+		},
+		{
+			name:          "H30_PMIN10_PMAX48_DB3",
+			hpCutoff:      30,
+			minPeriod:     10,
+			maxPeriod:     48,
+			threshold:     3,
+			heatmap:       expectedH30_PMIN10_PMAX48_DB3_HEATMAP,
+			heatmapMin:    expectedH30_PMIN10_PMAX48_DB3_HEATMAP_MIN,
+			heatmapMax:    expectedH30_PMIN10_PMAX48_DB3_HEATMAP_MAX,
+			dc:            expectedH30_PMIN10_PMAX48_DB3_DOMINANT_CYCLE,
+			dcm:           expectedH30_PMIN10_PMAX48_DB3_DOMINANT_CYCLE_MEDIAN,
+			maxPower:      expectedH30_PMIN10_PMAX48_DB3_MAXIMUM_POWER,
+			normPower:     expectedH30_PMIN10_PMAX48_DB3_NORMALIZATION_POWER,
+			selectedBins:  expectedH30_PMIN10_PMAX48_DB3_SELECTED_BINS,
+			hasEstimate:   expectedH30_PMIN10_PMAX48_DB3_HAS_CYCLE_ESTIMATE,
+			power:         expectedH30_PMIN10_PMAX48_DB3_POWER,
+			relativePower: expectedH30_PMIN10_PMAX48_DB3_RELATIVE_POWER,
+		},
+		{
+			name:          "H48_PMIN6_PMAX30_DB6",
+			hpCutoff:      48,
+			minPeriod:     6,
+			maxPeriod:     30,
+			threshold:     6,
+			heatmap:       expectedH48_PMIN6_PMAX30_DB6_HEATMAP,
+			heatmapMin:    expectedH48_PMIN6_PMAX30_DB6_HEATMAP_MIN,
+			heatmapMax:    expectedH48_PMIN6_PMAX30_DB6_HEATMAP_MAX,
+			dc:            expectedH48_PMIN6_PMAX30_DB6_DOMINANT_CYCLE,
+			dcm:           expectedH48_PMIN6_PMAX30_DB6_DOMINANT_CYCLE_MEDIAN,
+			maxPower:      expectedH48_PMIN6_PMAX30_DB6_MAXIMUM_POWER,
+			normPower:     expectedH48_PMIN6_PMAX30_DB6_NORMALIZATION_POWER,
+			selectedBins:  expectedH48_PMIN6_PMAX30_DB6_SELECTED_BINS,
+			hasEstimate:   expectedH48_PMIN6_PMAX30_DB6_HAS_CYCLE_ESTIMATE,
+			power:         expectedH48_PMIN6_PMAX30_DB6_POWER,
+			relativePower: expectedH48_PMIN6_PMAX30_DB6_RELATIVE_POWER,
+		},
+		{
+			name:          "H48_PMIN6_PMAX30_DB3",
+			hpCutoff:      48,
+			minPeriod:     6,
+			maxPeriod:     30,
+			threshold:     3,
+			heatmap:       expectedH48_PMIN6_PMAX30_DB3_HEATMAP,
+			heatmapMin:    expectedH48_PMIN6_PMAX30_DB3_HEATMAP_MIN,
+			heatmapMax:    expectedH48_PMIN6_PMAX30_DB3_HEATMAP_MAX,
+			dc:            expectedH48_PMIN6_PMAX30_DB3_DOMINANT_CYCLE,
+			dcm:           expectedH48_PMIN6_PMAX30_DB3_DOMINANT_CYCLE_MEDIAN,
+			maxPower:      expectedH48_PMIN6_PMAX30_DB3_MAXIMUM_POWER,
+			normPower:     expectedH48_PMIN6_PMAX30_DB3_NORMALIZATION_POWER,
+			selectedBins:  expectedH48_PMIN6_PMAX30_DB3_SELECTED_BINS,
+			hasEstimate:   expectedH48_PMIN6_PMAX30_DB3_HAS_CYCLE_ESTIMATE,
+			power:         expectedH48_PMIN6_PMAX30_DB3_POWER,
+			relativePower: expectedH48_PMIN6_PMAX30_DB3_RELATIVE_POWER,
+		},
+		{
+			name:          "H48_PMIN6_PMAX20_DB6",
+			hpCutoff:      48,
+			minPeriod:     6,
+			maxPeriod:     20,
+			threshold:     6,
+			heatmap:       expectedH48_PMIN6_PMAX20_DB6_HEATMAP,
+			heatmapMin:    expectedH48_PMIN6_PMAX20_DB6_HEATMAP_MIN,
+			heatmapMax:    expectedH48_PMIN6_PMAX20_DB6_HEATMAP_MAX,
+			dc:            expectedH48_PMIN6_PMAX20_DB6_DOMINANT_CYCLE,
+			dcm:           expectedH48_PMIN6_PMAX20_DB6_DOMINANT_CYCLE_MEDIAN,
+			maxPower:      expectedH48_PMIN6_PMAX20_DB6_MAXIMUM_POWER,
+			normPower:     expectedH48_PMIN6_PMAX20_DB6_NORMALIZATION_POWER,
+			selectedBins:  expectedH48_PMIN6_PMAX20_DB6_SELECTED_BINS,
+			hasEstimate:   expectedH48_PMIN6_PMAX20_DB6_HAS_CYCLE_ESTIMATE,
+			power:         expectedH48_PMIN6_PMAX20_DB6_POWER,
+			relativePower: expectedH48_PMIN6_PMAX20_DB6_RELATIVE_POWER,
+		},
+		{
+			name:          "H48_PMIN6_PMAX20_DB3",
+			hpCutoff:      48,
+			minPeriod:     6,
+			maxPeriod:     20,
+			threshold:     3,
+			heatmap:       expectedH48_PMIN6_PMAX20_DB3_HEATMAP,
+			heatmapMin:    expectedH48_PMIN6_PMAX20_DB3_HEATMAP_MIN,
+			heatmapMax:    expectedH48_PMIN6_PMAX20_DB3_HEATMAP_MAX,
+			dc:            expectedH48_PMIN6_PMAX20_DB3_DOMINANT_CYCLE,
+			dcm:           expectedH48_PMIN6_PMAX20_DB3_DOMINANT_CYCLE_MEDIAN,
+			maxPower:      expectedH48_PMIN6_PMAX20_DB3_MAXIMUM_POWER,
+			normPower:     expectedH48_PMIN6_PMAX20_DB3_NORMALIZATION_POWER,
+			selectedBins:  expectedH48_PMIN6_PMAX20_DB3_SELECTED_BINS,
+			hasEstimate:   expectedH48_PMIN6_PMAX20_DB3_HAS_CYCLE_ESTIMATE,
+			power:         expectedH48_PMIN6_PMAX20_DB3_POWER,
+			relativePower: expectedH48_PMIN6_PMAX20_DB3_RELATIVE_POWER,
+		},
+		{
+			name:          "H48_PMIN10_PMAX30_DB6",
+			hpCutoff:      48,
+			minPeriod:     10,
+			maxPeriod:     30,
+			threshold:     6,
+			heatmap:       expectedH48_PMIN10_PMAX30_DB6_HEATMAP,
+			heatmapMin:    expectedH48_PMIN10_PMAX30_DB6_HEATMAP_MIN,
+			heatmapMax:    expectedH48_PMIN10_PMAX30_DB6_HEATMAP_MAX,
+			dc:            expectedH48_PMIN10_PMAX30_DB6_DOMINANT_CYCLE,
+			dcm:           expectedH48_PMIN10_PMAX30_DB6_DOMINANT_CYCLE_MEDIAN,
+			maxPower:      expectedH48_PMIN10_PMAX30_DB6_MAXIMUM_POWER,
+			normPower:     expectedH48_PMIN10_PMAX30_DB6_NORMALIZATION_POWER,
+			selectedBins:  expectedH48_PMIN10_PMAX30_DB6_SELECTED_BINS,
+			hasEstimate:   expectedH48_PMIN10_PMAX30_DB6_HAS_CYCLE_ESTIMATE,
+			power:         expectedH48_PMIN10_PMAX30_DB6_POWER,
+			relativePower: expectedH48_PMIN10_PMAX30_DB6_RELATIVE_POWER,
+		},
+		{
+			name:          "H48_PMIN10_PMAX30_DB3",
+			hpCutoff:      48,
+			minPeriod:     10,
+			maxPeriod:     30,
+			threshold:     3,
+			heatmap:       expectedH48_PMIN10_PMAX30_DB3_HEATMAP,
+			heatmapMin:    expectedH48_PMIN10_PMAX30_DB3_HEATMAP_MIN,
+			heatmapMax:    expectedH48_PMIN10_PMAX30_DB3_HEATMAP_MAX,
+			dc:            expectedH48_PMIN10_PMAX30_DB3_DOMINANT_CYCLE,
+			dcm:           expectedH48_PMIN10_PMAX30_DB3_DOMINANT_CYCLE_MEDIAN,
+			maxPower:      expectedH48_PMIN10_PMAX30_DB3_MAXIMUM_POWER,
+			normPower:     expectedH48_PMIN10_PMAX30_DB3_NORMALIZATION_POWER,
+			selectedBins:  expectedH48_PMIN10_PMAX30_DB3_SELECTED_BINS,
+			hasEstimate:   expectedH48_PMIN10_PMAX30_DB3_HAS_CYCLE_ESTIMATE,
+			power:         expectedH48_PMIN10_PMAX30_DB3_POWER,
+			relativePower: expectedH48_PMIN10_PMAX30_DB3_RELATIVE_POWER,
+		},
+		{
+			name:          "H48_PMIN10_PMAX48_DB6",
+			hpCutoff:      48,
+			minPeriod:     10,
+			maxPeriod:     48,
+			threshold:     6,
+			heatmap:       expectedH48_PMIN10_PMAX48_DB6_HEATMAP,
+			heatmapMin:    expectedH48_PMIN10_PMAX48_DB6_HEATMAP_MIN,
+			heatmapMax:    expectedH48_PMIN10_PMAX48_DB6_HEATMAP_MAX,
+			dc:            expectedH48_PMIN10_PMAX48_DB6_DOMINANT_CYCLE,
+			dcm:           expectedH48_PMIN10_PMAX48_DB6_DOMINANT_CYCLE_MEDIAN,
+			maxPower:      expectedH48_PMIN10_PMAX48_DB6_MAXIMUM_POWER,
+			normPower:     expectedH48_PMIN10_PMAX48_DB6_NORMALIZATION_POWER,
+			selectedBins:  expectedH48_PMIN10_PMAX48_DB6_SELECTED_BINS,
+			hasEstimate:   expectedH48_PMIN10_PMAX48_DB6_HAS_CYCLE_ESTIMATE,
+			power:         expectedH48_PMIN10_PMAX48_DB6_POWER,
+			relativePower: expectedH48_PMIN10_PMAX48_DB6_RELATIVE_POWER,
+		},
+		{
+			name:          "H48_PMIN10_PMAX48_DB3",
+			hpCutoff:      48,
+			minPeriod:     10,
+			maxPeriod:     48,
+			threshold:     3,
+			heatmap:       expectedH48_PMIN10_PMAX48_DB3_HEATMAP,
+			heatmapMin:    expectedH48_PMIN10_PMAX48_DB3_HEATMAP_MIN,
+			heatmapMax:    expectedH48_PMIN10_PMAX48_DB3_HEATMAP_MAX,
+			dc:            expectedH48_PMIN10_PMAX48_DB3_DOMINANT_CYCLE,
+			dcm:           expectedH48_PMIN10_PMAX48_DB3_DOMINANT_CYCLE_MEDIAN,
+			maxPower:      expectedH48_PMIN10_PMAX48_DB3_MAXIMUM_POWER,
+			normPower:     expectedH48_PMIN10_PMAX48_DB3_NORMALIZATION_POWER,
+			selectedBins:  expectedH48_PMIN10_PMAX48_DB3_SELECTED_BINS,
+			hasEstimate:   expectedH48_PMIN10_PMAX48_DB3_HAS_CYCLE_ESTIMATE,
+			power:         expectedH48_PMIN10_PMAX48_DB3_POWER,
+			relativePower: expectedH48_PMIN10_PMAX48_DB3_RELATIVE_POWER,
+		},
 	}
 
-	x, err := NewCoronaSpectrumDefault()
+	for _, tc := range cases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			params := &Params{
+				MinRasterValue:       tc.threshold,
+				MaxRasterValue:       20.0,
+				MinParameterValue:    float64(tc.minPeriod),
+				MaxParameterValue:    float64(tc.maxPeriod),
+				HighPassFilterCutoff: tc.hpCutoff,
+			}
+			indicator, err := NewCoronaSpectrumParams(params)
+			if err != nil {
+				t.Fatalf("NewCoronaSpectrumParams: %v", err)
+			}
+			cells := 2*(tc.maxPeriod-tc.minPeriod) + 1
+			baseTime := time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)
+
+			for i, price := range testInput {
+				barTime := baseTime.AddDate(0, 0, i)
+				snap := indicator.Update(price, barTime)
+				assertClose(t, snap.Heatmap.ParameterFirst, float64(tc.minPeriod), fmt.Sprintf("%s[%d].first", tc.name, i))
+				assertClose(t, snap.Heatmap.ParameterLast, float64(tc.maxPeriod), fmt.Sprintf("%s[%d].last", tc.name, i))
+				assertClose(t, snap.Heatmap.ParameterResolution, 2.0, fmt.Sprintf("%s[%d].resolution", tc.name, i))
+
+				if i < 12 {
+					if indicator.IsPrimed() {
+						t.Fatalf("%s[%d]: expected IsPrimed=false", tc.name, i)
+					}
+					if !snap.Heatmap.IsEmpty() {
+						t.Fatalf("%s[%d]: expected empty heatmap", tc.name, i)
+					}
+					if len(snap.Power) != cells || len(snap.RelativePower) != cells {
+						t.Fatalf("%s[%d]: expected NaN slices of length %d", tc.name, i, cells)
+					}
+					for binIndex := 0; binIndex < cells; binIndex++ {
+						if !math.IsNaN(snap.Power[binIndex]) || !math.IsNaN(snap.RelativePower[binIndex]) {
+							t.Fatalf("%s[%d][%d]: expected NaN power/relativePower", tc.name, i, binIndex)
+						}
+					}
+				} else {
+					if !indicator.IsPrimed() {
+						t.Fatalf("%s[%d]: expected IsPrimed=true", tc.name, i)
+					}
+					if len(snap.Heatmap.Values) != cells {
+						t.Fatalf("%s[%d]: heatmap len = %d, want %d", tc.name, i, len(snap.Heatmap.Values), cells)
+					}
+					for binIndex := 0; binIndex < cells; binIndex++ {
+						assertClose(t, snap.Heatmap.Values[binIndex], tc.heatmap[i][binIndex], fmt.Sprintf("%s[%d].hm[%d]", tc.name, i, binIndex))
+						assertClose(t, snap.Power[binIndex], tc.power[i][binIndex], fmt.Sprintf("%s[%d].pow[%d]", tc.name, i, binIndex))
+						assertClose(t, snap.RelativePower[binIndex], tc.relativePower[i][binIndex], fmt.Sprintf("%s[%d].rel[%d]", tc.name, i, binIndex))
+					}
+				}
+
+				assertClose(t, snap.Heatmap.ValueMin, tc.heatmapMin[i], fmt.Sprintf("%s[%d].min", tc.name, i))
+				assertClose(t, snap.Heatmap.ValueMax, tc.heatmapMax[i], fmt.Sprintf("%s[%d].max", tc.name, i))
+				assertClose(t, snap.DominantCycle, tc.dc[i], fmt.Sprintf("%s[%d].dc", tc.name, i))
+				assertClose(t, snap.DominantCycleMedian, tc.dcm[i], fmt.Sprintf("%s[%d].dcm", tc.name, i))
+				assertClose(t, snap.MaximumPower, tc.maxPower[i], fmt.Sprintf("%s[%d].maxPower", tc.name, i))
+				assertClose(t, snap.NormalizationPower, tc.normPower[i], fmt.Sprintf("%s[%d].normPower", tc.name, i))
+				assertClose(t, snap.SelectedBins, tc.selectedBins[i], fmt.Sprintf("%s[%d].selected", tc.name, i))
+				assertClose(t, snap.HasCycleEstimate, tc.hasEstimate[i], fmt.Sprintf("%s[%d].hasEst", tc.name, i))
+			}
+
+			indicator.Reset()
+			if indicator.IsPrimed() {
+				t.Fatalf("%s: expected IsPrimed=false after Reset", tc.name)
+			}
+		})
+	}
+}
+
+func TestMetadataMnemonicsAndEntities(t *testing.T) {
+	t.Parallel()
+
+	indicator, err := NewCoronaSpectrumDefault()
 	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
+		t.Fatalf("NewCoronaSpectrumDefault: %v", err)
+	}
+	meta := indicator.Metadata()
+	if meta.Identifier != core.CoronaSpectrum {
+		t.Fatalf("Identifier = %v, want %v", meta.Identifier, core.CoronaSpectrum)
+	}
+	if meta.Mnemonic != "cspect(6, 20, 6, 30, 30)" {
+		t.Fatalf("Mnemonic = %q", meta.Mnemonic)
+	}
+	if len(meta.Outputs) != 3 {
+		t.Fatalf("Outputs len = %d, want 3", len(meta.Outputs))
+	}
+	if meta.Outputs[0].Shape != shape.Heatmap || meta.Outputs[1].Shape != shape.Scalar || meta.Outputs[2].Shape != shape.Scalar {
+		t.Fatalf("unexpected output shapes: %+v", meta.Outputs)
+	}
+	if meta.Outputs[1].Mnemonic != "cspect-dc(30)" || meta.Outputs[2].Mnemonic != "cspect-dcm(30)" {
+		t.Fatalf("unexpected sub-output mnemonics: %+v", meta.Outputs)
 	}
 
-	si := 0
-	for i := range input {
-		h, dc, dcm := x.Update(input[i], t0.Add(time.Duration(i)*time.Minute))
-
-		if h == nil {
-			t.Fatalf("[%d] heatmap must not be nil", i)
-		}
-
-		// Heatmap axis invariants are always present.
-		if h.ParameterFirst != 6 || h.ParameterLast != 30 || h.ParameterResolution != 2 {
-			t.Errorf("[%d] heatmap axis incorrect: first=%v last=%v result=%v",
-				i, h.ParameterFirst, h.ParameterLast, h.ParameterResolution)
-		}
-
-		if !x.IsPrimed() {
-			if !h.IsEmpty() {
-				t.Errorf("[%d] expected empty heatmap before priming, got len=%d", i, len(h.Values))
-			}
-
-			if !math.IsNaN(dc) || !math.IsNaN(dcm) {
-				t.Errorf("[%d] expected NaN scalars before priming, got dc=%v dcm=%v", i, dc, dcm)
-			}
-
-			continue
-		}
-
-		if len(h.Values) != 49 {
-			t.Errorf("[%d] heatmap values length: expected 49, got %d", i, len(h.Values))
-		}
-
-		if si < len(snapshots) && snapshots[si].i == i {
-			if math.Abs(snapshots[si].dc-dc) > testCSTolerance {
-				t.Errorf("[%d] dc: expected %v, got %v", i, snapshots[si].dc, dc)
-			}
-
-			if math.Abs(snapshots[si].dcm-dcm) > testCSTolerance {
-				t.Errorf("[%d] dcm: expected %v, got %v", i, snapshots[si].dcm, dcm)
-			}
-
-			si++
-		}
+	combos := []struct {
+		bc entities.BarComponent
+		qc entities.QuoteComponent
+		tc entities.TradeComponent
+	}{
+		{0, 0, 0},
+		{entities.BarOpenPrice, 0, 0},
+		{0, entities.QuoteBidPrice, 0},
+		{0, 0, entities.TradeVolume},
+		{entities.BarMedianPrice, entities.QuoteAskPrice, 0},
+		{entities.BarMedianPrice, 0, entities.TradeVolume},
+		{0, entities.QuoteAskPrice, entities.TradeVolume},
+		{entities.BarOpenPrice, entities.QuoteBidPrice, entities.TradeVolume},
 	}
-
-	if si != len(snapshots) {
-		t.Errorf("did not hit all %d snapshots, reached %d", len(snapshots), si)
-	}
-}
-
-func TestCoronaSpectrumPrimesAtBar11(t *testing.T) {
-	t.Parallel()
-
-	x, _ := NewCoronaSpectrumDefault()
-
-	if x.IsPrimed() {
-		t.Error("expected not primed at start")
-	}
-
-	input := testCSInput()
-	t0 := testCSTime()
-	primedAt := -1
-
-	for i := range input {
-		x.Update(input[i], t0.Add(time.Duration(i)*time.Minute))
-
-		if x.IsPrimed() && primedAt < 0 {
-			primedAt = i
+	for _, combo := range combos {
+		params := DefaultParams()
+		params.BarComponent = combo.bc
+		params.QuoteComponent = combo.qc
+		params.TradeComponent = combo.tc
+		instance, err := NewCoronaSpectrumParams(params)
+		if err != nil {
+			t.Fatalf("NewCoronaSpectrumParams: %v", err)
+		}
+		resolvedBC, resolvedQC, resolvedTC := combo.bc, combo.qc, combo.tc
+		if resolvedBC == 0 {
+			resolvedBC = entities.DefaultBarComponent
+		}
+		if resolvedQC == 0 {
+			resolvedQC = entities.DefaultQuoteComponent
+		}
+		if resolvedTC == 0 {
+			resolvedTC = entities.DefaultTradeComponent
+		}
+		expected := "cspect(6, 20, 6, 30, 30" + core.ComponentTripleMnemonic(resolvedBC, resolvedQC, resolvedTC) + ")"
+		if instance.Metadata().Mnemonic != expected || params.Mnemonic() != expected {
+			t.Fatalf("mnemonic mismatch: got %q / %q, want %q", instance.Metadata().Mnemonic, params.Mnemonic(), expected)
 		}
 	}
 
-	// MinimalPeriodTimesTwo = 12, so priming first happens at sample index 11 (0-indexed).
-	if primedAt != 11 {
-		t.Errorf("expected priming at index 11, got %d", primedAt)
-	}
-}
-
-func TestCoronaSpectrumNaNInput(t *testing.T) {
-	t.Parallel()
-
-	x, _ := NewCoronaSpectrumDefault()
-
-	h, dc, dcm := x.Update(math.NaN(), testCSTime())
-
-	if h == nil || !h.IsEmpty() {
-		t.Errorf("expected empty heatmap for NaN input, got %v", h)
-	}
-
-	if !math.IsNaN(dc) || !math.IsNaN(dcm) {
-		t.Errorf("expected NaN scalars for NaN input, got dc=%v dcm=%v", dc, dcm)
-	}
-
-	// NaN must not prime the indicator.
-	if x.IsPrimed() {
-		t.Error("NaN input must not prime the indicator")
+	baseTime := time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)
+	barInd, _ := NewCoronaSpectrumDefault()
+	scalarInd, _ := NewCoronaSpectrumDefault()
+	quoteInd, _ := NewCoronaSpectrumDefault()
+	tradeInd, _ := NewCoronaSpectrumDefault()
+	for i := 0; i < 15; i++ {
+		barTime := baseTime.AddDate(0, 0, i)
+		price := testInput[i]
+		outBar := barInd.UpdateBar(&entities.Bar{Time: barTime, Open: testOpen[i], High: testHigh[i], Low: testLow[i], Close: price, Volume: 1000})
+		outScalar := scalarInd.UpdateScalar(&entities.Scalar{Time: barTime, Value: price})
+		outQuote := quoteInd.UpdateQuote(&entities.Quote{Time: barTime, Bid: price - 0.5, Ask: price + 0.5, BidSize: 10, AskSize: 10})
+		outTrade := tradeInd.UpdateTrade(&entities.Trade{Time: barTime, Price: price, Volume: 10})
+		if len(outBar) != 3 {
+			t.Fatalf("len(outBar) = %d, want 3", len(outBar))
+		}
+		assertClose(t, outBar[1].(entities.Scalar).Value, outScalar[1].(entities.Scalar).Value, "bar vs scalar")
+		assertClose(t, outBar[1].(entities.Scalar).Value, outQuote[1].(entities.Scalar).Value, "bar vs quote")
+		assertClose(t, outBar[1].(entities.Scalar).Value, outTrade[1].(entities.Scalar).Value, "bar vs trade")
 	}
 }
 
-func TestCoronaSpectrumMetadata(t *testing.T) {
+func TestValidation(t *testing.T) {
 	t.Parallel()
 
-	x, _ := NewCoronaSpectrumDefault()
-	md := x.Metadata()
-
-	check := func(what string, exp, act any) {
-		t.Helper()
-
-		if exp != act {
-			t.Errorf("%s: expected %v, actual %v", what, exp, act)
+	invalid := []*Params{
+		{MinRasterValue: -0.1, MaxRasterValue: 20, MinParameterValue: 6, MaxParameterValue: 30, HighPassFilterCutoff: 30},
+		{MinRasterValue: 20, MaxRasterValue: 20, MinParameterValue: 6, MaxParameterValue: 30, HighPassFilterCutoff: 30},
+		{MinRasterValue: 6, MaxRasterValue: 20, MinParameterValue: 5, MaxParameterValue: 30, HighPassFilterCutoff: 30},
+		{MinRasterValue: 6, MaxRasterValue: 20, MinParameterValue: 0, MaxParameterValue: 30, HighPassFilterCutoff: 30},
+		{MinRasterValue: 6, MaxRasterValue: 20, MinParameterValue: 10, MaxParameterValue: 10, HighPassFilterCutoff: 30},
+		{MinRasterValue: 6, MaxRasterValue: 20, MinParameterValue: 6, MaxParameterValue: 30, HighPassFilterCutoff: 4},
+		{MinRasterValue: 6, MaxRasterValue: 20, MinParameterValue: 6, MaxParameterValue: 30, HighPassFilterCutoff: 0},
+	}
+	for i, bad := range invalid {
+		if _, err := NewCoronaSpectrumParams(bad); err == nil {
+			t.Fatalf("invalid[%d]: expected error, got nil", i)
 		}
 	}
-
-	mnValue := "cspect(6, 20, 6, 30, 30, hl/2)"
-	mnDC := "cspect-dc(30, hl/2)"
-	mnDCM := "cspect-dcm(30, hl/2)"
-
-	check("Identifier", core.CoronaSpectrum, md.Identifier)
-	check("Mnemonic", mnValue, md.Mnemonic)
-	check("Description", "Corona spectrum "+mnValue, md.Description)
-	check("len(Outputs)", 3, len(md.Outputs))
-
-	check("Outputs[0].Kind", int(Value), md.Outputs[0].Kind)
-	check("Outputs[0].Shape", shape.Heatmap, md.Outputs[0].Shape)
-	check("Outputs[0].Mnemonic", mnValue, md.Outputs[0].Mnemonic)
-
-	check("Outputs[1].Kind", int(DominantCycle), md.Outputs[1].Kind)
-	check("Outputs[1].Shape", shape.Scalar, md.Outputs[1].Shape)
-	check("Outputs[1].Mnemonic", mnDC, md.Outputs[1].Mnemonic)
-
-	check("Outputs[2].Kind", int(DominantCycleMedian), md.Outputs[2].Kind)
-	check("Outputs[2].Shape", shape.Scalar, md.Outputs[2].Shape)
-	check("Outputs[2].Mnemonic", mnDCM, md.Outputs[2].Mnemonic)
-}
-
-//nolint:funlen
-func TestCoronaSpectrumUpdateEntity(t *testing.T) {
-	t.Parallel()
-
-	const (
-		primeCount = 50
-		inp        = 100.
-		outputLen  = 3
-	)
-
-	tm := testCSTime()
-	input := testCSInput()
-
-	check := func(act core.Output) {
-		t.Helper()
-
-		if len(act) != outputLen {
-			t.Errorf("len(output): expected %v, actual %v", outputLen, len(act))
-
-			return
-		}
-
-		h, ok := act[0].(*outputs.Heatmap)
-		if !ok {
-			t.Errorf("output[0] is not a heatmap: %T", act[0])
-		} else if h.Time != tm {
-			t.Errorf("output[0].Time: expected %v, actual %v", tm, h.Time)
-		}
-
-		for i := 1; i < outputLen; i++ {
-			s, ok := act[i].(entities.Scalar)
-			if !ok {
-				t.Errorf("output[%d] is not a scalar", i)
-
-				continue
-			}
-
-			if s.Time != tm {
-				t.Errorf("output[%d].Time: expected %v, actual %v", i, tm, s.Time)
-			}
-		}
-	}
-
-	t.Run("update scalar", func(t *testing.T) {
-		t.Parallel()
-
-		s := entities.Scalar{Time: tm, Value: inp}
-		x, _ := NewCoronaSpectrumDefault()
-
-		for i := 0; i < primeCount; i++ {
-			x.Update(input[i%len(input)], tm)
-		}
-
-		check(x.UpdateScalar(&s))
-	})
-
-	t.Run("update bar", func(t *testing.T) {
-		t.Parallel()
-
-		b := entities.Bar{Time: tm, High: inp, Low: inp, Close: inp}
-		x, _ := NewCoronaSpectrumDefault()
-
-		for i := 0; i < primeCount; i++ {
-			x.Update(input[i%len(input)], tm)
-		}
-
-		check(x.UpdateBar(&b))
-	})
-
-	t.Run("update quote", func(t *testing.T) {
-		t.Parallel()
-
-		q := entities.Quote{Time: tm, Bid: inp, Ask: inp}
-		x, _ := NewCoronaSpectrumDefault()
-
-		for i := 0; i < primeCount; i++ {
-			x.Update(input[i%len(input)], tm)
-		}
-
-		check(x.UpdateQuote(&q))
-	})
-
-	t.Run("update trade", func(t *testing.T) {
-		t.Parallel()
-
-		r := entities.Trade{Time: tm, Price: inp}
-		x, _ := NewCoronaSpectrumDefault()
-
-		for i := 0; i < primeCount; i++ {
-			x.Update(input[i%len(input)], tm)
-		}
-
-		check(x.UpdateTrade(&r))
-	})
-}
-
-//nolint:funlen
-func TestNewCoronaSpectrum(t *testing.T) {
-	t.Parallel()
-
-	check := func(name string, exp, act any) {
-		t.Helper()
-
-		if exp != act {
-			t.Errorf("%s: expected %v, actual %v", name, exp, act)
-		}
-	}
-
-	t.Run("default", func(t *testing.T) {
-		t.Parallel()
-
-		x, err := NewCoronaSpectrumDefault()
-		check("err == nil", true, err == nil)
-		check("mnemonic", "cspect(6, 20, 6, 30, 30, hl/2)", x.mnemonic)
-		check("MinParameterValue", 6.0, x.minParameterValue)
-		check("MaxParameterValue", 30.0, x.maxParameterValue)
-		check("ParameterResolution", 2.0, x.parameterResolution)
-	})
-
-	t.Run("custom ranges round to integers", func(t *testing.T) {
-		t.Parallel()
-
-		x, err := NewCoronaSpectrumParams(&Params{
-			MinRasterValue:       4,
-			MaxRasterValue:       25,
-			MinParameterValue:    8.7,  // ceils to 9
-			MaxParameterValue:    40.4, // floors to 40
-			HighPassFilterCutoff: 20,
-		})
-		check("err == nil", true, err == nil)
-		check("MinParameterValue", 9.0, x.minParameterValue)
-		check("MaxParameterValue", 40.0, x.maxParameterValue)
-		check("mnemonic", "cspect(4, 25, 9, 40, 20, hl/2)", x.mnemonic)
-	})
-
-	t.Run("MaxRasterValue <= MinRasterValue", func(t *testing.T) {
-		t.Parallel()
-
-		_, err := NewCoronaSpectrumParams(&Params{
-			MinRasterValue:    10,
-			MaxRasterValue:    10,
-			MinParameterValue: 6,
-			MaxParameterValue: 30,
-		})
-		if err == nil || err.Error() !=
-			"invalid corona spectrum parameters: MaxRasterValue should be > MinRasterValue" {
-			t.Errorf("unexpected: %v", err)
-		}
-	})
-
-	t.Run("MinParameterValue < 2", func(t *testing.T) {
-		t.Parallel()
-
-		_, err := NewCoronaSpectrumParams(&Params{
-			MinParameterValue: 1,
-			MaxParameterValue: 30,
-		})
-		if err == nil || err.Error() !=
-			"invalid corona spectrum parameters: MinParameterValue should be >= 2" {
-			t.Errorf("unexpected: %v", err)
-		}
-	})
-
-	t.Run("MaxParameterValue <= MinParameterValue", func(t *testing.T) {
-		t.Parallel()
-
-		_, err := NewCoronaSpectrumParams(&Params{
-			MinParameterValue: 20,
-			MaxParameterValue: 20,
-		})
-		if err == nil || err.Error() !=
-			"invalid corona spectrum parameters: MaxParameterValue should be > MinParameterValue" {
-			t.Errorf("unexpected: %v", err)
-		}
-	})
-
-	t.Run("HighPassFilterCutoff < 2", func(t *testing.T) {
-		t.Parallel()
-
-		_, err := NewCoronaSpectrumParams(&Params{
-			HighPassFilterCutoff: 1,
-		})
-		if err == nil || err.Error() !=
-			"invalid corona spectrum parameters: HighPassFilterCutoff should be >= 2" {
-			t.Errorf("unexpected: %v", err)
-		}
-	})
-
-	t.Run("invalid bar component", func(t *testing.T) {
-		t.Parallel()
-
-		_, err := NewCoronaSpectrumParams(&Params{
-			BarComponent: entities.BarComponent(9999),
-		})
-		if err == nil {
-			t.Error("expected error")
-		}
-	})
 }

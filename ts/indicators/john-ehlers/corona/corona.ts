@@ -1,301 +1,548 @@
+import { Heatmap } from '../../core/outputs/heatmap';
 import { CoronaParams, DefaultCoronaParams } from './params';
 
-const DEFAULT_HIGH_PASS_FILTER_CUTOFF = 30;
-const DEFAULT_MINIMAL_PERIOD = 6;
-const DEFAULT_MAXIMAL_PERIOD = 30;
-const DEFAULT_DECIBELS_LOWER_THRESHOLD = 6;
-const DEFAULT_DECIBELS_UPPER_THRESHOLD = 20;
+export const FIRST_BANK_SAMPLE = 13;
+export const TWO_PI = 2.0 * Math.PI;
+export const SQRT_THREE_OVER_TWO = Math.sqrt(3.0) / 2.0;
 
-const HIGH_PASS_FILTER_BUFFER_SIZE = 6;
-const FIR_COEF_SUM = 12;
+const FIR_WEIGHTS: readonly number[] = [1.0, 2.0, 3.0, 3.0, 2.0, 1.0];
 
-const DELTA_LOWER_THRESHOLD = 0.1;
-const DELTA_FACTOR = -0.015;
-const DELTA_SUMMAND = 0.5;
-
-const DOMINANT_CYCLE_BUFFER_SIZE = 5;
-const DOMINANT_CYCLE_MEDIAN_INDEX = 2;
-
-const DECIBELS_SMOOTHING_ALPHA = 0.33;
-const DECIBELS_SMOOTHING_ONE_MINUS = 0.67;
-
-const NORMALIZED_AMPLITUDE_FACTOR = 0.99;
-const DECIBELS_FLOOR = 0.01;
-const DECIBELS_GAIN = 10;
-
-/** Per-bin state of a single bandpass filter in the Corona bank. */
-export interface CoronaFilter {
-  inPhase: number;
-  inPhasePrevious: number;
-  quadrature: number;
-  quadraturePrevious: number;
-  real: number;
-  realPrevious: number;
-  imaginary: number;
-  imaginaryPrevious: number;
-
-  /** |Real + j·Imaginary|² of the most recent update. */
-  amplitudeSquared: number;
-
-  /** Smoothed dB value of the most recent update. */
-  decibels: number;
+export function validateInteger(name: string, value: number, minimum: number): number {
+    if (typeof value !== 'number' || !Number.isInteger(value) || value < minimum) {
+        throw new Error(`${name} must be an integer >= ${minimum}`);
+    }
+    return value;
 }
 
-/** Shared spectral-analysis engine consumed by the CoronaSpectrum, CoronaSignalToNoiseRatio,
- * CoronaSwingPosition and CoronaTrendVigor indicators. It is not an indicator on its own.
- *
- * Call _update(sample)_ once per bar; then read _isPrimed_, _dominantCycle_,
- * _dominantCycleMedian_, _maximalAmplitudeSquared_ and the _filterBank_ array.
- *
- * Reference: John Ehlers, "Measuring Cycle Periods", Stocks & Commodities, November 2008. */
-export class Corona {
-  public readonly minimalPeriod: number;
-  public readonly maximalPeriod: number;
-  public readonly minimalPeriodTimesTwo: number;
-  public readonly maximalPeriodTimesTwo: number;
-  public readonly filterBankLength: number;
-
-  private readonly decibelsLowerThreshold: number;
-  private readonly decibelsUpperThreshold: number;
-  private readonly alpha: number;
-  private readonly halfOnePlusAlpha: number;
-  private readonly preCalculatedBeta: number[];
-
-  public readonly filterBank: CoronaFilter[];
-  private readonly highPassBuffer: number[];
-  private readonly dominantCycleBuffer: number[];
-
-  private samplePrevious = 0;
-  private smoothHPPrevious = 0;
-  private _maximalAmplitudeSquared = 0;
-  private sampleCount = 0;
-  private _dominantCycle: number;
-  private _dominantCycleMedian: number;
-  private _primed = false;
-
-  /** Creates a Corona engine. Zero/undefined parameters are replaced with the Ehlers defaults. */
-  public constructor(params?: CoronaParams) {
-    const hp = params?.highPassFilterCutoff;
-    const minP = params?.minimalPeriod;
-    const maxP = params?.maximalPeriod;
-    const dbLo = params?.decibelsLowerThreshold;
-    const dbHi = params?.decibelsUpperThreshold;
-
-    const cfg = {
-      highPassFilterCutoff: hp !== undefined && hp > 0 ? hp : DEFAULT_HIGH_PASS_FILTER_CUTOFF,
-      minimalPeriod: minP !== undefined && minP > 0 ? minP : DEFAULT_MINIMAL_PERIOD,
-      maximalPeriod: maxP !== undefined && maxP > 0 ? maxP : DEFAULT_MAXIMAL_PERIOD,
-      decibelsLowerThreshold: dbLo !== undefined && dbLo !== 0 ? dbLo : DEFAULT_DECIBELS_LOWER_THRESHOLD,
-      decibelsUpperThreshold: dbHi !== undefined && dbHi !== 0 ? dbHi : DEFAULT_DECIBELS_UPPER_THRESHOLD,
-    };
-
-    if (cfg.highPassFilterCutoff < 2) {
-      throw new Error('invalid corona parameters: HighPassFilterCutoff should be >= 2');
+export function validateFinite(name: string, value: number): number {
+    if (typeof value !== 'number' || !Number.isFinite(value)) {
+        throw new Error(`${name} must be finite`);
     }
-    if (cfg.minimalPeriod < 2) {
-      throw new Error('invalid corona parameters: MinimalPeriod should be >= 2');
+    return value;
+}
+
+export function validPrice(price: number): boolean {
+    if (typeof price !== 'number') {
+        throw new Error('price must be a number');
     }
-    if (cfg.maximalPeriod <= cfg.minimalPeriod) {
-      throw new Error('invalid corona parameters: MaximalPeriod should be > MinimalPeriod');
+    if (Number.isNaN(price)) {
+        return false;
     }
-    if (cfg.decibelsLowerThreshold < 0) {
-      throw new Error('invalid corona parameters: DecibelsLowerThreshold should be >= 0');
+    if (!Number.isFinite(price)) {
+        throw new Error('price must be finite or NaN');
     }
-    if (cfg.decibelsUpperThreshold <= cfg.decibelsLowerThreshold) {
-      throw new Error('invalid corona parameters: DecibelsUpperThreshold should be > DecibelsLowerThreshold');
-    }
-
-    this.minimalPeriod = cfg.minimalPeriod;
-    this.maximalPeriod = cfg.maximalPeriod;
-    this.minimalPeriodTimesTwo = cfg.minimalPeriod * 2;
-    this.maximalPeriodTimesTwo = cfg.maximalPeriod * 2;
-    this.decibelsLowerThreshold = cfg.decibelsLowerThreshold;
-    this.decibelsUpperThreshold = cfg.decibelsUpperThreshold;
-
-    this.filterBankLength = this.maximalPeriodTimesTwo - this.minimalPeriodTimesTwo + 1;
-
-    this.filterBank = new Array<CoronaFilter>(this.filterBankLength);
-    for (let i = 0; i < this.filterBankLength; i++) {
-      this.filterBank[i] = {
-        inPhase: 0, inPhasePrevious: 0,
-        quadrature: 0, quadraturePrevious: 0,
-        real: 0, realPrevious: 0,
-        imaginary: 0, imaginaryPrevious: 0,
-        amplitudeSquared: 0,
-        decibels: 0,
-      };
-    }
-
-    this.highPassBuffer = new Array<number>(HIGH_PASS_FILTER_BUFFER_SIZE).fill(0);
-
-    // MBST initializes the dominant cycle buffer with MaxValue sentinels.
-    this.dominantCycleBuffer = new Array<number>(DOMINANT_CYCLE_BUFFER_SIZE).fill(Number.MAX_VALUE);
-    this._dominantCycle = Number.MAX_VALUE;
-    this._dominantCycleMedian = Number.MAX_VALUE;
-
-    const phi = (2 * Math.PI) / cfg.highPassFilterCutoff;
-    this.alpha = (1 - Math.sin(phi)) / Math.cos(phi);
-    this.halfOnePlusAlpha = 0.5 * (1 + this.alpha);
-
-    this.preCalculatedBeta = new Array<number>(this.filterBankLength);
-    for (let index = 0; index < this.filterBankLength; index++) {
-      const n = this.minimalPeriodTimesTwo + index;
-      this.preCalculatedBeta[index] = Math.cos((4 * Math.PI) / n);
-    }
-  }
-
-  /** Indicates whether the engine has seen enough samples to produce meaningful output. */
-  public isPrimed(): boolean { return this._primed; }
-
-  /** The most recent weighted-center-of-gravity estimate of the dominant cycle period. */
-  public get dominantCycle(): number { return this._dominantCycle; }
-
-  /** The 5-sample median of the most recent dominant cycle estimates. */
-  public get dominantCycleMedian(): number { return this._dominantCycleMedian; }
-
-  /** The maximum amplitude-squared observed across the filter bank for the most recently
-   * processed sample. Reset to zero at the start of every update call. */
-  public get maximalAmplitudeSquared(): number { return this._maximalAmplitudeSquared; }
-
-  /** Feeds the next sample to the engine. NaN samples are a no-op. Returns true once primed. */
-  public update(sample: number): boolean {
-    if (Number.isNaN(sample)) {
-      return this._primed;
-    }
-
-    this.sampleCount++;
-
-    // First sample: store as prior reference and return without further processing.
-    if (this.sampleCount === 1) {
-      this.samplePrevious = sample;
-      return false;
-    }
-
-    // Step 1: High-pass filter.
-    const hp = this.alpha * this.highPassBuffer[HIGH_PASS_FILTER_BUFFER_SIZE - 1]
-      + this.halfOnePlusAlpha * (sample - this.samplePrevious);
-    this.samplePrevious = sample;
-
-    for (let i = 0; i < HIGH_PASS_FILTER_BUFFER_SIZE - 1; i++) {
-      this.highPassBuffer[i] = this.highPassBuffer[i + 1];
-    }
-    this.highPassBuffer[HIGH_PASS_FILTER_BUFFER_SIZE - 1] = hp;
-
-    // Step 2: 6-tap FIR smoothing {1, 2, 3, 3, 2, 1} / 12.
-    const smoothHP = (this.highPassBuffer[0]
-      + 2 * this.highPassBuffer[1]
-      + 3 * this.highPassBuffer[2]
-      + 3 * this.highPassBuffer[3]
-      + 2 * this.highPassBuffer[4]
-      + this.highPassBuffer[5]) / FIR_COEF_SUM;
-
-    // Step 3: Momentum.
-    const momentum = smoothHP - this.smoothHPPrevious;
-    this.smoothHPPrevious = smoothHP;
-
-    // Step 4: Adaptive delta.
-    let delta = DELTA_FACTOR * this.sampleCount + DELTA_SUMMAND;
-    if (delta < DELTA_LOWER_THRESHOLD) {
-      delta = DELTA_LOWER_THRESHOLD;
-    }
-
-    // Step 5: Filter-bank update.
-    this._maximalAmplitudeSquared = 0;
-    for (let index = 0; index < this.filterBankLength; index++) {
-      const n = this.minimalPeriodTimesTwo + index;
-      const nf = n;
-
-      const gamma = 1 / Math.cos((8 * Math.PI * delta) / nf);
-      const a = gamma - Math.sqrt(gamma * gamma - 1);
-
-      const quadrature = momentum * (nf / (4 * Math.PI));
-      const inPhase = smoothHP;
-
-      const halfOneMinA = 0.5 * (1 - a);
-      const beta = this.preCalculatedBeta[index];
-      const betaOnePlusA = beta * (1 + a);
-
-      const f = this.filterBank[index];
-
-      const real = halfOneMinA * (inPhase - f.inPhasePrevious) + betaOnePlusA * f.real - a * f.realPrevious;
-      const imag = halfOneMinA * (quadrature - f.quadraturePrevious) + betaOnePlusA * f.imaginary - a * f.imaginaryPrevious;
-
-      const ampSq = real * real + imag * imag;
-
-      f.inPhasePrevious = f.inPhase;
-      f.inPhase = inPhase;
-      f.quadraturePrevious = f.quadrature;
-      f.quadrature = quadrature;
-      f.realPrevious = f.real;
-      f.real = real;
-      f.imaginaryPrevious = f.imaginary;
-      f.imaginary = imag;
-      f.amplitudeSquared = ampSq;
-
-      if (ampSq > this._maximalAmplitudeSquared) {
-        this._maximalAmplitudeSquared = ampSq;
-      }
-    }
-
-    // Step 6: dB normalization and dominant-cycle weighted average.
-    let numerator = 0;
-    let denominator = 0;
-    this._dominantCycle = 0;
-
-    for (let index = 0; index < this.filterBankLength; index++) {
-      const f = this.filterBank[index];
-
-      let decibels = 0;
-      if (this._maximalAmplitudeSquared > 0) {
-        const normalized = f.amplitudeSquared / this._maximalAmplitudeSquared;
-        if (normalized > 0) {
-          const arg = (1 - NORMALIZED_AMPLITUDE_FACTOR * normalized) / DECIBELS_FLOOR;
-          if (arg > 0) {
-            decibels = DECIBELS_GAIN * Math.log10(arg);
-          }
-        }
-      }
-
-      decibels = DECIBELS_SMOOTHING_ALPHA * decibels + DECIBELS_SMOOTHING_ONE_MINUS * f.decibels;
-      if (decibels > this.decibelsUpperThreshold) {
-        decibels = this.decibelsUpperThreshold;
-      }
-      f.decibels = decibels;
-
-      if (decibels <= this.decibelsLowerThreshold) {
-        const n = this.minimalPeriodTimesTwo + index;
-        const adjusted = this.decibelsUpperThreshold - decibels;
-        numerator += n * adjusted;
-        denominator += adjusted;
-      }
-    }
-
-    if (denominator !== 0) {
-      this._dominantCycle = (0.5 * numerator) / denominator;
-    }
-    if (this._dominantCycle < this.minimalPeriod) {
-      this._dominantCycle = this.minimalPeriod;
-    }
-
-    // Step 7: 5-sample median of dominant cycle.
-    for (let i = 0; i < DOMINANT_CYCLE_BUFFER_SIZE - 1; i++) {
-      this.dominantCycleBuffer[i] = this.dominantCycleBuffer[i + 1];
-    }
-    this.dominantCycleBuffer[DOMINANT_CYCLE_BUFFER_SIZE - 1] = this._dominantCycle;
-
-    const sorted = [...this.dominantCycleBuffer].sort((a, b) => a - b);
-    this._dominantCycleMedian = sorted[DOMINANT_CYCLE_MEDIAN_INDEX];
-    if (this._dominantCycleMedian < this.minimalPeriod) {
-      this._dominantCycleMedian = this.minimalPeriod;
-    }
-
-    if (this.sampleCount < this.minimalPeriodTimesTwo) {
-      return false;
-    }
-    this._primed = true;
     return true;
-  }
 }
 
-// Re-exports avoid unused-import warning in bundlers.
-export { DefaultCoronaParams };
+export function checked(value: number): number {
+    if (!Number.isFinite(value)) {
+        throw new Error('calculation overflow; use finite, reasonably scaled prices');
+    }
+    return value;
+}
+
+export function clip(value: number, lower: number, upper: number): number {
+    return Math.max(lower, Math.min(upper, value));
+}
+
+export function formatNumber(value: number): string {
+    const normalized = Object.is(value, -0) ? 0 : value;
+    return Number.isInteger(normalized) ? String(normalized) : String(normalized);
+}
+
+export function rollingAppend(history: number[], value: number, length: number): [number, number] {
+    history.push(value);
+    if (history.length > length) {
+        history.shift();
+    }
+    let minimum = history[0];
+    let maximum = history[0];
+    for (let i = 1; i < history.length; i++) {
+        if (history[i] < minimum) minimum = history[i];
+        if (history[i] > maximum) maximum = history[i];
+    }
+    return [minimum, maximum];
+}
+
+export interface CoronaFilter {
+    inPhase1: number;
+    inPhase2: number;
+    quadrature1: number;
+    quadrature2: number;
+    real1: number;
+    real2: number;
+    imaginary1: number;
+    imaginary2: number;
+    power: number;
+    decibels: number;
+}
+
+export interface CoronaSnapshot {
+    readonly parameters: Required<CoronaParams>;
+    readonly sampleCount: number;
+    readonly accepted: boolean;
+    readonly primed: boolean;
+    readonly price: number;
+    readonly time: Date;
+    readonly highPass: number;
+    readonly filtered: number;
+    readonly bandwidth: number;
+    readonly dominantCycle: number;
+    readonly dominantCycleMedian: number;
+    readonly maximumPower: number;
+    readonly normalizationPower: number;
+    readonly selectedBins: number;
+    readonly hasCycleEstimate: boolean;
+    readonly power: number[];
+    readonly relativePower: number[];
+    readonly decibels: number[];
+}
+
+function cloneSnapshot(snapshot: CoronaSnapshot, overrides?: Partial<CoronaSnapshot>): CoronaSnapshot {
+    return {
+        ...snapshot,
+        ...overrides,
+        parameters: { ...snapshot.parameters },
+        power: snapshot.power.slice(),
+        relativePower: snapshot.relativePower.slice(),
+        decibels: snapshot.decibels.slice(),
+    };
+}
+
+export function acceptSnapshot(
+    snapshot: CoronaSnapshot,
+    expectedParameters: Required<CoronaParams>,
+    expectedCount: number,
+): boolean {
+    const p = snapshot.parameters;
+    if (
+        p.highPassFilterCutoff !== expectedParameters.highPassFilterCutoff ||
+        p.minimalPeriod !== expectedParameters.minimalPeriod ||
+        p.maximalPeriod !== expectedParameters.maximalPeriod ||
+        p.decibelsLowerThreshold !== expectedParameters.decibelsLowerThreshold ||
+        p.decibelsUpperThreshold !== expectedParameters.decibelsUpperThreshold
+    ) {
+        throw new Error('snapshot parameters do not match consumer engine parameters');
+    }
+    if (!snapshot.accepted) {
+        return false;
+    }
+    if (snapshot.sampleCount !== expectedCount) {
+        throw new Error('shared snapshots must be supplied in accepted-sample order');
+    }
+    return true;
+}
+
+export class Corona {
+    public readonly parameters: Required<CoronaParams>;
+    public readonly minimalPeriod: number;
+    public readonly maximalPeriod: number;
+    public readonly minimalPeriodTimesTwo: number;
+    public readonly maximalPeriodTimesTwo: number;
+    public readonly filterBankLength: number;
+    public readonly periods: readonly number[];
+
+    private readonly betas: readonly number[];
+    private readonly pole: number;
+    private _sampleCount = 0;
+    private pricePrevious = 0;
+    private hpHistory: number[] = [0, 0, 0, 0, 0, 0];
+    private filteredPrevious = 0;
+    private bank: CoronaFilter[] = [];
+    private dc = 0;
+    private dcHistory: number[] = [0, 0, 0, 0, 0];
+    private _lastSnapshot: CoronaSnapshot | null = null;
+
+    public constructor(params?: CoronaParams) {
+        const hpCutoff = validateInteger(
+            'highPassFilterCutoff',
+            params?.highPassFilterCutoff ?? DefaultCoronaParams.highPassFilterCutoff,
+            5,
+        );
+        const minPeriod = validateInteger(
+            'minimalPeriod',
+            params?.minimalPeriod ?? DefaultCoronaParams.minimalPeriod,
+            6,
+        );
+        const maxPeriod = validateInteger(
+            'maximalPeriod',
+            params?.maximalPeriod ?? DefaultCoronaParams.maximalPeriod,
+            minPeriod + 1,
+        );
+        const lowerThreshold = validateFinite(
+            'decibelsLowerThreshold',
+            params?.decibelsLowerThreshold ?? DefaultCoronaParams.decibelsLowerThreshold,
+        );
+        const upperThreshold = validateFinite(
+            'decibelsUpperThreshold',
+            params?.decibelsUpperThreshold ?? DefaultCoronaParams.decibelsUpperThreshold,
+        );
+        if (!(0.0 <= lowerThreshold && lowerThreshold < upperThreshold && upperThreshold > 0.0)) {
+            throw new Error('require 0 <= decibelsLowerThreshold < decibelsUpperThreshold');
+        }
+
+        const angle = TWO_PI / hpCutoff;
+        const pole = (1.0 - Math.sin(angle)) / Math.cos(angle);
+        if (!Number.isFinite(pole) || !(0.0 < pole && pole < 1.0)) {
+            throw new Error('high-pass coefficient must have a stable positive pole');
+        }
+
+        this.parameters = {
+            highPassFilterCutoff: hpCutoff,
+            minimalPeriod: minPeriod,
+            maximalPeriod: maxPeriod,
+            decibelsLowerThreshold: lowerThreshold,
+            decibelsUpperThreshold: upperThreshold,
+        };
+        this.minimalPeriod = minPeriod;
+        this.maximalPeriod = maxPeriod;
+        this.minimalPeriodTimesTwo = 2 * minPeriod;
+        this.maximalPeriodTimesTwo = 2 * maxPeriod;
+
+        const periods: number[] = [];
+        const betas: number[] = [];
+        for (let n2 = this.minimalPeriodTimesTwo; n2 <= this.maximalPeriodTimesTwo; n2++) {
+            const period = n2 / 2.0;
+            periods.push(period);
+            betas.push(Math.cos(TWO_PI / period));
+        }
+        this.periods = periods;
+        this.betas = betas;
+        this.filterBankLength = periods.length;
+        this.pole = pole;
+        this.reset();
+    }
+
+    public reset(): void {
+        this._sampleCount = 0;
+        this.pricePrevious = 0;
+        this.hpHistory = [0, 0, 0, 0, 0, 0];
+        this.filteredPrevious = 0;
+        this.bank = this.periods.map(() => ({
+            inPhase1: 0,
+            inPhase2: 0,
+            quadrature1: 0,
+            quadrature2: 0,
+            real1: 0,
+            real2: 0,
+            imaginary1: 0,
+            imaginary2: 0,
+            power: 0,
+            decibels: 0,
+        }));
+        this.dc = 0;
+        this.dcHistory = [0, 0, 0, 0, 0];
+        this._lastSnapshot = null;
+    }
+
+    public isPrimed(): boolean {
+        return this._sampleCount >= FIRST_BANK_SAMPLE;
+    }
+
+    public get sampleCount(): number {
+        return this._sampleCount;
+    }
+
+    public get dominantCycle(): number {
+        return this.dc;
+    }
+
+    public get dominantCycleMedian(): number {
+        return this._lastSnapshot !== null ? this._lastSnapshot.dominantCycleMedian : this.minimalPeriod;
+    }
+
+    public get maximumPower(): number {
+        return this._lastSnapshot !== null ? this._lastSnapshot.maximumPower : 0.0;
+    }
+
+    public get lastSnapshot(): CoronaSnapshot | null {
+        return this._lastSnapshot !== null ? cloneSnapshot(this._lastSnapshot) : null;
+    }
+
+    public update(price: number, time: Date = new Date(0)): CoronaSnapshot {
+        if (!validPrice(price)) {
+            if (this._lastSnapshot !== null) {
+                return cloneSnapshot(this._lastSnapshot, { accepted: false, price, time });
+            }
+            return {
+                parameters: { ...this.parameters },
+                sampleCount: 0,
+                accepted: false,
+                primed: false,
+                price,
+                time,
+                highPass: 0.0,
+                filtered: 0.0,
+                bandwidth: 0.5,
+                dominantCycle: 0.0,
+                dominantCycleMedian: this.minimalPeriod,
+                maximumPower: 0.0,
+                normalizationPower: 0.01,
+                selectedBins: 0,
+                hasCycleEstimate: false,
+                power: new Array<number>(this.filterBankLength).fill(0.0),
+                relativePower: new Array<number>(this.filterBankLength).fill(0.0),
+                decibels: new Array<number>(this.filterBankLength).fill(0.0),
+            };
+        }
+
+        const count = this._sampleCount + 1;
+        const previous = count === 1 ? price : this.pricePrevious;
+        const hp = checked(0.5 * (1.0 + this.pole) * (price - previous) + this.pole * this.hpHistory[5]);
+        const hpHistory = [
+            this.hpHistory[1],
+            this.hpHistory[2],
+            this.hpHistory[3],
+            this.hpHistory[4],
+            this.hpHistory[5],
+            hp,
+        ];
+        let firSum = 0.0;
+        for (let i = 0; i < 6; i++) {
+            firSum += hpHistory[i] * FIR_WEIGHTS[i];
+        }
+        let filtered = checked(firSum / 12.0);
+        if (count < 7) {
+            filtered = checked(price - previous);
+        }
+        if (count === 1) {
+            filtered = 0.0;
+        }
+        const bandwidth = Math.max(0.1, 0.5 - 0.015 * count);
+
+        const nextBank = new Array<CoronaFilter>(this.filterBankLength);
+        for (let i = 0; i < this.filterBankLength; i++) {
+            const old = this.bank[i];
+            if (count < FIRST_BANK_SAMPLE) {
+                nextBank[i] = { ...old };
+                continue;
+            }
+            const period = this.periods[i];
+            const beta = this.betas[i];
+            const gamma = 1.0 / Math.cos((2.0 * TWO_PI * bandwidth) / period);
+            const alpha = gamma - Math.sqrt(gamma * gamma - 1.0);
+            const inPhase = filtered;
+            const quadrature = checked((period / TWO_PI) * (filtered - this.filteredPrevious));
+            const realPart = checked(
+                0.5 * (1.0 - alpha) * (inPhase - old.inPhase2) +
+                    beta * (1.0 + alpha) * old.real1 -
+                    alpha * old.real2,
+            );
+            const imaginaryPart = checked(
+                0.5 * (1.0 - alpha) * (quadrature - old.quadrature2) +
+                    beta * (1.0 + alpha) * old.imaginary1 -
+                    alpha * old.imaginary2,
+            );
+            const power = checked(realPart * realPart + imaginaryPart * imaginaryPart);
+            nextBank[i] = {
+                inPhase1: inPhase,
+                inPhase2: old.inPhase1,
+                quadrature1: quadrature,
+                quadrature2: old.quadrature1,
+                real1: realPart,
+                real2: old.real1,
+                imaginary1: imaginaryPart,
+                imaginary2: old.imaginary1,
+                power,
+                decibels: old.decibels,
+            };
+        }
+
+        let maximum = 0.0;
+        for (let i = 0; i < nextBank.length; i++) {
+            if (nextBank[i].power > maximum) maximum = nextBank[i].power;
+        }
+        const firstPower = nextBank[0].power !== 0.0 ? nextBank[0].power : 0.01;
+        const normalizer = Math.max(firstPower, maximum);
+
+        let numerator = 0.0;
+        let denominator = 0.0;
+        let selected = 0;
+        const lowerThreshold = this.parameters.decibelsLowerThreshold;
+        const upperThreshold = this.parameters.decibelsUpperThreshold;
+        const powers = new Array<number>(this.filterBankLength);
+        const relativePowers = new Array<number>(this.filterBankLength);
+        const decibelsSlice = new Array<number>(this.filterBankLength);
+
+        for (let i = 0; i < this.filterBankLength; i++) {
+            const channel = nextBank[i];
+            const relative = channel.power / normalizer;
+            const raw =
+                relative > 0.0 ? 10.0 * Math.log10((1.0 - 0.99 * relative) / 0.01) : channel.decibels;
+            const decibels = Math.min(upperThreshold, 0.33 * raw + 0.67 * channel.decibels);
+            channel.decibels = decibels;
+            powers[i] = channel.power;
+            relativePowers[i] = relative;
+            decibelsSlice[i] = decibels;
+            if (decibels <= lowerThreshold) {
+                const weight = upperThreshold - decibels;
+                numerator += this.periods[i] * weight;
+                denominator += weight;
+                selected += 1;
+            }
+        }
+
+        const dc = denominator > 0.0 ? numerator / denominator : this.dc;
+        const dcHistory = [this.dcHistory[1], this.dcHistory[2], this.dcHistory[3], this.dcHistory[4], dc];
+        const sortedDC = dcHistory.slice().sort((a, b) => a - b);
+        const median = Math.max(this.minimalPeriod, sortedDC[2]);
+
+        const snapshot: CoronaSnapshot = {
+            parameters: { ...this.parameters },
+            sampleCount: count,
+            accepted: true,
+            primed: count >= FIRST_BANK_SAMPLE,
+            price,
+            time,
+            highPass: hp,
+            filtered,
+            bandwidth,
+            dominantCycle: dc,
+            dominantCycleMedian: median,
+            maximumPower: maximum,
+            normalizationPower: normalizer,
+            selectedBins: selected,
+            hasCycleEstimate: maximum > 0.0 && selected > 0,
+            power: powers,
+            relativePower: relativePowers,
+            decibels: decibelsSlice,
+        };
+
+        this._sampleCount = count;
+        this.pricePrevious = price;
+        this.hpHistory = hpHistory;
+        this.filteredPrevious = filtered;
+        this.bank = nextBank;
+        this.dc = dc;
+        this.dcHistory = dcHistory;
+        this._lastSnapshot = cloneSnapshot(snapshot);
+        return snapshot;
+    }
+}
+
+export interface AdaptiveCycle {
+    readonly bandPass: number;
+    readonly quadrature: number;
+    readonly amplitude: number;
+    readonly lead60: number;
+}
+
+export class AdaptiveBandPass {
+    private count = 0;
+    private prices: [number, number] = [0.0, 0.0];
+    private bp1 = 0.0;
+    private bp2 = 0.0;
+
+    public reset(): void {
+        this.count = 0;
+        this.prices = [0.0, 0.0];
+        this.bp1 = 0.0;
+        this.bp2 = 0.0;
+    }
+
+    public update(price: number, period: number): AdaptiveCycle {
+        this.count += 1;
+        if (this.count <= 2) {
+            this.prices[this.count - 1] = price;
+            return { bandPass: 0.0, quadrature: 0.0, amplitude: 0.0, lead60: 0.0 };
+        }
+        const omega = TWO_PI / period;
+        const beta = Math.cos(omega);
+        const gamma = 1.0 / Math.cos(2.0 * omega * 0.1);
+        const alpha = gamma - Math.sqrt(gamma * gamma - 1.0);
+        const bp = checked(
+            0.5 * (1.0 - alpha) * (price - this.prices[0]) +
+                beta * (1.0 + alpha) * this.bp1 -
+                alpha * this.bp2,
+        );
+        const quadrature = checked((bp - this.bp1) / omega);
+        const amplitude = checked(Math.sqrt(bp * bp + quadrature * quadrature));
+        const lead60 = checked(0.5 * bp + SQRT_THREE_OVER_TWO * quadrature);
+        this.prices = [this.prices[1], price];
+        this.bp2 = this.bp1;
+        this.bp1 = bp;
+        return { bandPass: bp, quadrature, amplitude, lead60 };
+    }
+}
+
+export type RasterKind = 'swing' | 'trend' | 'snr';
+
+export class Raster {
+    public readonly length: number;
+    public readonly lower: number;
+    public readonly upper: number;
+    public readonly ceiling: number;
+    public readonly step: number;
+    public readonly first: number;
+    public readonly resolution: number;
+    private values: number[];
+
+    public constructor(length: number, lower: number, upper: number, ceiling: number) {
+        this.length = validateInteger('rasterLength', length, 2);
+        this.lower = validateFinite('minParameterValue', lower);
+        this.upper = validateFinite('maxParameterValue', upper);
+        this.ceiling = validateFinite('maxRasterValue', ceiling);
+        if (this.upper <= this.lower || this.ceiling <= 0.0) {
+            throw new Error('require maxParameterValue > minParameterValue and maxRasterValue > 0');
+        }
+        this.step = (this.upper - this.lower) / this.length;
+        this.first = this.lower + this.step;
+        this.resolution = 1.0 / this.step;
+        this.values = new Array<number>(this.length).fill(0.0);
+    }
+
+    public reset(): void {
+        this.values.fill(0.0);
+    }
+
+    public valuesCopy(): number[] {
+        return this.values.slice();
+    }
+
+    public setValues(values: readonly number[]): void {
+        for (let i = 0; i < this.length; i++) {
+            this.values[i] = values[i];
+        }
+    }
+
+    public empty(time: Date): Heatmap {
+        return Heatmap.newEmptyHeatmap(time, this.first, this.upper, this.resolution);
+    }
+
+    public column(time: Date): Heatmap {
+        const copied = this.values.slice();
+        let minimum = copied[0];
+        let maximum = copied[0];
+        for (let i = 1; i < copied.length; i++) {
+            if (copied[i] < minimum) minimum = copied[i];
+            if (copied[i] > maximum) maximum = copied[i];
+        }
+        return Heatmap.newHeatmap(time, this.first, this.upper, this.resolution, minimum, maximum, copied);
+    }
+
+    public update(position: number, width: number, kind: RasterKind, suppress = false): void {
+        const marker = Math.floor(this.length * position + 0.5);
+        const [exponent, scale, historyScale]: [number, number, number] =
+            kind === 'swing' ? [0.95, 0.5, 0.5] : kind === 'trend' ? [0.85, 0.8, 0.2] : [0.8, 0.5, 1.0];
+        for (let i = 0; i < this.length; i++) {
+            const old = this.values[i];
+            const j = i + 1;
+            let value: number;
+            if (suppress) {
+                value = this.ceiling;
+            } else if (j === marker) {
+                value = 0.5 * old;
+            } else if (width <= 0.0) {
+                value = this.ceiling;
+            } else {
+                const distance = Math.abs(this.ceiling * position - (this.ceiling * j) / this.length) / width;
+                if (kind === 'snr' && j > marker && distance <= 1.0) {
+                    value = this.ceiling;
+                } else {
+                    value = scale * (Math.pow(distance, exponent) + historyScale * old);
+                }
+            }
+            this.values[i] = clip(value, 0.0, this.ceiling);
+        }
+    }
+}

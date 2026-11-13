@@ -1,44 +1,53 @@
-import { BarComponent } from '../../../entities/bar-component';
-import { QuoteComponent } from '../../../entities/quote-component';
-import { TradeComponent } from '../../../entities/trade-component';
+import { BarComponent, DefaultBarComponent } from '../../../entities/bar-component';
+import { DefaultQuoteComponent, QuoteComponent } from '../../../entities/quote-component';
+import { DefaultTradeComponent, TradeComponent } from '../../../entities/trade-component';
+import { componentTripleMnemonic } from '../../core/component-triple-mnemonic';
+import { formatNumber } from '../corona/corona';
 
-/** Describes parameters to create an instance of the CoronaSignalToNoiseRatio indicator. */
 export interface CoronaSignalToNoiseRatioParams {
-  /** Length of the heatmap raster (number of intensity bins). Default 50. A zero value is treated as "use default". */
-  rasterLength?: number;
-
-  /** Maximum raster intensity value. Default 20. A zero value is treated as "use default". */
-  maxRasterValue?: number;
-
-  /** Minimum ordinate (y) value of the heatmap — lower bound of the mapped SNR. Default 1. A zero value is treated as "use default". */
-  minParameterValue?: number;
-
-  /** Maximum ordinate (y) value of the heatmap — upper bound of the mapped SNR. Default 11. A zero value is treated as "use default". */
-  maxParameterValue?: number;
-
-  /** High-pass filter cutoff used by the inner Corona engine. Default 30. A zero value is treated as "use default". */
-  highPassFilterCutoff?: number;
-
-  /** Minimal cycle period covered by the filter bank. Default 6. A zero value is treated as "use default". */
-  minimalPeriod?: number;
-
-  /** Maximal cycle period covered by the filter bank. Default 30. A zero value is treated as "use default". */
-  maximalPeriod?: number;
-
-  /** A component of a bar to use when updating the indicator with a bar sample.
-   *
-   * If _undefined_, the default (BarComponent.Median, hl/2) is used, matching
-   * Ehlers' reference which operates on (High+Low)/2.
-   */
-  barComponent?: BarComponent;
-
-  /** A component of a quote to use when updating the indicator with a quote sample. */
-  quoteComponent?: QuoteComponent;
-
-  /** A component of a trade to use when updating the indicator with a trade sample. */
-  tradeComponent?: TradeComponent;
+    rasterLength?: number;
+    maxRasterValue?: number;
+    minParameterValue?: number;
+    maxParameterValue?: number;
+    highPassFilterCutoff?: number;
+    minimalPeriod?: number;
+    maximalPeriod?: number;
+    barComponent?: BarComponent;
+    quoteComponent?: QuoteComponent;
+    tradeComponent?: TradeComponent;
 }
 
 export function defaultParams(): CoronaSignalToNoiseRatioParams {
-    return { rasterLength: 50, maxRasterValue: 20, minParameterValue: 1, maxParameterValue: 11, highPassFilterCutoff: 30, minimalPeriod: 6, maximalPeriod: 30 };
+    return {
+        rasterLength: 50,
+        maxRasterValue: 20,
+        minParameterValue: 1,
+        maxParameterValue: 11,
+        highPassFilterCutoff: 30,
+        minimalPeriod: 6,
+        maximalPeriod: 30,
+    };
+}
+
+export function snrFlags(params?: CoronaSignalToNoiseRatioParams): string {
+    const minPeriod = params?.minimalPeriod ?? 6;
+    const maxPeriod = params?.maximalPeriod ?? 30;
+    const parts: string[] = [];
+    if (minPeriod !== 6) parts.push(`, pmin=${minPeriod}`);
+    if (maxPeriod !== 30) parts.push(`, pmax=${maxPeriod}`);
+    return parts.join('');
+}
+
+export function coronaSignalToNoiseRatioMnemonic(params?: CoronaSignalToNoiseRatioParams): string {
+    const rasterLength = params?.rasterLength ?? 50;
+    const maxRaster = params?.maxRasterValue ?? 20;
+    const minParam = params?.minParameterValue ?? 1;
+    const maxParam = params?.maxParameterValue ?? 11;
+    const hpCutoff = params?.highPassFilterCutoff ?? 30;
+    const bc = params?.barComponent ?? DefaultBarComponent;
+    const qc = params?.quoteComponent ?? DefaultQuoteComponent;
+    const tc = params?.tradeComponent ?? DefaultTradeComponent;
+    const comp = componentTripleMnemonic(bc, qc, tc);
+    const flags = snrFlags(params);
+    return `csnr(${rasterLength}, ${formatNumber(maxRaster)}, ${formatNumber(minParam)}, ${formatNumber(maxParam)}, ${hpCutoff}${flags}${comp})`;
 }

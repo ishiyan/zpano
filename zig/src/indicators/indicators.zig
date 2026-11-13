@@ -144,6 +144,7 @@ pub const mesa_adaptive_moving_average = @import("john_ehlers/mesa_adaptive_movi
 
 pub const corona = @import("john_ehlers/corona/corona.zig");
 pub const corona_spectrum = @import("john_ehlers/corona_spectrum/corona_spectrum.zig");
+pub const corona_signal_to_noise_ratio = @import("john_ehlers/corona_signal_to_noise_ratio/corona_signal_to_noise_ratio.zig");
 pub const corona_swing_position = @import("john_ehlers/corona_swing_position/corona_swing_position.zig");
 pub const corona_trend_vigor = @import("john_ehlers/corona_trend_vigor/corona_trend_vigor.zig");
 
@@ -289,6 +290,7 @@ comptime {
     _ = mesa_adaptive_moving_average;
     _ = corona;
     _ = corona_spectrum;
+    _ = corona_signal_to_noise_ratio;
     _ = corona_swing_position;
     _ = corona_trend_vigor;
     _ = goertzel_spectrum;

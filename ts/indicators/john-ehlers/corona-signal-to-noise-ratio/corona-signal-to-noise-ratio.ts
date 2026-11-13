@@ -1,343 +1,330 @@
-import { buildMetadata } from '../../core/build-metadata';
 import { Bar } from '../../../entities/bar';
-import { BarComponent, barComponentValue } from '../../../entities/bar-component';
+import { BarComponent, DefaultBarComponent, barComponentValue } from '../../../entities/bar-component';
 import { Quote } from '../../../entities/quote';
 import { DefaultQuoteComponent, quoteComponentValue } from '../../../entities/quote-component';
 import { Scalar } from '../../../entities/scalar';
 import { Trade } from '../../../entities/trade';
 import { DefaultTradeComponent, tradeComponentValue } from '../../../entities/trade-component';
+import { buildMetadata } from '../../core/build-metadata';
 import { componentTripleMnemonic } from '../../core/component-triple-mnemonic';
 import { Indicator } from '../../core/indicator';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
 import { IndicatorOutput } from '../../core/indicator-output';
-import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { Heatmap } from '../../core/outputs/heatmap';
-import { Corona } from '../corona/corona';
-import { CoronaSignalToNoiseRatioParams } from './params';
+import {
+    Corona,
+    CoronaSnapshot,
+    FIRST_BANK_SAMPLE,
+    Raster,
+    acceptSnapshot,
+    checked,
+    clip,
+    formatNumber,
+    validPrice,
+} from '../corona/corona';
+import { CoronaParams } from '../corona/params';
+import {
+    CoronaSignalToNoiseRatioParams,
+    coronaSignalToNoiseRatioMnemonic,
+    defaultParams,
+    snrFlags,
+} from './params';
 
-const DEFAULT_RASTER_LENGTH = 50;
-const DEFAULT_MAX_RASTER = 20;
-const DEFAULT_MIN_PARAM = 1;
-const DEFAULT_MAX_PARAM = 11;
-const DEFAULT_HP_CUTOFF = 30;
-const DEFAULT_MIN_PERIOD = 6;
-const DEFAULT_MAX_PERIOD = 30;
+export { CoronaSignalToNoiseRatioParams, coronaSignalToNoiseRatioMnemonic, defaultParams };
 
-const HIGH_LOW_BUFFER_SIZE = 5;
-const HIGH_LOW_BUFFER_SIZE_MIN_ONE = HIGH_LOW_BUFFER_SIZE - 1;
-const HIGH_LOW_MEDIAN_INDEX = 2;
-const AVERAGE_SAMPLE_ALPHA = 0.1;
-const AVERAGE_SAMPLE_ONE_MINUS = 0.9;
-const SIGNAL_EMA_ALPHA = 0.2;
-const SIGNAL_EMA_ONE_MINUS = 0.9; // Intentional: sums to 1.1, per Ehlers.
-const NOISE_EMA_ALPHA = 0.1;
-const NOISE_EMA_ONE_MINUS = 0.9;
-const RATIO_OFFSET_DB = 3.5;
-const RATIO_UPPER_DB = 10;
-const DB_GAIN = 20;
-const WIDTH_LOW_RATIO_THRESHOLD = 0.5;
-const WIDTH_BASELINE = 0.2;
-const WIDTH_SLOPE = 0.4;
-const RASTER_BLEND_EXPONENT = 0.8;
-const RASTER_BLEND_HALF = 0.5;
-const RASTER_NEGATIVE_ARG_CUTOFF = 1;
+export interface CoronaSignalToNoiseRatioSnapshot {
+    readonly heatmap: Heatmap;
+    readonly signalToNoiseRatio: number;
+    readonly physicalDecibels: number;
+    readonly calibratedDecibels: number;
+    readonly normalizedPosition: number;
+    readonly signal: number;
+    readonly noise: number;
+    readonly medianBarRange: number;
+    readonly width: number;
+    readonly dominantCycle: number;
+    readonly dominantCycleMedian: number;
+    readonly hasCycleEstimate: number;
+    readonly ratioIsFinite: number;
+}
 
-/** __Corona Signal-to-Noise Ratio__ (Ehlers) heatmap indicator.
- *
- * Measures cycle amplitude relative to noise, where "noise" is the average bar height
- * (there is not much trade information within a bar).
- *
- * It exposes two outputs:
- *
- *  - Value: a per-bar heatmap column (intensity raster).
- *  - SignalToNoiseRatio: the current SNR value mapped into [MinParameterValue, MaxParameterValue].
- *
- * Reference: John Ehlers, "Measuring Cycle Periods", Stocks & Commodities, November 2008.
- */
+function validateHighLow(low: number, high: number): number {
+    if (typeof low !== 'number' || typeof high !== 'number') {
+        throw new Error('high and low must be numbers');
+    }
+    if (Number.isNaN(low) || Number.isNaN(high)) {
+        return Number.NaN;
+    }
+    if (!Number.isFinite(low) || !Number.isFinite(high)) {
+        throw new Error('high and low must be finite');
+    }
+    if (high < low) {
+        throw new Error('high must be >= low');
+    }
+    return checked(high - low);
+}
+
+function validateBarRange(barRange: number): number {
+    if (typeof barRange !== 'number') {
+        throw new Error('barRange must be a number');
+    }
+    if (Number.isNaN(barRange)) {
+        return Number.NaN;
+    }
+    if (!Number.isFinite(barRange) || barRange < 0.0) {
+        throw new Error('barRange must be finite and >= 0');
+    }
+    return barRange;
+}
+
 export class CoronaSignalToNoiseRatio implements Indicator {
-  private readonly c: Corona;
-  private readonly rasterLength: number;
-  private readonly rasterStep: number;
-  private readonly maxRasterValue: number;
-  private readonly minParameterValue: number;
-  private readonly maxParameterValue: number;
-  private readonly parameterResolution: number;
-  private readonly raster: number[];
-  private readonly highLowBuffer: number[];
-  private readonly hlSorted: number[];
+    private readonly engine: Corona;
+    private readonly engineParams: Required<CoronaParams>;
+    private readonly raster: Raster;
+    private sampleCount = 0;
+    private averagePrice = 0.0;
+    private signal = 0.0;
+    private noise = 0.0;
+    private ranges: number[] = [0.0, 0.0, 0.0, 0.0, 0.0];
+    private readonly mnemonicValue: string;
+    private readonly descriptionValue: string;
+    private readonly mnemonicSNR: string;
+    private readonly descriptionSNR: string;
+    private readonly barComponentFunc: (bar: Bar) => number;
+    private readonly quoteComponentFunc: (quote: Quote) => number;
+    private readonly tradeComponentFunc: (trade: Trade) => number;
 
-  private readonly mnemonicValue: string;
-  private readonly descriptionValue: string;
-  private readonly mnemonicSNR: string;
-  private readonly descriptionSNR: string;
-
-  private readonly barComponentFunc: (bar: Bar) => number;
-  private readonly quoteComponentFunc: (quote: Quote) => number;
-  private readonly tradeComponentFunc: (trade: Trade) => number;
-
-  private averageSamplePrevious = 0;
-  private signalPrevious = 0;
-  private noisePrevious = 0;
-  private signalToNoiseRatio = Number.NaN;
-  private isStarted = false;
-
-  /** Creates an instance with default parameters. */
-  public static default(): CoronaSignalToNoiseRatio {
-    return new CoronaSignalToNoiseRatio({});
-  }
-
-  /** Creates an instance based on the given parameters. */
-  public static fromParams(params: CoronaSignalToNoiseRatioParams): CoronaSignalToNoiseRatio {
-    return new CoronaSignalToNoiseRatio(params);
-  }
-
-  private constructor(params: CoronaSignalToNoiseRatioParams) {
-    const invalid = 'invalid corona signal to noise ratio parameters';
-
-    const rasterLength = params.rasterLength !== undefined && params.rasterLength !== 0
-      ? params.rasterLength : DEFAULT_RASTER_LENGTH;
-    const maxRaster = params.maxRasterValue !== undefined && params.maxRasterValue !== 0
-      ? params.maxRasterValue : DEFAULT_MAX_RASTER;
-    const minParam = params.minParameterValue !== undefined && params.minParameterValue !== 0
-      ? params.minParameterValue : DEFAULT_MIN_PARAM;
-    const maxParam = params.maxParameterValue !== undefined && params.maxParameterValue !== 0
-      ? params.maxParameterValue : DEFAULT_MAX_PARAM;
-    const hpCutoff = params.highPassFilterCutoff !== undefined && params.highPassFilterCutoff !== 0
-      ? params.highPassFilterCutoff : DEFAULT_HP_CUTOFF;
-    const minPeriod = params.minimalPeriod !== undefined && params.minimalPeriod !== 0
-      ? params.minimalPeriod : DEFAULT_MIN_PERIOD;
-    const maxPeriod = params.maximalPeriod !== undefined && params.maximalPeriod !== 0
-      ? params.maximalPeriod : DEFAULT_MAX_PERIOD;
-
-    if (rasterLength < 2) {
-      throw new Error(`${invalid}: RasterLength should be >= 2`);
-    }
-    if (maxRaster <= 0) {
-      throw new Error(`${invalid}: MaxRasterValue should be > 0`);
-    }
-    if (minParam < 0) {
-      throw new Error(`${invalid}: MinParameterValue should be >= 0`);
-    }
-    if (maxParam <= minParam) {
-      throw new Error(`${invalid}: MaxParameterValue should be > MinParameterValue`);
-    }
-    if (hpCutoff < 2) {
-      throw new Error(`${invalid}: HighPassFilterCutoff should be >= 2`);
-    }
-    if (minPeriod < 2) {
-      throw new Error(`${invalid}: MinimalPeriod should be >= 2`);
-    }
-    if (maxPeriod <= minPeriod) {
-      throw new Error(`${invalid}: MaximalPeriod should be > MinimalPeriod`);
+    public static default(): CoronaSignalToNoiseRatio {
+        return new CoronaSignalToNoiseRatio(defaultParams());
     }
 
-    const bc = params.barComponent ?? BarComponent.Median;
-    const qc = params.quoteComponent ?? DefaultQuoteComponent;
-    const tc = params.tradeComponent ?? DefaultTradeComponent;
-
-    this.barComponentFunc = barComponentValue(bc);
-    this.quoteComponentFunc = quoteComponentValue(qc);
-    this.tradeComponentFunc = tradeComponentValue(tc);
-
-    this.c = new Corona({
-      highPassFilterCutoff: hpCutoff,
-      minimalPeriod: minPeriod,
-      maximalPeriod: maxPeriod,
-    });
-
-    this.rasterLength = rasterLength;
-    this.rasterStep = maxRaster / rasterLength;
-    this.maxRasterValue = maxRaster;
-    this.minParameterValue = minParam;
-    this.maxParameterValue = maxParam;
-    this.parameterResolution = (rasterLength - 1) / (maxParam - minParam);
-
-    this.raster = new Array<number>(rasterLength).fill(0);
-    this.highLowBuffer = new Array<number>(HIGH_LOW_BUFFER_SIZE).fill(0);
-    this.hlSorted = new Array<number>(HIGH_LOW_BUFFER_SIZE).fill(0);
-
-    const cm = componentTripleMnemonic(bc, qc, tc);
-    this.mnemonicValue = `csnr(${rasterLength}, ${maxRaster}, ${minParam}, ${maxParam}, ${hpCutoff}${cm})`;
-    this.mnemonicSNR = `csnr-snr(${hpCutoff}${cm})`;
-    this.descriptionValue = 'Corona signal to noise ratio ' + this.mnemonicValue;
-    this.descriptionSNR = 'Corona signal to noise ratio scalar ' + this.mnemonicSNR;
-  }
-
-  /** Indicates whether the indicator is primed. */
-  public isPrimed(): boolean { return this.c.isPrimed(); }
-
-  /** Describes the output data of the indicator. */
-  public metadata(): IndicatorMetadata {
-    return buildMetadata(
-      IndicatorIdentifier.CoronaSignalToNoiseRatio,
-      this.mnemonicValue,
-      this.descriptionValue,
-      [
-        { mnemonic: this.mnemonicValue, description: this.descriptionValue },
-        { mnemonic: this.mnemonicSNR, description: this.descriptionSNR },
-      ],
-    );
-  }
-
-  /** Feeds the next sample plus bar extremes and returns the heatmap column and the
-   * current SignalToNoiseRatio. On unprimed bars the heatmap is empty and the scalar
-   * is NaN. On NaN sample input state is left unchanged. */
-  public update(sample: number, sampleLow: number, sampleHigh: number, time: Date): [Heatmap, number] {
-    if (Number.isNaN(sample)) {
-      return [
-        Heatmap.newEmptyHeatmap(time, this.minParameterValue, this.maxParameterValue, this.parameterResolution),
-        Number.NaN,
-      ];
+    public static fromParams(params: CoronaSignalToNoiseRatioParams): CoronaSignalToNoiseRatio {
+        return new CoronaSignalToNoiseRatio(params);
     }
 
-    const primed = this.c.update(sample);
+    public constructor(params?: CoronaSignalToNoiseRatioParams) {
+        const rasterLength = params?.rasterLength ?? 50;
+        const maxRaster = params?.maxRasterValue ?? 20;
+        const minParam = params?.minParameterValue ?? 1;
+        const maxParam = params?.maxParameterValue ?? 11;
+        const hpCutoff = params?.highPassFilterCutoff ?? 30;
+        const minPeriod = params?.minimalPeriod ?? 6;
+        const maxPeriod = params?.maximalPeriod ?? 30;
 
-    if (!this.isStarted) {
-      this.averageSamplePrevious = sample;
-      this.highLowBuffer[HIGH_LOW_BUFFER_SIZE_MIN_ONE] = sampleHigh - sampleLow;
-      this.isStarted = true;
+        this.raster = new Raster(rasterLength, minParam, maxParam, maxRaster);
+        this.engine = new Corona({
+            highPassFilterCutoff: hpCutoff,
+            minimalPeriod: minPeriod,
+            maximalPeriod: maxPeriod,
+            decibelsLowerThreshold: 6.0,
+            decibelsUpperThreshold: this.raster.ceiling,
+        });
+        this.engineParams = this.engine.parameters;
 
-      return [
-        Heatmap.newEmptyHeatmap(time, this.minParameterValue, this.maxParameterValue, this.parameterResolution),
-        Number.NaN,
-      ];
+        const bc: BarComponent = params?.barComponent ?? DefaultBarComponent;
+        const qc = params?.quoteComponent ?? DefaultQuoteComponent;
+        const tc = params?.tradeComponent ?? DefaultTradeComponent;
+        this.barComponentFunc = barComponentValue(bc);
+        this.quoteComponentFunc = quoteComponentValue(qc);
+        this.tradeComponentFunc = tradeComponentValue(tc);
+
+        const comp = componentTripleMnemonic(bc, qc, tc);
+        const flags = snrFlags({ minimalPeriod: minPeriod, maximalPeriod: maxPeriod });
+        this.mnemonicValue = `csnr(${this.raster.length}, ${formatNumber(this.raster.ceiling)}, ${formatNumber(this.raster.lower)}, ${formatNumber(this.raster.upper)}, ${hpCutoff}${flags}${comp})`;
+        this.mnemonicSNR = `csnr-snr(${hpCutoff}${flags}${comp})`;
+        this.descriptionValue = 'Corona signal to noise ratio ' + this.mnemonicValue;
+        this.descriptionSNR = 'Corona signal to noise ratio scalar ' + this.mnemonicSNR;
     }
 
-    const maxAmpSq = this.c.maximalAmplitudeSquared;
-
-    const averageSample = AVERAGE_SAMPLE_ALPHA * sample + AVERAGE_SAMPLE_ONE_MINUS * this.averageSamplePrevious;
-    this.averageSamplePrevious = averageSample;
-
-    if (Math.abs(averageSample) > 0 || maxAmpSq > 0) {
-      this.signalPrevious = SIGNAL_EMA_ALPHA * Math.sqrt(maxAmpSq) + SIGNAL_EMA_ONE_MINUS * this.signalPrevious;
+    public reset(): void {
+        this.engine.reset();
+        this.raster.reset();
+        this.sampleCount = 0;
+        this.averagePrice = 0.0;
+        this.signal = 0.0;
+        this.noise = 0.0;
+        this.ranges = [0.0, 0.0, 0.0, 0.0, 0.0];
     }
 
-    // Shift H-L ring buffer left; push new value.
-    for (let i = 0; i < HIGH_LOW_BUFFER_SIZE_MIN_ONE; i++) {
-      this.highLowBuffer[i] = this.highLowBuffer[i + 1];
+    public isPrimed(): boolean {
+        return this.sampleCount >= FIRST_BANK_SAMPLE;
     }
-    this.highLowBuffer[HIGH_LOW_BUFFER_SIZE_MIN_ONE] = sampleHigh - sampleLow;
 
-    let ratio = 0;
-    if (Math.abs(averageSample) > 0) {
-      for (let i = 0; i < HIGH_LOW_BUFFER_SIZE; i++) {
-        this.hlSorted[i] = this.highLowBuffer[i];
-      }
-      this.hlSorted.sort((a, b) => a - b);
-      this.noisePrevious = NOISE_EMA_ALPHA * this.hlSorted[HIGH_LOW_MEDIAN_INDEX] + NOISE_EMA_ONE_MINUS * this.noisePrevious;
+    public metadata(): IndicatorMetadata {
+        return buildMetadata(
+            IndicatorIdentifier.CoronaSignalToNoiseRatio,
+            this.mnemonicValue,
+            this.descriptionValue,
+            [
+                { mnemonic: this.mnemonicValue, description: this.descriptionValue },
+                { mnemonic: this.mnemonicSNR, description: this.descriptionSNR },
+            ],
+        );
+    }
 
-      if (Math.abs(this.noisePrevious) > 0) {
-        ratio = DB_GAIN * Math.log10(this.signalPrevious / this.noisePrevious) + RATIO_OFFSET_DB;
-        if (ratio < 0) {
-          ratio = 0;
-        } else if (ratio > RATIO_UPPER_DB) {
-          ratio = RATIO_UPPER_DB;
+    private emptySnapshot(time: Date): CoronaSignalToNoiseRatioSnapshot {
+        return {
+            heatmap: this.raster.empty(time),
+            signalToNoiseRatio: Number.NaN,
+            physicalDecibels: Number.NaN,
+            calibratedDecibels: Number.NaN,
+            normalizedPosition: Number.NaN,
+            signal: Number.NaN,
+            noise: Number.NaN,
+            medianBarRange: Number.NaN,
+            width: Number.NaN,
+            dominantCycle: Number.NaN,
+            dominantCycleMedian: Number.NaN,
+            hasCycleEstimate: Number.NaN,
+            ratioIsFinite: Number.NaN,
+        };
+    }
+
+    private updateFromSnapshotRangeInternal(
+        snapshot: CoronaSnapshot,
+        barRange: number,
+    ): CoronaSignalToNoiseRatioSnapshot {
+        if (!acceptSnapshot(snapshot, this.engineParams, this.sampleCount + 1)) {
+            return this.emptySnapshot(snapshot.time);
         }
-        ratio /= RATIO_UPPER_DB; // ∈ [0, 1]
-      }
-    }
+        const rangeValue = validateBarRange(barRange);
+        if (Number.isNaN(rangeValue)) {
+            throw new Error('accepted shared snapshot requires a finite bar range');
+        }
+        this.sampleCount = snapshot.sampleCount;
 
-    this.signalToNoiseRatio = (this.maxParameterValue - this.minParameterValue) * ratio + this.minParameterValue;
+        this.ranges = [this.ranges[1], this.ranges[2], this.ranges[3], this.ranges[4], rangeValue];
+        const sortedRanges = this.ranges.slice().sort((a, b) => a - b);
+        const medianRange = sortedRanges[2];
 
-    // Raster update.
-    let width = 0;
-    if (ratio <= WIDTH_LOW_RATIO_THRESHOLD) {
-      width = WIDTH_BASELINE - WIDTH_SLOPE * ratio;
-    }
-
-    const ratioScaledToRasterLength = Math.round(ratio * this.rasterLength);
-    const ratioScaledToMaxRasterValue = ratio * this.maxRasterValue;
-
-    for (let i = 0; i < this.rasterLength; i++) {
-      let value = this.raster[i];
-
-      if (i === ratioScaledToRasterLength) {
-        value *= 0.5;
-      } else if (width === 0) {
-        // Above the high-ratio threshold: handled by the ratio>0.5 override below.
-      } else {
-        let argument = (ratioScaledToMaxRasterValue - this.rasterStep * i) / width;
-        if (i < ratioScaledToRasterLength) {
-          value = RASTER_BLEND_HALF * (Math.pow(argument, RASTER_BLEND_EXPONENT) + value);
+        if (snapshot.sampleCount === 1) {
+            this.averagePrice = snapshot.price;
         } else {
-          argument = -argument;
-          if (argument > RASTER_NEGATIVE_ARG_CUTOFF) {
-            value = RASTER_BLEND_HALF * (Math.pow(argument, RASTER_BLEND_EXPONENT) + value);
-          } else {
-            value = this.maxRasterValue;
-          }
+            this.averagePrice = checked(0.1 * snapshot.price + 0.9 * this.averagePrice);
+            if (this.averagePrice !== 0.0 || snapshot.maximumPower > 0.0) {
+                this.signal = checked(0.2 * Math.sqrt(snapshot.maximumPower) + 0.9 * this.signal);
+            }
+            if (this.averagePrice !== 0.0 && snapshot.sampleCount > 5) {
+                this.noise = checked(0.1 * medianRange + 0.9 * this.noise);
+            }
         }
-      }
 
-      if (value < 0) {
-        value = 0;
-      } else if (value > this.maxRasterValue) {
-        value = this.maxRasterValue;
-      }
+        let physicalDecibels: number;
+        if (this.signal > 0.0 && this.noise > 0.0) {
+            physicalDecibels = 20.0 * (Math.log10(this.signal) - Math.log10(this.noise));
+        } else if (this.signal > 0.0) {
+            physicalDecibels = Number.POSITIVE_INFINITY;
+        } else if (this.noise > 0.0) {
+            physicalDecibels = Number.NEGATIVE_INFINITY;
+        } else {
+            physicalDecibels = Number.NaN;
+        }
 
-      if (ratio > WIDTH_LOW_RATIO_THRESHOLD) {
-        value = this.maxRasterValue;
-      }
+        const calibratedDecibels = physicalDecibels + 3.5;
+        const position = Number.isNaN(calibratedDecibels)
+            ? 0.0
+            : clip(calibratedDecibels, 0.0, 10.0) / 10.0;
+        const width = Math.max(0.0, 0.2 - 0.4 * position);
+        this.raster.update(position, width, 'snr', position > 0.5);
 
-      this.raster[i] = value;
+        if (!snapshot.primed) {
+            return this.emptySnapshot(snapshot.time);
+        }
+
+        const mapped = this.raster.lower + (this.raster.upper - this.raster.lower) * position;
+        return {
+            heatmap: this.raster.column(snapshot.time),
+            signalToNoiseRatio: mapped,
+            physicalDecibels,
+            calibratedDecibels,
+            normalizedPosition: position,
+            signal: this.signal,
+            noise: this.noise,
+            medianBarRange: medianRange,
+            width,
+            dominantCycle: snapshot.dominantCycle,
+            dominantCycleMedian: snapshot.dominantCycleMedian,
+            hasCycleEstimate: snapshot.hasCycleEstimate ? 1.0 : 0.0,
+            ratioIsFinite: Number.isFinite(physicalDecibels) ? 1.0 : 0.0,
+        };
     }
 
-    if (!primed) {
-      return [
-        Heatmap.newEmptyHeatmap(time, this.minParameterValue, this.maxParameterValue, this.parameterResolution),
-        Number.NaN,
-      ];
+    public update(
+        sample: number,
+        sampleLow: number,
+        sampleHigh: number,
+        time: Date = new Date(0),
+    ): CoronaSignalToNoiseRatioSnapshot {
+        if (!validPrice(sample)) {
+            return this.emptySnapshot(time);
+        }
+        const rangeValue = validateHighLow(sampleLow, sampleHigh);
+        if (Number.isNaN(rangeValue)) {
+            return this.emptySnapshot(time);
+        }
+        return this.updateFromSnapshotRangeInternal(this.engine.update(sample, time), rangeValue);
     }
 
-    const values = new Array<number>(this.rasterLength);
-    let valueMin = Number.POSITIVE_INFINITY;
-    let valueMax = Number.NEGATIVE_INFINITY;
-
-    for (let i = 0; i < this.rasterLength; i++) {
-      const v = this.raster[i];
-      values[i] = v;
-      if (v < valueMin) valueMin = v;
-      if (v > valueMax) valueMax = v;
+    public updateRange(
+        sample: number,
+        barRange: number,
+        time: Date = new Date(0),
+    ): CoronaSignalToNoiseRatioSnapshot {
+        if (!validPrice(sample)) {
+            return this.emptySnapshot(time);
+        }
+        const rangeValue = validateBarRange(barRange);
+        if (Number.isNaN(rangeValue)) {
+            return this.emptySnapshot(time);
+        }
+        return this.updateFromSnapshotRangeInternal(this.engine.update(sample, time), rangeValue);
     }
 
-    const heatmap = Heatmap.newHeatmap(
-      time, this.minParameterValue, this.maxParameterValue, this.parameterResolution,
-      valueMin, valueMax, values,
-    );
+    public updateFromSnapshot(
+        snapshot: CoronaSnapshot,
+        sampleLow: number,
+        sampleHigh: number,
+    ): CoronaSignalToNoiseRatioSnapshot {
+        if (!snapshot.accepted) {
+            return this.updateFromSnapshotRangeInternal(snapshot, 0.0);
+        }
+        const rangeValue = validateHighLow(sampleLow, sampleHigh);
+        return this.updateFromSnapshotRangeInternal(snapshot, rangeValue);
+    }
 
-    return [heatmap, this.signalToNoiseRatio];
-  }
+    public updateFromSnapshotRange(
+        snapshot: CoronaSnapshot,
+        barRange: number,
+    ): CoronaSignalToNoiseRatioSnapshot {
+        return this.updateFromSnapshotRangeInternal(snapshot, barRange);
+    }
 
-  /** Updates the indicator given the next scalar sample. Since no High/Low is
-   * available, the sample is used for both, yielding zero noise. */
-  public updateScalar(sample: Scalar): IndicatorOutput {
-    return this.updateEntity(sample.time, sample.value, sample.value, sample.value);
-  }
+    private wrapEntity(time: Date, snapshot: CoronaSignalToNoiseRatioSnapshot): IndicatorOutput {
+        const snrScalar = new Scalar();
+        snrScalar.time = time;
+        snrScalar.value = snapshot.signalToNoiseRatio;
+        return [snapshot.heatmap, snrScalar];
+    }
 
-  /** Updates the indicator given the next bar sample. */
-  public updateBar(sample: Bar): IndicatorOutput {
-    return this.updateEntity(sample.time, this.barComponentFunc(sample), sample.low, sample.high);
-  }
+    public updateScalar(sample: Scalar): IndicatorOutput {
+        return this.wrapEntity(sample.time, this.update(sample.value, sample.value, sample.value, sample.time));
+    }
 
-  /** Updates the indicator given the next quote sample. */
-  public updateQuote(sample: Quote): IndicatorOutput {
-    const v = this.quoteComponentFunc(sample);
-    return this.updateEntity(sample.time, v, v, v);
-  }
+    public updateBar(sample: Bar): IndicatorOutput {
+        return this.wrapEntity(
+            sample.time,
+            this.update(this.barComponentFunc(sample), sample.low, sample.high, sample.time),
+        );
+    }
 
-  /** Updates the indicator given the next trade sample. */
-  public updateTrade(sample: Trade): IndicatorOutput {
-    const v = this.tradeComponentFunc(sample);
-    return this.updateEntity(sample.time, v, v, v);
-  }
+    public updateQuote(sample: Quote): IndicatorOutput {
+        const value = this.quoteComponentFunc(sample);
+        return this.wrapEntity(sample.time, this.update(value, value, value, sample.time));
+    }
 
-  private updateEntity(time: Date, sample: number, low: number, high: number): IndicatorOutput {
-    const [heatmap, snr] = this.update(sample, low, high, time);
-
-    const s = new Scalar();
-    s.time = time;
-    s.value = snr;
-
-    return [heatmap, s];
-  }
+    public updateTrade(sample: Trade): IndicatorOutput {
+        const value = this.tradeComponentFunc(sample);
+        return this.wrapEntity(sample.time, this.update(value, value, value, sample.time));
+    }
 }

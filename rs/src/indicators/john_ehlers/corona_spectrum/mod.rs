@@ -1,2 +1,4 @@
 pub mod corona_spectrum;
-mod testdata;
+pub use corona_spectrum::*;
+#[cfg(test)]
+pub(crate) mod testdata;

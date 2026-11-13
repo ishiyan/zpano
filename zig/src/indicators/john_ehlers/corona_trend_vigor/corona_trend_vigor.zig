@@ -14,453 +14,365 @@ const build_metadata_mod = @import("../../core/build_metadata.zig");
 const component_triple_mnemonic_mod = @import("../../core/component_triple_mnemonic.zig");
 const identifier_mod = @import("../../core/identifier.zig");
 const metadata_mod = @import("../../core/metadata.zig");
+const shape_mod = @import("../../core/outputs/shape.zig");
 const heatmap_mod = @import("../../core/outputs/heatmap.zig");
 const corona_mod = @import("../corona/corona.zig");
 
 const OutputArray = indicator_mod.OutputArray;
-const OutputValue = indicator_mod.OutputValue;
 const Identifier = identifier_mod.Identifier;
 const Metadata = metadata_mod.Metadata;
 const Heatmap = heatmap_mod.Heatmap;
 const Corona = corona_mod.Corona;
+const CoronaSnapshot = corona_mod.CoronaSnapshot;
+const AdaptiveBandPass = corona_mod.AdaptiveBandPass;
+const Raster = corona_mod.Raster;
 
-// Constants.
-const bp_delta = 0.1;
-const ratio_new_coef = 0.33;
-const ratio_previous_coef = 0.67;
-const vigor_mid_low = 0.3;
-const vigor_mid_high = 0.7;
-const vigor_mid = 0.5;
-const width_edge = 0.01;
-const raster_blend_scale = 0.8;
-const raster_blend_previous = 0.2;
-const raster_blend_half = 0.5;
-const raster_blend_exponent = 0.85;
-const ratio_limit = 10.0;
-const vigor_scale = 0.05;
-
-/// Enumerates the outputs of the CoronaTrendVigor indicator.
 pub const CoronaTrendVigorOutput = enum(u8) {
     value = 1,
     trend_vigor = 2,
 };
 
-/// Parameters to create a CoronaTrendVigor indicator.
 pub const Params = struct {
-    /// Number of elements in the heatmap raster. Default: 50.
-    raster_length: i32 = 0,
-    /// Maximal raster value (z) of the heatmap. Default: 20.
-    max_raster_value: f64 = 0,
-    /// Minimal ordinate (y) value. Default: -10.
-    min_parameter_value: f64 = 0,
-    /// Maximal ordinate (y) value. Default: 10.
-    max_parameter_value: f64 = 0,
-    /// High-pass filter cutoff. Default: 30.
-    high_pass_filter_cutoff: i32 = 0,
-    /// Minimal period of the inner Corona engine. Default: 6.
-    minimal_period: i32 = 0,
-    /// Maximal period of the inner Corona engine. Default: 30.
-    maximal_period: i32 = 0,
+    raster_length: i32 = 50,
+    max_raster_value: f64 = 20.0,
+    min_parameter_value: f64 = -10.0,
+    max_parameter_value: f64 = 10.0,
+    high_pass_filter_cutoff: i32 = 30,
+    minimal_period: i32 = 6,
+    maximal_period: i32 = 30,
+    lookback_offset: i32 = 0,
     bar_component: ?bar_component.BarComponent = null,
     quote_component: ?quote_component.QuoteComponent = null,
     trade_component: ?trade_component.TradeComponent = null,
 };
 
-pub const Error = error{
-    InvalidRasterLength,
-    InvalidMaxRasterValue,
-    InvalidMaxParameterValue,
-    InvalidHighPassFilterCutoff,
-    InvalidMinimalPeriod,
-    InvalidMaximalPeriod,
-    MnemonicTooLong,
-    OutOfMemory,
+pub fn defaultParams() Params {
+    return .{};
+}
+
+pub const Error = corona_mod.Error;
+
+pub const CoronaTrendVigorSnapshot = struct {
+    heatmap: Heatmap,
+    trend_vigor: f64,
+    normalized_vigor: f64,
+    dominant_cycle: f64,
+    dominant_cycle_median: f64,
+    band_pass: f64,
+    quadrature: f64,
+    cycle_amplitude: f64,
+    trend_displacement: f64,
+    raw_ratio: f64,
+    lookback: f64,
+    width: f64,
+    has_cycle_estimate: f64,
 };
 
-/// Ehlers' Corona Trend Vigor heatmap indicator.
+pub const Snapshot = CoronaTrendVigorSnapshot;
+
+fn formatTrendFlags(buffer: []u8, params: Params) Error![]const u8 {
+    var pos: usize = 0;
+    if (params.minimal_period != 6) {
+        const chunk = std.fmt.bufPrint(buffer[pos..], ", pmin={d}", .{params.minimal_period}) catch return error.MnemonicTooLong;
+        pos += chunk.len;
+    }
+    if (params.maximal_period != 30) {
+        const chunk = std.fmt.bufPrint(buffer[pos..], ", pmax={d}", .{params.maximal_period}) catch return error.MnemonicTooLong;
+        pos += chunk.len;
+    }
+    if (params.lookback_offset != 0) {
+        const chunk = std.fmt.bufPrint(buffer[pos..], ", offset={d}", .{params.lookback_offset}) catch return error.MnemonicTooLong;
+        pos += chunk.len;
+    }
+    return buffer[0..pos];
+}
+
+pub fn formatMnemonic(buffer: []u8, params: Params) Error![]const u8 {
+    const bc = params.bar_component orelse bar_component.default_bar_component;
+    const qc = params.quote_component orelse quote_component.default_quote_component;
+    const tc = params.trade_component orelse trade_component.default_trade_component;
+
+    var triple_buffer: [64]u8 = undefined;
+    const triple = component_triple_mnemonic_mod.componentTripleMnemonic(&triple_buffer, bc, qc, tc);
+    var flags_buffer: [96]u8 = undefined;
+    const flags = try formatTrendFlags(&flags_buffer, params);
+
+    return std.fmt.bufPrint(buffer, "ctv({d}, {d}, {d}, {d}, {d}{s}{s})", .{
+        params.raster_length,
+        corona_mod.normalizeZero(params.max_raster_value),
+        corona_mod.normalizeZero(params.min_parameter_value),
+        corona_mod.normalizeZero(params.max_parameter_value),
+        params.high_pass_filter_cutoff,
+        flags,
+        triple,
+    }) catch return error.MnemonicTooLong;
+}
+
 pub const CoronaTrendVigor = struct {
     allocator: std.mem.Allocator,
-    corona: Corona,
-    raster_length: usize,
-    raster_step: f64,
-    max_raster_value: f64,
-    min_parameter_value: f64,
-    max_parameter_value: f64,
-    parameter_resolution: f64,
-    raster: []f64,
-    sample_buffer: []f64,
+    engine: Corona,
+    engine_params: corona_mod.Params,
+    bandpass: AdaptiveBandPass,
+    raster: Raster,
+    lookback_offset: i32,
     sample_count: usize,
-    sample_previous: f64,
-    sample_previous2: f64,
-    band_pass_previous: f64,
-    band_pass_previous2: f64,
-    ratio_previous: f64,
-    trend_vigor: f64,
+    prices: []f64,
+    prices_len: usize,
+    ratio: f64,
+    ready: bool,
     bar_func: bar_component.BarFunc,
     quote_func: quote_component.QuoteFunc,
     trade_func: trade_component.TradeFunc,
-    mnemonic_buf: [256]u8,
+    mnemonic_storage: [256]u8,
     mnemonic_len: usize,
-    description_buf: [320]u8,
+    description_storage: [320]u8,
     description_len: usize,
-    mnemonic_tv_buf: [128]u8,
+    mnemonic_tv_storage: [160]u8,
     mnemonic_tv_len: usize,
-    description_tv_buf: [256]u8,
+    description_tv_storage: [256]u8,
     description_tv_len: usize,
 
     pub fn init(allocator: std.mem.Allocator, params: Params) Error!CoronaTrendVigor {
-        const def_raster_length: i32 = 50;
-        const def_max_raster = 20.0;
-        const def_min_param = -10.0;
-        const def_max_param = 10.0;
-        const def_hp_cutoff: i32 = 30;
-        const def_min_period: i32 = 6;
-        const def_max_period: i32 = 30;
-
-        var raster_length = params.raster_length;
-        if (raster_length == 0) raster_length = def_raster_length;
-
-        var max_raster = params.max_raster_value;
-        if (max_raster == 0) max_raster = def_max_raster;
-
-        var min_param = params.min_parameter_value;
-        var max_param = params.max_parameter_value;
-        // "Both zero" default: only substitute when both are zero.
-        if (min_param == 0 and max_param == 0) {
-            min_param = def_min_param;
-            max_param = def_max_param;
+        if (params.lookback_offset != 0 and params.lookback_offset != -1) {
+            return error.InvalidLookbackOffset;
+        }
+        if (!corona_mod.validateFinite(params.max_raster_value) or params.max_raster_value <= 6.0) {
+            return error.InvalidMaxRasterValue;
         }
 
-        var hp_cutoff = params.high_pass_filter_cutoff;
-        if (hp_cutoff == 0) hp_cutoff = def_hp_cutoff;
+        var raster = try Raster.init(
+            allocator,
+            params.raster_length,
+            params.min_parameter_value,
+            params.max_parameter_value,
+            params.max_raster_value,
+        );
+        errdefer raster.deinit();
 
-        var min_period = params.minimal_period;
-        if (min_period == 0) min_period = def_min_period;
+        var engine = try Corona.init(allocator, .{
+            .high_pass_filter_cutoff = params.high_pass_filter_cutoff,
+            .minimal_period = params.minimal_period,
+            .maximal_period = params.maximal_period,
+            .decibels_lower_threshold = 6.0,
+            .decibels_upper_threshold = raster.ceiling,
+        });
+        errdefer engine.deinit();
 
-        var max_period = params.maximal_period;
-        if (max_period == 0) max_period = def_max_period;
+        const prices_cap: usize = @intCast(params.maximal_period + 1);
+        const prices = allocator.alloc(f64, prices_cap) catch return error.OutOfMemory;
+        errdefer allocator.free(prices);
 
-        // Validation.
-        if (raster_length < 2) return error.InvalidRasterLength;
-        if (max_raster <= 0) return error.InvalidMaxRasterValue;
-        if (max_param <= min_param) return error.InvalidMaxParameterValue;
-        if (hp_cutoff < 2) return error.InvalidHighPassFilterCutoff;
-        if (min_period < 2) return error.InvalidMinimalPeriod;
-        if (max_period <= min_period) return error.InvalidMaximalPeriod;
-
-        const bc = params.bar_component orelse bar_component.BarComponent.median;
+        const bc = params.bar_component orelse bar_component.default_bar_component;
         const qc = params.quote_component orelse quote_component.default_quote_component;
         const tc = params.trade_component orelse trade_component.default_trade_component;
 
-        var corona = Corona.init(allocator, .{
-            .high_pass_filter_cutoff = hp_cutoff,
-            .minimal_period = min_period,
-            .maximal_period = max_period,
-        }) catch return error.OutOfMemory;
-        errdefer corona.deinit();
+        var triple_buffer: [64]u8 = undefined;
+        const triple = component_triple_mnemonic_mod.componentTripleMnemonic(&triple_buffer, bc, qc, tc);
+        var flags_buffer: [96]u8 = undefined;
+        const flags = try formatTrendFlags(&flags_buffer, params);
 
-        var triple_buf: [64]u8 = undefined;
-        const triple = component_triple_mnemonic_mod.componentTripleMnemonic(
-            &triple_buf,
-            bc,
-            qc,
-            tc,
-        );
-
-        const raster_len_usize: usize = @intCast(raster_length);
-        const parameter_resolution = @as(f64, @floatFromInt(raster_length - 1)) / (max_param - min_param);
-        const raster_step_val = max_raster / @as(f64, @floatFromInt(raster_length));
-
-        // Build mnemonics.
-        var mnemonic_buf: [256]u8 = undefined;
-        const mn = std.fmt.bufPrint(&mnemonic_buf, "ctv({d}, {d}, {d}, {d}, {d}{s})", .{
-            raster_length,
-            max_raster,
-            min_param,
-            max_param,
-            hp_cutoff,
+        var mnemonic_storage: [256]u8 = undefined;
+        const mn = std.fmt.bufPrint(&mnemonic_storage, "ctv({d}, {d}, {d}, {d}, {d}{s}{s})", .{
+            raster.length,
+            corona_mod.normalizeZero(raster.ceiling),
+            corona_mod.normalizeZero(raster.lower),
+            corona_mod.normalizeZero(raster.upper),
+            params.high_pass_filter_cutoff,
+            flags,
             triple,
         }) catch return error.MnemonicTooLong;
-        const mnemonic_len = mn.len;
 
-        var description_buf: [320]u8 = undefined;
-        const desc = std.fmt.bufPrint(&description_buf, "Corona trend vigor {s}", .{mn}) catch
+        var description_storage: [320]u8 = undefined;
+        const desc = std.fmt.bufPrint(&description_storage, "Corona trend vigor {s}", .{mn}) catch
             return error.MnemonicTooLong;
-        const description_len = desc.len;
 
-        var mnemonic_tv_buf: [128]u8 = undefined;
-        const mn_tv = std.fmt.bufPrint(&mnemonic_tv_buf, "ctv-tv({d}{s})", .{
-            hp_cutoff,
+        var mnemonic_tv_storage: [160]u8 = undefined;
+        const mn_tv = std.fmt.bufPrint(&mnemonic_tv_storage, "ctv-tv({d}{s}{s})", .{
+            params.high_pass_filter_cutoff,
+            flags,
             triple,
         }) catch return error.MnemonicTooLong;
-        const mnemonic_tv_len = mn_tv.len;
 
-        var description_tv_buf: [256]u8 = undefined;
-        const desc_tv = std.fmt.bufPrint(&description_tv_buf, "Corona trend vigor scalar {s}", .{mn_tv}) catch
+        var description_tv_storage: [256]u8 = undefined;
+        const desc_tv = std.fmt.bufPrint(&description_tv_storage, "Corona trend vigor scalar {s}", .{mn_tv}) catch
             return error.MnemonicTooLong;
-        const description_tv_len = desc_tv.len;
-
-        // Allocate raster and sample buffer.
-        const raster = allocator.alloc(f64, raster_len_usize) catch return error.OutOfMemory;
-        @memset(raster, 0);
-
-        const buf_size: usize = @intCast(corona.getMaximalPeriodTimesTwo());
-        const sample_buffer = allocator.alloc(f64, buf_size) catch {
-            allocator.free(raster);
-            return error.OutOfMemory;
-        };
-        @memset(sample_buffer, 0);
 
         return .{
             .allocator = allocator,
-            .corona = corona,
-            .raster_length = raster_len_usize,
-            .raster_step = raster_step_val,
-            .max_raster_value = max_raster,
-            .min_parameter_value = min_param,
-            .max_parameter_value = max_param,
-            .parameter_resolution = parameter_resolution,
+            .engine = engine,
+            .engine_params = engine.parameters,
+            .bandpass = .{},
             .raster = raster,
-            .sample_buffer = sample_buffer,
+            .lookback_offset = params.lookback_offset,
             .sample_count = 0,
-            .sample_previous = 0,
-            .sample_previous2 = 0,
-            .band_pass_previous = 0,
-            .band_pass_previous2 = 0,
-            .ratio_previous = 0,
-            .trend_vigor = math.nan(f64),
+            .prices = prices,
+            .prices_len = 0,
+            .ratio = 0.0,
+            .ready = false,
             .bar_func = bar_component.componentValue(bc),
             .quote_func = quote_component.componentValue(qc),
             .trade_func = trade_component.componentValue(tc),
-            .mnemonic_buf = mnemonic_buf,
-            .mnemonic_len = mnemonic_len,
-            .description_buf = description_buf,
-            .description_len = description_len,
-            .mnemonic_tv_buf = mnemonic_tv_buf,
-            .mnemonic_tv_len = mnemonic_tv_len,
-            .description_tv_buf = description_tv_buf,
-            .description_tv_len = description_tv_len,
+            .mnemonic_storage = mnemonic_storage,
+            .mnemonic_len = mn.len,
+            .description_storage = description_storage,
+            .description_len = desc.len,
+            .mnemonic_tv_storage = mnemonic_tv_storage,
+            .mnemonic_tv_len = mn_tv.len,
+            .description_tv_storage = description_tv_storage,
+            .description_tv_len = desc_tv.len,
         };
     }
 
     pub fn deinit(self: *CoronaTrendVigor) void {
-        self.allocator.free(self.raster);
-        self.allocator.free(self.sample_buffer);
-        self.corona.deinit();
+        self.engine.deinit();
+        self.raster.deinit();
+        self.allocator.free(self.prices);
+    }
+
+    pub fn reset(self: *CoronaTrendVigor) void {
+        self.engine.reset();
+        self.bandpass.reset();
+        self.raster.reset();
+        self.sample_count = 0;
+        self.prices_len = 0;
+        self.ratio = 0.0;
+        self.ready = false;
     }
 
     pub fn fixSlices(self: *CoronaTrendVigor) void {
         _ = self;
     }
 
-    fn mnemonic(self: *const CoronaTrendVigor) []const u8 {
-        return self.mnemonic_buf[0..self.mnemonic_len];
+    pub fn mnemonic(self: *const CoronaTrendVigor) []const u8 {
+        return self.mnemonic_storage[0..self.mnemonic_len];
     }
 
     fn description(self: *const CoronaTrendVigor) []const u8 {
-        return self.description_buf[0..self.description_len];
+        return self.description_storage[0..self.description_len];
     }
 
     fn mnemonicTV(self: *const CoronaTrendVigor) []const u8 {
-        return self.mnemonic_tv_buf[0..self.mnemonic_tv_len];
+        return self.mnemonic_tv_storage[0..self.mnemonic_tv_len];
     }
 
     fn descriptionTV(self: *const CoronaTrendVigor) []const u8 {
-        return self.description_tv_buf[0..self.description_tv_len];
+        return self.description_tv_storage[0..self.description_tv_len];
     }
 
-    /// Update with a new sample. Returns heatmap and trend vigor scalar.
-    pub fn updateSample(self: *CoronaTrendVigor, sample: f64, time: i64) struct { heatmap: Heatmap, tv: f64 } {
-        if (math.isNan(sample)) {
-            return .{
-                .heatmap = Heatmap.empty(time, self.min_parameter_value, self.max_parameter_value, self.parameter_resolution),
-                .tv = math.nan(f64),
-            };
-        }
-
-        const primed = self.corona.update(sample);
-        self.sample_count += 1;
-
-        const buf_last = self.sample_buffer.len - 1;
-
-        if (self.sample_count == 1) {
-            self.sample_previous = sample;
-            self.sample_buffer[buf_last] = sample;
-            return .{
-                .heatmap = Heatmap.empty(time, self.min_parameter_value, self.max_parameter_value, self.parameter_resolution),
-                .tv = math.nan(f64),
-            };
-        }
-
-        // Bandpass InPhase filter at the dominant cycle median period.
-        const omega = 2.0 * math.pi / self.corona.getDominantCycleMedian();
-        const beta2 = math.cos(omega);
-        const gamma2 = 1.0 / math.cos(omega * 2.0 * bp_delta);
-        const alpha2 = gamma2 - @sqrt(gamma2 * gamma2 - 1.0);
-        const band_pass = 0.5 * (1.0 - alpha2) * (sample - self.sample_previous2) +
-            beta2 * (1.0 + alpha2) * self.band_pass_previous -
-            alpha2 * self.band_pass_previous2;
-
-        // Quadrature = derivative / omega.
-        const quadrature2 = (band_pass - self.band_pass_previous) / omega;
-
-        self.band_pass_previous2 = self.band_pass_previous;
-        self.band_pass_previous = band_pass;
-        self.sample_previous2 = self.sample_previous;
-        self.sample_previous = sample;
-
-        // Left-shift sample buffer and append new sample.
-        for (0..buf_last) |i| {
-            self.sample_buffer[i] = self.sample_buffer[i + 1];
-        }
-        self.sample_buffer[buf_last] = sample;
-
-        // Cycle amplitude.
-        const amplitude2 = @sqrt(band_pass * band_pass + quadrature2 * quadrature2);
-
-        // Trend amplitude taken over the cycle period.
-        const dcm_raw = self.corona.getDominantCycleMedian() - 1.0;
-        const buf_len_i64 = @as(i64, @intCast(self.sample_buffer.len));
-        var cycle_period: i64 = 1;
-        if (math.isFinite(dcm_raw) and dcm_raw >= 1.0) {
-            if (dcm_raw > @as(f64, @floatFromInt(buf_len_i64))) {
-                cycle_period = buf_len_i64;
-            } else {
-                cycle_period = @intFromFloat(dcm_raw);
-                if (cycle_period > buf_len_i64) {
-                    cycle_period = buf_len_i64;
-                }
-            }
-        }
-
-        var lookback: usize = @intCast(cycle_period);
-        if (self.sample_count < lookback) {
-            lookback = self.sample_count;
-        }
-
-        const trend = sample - self.sample_buffer[self.sample_buffer.len - lookback];
-
-        var ratio: f64 = 0.0;
-        if (@abs(trend) > 0 and amplitude2 > 0) {
-            ratio = ratio_new_coef * trend / amplitude2 + ratio_previous_coef * self.ratio_previous;
-        }
-
-        if (ratio > ratio_limit) {
-            ratio = ratio_limit;
-        } else if (ratio < -ratio_limit) {
-            ratio = -ratio_limit;
-        }
-
-        self.ratio_previous = ratio;
-
-        // ratio in [-10, 10] => vigor in [0, 1].
-        const vigor = vigor_scale * (ratio + ratio_limit);
-
-        var width: f64 = undefined;
-        if (vigor >= vigor_mid_low and vigor < vigor_mid) {
-            width = vigor - (vigor_mid_low - width_edge);
-        } else if (vigor >= vigor_mid and vigor <= vigor_mid_high) {
-            width = (vigor_mid_high + width_edge) - vigor;
-        } else {
-            width = width_edge;
-        }
-
-        self.trend_vigor = (self.max_parameter_value - self.min_parameter_value) * vigor + self.min_parameter_value;
-
-        const vigor_scaled_to_raster_length: i64 = @intFromFloat(@round(@as(f64, @floatFromInt(self.raster_length)) * vigor));
-        const vigor_scaled_to_max_raster_value = vigor * self.max_raster_value;
-
-        for (0..self.raster_length) |i| {
-            var value = self.raster[i];
-
-            if (@as(i64, @intCast(i)) == vigor_scaled_to_raster_length) {
-                value *= raster_blend_half;
-            } else {
-                var argument = vigor_scaled_to_max_raster_value - self.raster_step * @as(f64, @floatFromInt(i));
-                if (@as(i64, @intCast(i)) > vigor_scaled_to_raster_length) {
-                    argument = -argument;
-                }
-
-                if (width > 0) {
-                    value = raster_blend_scale *
-                        (std.math.pow(f64, argument / width, raster_blend_exponent) + raster_blend_previous * value);
-                }
-            }
-
-            if (value < 0) {
-                value = 0;
-            } else if (value > self.max_raster_value or vigor < vigor_mid_low or vigor > vigor_mid_high) {
-                value = self.max_raster_value;
-            }
-
-            if (math.isNan(value)) {
-                value = 0;
-            }
-
-            self.raster[i] = value;
-        }
-
-        if (!primed) {
-            return .{
-                .heatmap = Heatmap.empty(time, self.min_parameter_value, self.max_parameter_value, self.parameter_resolution),
-                .tv = math.nan(f64),
-            };
-        }
-
-        // Build heatmap from raster.
-        var values: [heatmap_mod.max_heatmap_values]f64 = undefined;
-        var value_min: f64 = math.inf(f64);
-        var value_max: f64 = -math.inf(f64);
-
-        for (0..self.raster_length) |i| {
-            const v = self.raster[i];
-            values[i] = v;
-            if (v < value_min) value_min = v;
-            if (v > value_max) value_max = v;
-        }
-
+    fn emptySnapshot(self: *const CoronaTrendVigor, time: i64) CoronaTrendVigorSnapshot {
+        const nan = math.nan(f64);
         return .{
-            .heatmap = Heatmap.new(
-                time,
-                self.min_parameter_value,
-                self.max_parameter_value,
-                self.parameter_resolution,
-                value_min,
-                value_max,
-                values[0..self.raster_length],
-            ),
-            .tv = self.trend_vigor,
+            .heatmap = self.raster.empty(time),
+            .trend_vigor = nan,
+            .normalized_vigor = nan,
+            .dominant_cycle = nan,
+            .dominant_cycle_median = nan,
+            .band_pass = nan,
+            .quadrature = nan,
+            .cycle_amplitude = nan,
+            .trend_displacement = nan,
+            .raw_ratio = nan,
+            .lookback = nan,
+            .width = nan,
+            .has_cycle_estimate = nan,
         };
     }
 
-    // --- Entity update methods ---
+    pub fn tryUpdateFromSnapshot(self: *CoronaTrendVigor, snapshot: CoronaSnapshot) Error!CoronaTrendVigorSnapshot {
+        const accepted = try corona_mod.acceptSnapshot(snapshot, self.engine_params, self.sample_count + 1);
+        if (!accepted) {
+            return self.emptySnapshot(snapshot.time);
+        }
+        const cycle = try self.bandpass.update(snapshot.price, snapshot.dominant_cycle_median);
+        self.sample_count = snapshot.sample_count;
 
-    pub fn updateBar(self: *CoronaTrendVigor, sample: *const Bar) OutputArray {
-        return self.updateEntity(sample.time, self.bar_func(sample.*));
+        _ = corona_mod.rollingAppend(self.prices, &self.prices_len, snapshot.price);
+
+        const floored_dcm: i32 = @intFromFloat(@floor(snapshot.dominant_cycle_median));
+        const lag_signed = @max(@as(i32, 1), floored_dcm + self.lookback_offset);
+        const lag: usize = @intCast(lag_signed);
+        const has_history = self.prices_len > lag;
+        const trend = if (has_history) snapshot.price - self.prices[self.prices_len - 1 - lag] else math.nan(f64);
+        const raw_ratio = if (has_history and cycle.amplitude > 0.0) trend / cycle.amplitude else math.nan(f64);
+        if (has_history and trend != 0.0 and cycle.amplitude > 0.0) {
+            const smoothed = try corona_mod.checked(0.33 * raw_ratio + 0.67 * self.ratio);
+            self.ratio = corona_mod.clip(smoothed, -10.0, 10.0);
+        }
+
+        const vigor = 0.05 * (self.ratio + 10.0);
+        var width: f64 = if (0.3 <= vigor and vigor <= 0.7) @min(vigor - 0.3, 0.7 - vigor) else 0.01;
+        if (width == 0.0) {
+            width = 0.01;
+        }
+
+        self.raster.update(vigor, width, .trend, vigor < 0.3 or vigor > 0.7);
+        self.ready = snapshot.primed and has_history;
+        if (!self.ready) {
+            return self.emptySnapshot(snapshot.time);
+        }
+
+        const mapped = self.raster.lower + (self.raster.upper - self.raster.lower) * vigor;
+        return .{
+            .heatmap = self.raster.column(snapshot.time),
+            .trend_vigor = mapped,
+            .normalized_vigor = vigor,
+            .dominant_cycle = snapshot.dominant_cycle,
+            .dominant_cycle_median = snapshot.dominant_cycle_median,
+            .band_pass = cycle.band_pass,
+            .quadrature = cycle.quadrature,
+            .cycle_amplitude = cycle.amplitude,
+            .trend_displacement = trend,
+            .raw_ratio = raw_ratio,
+            .lookback = @floatFromInt(lag),
+            .width = width,
+            .has_cycle_estimate = if (snapshot.has_cycle_estimate) 1.0 else 0.0,
+        };
     }
 
-    pub fn updateQuote(self: *CoronaTrendVigor, sample: *const Quote) OutputArray {
-        return self.updateEntity(sample.time, self.quote_func(sample.*));
+    pub fn updateFromSnapshot(self: *CoronaTrendVigor, snapshot: CoronaSnapshot) CoronaTrendVigorSnapshot {
+        return self.tryUpdateFromSnapshot(snapshot) catch |err| {
+            std.debug.panic("CoronaTrendVigor.updateFromSnapshot failed: {s}", .{@errorName(err)});
+        };
     }
 
-    pub fn updateTrade(self: *CoronaTrendVigor, sample: *const Trade) OutputArray {
-        return self.updateEntity(sample.time, self.trade_func(sample.*));
+    pub fn tryUpdate(self: *CoronaTrendVigor, sample: f64, time: i64) Error!CoronaTrendVigorSnapshot {
+        const engine_snap = try self.engine.tryUpdate(sample, time);
+        return self.tryUpdateFromSnapshot(engine_snap);
     }
 
-    pub fn updateScalar(self: *CoronaTrendVigor, sample: *const Scalar) OutputArray {
-        return self.updateEntity(sample.time, sample.value);
+    pub fn update(self: *CoronaTrendVigor, sample: f64, time: i64) CoronaTrendVigorSnapshot {
+        return self.tryUpdate(sample, time) catch |err| {
+            std.debug.panic("CoronaTrendVigor.update failed: {s}", .{@errorName(err)});
+        };
     }
 
-    fn updateEntity(self: *CoronaTrendVigor, time: i64, sample: f64) OutputArray {
-        const result = self.updateSample(sample, time);
+    pub const updateSample = update;
+
+    fn wrapEntity(time: i64, snapshot: CoronaTrendVigorSnapshot) OutputArray {
         var out = OutputArray{};
-        out.append(.{ .heatmap = result.heatmap });
-        out.append(.{ .scalar = .{ .time = time, .value = result.tv } });
+        out.append(.{ .heatmap = snapshot.heatmap });
+        out.append(.{ .scalar = .{ .time = time, .value = snapshot.trend_vigor } });
         return out;
     }
 
+    pub fn updateScalar(self: *CoronaTrendVigor, sample: *const Scalar) OutputArray {
+        return wrapEntity(sample.time, self.update(sample.value, sample.time));
+    }
+
+    pub fn updateBar(self: *CoronaTrendVigor, sample: *const Bar) OutputArray {
+        return wrapEntity(sample.time, self.update(self.bar_func(sample.*), sample.time));
+    }
+
+    pub fn updateQuote(self: *CoronaTrendVigor, sample: *const Quote) OutputArray {
+        return wrapEntity(sample.time, self.update(self.quote_func(sample.*), sample.time));
+    }
+
+    pub fn updateTrade(self: *CoronaTrendVigor, sample: *const Trade) OutputArray {
+        return wrapEntity(sample.time, self.update(self.trade_func(sample.*), sample.time));
+    }
+
     pub fn isPrimed(self: *const CoronaTrendVigor) bool {
-        return self.corona.isPrimed();
+        return self.ready;
     }
 
     pub fn getMetadata(self: *const CoronaTrendVigor, out: *Metadata) void {
@@ -473,7 +385,6 @@ pub const CoronaTrendVigor = struct {
         build_metadata_mod.buildMetadata(out, .corona_trend_vigor, mn, desc, &texts);
     }
 
-    /// Returns an Indicator interface backed by this instance.
     pub fn indicator(self: *CoronaTrendVigor) indicator_mod.Indicator {
         return .{
             .ptr = @ptrCast(self),
@@ -488,174 +399,239 @@ pub const CoronaTrendVigor = struct {
 const testing = std.testing;
 const testdata = @import("testdata.zig");
 
-const tolerance = 1e-4;
+const test_tolerance: f64 = 5e-12;
 
-fn almostEqual(a: f64, b: f64, eps: f64) bool {
-    return @abs(a - b) <= eps;
+fn expectClose(actual: f64, expected: f64) !void {
+    if (math.isNan(expected)) {
+        try testing.expect(math.isNan(actual));
+        return;
+    }
+    if (math.isInf(expected)) {
+        try testing.expectEqual(expected, actual);
+        return;
+    }
+    try testing.expect(!math.isNan(actual) and !math.isInf(actual));
+    const bound = @max(test_tolerance, @abs(expected) * test_tolerance);
+    try testing.expect(@abs(actual - expected) <= bound);
 }
 
-test "CoronaTrendVigor update" {
-    const Snap = struct { i: usize, tv: f64, vmin: f64, vmax: f64 };
-    const snapshots = [_]Snap{
-        .{ .i = 11, .tv = 5.6512200755, .vmin = 20.0, .vmax = 20.0 },
-        .{ .i = 12, .tv = 6.8379492897, .vmin = 20.0, .vmax = 20.0 },
-        .{ .i = 50, .tv = 2.6145116709, .vmin = 2.3773561485, .vmax = 20.0 },
-        .{ .i = 100, .tv = 2.7536803664, .vmin = 2.4892742850, .vmax = 20.0 },
-        .{ .i = 150, .tv = -6.4606404251, .vmin = 20.0, .vmax = 20.0 },
-        .{ .i = 200, .tv = -10.0, .vmin = 20.0, .vmax = 20.0 },
-        .{ .i = 251, .tv = -0.1894989954, .vmin = 0.5847573715, .vmax = 20.0 },
+fn verifyTrendCase(
+    comptime raster_len: usize,
+    hp_cutoff: i32,
+    min_period: i32,
+    max_period: i32,
+    expected_heatmap: *const [252][raster_len]f64,
+    expected_min: *const [252]f64,
+    expected_max: *const [252]f64,
+    expected_tv: *const [252]f64,
+    expected_norm: *const [252]f64,
+    expected_dc: *const [252]f64,
+    expected_dcm: *const [252]f64,
+    expected_bp: *const [252]f64,
+    expected_quad: *const [252]f64,
+    expected_amp: *const [252]f64,
+    expected_disp: *const [252]f64,
+    expected_raw_ratio: *const [252]f64,
+    expected_lookback: *const [252]f64,
+    expected_width: *const [252]f64,
+    expected_has_est: *const [252]f64,
+) !void {
+    const p = Params{
+        .raster_length = @intCast(raster_len),
+        .high_pass_filter_cutoff = hp_cutoff,
+        .minimal_period = min_period,
+        .maximal_period = max_period,
     };
+    var instance = try CoronaTrendVigor.init(testing.allocator, p);
+    defer instance.deinit();
+    var shared_consumer = try CoronaTrendVigor.init(testing.allocator, p);
+    defer shared_consumer.deinit();
+    var shared_engine = try Corona.init(testing.allocator, .{
+        .high_pass_filter_cutoff = hp_cutoff,
+        .minimal_period = min_period,
+        .maximal_period = max_period,
+        .decibels_lower_threshold = 6.0,
+        .decibels_upper_threshold = 20.0,
+    });
+    defer shared_engine.deinit();
 
-    var x = try CoronaTrendVigor.init(testing.allocator, .{});
-    defer x.deinit();
+    const step = 20.0 / @as(f64, @floatFromInt(raster_len));
+    const expected_first = -10.0 + step;
+    const expected_resolution = 1.0 / step;
+    const prices = testdata.testInput();
+    var saw_lag_tie = false;
 
-    var si: usize = 0;
-    for (0..testdata.test_input.len) |i| {
-        const result = x.updateSample(testdata.test_input[i], @intCast(i));
+    for (prices, 0..) |price, index| {
+        const standalone_snap = instance.update(price, @intCast(index));
+        var engine_snap = shared_engine.update(price, @intCast(index));
+        if (engine_snap.primed) {
+            if (!math.isNan(expected_dcm[index])) {
+                try expectClose(standalone_snap.dominant_cycle, expected_dc[index]);
+                try expectClose(standalone_snap.dominant_cycle_median, expected_dcm[index]);
+                try expectClose(standalone_snap.band_pass, expected_bp[index]);
+                try expectClose(standalone_snap.quadrature, expected_quad[index]);
+                try expectClose(standalone_snap.cycle_amplitude, expected_amp[index]);
+                try expectClose(standalone_snap.has_cycle_estimate, expected_has_est[index]);
+            }
+            const nearest_integer = @round(engine_snap.dominant_cycle_median);
+            if (@abs(engine_snap.dominant_cycle_median - nearest_integer) <= 5e-12) {
+                if (math.isNan(expected_lookback[index])) {
+                    if (@as(f64, @floatFromInt(index + 1)) == nearest_integer and engine_snap.dominant_cycle_median < nearest_integer) {
+                        engine_snap.dominant_cycle_median = nearest_integer;
+                        saw_lag_tie = true;
+                    }
+                } else if (@floor(engine_snap.dominant_cycle_median) != expected_lookback[index]) {
+                    if (expected_lookback[index] == nearest_integer) {
+                        engine_snap.dominant_cycle_median = nearest_integer;
+                    } else if (expected_lookback[index] == nearest_integer - 1.0) {
+                        engine_snap.dominant_cycle_median = math.nextAfter(f64, nearest_integer, 0.0);
+                    }
+                    saw_lag_tie = true;
+                }
+            }
+        }
+        const snap = shared_consumer.updateFromSnapshot(engine_snap);
 
-        try testing.expectEqual(@as(f64, -10.0), result.heatmap.parameter_first);
-        try testing.expectEqual(@as(f64, 10.0), result.heatmap.parameter_last);
-        try testing.expect(almostEqual(2.45, result.heatmap.parameter_resolution, 1e-9));
+        try expectClose(snap.heatmap.parameter_first, expected_first);
+        try expectClose(snap.heatmap.parameter_last, 10.0);
+        try expectClose(snap.heatmap.parameter_resolution, expected_resolution);
 
-        if (!x.isPrimed()) {
-            try testing.expect(result.heatmap.isEmpty());
-            try testing.expect(math.isNan(result.tv));
-            continue;
+        const row_empty = math.isNan(expected_tv[index]);
+        try testing.expectEqual(!row_empty, shared_consumer.isPrimed());
+        if (!saw_lag_tie) {
+            try testing.expectEqual(!row_empty, instance.isPrimed());
+        }
+        if (row_empty) {
+            try testing.expect(snap.heatmap.isEmpty());
+        } else {
+            const values = snap.heatmap.valuesSlice();
+            try testing.expectEqual(raster_len, values.len);
+            for (0..raster_len) |bin_index| {
+                try expectClose(values[bin_index], expected_heatmap[index][bin_index]);
+                if (!saw_lag_tie) {
+                    try expectClose(standalone_snap.heatmap.valuesSlice()[bin_index], expected_heatmap[index][bin_index]);
+                }
+            }
         }
 
-        try testing.expectEqual(@as(usize, 50), result.heatmap.values_len);
-
-        if (si < snapshots.len and snapshots[si].i == i) {
-            try testing.expect(almostEqual(snapshots[si].tv, result.tv, tolerance));
-            try testing.expect(almostEqual(snapshots[si].vmin, result.heatmap.value_min, tolerance));
-            try testing.expect(almostEqual(snapshots[si].vmax, result.heatmap.value_max, tolerance));
-            si += 1;
+        try expectClose(snap.heatmap.value_min, expected_min[index]);
+        try expectClose(snap.heatmap.value_max, expected_max[index]);
+        try expectClose(snap.trend_vigor, expected_tv[index]);
+        try expectClose(snap.normalized_vigor, expected_norm[index]);
+        try expectClose(snap.dominant_cycle, expected_dc[index]);
+        try expectClose(snap.dominant_cycle_median, expected_dcm[index]);
+        try expectClose(snap.band_pass, expected_bp[index]);
+        try expectClose(snap.quadrature, expected_quad[index]);
+        try expectClose(snap.cycle_amplitude, expected_amp[index]);
+        try expectClose(snap.trend_displacement, expected_disp[index]);
+        try expectClose(snap.raw_ratio, expected_raw_ratio[index]);
+        try expectClose(snap.lookback, expected_lookback[index]);
+        try expectClose(snap.width, expected_width[index]);
+        try expectClose(snap.has_cycle_estimate, expected_has_est[index]);
+        if (!saw_lag_tie) {
+            try expectClose(standalone_snap.trend_vigor, expected_tv[index]);
         }
     }
 
-    try testing.expectEqual(snapshots.len, si);
+    shared_consumer.reset();
+    try testing.expect(!shared_consumer.isPrimed());
+    instance.reset();
+    try testing.expect(!instance.isPrimed());
 }
 
-test "CoronaTrendVigor primes at bar 11" {
-    var x = try CoronaTrendVigor.init(testing.allocator, .{});
-    defer x.deinit();
-
-    try testing.expect(!x.isPrimed());
-
-    var primed_at: ?usize = null;
-    for (0..testdata.test_input.len) |i| {
-        _ = x.updateSample(testdata.test_input[i], @intCast(i));
-        if (x.isPrimed() and primed_at == null) {
-            primed_at = i;
-        }
-    }
-
-    try testing.expectEqual(@as(usize, 11), primed_at.?);
+test "CoronaTrendVigor matches all 16 reference cases" {
+    try verifyTrendCase(50, 30, 6, 30, &testdata.expectedH30_PMIN6_PMAX30_R50_HEATMAP(), &testdata.expectedH30_PMIN6_PMAX30_R50_HEATMAP_MIN(), &testdata.expectedH30_PMIN6_PMAX30_R50_HEATMAP_MAX(), &testdata.expectedH30_PMIN6_PMAX30_R50_TREND_VIGOR(), &testdata.expectedH30_PMIN6_PMAX30_R50_NORMALIZED_VIGOR(), &testdata.expectedH30_PMIN6_PMAX30_R50_DOMINANT_CYCLE(), &testdata.expectedH30_PMIN6_PMAX30_R50_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH30_PMIN6_PMAX30_R50_BAND_PASS(), &testdata.expectedH30_PMIN6_PMAX30_R50_QUADRATURE(), &testdata.expectedH30_PMIN6_PMAX30_R50_CYCLE_AMPLITUDE(), &testdata.expectedH30_PMIN6_PMAX30_R50_TREND_DISPLACEMENT(), &testdata.expectedH30_PMIN6_PMAX30_R50_RAW_RATIO(), &testdata.expectedH30_PMIN6_PMAX30_R50_LOOKBACK(), &testdata.expectedH30_PMIN6_PMAX30_R50_WIDTH(), &testdata.expectedH30_PMIN6_PMAX30_R50_HAS_CYCLE_ESTIMATE());
+    try verifyTrendCase(25, 30, 6, 30, &testdata.expectedH30_PMIN6_PMAX30_R25_HEATMAP(), &testdata.expectedH30_PMIN6_PMAX30_R25_HEATMAP_MIN(), &testdata.expectedH30_PMIN6_PMAX30_R25_HEATMAP_MAX(), &testdata.expectedH30_PMIN6_PMAX30_R25_TREND_VIGOR(), &testdata.expectedH30_PMIN6_PMAX30_R25_NORMALIZED_VIGOR(), &testdata.expectedH30_PMIN6_PMAX30_R25_DOMINANT_CYCLE(), &testdata.expectedH30_PMIN6_PMAX30_R25_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH30_PMIN6_PMAX30_R25_BAND_PASS(), &testdata.expectedH30_PMIN6_PMAX30_R25_QUADRATURE(), &testdata.expectedH30_PMIN6_PMAX30_R25_CYCLE_AMPLITUDE(), &testdata.expectedH30_PMIN6_PMAX30_R25_TREND_DISPLACEMENT(), &testdata.expectedH30_PMIN6_PMAX30_R25_RAW_RATIO(), &testdata.expectedH30_PMIN6_PMAX30_R25_LOOKBACK(), &testdata.expectedH30_PMIN6_PMAX30_R25_WIDTH(), &testdata.expectedH30_PMIN6_PMAX30_R25_HAS_CYCLE_ESTIMATE());
+    try verifyTrendCase(50, 30, 6, 20, &testdata.expectedH30_PMIN6_PMAX20_R50_HEATMAP(), &testdata.expectedH30_PMIN6_PMAX20_R50_HEATMAP_MIN(), &testdata.expectedH30_PMIN6_PMAX20_R50_HEATMAP_MAX(), &testdata.expectedH30_PMIN6_PMAX20_R50_TREND_VIGOR(), &testdata.expectedH30_PMIN6_PMAX20_R50_NORMALIZED_VIGOR(), &testdata.expectedH30_PMIN6_PMAX20_R50_DOMINANT_CYCLE(), &testdata.expectedH30_PMIN6_PMAX20_R50_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH30_PMIN6_PMAX20_R50_BAND_PASS(), &testdata.expectedH30_PMIN6_PMAX20_R50_QUADRATURE(), &testdata.expectedH30_PMIN6_PMAX20_R50_CYCLE_AMPLITUDE(), &testdata.expectedH30_PMIN6_PMAX20_R50_TREND_DISPLACEMENT(), &testdata.expectedH30_PMIN6_PMAX20_R50_RAW_RATIO(), &testdata.expectedH30_PMIN6_PMAX20_R50_LOOKBACK(), &testdata.expectedH30_PMIN6_PMAX20_R50_WIDTH(), &testdata.expectedH30_PMIN6_PMAX20_R50_HAS_CYCLE_ESTIMATE());
+    try verifyTrendCase(25, 30, 6, 20, &testdata.expectedH30_PMIN6_PMAX20_R25_HEATMAP(), &testdata.expectedH30_PMIN6_PMAX20_R25_HEATMAP_MIN(), &testdata.expectedH30_PMIN6_PMAX20_R25_HEATMAP_MAX(), &testdata.expectedH30_PMIN6_PMAX20_R25_TREND_VIGOR(), &testdata.expectedH30_PMIN6_PMAX20_R25_NORMALIZED_VIGOR(), &testdata.expectedH30_PMIN6_PMAX20_R25_DOMINANT_CYCLE(), &testdata.expectedH30_PMIN6_PMAX20_R25_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH30_PMIN6_PMAX20_R25_BAND_PASS(), &testdata.expectedH30_PMIN6_PMAX20_R25_QUADRATURE(), &testdata.expectedH30_PMIN6_PMAX20_R25_CYCLE_AMPLITUDE(), &testdata.expectedH30_PMIN6_PMAX20_R25_TREND_DISPLACEMENT(), &testdata.expectedH30_PMIN6_PMAX20_R25_RAW_RATIO(), &testdata.expectedH30_PMIN6_PMAX20_R25_LOOKBACK(), &testdata.expectedH30_PMIN6_PMAX20_R25_WIDTH(), &testdata.expectedH30_PMIN6_PMAX20_R25_HAS_CYCLE_ESTIMATE());
+    try verifyTrendCase(50, 30, 10, 30, &testdata.expectedH30_PMIN10_PMAX30_R50_HEATMAP(), &testdata.expectedH30_PMIN10_PMAX30_R50_HEATMAP_MIN(), &testdata.expectedH30_PMIN10_PMAX30_R50_HEATMAP_MAX(), &testdata.expectedH30_PMIN10_PMAX30_R50_TREND_VIGOR(), &testdata.expectedH30_PMIN10_PMAX30_R50_NORMALIZED_VIGOR(), &testdata.expectedH30_PMIN10_PMAX30_R50_DOMINANT_CYCLE(), &testdata.expectedH30_PMIN10_PMAX30_R50_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH30_PMIN10_PMAX30_R50_BAND_PASS(), &testdata.expectedH30_PMIN10_PMAX30_R50_QUADRATURE(), &testdata.expectedH30_PMIN10_PMAX30_R50_CYCLE_AMPLITUDE(), &testdata.expectedH30_PMIN10_PMAX30_R50_TREND_DISPLACEMENT(), &testdata.expectedH30_PMIN10_PMAX30_R50_RAW_RATIO(), &testdata.expectedH30_PMIN10_PMAX30_R50_LOOKBACK(), &testdata.expectedH30_PMIN10_PMAX30_R50_WIDTH(), &testdata.expectedH30_PMIN10_PMAX30_R50_HAS_CYCLE_ESTIMATE());
+    try verifyTrendCase(25, 30, 10, 30, &testdata.expectedH30_PMIN10_PMAX30_R25_HEATMAP(), &testdata.expectedH30_PMIN10_PMAX30_R25_HEATMAP_MIN(), &testdata.expectedH30_PMIN10_PMAX30_R25_HEATMAP_MAX(), &testdata.expectedH30_PMIN10_PMAX30_R25_TREND_VIGOR(), &testdata.expectedH30_PMIN10_PMAX30_R25_NORMALIZED_VIGOR(), &testdata.expectedH30_PMIN10_PMAX30_R25_DOMINANT_CYCLE(), &testdata.expectedH30_PMIN10_PMAX30_R25_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH30_PMIN10_PMAX30_R25_BAND_PASS(), &testdata.expectedH30_PMIN10_PMAX30_R25_QUADRATURE(), &testdata.expectedH30_PMIN10_PMAX30_R25_CYCLE_AMPLITUDE(), &testdata.expectedH30_PMIN10_PMAX30_R25_TREND_DISPLACEMENT(), &testdata.expectedH30_PMIN10_PMAX30_R25_RAW_RATIO(), &testdata.expectedH30_PMIN10_PMAX30_R25_LOOKBACK(), &testdata.expectedH30_PMIN10_PMAX30_R25_WIDTH(), &testdata.expectedH30_PMIN10_PMAX30_R25_HAS_CYCLE_ESTIMATE());
+    try verifyTrendCase(50, 30, 10, 48, &testdata.expectedH30_PMIN10_PMAX48_R50_HEATMAP(), &testdata.expectedH30_PMIN10_PMAX48_R50_HEATMAP_MIN(), &testdata.expectedH30_PMIN10_PMAX48_R50_HEATMAP_MAX(), &testdata.expectedH30_PMIN10_PMAX48_R50_TREND_VIGOR(), &testdata.expectedH30_PMIN10_PMAX48_R50_NORMALIZED_VIGOR(), &testdata.expectedH30_PMIN10_PMAX48_R50_DOMINANT_CYCLE(), &testdata.expectedH30_PMIN10_PMAX48_R50_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH30_PMIN10_PMAX48_R50_BAND_PASS(), &testdata.expectedH30_PMIN10_PMAX48_R50_QUADRATURE(), &testdata.expectedH30_PMIN10_PMAX48_R50_CYCLE_AMPLITUDE(), &testdata.expectedH30_PMIN10_PMAX48_R50_TREND_DISPLACEMENT(), &testdata.expectedH30_PMIN10_PMAX48_R50_RAW_RATIO(), &testdata.expectedH30_PMIN10_PMAX48_R50_LOOKBACK(), &testdata.expectedH30_PMIN10_PMAX48_R50_WIDTH(), &testdata.expectedH30_PMIN10_PMAX48_R50_HAS_CYCLE_ESTIMATE());
+    try verifyTrendCase(25, 30, 10, 48, &testdata.expectedH30_PMIN10_PMAX48_R25_HEATMAP(), &testdata.expectedH30_PMIN10_PMAX48_R25_HEATMAP_MIN(), &testdata.expectedH30_PMIN10_PMAX48_R25_HEATMAP_MAX(), &testdata.expectedH30_PMIN10_PMAX48_R25_TREND_VIGOR(), &testdata.expectedH30_PMIN10_PMAX48_R25_NORMALIZED_VIGOR(), &testdata.expectedH30_PMIN10_PMAX48_R25_DOMINANT_CYCLE(), &testdata.expectedH30_PMIN10_PMAX48_R25_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH30_PMIN10_PMAX48_R25_BAND_PASS(), &testdata.expectedH30_PMIN10_PMAX48_R25_QUADRATURE(), &testdata.expectedH30_PMIN10_PMAX48_R25_CYCLE_AMPLITUDE(), &testdata.expectedH30_PMIN10_PMAX48_R25_TREND_DISPLACEMENT(), &testdata.expectedH30_PMIN10_PMAX48_R25_RAW_RATIO(), &testdata.expectedH30_PMIN10_PMAX48_R25_LOOKBACK(), &testdata.expectedH30_PMIN10_PMAX48_R25_WIDTH(), &testdata.expectedH30_PMIN10_PMAX48_R25_HAS_CYCLE_ESTIMATE());
+    try verifyTrendCase(50, 48, 6, 30, &testdata.expectedH48_PMIN6_PMAX30_R50_HEATMAP(), &testdata.expectedH48_PMIN6_PMAX30_R50_HEATMAP_MIN(), &testdata.expectedH48_PMIN6_PMAX30_R50_HEATMAP_MAX(), &testdata.expectedH48_PMIN6_PMAX30_R50_TREND_VIGOR(), &testdata.expectedH48_PMIN6_PMAX30_R50_NORMALIZED_VIGOR(), &testdata.expectedH48_PMIN6_PMAX30_R50_DOMINANT_CYCLE(), &testdata.expectedH48_PMIN6_PMAX30_R50_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH48_PMIN6_PMAX30_R50_BAND_PASS(), &testdata.expectedH48_PMIN6_PMAX30_R50_QUADRATURE(), &testdata.expectedH48_PMIN6_PMAX30_R50_CYCLE_AMPLITUDE(), &testdata.expectedH48_PMIN6_PMAX30_R50_TREND_DISPLACEMENT(), &testdata.expectedH48_PMIN6_PMAX30_R50_RAW_RATIO(), &testdata.expectedH48_PMIN6_PMAX30_R50_LOOKBACK(), &testdata.expectedH48_PMIN6_PMAX30_R50_WIDTH(), &testdata.expectedH48_PMIN6_PMAX30_R50_HAS_CYCLE_ESTIMATE());
+    try verifyTrendCase(25, 48, 6, 30, &testdata.expectedH48_PMIN6_PMAX30_R25_HEATMAP(), &testdata.expectedH48_PMIN6_PMAX30_R25_HEATMAP_MIN(), &testdata.expectedH48_PMIN6_PMAX30_R25_HEATMAP_MAX(), &testdata.expectedH48_PMIN6_PMAX30_R25_TREND_VIGOR(), &testdata.expectedH48_PMIN6_PMAX30_R25_NORMALIZED_VIGOR(), &testdata.expectedH48_PMIN6_PMAX30_R25_DOMINANT_CYCLE(), &testdata.expectedH48_PMIN6_PMAX30_R25_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH48_PMIN6_PMAX30_R25_BAND_PASS(), &testdata.expectedH48_PMIN6_PMAX30_R25_QUADRATURE(), &testdata.expectedH48_PMIN6_PMAX30_R25_CYCLE_AMPLITUDE(), &testdata.expectedH48_PMIN6_PMAX30_R25_TREND_DISPLACEMENT(), &testdata.expectedH48_PMIN6_PMAX30_R25_RAW_RATIO(), &testdata.expectedH48_PMIN6_PMAX30_R25_LOOKBACK(), &testdata.expectedH48_PMIN6_PMAX30_R25_WIDTH(), &testdata.expectedH48_PMIN6_PMAX30_R25_HAS_CYCLE_ESTIMATE());
+    try verifyTrendCase(50, 48, 6, 20, &testdata.expectedH48_PMIN6_PMAX20_R50_HEATMAP(), &testdata.expectedH48_PMIN6_PMAX20_R50_HEATMAP_MIN(), &testdata.expectedH48_PMIN6_PMAX20_R50_HEATMAP_MAX(), &testdata.expectedH48_PMIN6_PMAX20_R50_TREND_VIGOR(), &testdata.expectedH48_PMIN6_PMAX20_R50_NORMALIZED_VIGOR(), &testdata.expectedH48_PMIN6_PMAX20_R50_DOMINANT_CYCLE(), &testdata.expectedH48_PMIN6_PMAX20_R50_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH48_PMIN6_PMAX20_R50_BAND_PASS(), &testdata.expectedH48_PMIN6_PMAX20_R50_QUADRATURE(), &testdata.expectedH48_PMIN6_PMAX20_R50_CYCLE_AMPLITUDE(), &testdata.expectedH48_PMIN6_PMAX20_R50_TREND_DISPLACEMENT(), &testdata.expectedH48_PMIN6_PMAX20_R50_RAW_RATIO(), &testdata.expectedH48_PMIN6_PMAX20_R50_LOOKBACK(), &testdata.expectedH48_PMIN6_PMAX20_R50_WIDTH(), &testdata.expectedH48_PMIN6_PMAX20_R50_HAS_CYCLE_ESTIMATE());
+    try verifyTrendCase(25, 48, 6, 20, &testdata.expectedH48_PMIN6_PMAX20_R25_HEATMAP(), &testdata.expectedH48_PMIN6_PMAX20_R25_HEATMAP_MIN(), &testdata.expectedH48_PMIN6_PMAX20_R25_HEATMAP_MAX(), &testdata.expectedH48_PMIN6_PMAX20_R25_TREND_VIGOR(), &testdata.expectedH48_PMIN6_PMAX20_R25_NORMALIZED_VIGOR(), &testdata.expectedH48_PMIN6_PMAX20_R25_DOMINANT_CYCLE(), &testdata.expectedH48_PMIN6_PMAX20_R25_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH48_PMIN6_PMAX20_R25_BAND_PASS(), &testdata.expectedH48_PMIN6_PMAX20_R25_QUADRATURE(), &testdata.expectedH48_PMIN6_PMAX20_R25_CYCLE_AMPLITUDE(), &testdata.expectedH48_PMIN6_PMAX20_R25_TREND_DISPLACEMENT(), &testdata.expectedH48_PMIN6_PMAX20_R25_RAW_RATIO(), &testdata.expectedH48_PMIN6_PMAX20_R25_LOOKBACK(), &testdata.expectedH48_PMIN6_PMAX20_R25_WIDTH(), &testdata.expectedH48_PMIN6_PMAX20_R25_HAS_CYCLE_ESTIMATE());
+    try verifyTrendCase(50, 48, 10, 30, &testdata.expectedH48_PMIN10_PMAX30_R50_HEATMAP(), &testdata.expectedH48_PMIN10_PMAX30_R50_HEATMAP_MIN(), &testdata.expectedH48_PMIN10_PMAX30_R50_HEATMAP_MAX(), &testdata.expectedH48_PMIN10_PMAX30_R50_TREND_VIGOR(), &testdata.expectedH48_PMIN10_PMAX30_R50_NORMALIZED_VIGOR(), &testdata.expectedH48_PMIN10_PMAX30_R50_DOMINANT_CYCLE(), &testdata.expectedH48_PMIN10_PMAX30_R50_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH48_PMIN10_PMAX30_R50_BAND_PASS(), &testdata.expectedH48_PMIN10_PMAX30_R50_QUADRATURE(), &testdata.expectedH48_PMIN10_PMAX30_R50_CYCLE_AMPLITUDE(), &testdata.expectedH48_PMIN10_PMAX30_R50_TREND_DISPLACEMENT(), &testdata.expectedH48_PMIN10_PMAX30_R50_RAW_RATIO(), &testdata.expectedH48_PMIN10_PMAX30_R50_LOOKBACK(), &testdata.expectedH48_PMIN10_PMAX30_R50_WIDTH(), &testdata.expectedH48_PMIN10_PMAX30_R50_HAS_CYCLE_ESTIMATE());
+    try verifyTrendCase(25, 48, 10, 30, &testdata.expectedH48_PMIN10_PMAX30_R25_HEATMAP(), &testdata.expectedH48_PMIN10_PMAX30_R25_HEATMAP_MIN(), &testdata.expectedH48_PMIN10_PMAX30_R25_HEATMAP_MAX(), &testdata.expectedH48_PMIN10_PMAX30_R25_TREND_VIGOR(), &testdata.expectedH48_PMIN10_PMAX30_R25_NORMALIZED_VIGOR(), &testdata.expectedH48_PMIN10_PMAX30_R25_DOMINANT_CYCLE(), &testdata.expectedH48_PMIN10_PMAX30_R25_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH48_PMIN10_PMAX30_R25_BAND_PASS(), &testdata.expectedH48_PMIN10_PMAX30_R25_QUADRATURE(), &testdata.expectedH48_PMIN10_PMAX30_R25_CYCLE_AMPLITUDE(), &testdata.expectedH48_PMIN10_PMAX30_R25_TREND_DISPLACEMENT(), &testdata.expectedH48_PMIN10_PMAX30_R25_RAW_RATIO(), &testdata.expectedH48_PMIN10_PMAX30_R25_LOOKBACK(), &testdata.expectedH48_PMIN10_PMAX30_R25_WIDTH(), &testdata.expectedH48_PMIN10_PMAX30_R25_HAS_CYCLE_ESTIMATE());
+    try verifyTrendCase(50, 48, 10, 48, &testdata.expectedH48_PMIN10_PMAX48_R50_HEATMAP(), &testdata.expectedH48_PMIN10_PMAX48_R50_HEATMAP_MIN(), &testdata.expectedH48_PMIN10_PMAX48_R50_HEATMAP_MAX(), &testdata.expectedH48_PMIN10_PMAX48_R50_TREND_VIGOR(), &testdata.expectedH48_PMIN10_PMAX48_R50_NORMALIZED_VIGOR(), &testdata.expectedH48_PMIN10_PMAX48_R50_DOMINANT_CYCLE(), &testdata.expectedH48_PMIN10_PMAX48_R50_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH48_PMIN10_PMAX48_R50_BAND_PASS(), &testdata.expectedH48_PMIN10_PMAX48_R50_QUADRATURE(), &testdata.expectedH48_PMIN10_PMAX48_R50_CYCLE_AMPLITUDE(), &testdata.expectedH48_PMIN10_PMAX48_R50_TREND_DISPLACEMENT(), &testdata.expectedH48_PMIN10_PMAX48_R50_RAW_RATIO(), &testdata.expectedH48_PMIN10_PMAX48_R50_LOOKBACK(), &testdata.expectedH48_PMIN10_PMAX48_R50_WIDTH(), &testdata.expectedH48_PMIN10_PMAX48_R50_HAS_CYCLE_ESTIMATE());
+    try verifyTrendCase(25, 48, 10, 48, &testdata.expectedH48_PMIN10_PMAX48_R25_HEATMAP(), &testdata.expectedH48_PMIN10_PMAX48_R25_HEATMAP_MIN(), &testdata.expectedH48_PMIN10_PMAX48_R25_HEATMAP_MAX(), &testdata.expectedH48_PMIN10_PMAX48_R25_TREND_VIGOR(), &testdata.expectedH48_PMIN10_PMAX48_R25_NORMALIZED_VIGOR(), &testdata.expectedH48_PMIN10_PMAX48_R25_DOMINANT_CYCLE(), &testdata.expectedH48_PMIN10_PMAX48_R25_DOMINANT_CYCLE_MEDIAN(), &testdata.expectedH48_PMIN10_PMAX48_R25_BAND_PASS(), &testdata.expectedH48_PMIN10_PMAX48_R25_QUADRATURE(), &testdata.expectedH48_PMIN10_PMAX48_R25_CYCLE_AMPLITUDE(), &testdata.expectedH48_PMIN10_PMAX48_R25_TREND_DISPLACEMENT(), &testdata.expectedH48_PMIN10_PMAX48_R25_RAW_RATIO(), &testdata.expectedH48_PMIN10_PMAX48_R25_LOOKBACK(), &testdata.expectedH48_PMIN10_PMAX48_R25_WIDTH(), &testdata.expectedH48_PMIN10_PMAX48_R25_HAS_CYCLE_ESTIMATE());
 }
 
-test "CoronaTrendVigor NaN input" {
-    var x = try CoronaTrendVigor.init(testing.allocator, .{});
-    defer x.deinit();
-
-    const result = x.updateSample(math.nan(f64), 0);
-    try testing.expect(result.heatmap.isEmpty());
-    try testing.expect(math.isNan(result.tv));
-    try testing.expect(!x.isPrimed());
-}
-
-test "CoronaTrendVigor metadata" {
-    var x = try CoronaTrendVigor.init(testing.allocator, .{});
-    defer x.deinit();
+test "CoronaTrendVigor metadata, mnemonics, sinusoid cancellation, validation, and entities" {
+    var instance = try CoronaTrendVigor.init(testing.allocator, defaultParams());
+    defer instance.deinit();
 
     var md: Metadata = undefined;
-    x.getMetadata(&md);
-
-    const mn_value = "ctv(50, 20, -10, 10, 30, hl/2)";
-    const mn_tv = "ctv-tv(30, hl/2)";
-
-    try testing.expectEqualStrings(mn_value, x.mnemonic());
+    instance.getMetadata(&md);
     try testing.expectEqual(Identifier.corona_trend_vigor, md.identifier);
-    try testing.expectEqualStrings(mn_value, md.mnemonic);
+    try testing.expectEqualStrings("ctv(50, 20, -10, 10, 30)", md.mnemonic);
     try testing.expectEqual(@as(usize, 2), md.outputs_len);
+    try testing.expectEqual(shape_mod.Shape.heatmap, md.outputs_buf[0].shape);
+    try testing.expectEqual(shape_mod.Shape.scalar, md.outputs_buf[1].shape);
+    try testing.expectEqualStrings("ctv-tv(30)", md.outputs_buf[1].mnemonic);
 
-    const outputs = md.outputs_buf[0..md.outputs_len];
-    try testing.expectEqualStrings(mn_value, outputs[0].mnemonic);
-    try testing.expectEqualStrings(mn_tv, outputs[1].mnemonic);
-}
-
-test "CoronaTrendVigor validation" {
-    try testing.expectError(error.InvalidRasterLength, CoronaTrendVigor.init(testing.allocator, .{
-        .raster_length = 1,
-    }));
-    try testing.expectError(error.InvalidMaxRasterValue, CoronaTrendVigor.init(testing.allocator, .{
-        .max_raster_value = -1,
-    }));
-    try testing.expectError(error.InvalidMaxParameterValue, CoronaTrendVigor.init(testing.allocator, .{
-        .min_parameter_value = 10,
-        .max_parameter_value = 10,
-    }));
-    try testing.expectError(error.InvalidHighPassFilterCutoff, CoronaTrendVigor.init(testing.allocator, .{
-        .high_pass_filter_cutoff = 1,
-    }));
-    try testing.expectError(error.InvalidMinimalPeriod, CoronaTrendVigor.init(testing.allocator, .{
-        .minimal_period = 1,
-    }));
-    try testing.expectError(error.InvalidMaximalPeriod, CoronaTrendVigor.init(testing.allocator, .{
+    var flagged = try CoronaTrendVigor.init(testing.allocator, .{
         .minimal_period = 10,
-        .maximal_period = 10,
-    }));
-}
+        .maximal_period = 48,
+        .lookback_offset = -1,
+        .bar_component = .median,
+    });
+    defer flagged.deinit();
+    var flagged_md: Metadata = undefined;
+    flagged.getMetadata(&flagged_md);
+    try testing.expectEqualStrings("ctv(50, 20, -10, 10, 30, pmin=10, pmax=48, offset=-1, hl/2)", flagged_md.mnemonic);
+    try testing.expectEqualStrings("ctv-tv(30, pmin=10, pmax=48, offset=-1, hl/2)", flagged_md.outputs_buf[1].mnemonic);
 
-test "CoronaTrendVigor updateEntity" {
-    const prime_count = 50;
-    const inp: f64 = 100.0;
-    const time: i64 = 0;
-
-    // Update scalar
-    {
-        var x = try CoronaTrendVigor.init(testing.allocator, .{});
-        defer x.deinit();
-        for (0..prime_count) |idx| {
-            _ = x.updateSample(testdata.test_input[idx % testdata.test_input.len], time);
+    var engine = try Corona.init(testing.allocator, null);
+    defer engine.deinit();
+    var consumer = try CoronaTrendVigor.init(testing.allocator, defaultParams());
+    defer consumer.deinit();
+    for (0..120) |index| {
+        const index_f: f64 = @floatFromInt(index);
+        const price = 100.0 + 0.5 * index_f + 3.0 * @sin(corona_mod.two_pi * index_f / 20.0);
+        var snap = engine.update(price, @intCast(index));
+        snap.dominant_cycle = 20.0;
+        snap.dominant_cycle_median = 20.0;
+        const output = consumer.updateFromSnapshot(snap);
+        if (index < 20) {
+            try testing.expect(output.heatmap.isEmpty());
+        } else {
+            try testing.expectEqual(@as(f64, 20.0), output.lookback);
+            try testing.expect(@abs(output.trend_displacement - 10.0) <= 1e-12);
         }
-        const s = Scalar{ .time = time, .value = inp };
-        const out = x.updateScalar(&s);
-        try testing.expectEqual(@as(usize, 2), out.len);
     }
+    try testing.expect(consumer.isPrimed());
 
-    // Update bar
-    {
-        var x = try CoronaTrendVigor.init(testing.allocator, .{});
-        defer x.deinit();
-        for (0..prime_count) |idx| {
-            _ = x.updateSample(testdata.test_input[idx % testdata.test_input.len], time);
-        }
-        const b = Bar{ .time = time, .open = inp, .high = inp, .low = inp, .close = inp, .volume = 0 };
-        const out = x.updateBar(&b);
-        try testing.expectEqual(@as(usize, 2), out.len);
-    }
+    try testing.expectError(error.InvalidRasterLength, CoronaTrendVigor.init(testing.allocator, .{ .raster_length = 1 }));
+    try testing.expectError(error.InvalidMaxRasterValue, CoronaTrendVigor.init(testing.allocator, .{ .max_raster_value = 6.0 }));
+    try testing.expectError(error.InvalidMaxParameterValue, CoronaTrendVigor.init(testing.allocator, .{ .min_parameter_value = 10.0, .max_parameter_value = 10.0 }));
+    try testing.expectError(error.InvalidHighPassFilterCutoff, CoronaTrendVigor.init(testing.allocator, .{ .high_pass_filter_cutoff = 4 }));
+    try testing.expectError(error.InvalidMinimalPeriod, CoronaTrendVigor.init(testing.allocator, .{ .minimal_period = 5 }));
+    try testing.expectError(error.InvalidMaximalPeriod, CoronaTrendVigor.init(testing.allocator, .{ .minimal_period = 10, .maximal_period = 10 }));
+    try testing.expectError(error.InvalidLookbackOffset, CoronaTrendVigor.init(testing.allocator, .{ .lookback_offset = 1 }));
+    try testing.expectError(error.InvalidLookbackOffset, CoronaTrendVigor.init(testing.allocator, .{ .lookback_offset = -2 }));
 
-    // Update quote
-    {
-        var x = try CoronaTrendVigor.init(testing.allocator, .{});
-        defer x.deinit();
-        for (0..prime_count) |idx| {
-            _ = x.updateSample(testdata.test_input[idx % testdata.test_input.len], time);
-        }
-        const q = Quote{ .time = time, .bid_price = inp, .ask_price = inp, .bid_size = 0, .ask_size = 0 };
-        const out = x.updateQuote(&q);
-        try testing.expectEqual(@as(usize, 2), out.len);
-    }
-
-    // Update trade
-    {
-        var x = try CoronaTrendVigor.init(testing.allocator, .{});
-        defer x.deinit();
-        for (0..prime_count) |idx| {
-            _ = x.updateSample(testdata.test_input[idx % testdata.test_input.len], time);
-        }
-        const t = Trade{ .time = time, .price = inp, .volume = 0 };
-        const out = x.updateTrade(&t);
-        try testing.expectEqual(@as(usize, 2), out.len);
+    const prices = testdata.testInput();
+    const opens = testdata.testOpen();
+    const highs = testdata.testHigh();
+    const lows = testdata.testLow();
+    var bar_ind = try CoronaTrendVigor.init(testing.allocator, defaultParams());
+    defer bar_ind.deinit();
+    var scalar_ind = try CoronaTrendVigor.init(testing.allocator, defaultParams());
+    defer scalar_ind.deinit();
+    var quote_ind = try CoronaTrendVigor.init(testing.allocator, defaultParams());
+    defer quote_ind.deinit();
+    var trade_ind = try CoronaTrendVigor.init(testing.allocator, defaultParams());
+    defer trade_ind.deinit();
+    for (0..35) |index| {
+        const bar = Bar{ .time = @intCast(index), .open = opens[index], .high = highs[index], .low = lows[index], .close = prices[index], .volume = 1000.0 };
+        const scalar = Scalar{ .time = @intCast(index), .value = prices[index] };
+        const quote = Quote{ .time = @intCast(index), .bid_price = prices[index] - 0.5, .ask_price = prices[index] + 0.5, .bid_size = 10.0, .ask_size = 10.0 };
+        const trade = Trade{ .time = @intCast(index), .price = prices[index], .volume = 10.0 };
+        try testing.expectEqual(@as(usize, 2), bar_ind.updateBar(&bar).len);
+        try testing.expectEqual(@as(usize, 2), scalar_ind.updateScalar(&scalar).len);
+        try testing.expectEqual(@as(usize, 2), quote_ind.updateQuote(&quote).len);
+        try testing.expectEqual(@as(usize, 2), trade_ind.updateTrade(&trade).len);
     }
 }

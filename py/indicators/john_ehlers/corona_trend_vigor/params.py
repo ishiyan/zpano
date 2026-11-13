@@ -1,64 +1,89 @@
 """Parameters for the CoronaTrendVigor indicator."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass
 from typing import Optional
 
-from ....entities.bar_component import BarComponent
-from ....entities.quote_component import QuoteComponent
-from ....entities.trade_component import TradeComponent
+from ....entities.bar_component import BarComponent, DEFAULT_BAR_COMPONENT
+from ....entities.quote_component import QuoteComponent, DEFAULT_QUOTE_COMPONENT
+from ....entities.trade_component import TradeComponent, DEFAULT_TRADE_COMPONENT
+from ...core.component_triple_mnemonic import component_triple_mnemonic
+from ..corona.corona import format_number
 
 
 @dataclass
-class Params:
-    """Configuration for the Corona Trend Vigor indicator."""
-    raster_length: int = 0
-    """Length of the heatmap raster. Default 50. A zero value is treated as "use default"."""
+class CoronaTrendVigorParams:
+    """Configuration for the Corona Trend Vigor indicator.
 
-    max_raster_value: float = 0.0
-    """Maximum raster intensity value. Default 20. A zero value is treated as "use default"."""
+    All fields default to Ehlers' TASC settings. Explicit zero values are NOT
+    substituted with defaults (`lookback_offset=0` is the article default).
+    """
 
-    min_parameter_value: float = 0.0
-    """Minimum ordinate (y) value. Default -10. Only substituted when both Min and Max are 0 (unconfigured)."""
+    raster_length: int = 50
+    """Length of the heatmap raster (`>= 2`). Default 50."""
 
-    max_parameter_value: float = 0.0
-    """Maximum ordinate (y) value. Default 10. Only substituted when both Min and Max are 0 (unconfigured)."""
+    max_raster_value: float = 20.0
+    """Maximum raster intensity value (`> 6`). Default 20."""
 
-    high_pass_filter_cutoff: int = 0
-    """High-pass filter cutoff. Default 30. A zero value is treated as "use default"."""
+    min_parameter_value: float = -10.0
+    """Minimum ordinate (y) value. Default -10."""
 
-    minimal_period: int = 0
-    """Minimal cycle period. Default 6. A zero value is treated as "use default"."""
+    max_parameter_value: float = 10.0
+    """Maximum ordinate (y) value (`> min_parameter_value`). Default 10."""
 
-    maximal_period: int = 0
-    """Maximal cycle period. Default 30. A zero value is treated as "use default"."""
+    high_pass_filter_cutoff: int = 30
+    """High-pass filter cutoff (`>= 5`). Default 30."""
+
+    minimal_period: int = 6
+    """Minimal cycle period (`>= 6`). Default 6."""
+
+    maximal_period: int = 30
+    """Maximal cycle period (`> minimal_period`). Default 30."""
+
+    lookback_offset: int = 0
+    """Cycle lag offset (`0` for full-cycle `floor(D)`, `-1` for `floor(D) - 1`). Default 0."""
 
     bar_component: Optional[BarComponent] = None
-    """A component of a bar to use when updating the indicator with a bar sample.
-
-    If not set, the bar component defaults to ClosePrice and is not shown in the indicator mnemonic.
-    """
+    """Bar component used by update_bar(); None defaults to Close."""
 
     quote_component: Optional[QuoteComponent] = None
-    """A component of a quote to use when updating the indicator with a quote sample.
-
-    If not set, the quote component defaults to MidPrice and is not shown in the indicator mnemonic.
-    """
+    """Quote component used by update_quote(); None defaults to Mid."""
 
     trade_component: Optional[TradeComponent] = None
-    """A component of a trade to use when updating the indicator with a trade sample.
-
-    If not set, the trade component defaults to Price and is not shown in the indicator mnemonic.
-    """
+    """Trade component used by update_trade(); None defaults to Price."""
 
 
-def default_params() -> Params:
+Params = CoronaTrendVigorParams
+
+
+def default_params() -> CoronaTrendVigorParams:
     """Return default Ehlers parameters."""
-    return Params(
-        raster_length=50,
-        max_raster_value=20.0,
-        min_parameter_value=-10.0,
-        max_parameter_value=10.0,
-        high_pass_filter_cutoff=30,
-        minimal_period=6,
-        maximal_period=30,
+    return CoronaTrendVigorParams()
+
+
+def trend_flags(params: CoronaTrendVigorParams) -> str:
+    """Build optional override flags when period or offset parameters differ from defaults."""
+    parts: list[str] = []
+    if params.minimal_period != 6:
+        parts.append(f", pmin={params.minimal_period}")
+    if params.maximal_period != 30:
+        parts.append(f", pmax={params.maximal_period}")
+    if params.lookback_offset != 0:
+        parts.append(f", offset={params.lookback_offset}")
+    return "".join(parts)
+
+
+def corona_trend_vigor_mnemonic(params: CoronaTrendVigorParams) -> str:
+    """Build the primary CoronaTrendVigor mnemonic."""
+    bc = params.bar_component if params.bar_component is not None else DEFAULT_BAR_COMPONENT
+    qc = params.quote_component if params.quote_component is not None else DEFAULT_QUOTE_COMPONENT
+    tc = params.trade_component if params.trade_component is not None else DEFAULT_TRADE_COMPONENT
+    comp = component_triple_mnemonic(bc, qc, tc)
+    flags = trend_flags(params)
+    return (
+        f"ctv({params.raster_length}, {format_number(params.max_raster_value)}, "
+        f"{format_number(params.min_parameter_value)}, "
+        f"{format_number(params.max_parameter_value)}, "
+        f"{params.high_pass_filter_cutoff}{flags}{comp})"
     )

@@ -202,7 +202,7 @@ var descriptors = map[Identifier]Descriptor{
 	},
 	CoronaSignalToNoiseRatio: {
 		Identifier: CoronaSignalToNoiseRatio, Family: "John Ehlers",
-		Adaptivity: Adaptive, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Adaptivity: Adaptive, InputRequirement: BarInput, VolumeUsage: NoVolume,
 		Outputs: []OutputDescriptor{
 			{Kind: 1 /* Value */, Shape: shape.Heatmap, Role: Spectrum, Pane: Own},
 			{Kind: 2 /* SignalToNoiseRatio */, Shape: shape.Scalar, Role: BoundedOscillator, Pane: Own},

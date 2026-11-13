@@ -1,113 +1,125 @@
-"""Ehlers' Corona Trend Vigor heatmap indicator."""
+"""Ehlers' Corona Trend Vigor indicator."""
 
-import math
+from __future__ import annotations
+
 import datetime
+import math
+from typing import NamedTuple, Optional
 
 from ....entities.bar import Bar
-from ....entities.bar_component import BarComponent, bar_component_value, DEFAULT_BAR_COMPONENT
+from ....entities.bar_component import DEFAULT_BAR_COMPONENT, bar_component_value
 from ....entities.quote import Quote
-from ....entities.quote_component import QuoteComponent, quote_component_value, DEFAULT_QUOTE_COMPONENT
-from ....entities.trade import Trade
-from ....entities.trade_component import TradeComponent, trade_component_value, DEFAULT_TRADE_COMPONENT
+from ....entities.quote_component import DEFAULT_QUOTE_COMPONENT, quote_component_value
 from ....entities.scalar import Scalar
-from ...core.identifier import Identifier
-from ...core.metadata import Metadata
-from ...core.build_metadata import build_metadata, OutputText
+from ....entities.trade import Trade
+from ....entities.trade_component import DEFAULT_TRADE_COMPONENT, trade_component_value
+from ...core.build_metadata import OutputText, build_metadata
 from ...core.component_triple_mnemonic import component_triple_mnemonic
+from ...core.identifier import Identifier
+from ...core.indicator import Indicator
+from ...core.metadata import Metadata
+from ...core.output import Output
 from ...core.outputs.heatmap import Heatmap
-from ..corona.corona import Corona
+from ..corona.corona import (
+    AdaptiveBandPass,
+    Corona,
+    CoronaSnapshot,
+    Raster,
+    accept_snapshot,
+    checked,
+    clip,
+    format_number,
+)
 from ..corona.params import CoronaParams
-from .params import Params
-
-_BP_DELTA = 0.1
-_RATIO_NEW_COEF = 0.33
-_RATIO_PREVIOUS_COEF = 0.67
-_VIGOR_MID_LOW = 0.3
-_VIGOR_MID_HIGH = 0.7
-_VIGOR_MID = 0.5
-_WIDTH_EDGE = 0.01
-_RASTER_BLEND_SCALE = 0.8
-_RASTER_BLEND_PREVIOUS = 0.2
-_RASTER_BLEND_HALF = 0.5
-_RASTER_BLEND_EXPONENT = 0.85
-_RATIO_LIMIT = 10.0
-_VIGOR_SCALE = 0.05
+from .params import CoronaTrendVigorParams, default_params, trend_flags
 
 
-class CoronaTrendVigor:
-    """Ehlers' Corona Trend Vigor heatmap indicator."""
+class CoronaTrendVigorSnapshot(NamedTuple):
+    """Full 13-field numerical snapshot for CoronaTrendVigor."""
 
-    def __init__(self, params: Params) -> None:
-        invalid = "invalid corona trend vigor parameters"
+    heatmap: Heatmap
+    trend_vigor: float
+    normalized_vigor: float
+    dominant_cycle: float
+    dominant_cycle_median: float
+    band_pass: float
+    quadrature: float
+    cycle_amplitude: float
+    trend_displacement: float
+    raw_ratio: float
+    lookback: float
+    width: float
+    has_cycle_estimate: float
 
-        cfg_raster_len = params.raster_length if params.raster_length != 0 else 50
-        cfg_max_raster = params.max_raster_value if params.max_raster_value != 0 else 20.0
 
-        if params.min_parameter_value == 0 and params.max_parameter_value == 0:
-            cfg_min_param = -10.0
-            cfg_max_param = 10.0
-        else:
-            cfg_min_param = params.min_parameter_value
-            cfg_max_param = params.max_parameter_value
+Snapshot = CoronaTrendVigorSnapshot
+TrendOutput = CoronaTrendVigorSnapshot
 
-        cfg_hp_cutoff = params.high_pass_filter_cutoff if params.high_pass_filter_cutoff != 0 else 30
-        cfg_min_period = params.minimal_period if params.minimal_period != 0 else 6
-        cfg_max_period = params.maximal_period if params.maximal_period != 0 else 30
 
-        if cfg_raster_len < 2:
-            raise ValueError(f"{invalid}: RasterLength should be >= 2")
-        if cfg_max_raster <= 0:
-            raise ValueError(f"{invalid}: MaxRasterValue should be > 0")
-        if cfg_max_param <= cfg_min_param:
-            raise ValueError(f"{invalid}: MaxParameterValue should be > MinParameterValue")
-        if cfg_hp_cutoff < 2:
-            raise ValueError(f"{invalid}: HighPassFilterCutoff should be >= 2")
-        if cfg_min_period < 2:
-            raise ValueError(f"{invalid}: MinimalPeriod should be >= 2")
-        if cfg_max_period <= cfg_min_period:
-            raise ValueError(f"{invalid}: MaximalPeriod should be > MinimalPeriod")
+class CoronaTrendVigor(Indicator):
+    """Ehlers' Corona Trend Vigor indicator."""
 
-        bc = params.bar_component if params.bar_component is not None else BarComponent.MEDIAN
-        qc = params.quote_component if params.quote_component is not None else DEFAULT_QUOTE_COMPONENT
-        tc = params.trade_component if params.trade_component is not None else DEFAULT_TRADE_COMPONENT
+    def __init__(self, params: Optional[CoronaTrendVigorParams] = None) -> None:
+        source = default_params() if params is None else params
+        self._raster = Raster(
+            source.raster_length,
+            source.min_parameter_value,
+            source.max_parameter_value,
+            source.max_raster_value,
+        )
+        if (
+            isinstance(source.lookback_offset, bool)
+            or not isinstance(source.lookback_offset, int)
+            or source.lookback_offset not in (0, -1)
+        ):
+            raise ValueError("lookback_offset must be integer 0 or -1")
+        self._lookback_offset: int = source.lookback_offset
+
+        self._corona = Corona(
+            CoronaParams(
+                high_pass_filter_cutoff=source.high_pass_filter_cutoff,
+                minimal_period=source.minimal_period,
+                maximal_period=source.maximal_period,
+                decibels_lower_threshold=6.0,
+                decibels_upper_threshold=self._raster.ceiling,
+            )
+        )
+        self._corona_parameters = self._corona.parameters
+        self._bandpass = AdaptiveBandPass()
+
+        bc = source.bar_component if source.bar_component is not None else DEFAULT_BAR_COMPONENT
+        qc = source.quote_component if source.quote_component is not None else DEFAULT_QUOTE_COMPONENT
+        tc = source.trade_component if source.trade_component is not None else DEFAULT_TRADE_COMPONENT
 
         self._bar_func = bar_component_value(bc)
         self._quote_func = quote_component_value(qc)
         self._trade_func = trade_component_value(tc)
 
-        self._corona = Corona(CoronaParams(
-            high_pass_filter_cutoff=cfg_hp_cutoff,
-            minimal_period=cfg_min_period,
-            maximal_period=cfg_max_period,
-        ))
+        comp = component_triple_mnemonic(bc, qc, tc)
+        flags = trend_flags(source)
+        self.mnemonic: str = (
+            f"ctv({self._raster.length}, {format_number(self._raster.ceiling)}, "
+            f"{format_number(self._raster.lower)}, {format_number(self._raster.upper)}, "
+            f"{source.high_pass_filter_cutoff}{flags}{comp})"
+        )
+        self.description: str = "Corona trend vigor " + self.mnemonic
+        self._mnemonic_tv: str = f"ctv-tv({source.high_pass_filter_cutoff}{flags}{comp})"
+        self._description_tv: str = "Corona trend vigor scalar " + self._mnemonic_tv
 
-        self._raster_length = cfg_raster_len
-        self._raster_step = cfg_max_raster / cfg_raster_len
-        self._max_raster_value = cfg_max_raster
-        self._min_parameter_value = cfg_min_param
-        self._max_parameter_value = cfg_max_param
-        self._parameter_resolution = (cfg_raster_len - 1) / (cfg_max_param - cfg_min_param)
-        self._raster = [0.0] * cfg_raster_len
+        self.reset()
 
-        buf_len = self._corona.maximal_period_times_two
-        self._sample_buffer = [0.0] * buf_len
-        self._sample_count = 0
-        self._sample_previous = 0.0
-        self._sample_previous2 = 0.0
-        self._band_pass_previous = 0.0
-        self._band_pass_previous2 = 0.0
-        self._ratio_previous = 0.0
-        self._trend_vigor = math.nan
-
-        comp_mn = component_triple_mnemonic(bc, qc, tc)
-        self.mnemonic = f"ctv({cfg_raster_len}, {cfg_max_raster:g}, " \
-            f"{cfg_min_param:g}, {cfg_max_param:g}, {cfg_hp_cutoff}{comp_mn})"
-        self.description = "Corona trend vigor " + self.mnemonic
-        self._mnemonic_tv = f"ctv-tv({cfg_hp_cutoff}{comp_mn})"
-        self._description_tv = "Corona trend vigor scalar " + self._mnemonic_tv
+    def reset(self) -> None:
+        """Reset streaming state while preserving configuration."""
+        self._corona.reset()
+        self._sample_count: int = 0
+        self._bandpass.reset()
+        self._raster.reset()
+        self._prices: list[float] = []
+        self._ratio: float = 0.0
+        self._ready: bool = False
 
     def is_primed(self) -> bool:
-        return self._corona.is_primed()
+        return self._ready
 
     def metadata(self) -> Metadata:
         return build_metadata(
@@ -120,155 +132,87 @@ class CoronaTrendVigor:
             ],
         )
 
-    def update(self, sample: float, t: datetime.datetime) -> tuple:
-        """Returns (heatmap, trend_vigor)."""
-        if math.isnan(sample):
-            return (Heatmap.empty(t, self._min_parameter_value,
-                                  self._max_parameter_value, self._parameter_resolution),
-                    math.nan)
+    def _empty(self, time: Optional[datetime.datetime]) -> CoronaTrendVigorSnapshot:
+        return CoronaTrendVigorSnapshot(
+            self._raster.empty(time),
+            math.nan,
+            math.nan,
+            math.nan,
+            math.nan,
+            math.nan,
+            math.nan,
+            math.nan,
+            math.nan,
+            math.nan,
+            math.nan,
+            math.nan,
+            math.nan,
+        )
 
-        primed = self._corona.update(sample)
-        self._sample_count += 1
+    def update(
+        self, sample: float, time: Optional[datetime.datetime] = None
+    ) -> CoronaTrendVigorSnapshot:
+        """Advance standalone engine with one price sample and return full snapshot."""
+        return self.update_from_snapshot(self._corona.update(sample, time))
 
-        buf_last = len(self._sample_buffer) - 1
+    def update_from_snapshot(self, snapshot: CoronaSnapshot) -> CoronaTrendVigorSnapshot:
+        """Consume one shared CoronaSnapshot in accepted-sample order."""
+        if not accept_snapshot(snapshot, self._corona_parameters, self._sample_count + 1):
+            return self._empty(snapshot.time)
+        self._sample_count = snapshot.sample_count
 
-        if self._sample_count == 1:
-            self._sample_previous = sample
-            self._sample_buffer[buf_last] = sample
-            return (Heatmap.empty(t, self._min_parameter_value,
-                                  self._max_parameter_value, self._parameter_resolution),
-                    math.nan)
+        cycle = self._bandpass.update(snapshot.price, snapshot.dominant_cycle_median)
+        self._prices.append(snapshot.price)
+        if len(self._prices) > self._corona_parameters.maximal_period + 1:
+            del self._prices[0]
 
-        # Bandpass filter at the dominant cycle median period.
-        dcm = self._corona.dominant_cycle_median
-        omega = 2.0 * math.pi / dcm if dcm != 0 else math.inf
-        beta2 = math.cos(omega)
-        cos_val = math.cos(omega * 2 * _BP_DELTA)
-        if cos_val == 0:
-            gamma2 = math.copysign(math.inf, 1.0)
-        else:
-            gamma2 = 1.0 / cos_val
-        disc = gamma2 * gamma2 - 1.0
-        alpha2 = gamma2 - math.sqrt(disc) if disc >= 0 else 0.0
-        band_pass = 0.5 * (1 - alpha2) * (sample - self._sample_previous2) + \
-            beta2 * (1 + alpha2) * self._band_pass_previous - \
-            alpha2 * self._band_pass_previous2
+        lag = max(1, int(math.floor(snapshot.dominant_cycle_median)) + self._lookback_offset)
+        has_history = len(self._prices) > lag
+        trend = snapshot.price - self._prices[-1 - lag] if has_history else math.nan
+        raw_ratio = (
+            trend / cycle.amplitude if has_history and cycle.amplitude > 0.0 else math.nan
+        )
+        if has_history and trend != 0.0 and cycle.amplitude > 0.0:
+            self._ratio = clip(checked(0.33 * raw_ratio + 0.67 * self._ratio), -10.0, 10.0)
 
-        # Quadrature = derivative / omega.
-        if omega == 0:
-            diff = band_pass - self._band_pass_previous
-            quadrature2 = math.copysign(math.inf, diff) if diff != 0 else 0.0
-        else:
-            quadrature2 = (band_pass - self._band_pass_previous) / omega
+        vigor = 0.05 * (self._ratio + 10.0)
+        width = min(vigor - 0.3, 0.7 - vigor) if 0.3 <= vigor <= 0.7 else 0.01
+        if width == 0.0:
+            width = 0.01
 
-        self._band_pass_previous2 = self._band_pass_previous
-        self._band_pass_previous = band_pass
-        self._sample_previous2 = self._sample_previous
-        self._sample_previous = sample
+        self._raster.update(vigor, width, "trend", suppress=vigor < 0.3 or vigor > 0.7)
+        self._ready = snapshot.primed and has_history
+        if not self._ready:
+            return self._empty(snapshot.time)
 
-        # Left-shift sample buffer and append new sample.
-        for i in range(buf_last):
-            self._sample_buffer[i] = self._sample_buffer[i + 1]
-        self._sample_buffer[buf_last] = sample
+        mapped = self._raster.lower + (self._raster.upper - self._raster.lower) * vigor
+        return CoronaTrendVigorSnapshot(
+            heatmap=self._raster.column(snapshot.time),
+            trend_vigor=mapped,
+            normalized_vigor=vigor,
+            dominant_cycle=snapshot.dominant_cycle,
+            dominant_cycle_median=snapshot.dominant_cycle_median,
+            band_pass=cycle.band_pass,
+            quadrature=cycle.quadrature,
+            cycle_amplitude=cycle.amplitude,
+            trend_displacement=trend,
+            raw_ratio=raw_ratio,
+            lookback=float(lag),
+            width=width,
+            has_cycle_estimate=float(snapshot.has_cycle_estimate),
+        )
 
-        # Cycle amplitude.
-        amplitude2 = math.sqrt(band_pass * band_pass + quadrature2 * quadrature2)
+    def _wrap(self, time: datetime.datetime, result: CoronaTrendVigorSnapshot) -> Output:
+        return [result.heatmap, Scalar(time, result.trend_vigor)]
 
-        # Trend over cycle period.
-        dcm = self._corona.dominant_cycle_median
-        if math.isinf(dcm) or math.isnan(dcm):
-            cycle_period = len(self._sample_buffer)
-        else:
-            cycle_period = int(dcm - 1)
-            if cycle_period > len(self._sample_buffer):
-                cycle_period = len(self._sample_buffer)
-        if cycle_period < 1:
-            cycle_period = 1
+    def update_scalar(self, sample: Scalar) -> Output:
+        return self._wrap(sample.time, self.update(sample.value, sample.time))
 
-        lookback = cycle_period
-        if self._sample_count < lookback:
-            lookback = self._sample_count
+    def update_bar(self, sample: Bar) -> Output:
+        return self._wrap(sample.time, self.update(self._bar_func(sample), sample.time))
 
-        trend = sample - self._sample_buffer[len(self._sample_buffer) - lookback]
+    def update_quote(self, sample: Quote) -> Output:
+        return self._wrap(sample.time, self.update(self._quote_func(sample), sample.time))
 
-        ratio = 0.0
-        if abs(trend) > 0 and amplitude2 > 0:
-            ratio = _RATIO_NEW_COEF * trend / amplitude2 + _RATIO_PREVIOUS_COEF * self._ratio_previous
-
-        if ratio > _RATIO_LIMIT:
-            ratio = _RATIO_LIMIT
-        elif ratio < -_RATIO_LIMIT:
-            ratio = -_RATIO_LIMIT
-
-        self._ratio_previous = ratio
-
-        # vigor in [0, 1]
-        vigor = _VIGOR_SCALE * (ratio + _RATIO_LIMIT)
-
-        # Width.
-        if vigor >= _VIGOR_MID_LOW and vigor < _VIGOR_MID:
-            width = vigor - (_VIGOR_MID_LOW - _WIDTH_EDGE)
-        elif vigor >= _VIGOR_MID and vigor <= _VIGOR_MID_HIGH:
-            width = (_VIGOR_MID_HIGH + _WIDTH_EDGE) - vigor
-        else:
-            width = _WIDTH_EDGE
-
-        self._trend_vigor = (self._max_parameter_value - self._min_parameter_value) * \
-            vigor + self._min_parameter_value
-
-        vigor_scaled_to_raster_length = round(self._raster_length * vigor)
-        vigor_scaled_to_max_raster_value = vigor * self._max_raster_value
-
-        for i in range(self._raster_length):
-            value = self._raster[i]
-
-            if i == vigor_scaled_to_raster_length:
-                value *= _RASTER_BLEND_HALF
-            else:
-                argument = vigor_scaled_to_max_raster_value - self._raster_step * i
-                if i > vigor_scaled_to_raster_length:
-                    argument = -argument
-
-                if width > 0:
-                    value = _RASTER_BLEND_SCALE * \
-                        (math.pow(argument / width, _RASTER_BLEND_EXPONENT) + _RASTER_BLEND_PREVIOUS * value)
-
-            if value < 0:
-                value = 0
-            elif value > self._max_raster_value or vigor < _VIGOR_MID_LOW or vigor > _VIGOR_MID_HIGH:
-                value = self._max_raster_value
-
-            if math.isnan(value):
-                value = 0
-
-            self._raster[i] = value
-
-        if not primed:
-            return (Heatmap.empty(t, self._min_parameter_value,
-                                  self._max_parameter_value, self._parameter_resolution),
-                    math.nan)
-
-        values = list(self._raster)
-        value_min = min(values)
-        value_max = max(values)
-
-        heatmap = Heatmap(t, self._min_parameter_value, self._max_parameter_value,
-                          self._parameter_resolution, value_min, value_max, values)
-
-        return heatmap, self._trend_vigor
-
-    def update_scalar(self, sample: Scalar) -> list:
-        return self._update_entity(sample.time, sample.value)
-
-    def update_bar(self, sample: Bar) -> list:
-        return self._update_entity(sample.time, self._bar_func(sample))
-
-    def update_quote(self, sample: Quote) -> list:
-        return self._update_entity(sample.time, self._quote_func(sample))
-
-    def update_trade(self, sample: Trade) -> list:
-        return self._update_entity(sample.time, self._trade_func(sample))
-
-    def _update_entity(self, t: datetime.datetime, sample: float) -> list:
-        heatmap, tv = self.update(sample, t)
-        return [heatmap, Scalar(t, tv)]
+    def update_trade(self, sample: Trade) -> Output:
+        return self._wrap(sample.time, self.update(self._trade_func(sample), sample.time))

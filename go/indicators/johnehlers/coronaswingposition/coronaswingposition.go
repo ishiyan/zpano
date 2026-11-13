@@ -1,16 +1,5 @@
-// Package coronaswingposition implements Ehlers' Corona Swing Position heatmap
-// indicator.
-//
-// The Corona swing position is estimated by correlating the prices with a
-// perfect sine wave having the dominant cycle period. This correlation produces
-// a smooth waveform that lets us better estimate the swing position and
-// impending turning points.
-//
-// Reference: John Ehlers, "Measuring Cycle Periods", Stocks & Commodities,
-// November 2008.
 package coronaswingposition
 
-//nolint: gofumpt
 import (
 	"fmt"
 	"math"
@@ -23,215 +12,164 @@ import (
 	"zpano/indicators/johnehlers/corona"
 )
 
-const (
-	maxLeadListCount     = 50
-	maxPositionListCount = 20
+// Snapshot owns all 12 diagnostic fields for one CoronaSwingPosition update.
+type Snapshot struct {
+	Heatmap             *outputs.Heatmap
+	SwingPosition       float64
+	NormalizedPosition  float64
+	DominantCycle       float64
+	DominantCycleMedian float64
+	BandPass            float64
+	Quadrature          float64
+	CycleAmplitude      float64
+	Lead60              float64
+	PositionSpan        float64
+	Width               float64
+	HasCycleEstimate    float64
+}
 
-	// 60° phase-lead coefficients: lead60 = 0.5·BP + sin(60°)·Q ≈ 0.5·BP + 0.866·Q.
-	lead60CoefBP = 0.5
-	lead60CoefQ  = 0.866
-
-	// Bandpass filter delta factor in γ = 1/cos(ω · 2 · 0.1).
-	bpDelta = 0.1
-
-	widthHighThreshold = 0.85
-	widthHighSaturate  = 0.8
-	widthNarrow        = 0.01
-	widthScale         = 0.15
-
-	rasterBlendExponent = 0.95
-	rasterBlendHalf     = 0.5
-)
+// SwingOutput aliases [Snapshot].
+type SwingOutput = Snapshot
 
 // CoronaSwingPosition is Ehlers' Corona Swing Position indicator.
 type CoronaSwingPosition struct {
-	mu                  sync.RWMutex
-	mnemonic            string
-	description         string
-	mnemonicSP          string
-	descriptionSP       string
-	c                   *corona.Corona
-	rasterLength        int
-	rasterStep          float64
-	maxRasterValue      float64
-	minParameterValue   float64
-	maxParameterValue   float64
-	parameterResolution float64
-	raster              []float64
-	leadList            []float64
-	positionList        []float64
-	samplePrevious      float64
-	samplePrevious2     float64
-	bandPassPrevious    float64
-	bandPassPrevious2   float64
-	swingPosition       float64
-	isStarted           bool
-	barFunc             entities.BarFunc
-	quoteFunc           entities.QuoteFunc
-	tradeFunc           entities.TradeFunc
+	mu             sync.RWMutex
+	mnemonic       string
+	description    string
+	mnemonicSP     string
+	descriptionSP  string
+	engine         *corona.Corona
+	engineParams   corona.Params
+	bandpass       *corona.AdaptiveBandPass
+	raster         *corona.Raster
+	leadWindow     int
+	positionWindow int
+	sampleCount    int
+	leads          []float64
+	positions      []float64
+	barFunc        entities.BarFunc
+	quoteFunc      entities.QuoteFunc
+	tradeFunc      entities.TradeFunc
 }
 
 // NewCoronaSwingPositionDefault returns an instance created with default parameters.
 func NewCoronaSwingPositionDefault() (*CoronaSwingPosition, error) {
-	return NewCoronaSwingPositionParams(&Params{})
+	return NewCoronaSwingPositionParams(DefaultParams())
+}
+
+// NewCoronaSwingPosition aliases [NewCoronaSwingPositionParams].
+func NewCoronaSwingPosition(p *Params) (*CoronaSwingPosition, error) {
+	return NewCoronaSwingPositionParams(p)
 }
 
 // NewCoronaSwingPositionParams returns an instance created with the supplied parameters.
-//
-//nolint:funlen,cyclop
 func NewCoronaSwingPositionParams(p *Params) (*CoronaSwingPosition, error) {
-	const (
-		invalid      = "invalid corona swing position parameters"
-		fmtRaster    = "%s: RasterLength should be >= 2"
-		fmtMaxRaster = "%s: MaxRasterValue should be > 0"
-		fmtMaxParam  = "%s: MaxParameterValue should be > MinParameterValue"
-		fmtHP        = "%s: HighPassFilterCutoff should be >= 2"
-		fmtMinP      = "%s: MinimalPeriod should be >= 2"
-		fmtMaxP      = "%s: MaximalPeriod should be > MinimalPeriod"
-		fmtw         = "%s: %w"
-		fmtnValue    = "cswing(%d, %g, %g, %g, %d%s)"
-		fmtnSP       = "cswing-sp(%d%s)"
-		descrValue   = "Corona swing position "
-		descrSP      = "Corona swing position scalar "
-		defRaster    = 50
-		defMaxRast   = 20.0
-		defMinParam  = -5.0
-		defMaxParam  = 5.0
-		defHPCutoff  = 30
-		defMinPer    = 6
-		defMaxPer    = 30
-	)
+	const invalid = "invalid corona swing position parameters"
 
-	cfg := *p
-
-	if cfg.RasterLength == 0 {
-		cfg.RasterLength = defRaster
+	source := DefaultParams()
+	if p != nil {
+		copied := *p
+		source = &copied
+	}
+	raster, err := corona.NewRaster(source.RasterLength, source.MinParameterValue, source.MaxParameterValue, source.MaxRasterValue)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", invalid, err)
+	}
+	if err := corona.ValidateInteger("LeadWindow", source.LeadWindow, 2); err != nil {
+		return nil, fmt.Errorf("%s: %w", invalid, err)
+	}
+	if err := corona.ValidateInteger("PositionWindow", source.PositionWindow, 2); err != nil {
+		return nil, fmt.Errorf("%s: %w", invalid, err)
 	}
 
-	if cfg.MaxRasterValue == 0 {
-		cfg.MaxRasterValue = defMaxRast
+	engine, err := corona.NewCorona(&corona.Params{
+		HighPassFilterCutoff:   source.HighPassFilterCutoff,
+		MinimalPeriod:          source.MinimalPeriod,
+		MaximalPeriod:          source.MaximalPeriod,
+		DecibelsLowerThreshold: 6.0,
+		DecibelsUpperThreshold: raster.Ceiling(),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", invalid, err)
 	}
 
-	// MinParameterValue and MaxParameterValue default to -5 and 5; since 0 is a
-	// valid user value for either, we only substitute when both are zero (the
-	// unconfigured case).
-	if cfg.MinParameterValue == 0 && cfg.MaxParameterValue == 0 {
-		cfg.MinParameterValue = defMinParam
-		cfg.MaxParameterValue = defMaxParam
-	}
-
-	if cfg.HighPassFilterCutoff == 0 {
-		cfg.HighPassFilterCutoff = defHPCutoff
-	}
-
-	if cfg.MinimalPeriod == 0 {
-		cfg.MinimalPeriod = defMinPer
-	}
-
-	if cfg.MaximalPeriod == 0 {
-		cfg.MaximalPeriod = defMaxPer
-	}
-
-	if cfg.RasterLength < 2 {
-		return nil, fmt.Errorf(fmtRaster, invalid)
-	}
-
-	if cfg.MaxRasterValue <= 0 {
-		return nil, fmt.Errorf(fmtMaxRaster, invalid)
-	}
-
-	if cfg.MaxParameterValue <= cfg.MinParameterValue {
-		return nil, fmt.Errorf(fmtMaxParam, invalid)
-	}
-
-	if cfg.HighPassFilterCutoff < 2 {
-		return nil, fmt.Errorf(fmtHP, invalid)
-	}
-
-	if cfg.MinimalPeriod < 2 {
-		return nil, fmt.Errorf(fmtMinP, invalid)
-	}
-
-	if cfg.MaximalPeriod <= cfg.MinimalPeriod {
-		return nil, fmt.Errorf(fmtMaxP, invalid)
-	}
-
-	bc := cfg.BarComponent
+	bc, qc, tc := source.BarComponent, source.QuoteComponent, source.TradeComponent
 	if bc == 0 {
-		bc = entities.BarMedianPrice
+		bc = entities.DefaultBarComponent
 	}
-
-	qc := cfg.QuoteComponent
 	if qc == 0 {
 		qc = entities.DefaultQuoteComponent
 	}
-
-	tc := cfg.TradeComponent
 	if tc == 0 {
 		tc = entities.DefaultTradeComponent
 	}
 
-	c, err := corona.NewCorona(&corona.Params{
-		HighPassFilterCutoff: cfg.HighPassFilterCutoff,
-		MinimalPeriod:        cfg.MinimalPeriod,
-		MaximalPeriod:        cfg.MaximalPeriod,
-	})
-	if err != nil {
-		return nil, fmt.Errorf(fmtw, invalid, err)
-	}
-
 	barFunc, err := entities.BarComponentFunc(bc)
 	if err != nil {
-		return nil, fmt.Errorf(fmtw, invalid, err)
+		return nil, fmt.Errorf("%s: %w", invalid, err)
 	}
-
 	quoteFunc, err := entities.QuoteComponentFunc(qc)
 	if err != nil {
-		return nil, fmt.Errorf(fmtw, invalid, err)
+		return nil, fmt.Errorf("%s: %w", invalid, err)
 	}
-
 	tradeFunc, err := entities.TradeComponentFunc(tc)
 	if err != nil {
-		return nil, fmt.Errorf(fmtw, invalid, err)
+		return nil, fmt.Errorf("%s: %w", invalid, err)
 	}
 
-	componentMnemonic := core.ComponentTripleMnemonic(bc, qc, tc)
+	comp := core.ComponentTripleMnemonic(bc, qc, tc)
+	flags := swingFlags(*source)
+	mnemonicValue := fmt.Sprintf("cswing(%d, %s, %s, %s, %d%s%s)",
+		raster.Length(),
+		corona.FormatNumber(raster.Ceiling()),
+		corona.FormatNumber(raster.Lower()),
+		corona.FormatNumber(raster.Upper()),
+		source.HighPassFilterCutoff,
+		flags,
+		comp,
+	)
+	mnemonicSP := fmt.Sprintf("cswing-sp(%d%s%s)", source.HighPassFilterCutoff, flags, comp)
 
-	mnemonicValue := fmt.Sprintf(fmtnValue,
-		cfg.RasterLength, cfg.MaxRasterValue, cfg.MinParameterValue, cfg.MaxParameterValue,
-		cfg.HighPassFilterCutoff, componentMnemonic)
-	mnemonicSP := fmt.Sprintf(fmtnSP, cfg.HighPassFilterCutoff, componentMnemonic)
+	instance := &CoronaSwingPosition{
+		mnemonic:       mnemonicValue,
+		description:    "Corona swing position " + mnemonicValue,
+		mnemonicSP:     mnemonicSP,
+		descriptionSP:  "Corona swing position scalar " + mnemonicSP,
+		engine:         engine,
+		engineParams:   engine.Parameters(),
+		bandpass:       corona.NewAdaptiveBandPass(),
+		raster:         raster,
+		leadWindow:     source.LeadWindow,
+		positionWindow: source.PositionWindow,
+		barFunc:        barFunc,
+		quoteFunc:      quoteFunc,
+		tradeFunc:      tradeFunc,
+	}
+	instance.resetLocked()
+	return instance, nil
+}
 
-	parameterResolution := float64(cfg.RasterLength-1) / (cfg.MaxParameterValue - cfg.MinParameterValue)
+func (s *CoronaSwingPosition) resetLocked() {
+	s.engine.Reset()
+	s.sampleCount = 0
+	s.bandpass.Reset()
+	s.raster.Reset()
+	s.leads = make([]float64, s.leadWindow)
+	s.positions = make([]float64, s.positionWindow)
+}
 
-	return &CoronaSwingPosition{
-		mnemonic:            mnemonicValue,
-		description:         descrValue + mnemonicValue,
-		mnemonicSP:          mnemonicSP,
-		descriptionSP:       descrSP + mnemonicSP,
-		c:                   c,
-		rasterLength:        cfg.RasterLength,
-		rasterStep:          cfg.MaxRasterValue / float64(cfg.RasterLength),
-		maxRasterValue:      cfg.MaxRasterValue,
-		minParameterValue:   cfg.MinParameterValue,
-		maxParameterValue:   cfg.MaxParameterValue,
-		parameterResolution: parameterResolution,
-		raster:              make([]float64, cfg.RasterLength),
-		leadList:            make([]float64, 0, maxLeadListCount),
-		positionList:        make([]float64, 0, maxPositionListCount),
-		swingPosition:       math.NaN(),
-		barFunc:             barFunc,
-		quoteFunc:           quoteFunc,
-		tradeFunc:           tradeFunc,
-	}, nil
+// Reset clears streaming state while retaining parameters.
+func (s *CoronaSwingPosition) Reset() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.resetLocked()
 }
 
 // IsPrimed indicates whether the indicator is primed.
 func (s *CoronaSwingPosition) IsPrimed() bool {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-
-	return s.c.IsPrimed()
+	return s.sampleCount >= corona.FirstBankSample
 }
 
 // Metadata describes the output data of the indicator.
@@ -247,182 +185,144 @@ func (s *CoronaSwingPosition) Metadata() core.Metadata {
 	)
 }
 
-// Update feeds the next sample and returns the heatmap column plus the current
-// SwingPosition. On unprimed bars the heatmap is empty and the scalar is NaN.
-//
-//nolint:funlen,cyclop,gocognit
-func (s *CoronaSwingPosition) Update(sample float64, t time.Time) (*outputs.Heatmap, float64) {
+func (s *CoronaSwingPosition) emptySnapshot(t time.Time) Snapshot {
+	nan := math.NaN()
+	return Snapshot{
+		Heatmap:             s.raster.Empty(t),
+		SwingPosition:       nan,
+		NormalizedPosition:  nan,
+		DominantCycle:       nan,
+		DominantCycleMedian: nan,
+		BandPass:            nan,
+		Quadrature:          nan,
+		CycleAmplitude:      nan,
+		Lead60:              nan,
+		PositionSpan:        nan,
+		Width:               nan,
+		HasCycleEstimate:    nan,
+	}
+}
+
+func (s *CoronaSwingPosition) updateFromSnapshotLocked(snapshot corona.Snapshot) (Snapshot, error) {
+	accepted, err := corona.AcceptSnapshot(snapshot, s.engineParams, s.sampleCount+1)
+	if err != nil {
+		return Snapshot{}, err
+	}
+	if !accepted {
+		return s.emptySnapshot(snapshot.Time), nil
+	}
+
+	cycle, err := s.bandpass.TryUpdate(snapshot.Price, snapshot.DominantCycleMedian)
+	if err != nil {
+		return Snapshot{}, err
+	}
+	s.sampleCount = snapshot.SampleCount
+
+	var lowest, highest float64
+	s.leads, lowest, highest = corona.RollingAppend(s.leads, cycle.Lead60, s.leadWindow)
+	flat := highest == lowest
+	position := 0.5
+	if !flat {
+		position = (cycle.Lead60 - lowest) / (highest - lowest)
+	}
+	position = corona.Clip(position, 0.0, 1.0)
+
+	var lowPosition, highPosition float64
+	s.positions, lowPosition, highPosition = corona.RollingAppend(s.positions, position, s.positionWindow)
+	span := highPosition - lowPosition
+	width := 0.15 * span
+	if span > 0.85 {
+		width = 0.01
+	}
+	if width == 0.0 {
+		width = 0.01
+	}
+
+	s.raster.Update(position, width, corona.RasterSwing, span > 0.8 || flat)
+	if !snapshot.Primed {
+		return s.emptySnapshot(snapshot.Time), nil
+	}
+
+	mapped := s.raster.Lower() + (s.raster.Upper()-s.raster.Lower())*position
+	hasEstimate := 0.0
+	if snapshot.HasCycleEstimate {
+		hasEstimate = 1.0
+	}
+	return Snapshot{
+		Heatmap:             s.raster.Column(snapshot.Time),
+		SwingPosition:       mapped,
+		NormalizedPosition:  position,
+		DominantCycle:       snapshot.DominantCycle,
+		DominantCycleMedian: snapshot.DominantCycleMedian,
+		BandPass:            cycle.BandPass,
+		Quadrature:          cycle.Quadrature,
+		CycleAmplitude:      cycle.Amplitude,
+		Lead60:              cycle.Lead60,
+		PositionSpan:        span,
+		Width:               width,
+		HasCycleEstimate:    hasEstimate,
+	}, nil
+}
+
+// TryUpdate feeds the next sample to the standalone engine and returns a full snapshot or error.
+func (s *CoronaSwingPosition) TryUpdate(sample float64, t time.Time) (Snapshot, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-
-	if math.IsNaN(sample) {
-		return outputs.NewEmptyHeatmap(t, s.minParameterValue, s.maxParameterValue, s.parameterResolution), math.NaN()
+	snapshot, err := s.engine.TryUpdate(sample, t)
+	if err != nil {
+		return Snapshot{}, err
 	}
+	return s.updateFromSnapshotLocked(snapshot)
+}
 
-	primed := s.c.Update(sample)
-
-	if !s.isStarted {
-		s.samplePrevious = sample
-		s.isStarted = true
-
-		return outputs.NewEmptyHeatmap(t, s.minParameterValue, s.maxParameterValue, s.parameterResolution), math.NaN()
+// Update feeds the next sample to the standalone engine and returns a full snapshot.
+func (s *CoronaSwingPosition) Update(sample float64, t time.Time) Snapshot {
+	result, err := s.TryUpdate(sample, t)
+	if err != nil {
+		panic(err)
 	}
+	return result
+}
 
-	// Bandpass InPhase filter at the dominant cycle median period.
-	omega := 2. * math.Pi / s.c.DominantCycleMedian()
-	beta2 := math.Cos(omega)
-	gamma2 := 1. / math.Cos(omega*2*bpDelta)
-	alpha2 := gamma2 - math.Sqrt(gamma2*gamma2-1.)
-	bandPass := 0.5*(1-alpha2)*(sample-s.samplePrevious2) +
-		beta2*(1+alpha2)*s.bandPassPrevious -
-		alpha2*s.bandPassPrevious2
+// TryUpdateFromSnapshot consumes one shared engine snapshot in accepted-sample order.
+func (s *CoronaSwingPosition) TryUpdateFromSnapshot(snapshot corona.Snapshot) (Snapshot, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.updateFromSnapshotLocked(snapshot)
+}
 
-	// Quadrature = derivative / omega.
-	quadrature2 := (bandPass - s.bandPassPrevious) / omega
-
-	s.bandPassPrevious2 = s.bandPassPrevious
-	s.bandPassPrevious = bandPass
-	s.samplePrevious2 = s.samplePrevious
-	s.samplePrevious = sample
-
-	// 60° lead: lead60 = 0.5·BP_previous2 + 0.866·Q
-	lead60 := lead60CoefBP*s.bandPassPrevious2 + lead60CoefQ*quadrature2
-
-	lowest, highest := appendRolling(&s.leadList, maxLeadListCount, lead60)
-
-	// Normalised lead position ∈ [0, 1].
-	position := highest - lowest
-	if position > 0 {
-		position = (lead60 - lowest) / position
+// UpdateFromSnapshot consumes one shared engine snapshot and panics on invalid ordering/parameters.
+func (s *CoronaSwingPosition) UpdateFromSnapshot(snapshot corona.Snapshot) Snapshot {
+	result, err := s.TryUpdateFromSnapshot(snapshot)
+	if err != nil {
+		panic(err)
 	}
+	return result
+}
 
-	lowest, highest = appendRolling(&s.positionList, maxPositionListCount, position)
-	highest -= lowest
-
-	width := 0.15 * highest
-	if highest > widthHighThreshold {
-		width = widthNarrow
+func (s *CoronaSwingPosition) wrapEntity(t time.Time, result Snapshot) core.Output {
+	return core.Output{
+		result.Heatmap,
+		entities.Scalar{Time: t, Value: result.SwingPosition},
 	}
-
-	s.swingPosition = (s.maxParameterValue-s.minParameterValue)*position + s.minParameterValue
-
-	positionScaledToRasterLength := int(math.Round(position * float64(s.rasterLength)))
-	positionScaledToMaxRasterValue := position * s.maxRasterValue
-
-	for i := 0; i < s.rasterLength; i++ {
-		value := s.raster[i]
-
-		if i == positionScaledToRasterLength {
-			value *= rasterBlendHalf
-		} else {
-			argument := positionScaledToMaxRasterValue - s.rasterStep*float64(i)
-			if i > positionScaledToRasterLength {
-				argument = -argument
-			}
-
-			if width > 0 {
-				value = rasterBlendHalf *
-					(math.Pow(argument/width, rasterBlendExponent) + rasterBlendHalf*value)
-			}
-		}
-
-		if value < 0 {
-			value = 0
-		} else if value > s.maxRasterValue {
-			value = s.maxRasterValue
-		}
-
-		if highest > widthHighSaturate {
-			value = s.maxRasterValue
-		}
-
-		if math.IsNaN(value) {
-			value = 0
-		}
-
-		s.raster[i] = value
-	}
-
-	if !primed {
-		return outputs.NewEmptyHeatmap(t, s.minParameterValue, s.maxParameterValue, s.parameterResolution), math.NaN()
-	}
-
-	values := make([]float64, s.rasterLength)
-	valueMin := math.Inf(1)
-	valueMax := math.Inf(-1)
-
-	for i := 0; i < s.rasterLength; i++ {
-		v := s.raster[i]
-		values[i] = v
-
-		if v < valueMin {
-			valueMin = v
-		}
-
-		if v > valueMax {
-			valueMax = v
-		}
-	}
-
-	heatmap := outputs.NewHeatmap(t, s.minParameterValue, s.maxParameterValue, s.parameterResolution,
-		valueMin, valueMax, values)
-
-	return heatmap, s.swingPosition
 }
 
 // UpdateScalar updates the indicator given the next scalar sample.
 func (s *CoronaSwingPosition) UpdateScalar(sample *entities.Scalar) core.Output {
-	return s.updateEntity(sample.Time, sample.Value)
+	return s.wrapEntity(sample.Time, s.Update(sample.Value, sample.Time))
 }
 
 // UpdateBar updates the indicator given the next bar sample.
 func (s *CoronaSwingPosition) UpdateBar(sample *entities.Bar) core.Output {
-	return s.updateEntity(sample.Time, s.barFunc(sample))
+	return s.wrapEntity(sample.Time, s.Update(s.barFunc(sample), sample.Time))
 }
 
 // UpdateQuote updates the indicator given the next quote sample.
 func (s *CoronaSwingPosition) UpdateQuote(sample *entities.Quote) core.Output {
-	return s.updateEntity(sample.Time, s.quoteFunc(sample))
+	return s.wrapEntity(sample.Time, s.Update(s.quoteFunc(sample), sample.Time))
 }
 
 // UpdateTrade updates the indicator given the next trade sample.
 func (s *CoronaSwingPosition) UpdateTrade(sample *entities.Trade) core.Output {
-	return s.updateEntity(sample.Time, s.tradeFunc(sample))
-}
-
-func (s *CoronaSwingPosition) updateEntity(t time.Time, sample float64) core.Output {
-	const length = 2
-
-	heatmap, sp := s.Update(sample, t)
-
-	output := make([]any, length)
-	output[0] = heatmap
-	output[1] = entities.Scalar{Time: t, Value: sp}
-
-	return output
-}
-
-// appendRolling appends v to the list, drops the oldest element once the list
-// reaches maxCount, and returns the current (lowest, highest) values.
-func appendRolling(list *[]float64, maxCount int, v float64) (float64, float64) {
-	if len(*list) >= maxCount {
-		*list = (*list)[1:]
-	}
-
-	*list = append(*list, v)
-
-	lowest := v
-	highest := v
-
-	for _, x := range *list {
-		if x < lowest {
-			lowest = x
-		}
-
-		if x > highest {
-			highest = x
-		}
-	}
-
-	return lowest, highest
+	return s.wrapEntity(sample.Time, s.Update(s.tradeFunc(sample), sample.Time))
 }

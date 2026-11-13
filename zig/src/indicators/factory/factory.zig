@@ -748,12 +748,13 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
         },
 
         .corona_spectrum => blk: {
+            const defaults = cs_mod.defaultParams();
             const p = cs_mod.Params{
-                .min_raster_value = getF64(obj, "minRasterValue", 0),
-                .max_raster_value = getF64(obj, "maxRasterValue", 0),
-                .min_parameter_value = getF64(obj, "minParameterValue", 0),
-                .max_parameter_value = getF64(obj, "maxParameterValue", 0),
-                .high_pass_filter_cutoff = getInt(obj, "highPassFilterCutoff", 0),
+                .min_raster_value = getF64(obj, "minRasterValue", defaults.min_raster_value),
+                .max_raster_value = getF64(obj, "maxRasterValue", defaults.max_raster_value),
+                .min_parameter_value = getF64(obj, "minParameterValue", defaults.min_parameter_value),
+                .max_parameter_value = getF64(obj, "maxParameterValue", defaults.max_parameter_value),
+                .high_pass_filter_cutoff = getInt(obj, "highPassFilterCutoff", defaults.high_pass_filter_cutoff),
                 .bar_component = getBarComponent(obj),
                 .quote_component = getQuoteComponent(obj),
                 .trade_component = getTradeComponent(obj),
@@ -764,14 +765,15 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
         },
 
         .corona_signal_to_noise_ratio => blk: {
+            const defaults = csnr_mod.defaultParams();
             const p = csnr_mod.Params{
-                .raster_length = getInt(obj, "rasterLength", 0),
-                .max_raster_value = getF64(obj, "maxRasterValue", 0),
-                .min_parameter_value = getF64(obj, "minParameterValue", 0),
-                .max_parameter_value = getF64(obj, "maxParameterValue", 0),
-                .high_pass_filter_cutoff = getInt(obj, "highPassFilterCutoff", 0),
-                .minimal_period = getInt(obj, "minimalPeriod", 0),
-                .maximal_period = getInt(obj, "maximalPeriod", 0),
+                .raster_length = getInt(obj, "rasterLength", defaults.raster_length),
+                .max_raster_value = getF64(obj, "maxRasterValue", defaults.max_raster_value),
+                .min_parameter_value = getF64(obj, "minParameterValue", defaults.min_parameter_value),
+                .max_parameter_value = getF64(obj, "maxParameterValue", defaults.max_parameter_value),
+                .high_pass_filter_cutoff = getInt(obj, "highPassFilterCutoff", defaults.high_pass_filter_cutoff),
+                .minimal_period = getInt(obj, "minimalPeriod", defaults.minimal_period),
+                .maximal_period = getInt(obj, "maximalPeriod", defaults.maximal_period),
                 .bar_component = getBarComponent(obj),
                 .quote_component = getQuoteComponent(obj),
                 .trade_component = getTradeComponent(obj),
@@ -782,14 +784,17 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
         },
 
         .corona_swing_position => blk: {
+            const defaults = cswp_mod.defaultParams();
             const p = cswp_mod.Params{
-                .raster_length = getInt(obj, "rasterLength", 0),
-                .max_raster_value = getF64(obj, "maxRasterValue", 0),
-                .min_parameter_value = getF64(obj, "minParameterValue", 0),
-                .max_parameter_value = getF64(obj, "maxParameterValue", 0),
-                .high_pass_filter_cutoff = getInt(obj, "highPassFilterCutoff", 0),
-                .minimal_period = getInt(obj, "minimalPeriod", 0),
-                .maximal_period = getInt(obj, "maximalPeriod", 0),
+                .raster_length = getInt(obj, "rasterLength", defaults.raster_length),
+                .max_raster_value = getF64(obj, "maxRasterValue", defaults.max_raster_value),
+                .min_parameter_value = getF64(obj, "minParameterValue", defaults.min_parameter_value),
+                .max_parameter_value = getF64(obj, "maxParameterValue", defaults.max_parameter_value),
+                .high_pass_filter_cutoff = getInt(obj, "highPassFilterCutoff", defaults.high_pass_filter_cutoff),
+                .minimal_period = getInt(obj, "minimalPeriod", defaults.minimal_period),
+                .maximal_period = getInt(obj, "maximalPeriod", defaults.maximal_period),
+                .lead_window = getInt(obj, "leadWindow", defaults.lead_window),
+                .position_window = getInt(obj, "positionWindow", defaults.position_window),
                 .bar_component = getBarComponent(obj),
                 .quote_component = getQuoteComponent(obj),
                 .trade_component = getTradeComponent(obj),
@@ -800,14 +805,16 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
         },
 
         .corona_trend_vigor => blk: {
+            const defaults = ctv_mod.defaultParams();
             const p = ctv_mod.Params{
-                .raster_length = getInt(obj, "rasterLength", 0),
-                .max_raster_value = getF64(obj, "maxRasterValue", 0),
-                .min_parameter_value = getF64(obj, "minParameterValue", 0),
-                .max_parameter_value = getF64(obj, "maxParameterValue", 0),
-                .high_pass_filter_cutoff = getInt(obj, "highPassFilterCutoff", 0),
-                .minimal_period = getInt(obj, "minimalPeriod", 0),
-                .maximal_period = getInt(obj, "maximalPeriod", 0),
+                .raster_length = getInt(obj, "rasterLength", defaults.raster_length),
+                .max_raster_value = getF64(obj, "maxRasterValue", defaults.max_raster_value),
+                .min_parameter_value = getF64(obj, "minParameterValue", defaults.min_parameter_value),
+                .max_parameter_value = getF64(obj, "maxParameterValue", defaults.max_parameter_value),
+                .high_pass_filter_cutoff = getInt(obj, "highPassFilterCutoff", defaults.high_pass_filter_cutoff),
+                .minimal_period = getInt(obj, "minimalPeriod", defaults.minimal_period),
+                .maximal_period = getInt(obj, "maximalPeriod", defaults.maximal_period),
+                .lookback_offset = getInt(obj, "lookbackOffset", defaults.lookback_offset),
                 .bar_component = getBarComponent(obj),
                 .quote_component = getQuoteComponent(obj),
                 .trade_component = getTradeComponent(obj),
@@ -1709,6 +1716,54 @@ test "create exponential moving average with smoothing factor" {
     var md: metadata_mod.Metadata = undefined;
     result.indicator.metadata(&md);
     try std.testing.expect(md.outputs_len > 0);
+}
+
+
+test "create corona indicators with defaults, explicit zero threshold, and invalid zero cutoff" {
+    const allocator = std.testing.allocator;
+
+    const spec_default = try create(allocator, .corona_spectrum, "{}");
+    defer spec_default.deinit(allocator);
+    var md_spec: metadata_mod.Metadata = undefined;
+    spec_default.indicator.metadata(&md_spec);
+    try std.testing.expectEqualStrings("cspect(6, 20, 6, 30, 30)", md_spec.mnemonic);
+
+    const spec_zero = try create(allocator, .corona_spectrum,
+        \\{"minRasterValue": 0}
+    );
+    defer spec_zero.deinit(allocator);
+    var md_zero: metadata_mod.Metadata = undefined;
+    spec_zero.indicator.metadata(&md_zero);
+    try std.testing.expectEqualStrings("cspect(0, 20, 6, 30, 30)", md_zero.mnemonic);
+
+    try std.testing.expectError(
+        FactoryError.IndicatorInitFailed,
+        create(allocator, .corona_spectrum,
+            \\{"highPassFilterCutoff": 0}
+        ),
+    );
+
+    const snr_default = try create(allocator, .corona_signal_to_noise_ratio, "{}");
+    defer snr_default.deinit(allocator);
+    var md_snr: metadata_mod.Metadata = undefined;
+    snr_default.indicator.metadata(&md_snr);
+    try std.testing.expectEqualStrings("csnr(50, 20, 1, 11, 30)", md_snr.mnemonic);
+
+    const swing_custom = try create(allocator, .corona_swing_position,
+        \\{"leadWindow": 25, "positionWindow": 15}
+    );
+    defer swing_custom.deinit(allocator);
+    var md_swing: metadata_mod.Metadata = undefined;
+    swing_custom.indicator.metadata(&md_swing);
+    try std.testing.expectEqualStrings("cswing(50, 20, -5, 5, 30, lead=25, pos=15)", md_swing.mnemonic);
+
+    const vigor_custom = try create(allocator, .corona_trend_vigor,
+        \\{"lookbackOffset": -1}
+    );
+    defer vigor_custom.deinit(allocator);
+    var md_vigor: metadata_mod.Metadata = undefined;
+    vigor_custom.indicator.metadata(&md_vigor);
+    try std.testing.expectEqualStrings("ctv(50, 20, -10, 10, 30, offset=-1)", md_vigor.mnemonic);
 }
 
 test "create true range no params" {

@@ -1,121 +1,122 @@
-"""Ehlers' Corona Swing Position heatmap indicator."""
+"""Ehlers' Corona Swing Position indicator."""
 
-import math
+from __future__ import annotations
+
 import datetime
+import math
+from typing import NamedTuple, Optional
 
 from ....entities.bar import Bar
-from ....entities.bar_component import BarComponent, bar_component_value, DEFAULT_BAR_COMPONENT
+from ....entities.bar_component import DEFAULT_BAR_COMPONENT, bar_component_value
 from ....entities.quote import Quote
-from ....entities.quote_component import QuoteComponent, quote_component_value, DEFAULT_QUOTE_COMPONENT
-from ....entities.trade import Trade
-from ....entities.trade_component import TradeComponent, trade_component_value, DEFAULT_TRADE_COMPONENT
+from ....entities.quote_component import DEFAULT_QUOTE_COMPONENT, quote_component_value
 from ....entities.scalar import Scalar
-from ...core.identifier import Identifier
-from ...core.metadata import Metadata
-from ...core.build_metadata import build_metadata, OutputText
+from ....entities.trade import Trade
+from ....entities.trade_component import DEFAULT_TRADE_COMPONENT, trade_component_value
+from ...core.build_metadata import OutputText, build_metadata
 from ...core.component_triple_mnemonic import component_triple_mnemonic
+from ...core.identifier import Identifier
+from ...core.indicator import Indicator
+from ...core.metadata import Metadata
+from ...core.output import Output
 from ...core.outputs.heatmap import Heatmap
-from ..corona.corona import Corona
+from ..corona.corona import (
+    FIRST_BANK_SAMPLE,
+    AdaptiveBandPass,
+    Corona,
+    CoronaSnapshot,
+    Raster,
+    accept_snapshot,
+    clip,
+    format_number,
+    rolling_append,
+    validate_integer_parameter,
+)
 from ..corona.params import CoronaParams
-from .params import Params
-
-_MAX_LEAD_LIST_COUNT = 50
-_MAX_POSITION_LIST_COUNT = 20
-_LEAD60_COEF_BP = 0.5
-_LEAD60_COEF_Q = 0.866
-_BP_DELTA = 0.1
-_WIDTH_HIGH_THRESHOLD = 0.85
-_WIDTH_HIGH_SATURATE = 0.8
-_WIDTH_NARROW = 0.01
-_WIDTH_SCALE = 0.15
-_RASTER_BLEND_EXPONENT = 0.95
-_RASTER_BLEND_HALF = 0.5
+from .params import CoronaSwingPositionParams, default_params, swing_flags
 
 
-def _append_rolling(lst: list[float], max_count: int, v: float) -> tuple[float, float]:
-    """Append v, drop oldest if at max_count, return (lowest, highest)."""
-    if len(lst) >= max_count:
-        del lst[0]
-    lst.append(v)
-    lowest = min(lst)
-    highest = max(lst)
-    return lowest, highest
+class CoronaSwingPositionSnapshot(NamedTuple):
+    """Full 12-field numerical snapshot for CoronaSwingPosition."""
+
+    heatmap: Heatmap
+    swing_position: float
+    normalized_position: float
+    dominant_cycle: float
+    dominant_cycle_median: float
+    band_pass: float
+    quadrature: float
+    cycle_amplitude: float
+    lead60: float
+    position_span: float
+    width: float
+    has_cycle_estimate: float
 
 
-class CoronaSwingPosition:
-    """Ehlers' Corona Swing Position heatmap indicator."""
+Snapshot = CoronaSwingPositionSnapshot
+SwingOutput = CoronaSwingPositionSnapshot
 
-    def __init__(self, params: Params) -> None:
-        invalid = "invalid corona swing position parameters"
 
-        cfg_raster_len = params.raster_length if params.raster_length != 0 else 50
-        cfg_max_raster = params.max_raster_value if params.max_raster_value != 0 else 20.0
+class CoronaSwingPosition(Indicator):
+    """Ehlers' Corona Swing Position indicator."""
 
-        # Both must be zero to trigger defaults (since 0 is valid for either individually).
-        if params.min_parameter_value == 0 and params.max_parameter_value == 0:
-            cfg_min_param = -5.0
-            cfg_max_param = 5.0
-        else:
-            cfg_min_param = params.min_parameter_value
-            cfg_max_param = params.max_parameter_value
+    def __init__(self, params: Optional[CoronaSwingPositionParams] = None) -> None:
+        source = default_params() if params is None else params
+        self._raster = Raster(
+            source.raster_length,
+            source.min_parameter_value,
+            source.max_parameter_value,
+            source.max_raster_value,
+        )
+        validate_integer_parameter("lead_window", source.lead_window, 2)
+        validate_integer_parameter("position_window", source.position_window, 2)
+        self._lead_window: int = source.lead_window
+        self._position_window: int = source.position_window
 
-        cfg_hp_cutoff = params.high_pass_filter_cutoff if params.high_pass_filter_cutoff != 0 else 30
-        cfg_min_period = params.minimal_period if params.minimal_period != 0 else 6
-        cfg_max_period = params.maximal_period if params.maximal_period != 0 else 30
+        self._corona = Corona(
+            CoronaParams(
+                high_pass_filter_cutoff=source.high_pass_filter_cutoff,
+                minimal_period=source.minimal_period,
+                maximal_period=source.maximal_period,
+                decibels_lower_threshold=6.0,
+                decibels_upper_threshold=self._raster.ceiling,
+            )
+        )
+        self._corona_parameters = self._corona.parameters
+        self._bandpass = AdaptiveBandPass()
 
-        if cfg_raster_len < 2:
-            raise ValueError(f"{invalid}: RasterLength should be >= 2")
-        if cfg_max_raster <= 0:
-            raise ValueError(f"{invalid}: MaxRasterValue should be > 0")
-        if cfg_max_param <= cfg_min_param:
-            raise ValueError(f"{invalid}: MaxParameterValue should be > MinParameterValue")
-        if cfg_hp_cutoff < 2:
-            raise ValueError(f"{invalid}: HighPassFilterCutoff should be >= 2")
-        if cfg_min_period < 2:
-            raise ValueError(f"{invalid}: MinimalPeriod should be >= 2")
-        if cfg_max_period <= cfg_min_period:
-            raise ValueError(f"{invalid}: MaximalPeriod should be > MinimalPeriod")
-
-        bc = params.bar_component if params.bar_component is not None else BarComponent.MEDIAN
-        qc = params.quote_component if params.quote_component is not None else DEFAULT_QUOTE_COMPONENT
-        tc = params.trade_component if params.trade_component is not None else DEFAULT_TRADE_COMPONENT
+        bc = source.bar_component if source.bar_component is not None else DEFAULT_BAR_COMPONENT
+        qc = source.quote_component if source.quote_component is not None else DEFAULT_QUOTE_COMPONENT
+        tc = source.trade_component if source.trade_component is not None else DEFAULT_TRADE_COMPONENT
 
         self._bar_func = bar_component_value(bc)
         self._quote_func = quote_component_value(qc)
         self._trade_func = trade_component_value(tc)
 
-        self._corona = Corona(CoronaParams(
-            high_pass_filter_cutoff=cfg_hp_cutoff,
-            minimal_period=cfg_min_period,
-            maximal_period=cfg_max_period,
-        ))
+        comp = component_triple_mnemonic(bc, qc, tc)
+        flags = swing_flags(source)
+        self.mnemonic: str = (
+            f"cswing({self._raster.length}, {format_number(self._raster.ceiling)}, "
+            f"{format_number(self._raster.lower)}, {format_number(self._raster.upper)}, "
+            f"{source.high_pass_filter_cutoff}{flags}{comp})"
+        )
+        self.description: str = "Corona swing position " + self.mnemonic
+        self._mnemonic_sp: str = f"cswing-sp({source.high_pass_filter_cutoff}{flags}{comp})"
+        self._description_sp: str = "Corona swing position scalar " + self._mnemonic_sp
 
-        self._raster_length = cfg_raster_len
-        self._raster_step = cfg_max_raster / cfg_raster_len
-        self._max_raster_value = cfg_max_raster
-        self._min_parameter_value = cfg_min_param
-        self._max_parameter_value = cfg_max_param
-        self._parameter_resolution = (cfg_raster_len - 1) / (cfg_max_param - cfg_min_param)
-        self._raster = [0.0] * cfg_raster_len
+        self.reset()
 
-        self._lead_list: list[float] = []
-        self._position_list: list[float] = []
-        self._sample_previous = 0.0
-        self._sample_previous2 = 0.0
-        self._band_pass_previous = 0.0
-        self._band_pass_previous2 = 0.0
-        self._swing_position = math.nan
-        self._is_started = False
-
-        comp_mn = component_triple_mnemonic(bc, qc, tc)
-        self.mnemonic = f"cswing({cfg_raster_len}, {cfg_max_raster:g}, " \
-            f"{cfg_min_param:g}, {cfg_max_param:g}, {cfg_hp_cutoff}{comp_mn})"
-        self.description = "Corona swing position " + self.mnemonic
-        self._mnemonic_sp = f"cswing-sp({cfg_hp_cutoff}{comp_mn})"
-        self._description_sp = "Corona swing position scalar " + self._mnemonic_sp
+    def reset(self) -> None:
+        """Reset streaming state while preserving configuration."""
+        self._corona.reset()
+        self._sample_count: int = 0
+        self._bandpass.reset()
+        self._raster.reset()
+        self._leads: list[float] = [0.0] * self._lead_window
+        self._positions: list[float] = [0.0] * self._position_window
 
     def is_primed(self) -> bool:
-        return self._corona.is_primed()
+        return self._sample_count >= FIRST_BANK_SAMPLE
 
     def metadata(self) -> Metadata:
         return build_metadata(
@@ -128,128 +129,79 @@ class CoronaSwingPosition:
             ],
         )
 
-    def update(self, sample: float, t: datetime.datetime) -> tuple:
-        """Returns (heatmap, swing_position)."""
-        if math.isnan(sample):
-            return (Heatmap.empty(t, self._min_parameter_value,
-                                  self._max_parameter_value, self._parameter_resolution),
-                    math.nan)
+    def _empty(self, time: Optional[datetime.datetime]) -> CoronaSwingPositionSnapshot:
+        return CoronaSwingPositionSnapshot(
+            self._raster.empty(time),
+            math.nan,
+            math.nan,
+            math.nan,
+            math.nan,
+            math.nan,
+            math.nan,
+            math.nan,
+            math.nan,
+            math.nan,
+            math.nan,
+            math.nan,
+        )
 
-        primed = self._corona.update(sample)
+    def update(
+        self, sample: float, time: Optional[datetime.datetime] = None
+    ) -> CoronaSwingPositionSnapshot:
+        """Advance standalone engine with one price sample and return full snapshot."""
+        return self.update_from_snapshot(self._corona.update(sample, time))
 
-        if not self._is_started:
-            self._sample_previous = sample
-            self._is_started = True
-            return (Heatmap.empty(t, self._min_parameter_value,
-                                  self._max_parameter_value, self._parameter_resolution),
-                    math.nan)
+    def update_from_snapshot(self, snapshot: CoronaSnapshot) -> CoronaSwingPositionSnapshot:
+        """Consume one shared CoronaSnapshot in accepted-sample order."""
+        if not accept_snapshot(snapshot, self._corona_parameters, self._sample_count + 1):
+            return self._empty(snapshot.time)
+        self._sample_count = snapshot.sample_count
 
-        # Bandpass filter at the dominant cycle median period.
-        dcm = self._corona.dominant_cycle_median
-        omega = 2.0 * math.pi / dcm if dcm != 0 else math.inf
-        beta2 = math.cos(omega)
-        cos_val = math.cos(omega * 2 * _BP_DELTA)
-        if cos_val == 0:
-            gamma2 = math.copysign(math.inf, 1.0)
-        else:
-            gamma2 = 1.0 / cos_val
-        disc = gamma2 * gamma2 - 1.0
-        alpha2 = gamma2 - math.sqrt(disc) if disc >= 0 else 0.0
-        band_pass = 0.5 * (1 - alpha2) * (sample - self._sample_previous2) + \
-            beta2 * (1 + alpha2) * self._band_pass_previous - \
-            alpha2 * self._band_pass_previous2
+        cycle = self._bandpass.update(snapshot.price, snapshot.dominant_cycle_median)
+        lowest, highest = rolling_append(self._leads, cycle.lead60, self._lead_window)
+        flat = highest == lowest
+        position = 0.5 if flat else (cycle.lead60 - lowest) / (highest - lowest)
+        position = clip(position, 0.0, 1.0)
 
-        # Quadrature = derivative / omega.  Go produces ±Inf on /0; mimic that.
-        if omega == 0:
-            diff = band_pass - self._band_pass_previous
-            if diff == 0:
-                quadrature2 = 0.0
-            else:
-                quadrature2 = math.copysign(math.inf, diff)
-        else:
-            quadrature2 = (band_pass - self._band_pass_previous) / omega
+        low_position, high_position = rolling_append(
+            self._positions, position, self._position_window
+        )
+        span = high_position - low_position
+        width = 0.01 if span > 0.85 else 0.15 * span
+        if width == 0.0:
+            width = 0.01
 
-        self._band_pass_previous2 = self._band_pass_previous
-        self._band_pass_previous = band_pass
-        self._sample_previous2 = self._sample_previous
-        self._sample_previous = sample
+        self._raster.update(position, width, "swing", suppress=span > 0.8 or flat)
+        if not snapshot.primed:
+            return self._empty(snapshot.time)
 
-        # 60° lead: lead60 = 0.5·BP_previous2 + 0.866·Q
-        lead60 = _LEAD60_COEF_BP * self._band_pass_previous2 + _LEAD60_COEF_Q * quadrature2
+        mapped = self._raster.lower + (self._raster.upper - self._raster.lower) * position
+        return CoronaSwingPositionSnapshot(
+            heatmap=self._raster.column(snapshot.time),
+            swing_position=mapped,
+            normalized_position=position,
+            dominant_cycle=snapshot.dominant_cycle,
+            dominant_cycle_median=snapshot.dominant_cycle_median,
+            band_pass=cycle.band_pass,
+            quadrature=cycle.quadrature,
+            cycle_amplitude=cycle.amplitude,
+            lead60=cycle.lead60,
+            position_span=span,
+            width=width,
+            has_cycle_estimate=float(snapshot.has_cycle_estimate),
+        )
 
-        lowest, highest = _append_rolling(self._lead_list, _MAX_LEAD_LIST_COUNT, lead60)
+    def _wrap(self, time: datetime.datetime, result: CoronaSwingPositionSnapshot) -> Output:
+        return [result.heatmap, Scalar(time, result.swing_position)]
 
-        # Normalised lead position in [0, 1].
-        position = highest - lowest
-        if position > 0:
-            position = (lead60 - lowest) / position
+    def update_scalar(self, sample: Scalar) -> Output:
+        return self._wrap(sample.time, self.update(sample.value, sample.time))
 
-        lowest, highest = _append_rolling(self._position_list, _MAX_POSITION_LIST_COUNT, position)
-        highest -= lowest
+    def update_bar(self, sample: Bar) -> Output:
+        return self._wrap(sample.time, self.update(self._bar_func(sample), sample.time))
 
-        width = _WIDTH_SCALE * highest
-        if highest > _WIDTH_HIGH_THRESHOLD:
-            width = _WIDTH_NARROW
+    def update_quote(self, sample: Quote) -> Output:
+        return self._wrap(sample.time, self.update(self._quote_func(sample), sample.time))
 
-        self._swing_position = (self._max_parameter_value - self._min_parameter_value) * \
-            position + self._min_parameter_value
-
-        position_scaled_to_raster_length = round(position * self._raster_length)
-        position_scaled_to_max_raster_value = position * self._max_raster_value
-
-        for i in range(self._raster_length):
-            value = self._raster[i]
-
-            if i == position_scaled_to_raster_length:
-                value *= _RASTER_BLEND_HALF
-            else:
-                argument = position_scaled_to_max_raster_value - self._raster_step * i
-                if i > position_scaled_to_raster_length:
-                    argument = -argument
-
-                if width > 0:
-                    value = _RASTER_BLEND_HALF * \
-                        (math.pow(argument / width, _RASTER_BLEND_EXPONENT) + _RASTER_BLEND_HALF * value)
-
-            if value < 0:
-                value = 0
-            elif value > self._max_raster_value:
-                value = self._max_raster_value
-
-            if highest > _WIDTH_HIGH_SATURATE:
-                value = self._max_raster_value
-
-            if math.isnan(value):
-                value = 0
-
-            self._raster[i] = value
-
-        if not primed:
-            return (Heatmap.empty(t, self._min_parameter_value,
-                                  self._max_parameter_value, self._parameter_resolution),
-                    math.nan)
-
-        values = list(self._raster)
-        value_min = min(values)
-        value_max = max(values)
-
-        heatmap = Heatmap(t, self._min_parameter_value, self._max_parameter_value,
-                          self._parameter_resolution, value_min, value_max, values)
-
-        return heatmap, self._swing_position
-
-    def update_scalar(self, sample: Scalar) -> list:
-        return self._update_entity(sample.time, sample.value)
-
-    def update_bar(self, sample: Bar) -> list:
-        return self._update_entity(sample.time, self._bar_func(sample))
-
-    def update_quote(self, sample: Quote) -> list:
-        return self._update_entity(sample.time, self._quote_func(sample))
-
-    def update_trade(self, sample: Trade) -> list:
-        return self._update_entity(sample.time, self._trade_func(sample))
-
-    def _update_entity(self, t: datetime.datetime, sample: float) -> list:
-        heatmap, sp = self.update(sample, t)
-        return [heatmap, Scalar(t, sp)]
+    def update_trade(self, sample: Trade) -> Output:
+        return self._wrap(sample.time, self.update(self._trade_func(sample), sample.time))
