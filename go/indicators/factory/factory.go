@@ -456,12 +456,27 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 		return zerolagexponentialmovingaverage.NewZeroLagExponentialMovingAverage(p)
 
 	case core.ZeroLagErrorCorrectingExponentialMovingAverage:
-		p := zerolagerrorcorrectingexponentialmovingaverage.DefaultParams()
+		if hasKey(b, "gainStep") {
+			return nil, fmt.Errorf("invalid zero-lag error-correcting exponential moving average parameters: gainStep is not supported")
+		}
+		if hasKey(b, "length") && hasKey(b, "smoothingFactor") {
+			return nil, fmt.Errorf("invalid zero-lag error-correcting exponential moving average parameters: length and smoothingFactor are mutually exclusive")
+		}
+		if hasKey(b, "smoothingFactor") {
+			p := zerolagerrorcorrectingexponentialmovingaverage.DefaultSmoothingFactorParams()
+			if err := unmarshal(b, p); err != nil {
+				return nil, err
+			}
+
+			return zerolagerrorcorrectingexponentialmovingaverage.NewZeroLagErrorCorrectingExponentialMovingAverageSmoothingFactor(p)
+		}
+
+		p := zerolagerrorcorrectingexponentialmovingaverage.DefaultLengthParams()
 		if err := unmarshal(b, p); err != nil {
 			return nil, err
 		}
 
-		return zerolagerrorcorrectingexponentialmovingaverage.NewZeroLagErrorCorrectingExponentialMovingAverage(p)
+		return zerolagerrorcorrectingexponentialmovingaverage.NewZeroLagErrorCorrectingExponentialMovingAverageLength(p)
 
 	case core.RoofingFilter:
 		p := roofingfilter.DefaultParams()

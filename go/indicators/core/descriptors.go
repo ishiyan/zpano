@@ -325,8 +325,11 @@ var descriptors = map[Identifier]Descriptor{
 	},
 	ZeroLagErrorCorrectingExponentialMovingAverage: {
 		Identifier: ZeroLagErrorCorrectingExponentialMovingAverage, Family: "John Ehlers",
-		Adaptivity: Static, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
-		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Smoother, Pane: Price}},
+		Adaptivity: Adaptive, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{
+			{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Smoother, Pane: Price},
+			{Kind: 2 /* Ema */, Shape: shape.Scalar, Role: Smoother, Pane: Price},
+		},
 	},
 	ZeroLagExponentialMovingAverage: {
 		Identifier: ZeroLagExponentialMovingAverage, Family: "John Ehlers",

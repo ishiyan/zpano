@@ -639,14 +639,50 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
             .trade_component = getTradeComponent(obj),
         }),
 
-        .zero_lag_error_correcting_exponential_moving_average => createWithParams(zlecema_mod.ZeroLagErrorCorrectingExponentialMovingAverage, allocator, zlecema_mod.ZeroLagErrorCorrectingExponentialMovingAverage.init(.{
-            .smoothing_factor = getF64(obj, "smoothingFactor", 0.095),
-            .gain_limit = getF64(obj, "gainLimit", 5),
-            .gain_step = getF64(obj, "gainStep", 0.1),
-            .bar_component = getBarComponent(obj),
-            .quote_component = getQuoteComponent(obj),
-            .trade_component = getTradeComponent(obj),
-        })),
+        .zero_lag_error_correcting_exponential_moving_average => blk: {
+            if (hasKey(obj, "gainStep") or (hasKey(obj, "length") and hasKey(obj, "smoothingFactor"))) {
+                return FactoryError.InvalidParams;
+            }
+            const gain_limit: i32 = if (obj.get("gainLimit")) |raw| switch (raw) {
+                .integer => |number| if (number >= std.math.minInt(i32) and number <= std.math.maxInt(i32)) @intCast(number) else return FactoryError.InvalidParams,
+                .float => |number| if (std.math.isFinite(number) and @trunc(number) == number and number >= @as(f64, @floatFromInt(std.math.minInt(i32))) and number <= @as(f64, @floatFromInt(std.math.maxInt(i32)))) @intFromFloat(number) else return FactoryError.InvalidParams,
+                else => return FactoryError.InvalidParams,
+            } else 50;
+            if (obj.get("smoothingFactor")) |raw_sf| {
+                const sf: f64 = switch (raw_sf) {
+                    .float => |number| number,
+                    .integer => |number| @floatFromInt(number),
+                    else => return FactoryError.InvalidParams,
+                };
+                break :blk createWithParams(
+                    zlecema_mod.ZeroLagErrorCorrectingExponentialMovingAverage,
+                    allocator,
+                    zlecema_mod.ZeroLagErrorCorrectingExponentialMovingAverage.initFromSmoothingFactor(.{
+                        .smoothing_factor = sf,
+                        .gain_limit = gain_limit,
+                        .bar_component = getBarComponent(obj),
+                        .quote_component = getQuoteComponent(obj),
+                        .trade_component = getTradeComponent(obj),
+                    }),
+                );
+            }
+            const length: i64 = if (obj.get("length")) |raw| switch (raw) {
+                .integer => |number| number,
+                .float => |number| if (std.math.isFinite(number) and @trunc(number) == number and number >= @as(f64, @floatFromInt(std.math.minInt(i64))) and number < @as(f64, @floatFromInt(std.math.maxInt(i64)))) @intFromFloat(number) else return FactoryError.InvalidParams,
+                else => return FactoryError.InvalidParams,
+            } else 20;
+            break :blk createWithParams(
+                zlecema_mod.ZeroLagErrorCorrectingExponentialMovingAverage,
+                allocator,
+                zlecema_mod.ZeroLagErrorCorrectingExponentialMovingAverage.initFromLength(.{
+                    .length = length,
+                    .gain_limit = gain_limit,
+                    .bar_component = getBarComponent(obj),
+                    .quote_component = getQuoteComponent(obj),
+                    .trade_component = getTradeComponent(obj),
+                }),
+            );
+        },
 
         .roofing_filter => blk: {
             const shortest: f64 = if (obj.get("shortestCyclePeriod")) |raw| switch (raw) {
@@ -1903,6 +1939,66 @@ test "create corona indicators with defaults, explicit zero threshold, and inval
         FactoryError.IndicatorInitFailed,
         create(allocator, .center_of_gravity_oscillator,
             \\{"length": 0}
+        ),
+    );
+
+    const zecema_default = try create(allocator, .zero_lag_error_correcting_exponential_moving_average, "{}");
+    defer zecema_default.deinit(allocator);
+    var md_zecema_default: metadata_mod.Metadata = undefined;
+    zecema_default.indicator.metadata(&md_zecema_default);
+    try std.testing.expectEqualStrings("zecema(20, 50)", md_zecema_default.mnemonic);
+    try std.testing.expectEqual(@as(usize, 2), md_zecema_default.outputs_len);
+
+    const zecema_zero_gain = try create(allocator, .zero_lag_error_correcting_exponential_moving_average,
+        \\{"length": 12, "gainLimit": 0, "barComponent": 5}
+    );
+    defer zecema_zero_gain.deinit(allocator);
+    var md_zecema_zero_gain: metadata_mod.Metadata = undefined;
+    zecema_zero_gain.indicator.metadata(&md_zecema_zero_gain);
+    try std.testing.expectEqualStrings("zecema(12, 0, hl/2)", md_zecema_zero_gain.mnemonic);
+
+    const zecema_alpha = try create(allocator, .zero_lag_error_correcting_exponential_moving_average,
+        \\{"smoothingFactor": 0.2, "gainLimit": 22}
+    );
+    defer zecema_alpha.deinit(allocator);
+    var md_zecema_alpha: metadata_mod.Metadata = undefined;
+    zecema_alpha.indicator.metadata(&md_zecema_alpha);
+    try std.testing.expectEqualStrings("zecema(9, 0.20000000, 22)", md_zecema_alpha.mnemonic);
+
+    try std.testing.expectError(
+        FactoryError.InvalidParams,
+        create(allocator, .zero_lag_error_correcting_exponential_moving_average,
+            \\{"gainStep": 0.1}
+        ),
+    );
+    try std.testing.expectError(
+        FactoryError.InvalidParams,
+        create(allocator, .zero_lag_error_correcting_exponential_moving_average,
+            \\{"length": 20, "smoothingFactor": 0.2}
+        ),
+    );
+    try std.testing.expectError(
+        FactoryError.InvalidParams,
+        create(allocator, .zero_lag_error_correcting_exponential_moving_average,
+            \\{"length": 1.5}
+        ),
+    );
+    try std.testing.expectError(
+        FactoryError.InvalidParams,
+        create(allocator, .zero_lag_error_correcting_exponential_moving_average,
+            \\{"gainLimit": 2.5}
+        ),
+    );
+    try std.testing.expectError(
+        FactoryError.IndicatorInitFailed,
+        create(allocator, .zero_lag_error_correcting_exponential_moving_average,
+            \\{"length": 0}
+        ),
+    );
+    try std.testing.expectError(
+        FactoryError.IndicatorInitFailed,
+        create(allocator, .zero_lag_error_correcting_exponential_moving_average,
+            \\{"gainLimit": -1}
         ),
     );
 }

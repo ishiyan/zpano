@@ -10,13 +10,16 @@ import (
 type Output int
 
 const (
-	// The scalar value of the zero-lag error-correcting exponential moving average.
+	// Value is the scalar value of the error-corrected exponential moving average (EC).
 	Value Output = iota + 1
+	// Ema is the scalar value of the baseline exponential moving average (EMA).
+	Ema
 	outputLast
 )
 
 const (
 	valueStr   = "value"
+	emaStr     = "ema"
 	unknownStr = "unknown"
 )
 
@@ -25,6 +28,8 @@ func (o Output) String() string {
 	switch o {
 	case Value:
 		return valueStr
+	case Ema:
+		return emaStr
 	default:
 		return unknownStr
 	}
@@ -69,6 +74,8 @@ func (o *Output) UnmarshalJSON(data []byte) error {
 	switch s {
 	case valueStr:
 		*o = Value
+	case emaStr:
+		*o = Ema
 	default:
 		return fmt.Errorf(errFmt, s)
 	}

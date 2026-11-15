@@ -832,15 +832,23 @@ pub static DESCRIPTORS: &[Descriptor] = &[
     Descriptor {
         identifier: ZeroLagErrorCorrectingExponentialMovingAverage,
         family: "John Ehlers",
-        adaptivity: Static,
+        adaptivity: Adaptive,
         input_requirement: ScalarInput,
         volume_usage: NoVolume,
-        outputs: &[OutputDescriptor {
-            kind: 1,
-            shape: Scalar,
-            role: Smoother,
-            pane: Price,
-        }],
+        outputs: &[
+            OutputDescriptor {
+                kind: 1,
+                shape: Scalar,
+                role: Smoother,
+                pane: Price,
+            },
+            OutputDescriptor {
+                kind: 2,
+                shape: Scalar,
+                role: Smoother,
+                pane: Price,
+            },
+        ],
     },
     Descriptor {
         identifier: ZeroLagExponentialMovingAverage,

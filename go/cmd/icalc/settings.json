@@ -33,7 +33,7 @@
   { "identifier": "instantaneousTrendLine", "params": { "length": 28 } },
   { "identifier": "superSmoother", "params": { "shortestCyclePeriod": 10 } },
   { "identifier": "zeroLagExponentialMovingAverage", "params": { "smoothingFactor": 0.25, "velocityGainFactor": 0.5, "velocityMomentumLength": 3 } },
-  { "identifier": "zeroLagErrorCorrectingExponentialMovingAverage", "params": { "smoothingFactor": 0.095, "gainLimit": 5, "gainStep": 0.1 } },
+  { "identifier": "zeroLagErrorCorrectingExponentialMovingAverage", "params": { "length": 20, "gainLimit": 50 } },
   { "identifier": "roofingFilter", "params": { "shortestCyclePeriod": 10, "longestCyclePeriod": 48 } },
   { "identifier": "trueRange", "params": {} },
   { "identifier": "averageTrueRange", "params": { "length": 14 } },

@@ -145,7 +145,10 @@ pub const descriptors = [_]Descriptor{
         .{ .kind = 7, .shape = .scalar, .role = .cycle_period, .pane = .own },
         .{ .kind = 8, .shape = .scalar, .role = .cycle_phase, .pane = .own },
     } },
-    .{ .identifier = .zero_lag_error_correcting_exponential_moving_average, .family = "John Ehlers", .adaptivity = .static_, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .smoother, .pane = .price }} },
+    .{ .identifier = .zero_lag_error_correcting_exponential_moving_average, .family = "John Ehlers", .adaptivity = .adaptive, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{
+        .{ .kind = 1, .shape = .scalar, .role = .smoother, .pane = .price },
+        .{ .kind = 2, .shape = .scalar, .role = .smoother, .pane = .price },
+    } },
     .{ .identifier = .zero_lag_exponential_moving_average, .family = "John Ehlers", .adaptivity = .static_, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .smoother, .pane = .price }} },
     // ── joseph granville ──────────────────────────────────────────────────────────
     .{ .identifier = .on_balance_volume, .family = "Joseph Granville", .adaptivity = .static_, .input_requirement = .bar_input, .volume_usage = .aggregate_bar_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .volume_flow, .pane = .own }} },

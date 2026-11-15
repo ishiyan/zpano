@@ -136,7 +136,10 @@ import { defaultSmoothingFactorParams as defaultItlSfParams } from '../john-ehle
 import { ZeroLagExponentialMovingAverage } from '../john-ehlers/zero-lag-exponential-moving-average/zero-lag-exponential-moving-average.js';
 import { defaultParams as defaultZemaParams } from '../john-ehlers/zero-lag-exponential-moving-average/params.js';
 import { ZeroLagErrorCorrectingExponentialMovingAverage } from '../john-ehlers/zero-lag-error-correcting-exponential-moving-average/zero-lag-error-correcting-exponential-moving-average.js';
-import { defaultParams as defaultZecemaParams } from '../john-ehlers/zero-lag-error-correcting-exponential-moving-average/params.js';
+import {
+    defaultLengthParams as defaultZecemaLengthParams,
+    defaultSmoothingFactorParams as defaultZecemaSfParams,
+} from '../john-ehlers/zero-lag-error-correcting-exponential-moving-average/params.js';
 import { RoofingFilter } from '../john-ehlers/roofing-filter/roofing-filter.js';
 import { defaultParams as defaultRoofParams } from '../john-ehlers/roofing-filter/params.js';
 import { SineWave } from '../john-ehlers/sine-wave/sine-wave.js';
@@ -488,8 +491,20 @@ export function createIndicator(identifier: IndicatorIdentifier, params?: Record
             });
 
         case IndicatorIdentifier.ZeroLagErrorCorrectingExponentialMovingAverage:
-            return new ZeroLagErrorCorrectingExponentialMovingAverage({
-                ...defaultZecemaParams(),
+            if (hasKey(p, 'gainStep')) {
+                throw new Error('gainStep is not supported; gain step is fixed at 0.1');
+            }
+            if (hasKey(p, 'length') && hasKey(p, 'smoothingFactor')) {
+                throw new Error('cannot specify both length and smoothingFactor');
+            }
+            if (hasKey(p, 'smoothingFactor')) {
+                return ZeroLagErrorCorrectingExponentialMovingAverage.fromSmoothingFactor({
+                    ...defaultZecemaSfParams(),
+                    ...p,
+                } as any);
+            }
+            return ZeroLagErrorCorrectingExponentialMovingAverage.fromLength({
+                ...defaultZecemaLengthParams(),
                 ...p,
             });
 

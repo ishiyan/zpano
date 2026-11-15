@@ -7,4 +7,7 @@ class ZeroLagErrorCorrectingExponentialMovingAverageOutput(IntEnum):
     """Enumerates the outputs of the zero-lag error-correcting exponential moving average indicator."""
 
     VALUE = 0
-    """The calculated value of the zero-lag error-correcting exponential moving average."""
+    """The scalar value of the error-corrected exponential moving average (EC)."""
+
+    EMA = 1
+    """The scalar value of the baseline exponential moving average (EMA)."""

@@ -13,6 +13,7 @@ func TestOutputString(t *testing.T) {
 		text string
 	}{
 		{Value, valueStr},
+		{Ema, emaStr},
 		{outputLast, unknownStr},
 		{Output(0), unknownStr},
 		{Output(9999), unknownStr},
@@ -37,6 +38,7 @@ func TestOutputIsKnown(t *testing.T) {
 		boolean bool
 	}{
 		{Value, true},
+		{Ema, true},
 		{outputLast, false},
 		{Output(0), false},
 		{Output(9999), false},
@@ -65,6 +67,7 @@ func TestOutputMarshalJSON(t *testing.T) {
 		succeeded bool
 	}{
 		{Value, dqs + valueStr + dqs, true},
+		{Ema, dqs + emaStr + dqs, true},
 		{outputLast, nilstr, false},
 		{Output(9999), nilstr, false},
 		{Output(-9999), nilstr, false},
@@ -104,6 +107,7 @@ func TestOutputUnmarshalJSON(t *testing.T) {
 		succeeded bool
 	}{
 		{Value, dqs + valueStr + dqs, true},
+		{Ema, dqs + emaStr + dqs, true},
 		{zero, dqs + unknownStr + dqs, false},
 		{zero, dqs + "foobar" + dqs, false},
 	}

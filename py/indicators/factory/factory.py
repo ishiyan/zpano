@@ -232,9 +232,46 @@ def create_indicator(
         return ZeroLagExponentialMovingAverage.create(_apply(default_params(), params))
 
     if identifier == Identifier.ZERO_LAG_ERROR_CORRECTING_EXPONENTIAL_MOVING_AVERAGE:
-        from ..john_ehlers.zero_lag_error_correcting_exponential_moving_average.params import default_params
+        from ..john_ehlers.zero_lag_error_correcting_exponential_moving_average.params import (
+            default_length_params,
+            default_smoothing_factor_params,
+        )
         from ..john_ehlers.zero_lag_error_correcting_exponential_moving_average.zero_lag_error_correcting_exponential_moving_average import ZeroLagErrorCorrectingExponentialMovingAverage
-        return ZeroLagErrorCorrectingExponentialMovingAverage.create(_apply(default_params(), params))
+        if _is_empty(params):
+            return ZeroLagErrorCorrectingExponentialMovingAverage.create_default()
+        assert params is not None
+        alias_map = {
+            "smoothingFactor": "smoothing_factor",
+            "gainLimit": "gain_limit",
+            "barComponent": "bar_component",
+            "quoteComponent": "quote_component",
+            "tradeComponent": "trade_component",
+        }
+        normalized = {alias_map.get(key, key): item for key, item in params.items()}
+        allowed_keys = {
+            "length",
+            "smoothing_factor",
+            "gain_limit",
+            "bar_component",
+            "quote_component",
+            "trade_component",
+        }
+        unknown_keys = set(normalized.keys()) - allowed_keys
+        if unknown_keys:
+            raise ValueError(
+                f"invalid zero-lag error-correcting exponential moving average parameters: unsupported keys {sorted(unknown_keys)}"
+            )
+        if "length" in normalized and "smoothing_factor" in normalized:
+            raise ValueError(
+                "invalid zero-lag error-correcting exponential moving average parameters: length and smoothing_factor are mutually exclusive"
+            )
+        if "smoothing_factor" in normalized:
+            return ZeroLagErrorCorrectingExponentialMovingAverage.from_smoothing_factor(
+                _apply(default_smoothing_factor_params(), normalized)
+            )
+        return ZeroLagErrorCorrectingExponentialMovingAverage.from_length(
+            _apply(default_length_params(), normalized)
+        )
 
     if identifier == Identifier.ROOFING_FILTER:
         from ..john_ehlers.roofing_filter.params import default_params

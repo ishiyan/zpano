@@ -103,7 +103,11 @@ use crate::indicators::john_ehlers::instantaneous_trendline::{InstantaneousTrend
 use crate::indicators::john_ehlers::instantaneous_trendline::LengthParams as ItlLengthParams;
 use crate::indicators::john_ehlers::instantaneous_trendline::SmoothingFactorParams as ItlSmoothingFactorParams;
 use crate::indicators::john_ehlers::zero_lag_exponential_moving_average::zero_lag_exponential_moving_average::{ZeroLagExponentialMovingAverage, ZeroLagExponentialMovingAverageParams};
-use crate::indicators::john_ehlers::zero_lag_error_correcting_exponential_moving_average::{ZeroLagErrorCorrectingExponentialMovingAverage, ZeroLagErrorCorrectingExponentialMovingAverageParams};
+use crate::indicators::john_ehlers::zero_lag_error_correcting_exponential_moving_average::{
+    ZeroLagErrorCorrectingExponentialMovingAverage,
+    ZeroLagErrorCorrectingExponentialMovingAverageLengthParams,
+    ZeroLagErrorCorrectingExponentialMovingAverageSmoothingFactorParams,
+};
 use crate::indicators::john_ehlers::roofing_filter::{RoofingFilter, RoofingFilterParams};
 use crate::indicators::john_ehlers::mesa_adaptive_moving_average::{MesaAdaptiveMovingAverage, MesaAdaptiveMovingAverageLengthParams, MesaAdaptiveMovingAverageSmoothingFactorParams};
 use crate::indicators::john_ehlers::fractal_adaptive_moving_average::{FractalAdaptiveMovingAverage, FractalAdaptiveMovingAverageParams};
@@ -758,19 +762,93 @@ pub fn create_indicator(
         }
 
         Identifier::ZeroLagErrorCorrectingExponentialMovingAverage => {
-            let mut p = ZeroLagErrorCorrectingExponentialMovingAverageParams::default();
-            if let Some(v) = get_f64(&params, "smoothingFactor") {
-                p.smoothing_factor = v;
+            if has_key(&params, "gainStep") {
+                return Err("gainStep is not supported; gain step is fixed at 0.1".to_string());
             }
-            if let Some(v) = get_f64(&params, "gainLimit") {
-                p.gain_limit = v;
+            if has_key(&params, "length") && has_key(&params, "smoothingFactor") {
+                return Err("cannot specify both length and smoothingFactor".to_string());
             }
-            if let Some(v) = get_f64(&params, "gainStep") {
-                p.gain_step = v;
+            let gain_limit = if let Some(raw) = params.get("gainLimit") {
+                match raw {
+                    JsonValue::Number(number)
+                        if number.is_finite()
+                            && number.fract() == 0.0
+                            && *number >= i32::MIN as f64
+                            && *number <= i32::MAX as f64 =>
+                    {
+                        *number as i32
+                    }
+                    _ => return Err("gainLimit must be a nonnegative integer".to_string()),
+                }
+            } else {
+                50
+            };
+            let bar_component = if let Some(raw) = params.get("barComponent") {
+                match raw {
+                    JsonValue::Number(number) => Some(lvt_bar_component(*number)?),
+                    _ => return Err("invalid component number".to_string()),
+                }
+            } else {
+                None
+            };
+            let quote_component = if let Some(raw) = params.get("quoteComponent") {
+                match raw {
+                    JsonValue::Number(number) => Some(lvt_quote_component(*number)?),
+                    _ => return Err("invalid component number".to_string()),
+                }
+            } else {
+                None
+            };
+            let trade_component = if let Some(raw) = params.get("tradeComponent") {
+                match raw {
+                    JsonValue::Number(number) => Some(lvt_trade_component(*number)?),
+                    _ => return Err("invalid component number".to_string()),
+                }
+            } else {
+                None
+            };
+            if let Some(raw_sf) = params.get("smoothingFactor") {
+                let smoothing_factor = match raw_sf {
+                    JsonValue::Number(number) => *number,
+                    _ => return Err("smoothingFactor must be a number".to_string()),
+                };
+                let options = ZeroLagErrorCorrectingExponentialMovingAverageSmoothingFactorParams {
+                    smoothing_factor,
+                    gain_limit,
+                    bar_component,
+                    quote_component,
+                    trade_component,
+                };
+                Ok(Box::new(
+                    ZeroLagErrorCorrectingExponentialMovingAverage::from_smoothing_factor(&options)?,
+                ))
+            } else {
+                let length = if let Some(raw) = params.get("length") {
+                    match raw {
+                        JsonValue::Number(number)
+                            if number.is_finite()
+                                && number.fract() == 0.0
+                                && *number >= i64::MIN as f64
+                                && *number < i64::MAX as f64 =>
+                        {
+                            *number as i64
+                        }
+                        _ => return Err("length must be a positive integer".to_string()),
+                    }
+                } else {
+                    20
+                };
+                let options = ZeroLagErrorCorrectingExponentialMovingAverageLengthParams {
+                    length,
+                    gain_limit,
+                    bar_component,
+                    quote_component,
+                    trade_component,
+                };
+                Ok(Box::new(
+                    ZeroLagErrorCorrectingExponentialMovingAverage::from_length(&options)?,
+                ))
             }
-            Ok(Box::new(
-                ZeroLagErrorCorrectingExponentialMovingAverage::new(&p)?,
-            ))
         }
 
         Identifier::RoofingFilter => {
@@ -2481,6 +2559,40 @@ mod tests {
         assert!(create_indicator(Identifier::CenterOfGravityOscillator, r#"{"length": 1.5}"#).is_err());
         assert!(create_indicator(Identifier::CenterOfGravityOscillator, r#"{"centered": 1}"#).is_err());
         assert!(create_indicator(Identifier::CenterOfGravityOscillator, r#"{"length": 0}"#).is_err());
+
+        let zecema_default =
+            create_indicator(Identifier::ZeroLagErrorCorrectingExponentialMovingAverage, "{}").unwrap();
+        assert_eq!(zecema_default.metadata().mnemonic, "zecema(20, 50)");
+        assert_eq!(zecema_default.metadata().outputs.len(), 2);
+
+        let zecema_zero_gain = create_indicator(
+            Identifier::ZeroLagErrorCorrectingExponentialMovingAverage,
+            r#"{"length": 12, "gainLimit": 0, "barComponent": 5}"#,
+        )
+        .unwrap();
+        assert_eq!(zecema_zero_gain.metadata().mnemonic, "zecema(12, 0, hl/2)");
+
+        let zecema_alpha = create_indicator(
+            Identifier::ZeroLagErrorCorrectingExponentialMovingAverage,
+            r#"{"smoothingFactor": 0.2, "gainLimit": 22}"#,
+        )
+        .unwrap();
+        assert_eq!(zecema_alpha.metadata().mnemonic, "zecema(9, 0.20000000, 22)");
+
+        for bad_json in [
+            r#"{"gainStep": 0.1}"#,
+            r#"{"length": 20, "smoothingFactor": 0.2}"#,
+            r#"{"length": 0}"#,
+            r#"{"length": 1.5}"#,
+            r#"{"gainLimit": -1}"#,
+            r#"{"gainLimit": 2.5}"#,
+            r#"{"smoothingFactor": 0}"#,
+        ] {
+            assert!(
+                create_indicator(Identifier::ZeroLagErrorCorrectingExponentialMovingAverage, bad_json).is_err(),
+                "expected error for {bad_json}"
+            );
+        }
     }
 }
 
