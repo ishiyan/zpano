@@ -252,7 +252,15 @@ def create_indicator(
         from ..john_ehlers.fractal_adaptive_moving_average.fractal_adaptive_moving_average import FractalAdaptiveMovingAverage
         if _is_empty(params):
             return FractalAdaptiveMovingAverage.create_default()
-        return FractalAdaptiveMovingAverage.create(_apply(default_params(), params))
+        alias_map = {
+            "slowestSmoothingFactor": "slowest_smoothing_factor",
+            "coefficientMode": "coefficient_mode",
+            "barComponent": "bar_component",
+            "quoteComponent": "quote_component",
+            "tradeComponent": "trade_component",
+        }
+        normalized = {alias_map.get(key, key): item for key, item in params.items()}
+        return FractalAdaptiveMovingAverage.create(_apply(default_params(), normalized))
 
     if identifier == Identifier.DOMINANT_CYCLE:
         from ..john_ehlers.dominant_cycle.dominant_cycle import DominantCycle

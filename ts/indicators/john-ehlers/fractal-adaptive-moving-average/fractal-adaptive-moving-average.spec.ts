@@ -1,326 +1,345 @@
-import { } from 'jasmine';
-
-import { FractalAdaptiveMovingAverage } from './fractal-adaptive-moving-average';
-import { FractalAdaptiveMovingAverageOutput } from './output';
+import { Bar } from '../../../entities/bar';
+import { BarComponent } from '../../../entities/bar-component';
+import { Quote } from '../../../entities/quote';
+import { QuoteComponent } from '../../../entities/quote-component';
+import { Scalar } from '../../../entities/scalar';
+import { Trade } from '../../../entities/trade';
+import { TradeComponent } from '../../../entities/trade-component';
 import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { Shape } from '../../core/outputs/shape/shape';
-import { BarComponent } from '../../../entities/bar-component';
-import { QuoteComponent } from '../../../entities/quote-component';
-import { TradeComponent } from '../../../entities/trade-component';
-import { Scalar } from '../../../entities/scalar';
-import { Bar } from '../../../entities/bar';
-import { Quote } from '../../../entities/quote';
-import { Trade } from '../../../entities/trade';
+import { createIndicator } from '../../factory/factory';
+import { FractalAdaptiveMovingAverage } from './fractal-adaptive-moving-average';
+import { FractalAdaptiveMovingAverageOutput } from './output';
 import {
-    inputMid,
-    inputHigh,
-    inputLow,
-    expectedFrama,
-    expectedFdim,
-} from './testdata';
+    FractalAdaptiveMovingAverageParams,
+    fractalAdaptiveMovingAverageDimensionMnemonic,
+    fractalAdaptiveMovingAverageMnemonic,
+} from './params';
+import * as testdata from './testdata';
 
-/* eslint-disable max-len */
-// Input data taken from test_FRAMA.xsl reference implementation:
-// Mid-Price, D5...D256, 252 entries,
-// High, B5...B256, 252 entries,
-// Low, C5...C256, 252 entries.
-//
-// Expected data taken from test_FRAMA.xsl reference implementation:
-// FRAMA, R5...R256, 252 entries,
-// FDIM, O5...O256, 252 entries.
-//
-// All parameters have default values.
+interface ReferenceCase {
+    params: FractalAdaptiveMovingAverageParams;
+    expectedValues: number[];
+    expectedDimensions: number[];
+}
+
+const REFERENCE_CASES: ReferenceCase[] = [
+    { params: { length: 16, slowestSmoothingFactor: 0.01, coefficientMode: 1 }, expectedValues: testdata.expectedL16_A0_01_C1_VALUE, expectedDimensions: testdata.expectedL16_A0_01_C1_FDIM },
+    { params: { length: 2, slowestSmoothingFactor: 0.01, coefficientMode: 1 }, expectedValues: testdata.expectedL2_A0_01_C1_VALUE, expectedDimensions: testdata.expectedL2_A0_01_C1_FDIM },
+    { params: { length: 4, slowestSmoothingFactor: 0.01, coefficientMode: 1 }, expectedValues: testdata.expectedL4_A0_01_C1_VALUE, expectedDimensions: testdata.expectedL4_A0_01_C1_FDIM },
+    { params: { length: 8, slowestSmoothingFactor: 0.01, coefficientMode: 1 }, expectedValues: testdata.expectedL8_A0_01_C1_VALUE, expectedDimensions: testdata.expectedL8_A0_01_C1_FDIM },
+    { params: { length: 20, slowestSmoothingFactor: 0.01, coefficientMode: 1 }, expectedValues: testdata.expectedL20_A0_01_C1_VALUE, expectedDimensions: testdata.expectedL20_A0_01_C1_FDIM },
+    { params: { length: 30, slowestSmoothingFactor: 0.01, coefficientMode: 1 }, expectedValues: testdata.expectedL30_A0_01_C1_VALUE, expectedDimensions: testdata.expectedL30_A0_01_C1_FDIM },
+    { params: { length: 64, slowestSmoothingFactor: 0.01, coefficientMode: 1 }, expectedValues: testdata.expectedL64_A0_01_C1_VALUE, expectedDimensions: testdata.expectedL64_A0_01_C1_FDIM },
+    { params: { length: 128, slowestSmoothingFactor: 0.01, coefficientMode: 1 }, expectedValues: testdata.expectedL128_A0_01_C1_VALUE, expectedDimensions: testdata.expectedL128_A0_01_C1_FDIM },
+    { params: { length: 250, slowestSmoothingFactor: 0.01, coefficientMode: 1 }, expectedValues: testdata.expectedL250_A0_01_C1_VALUE, expectedDimensions: testdata.expectedL250_A0_01_C1_FDIM },
+    { params: { length: 252, slowestSmoothingFactor: 0.01, coefficientMode: 1 }, expectedValues: testdata.expectedL252_A0_01_C1_VALUE, expectedDimensions: testdata.expectedL252_A0_01_C1_FDIM },
+    { params: { length: 254, slowestSmoothingFactor: 0.01, coefficientMode: 1 }, expectedValues: testdata.expectedL254_A0_01_C1_VALUE, expectedDimensions: testdata.expectedL254_A0_01_C1_FDIM },
+    { params: { length: 16, slowestSmoothingFactor: 0.001, coefficientMode: 1 }, expectedValues: testdata.expectedL16_A0_001_C1_VALUE, expectedDimensions: testdata.expectedL16_A0_001_C1_FDIM },
+    { params: { length: 16, slowestSmoothingFactor: 0.1, coefficientMode: 1 }, expectedValues: testdata.expectedL16_A0_1_C1_VALUE, expectedDimensions: testdata.expectedL16_A0_1_C1_FDIM },
+    { params: { length: 16, slowestSmoothingFactor: 1.0, coefficientMode: 1 }, expectedValues: testdata.expectedL16_A1_C1_VALUE, expectedDimensions: testdata.expectedL16_A1_C1_FDIM },
+    { params: { length: 16, slowestSmoothingFactor: 0.01, coefficientMode: 0 }, expectedValues: testdata.expectedL16_A0_01_C0_VALUE, expectedDimensions: testdata.expectedL16_A0_01_C0_FDIM },
+    { params: { length: 30, slowestSmoothingFactor: 0.01, coefficientMode: 0 }, expectedValues: testdata.expectedL30_A0_01_C0_VALUE, expectedDimensions: testdata.expectedL30_A0_01_C0_FDIM },
+];
+
+function articleBatch(
+    prices: number[],
+    length: number,
+    slowest = 0.01,
+    mode = 0,
+    highs?: number[],
+    lows?: number[],
+): Array<[number, number]> {
+    const highSeries = highs ?? prices;
+    const lowSeries = lows ?? prices;
+    const half = Math.floor(length / 2);
+    const scale = mode === 1 ? Math.log(slowest) : -4.6;
+    let dimension = 0;
+    const filtered = new Array<number>(prices.length).fill(0);
+    const outputs: Array<[number, number]> = [];
+
+    for (let index = 0; index < prices.length; index++) {
+        const price = prices[index];
+        if (index + 1 >= length) {
+            let max1 = highSeries[index];
+            let min1 = lowSeries[index];
+            for (let offset = 1; offset < half; offset++) {
+                if (highSeries[index - offset] > max1) max1 = highSeries[index - offset];
+                if (lowSeries[index - offset] < min1) min1 = lowSeries[index - offset];
+            }
+            let max2 = highSeries[index - half];
+            let min2 = lowSeries[index - half];
+            for (let offset = half + 1; offset < length; offset++) {
+                if (highSeries[index - offset] > max2) max2 = highSeries[index - offset];
+                if (lowSeries[index - offset] < min2) min2 = lowSeries[index - offset];
+            }
+            const max3 = Math.max(max1, max2);
+            const min3 = Math.min(min1, min2);
+            const n1 = (max1 - min1) / half;
+            const n2 = (max2 - min2) / half;
+            const n3 = (max3 - min3) / length;
+            if (n1 > 0 && n2 > 0 && n3 > 0) {
+                dimension = (Math.log(n1 + n2) - Math.log(n3)) / Math.log(2);
+            }
+            const rawAlpha = dimension <= 1 ? 1 : Math.exp(scale * (dimension - 1));
+            const alpha = Math.max(slowest, Math.min(1, rawAlpha));
+            filtered[index] = index + 1 < length + 1
+                ? price
+                : alpha * price + (1 - alpha) * filtered[index - 1];
+            outputs.push([filtered[index], dimension]);
+        } else {
+            filtered[index] = price;
+            outputs.push([Number.NaN, Number.NaN]);
+        }
+    }
+    return outputs;
+}
 
 describe('FractalAdaptiveMovingAverage', () => {
-  const time = new Date(2021, 3, 1); // April 1, 2021
+    it('matches all 16 confirmed reference fixtures', () => {
+        expect(testdata.testInput.length).toBe(252);
+        for (const item of REFERENCE_CASES) {
+            const indicator = new FractalAdaptiveMovingAverage(item.params);
+            const warmup = (item.params.length ?? 16) - 1;
+            expect(indicator.warmupBars()).toBe(warmup);
+            expect(indicator.isPrimed()).toBeFalse();
+            expect(Number.isNaN(indicator.value())).toBeTrue();
+            expect(Number.isNaN(indicator.fractalDimension())).toBeTrue();
+            expect(Number.isNaN(indicator.alpha())).toBeTrue();
 
-  it('should have correct output enum values', () => {
-    expect(FractalAdaptiveMovingAverageOutput.Value).toBe(0);
-    expect(FractalAdaptiveMovingAverageOutput.Fdim).toBe(1);
-  });
+            for (let index = 0; index < testdata.testInput.length; index++) {
+                const actualValue = indicator.update(testdata.testInput[index]);
+                const actualDimension = indicator.fractalDimension();
+                const targetValue = item.expectedValues[index];
+                const targetDimension = item.expectedDimensions[index];
 
-  it('should return expected mnemonic', () => {
-    let frama = new FractalAdaptiveMovingAverage(
-      { length: 16, slowestSmoothingFactor: 0.01 });
-    expect(frama.metadata().mnemonic).toBe('frama(16, 0.010)');
-
-    frama = new FractalAdaptiveMovingAverage(
-      { length: 18, slowestSmoothingFactor: 0.005 });
-    expect(frama.metadata().mnemonic).toBe('frama(18, 0.005)');
-
-    frama = new FractalAdaptiveMovingAverage(
-      { length: 17, slowestSmoothingFactor: 0.01 });
-    expect(frama.metadata().mnemonic).toBe('frama(18, 0.010)');
-  });
-
-  it('should return expected mnemonic with non-default bar component', () => {
-    const frama = new FractalAdaptiveMovingAverage({
-      length: 16, slowestSmoothingFactor: 0.01,
-      barComponent: BarComponent.Median,
+                if (index < warmup) {
+                    expect(indicator.isPrimed()).toBeFalse();
+                    expect(Number.isNaN(actualValue)).toBeTrue();
+                    expect(Number.isNaN(actualDimension)).toBeTrue();
+                    expect(Number.isNaN(targetValue)).toBeTrue();
+                    expect(Number.isNaN(targetDimension)).toBeTrue();
+                } else {
+                    expect(indicator.isPrimed()).toBeTrue();
+                    const valueBound = Math.max(1e-12, Math.abs(targetValue) * 1e-12);
+                    const dimBound = Math.max(1e-12, Math.abs(targetDimension) * 1e-12);
+                    expect(Math.abs(actualValue - targetValue)).toBeLessThanOrEqual(valueBound);
+                    expect(Math.abs(actualDimension - targetDimension)).toBeLessThanOrEqual(dimBound);
+                    expect(Math.abs(indicator.value() - actualValue)).toBeLessThanOrEqual(1e-15);
+                }
+            }
+        }
     });
-    expect(frama.metadata().mnemonic).toBe('frama(16, 0.010, hl/2)');
-    expect(frama.metadata().description).toBe('Fractal adaptive moving average frama(16, 0.010, hl/2)');
-  });
 
-  it('should return expected mnemonic with non-default quote component', () => {
-    const frama = new FractalAdaptiveMovingAverage({
-      length: 16, slowestSmoothingFactor: 0.01,
-      quoteComponent: QuoteComponent.Bid,
+    it('matches independent batch oracle on midpoint and bar high/low ranges', () => {
+        const midpoints = testdata.testHigh.map((high, index) => (high + testdata.testLow[index]) / 2);
+        const stream = new FractalAdaptiveMovingAverage({ length: 16, slowestSmoothingFactor: 0.01, coefficientMode: 0 });
+        const expected = articleBatch(midpoints, 16, 0.01, 0, testdata.testHigh, testdata.testLow);
+
+        for (let index = 0; index < midpoints.length; index++) {
+            const actualValue = stream.update(midpoints[index], testdata.testHigh[index], testdata.testLow[index]);
+            const actualDimension = stream.fractalDimension();
+            const [targetValue, targetDimension] = expected[index];
+            if (Number.isNaN(targetValue)) {
+                expect(Number.isNaN(actualValue)).toBeTrue();
+                expect(Number.isNaN(actualDimension)).toBeTrue();
+            } else {
+                expect(Math.abs(actualValue - targetValue)).toBeLessThanOrEqual(1e-12);
+                expect(Math.abs(actualDimension - targetDimension)).toBeLessThanOrEqual(1e-12);
+            }
+        }
     });
-    expect(frama.metadata().mnemonic).toBe('frama(16, 0.010, b)');
-  });
 
-  it('should return expected mnemonic with non-default trade component', () => {
-    const frama = new FractalAdaptiveMovingAverage({
-      length: 16, slowestSmoothingFactor: 0.01,
-      tradeComponent: TradeComponent.Volume,
+    it('preserves startup seed, unclamped ramp/gap dimensions, flat-box guard, and mode endpoints', () => {
+        const seeded = FractalAdaptiveMovingAverage.default();
+        let seedValue = 0;
+        for (let index = 0; index < 20; index++) {
+            const price = testdata.testInput[index];
+            const actualValue = seeded.update(price);
+            if (index === 15) {
+                expect(actualValue).toBe(price);
+                seedValue = actualValue;
+            }
+            if (index === 16) {
+                const currentAlpha = seeded.alpha();
+                expect(actualValue).toBeCloseTo(currentAlpha * price + (1 - currentAlpha) * seedValue, 14);
+            }
+        }
+
+        const expectedRampDimension = Math.log2(28 / 15);
+        for (const offset of [100, 0, -100]) {
+            const ramp = FractalAdaptiveMovingAverage.default();
+            for (let step = 0; step < 40; step++) {
+                const actualValue = ramp.update(offset + step);
+                if (step >= 15) {
+                    expect(ramp.fractalDimension()).toBeCloseTo(expectedRampDimension, 13);
+                    expect(ramp.fractalDimension()).toBeLessThan(1);
+                    expect(ramp.alpha()).toBe(1);
+                    expect(actualValue).toBe(offset + step);
+                }
+            }
+        }
+
+        const gap = new FractalAdaptiveMovingAverage({ length: 4 });
+        let gapValue = Number.NaN;
+        for (const price of [0, 1, 100, 101]) {
+            gapValue = gap.update(price);
+        }
+        expect(gap.fractalDimension()).toBeCloseTo(Math.log2(4 / 101), 13);
+        expect(gap.fractalDimension()).toBeLessThan(0);
+        expect(gap.alpha()).toBe(1);
+        expect(gapValue).toBe(101);
+
+        const hold = new FractalAdaptiveMovingAverage({ length: 4 });
+        for (const price of [0, 1, 0, 1]) {
+            hold.update(price);
+        }
+        expect(hold.fractalDimension()).toBe(2);
+        for (let step = 0; step < 8; step++) {
+            hold.update(1);
+            expect(hold.fractalDimension()).toBe(2);
+        }
+
+        const precise = new FractalAdaptiveMovingAverage({ length: 4, coefficientMode: 1 });
+        const article = new FractalAdaptiveMovingAverage({ length: 4, coefficientMode: 0 });
+        for (let step = 0; step < 5; step++) {
+            precise.update(1, 2, 0);
+            article.update(1, 2, 0);
+        }
+        expect(precise.alpha()).toBeCloseTo(0.01, 15);
+        expect(article.alpha()).toBe(Math.exp(-4.6));
+        expect(article.alpha()).toBeGreaterThan(precise.alpha());
     });
-    expect(frama.metadata().mnemonic).toBe('frama(16, 0.010, v)');
-  });
 
-  it('should return expected metadata', () => {
-    const frama = new FractalAdaptiveMovingAverage(
-      { length: 16, slowestSmoothingFactor: 0.01 });
-    const meta = frama.metadata();
+    it('supports affine invariance, NaN gaps, reset, and atomic validation', () => {
+        const original = FractalAdaptiveMovingAverage.default();
+        const transformed = FractalAdaptiveMovingAverage.default();
+        const withGaps = FractalAdaptiveMovingAverage.default();
 
-    const mn = 'frama(16, 0.010)';
-    const mnFdim = 'framaDim(16, 0.010)';
-    const descr = 'Fractal adaptive moving average ';
+        for (const price of testdata.testInput) {
+            const leftVal = original.update(price);
+            const rightVal = transformed.update(3 * price - 1000);
+            const gapVal = withGaps.update(price);
+            const seenBefore = withGaps.samplesSeen();
+            const savedVal = withGaps.value();
 
-    expect(meta.identifier).toBe(IndicatorIdentifier.FractalAdaptiveMovingAverage);
-    expect(meta.mnemonic).toBe(mn);
-    expect(meta.description).toBe(descr + mn);
-    expect(meta.outputs.length).toBe(2);
+            expect(Number.isNaN(withGaps.update(Number.NaN))).toBeTrue();
+            expect(Number.isNaN(withGaps.update(price, Number.NaN, price))).toBeTrue();
+            expect(withGaps.samplesSeen()).toBe(seenBefore);
+            if (Number.isNaN(savedVal)) {
+                expect(Number.isNaN(withGaps.value())).toBeTrue();
+            } else {
+                expect(withGaps.value()).toBe(savedVal);
+            }
 
-    expect(meta.outputs[0].kind).toBe(FractalAdaptiveMovingAverageOutput.Value);
-    expect(meta.outputs[0].shape).toBe(Shape.Scalar);
-    expect(meta.outputs[0].mnemonic).toBe(mn);
-    expect(meta.outputs[0].description).toBe(descr + mn);
+            if (!Number.isNaN(leftVal)) {
+                expect(leftVal).toBe(gapVal);
+                expect(original.fractalDimension()).toBeCloseTo(transformed.fractalDimension(), 11);
+                expect(3 * leftVal - 1000).toBeCloseTo(rightVal, 10);
+            }
+        }
 
-    expect(meta.outputs[1].kind).toBe(FractalAdaptiveMovingAverageOutput.Fdim);
-    expect(meta.outputs[1].shape).toBe(Shape.Scalar);
-    expect(meta.outputs[1].mnemonic).toBe(mnFdim);
-    expect(meta.outputs[1].description).toBe(descr + mnFdim);
-  });
+        withGaps.reset();
+        expect(withGaps.isPrimed()).toBeFalse();
+        expect(withGaps.samplesSeen()).toBe(0);
+        const fresh = FractalAdaptiveMovingAverage.default();
+        for (const price of testdata.testInput) {
+            const a = withGaps.update(price);
+            const b = fresh.update(price);
+            if (Number.isNaN(b)) {
+                expect(Number.isNaN(a)).toBeTrue();
+            } else {
+                expect(a).toBe(b);
+            }
+        }
 
-  it('should throw if the length is less than 2', () => {
-    expect(() => { new FractalAdaptiveMovingAverage({ length: 1, slowestSmoothingFactor: 0.01 }); }).toThrow();
-    expect(() => { new FractalAdaptiveMovingAverage({ length: 0, slowestSmoothingFactor: 0.01 }); }).toThrow();
-    expect(() => { new FractalAdaptiveMovingAverage({ length: -1, slowestSmoothingFactor: 0.01 }); }).toThrow();
-  });
+        const atomic = new FractalAdaptiveMovingAverage({ length: 2 });
+        atomic.update(0);
+        const invalidUpdates: Array<() => void> = [
+            () => atomic.update(Number.POSITIVE_INFINITY),
+            () => atomic.update(true as unknown as number),
+            () => atomic.update(1, 2),
+            () => atomic.update(1, 0, 2),
+            () => atomic.update(1, Number.POSITIVE_INFINITY, 0),
+            () => atomic.update(0, 1e308, -1e308),
+        ];
+        for (const call of invalidUpdates) {
+            expect(call).toThrow();
+            expect(atomic.samplesSeen()).toBe(1);
+            expect(atomic.isPrimed()).toBeFalse();
+        }
 
-  it('should throw if the slowest smoothing factor is less than 0', () => {
-    expect(() => {
-      new FractalAdaptiveMovingAverage(
-        { length: 16, slowestSmoothingFactor: -0.01 });
-    }).toThrow();
-  });
+        const invalidConfigs: FractalAdaptiveMovingAverageParams[] = [
+            { length: 1 },
+            { length: 17 },
+            { length: 16.5 },
+            { length: true as unknown as number },
+            { slowestSmoothingFactor: 0 },
+            { slowestSmoothingFactor: -0.1 },
+            { slowestSmoothingFactor: 1.1 },
+            { slowestSmoothingFactor: Number.NaN },
+            { slowestSmoothingFactor: Number.POSITIVE_INFINITY },
+            { coefficientMode: 2 },
+            { coefficientMode: 0, slowestSmoothingFactor: 0.1 },
+        ];
+        for (const bad of invalidConfigs) {
+            expect(() => new FractalAdaptiveMovingAverage(bad)).toThrow();
+        }
+    });
 
-  it('should throw if the slowest smoothing factor is greater than 1', () => {
-    expect(() => {
-      new FractalAdaptiveMovingAverage(
-        { length: 16, slowestSmoothingFactor: 1.01 });
-    }).toThrow();
-  });
+    it('produces expected metadata, mnemonics, factory instances, and entity outputs', () => {
+        expect(FractalAdaptiveMovingAverageOutput.Value).toBe(0);
+        expect(FractalAdaptiveMovingAverageOutput.Fdim).toBe(1);
 
-  it('should calculate expected FRAMA values from reference implementation', () => {
-    const lprimed = 15;
-    const eps = 1e-9;
-    const frama = new FractalAdaptiveMovingAverage({ length: 16, slowestSmoothingFactor: 0.01 });
+        const defaultInd = FractalAdaptiveMovingAverage.default();
+        const meta = defaultInd.metadata();
+        expect(meta.identifier).toBe(IndicatorIdentifier.FractalAdaptiveMovingAverage);
+        expect(meta.mnemonic).toBe('frama(16, 0.01)');
+        expect(meta.description).toBe('Fractal adaptive moving average frama(16, 0.01)');
+        expect(meta.outputs.length).toBe(2);
+        expect(meta.outputs[0].kind).toBe(FractalAdaptiveMovingAverageOutput.Value);
+        expect(meta.outputs[0].shape).toBe(Shape.Scalar);
+        expect(meta.outputs[0].mnemonic).toBe('frama(16, 0.01)');
+        expect(meta.outputs[1].kind).toBe(FractalAdaptiveMovingAverageOutput.Fdim);
+        expect(meta.outputs[1].shape).toBe(Shape.Scalar);
+        expect(meta.outputs[1].mnemonic).toBe('framaDim(16, 0.01)');
 
-    for (let i = 0; i < lprimed; i++) {
-      expect(frama.update(inputMid[i], inputHigh[i], inputLow[i])).toBeNaN();
-      expect(frama.isPrimed()).toBe(false);
-    }
+        const custom: FractalAdaptiveMovingAverageParams = {
+            length: 30,
+            slowestSmoothingFactor: 0.01,
+            coefficientMode: 0,
+            barComponent: BarComponent.Median,
+            quoteComponent: QuoteComponent.Bid,
+            tradeComponent: TradeComponent.Volume,
+        };
+        expect(fractalAdaptiveMovingAverageMnemonic(custom)).toBe('frama(30, 0.01, mode=0, hl/2, b, v)');
+        expect(fractalAdaptiveMovingAverageDimensionMnemonic(custom)).toBe('framaDim(30, 0.01, mode=0, hl/2, b, v)');
 
-    for (let i = lprimed; i < inputMid.length; i++) {
-      const act = frama.update(inputMid[i], inputHigh[i], inputLow[i]);
-      expect(frama.isPrimed()).toBe(true);
-      expect(Math.abs(act - expectedFrama[i])).withContext(`FRAMA [${i}]: expected ${expectedFrama[i]}, actual ${act}`)
-        .toBeLessThan(eps);
-    }
+        const fromFactory = createIndicator(IndicatorIdentifier.FractalAdaptiveMovingAverage, {
+            length: 30,
+            slowestSmoothingFactor: 0.01,
+            coefficientMode: 0,
+        });
+        expect(fromFactory.metadata().mnemonic).toBe('frama(30, 0.01, mode=0)');
 
-    expect(frama.update(Number.NaN, Number.NaN, Number.NaN)).toBeNaN();
-    expect(frama.update(Number.NaN, 1, 1)).toBeNaN();
-    expect(frama.update(1, Number.NaN, 1)).toBeNaN();
-    expect(frama.update(1, 1, Number.NaN)).toBeNaN();
-  });
+        const stamp = new Date('2026-01-02T00:00:00Z');
+        const entityInd = new FractalAdaptiveMovingAverage({ length: 2 });
+        entityInd.updateBar(new Bar({ time: stamp, open: 10, high: 12, low: 9, close: 11, volume: 100 }));
+        const barOut = entityInd.updateBar(new Bar({ time: stamp, open: 11, high: 14, low: 10, close: 13, volume: 100 }));
+        expect((barOut[0] as Scalar).value).toBe(13);
 
-  it('should calculate expected Fdim values from reference implementation', () => {
-    const lprimed = 15;
-    const eps = 1e-9;
-    const frama = new FractalAdaptiveMovingAverage({ length: 16, slowestSmoothingFactor: 0.01 });
+        const skipped = entityInd.updateScalar(new Scalar({ time: stamp, value: Number.NaN }));
+        expect(Number.isNaN((skipped[0] as Scalar).value)).toBeTrue();
+        expect(Number.isNaN((skipped[1] as Scalar).value)).toBeTrue();
 
-    // Access fractal dimension via updateEntity output.
-    for (let i = 0; i < lprimed; i++) {
-      const output = frama.updateScalar(new Scalar({ time, value: inputMid[i] }));
-      // Before primed, scalar uses sample for high/low too, which is different from the reference.
-      // Instead, use update directly and check output entity.
-    }
+        const quoteInd = new FractalAdaptiveMovingAverage({ length: 2 });
+        quoteInd.updateQuote(new Quote({ time: stamp, bidPrice: 9, askPrice: 11, bidSize: 1, askSize: 1 }));
+        const quoteOut = quoteInd.updateQuote(new Quote({ time: stamp, bidPrice: 10, askPrice: 12, bidSize: 1, askSize: 1 }));
+        expect((quoteOut[0] as Scalar).value).toBe(11);
 
-    // Re-create to test Fdim properly through the entity path with high/low.
-    const frama2 = new FractalAdaptiveMovingAverage({ length: 16, slowestSmoothingFactor: 0.01 });
-
-    for (let i = 0; i < lprimed; i++) {
-      frama2.update(inputMid[i], inputHigh[i], inputLow[i]);
-    }
-
-    for (let i = lprimed; i < inputMid.length; i++) {
-      const bar = new Bar({ time, open: inputMid[i], high: inputHigh[i], low: inputLow[i], close: inputMid[i], volume: 0 });
-      const output = frama2.updateBar(bar);
-      expect(output.length).toBe(2);
-
-      const framaScalar = output[0] as Scalar;
-      const fdimScalar = output[1] as Scalar;
-
-      expect(Math.abs(framaScalar.value - expectedFrama[i]))
-        .withContext(`FRAMA [${i}]: expected ${expectedFrama[i]}, actual ${framaScalar.value}`)
-        .toBeLessThan(eps);
-
-      expect(Math.abs(fdimScalar.value - expectedFdim[i]))
-        .withContext(`FDIM [${i}]: expected ${expectedFdim[i]}, actual ${fdimScalar.value}`)
-        .toBeLessThan(eps);
-    }
-  });
-
-  it('should transition primed state correctly', () => {
-    const lprimed = 15;
-    const frama = new FractalAdaptiveMovingAverage({ length: 16, slowestSmoothingFactor: 0.01 });
-
-    expect(frama.isPrimed()).toBe(false);
-
-    for (let i = 0; i < lprimed; i++) {
-      frama.update(inputMid[i], inputHigh[i], inputLow[i]);
-      expect(frama.isPrimed()).toBe(false);
-    }
-
-    for (let i = lprimed; i < inputMid.length; i++) {
-      frama.update(inputMid[i], inputHigh[i], inputLow[i]);
-      expect(frama.isPrimed()).toBe(true);
-    }
-  });
-
-  it('should produce correct updateEntity output for scalar', () => {
-    const lprimed = 15;
-    const inp = 3;
-    const frama = new FractalAdaptiveMovingAverage({ length: 16, slowestSmoothingFactor: 0.01 });
-
-    for (let i = 0; i < lprimed; i++) {
-      frama.update(0, 0, 0);
-    }
-
-    const s = new Scalar({ time, value: inp });
-    const output = frama.updateScalar(s);
-    expect(output.length).toBe(2);
-
-    const s0 = output[0] as Scalar;
-    const s1 = output[1] as Scalar;
-    expect(s0.time).toBe(time);
-    expect(s1.time).toBe(time);
-    // After priming with zeros, update with 3 should produce a specific value.
-    expect(Number.isNaN(s0.value)).toBe(false);
-    expect(Number.isNaN(s1.value)).toBe(false);
-  });
-
-  it('should produce correct updateEntity output for bar', () => {
-    const lprimed = 15;
-    const inp = 3;
-    const frama = new FractalAdaptiveMovingAverage({ length: 16, slowestSmoothingFactor: 0.01 });
-
-    for (let i = 0; i < lprimed; i++) {
-      frama.update(0, 0, 0);
-    }
-
-    const b = new Bar({ time, open: inp, high: inp, low: inp, close: inp, volume: 0 });
-    const output = frama.updateBar(b);
-    expect(output.length).toBe(2);
-
-    const s0 = output[0] as Scalar;
-    const s1 = output[1] as Scalar;
-    expect(s0.time).toBe(time);
-    expect(s1.time).toBe(time);
-    expect(Number.isNaN(s0.value)).toBe(false);
-    expect(Number.isNaN(s1.value)).toBe(false);
-  });
-
-  it('should produce correct updateEntity output for quote', () => {
-    const lprimed = 15;
-    const inp = 3;
-    const frama = new FractalAdaptiveMovingAverage({ length: 16, slowestSmoothingFactor: 0.01 });
-
-    for (let i = 0; i < lprimed; i++) {
-      frama.update(0, 0, 0);
-    }
-
-    const q = new Quote({ time, bidPrice: inp, askPrice: inp, bidSize: 0, askSize: 0 });
-    const output = frama.updateQuote(q);
-    expect(output.length).toBe(2);
-
-    const s0 = output[0] as Scalar;
-    const s1 = output[1] as Scalar;
-    expect(s0.time).toBe(time);
-    expect(s1.time).toBe(time);
-    expect(Number.isNaN(s0.value)).toBe(false);
-    expect(Number.isNaN(s1.value)).toBe(false);
-  });
-
-  it('should produce correct updateEntity output for trade', () => {
-    const lprimed = 15;
-    const inp = 3;
-    const frama = new FractalAdaptiveMovingAverage({ length: 16, slowestSmoothingFactor: 0.01 });
-
-    for (let i = 0; i < lprimed; i++) {
-      frama.update(0, 0, 0);
-    }
-
-    const r = new Trade({ time, price: inp, volume: 0 });
-    const output = frama.updateTrade(r);
-    expect(output.length).toBe(2);
-
-    const s0 = output[0] as Scalar;
-    const s1 = output[1] as Scalar;
-    expect(s0.time).toBe(time);
-    expect(s1.time).toBe(time);
-    expect(Number.isNaN(s0.value)).toBe(false);
-    expect(Number.isNaN(s1.value)).toBe(false);
-  });
-
-  it('should return NaN for fdim when frama is NaN (not primed)', () => {
-    const frama = new FractalAdaptiveMovingAverage({ length: 16, slowestSmoothingFactor: 0.01 });
-
-    const s = new Scalar({ time, value: 100 });
-    const output = frama.updateScalar(s);
-    expect(output.length).toBe(2);
-
-    const s0 = output[0] as Scalar;
-    const s1 = output[1] as Scalar;
-    expect(Number.isNaN(s0.value)).toBe(true);
-    expect(Number.isNaN(s1.value)).toBe(true);
-  });
-
-  it('should match Go updateEntity values exactly', () => {
-    const lprimed = 15;
-    const inp = 3;
-    const expectedFramaValue = 2.999999999999997;
-    const expectedFdimValue = 1.0000000000000002;
-    const eps = 1e-13;
-
-    const frama = new FractalAdaptiveMovingAverage({ length: 16, slowestSmoothingFactor: 0.01 });
-
-    for (let i = 0; i < lprimed; i++) {
-      frama.update(0, 0, 0);
-    }
-
-    const s = new Scalar({ time, value: inp });
-    const output = frama.updateScalar(s);
-    const s0 = output[0] as Scalar;
-    const s1 = output[1] as Scalar;
-
-    expect(Math.abs(s0.value - expectedFramaValue))
-      .withContext(`FRAMA: expected ${expectedFramaValue}, actual ${s0.value}`)
-      .toBeLessThan(eps);
-    expect(Math.abs(s1.value - expectedFdimValue))
-      .withContext(`FDIM: expected ${expectedFdimValue}, actual ${s1.value}`)
-      .toBeLessThan(eps);
-  });
+        const tradeInd = new FractalAdaptiveMovingAverage({ length: 2 });
+        tradeInd.updateTrade(new Trade({ time: stamp, price: 5, volume: 1 }));
+        const tradeOut = tradeInd.updateTrade(new Trade({ time: stamp, price: 7, volume: 1 }));
+        expect((tradeOut[0] as Scalar).value).toBe(7);
+    });
 });

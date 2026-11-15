@@ -698,14 +698,30 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
         },
 
         .fractal_adaptive_moving_average => blk: {
-            const p = frama_mod.Params{
-                .length = getInt(obj, "length", 16),
-                .slowest_smoothing_factor = getF64(obj, "slowestSmoothingFactor", 0.01),
+            const length: i32 = if (obj.get("length")) |raw| switch (raw) {
+                .integer => |number| if (number >= std.math.minInt(i32) and number <= std.math.maxInt(i32)) @intCast(number) else return FactoryError.InvalidParams,
+                .float => |number| if (std.math.isFinite(number) and @trunc(number) == number and number >= @as(f64, @floatFromInt(std.math.minInt(i32))) and number <= @as(f64, @floatFromInt(std.math.maxInt(i32)))) @intFromFloat(number) else return FactoryError.InvalidParams,
+                else => return FactoryError.InvalidParams,
+            } else 16;
+            const slowest: f64 = if (obj.get("slowestSmoothingFactor")) |raw| switch (raw) {
+                .float => |number| number,
+                .integer => |number| @floatFromInt(number),
+                else => return FactoryError.InvalidParams,
+            } else 0.01;
+            const mode: i32 = if (obj.get("coefficientMode")) |raw| switch (raw) {
+                .integer => |number| if (number >= std.math.minInt(i32) and number <= std.math.maxInt(i32)) @intCast(number) else return FactoryError.InvalidParams,
+                .float => |number| if (std.math.isFinite(number) and @trunc(number) == number and number >= @as(f64, @floatFromInt(std.math.minInt(i32))) and number <= @as(f64, @floatFromInt(std.math.maxInt(i32)))) @intFromFloat(number) else return FactoryError.InvalidParams,
+                else => return FactoryError.InvalidParams,
+            } else 1;
+            const options = frama_mod.FractalAdaptiveMovingAverageParams{
+                .length = length,
+                .slowest_smoothing_factor = slowest,
+                .coefficient_mode = mode,
                 .bar_component = getBarComponent(obj),
                 .quote_component = getQuoteComponent(obj),
                 .trade_component = getTradeComponent(obj),
             };
-            const ind = frama_mod.FractalAdaptiveMovingAverage.init(allocator, p) catch return FactoryError.IndicatorInitFailed;
+            const ind = frama_mod.FractalAdaptiveMovingAverage.init(allocator, options) catch return FactoryError.IndicatorInitFailed;
             const ptr = heapAlloc(frama_mod.FractalAdaptiveMovingAverage, allocator, ind) catch return FactoryError.OutOfMemory;
             break :blk .{ .indicator = ptr.indicator(), .ctx = ptr, .deinit_fn = DeinitFn(frama_mod.FractalAdaptiveMovingAverage) };
         },

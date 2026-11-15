@@ -821,11 +821,70 @@ pub fn create_indicator(
         }
 
         Identifier::FractalAdaptiveMovingAverage => {
-            let mut p = FractalAdaptiveMovingAverageParams::default();
-            if let Some(v) = get_i64(&params, "length") {
-                p.length = v;
+            let mut options = FractalAdaptiveMovingAverageParams::default();
+            if !is_empty_object(&params) {
+                if let Some(raw) = params.get("length") {
+                    match raw {
+                        JsonValue::Number(number)
+                            if number.is_finite()
+                                && number.fract() == 0.0
+                                && *number >= i64::MIN as f64
+                                && *number <= i64::MAX as f64 =>
+                        {
+                            options.length = *number as i64;
+                        }
+                        _ => return Err("length must be an even integer >= 2".to_string()),
+                    }
+                }
+                if let Some(raw) = params.get("slowestSmoothingFactor") {
+                    match raw {
+                        JsonValue::Number(number) => options.slowest_smoothing_factor = *number,
+                        _ => {
+                            return Err("slowestSmoothingFactor must be a number".to_string());
+                        }
+                    }
+                }
+                if let Some(raw) = params.get("coefficientMode") {
+                    match raw {
+                        JsonValue::Number(number)
+                            if number.is_finite()
+                                && number.fract() == 0.0
+                                && *number >= i32::MIN as f64
+                                && *number <= i32::MAX as f64 =>
+                        {
+                            options.coefficient_mode = *number as i32;
+                        }
+                        _ => {
+                            return Err("coefficientMode must be integer 0 or 1".to_string());
+                        }
+                    }
+                }
+                if let Some(raw) = params.get("barComponent") {
+                    match raw {
+                        JsonValue::Number(number) => {
+                            options.bar_component = Some(lvt_bar_component(*number)?);
+                        }
+                        _ => return Err("invalid component number".to_string()),
+                    }
+                }
+                if let Some(raw) = params.get("quoteComponent") {
+                    match raw {
+                        JsonValue::Number(number) => {
+                            options.quote_component = Some(lvt_quote_component(*number)?);
+                        }
+                        _ => return Err("invalid component number".to_string()),
+                    }
+                }
+                if let Some(raw) = params.get("tradeComponent") {
+                    match raw {
+                        JsonValue::Number(number) => {
+                            options.trade_component = Some(lvt_trade_component(*number)?);
+                        }
+                        _ => return Err("invalid component number".to_string()),
+                    }
+                }
             }
-            Ok(Box::new(FractalAdaptiveMovingAverage::new(&p)?))
+            Ok(Box::new(FractalAdaptiveMovingAverage::new(&options)?))
         }
 
         Identifier::DominantCycle => {

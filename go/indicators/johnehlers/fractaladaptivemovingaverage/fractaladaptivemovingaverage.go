@@ -1,7 +1,7 @@
 package fractaladaptivemovingaverage
 
-//nolint: gofumpt
 import (
+	"errors"
 	"fmt"
 	"math"
 	"sync"
@@ -11,170 +11,199 @@ import (
 	"zpano/indicators/core"
 )
 
-// FractalAdaptiveMovingAverage (Ehler's fractal adaptive moving average, FRAMA)
-// is an EMA with the smoothing factor, α, being changed with each new sample:
-//
-// FRAMAᵢ = αᵢPᵢ + (1 - αᵢ)*FRAMAᵢ₋₁,  αs ≤ αᵢ ≤ 1
-//
-// Here the αs is the slowest α (default suggested value is 0.01 or equivalent
-// length of 199 samples).
-//
-// The concept of FRAMA is to relate the fractal dimension FDᵢ, calculated on a window
-// samples, to the EMA smoothing factor αᵢ, thus making the EMA adaptive.
-//
-// This dependency is defined as follows:
-//
-//	αᵢ = exp(-w(FDᵢ - 1)),  1 ≤ FDᵢ ≤ 2,
-//
-//	w = ln(αs)
-//
-//	or, given the length ℓs = 2/αs - 1,
-//
-//	w = ln(2/(ℓs + 1))
-//
-// The fractal dimension varies over the range from 1 to 2.
-//
-// When FDᵢ = 1 (series forms a straight line), the exponent is zero – which means that
-// αᵢ = 1, and the output of the exponential moving average is equal to the input.
-//
-// When FDᵢ = 2 (series fills all plane, excibiting extreme volatility), the exponent
-// is -w, which means that αᵢ = αs, and the output of the exponential moving average
-// is equal to the output of the slowest moving average with αs.
-//
-// The fractal dimension is estimated by using a "box count" method.
-// Since price samples are typically uniformly spaced, the box count is approximated
-// by the average slope of the price curve. This is calculated as the highest price
-// minus the lowest price within an interval, divided by the length of that interval.
-//
-// FDᵢ = (ln(N1+N2) − ln(N3)) / ln(2)
-//
-// N1 is calculated over the first half of the total lookback period ℓ as the
-// (highest price - lowest price) during the first ℓ/2 bars, divided by ℓ/2.
-//
-// N2 is calculated over the second half of the total lookback period ℓ as the
-// (lighest price - lowest price) during the second ℓ/2 bars (from ℓ/2 to ℓ-1 bars ago),
-// divided by ℓ/2.
-//
-// N3 is calculated over the entire lookback period ℓ as the
-// (highest price - lowest price) during the full ℓ bars, divided by ℓ.
-//
-// Reference:
-//
-//	Falconer, K. (2014). Fractal geometry: Mathematical foundations and applications (3rd ed) Wiley.
-//	Ehlers, John F. (2005). Fractal Adaptive Moving Average. Technical Analysis of Stocks & Commodities, 23(10), 81–82.
-//	Ehlers, John F. (2006). FRAMA – Fractal Adaptive Moving Average, https://www.mesasoftware.com/papers/FRAMA.pdf.
-type FractalAdaptiveMovingAverage struct {
-	mu               sync.RWMutex
-	mnemonic         string
-	description      string
-	mnemonicFdim     string
-	descriptionFdim  string
-	alphaSlowest     float64
-	scalingFactor    float64
-	fractalDimension float64
-	value            float64
-	length           int
-	lengthMinOne     int
-	halfLength       int
-	windowCount      int
-	windowHigh       []float64
-	windowLow        []float64
-	primed           bool
-	barFunc          entities.BarFunc
-	quoteFunc        entities.QuoteFunc
-	tradeFunc        entities.TradeFunc
+var logTwo = math.Log(2.0)
+
+func boxRange(highs, lows []float64, start, end int) (float64, error) {
+	highest := highs[start]
+	lowest := lows[start]
+	for index := start + 1; index < end; index++ {
+		if highs[index] > highest {
+			highest = highs[index]
+		}
+		if lows[index] < lowest {
+			lowest = lows[index]
+		}
+	}
+	span := highest - lowest
+	if math.IsNaN(span) || math.IsInf(span, 0) {
+		return 0, errors.New("price-range arithmetic overflowed")
+	}
+	return span, nil
 }
 
-// NewFractalAdaptiveMovingAverage returns an instance of the indicator
-// created using supplied parameters.
-func NewFractalAdaptiveMovingAverage( //nolint:funlen
-	params *Params,
-) (*FractalAdaptiveMovingAverage, error) {
+// FractalAdaptiveMovingAverage implements John F. Ehlers' 2005 Fractal Adaptive
+// Moving Average (FRAMA), returning both the adaptive EMA and the raw guarded
+// box-range fractal-dimension estimate used to adapt it.
+type FractalAdaptiveMovingAverage struct {
+	mu                     sync.RWMutex
+	mnemonic               string
+	description            string
+	mnemonicFdim           string
+	descriptionFdim        string
+	length                 int
+	halfLength             int
+	warmupCount            int
+	slowestSmoothingFactor float64
+	coefficientMode        int
+	exponentScale          float64
+	count                  int
+	highs                  []float64
+	lows                   []float64
+	dimensionState         float64
+	alphaState             float64
+	filterState            float64
+	currentValue           float64
+	currentDimension       float64
+	barFunc                entities.BarFunc
+	quoteFunc              entities.QuoteFunc
+	tradeFunc              entities.TradeFunc
+}
+
+// NewFractalAdaptiveMovingAverageDefault creates a FractalAdaptiveMovingAverage with Ehlers defaults.
+func NewFractalAdaptiveMovingAverageDefault() (*FractalAdaptiveMovingAverage, error) {
+	return NewFractalAdaptiveMovingAverage(DefaultParams())
+}
+
+// NewFractalAdaptiveMovingAverage returns an instance of the indicator created using supplied parameters.
+func NewFractalAdaptiveMovingAverage(params *Params) (*FractalAdaptiveMovingAverage, error) {
 	const (
 		invalid = "invalid fractal adaptive moving average parameters"
-		fmtl    = "%s: length should be an even integer larger than 1"
-		fmta    = "%s: slowest smoothing factor should be in range [0, 1]"
+		fmts    = "%s: %s"
 		fmtw    = "%s: %w"
-		fmtn    = "frama(%d, %.3f%s)"
-		fmtnd   = "framaDim(%d, %.3f%s)"
-		two     = 2
 		descr   = "Fractal adaptive moving average "
 	)
 
-	var (
-		err       error
-		barFunc   entities.BarFunc
-		quoteFunc entities.QuoteFunc
-		tradeFunc entities.TradeFunc
-	)
-
-	if params.Length < two {
-		return nil, fmt.Errorf(fmtl, invalid)
+	if params == nil {
+		params = DefaultParams()
 	}
 
-	if params.SlowestSmoothingFactor < 0. || params.SlowestSmoothingFactor > 1. {
-		return nil, fmt.Errorf(fmta, invalid)
+	if params.Length < 2 || params.Length%2 != 0 {
+		return nil, fmt.Errorf(fmts, invalid, "length must be an even integer >= 2")
 	}
 
-	length := params.Length
-	if length%2 != 0 {
-		length++
+	slowest := params.SlowestSmoothingFactor
+	if math.IsNaN(slowest) || math.IsInf(slowest, 0) || slowest <= 0.0 || slowest > 1.0 {
+		return nil, fmt.Errorf(fmts, invalid, "slowest_smoothing_factor must satisfy 0 < A <= 1")
 	}
 
-	// Resolve defaults for component functions.
-	// A zero value means "use default, don't show in mnemonic".
-	bc := params.BarComponent
-	qc := params.QuoteComponent
-	tc := params.TradeComponent
-
-	if bc == 0 {
-		bc = entities.DefaultBarComponent
+	if params.CoefficientMode != 0 && params.CoefficientMode != 1 {
+		return nil, fmt.Errorf(fmts, invalid, "coefficient_mode must be 0 (article) or 1 (full precision)")
+	}
+	if params.CoefficientMode == 0 && slowest != 0.01 {
+		return nil, fmt.Errorf(fmts, invalid, "literal article mode requires slowest_smoothing_factor=0.01")
 	}
 
-	if qc == 0 {
-		qc = entities.DefaultQuoteComponent
+	barComp := params.BarComponent
+	if barComp == 0 {
+		barComp = entities.DefaultBarComponent
+	}
+	quoteComp := params.QuoteComponent
+	if quoteComp == 0 {
+		quoteComp = entities.DefaultQuoteComponent
+	}
+	tradeComp := params.TradeComponent
+	if tradeComp == 0 {
+		tradeComp = entities.DefaultTradeComponent
 	}
 
-	if tc == 0 {
-		tc = entities.DefaultTradeComponent
+	barFunc, err := entities.BarComponentFunc(barComp)
+	if err != nil {
+		return nil, fmt.Errorf(fmtw, invalid, err)
 	}
-
-	componentMnemonic := core.ComponentTripleMnemonic(bc, qc, tc)
-	mnemonic := fmt.Sprintf(fmtn, length, params.SlowestSmoothingFactor, componentMnemonic)
-	mnemonicFdim := fmt.Sprintf(fmtnd, length, params.SlowestSmoothingFactor, componentMnemonic)
-
-	if barFunc, err = entities.BarComponentFunc(bc); err != nil {
+	quoteFunc, err := entities.QuoteComponentFunc(quoteComp)
+	if err != nil {
+		return nil, fmt.Errorf(fmtw, invalid, err)
+	}
+	tradeFunc, err := entities.TradeComponentFunc(tradeComp)
+	if err != nil {
 		return nil, fmt.Errorf(fmtw, invalid, err)
 	}
 
-	if quoteFunc, err = entities.QuoteComponentFunc(qc); err != nil {
-		return nil, fmt.Errorf(fmtw, invalid, err)
+	exponentScale := -4.6
+	if params.CoefficientMode == 1 {
+		exponentScale = math.Log(slowest)
 	}
 
-	if tradeFunc, err = entities.TradeComponentFunc(tc); err != nil {
-		return nil, fmt.Errorf(fmtw, invalid, err)
-	}
+	mnemonic := params.Mnemonic()
+	mnemonicFdim := params.DimensionMnemonic()
 
-	return &FractalAdaptiveMovingAverage{
-		mnemonic:         mnemonic,
-		description:      descr + mnemonic,
-		mnemonicFdim:     mnemonicFdim,
-		descriptionFdim:  descr + mnemonicFdim,
-		length:           length,
-		lengthMinOne:     length - 1,
-		halfLength:       length / two,
-		windowHigh:       make([]float64, length),
-		windowLow:        make([]float64, length),
-		windowCount:      0,
-		alphaSlowest:     params.SlowestSmoothingFactor,
-		scalingFactor:    math.Log(params.SlowestSmoothingFactor),
-		fractalDimension: math.NaN(),
-		value:            math.NaN(),
-		primed:           false,
-		barFunc:          barFunc,
-		quoteFunc:        quoteFunc,
-		tradeFunc:        tradeFunc,
-	}, nil
+	indicator := &FractalAdaptiveMovingAverage{
+		mnemonic:               mnemonic,
+		description:            descr + mnemonic,
+		mnemonicFdim:           mnemonicFdim,
+		descriptionFdim:        descr + mnemonicFdim,
+		length:                 params.Length,
+		halfLength:             params.Length / 2,
+		warmupCount:            params.Length - 1,
+		slowestSmoothingFactor: slowest,
+		coefficientMode:        params.CoefficientMode,
+		exponentScale:          exponentScale,
+		highs:                  make([]float64, 0, params.Length),
+		lows:                   make([]float64, 0, params.Length),
+		barFunc:                barFunc,
+		quoteFunc:              quoteFunc,
+		tradeFunc:              tradeFunc,
+	}
+	indicator.Reset()
+	return indicator, nil
+}
+
+// Reset clears all streaming histories and priming state while preserving configuration.
+func (s *FractalAdaptiveMovingAverage) Reset() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	s.count = 0
+	s.highs = s.highs[:0]
+	s.lows = s.lows[:0]
+	s.dimensionState = 0.0
+	s.alphaState = 1.0
+	s.filterState = 0.0
+	s.currentValue = math.NaN()
+	s.currentDimension = math.NaN()
+}
+
+// WarmupBars returns the number of initial NaN outputs before priming.
+func (s *FractalAdaptiveMovingAverage) WarmupBars() int {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	return s.warmupCount
+}
+
+// SamplesSeen returns the number of accepted finite observations seen since start or reset.
+func (s *FractalAdaptiveMovingAverage) SamplesSeen() int {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	return s.count
+}
+
+// Value returns the latest accepted FRAMA value (NaN before priming).
+func (s *FractalAdaptiveMovingAverage) Value() float64 {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	return s.currentValue
+}
+
+// FractalDimension returns the latest accepted raw fractal-dimension estimate (NaN before priming).
+func (s *FractalAdaptiveMovingAverage) FractalDimension() float64 {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	return s.currentDimension
+}
+
+// Alpha returns the latest diagnostic smoothing factor (NaN before priming).
+func (s *FractalAdaptiveMovingAverage) Alpha() float64 {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	if s.count < s.length {
+		return math.NaN()
+	}
+	return s.alphaState
 }
 
 // IsPrimed indicates whether an indicator is primed.
@@ -182,10 +211,10 @@ func (s *FractalAdaptiveMovingAverage) IsPrimed() bool {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
-	return s.primed
+	return s.count >= s.length
 }
 
-// Metadata describes an output data of the indicator.
+// Metadata describes a requested output data of an indicator.
 func (s *FractalAdaptiveMovingAverage) Metadata() core.Metadata {
 	return core.BuildMetadata(
 		core.FractalAdaptiveMovingAverage,
@@ -198,169 +227,179 @@ func (s *FractalAdaptiveMovingAverage) Metadata() core.Metadata {
 	)
 }
 
-// Update updates the value of the moving average given the next sample.
-func (s *FractalAdaptiveMovingAverage) Update(sample, sampleHigh, sampleLow float64) float64 {
-	if math.IsNaN(sampleHigh) || math.IsNaN(sampleLow) || math.IsNaN(sample) {
-		return math.NaN()
+func (s *FractalAdaptiveMovingAverage) tryUpdateLocked(
+	sample, sampleHigh, sampleLow float64,
+) (float64, error) {
+	if math.IsInf(sample, 0) {
+		return math.NaN(), errors.New("price must be finite or NaN")
+	}
+	if math.IsInf(sampleHigh, 0) {
+		return math.NaN(), errors.New("high must be finite or NaN")
+	}
+	if math.IsInf(sampleLow, 0) {
+		return math.NaN(), errors.New("low must be finite or NaN")
+	}
+	if math.IsNaN(sample) || math.IsNaN(sampleHigh) || math.IsNaN(sampleLow) {
+		return math.NaN(), nil
+	}
+	if sampleHigh < sampleLow {
+		return math.NaN(), errors.New("high must be >= low")
 	}
 
+	keep := len(s.highs)
+	if keep > s.length-1 {
+		keep = s.length - 1
+	}
+	nextHighs := make([]float64, keep+1)
+	nextLows := make([]float64, keep+1)
+	nextHighs[0] = sampleHigh
+	nextLows[0] = sampleLow
+	copy(nextHighs[1:], s.highs[:keep])
+	copy(nextLows[1:], s.lows[:keep])
+
+	nextCount := s.count + 1
+	dimension := s.dimensionState
+	alpha := s.alphaState
+
+	if nextCount >= s.length {
+		range1, err := boxRange(nextHighs, nextLows, 0, s.halfLength)
+		if err != nil {
+			return math.NaN(), err
+		}
+		range2, err := boxRange(nextHighs, nextLows, s.halfLength, s.length)
+		if err != nil {
+			return math.NaN(), err
+		}
+		range3, err := boxRange(nextHighs, nextLows, 0, s.length)
+		if err != nil {
+			return math.NaN(), err
+		}
+
+		halfFloat := float64(s.halfLength)
+		lengthFloat := float64(s.length)
+		n1 := range1 / halfFloat
+		n2 := range2 / halfFloat
+		n3 := range3 / lengthFloat
+
+		if n1 > 0.0 && n2 > 0.0 && n3 > 0.0 {
+			combined := n1 + n2
+			if math.IsNaN(combined) || math.IsInf(combined, 0) {
+				return math.NaN(), errors.New("combined box-range arithmetic overflowed")
+			}
+			dimension = (math.Log(combined) - math.Log(n3)) / logTwo
+			if math.IsNaN(dimension) || math.IsInf(dimension, 0) {
+				return math.NaN(), errors.New("dimension arithmetic overflowed")
+			}
+		}
+
+		if dimension <= 1.0 {
+			alpha = 1.0
+		} else {
+			alpha = math.Exp(s.exponentScale * (dimension - 1.0))
+			if alpha < s.slowestSmoothingFactor {
+				alpha = s.slowestSmoothingFactor
+			}
+			if alpha > 1.0 {
+				alpha = 1.0
+			}
+		}
+	}
+
+	var nextValue float64
+	if nextCount <= s.length {
+		nextValue = sample
+	} else {
+		nextValue = alpha*sample + (1.0-alpha)*s.filterState
+		if math.IsNaN(nextValue) || math.IsInf(nextValue, 0) {
+			return math.NaN(), errors.New("FRAMA arithmetic overflowed")
+		}
+	}
+
+	s.highs = nextHighs
+	s.lows = nextLows
+	s.count = nextCount
+	s.dimensionState = dimension
+	s.alphaState = alpha
+	s.filterState = nextValue
+	if nextCount >= s.length {
+		s.currentValue = nextValue
+		s.currentDimension = dimension
+		return nextValue, nil
+	}
+	return math.NaN(), nil
+}
+
+// TryUpdate consumes one (sample, sampleHigh, sampleLow) observation and returns an error on invalid input.
+func (s *FractalAdaptiveMovingAverage) TryUpdate(
+	sample, sampleHigh, sampleLow float64,
+) (float64, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	if s.primed {
-		for i := range s.lengthMinOne {
-			j := i + 1
-			s.windowHigh[i] = s.windowHigh[j]
-			s.windowLow[i] = s.windowLow[j]
-		}
+	return s.tryUpdateLocked(sample, sampleHigh, sampleLow)
+}
 
-		s.windowHigh[s.lengthMinOne] = sampleHigh
-		s.windowLow[s.lengthMinOne] = sampleLow
-
-		s.fractalDimension = s.estimateFractalDimension()
-		alpha := s.estimateAlpha()
-		s.value += (sample - s.value) * alpha
-
-		return s.value
-	} else {
-		s.windowHigh[s.windowCount] = sampleHigh
-		s.windowLow[s.windowCount] = sampleLow
-
-		s.windowCount++
-		if s.windowCount == s.lengthMinOne {
-			s.value = sample
-		} else if s.windowCount == s.length {
-			s.fractalDimension = s.estimateFractalDimension()
-			alpha := s.estimateAlpha()
-			s.value += (sample - s.value) * alpha
-			s.primed = true
-
-			return s.value
-		}
+// Update updates the value of the indicator given (sample, sampleHigh, sampleLow) and panics on invalid input.
+func (s *FractalAdaptiveMovingAverage) Update(sample, sampleHigh, sampleLow float64) float64 {
+	result, err := s.TryUpdate(sample, sampleHigh, sampleLow)
+	if err != nil {
+		panic(err)
 	}
-
-	return math.NaN()
+	return result
 }
 
-// UpdateScalar updates the indicator given the next scalar sample.
+// TryUpdatePrice consumes one scalar price observation (using price for high and low).
+func (s *FractalAdaptiveMovingAverage) TryUpdatePrice(price float64) (float64, error) {
+	return s.TryUpdate(price, price, price)
+}
+
+// UpdatePrice updates the indicator with a scalar price observation and panics on invalid input.
+func (s *FractalAdaptiveMovingAverage) UpdatePrice(price float64) float64 {
+	return s.Update(price, price, price)
+}
+
+// UpdateScalar updates an indicator given the next scalar sample.
 func (s *FractalAdaptiveMovingAverage) UpdateScalar(sample *entities.Scalar) core.Output {
-	v := sample.Value
-
-	return s.updateEntity(sample.Time, v, v, v)
+	extracted := sample.Value
+	return s.updateEntity(sample.Time, extracted, extracted, extracted)
 }
 
-// UpdateBar updates the indicator given the next bar sample.
+// UpdateBar updates an indicator given the next bar sample.
 func (s *FractalAdaptiveMovingAverage) UpdateBar(sample *entities.Bar) core.Output {
-	v := s.barFunc(sample)
-
-	return s.updateEntity(sample.Time, v, sample.High, sample.Low)
+	extracted := s.barFunc(sample)
+	return s.updateEntity(sample.Time, extracted, sample.High, sample.Low)
 }
 
-// UpdateQuote updates the indicator given the next quote sample.
+// UpdateQuote updates an indicator given the next quote sample.
 func (s *FractalAdaptiveMovingAverage) UpdateQuote(sample *entities.Quote) core.Output {
-	v := s.quoteFunc(sample)
-
-	return s.updateEntity(sample.Time, v, sample.Ask, sample.Bid)
+	extracted := s.quoteFunc(sample)
+	return s.updateEntity(sample.Time, extracted, sample.Ask, sample.Bid)
 }
 
-// UpdateTrade updates the indicator given the next trade sample.
+// UpdateTrade updates an indicator given the next trade sample.
 func (s *FractalAdaptiveMovingAverage) UpdateTrade(sample *entities.Trade) core.Output {
-	v := s.tradeFunc(sample)
-
-	return s.updateEntity(sample.Time, v, v, v)
+	extracted := s.tradeFunc(sample)
+	return s.updateEntity(sample.Time, extracted, extracted, extracted)
 }
 
 func (s *FractalAdaptiveMovingAverage) updateEntity(
-	time time.Time, sample, sampleHigh, sampleLow float64,
+	stamp time.Time,
+	sample, sampleHigh, sampleLow float64,
 ) core.Output {
-	const length = 2
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
-	output := make([]any, length)
-	frama := s.Update(sample, sampleHigh, sampleLow)
-
-	fdim := s.fractalDimension
-	if math.IsNaN(frama) {
-		fdim = math.NaN()
+	frama, err := s.tryUpdateLocked(sample, sampleHigh, sampleLow)
+	if err != nil {
+		panic(err)
+	}
+	fdim := math.NaN()
+	if !math.IsNaN(frama) {
+		fdim = s.currentDimension
 	}
 
-	i := 0
-	output[i] = entities.Scalar{Time: time, Value: frama}
-	i++
-	output[i] = entities.Scalar{Time: time, Value: fdim}
-
+	output := make(core.Output, 2)
+	output[0] = entities.Scalar{Time: stamp, Value: frama}
+	output[1] = entities.Scalar{Time: stamp, Value: fdim}
 	return output
-}
-
-func (s *FractalAdaptiveMovingAverage) estimateFractalDimension() float64 {
-	minLowHalf := math.MaxFloat64
-	maxHighHalf := math.SmallestNonzeroFloat64
-
-	for i := range s.halfLength {
-		l := s.windowLow[i]
-		if minLowHalf > l {
-			minLowHalf = l
-		}
-
-		h := s.windowHigh[i]
-		if maxHighHalf < h {
-			maxHighHalf = h
-		}
-	}
-
-	rangeN1 := maxHighHalf - minLowHalf
-	minLowFull := minLowHalf
-	maxHighFull := maxHighHalf
-	minLowHalf = math.MaxFloat64
-	maxHighHalf = math.SmallestNonzeroFloat64
-
-	for j := range s.halfLength {
-		i := j + s.halfLength
-		l := s.windowLow[i]
-
-		if minLowFull > l {
-			minLowFull = l
-		}
-
-		if minLowHalf > l {
-			minLowHalf = l
-		}
-
-		h := s.windowHigh[i]
-		if maxHighFull < h {
-			maxHighFull = h
-		}
-
-		if maxHighHalf < h {
-			maxHighHalf = h
-		}
-	}
-
-	rangeN2 := maxHighHalf - minLowHalf
-	rangeN3 := maxHighFull - minLowFull
-
-	fdim := (math.Log((rangeN1+rangeN2)/float64(s.halfLength)) -
-		math.Log(rangeN3/float64(s.length))) * math.Log2E
-
-	const two = 2
-
-	return math.Min(math.Max(fdim, 1), two)
-}
-
-func (s *FractalAdaptiveMovingAverage) estimateAlpha() float64 {
-	factor := s.scalingFactor
-
-	// We use the fractal dimension to dynamically change the alpha of an exponential moving average.
-	// The fractal dimension varies over the range from 1 to 2.
-	// Since the prices are log-normal, it seems reasonable to use an exponential function to relate
-	// the fractal dimension to alpha.
-
-	// An empirically chosen scaling in Ehlers's method to map fractal dimension (1–2)
-	// to the exponential α.
-	alpha := math.Exp(factor * (s.fractalDimension - 1))
-
-	// When the fractal dimension is 1, the exponent is zero – which means that alpha is 1, and
-	// the output of the exponential moving average is equal to the input.
-
-	// Limit alpha to vary only from αs to 1.
-	return math.Min(math.Max(alpha, s.alphaSlowest), 1)
 }

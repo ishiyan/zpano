@@ -1,591 +1,485 @@
 //nolint:testpackage
 package fractaladaptivemovingaverage
 
-//nolint: gofumpt
 import (
+	"fmt"
 	"math"
-	"strings"
+	"sync"
 	"testing"
+	"time"
 
 	"zpano/entities"
 	"zpano/indicators/core"
 	"zpano/indicators/core/outputs/shape"
 )
 
-func TestFractalAdaptiveMovingAverageUpdate(t *testing.T) { //nolint: funlen
+type referenceCase struct {
+	params             Params
+	expectedValues     []float64
+	expectedDimensions []float64
+}
+
+func referenceCases() []referenceCase {
+	return []referenceCase{
+		{Params{Length: 16, SlowestSmoothingFactor: 0.01, CoefficientMode: 1}, expectedL16_A0_01_C1_VALUE, expectedL16_A0_01_C1_FDIM},
+		{Params{Length: 2, SlowestSmoothingFactor: 0.01, CoefficientMode: 1}, expectedL2_A0_01_C1_VALUE, expectedL2_A0_01_C1_FDIM},
+		{Params{Length: 4, SlowestSmoothingFactor: 0.01, CoefficientMode: 1}, expectedL4_A0_01_C1_VALUE, expectedL4_A0_01_C1_FDIM},
+		{Params{Length: 8, SlowestSmoothingFactor: 0.01, CoefficientMode: 1}, expectedL8_A0_01_C1_VALUE, expectedL8_A0_01_C1_FDIM},
+		{Params{Length: 20, SlowestSmoothingFactor: 0.01, CoefficientMode: 1}, expectedL20_A0_01_C1_VALUE, expectedL20_A0_01_C1_FDIM},
+		{Params{Length: 30, SlowestSmoothingFactor: 0.01, CoefficientMode: 1}, expectedL30_A0_01_C1_VALUE, expectedL30_A0_01_C1_FDIM},
+		{Params{Length: 64, SlowestSmoothingFactor: 0.01, CoefficientMode: 1}, expectedL64_A0_01_C1_VALUE, expectedL64_A0_01_C1_FDIM},
+		{Params{Length: 128, SlowestSmoothingFactor: 0.01, CoefficientMode: 1}, expectedL128_A0_01_C1_VALUE, expectedL128_A0_01_C1_FDIM},
+		{Params{Length: 250, SlowestSmoothingFactor: 0.01, CoefficientMode: 1}, expectedL250_A0_01_C1_VALUE, expectedL250_A0_01_C1_FDIM},
+		{Params{Length: 252, SlowestSmoothingFactor: 0.01, CoefficientMode: 1}, expectedL252_A0_01_C1_VALUE, expectedL252_A0_01_C1_FDIM},
+		{Params{Length: 254, SlowestSmoothingFactor: 0.01, CoefficientMode: 1}, expectedL254_A0_01_C1_VALUE, expectedL254_A0_01_C1_FDIM},
+		{Params{Length: 16, SlowestSmoothingFactor: 0.001, CoefficientMode: 1}, expectedL16_A0_001_C1_VALUE, expectedL16_A0_001_C1_FDIM},
+		{Params{Length: 16, SlowestSmoothingFactor: 0.1, CoefficientMode: 1}, expectedL16_A0_1_C1_VALUE, expectedL16_A0_1_C1_FDIM},
+		{Params{Length: 16, SlowestSmoothingFactor: 1.0, CoefficientMode: 1}, expectedL16_A1_C1_VALUE, expectedL16_A1_C1_FDIM},
+		{Params{Length: 16, SlowestSmoothingFactor: 0.01, CoefficientMode: 0}, expectedL16_A0_01_C0_VALUE, expectedL16_A0_01_C0_FDIM},
+		{Params{Length: 30, SlowestSmoothingFactor: 0.01, CoefficientMode: 0}, expectedL30_A0_01_C0_VALUE, expectedL30_A0_01_C0_FDIM},
+	}
+}
+
+func articleBatch(
+	prices []float64,
+	length int,
+	slowest float64,
+	mode int,
+	highs, lows []float64,
+) ([]float64, []float64) {
+	if highs == nil {
+		highs = prices
+	}
+	if lows == nil {
+		lows = prices
+	}
+	half := length / 2
+	scale := -4.6
+	if mode == 1 {
+		scale = math.Log(slowest)
+	}
+	dimension := 0.0
+	filtered := make([]float64, len(prices))
+	outValues := make([]float64, len(prices))
+	outDimensions := make([]float64, len(prices))
+
+	for index, price := range prices {
+		if index+1 >= length {
+			max1, min1 := highs[index], lows[index]
+			for offset := 1; offset < half; offset++ {
+				if highs[index-offset] > max1 {
+					max1 = highs[index-offset]
+				}
+				if lows[index-offset] < min1 {
+					min1 = lows[index-offset]
+				}
+			}
+			max2, min2 := highs[index-half], lows[index-half]
+			for offset := half + 1; offset < length; offset++ {
+				if highs[index-offset] > max2 {
+					max2 = highs[index-offset]
+				}
+				if lows[index-offset] < min2 {
+					min2 = lows[index-offset]
+				}
+			}
+			max3, min3 := math.Max(max1, max2), math.Min(min1, min2)
+			n1 := (max1 - min1) / float64(half)
+			n2 := (max2 - min2) / float64(half)
+			n3 := (max3 - min3) / float64(length)
+			if n1 > 0.0 && n2 > 0.0 && n3 > 0.0 {
+				dimension = (math.Log(n1+n2) - math.Log(n3)) / math.Log(2.0)
+			}
+			rawAlpha := 1.0
+			if dimension > 1.0 {
+				rawAlpha = math.Exp(scale * (dimension - 1.0))
+			}
+			alpha := math.Max(slowest, math.Min(1.0, rawAlpha))
+			if index+1 < length+1 {
+				filtered[index] = price
+			} else {
+				filtered[index] = alpha*price + (1.0-alpha)*filtered[index-1]
+			}
+			outValues[index] = filtered[index]
+			outDimensions[index] = dimension
+		} else {
+			filtered[index] = price
+			outValues[index] = math.NaN()
+			outDimensions[index] = math.NaN()
+		}
+	}
+	return outValues, outDimensions
+}
+
+func TestFractalAdaptiveMovingAverageReferenceFixtures(t *testing.T) {
 	t.Parallel()
 
-	check := func(index int, exp, act float64) {
-		t.Helper()
-
-		if math.Abs(exp-act) > 1e-9 {
-			t.Errorf("[%v] is incorrect: expected %v, actual %v", index, exp, act)
-		}
+	if len(testInput) != 252 {
+		t.Fatalf("expected 252 input bars, got %d", len(testInput))
 	}
 
-	checkNaN := func(index int, act float64) {
-		t.Helper()
+	for _, tc := range referenceCases() {
+		tc := tc
+		t.Run(tc.params.Mnemonic(), func(t *testing.T) {
+			t.Parallel()
 
-		if !math.IsNaN(act) {
-			t.Errorf("[%v] is incorrect: expected NaN, actual %v", index, act)
-		}
+			params := tc.params
+			indicator, err := NewFractalAdaptiveMovingAverage(&params)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+
+			warmup := params.Length - 1
+			if indicator.WarmupBars() != warmup {
+				t.Fatalf("expected warmup %d, got %d", warmup, indicator.WarmupBars())
+			}
+			if indicator.IsPrimed() {
+				t.Fatal("expected unprimed initially")
+			}
+			if !math.IsNaN(indicator.Value()) || !math.IsNaN(indicator.FractalDimension()) || !math.IsNaN(indicator.Alpha()) {
+				t.Fatal("expected initial accessors to return NaN")
+			}
+
+			for index, sample := range testInput {
+				actualValue := indicator.UpdatePrice(sample)
+				actualDimension := indicator.FractalDimension()
+				targetValue := tc.expectedValues[index]
+				targetDimension := tc.expectedDimensions[index]
+
+				if index < warmup {
+					if indicator.IsPrimed() {
+						t.Fatalf("bar %d unexpectedly primed", index)
+					}
+					if !math.IsNaN(actualValue) || !math.IsNaN(actualDimension) {
+						t.Fatalf("bar %d expected NaNs, got (%v, %v)", index, actualValue, actualDimension)
+					}
+					if !math.IsNaN(targetValue) || !math.IsNaN(targetDimension) {
+						t.Fatalf("bar %d fixture expected NaNs", index)
+					}
+					continue
+				}
+
+				if !indicator.IsPrimed() {
+					t.Fatalf("bar %d expected primed", index)
+				}
+				valueBound := math.Max(1e-12, math.Abs(targetValue)*1e-12)
+				dimBound := math.Max(1e-12, math.Abs(targetDimension)*1e-12)
+				if math.Abs(actualValue-targetValue) > valueBound {
+					t.Fatalf("bar %d value mismatch: got %.17g, want %.17g", index, actualValue, targetValue)
+				}
+				if math.Abs(actualDimension-targetDimension) > dimBound {
+					t.Fatalf("bar %d dimension mismatch: got %.17g, want %.17g", index, actualDimension, targetDimension)
+				}
+				if math.Abs(indicator.Value()-actualValue) > 1e-15 {
+					t.Fatalf("bar %d Value() accessor mismatch", index)
+				}
+			}
+		})
+	}
+}
+
+func TestFractalAdaptiveMovingAverageBatchOracleAndMidpointBars(t *testing.T) {
+	t.Parallel()
+
+	midpoints := make([]float64, len(testHigh))
+	for index := range testHigh {
+		midpoints[index] = (testHigh[index] + testLow[index]) / 2.0
 	}
 
-	inputHigh := testFractalAdaptiveMovingAverageInputHigh()
-	inputLow := testFractalAdaptiveMovingAverageInputLow()
-	inputMid := testFractalAdaptiveMovingAverageInputMid()
+	params := Params{Length: 16, SlowestSmoothingFactor: 0.01, CoefficientMode: 0}
+	stream, err := NewFractalAdaptiveMovingAverage(&params)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	expectedValues, expectedDimensions := articleBatch(midpoints, 16, 0.01, 0, testHigh, testLow)
+	for index := range midpoints {
+		actualValue := stream.Update(midpoints[index], testHigh[index], testLow[index])
+		actualDimension := stream.FractalDimension()
+		if math.IsNaN(expectedValues[index]) {
+			if !math.IsNaN(actualValue) || !math.IsNaN(actualDimension) {
+				t.Fatalf("bar %d expected NaN", index)
+			}
+		} else {
+			if math.Abs(actualValue-expectedValues[index]) > 1e-12 {
+				t.Fatalf("bar %d value mismatch: %v vs %v", index, actualValue, expectedValues[index])
+			}
+			if math.Abs(actualDimension-expectedDimensions[index]) > 1e-12 {
+				t.Fatalf("bar %d dimension mismatch: %v vs %v", index, actualDimension, expectedDimensions[index])
+			}
+		}
+	}
+}
 
-	const (
-		lprimed = 15
-		l       = 16
-		a       = 0.01
-	)
+func TestFractalAdaptiveMovingAverageInvariants(t *testing.T) {
+	t.Parallel()
 
-	t.Run("reference implementation: FRAMA from test_frama.xls", func(t *testing.T) {
+	t.Run("seed_and_first_adaptive_step", func(t *testing.T) {
 		t.Parallel()
-
-		frama := testFractalAdaptiveMovingAverageCreate(l, a)
-		exp := testFractalAdaptiveMovingAverageExpected()
-
-		for i := range lprimed {
-			checkNaN(i, frama.Update(inputMid[i], inputHigh[i], inputLow[i]))
+		stream, err := NewFractalAdaptiveMovingAverageDefault()
+		if err != nil {
+			t.Fatal(err)
 		}
-
-		for i := lprimed; i < len(inputMid); i++ {
-			act := frama.Update(inputMid[i], inputHigh[i], inputLow[i])
-			check(i, exp[i], act)
+		var seedValue float64
+		for index, price := range testInput {
+			actualValue := stream.UpdatePrice(price)
+			if stream.SamplesSeen() != index+1 {
+				t.Fatalf("samples seen mismatch at %d", index)
+			}
+			if index == 15 {
+				if actualValue != price {
+					t.Fatalf("expected bar 15 final seed %v, got %v", price, actualValue)
+				}
+				seedValue = actualValue
+			}
+			if index == 16 {
+				currentAlpha := stream.Alpha()
+				expected := currentAlpha*price + (1.0-currentAlpha)*seedValue
+				if math.Abs(actualValue-expected) > 1e-15 {
+					t.Fatalf("bar 16 adaptive step mismatch: %v vs %v", actualValue, expected)
+				}
+			}
 		}
-
-		checkNaN(0, frama.Update(math.NaN(), math.NaN(), math.NaN()))
 	})
 
-	t.Run("reference implementation: Fdim from test_frama.xls", func(t *testing.T) {
+	t.Run("ramp_gap_constant_flat_half_and_alpha_modes", func(t *testing.T) {
 		t.Parallel()
-
-		frama := testFractalAdaptiveMovingAverageCreate(l, a)
-		exp := testFractalAdaptiveMovingAverageExpectedFdim()
-
-		for i := range lprimed {
-			frama.Update(inputMid[i], inputHigh[i], inputLow[i])
-			checkNaN(i, frama.fractalDimension)
+		expectedRampDim := math.Log2(28.0 / 15.0)
+		for _, offset := range []float64{100.0, 0.0, -100.0} {
+			stream, _ := NewFractalAdaptiveMovingAverageDefault()
+			for step := 0; step < 40; step++ {
+				sample := offset + float64(step)
+				actualValue := stream.UpdatePrice(sample)
+				if step >= 15 {
+					if math.Abs(stream.FractalDimension()-expectedRampDim) > 1e-13 {
+						t.Fatalf("ramp dimension mismatch: %v", stream.FractalDimension())
+					}
+					if stream.FractalDimension() >= 1.0 || stream.Alpha() != 1.0 || actualValue != sample {
+						t.Fatalf("ramp adaptation mismatch at step %d", step)
+					}
+				}
+			}
 		}
 
-		for i := lprimed; i < len(inputMid); i++ {
-			frama.Update(inputMid[i], inputHigh[i], inputLow[i])
-			act := frama.fractalDimension
-			check(i, exp[i], act)
+		gapParams := Params{Length: 4, SlowestSmoothingFactor: 0.01, CoefficientMode: 1}
+		gapStream, _ := NewFractalAdaptiveMovingAverage(&gapParams)
+		var gapValue float64
+		for _, price := range []float64{0.0, 1.0, 100.0, 101.0} {
+			gapValue = gapStream.UpdatePrice(price)
+		}
+		if gapStream.FractalDimension() >= 0.0 || math.Abs(gapStream.FractalDimension()-math.Log2(4.0/101.0)) > 1e-13 {
+			t.Fatalf("unexpected gap dimension: %v", gapStream.FractalDimension())
+		}
+		if gapStream.Alpha() != 1.0 || gapValue != 101.0 {
+			t.Fatalf("unexpected gap alpha/value: %v, %v", gapStream.Alpha(), gapValue)
+		}
+
+		for _, level := range []float64{-123.0, 0.0, 123.0} {
+			flatStream, _ := NewFractalAdaptiveMovingAverage(&gapParams)
+			for step := 0; step < 20; step++ {
+				actualValue := flatStream.UpdatePrice(level)
+				if flatStream.IsPrimed() && (actualValue != level || flatStream.FractalDimension() != 0.0) {
+					t.Fatalf("constant guard failed for %v", level)
+				}
+			}
+		}
+
+		holdStream, _ := NewFractalAdaptiveMovingAverage(&gapParams)
+		for _, price := range []float64{0.0, 1.0, 0.0, 1.0} {
+			holdStream.UpdatePrice(price)
+		}
+		if holdStream.FractalDimension() != 2.0 {
+			t.Fatalf("expected dimension 2.0, got %v", holdStream.FractalDimension())
+		}
+		for step := 0; step < 10; step++ {
+			holdStream.UpdatePrice(1.0)
+			if holdStream.FractalDimension() != 2.0 {
+				t.Fatalf("expected held dimension 2.0, got %v", holdStream.FractalDimension())
+			}
+		}
+
+		preciseParams := Params{Length: 4, SlowestSmoothingFactor: 0.01, CoefficientMode: 1}
+		articleParams := Params{Length: 4, SlowestSmoothingFactor: 0.01, CoefficientMode: 0}
+		precise, _ := NewFractalAdaptiveMovingAverage(&preciseParams)
+		article, _ := NewFractalAdaptiveMovingAverage(&articleParams)
+		for step := 0; step < 5; step++ {
+			precise.Update(1.0, 2.0, 0.0)
+			article.Update(1.0, 2.0, 0.0)
+		}
+		if math.Abs(precise.Alpha()-0.01) > 1e-15 || article.Alpha() != math.Exp(-4.6) || article.Alpha() <= precise.Alpha() {
+			t.Fatalf("alpha endpoint mismatch: precise=%v article=%v", precise.Alpha(), article.Alpha())
+		}
+	})
+
+	t.Run("affine_invariance_nan_gap_and_reset", func(t *testing.T) {
+		t.Parallel()
+		original, _ := NewFractalAdaptiveMovingAverageDefault()
+		transformed, _ := NewFractalAdaptiveMovingAverageDefault()
+		withGaps, _ := NewFractalAdaptiveMovingAverageDefault()
+
+		for _, price := range testInput {
+			leftVal := original.UpdatePrice(price)
+			rightVal := transformed.UpdatePrice(3.0*price - 1000.0)
+			gapVal := withGaps.UpdatePrice(price)
+			seenBefore := withGaps.SamplesSeen()
+			savedVal := withGaps.Value()
+			if !math.IsNaN(withGaps.UpdatePrice(math.NaN())) || !math.IsNaN(withGaps.Update(price, math.NaN(), price)) {
+				t.Fatal("expected NaN on missing observation")
+			}
+			if withGaps.SamplesSeen() != seenBefore {
+				t.Fatal("NaN advanced SamplesSeen")
+			}
+			if math.IsNaN(savedVal) != math.IsNaN(withGaps.Value()) || (!math.IsNaN(savedVal) && savedVal != withGaps.Value()) {
+				t.Fatal("NaN mutated saved Value")
+			}
+			if !math.IsNaN(leftVal) {
+				if leftVal != gapVal {
+					t.Fatalf("NaN gap altered trajectory: %v vs %v", leftVal, gapVal)
+				}
+				if math.Abs(original.FractalDimension()-transformed.FractalDimension()) > 1e-11 {
+					t.Fatal("affine dimension mismatch")
+				}
+				if math.Abs((3.0*leftVal-1000.0)-rightVal) > 1e-10 {
+					t.Fatal("affine value mismatch")
+				}
+			}
+		}
+
+		withGaps.Reset()
+		if withGaps.IsPrimed() || withGaps.SamplesSeen() != 0 || !math.IsNaN(withGaps.Value()) {
+			t.Fatal("reset did not clear state")
+		}
+		fresh, _ := NewFractalAdaptiveMovingAverageDefault()
+		for _, price := range testInput {
+			a := withGaps.UpdatePrice(price)
+			b := fresh.UpdatePrice(price)
+			if math.IsNaN(b) != math.IsNaN(a) || (!math.IsNaN(b) && a != b) {
+				t.Fatal("post-reset output mismatch")
+			}
 		}
 	})
 }
 
-func TestFractalAdaptiveMovingAverageUpdateEntity(t *testing.T) { //nolint: funlen,cyclop
+func TestFractalAdaptiveMovingAverageValidationMetadataEntitiesAndConcurrency(t *testing.T) {
 	t.Parallel()
 
-	const (
-		lprimed       = 15
-		l             = 16
-		a             = 0.01
-		inp           = 3.
-		expectedFrama = 2.999999999999997
-		expectedFdim  = 1.0000000000000002
-	)
-
-	time := testFractalAdaptiveMovingAverageTime()
-	check := func(expFrama, expFdim float64, act core.Output) {
-		t.Helper()
-
-		const outputLen = 2
-
-		if len(act) != outputLen {
-			t.Errorf("len(output) is incorrect: expected %v, actual %v", outputLen, len(act))
-		}
-
-		i := 0
-
-		s0, ok := act[i].(entities.Scalar)
-		if !ok {
-			t.Error("output[0] is not a scalar")
-		}
-
-		i++
-
-		s1, ok := act[i].(entities.Scalar)
-		if !ok {
-			t.Error("output[1] is not a scalar")
-		}
-
-		if s0.Time != time {
-			t.Errorf("output[0] time is incorrect: expected %v, actual %v", time, s0.Time)
-		}
-
-		if s0.Value != expFrama {
-			t.Errorf("output[0] value is incorrect: expected %v, actual %v", expFrama, s0.Value)
-		}
-
-		if s1.Time != time {
-			t.Errorf("output[1] time is incorrect: expected %v, actual %v", time, s1.Time)
-		}
-
-		if s1.Value != expFdim {
-			t.Errorf("output[1] value is incorrect: expected %v, actual %v", expFdim, s1.Value)
+	invalidParams := []Params{
+		{Length: 1, SlowestSmoothingFactor: 0.01, CoefficientMode: 1},
+		{Length: 17, SlowestSmoothingFactor: 0.01, CoefficientMode: 1},
+		{Length: 16, SlowestSmoothingFactor: 0.0, CoefficientMode: 1},
+		{Length: 16, SlowestSmoothingFactor: -0.1, CoefficientMode: 1},
+		{Length: 16, SlowestSmoothingFactor: 1.1, CoefficientMode: 1},
+		{Length: 16, SlowestSmoothingFactor: math.NaN(), CoefficientMode: 1},
+		{Length: 16, SlowestSmoothingFactor: math.Inf(1), CoefficientMode: 1},
+		{Length: 16, SlowestSmoothingFactor: 0.01, CoefficientMode: 2},
+		{Length: 16, SlowestSmoothingFactor: 0.01, CoefficientMode: -1},
+		{Length: 16, SlowestSmoothingFactor: 0.1, CoefficientMode: 0},
+		{Length: 16, SlowestSmoothingFactor: 0.01, CoefficientMode: 1, BarComponent: entities.BarComponent(99)},
+		{Length: 16, SlowestSmoothingFactor: 0.01, CoefficientMode: 1, QuoteComponent: entities.QuoteComponent(99)},
+		{Length: 16, SlowestSmoothingFactor: 0.01, CoefficientMode: 1, TradeComponent: entities.TradeComponent(99)},
+	}
+	for index, bad := range invalidParams {
+		badCopy := bad
+		if _, err := NewFractalAdaptiveMovingAverage(&badCopy); err == nil {
+			t.Fatalf("case %d: expected error for invalid params %+v", index, badCopy)
 		}
 	}
 
-	t.Run("update scalar", func(t *testing.T) {
-		t.Parallel()
-
-		s := entities.Scalar{Time: time, Value: inp}
-		frama := testFractalAdaptiveMovingAverageCreate(l, a)
-
-		for range lprimed {
-			frama.Update(0., 0., 0.)
+	twoBarParams := Params{Length: 2, SlowestSmoothingFactor: 0.01, CoefficientMode: 1}
+	atomicStream, err := NewFractalAdaptiveMovingAverage(&twoBarParams)
+	if err != nil {
+		t.Fatal(err)
+	}
+	atomicStream.UpdatePrice(0.0)
+	badObservations := [][3]float64{
+		{math.Inf(1), math.Inf(1), math.Inf(1)},
+		{1.0, 0.0, 2.0},
+		{1.0, math.Inf(1), 0.0},
+		{0.0, 1e308, -1e308},
+	}
+	for _, obs := range badObservations {
+		if _, err := atomicStream.TryUpdate(obs[0], obs[1], obs[2]); err == nil {
+			t.Fatalf("expected TryUpdate error for %v", obs)
 		}
-
-		check(expectedFrama, expectedFdim, frama.UpdateScalar(&s))
-	})
-
-	t.Run("update bar", func(t *testing.T) {
-		t.Parallel()
-
-		b := entities.Bar{Time: time, Close: inp, High: inp, Low: inp}
-		frama := testFractalAdaptiveMovingAverageCreate(l, a)
-
-		for range lprimed {
-			frama.Update(0., 0., 0.)
-		}
-
-		check(expectedFrama, expectedFdim, frama.UpdateBar(&b))
-	})
-
-	t.Run("update quote", func(t *testing.T) {
-		t.Parallel()
-
-		q := entities.Quote{Time: time, Bid: inp, Ask: inp}
-		frama := testFractalAdaptiveMovingAverageCreate(l, a)
-
-		for range lprimed {
-			frama.Update(0., 0., 0.)
-		}
-
-		check(expectedFrama, expectedFdim, frama.UpdateQuote(&q))
-	})
-
-	t.Run("update trade", func(t *testing.T) {
-		t.Parallel()
-
-		r := entities.Trade{Time: time, Price: inp}
-		frama := testFractalAdaptiveMovingAverageCreate(l, a)
-
-		for range lprimed {
-			frama.Update(0., 0., 0.)
-		}
-
-		check(expectedFrama, expectedFdim, frama.UpdateTrade(&r))
-	})
-}
-
-func TestFractalAdaptiveMovingAverageIsPrimed(t *testing.T) {
-	t.Parallel()
-
-	inputHigh := testFractalAdaptiveMovingAverageInputHigh()
-	inputLow := testFractalAdaptiveMovingAverageInputLow()
-	inputMid := testFractalAdaptiveMovingAverageInputMid()
-
-	check := func(index int, exp, act bool) {
-		t.Helper()
-
-		if exp != act {
-			t.Errorf("[%v] is incorrect: expected %v, actual %v", index, exp, act)
+		if atomicStream.SamplesSeen() != 1 || atomicStream.IsPrimed() {
+			t.Fatal("failed TryUpdate mutated state")
 		}
 	}
 
-	const (
-		lprimed = 15
-		l       = 16
-		a       = 0.01
-	)
-
-	t.Run("length = 16, slow alpha = 0.01 (test_frama.xls)", func(t *testing.T) {
-		t.Parallel()
-
-		frama := testFractalAdaptiveMovingAverageCreate(l, a)
-
-		check(0, false, frama.IsPrimed())
-
-		for i := range lprimed {
-			frama.Update(inputMid[i], inputHigh[i], inputLow[i])
-			check(i+1, false, frama.IsPrimed())
-		}
-
-		for i := lprimed; i < len(inputMid); i++ {
-			frama.Update(inputMid[i], inputHigh[i], inputLow[i])
-			check(i+1, true, frama.IsPrimed())
-		}
-	})
-}
-
-func TestFractalAdaptiveMovingAverageMetadata(t *testing.T) {
-	t.Parallel()
-
-	check := func(what string, exp, act any) {
-		t.Helper()
-
-		if exp != act {
-			t.Errorf("%s is incorrect: expected %v, actual %v", what, exp, act)
-		}
+	defaultInd, _ := NewFractalAdaptiveMovingAverageDefault()
+	meta := defaultInd.Metadata()
+	if meta.Identifier != core.FractalAdaptiveMovingAverage {
+		t.Fatalf("unexpected identifier: %v", meta.Identifier)
+	}
+	if meta.Mnemonic != "frama(16, 0.01)" || meta.Description != "Fractal adaptive moving average frama(16, 0.01)" {
+		t.Fatalf("unexpected metadata: %+v", meta)
+	}
+	if len(meta.Outputs) != 2 || meta.Outputs[0].Shape != shape.Scalar || meta.Outputs[1].Mnemonic != "framaDim(16, 0.01)" {
+		t.Fatalf("unexpected outputs metadata: %+v", meta.Outputs)
 	}
 
-	t.Run("length = 16, alpha = 0.01", func(t *testing.T) {
-		t.Parallel()
-
-		const (
-			l = 16
-			a = 0.01
-		)
-
-		frama := testFractalAdaptiveMovingAverageCreate(l, a)
-		act := frama.Metadata()
-
-		mn := "frama(16, 0.010)"
-		mnFdim := "framaDim(16, 0.010)"
-		descr := "Fractal adaptive moving average "
-
-		check("Identifier", core.FractalAdaptiveMovingAverage, act.Identifier)
-		check("Mnemonic", mn, act.Mnemonic)
-		check("Description", descr+mn, act.Description)
-		check("len(Outputs)", 2, len(act.Outputs))
-
-		check("Outputs[0].Kind", int(Value), act.Outputs[0].Kind)
-		check("Outputs[0].Shape", shape.Scalar, act.Outputs[0].Shape)
-		check("Outputs[0].Mnemonic", mn, act.Outputs[0].Mnemonic)
-		check("Outputs[0].Description", descr+mn, act.Outputs[0].Description)
-
-		check("Outputs[1].Kind", int(Fdim), act.Outputs[1].Kind)
-		check("Outputs[1].Shape", shape.Scalar, act.Outputs[1].Shape)
-		check("Outputs[1].Mnemonic", mnFdim, act.Outputs[1].Mnemonic)
-		check("Outputs[1].Description", descr+mnFdim, act.Outputs[1].Description)
-	})
-
-	t.Run("with non-default bar component", func(t *testing.T) {
-		t.Parallel()
-
-		params := Params{
-			Length: 16, SlowestSmoothingFactor: 0.01,
-			BarComponent: entities.BarMedianPrice,
-		}
-
-		frama, _ := NewFractalAdaptiveMovingAverage(&params)
-		act := frama.Metadata()
-
-		check("Mnemonic", "frama(16, 0.010, hl/2)", act.Mnemonic)
-		check("Description", "Fractal adaptive moving average frama(16, 0.010, hl/2)", act.Description)
-	})
-}
-
-func TestNewFractalAdaptiveMovingAverage(t *testing.T) { //nolint: funlen
-	t.Parallel()
-
-	const (
-		bc entities.BarComponent   = entities.BarMedianPrice
-		qc entities.QuoteComponent = entities.QuoteMidPrice
-		tc entities.TradeComponent = entities.TradePrice
-
-		errl  = "invalid fractal adaptive moving average parameters: length should be an even integer larger than 1"
-		erra  = "invalid fractal adaptive moving average parameters: slowest smoothing factor should be in range [0, 1]"
-		errbc = "invalid fractal adaptive moving average parameters: 9999: unknown bar component"
-		errqc = "invalid fractal adaptive moving average parameters: 9999: unknown quote component"
-		errtc = "invalid fractal adaptive moving average parameters: 9999: unknown trade component"
-	)
-
-	check := func(name string, exp, act any) {
-		t.Helper()
-
-		if exp != act {
-			t.Errorf("%s is incorrect: expected %v, actual %v", name, exp, act)
-		}
+	customParams := Params{
+		Length:                 30,
+		SlowestSmoothingFactor: 0.01,
+		CoefficientMode:        0,
+		BarComponent:           entities.BarMedianPrice,
+		QuoteComponent:         entities.QuoteBidPrice,
+		TradeComponent:         entities.TradeVolume,
+	}
+	if got := customParams.Mnemonic(); got != "frama(30, 0.01, mode=0, hl/2, b, v)" {
+		t.Fatalf("unexpected custom mnemonic: %s", got)
+	}
+	if got := customParams.DimensionMnemonic(); got != "framaDim(30, 0.01, mode=0, hl/2, b, v)" {
+		t.Fatalf("unexpected custom dimension mnemonic: %s", got)
 	}
 
-	checkInstance := func(frama *FractalAdaptiveMovingAverage,
-		mnemonic string, length int, aSlow float64,
-	) {
-		const (
-			descr = "Fractal adaptive moving average "
-			two   = 2
-		)
-
-		mnemonicFdim := strings.ReplaceAll(mnemonic, "frama", "framaDim")
-
-		check("mnemonic", mnemonic, frama.mnemonic)
-		check("description", descr+mnemonic, frama.description)
-		check("mnemonicFdim", mnemonicFdim, frama.mnemonicFdim)
-		check("descriptionFdim", descr+mnemonicFdim, frama.descriptionFdim)
-		check("length", length, frama.length)
-		check("lengthMinOne", length-1, frama.lengthMinOne)
-		check("halfLength", length/two, frama.halfLength)
-		check("alphaSlowest", aSlow, frama.alphaSlowest)
-		check("scalingFactor", math.Log(aSlow), frama.scalingFactor)
-		check("windowCount", 0, frama.windowCount)
-		check("windowHigh != nil", true, frama.windowHigh != nil)
-		check("windowLow != nil", true, frama.windowLow != nil)
-		check("len(windowHigh)", length, len(frama.windowHigh))
-		check("len(windowLow)", length, len(frama.windowLow))
-		check("primed", false, frama.primed)
-		check("barFunc == nil", false, frama.barFunc == nil)
-		check("quoteFunc == nil", false, frama.quoteFunc == nil)
-		check("tradeFunc == nil", false, frama.tradeFunc == nil)
+	stamp := time.Date(2026, 1, 2, 0, 0, 0, 0, time.UTC)
+	entityParams := Params{Length: 2, SlowestSmoothingFactor: 0.01, CoefficientMode: 1}
+	entityInd, _ := NewFractalAdaptiveMovingAverage(&entityParams)
+	entityInd.UpdateBar(&entities.Bar{Time: stamp, Open: 10, High: 12, Low: 9, Close: 11, Volume: 100})
+	barOut := entityInd.UpdateBar(&entities.Bar{Time: stamp.Add(time.Hour), Open: 11, High: 14, Low: 10, Close: 13, Volume: 100})
+	if len(barOut) != 2 {
+		t.Fatalf("expected 2 bar outputs, got %d", len(barOut))
+	}
+	firstScalar, ok := barOut[0].(entities.Scalar)
+	if !ok || firstScalar.Value != 13.0 {
+		t.Fatalf("unexpected bar output[0]: %+v", barOut[0])
 	}
 
-	t.Run("default", func(t *testing.T) {
-		t.Parallel()
+	nanOut := entityInd.UpdateScalar(&entities.Scalar{Time: stamp.Add(2 * time.Hour), Value: math.NaN()})
+	if !math.IsNaN(nanOut[0].(entities.Scalar).Value) || !math.IsNaN(nanOut[1].(entities.Scalar).Value) {
+		t.Fatalf("expected NaN entity outputs on skipped sample, got %+v", nanOut)
+	}
 
-		const (
-			l = 16
-			a = 0.01
-		)
+	quoteInd, _ := NewFractalAdaptiveMovingAverage(&entityParams)
+	quoteInd.UpdateQuote(&entities.Quote{Time: stamp, Bid: 9, Ask: 11, BidSize: 1, AskSize: 1})
+	quoteOut := quoteInd.UpdateQuote(&entities.Quote{Time: stamp.Add(time.Hour), Bid: 10, Ask: 12, BidSize: 1, AskSize: 1})
+	if quoteOut[0].(entities.Scalar).Value != 11.0 {
+		t.Fatalf("unexpected quote output: %+v", quoteOut)
+	}
 
-		params := Params{
-			Length: l, SlowestSmoothingFactor: a,
-			BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
-		}
+	tradeInd, _ := NewFractalAdaptiveMovingAverage(&entityParams)
+	tradeInd.UpdateTrade(&entities.Trade{Time: stamp, Price: 5, Volume: 1})
+	tradeOut := tradeInd.UpdateTrade(&entities.Trade{Time: stamp.Add(time.Hour), Price: 7, Volume: 1})
+	if tradeOut[0].(entities.Scalar).Value != 7.0 {
+		t.Fatalf("unexpected trade output: %+v", tradeOut)
+	}
 
-		frama, err := NewFractalAdaptiveMovingAverage(&params)
-		check("err == nil", true, err == nil)
-		checkInstance(frama, "frama(16, 0.010, hl/2)", l, a)
-	})
-
-	t.Run("non-default lengths and alpha", func(t *testing.T) {
-		t.Parallel()
-
-		const (
-			l = 18
-			a = 0.05
-		)
-
-		params := Params{
-			Length: l, SlowestSmoothingFactor: a,
-			BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
-		}
-
-		frama, err := NewFractalAdaptiveMovingAverage(&params)
-		check("err == nil", true, err == nil)
-		checkInstance(frama, "frama(18, 0.050, hl/2)", l, a)
-	})
-
-	t.Run("odd lengths", func(t *testing.T) {
-		t.Parallel()
-
-		const (
-			l = 17
-			a = 0.01
-		)
-
-		params := Params{
-			Length: l, SlowestSmoothingFactor: a,
-			BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
-		}
-
-		frama, err := NewFractalAdaptiveMovingAverage(&params)
-		check("err == nil", true, err == nil)
-		checkInstance(frama, "frama(18, 0.010, hl/2)", l+1, a)
-	})
-
-	t.Run("length = 1, error", func(t *testing.T) {
-		t.Parallel()
-
-		const (
-			l = 1
-			a = 0.01
-		)
-
-		params := Params{
-			Length: l, SlowestSmoothingFactor: a,
-			BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
-		}
-
-		frama, err := NewFractalAdaptiveMovingAverage(&params)
-		check("frama == nil", true, frama == nil)
-		check("err", errl, err.Error())
-	})
-
-	t.Run("length = 0, error", func(t *testing.T) {
-		t.Parallel()
-
-		const (
-			l = 0
-			a = 0.01
-		)
-
-		params := Params{
-			Length: l, SlowestSmoothingFactor: a,
-			BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
-		}
-
-		frama, err := NewFractalAdaptiveMovingAverage(&params)
-		check("frama == nil", true, frama == nil)
-		check("err", errl, err.Error())
-	})
-
-	t.Run("length < 0, error", func(t *testing.T) {
-		t.Parallel()
-
-		const (
-			l = -1
-			a = 0.01
-		)
-
-		params := Params{
-			Length: l, SlowestSmoothingFactor: a,
-			BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
-		}
-
-		frama, err := NewFractalAdaptiveMovingAverage(&params)
-		check("frama == nil", true, frama == nil)
-		check("err", errl, err.Error())
-	})
-
-	t.Run("αs < 0, error", func(t *testing.T) {
-		t.Parallel()
-
-		const (
-			l = 16
-			a = -0.01
-		)
-
-		params := Params{
-			Length: l, SlowestSmoothingFactor: a,
-			BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
-		}
-
-		frama, err := NewFractalAdaptiveMovingAverage(&params)
-		check("frama == nil", true, frama == nil)
-		check("err", erra, err.Error())
-	})
-
-	t.Run("αs > 1, error", func(t *testing.T) {
-		t.Parallel()
-
-		const (
-			l = 16
-			a = 1.01
-		)
-
-		params := Params{
-			Length: l, SlowestSmoothingFactor: a,
-			BarComponent: bc, QuoteComponent: qc, TradeComponent: tc,
-		}
-
-		frama, err := NewFractalAdaptiveMovingAverage(&params)
-		check("frama == nil", true, frama == nil)
-		check("err", erra, err.Error())
-	})
-
-	t.Run("invalid bar component", func(t *testing.T) {
-		t.Parallel()
-
-		const (
-			l = 16
-			a = 0.01
-		)
-
-		params := Params{
-			Length: l, SlowestSmoothingFactor: a,
-			BarComponent: entities.BarComponent(9999), QuoteComponent: qc, TradeComponent: tc,
-		}
-
-		frama, err := NewFractalAdaptiveMovingAverage(&params)
-		check("frama == nil", true, frama == nil)
-		check("err", errbc, err.Error())
-	})
-
-	t.Run("invalid quote component", func(t *testing.T) {
-		t.Parallel()
-
-		const (
-			l = 16
-			a = 0.01
-		)
-
-		params := Params{
-			Length: l, SlowestSmoothingFactor: a,
-			BarComponent: bc, QuoteComponent: entities.QuoteComponent(9999), TradeComponent: tc,
-		}
-
-		frama, err := NewFractalAdaptiveMovingAverage(&params)
-		check("frama == nil", true, frama == nil)
-		check("err", errqc, err.Error())
-	})
-
-	t.Run("invalid trade component", func(t *testing.T) {
-		t.Parallel()
-
-		const (
-			l = 16
-			a = 0.01
-		)
-
-		params := Params{
-			Length: l, SlowestSmoothingFactor: a,
-			BarComponent: bc, QuoteComponent: qc, TradeComponent: entities.TradeComponent(9999),
-		}
-
-		frama, err := NewFractalAdaptiveMovingAverage(&params)
-		check("frama == nil", true, frama == nil)
-		check("err", errtc, err.Error())
-	})
-
-	// Zero-value component mnemonic tests.
-	// A zero value means "use default, don't show in mnemonic".
-
-	t.Run("all components zero", func(t *testing.T) {
-		t.Parallel()
-
-		params := Params{Length: 16, SlowestSmoothingFactor: 0.01}
-
-		frama, err := NewFractalAdaptiveMovingAverage(&params)
-		check("err == nil", true, err == nil)
-		check("mnemonic", "frama(16, 0.010)", frama.mnemonic)
-		check("description", "Fractal adaptive moving average frama(16, 0.010)", frama.description)
-	})
-
-	t.Run("only bar component set", func(t *testing.T) {
-		t.Parallel()
-
-		params := Params{
-			Length: 16, SlowestSmoothingFactor: 0.01,
-			BarComponent: entities.BarMedianPrice,
-		}
-
-		frama, err := NewFractalAdaptiveMovingAverage(&params)
-		check("err == nil", true, err == nil)
-		check("mnemonic", "frama(16, 0.010, hl/2)", frama.mnemonic)
-		check("description", "Fractal adaptive moving average frama(16, 0.010, hl/2)", frama.description)
-	})
-
-	t.Run("only quote component set", func(t *testing.T) {
-		t.Parallel()
-
-		params := Params{
-			Length: 16, SlowestSmoothingFactor: 0.01,
-			QuoteComponent: entities.QuoteBidPrice,
-		}
-
-		frama, err := NewFractalAdaptiveMovingAverage(&params)
-		check("err == nil", true, err == nil)
-		check("mnemonic", "frama(16, 0.010, b)", frama.mnemonic)
-		check("description", "Fractal adaptive moving average frama(16, 0.010, b)", frama.description)
-	})
-
-	t.Run("only trade component set", func(t *testing.T) {
-		t.Parallel()
-
-		params := Params{
-			Length: 16, SlowestSmoothingFactor: 0.01,
-			TradeComponent: entities.TradeVolume,
-		}
-
-		frama, err := NewFractalAdaptiveMovingAverage(&params)
-		check("err == nil", true, err == nil)
-		check("mnemonic", "frama(16, 0.010, v)", frama.mnemonic)
-		check("description", "Fractal adaptive moving average frama(16, 0.010, v)", frama.description)
-	})
+	concurrentInd, _ := NewFractalAdaptiveMovingAverageDefault()
+	var wg sync.WaitGroup
+	for worker := 0; worker < 4; worker++ {
+		wg.Add(1)
+		go func(offset int) {
+			defer wg.Done()
+			for step := 0; step < 50; step++ {
+				price := float64(100 + offset + step)
+				_ = concurrentInd.UpdatePrice(price)
+				_ = concurrentInd.IsPrimed()
+				_ = concurrentInd.Value()
+				_ = concurrentInd.FractalDimension()
+				_ = concurrentInd.Alpha()
+				_ = fmt.Sprint(concurrentInd.Metadata().Mnemonic)
+			}
+		}(worker)
+	}
+	wg.Wait()
 }

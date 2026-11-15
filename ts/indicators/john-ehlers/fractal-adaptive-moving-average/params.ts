@@ -1,47 +1,60 @@
-import { BarComponent } from '../../../entities/bar-component';
-import { QuoteComponent } from '../../../entities/quote-component';
-import { TradeComponent } from '../../../entities/trade-component';
+import { BarComponent, DefaultBarComponent } from '../../../entities/bar-component';
+import { DefaultQuoteComponent, QuoteComponent } from '../../../entities/quote-component';
+import { DefaultTradeComponent, TradeComponent } from '../../../entities/trade-component';
+import { componentTripleMnemonic } from '../../core/component-triple-mnemonic';
 
-/** Describes parameters to create an instance of the indicator. */
+/** Describes parameters to create an instance of Ehlers' FractalAdaptiveMovingAverage indicator. */
 export interface FractalAdaptiveMovingAverageParams {
-  /** Length is the length, l, (the number of time periods) of the Fractal Adaptive Moving Average.
-   *
-   * The value should be an even integer, greater or equal to 2.
-   * The default value is 16.
-   */
-  length: number;
+    /** Even integer lookback length (>= 2). Default: 16. */
+    length?: number;
 
-  /** SlowestSmoothingFactor is the slowest boundary smoothing factor, as in [0,1].
-   * The equivalent length ls is
-   *
-   *   ls = 2/as - 1, 0 < as <= 1, 1 <= ls
-   *
-   * The default value is 0.01 (equivalent ls = 199).
-    */
-  slowestSmoothingFactor: number;
+    /** Slowest boundary smoothing factor (finite, 0 < A <= 1). Default: 0.01. */
+    slowestSmoothingFactor?: number;
 
-  /**
-   * A component of a bar to use when updating the indicator with a bar sample.
-   *
-   * If _undefined_, the bar component will have a default value and will not be shown in the indicator mnemonic.
-   */
-  barComponent?: BarComponent;
+    /** Alpha exponent scale mode: 1 for full-precision ln(A), 0 for literal 2005 -4.6 (requires A === 0.01). Default: 1. */
+    coefficientMode?: number;
 
-  /**
-   * A component of a quote to use when updating the indicator with a quote sample.
-   *
-   * If _undefined_, the quote component will have a default value and will not be shown in the indicator mnemonic.
-   */
-  quoteComponent?: QuoteComponent;
+    /** Bar component used when updating with a bar sample; undefined defaults to Close. */
+    barComponent?: BarComponent;
 
-  /**
-   * A component of a trade to use when updating the indicator with a trade sample.
-   *
-   * If _undefined_, the trade component will have a default value and will not be shown in the indicator mnemonic.
-   */
-  tradeComponent?: TradeComponent;
+    /** Quote component used when updating with a quote sample; undefined defaults to Mid. */
+    quoteComponent?: QuoteComponent;
+
+    /** Trade component used when updating with a trade sample; undefined defaults to Price. */
+    tradeComponent?: TradeComponent;
 }
 
+export type Params = FractalAdaptiveMovingAverageParams;
+
 export function defaultParams(): FractalAdaptiveMovingAverageParams {
-    return { length: 16, slowestSmoothingFactor: 0.01 };
+    return {
+        length: 16,
+        slowestSmoothingFactor: 0.01,
+        coefficientMode: 1,
+    };
+}
+
+export function formatNumber(value: number): string {
+    const normalized = Object.is(value, -0) ? 0 : value;
+    return String(normalized);
+}
+
+function formatMnemonic(prefix: string, params?: FractalAdaptiveMovingAverageParams): string {
+    const length = params?.length ?? 16;
+    const slowest = params?.slowestSmoothingFactor ?? 0.01;
+    const mode = params?.coefficientMode ?? 1;
+    const barComp = params?.barComponent ?? DefaultBarComponent;
+    const quoteComp = params?.quoteComponent ?? DefaultQuoteComponent;
+    const tradeComp = params?.tradeComponent ?? DefaultTradeComponent;
+    const modeTag = mode === 0 ? ', mode=0' : '';
+    const suffix = componentTripleMnemonic(barComp, quoteComp, tradeComp);
+    return `${prefix}(${length}, ${formatNumber(slowest)}${modeTag}${suffix})`;
+}
+
+export function fractalAdaptiveMovingAverageMnemonic(params?: FractalAdaptiveMovingAverageParams): string {
+    return formatMnemonic('frama', params);
+}
+
+export function fractalAdaptiveMovingAverageDimensionMnemonic(params?: FractalAdaptiveMovingAverageParams): string {
+    return formatMnemonic('framaDim', params);
 }
