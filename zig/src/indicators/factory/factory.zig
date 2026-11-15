@@ -565,8 +565,18 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
         },
 
         .center_of_gravity_oscillator => blk: {
+            const length: i32 = if (obj.get("length")) |raw| switch (raw) {
+                .integer => |number| if (number >= std.math.minInt(i32) and number <= std.math.maxInt(i32)) @intCast(number) else return FactoryError.InvalidParams,
+                .float => |number| if (std.math.isFinite(number) and @trunc(number) == number and number >= @as(f64, @floatFromInt(std.math.minInt(i32))) and number <= @as(f64, @floatFromInt(std.math.maxInt(i32)))) @intFromFloat(number) else return FactoryError.InvalidParams,
+                else => return FactoryError.InvalidParams,
+            } else 10;
+            const centered: bool = if (obj.get("centered")) |raw| switch (raw) {
+                .bool => |flag| flag,
+                else => return FactoryError.InvalidParams,
+            } else false;
             const p = cog_mod.Params{
-                .length = getInt(obj, "length", 10),
+                .length = length,
+                .centered = centered,
                 .bar_component = getBarComponent(obj),
                 .quote_component = getQuoteComponent(obj),
                 .trade_component = getTradeComponent(obj),
@@ -1860,6 +1870,39 @@ test "create corona indicators with defaults, explicit zero threshold, and inval
         FactoryError.IndicatorInitFailed,
         create(allocator, .super_smoother,
             \\{"shortestCyclePeriod": 0}
+        ),
+    );
+
+    const cog_default = try create(allocator, .center_of_gravity_oscillator, "{}");
+    defer cog_default.deinit(allocator);
+    var md_cog_default: metadata_mod.Metadata = undefined;
+    cog_default.indicator.metadata(&md_cog_default);
+    try std.testing.expectEqualStrings("cog(10)", md_cog_default.mnemonic);
+
+    const cog_custom = try create(allocator, .center_of_gravity_oscillator,
+        \\{"length": 8, "centered": true, "barComponent": 5}
+    );
+    defer cog_custom.deinit(allocator);
+    var md_cog_custom: metadata_mod.Metadata = undefined;
+    cog_custom.indicator.metadata(&md_cog_custom);
+    try std.testing.expectEqualStrings("cog(8, centered, hl/2)", md_cog_custom.mnemonic);
+
+    try std.testing.expectError(
+        FactoryError.InvalidParams,
+        create(allocator, .center_of_gravity_oscillator,
+            \\{"length": 1.5}
+        ),
+    );
+    try std.testing.expectError(
+        FactoryError.InvalidParams,
+        create(allocator, .center_of_gravity_oscillator,
+            \\{"centered": 1}
+        ),
+    );
+    try std.testing.expectError(
+        FactoryError.IndicatorInitFailed,
+        create(allocator, .center_of_gravity_oscillator,
+            \\{"length": 0}
         ),
     );
 }

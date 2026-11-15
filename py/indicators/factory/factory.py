@@ -198,7 +198,15 @@ def create_indicator(
     if identifier == Identifier.CENTER_OF_GRAVITY_OSCILLATOR:
         from ..john_ehlers.center_of_gravity_oscillator.params import default_params
         from ..john_ehlers.center_of_gravity_oscillator.center_of_gravity_oscillator import CenterOfGravityOscillator
-        return CenterOfGravityOscillator.create(_apply(default_params(), params))
+        if _is_empty(params):
+            return CenterOfGravityOscillator.create_default()
+        alias_map = {
+            "barComponent": "bar_component",
+            "quoteComponent": "quote_component",
+            "tradeComponent": "trade_component",
+        }
+        normalized = {alias_map.get(key, key): item for key, item in params.items()}
+        return CenterOfGravityOscillator.create(_apply(default_params(), normalized))
 
     if identifier == Identifier.CYBER_CYCLE:
         if _has_key(params, 'smoothing_factor'):

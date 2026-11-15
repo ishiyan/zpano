@@ -656,11 +656,53 @@ pub fn create_indicator(
         }
 
         Identifier::CenterOfGravityOscillator => {
-            let mut p = CenterOfGravityOscillatorParams::default();
-            if let Some(v) = get_usize(&params, "length") {
-                p.length = v;
+            let mut options = CenterOfGravityOscillatorParams::default();
+            if !is_empty_object(&params) {
+                if let Some(raw) = params.get("length") {
+                    match raw {
+                        JsonValue::Number(number)
+                            if number.is_finite()
+                                && number.fract() == 0.0
+                                && *number >= i64::MIN as f64
+                                && *number <= i64::MAX as f64 =>
+                        {
+                            options.length = *number as i64;
+                        }
+                        _ => return Err("length must be a positive integer".to_string()),
+                    }
+                }
+                if let Some(raw) = params.get("centered") {
+                    match raw {
+                        JsonValue::Bool(flag) => options.centered = *flag,
+                        _ => return Err("centered must be a boolean".to_string()),
+                    }
+                }
+                if let Some(raw) = params.get("barComponent") {
+                    match raw {
+                        JsonValue::Number(number) => {
+                            options.bar_component = Some(lvt_bar_component(*number)?);
+                        }
+                        _ => return Err("invalid component number".to_string()),
+                    }
+                }
+                if let Some(raw) = params.get("quoteComponent") {
+                    match raw {
+                        JsonValue::Number(number) => {
+                            options.quote_component = Some(lvt_quote_component(*number)?);
+                        }
+                        _ => return Err("invalid component number".to_string()),
+                    }
+                }
+                if let Some(raw) = params.get("tradeComponent") {
+                    match raw {
+                        JsonValue::Number(number) => {
+                            options.trade_component = Some(lvt_trade_component(*number)?);
+                        }
+                        _ => return Err("invalid component number".to_string()),
+                    }
+                }
             }
-            Ok(Box::new(CenterOfGravityOscillator::new(&p)?))
+            Ok(Box::new(CenterOfGravityOscillator::new(&options)?))
         }
 
         Identifier::CyberCycle => {
@@ -2425,6 +2467,20 @@ mod tests {
 
         assert!(create_indicator(Identifier::SuperSmoother, r#"{"shortestCyclePeriod": "bad"}"#).is_err());
         assert!(create_indicator(Identifier::SuperSmoother, r#"{"shortestCyclePeriod": 0}"#).is_err());
+
+        let cog_default = create_indicator(Identifier::CenterOfGravityOscillator, "{}").unwrap();
+        assert_eq!(cog_default.metadata().mnemonic, "cog(10)");
+
+        let cog_custom = create_indicator(
+            Identifier::CenterOfGravityOscillator,
+            r#"{"length": 8, "centered": true, "barComponent": 5}"#,
+        )
+        .unwrap();
+        assert_eq!(cog_custom.metadata().mnemonic, "cog(8, centered, hl/2)");
+
+        assert!(create_indicator(Identifier::CenterOfGravityOscillator, r#"{"length": 1.5}"#).is_err());
+        assert!(create_indicator(Identifier::CenterOfGravityOscillator, r#"{"centered": 1}"#).is_err());
+        assert!(create_indicator(Identifier::CenterOfGravityOscillator, r#"{"length": 0}"#).is_err());
     }
 }
 

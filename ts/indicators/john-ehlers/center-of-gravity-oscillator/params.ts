@@ -1,40 +1,50 @@
-import { BarComponent } from '../../../entities/bar-component';
-import { QuoteComponent } from '../../../entities/quote-component';
-import { TradeComponent } from '../../../entities/trade-component';
+import { BarComponent, DefaultBarComponent } from '../../../entities/bar-component';
+import { DefaultQuoteComponent, QuoteComponent } from '../../../entities/quote-component';
+import { DefaultTradeComponent, TradeComponent } from '../../../entities/trade-component';
+import { componentTripleMnemonic } from '../../core/component-triple-mnemonic';
 
-/** Describes parameters to create an instance of the indicator. */
+/** Describes parameters to create an instance of Ehlers' CenterOfGravityOscillator indicator. */
 export interface CenterOfGravityOscillatorParams {
-  /** Length is the length, l, (the number of time periods) of the Center of Gravity oscillator.
-   *
-   * The value should be a positive integer, greater or equal to 1.
-   * The default value used by Ehlers is 10.
-   */
-  length: number;
+    /** Observation window length (integer >= 1). Default: 10. */
+    length?: number;
 
-  /**
-   * A component of a bar to use when updating the indicator with a bar sample.
-   *
-   * If _undefined_, the bar component defaults to BarComponent.Median (median price)
-   * and will be shown in the indicator mnemonic as 'hl/2' since it differs from the
-   * framework default (close).
-   */
-  barComponent?: BarComponent;
+    /** Zero-centered 2004 book baseline (-Num/Denom + (length+1)/2) when true; May 2002 article baseline (-Num/Denom) when false. Default: false. */
+    centered?: boolean;
 
-  /**
-   * A component of a quote to use when updating the indicator with a quote sample.
-   *
-   * If _undefined_, the quote component will have a default value and will not be shown in the indicator mnemonic.
-   */
-  quoteComponent?: QuoteComponent;
+    /** Bar component used when updating with a bar sample; undefined defaults to Close and is omitted from the mnemonic. */
+    barComponent?: BarComponent;
 
-  /**
-   * A component of a trade to use when updating the indicator with a trade sample.
-   *
-   * If _undefined_, the trade component will have a default value and will not be shown in the indicator mnemonic.
-   */
-  tradeComponent?: TradeComponent;
+    /** Quote component used when updating with a quote sample; undefined defaults to Mid and is omitted from the mnemonic. */
+    quoteComponent?: QuoteComponent;
+
+    /** Trade component used when updating with a trade sample; undefined defaults to Price and is omitted from the mnemonic. */
+    tradeComponent?: TradeComponent;
 }
 
+export type Params = CenterOfGravityOscillatorParams;
+
 export function defaultParams(): CenterOfGravityOscillatorParams {
-    return { length: 10 };
+    return {
+        length: 10,
+        centered: false,
+    };
+}
+
+function formatMnemonic(prefix: string, params?: CenterOfGravityOscillatorParams): string {
+    const length = params === undefined || params.length === undefined ? 10 : params.length;
+    const centered = params === undefined || params.centered === undefined ? false : params.centered;
+    const barComp = params?.barComponent ?? DefaultBarComponent;
+    const quoteComp = params?.quoteComponent ?? DefaultQuoteComponent;
+    const tradeComp = params?.tradeComponent ?? DefaultTradeComponent;
+    const centeredTag = centered ? ', centered' : '';
+    const suffix = componentTripleMnemonic(barComp, quoteComp, tradeComp);
+    return `${prefix}(${length}${centeredTag}${suffix})`;
+}
+
+export function centerOfGravityOscillatorMnemonic(params?: CenterOfGravityOscillatorParams): string {
+    return formatMnemonic('cog', params);
+}
+
+export function centerOfGravityOscillatorTriggerMnemonic(params?: CenterOfGravityOscillatorParams): string {
+    return formatMnemonic('cogTrig', params);
 }
