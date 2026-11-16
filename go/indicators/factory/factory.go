@@ -4,6 +4,7 @@
 package factory
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 
@@ -168,6 +169,34 @@ func hasKey(data []byte, key string) bool {
 // unmarshal is a helper that returns a formatted error on failure.
 func unmarshal(data []byte, v any) error {
 	if err := json.Unmarshal(data, v); err != nil {
+		return fmt.Errorf("parse params: %w", err)
+	}
+
+	return nil
+}
+
+func unmarshalStrictAllowed(data []byte, target any, allowedKeys map[string]struct{}) error {
+	trimmed := bytes.TrimSpace(data)
+	if len(trimmed) == 0 || bytes.Equal(trimmed, []byte("null")) {
+		return nil
+	}
+
+	var rawMap map[string]json.RawMessage
+	if err := json.Unmarshal(trimmed, &rawMap); err != nil {
+		return fmt.Errorf("parse params: %w", err)
+	}
+	for key, rawValue := range rawMap {
+		if _, ok := allowedKeys[key]; !ok {
+			return fmt.Errorf("parse params: unknown field %q", key)
+		}
+		if bytes.Equal(bytes.TrimSpace(rawValue), []byte("null")) {
+			return fmt.Errorf("parse params: field %q cannot be null", key)
+		}
+	}
+
+	decoder := json.NewDecoder(bytes.NewReader(trimmed))
+	decoder.DisallowUnknownFields()
+	if err := decoder.Decode(target); err != nil {
 		return fmt.Errorf("parse params: %w", err)
 	}
 
@@ -652,8 +681,20 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 			return discretefouriertransformspectrum.NewDiscreteFourierTransformSpectrumDefault()
 		}
 
-		p := &discretefouriertransformspectrum.Params{}
-		if err := unmarshal(b, p); err != nil {
+		allowed := map[string]struct{}{
+			"minPeriod":                    {},
+			"maxPeriod":                    {},
+			"windowLength":                 {},
+			"highpassPeriod":               {},
+			"smoothingPeriod":              {},
+			"spectralDilationCompensation": {},
+			"enhanceResolution":            {},
+			"barComponent":                 {},
+			"quoteComponent":               {},
+			"tradeComponent":               {},
+		}
+		p := discretefouriertransformspectrum.DefaultParams()
+		if err := unmarshalStrictAllowed(b, p, allowed); err != nil {
 			return nil, err
 		}
 

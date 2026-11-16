@@ -136,7 +136,10 @@ const descriptors: Map<IndicatorIdentifier, Descriptor> = new Map<IndicatorIdent
     out(0, S.Scalar, R.Oscillator, P.Own),
     out(1, S.Scalar, R.Signal, P.Own),
   ])],
-  [IndicatorIdentifier.DiscreteFourierTransformSpectrum, desc(IndicatorIdentifier.DiscreteFourierTransformSpectrum, 'John Ehlers', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Heatmap, R.Spectrum, P.Own)])],
+  [IndicatorIdentifier.DiscreteFourierTransformSpectrum, desc(IndicatorIdentifier.DiscreteFourierTransformSpectrum, 'John Ehlers', A.Static, I.ScalarInput, V.NoVolume, [
+    out(0, S.Heatmap, R.Spectrum, P.Own),
+    out(1, S.Scalar, R.CyclePeriod, P.Own),
+  ])],
   [IndicatorIdentifier.DominantCycle, desc(IndicatorIdentifier.DominantCycle, 'John Ehlers', A.Adaptive, I.ScalarInput, V.NoVolume, [
     out(0, S.Scalar, R.CyclePeriod, P.Own),
     out(1, S.Scalar, R.CyclePeriod, P.Own),

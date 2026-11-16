@@ -244,7 +244,10 @@ var descriptors = map[Identifier]Descriptor{
 	DiscreteFourierTransformSpectrum: {
 		Identifier: DiscreteFourierTransformSpectrum, Family: "John Ehlers",
 		Adaptivity: Static, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
-		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Heatmap, Role: Spectrum, Pane: Own}},
+		Outputs: []OutputDescriptor{
+			{Kind: 1 /* Value */, Shape: shape.Heatmap, Role: Spectrum, Pane: Own},
+			{Kind: 2 /* DominantCycle */, Shape: shape.Scalar, Role: CyclePeriod, Pane: Own},
+		},
 	},
 	DominantCycle: {
 		Identifier: DominantCycle, Family: "John Ehlers",

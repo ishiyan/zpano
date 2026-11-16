@@ -175,7 +175,8 @@ _descriptors: dict[Id, Descriptor] = {
          _o(1, S.SCALAR, R.SIGNAL, P.OWN)]),
     Id.DISCRETE_FOURIER_TRANSFORM_SPECTRUM: _d(
         Id.DISCRETE_FOURIER_TRANSFORM_SPECTRUM, "John Ehlers", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
-        [_o(0, S.HEATMAP, R.SPECTRUM, P.OWN)]),
+        [_o(0, S.HEATMAP, R.SPECTRUM, P.OWN),
+         _o(1, S.SCALAR, R.CYCLE_PERIOD, P.OWN)]),
     Id.DOMINANT_CYCLE: _d(
         Id.DOMINANT_CYCLE, "John Ehlers", A.ADAPTIVE, I.SCALAR_INPUT, V.NO_VOLUME,
         [_o(0, S.SCALAR, R.CYCLE_PERIOD, P.OWN),

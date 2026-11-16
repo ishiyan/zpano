@@ -1,243 +1,500 @@
-import { buildMetadata } from '../../core/build-metadata';
 import { Bar } from '../../../entities/bar';
-import { BarComponent, barComponentValue } from '../../../entities/bar-component';
+import { BarComponent, DefaultBarComponent, barComponentMnemonic, barComponentValue } from '../../../entities/bar-component';
 import { Quote } from '../../../entities/quote';
-import { DefaultQuoteComponent, quoteComponentValue } from '../../../entities/quote-component';
+import { DefaultQuoteComponent, QuoteComponent, quoteComponentMnemonic, quoteComponentValue } from '../../../entities/quote-component';
 import { Scalar } from '../../../entities/scalar';
 import { Trade } from '../../../entities/trade';
-import { DefaultTradeComponent, tradeComponentValue } from '../../../entities/trade-component';
-import { componentTripleMnemonic } from '../../core/component-triple-mnemonic';
+import { DefaultTradeComponent, TradeComponent, tradeComponentMnemonic, tradeComponentValue } from '../../../entities/trade-component';
+import { buildMetadata } from '../../core/build-metadata';
 import { Indicator } from '../../core/indicator';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
 import { IndicatorOutput } from '../../core/indicator-output';
-import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { Heatmap } from '../../core/outputs/heatmap';
-import { DiscreteFourierTransformSpectrumEstimator } from './estimator';
-import { DiscreteFourierTransformSpectrumParams } from './params';
+import {
+    DiscreteFourierTransformSpectrumParams,
+    defaultParams,
+    discreteFourierTransformSpectrumDominantCycleMnemonic,
+    discreteFourierTransformSpectrumMnemonic,
+} from './params';
 
-const DEFAULT_LENGTH = 48;
-const DEFAULT_MIN_PERIOD = 10;
-const DEFAULT_MAX_PERIOD = 48;
-const DEFAULT_SPECTRUM_RESOLUTION = 1;
-const DEFAULT_AGC_DECAY_FACTOR = 0.995;
-const AGC_DECAY_EPSILON = 1e-12;
+export {
+    DiscreteFourierTransformSpectrumParams,
+    defaultParams,
+    discreteFourierTransformSpectrumDominantCycleMnemonic,
+    discreteFourierTransformSpectrumMnemonic,
+};
 
-/** __Discrete Fourier Transform Spectrum__ heatmap indicator (MBST port).
- *
- * Displays a power heatmap of cyclic activity over a configurable cycle-period range by
- * evaluating a discrete Fourier transform on a length-N sliding window with its mean
- * subtracted. It supports optional spectral dilation compensation (division of the squared
- * magnitude by the evaluated period), a fast-attack slow-decay automatic gain control, and
- * either floating or fixed (0-clamped) intensity normalization.
- *
- * Note: this is a faithful port of MBST's implementation, which differs from John Ehlers'
- * EasyLanguage listing 9-1 (Ehlers pre-filters the input with a highpass + Super Smoother
- * before the DFT and normalizes by MaxPwr only). MBST's algorithm is in the same family as
- * the Goertzel and Maximum Entropy Spectrum heatmap indicators.
- *
- * Reference: MBST Mbs.Trading.Indicators.JohnEhlers.DiscreteFourierTransformSpectrum. */
+const TWO_PI = 2.0 * Math.PI;
+const SQRT_TWO = Math.SQRT2;
+const AGC_DECAY = 0.995;
+const CENTROID_THRESHOLD = 0.5;
+
+const ALLOWED_KEYS = new Set<string>([
+    'minPeriod',
+    'maxPeriod',
+    'windowLength',
+    'highpassPeriod',
+    'smoothingPeriod',
+    'spectralDilationCompensation',
+    'enhanceResolution',
+    'barComponent',
+    'quoteComponent',
+    'tradeComponent',
+]);
+
+export interface SpectrumOutput {
+    readonly heatmap: Heatmap;
+    readonly dominantCycle: number;
+}
+
+export interface SpectrumState {
+    readonly highPass: number;
+    readonly filtered: number;
+    readonly rawPower: readonly number[];
+    readonly normalizationMaximum: number;
+    readonly internalDominantCycle: number;
+}
+
+export interface ResolvedDiscreteFourierTransformSpectrumParams {
+    readonly minPeriod: number;
+    readonly maxPeriod: number;
+    readonly windowLength: number;
+    readonly highpassPeriod: number;
+    readonly smoothingPeriod: number;
+    readonly spectralDilationCompensation: boolean;
+    readonly enhanceResolution: boolean;
+}
+
+function validateInteger(value: unknown, name: string, minimum: number): number {
+    if (typeof value !== 'number' || !Number.isInteger(value) || value < minimum) {
+        throw new Error(`${name} must be an integer >= ${minimum}`);
+    }
+    return value;
+}
+
+function validateReal(value: unknown, name: string, minimum: number): number {
+    if (typeof value !== 'number' || !Number.isFinite(value) || value < minimum) {
+        throw new Error(`${name} must be a finite real >= ${minimum}`);
+    }
+    return value;
+}
+
+function validateBoolean(value: unknown, name: string): boolean {
+    if (typeof value !== 'boolean') {
+        throw new Error(`${name} must be a boolean`);
+    }
+    return value;
+}
+
+function validateSample(value: unknown): number {
+    if (typeof value !== 'number') {
+        throw new Error('price must be a real number');
+    }
+    if (!Number.isFinite(value) && !Number.isNaN(value)) {
+        throw new Error('price must be finite or NaN (missing)');
+    }
+    return value;
+}
+
+class RoofFilter {
+    private readonly hp0: number;
+    private readonly hp1: number;
+    private readonly hp2: number;
+    private readonly ss1: number;
+    private readonly ss2: number;
+    private readonly ss3: number;
+    public x1 = 0.0;
+    public x2 = 0.0;
+    public h1 = 0.0;
+    public h2 = 0.0;
+    public f1 = 0.0;
+    public f2 = 0.0;
+
+    public constructor(highpassPeriod: number, smoothingPeriod: number) {
+        const hp = validateReal(highpassPeriod, 'highpassPeriod', 5.0);
+        const lp = validateReal(smoothingPeriod, 'smoothingPeriod', 2.0);
+        const angle = TWO_PI / (SQRT_TWO * hp);
+        const cosine = Math.cos(angle);
+        const alpha = (cosine + Math.sin(angle) - 1.0) / cosine;
+        const pole = 1.0 - alpha;
+        const a = Math.exp((-SQRT_TWO * Math.PI) / lp);
+        this.hp0 = (1.0 - alpha / 2.0) * (1.0 - alpha / 2.0);
+        this.hp1 = 2.0 * pole;
+        this.hp2 = pole * pole;
+        this.ss2 = 2.0 * a * Math.cos((SQRT_TWO * Math.PI) / lp);
+        this.ss3 = -a * a;
+        this.ss1 = 1.0 - this.ss2 - this.ss3;
+        if (
+            !(pole > 0.0 && pole < 1.0 && a > 0.0 && a < 1.0 && this.ss1 > 0.0) ||
+            !Number.isFinite(this.hp0) ||
+            !Number.isFinite(this.ss1)
+        ) {
+            throw new Error('periods must produce finite resolvable stable coefficients');
+        }
+    }
+
+    public reset(): void {
+        this.x1 = 0.0;
+        this.x2 = 0.0;
+        this.h1 = 0.0;
+        this.h2 = 0.0;
+        this.f1 = 0.0;
+        this.f2 = 0.0;
+    }
+
+    public candidate(price: number): [number, number] {
+        const high =
+            this.hp0 * (price - 2.0 * this.x1 + this.x2) +
+            this.hp1 * this.h1 -
+            this.hp2 * this.h2;
+        const filtered =
+            (this.ss1 * (high + this.h1)) / 2.0 +
+            this.ss2 * this.f1 +
+            this.ss3 * this.f2;
+        if (!Number.isFinite(high) || !Number.isFinite(filtered)) {
+            throw new Error('roofing arithmetic overflowed');
+        }
+        return [high, filtered];
+    }
+
+    public commit(price: number, high: number, filtered: number): void {
+        this.x2 = this.x1;
+        this.x1 = price;
+        this.h2 = this.h1;
+        this.h1 = high;
+        this.f2 = this.f1;
+        this.f1 = filtered;
+    }
+}
+
+function normalizeAndCentroid(
+    periods: readonly number[],
+    raw: readonly number[],
+    previousMax: number,
+    previousDC: number,
+    hasDC: boolean,
+    enhance: boolean,
+): { maximum: number; dominant: number; hasDC: boolean; values: number[] } {
+    let maximum = AGC_DECAY * previousMax;
+    for (const power of raw) {
+        if (!Number.isFinite(power) || power < 0.0) {
+            throw new Error('spectral power arithmetic overflowed');
+        }
+        if (power > maximum) {
+            maximum = power;
+        }
+    }
+    const normalized = raw.map((power) => (maximum > 0.0 ? power / maximum : 0.0));
+    let sp = 0.0;
+    let spx = 0.0;
+    for (let index = 0; index < periods.length; index++) {
+        const power = normalized[index];
+        if (power >= CENTROID_THRESHOLD) {
+            spx += periods[index] * power;
+            sp += power;
+        }
+    }
+    let dominant = previousDC;
+    let nextHasDC = hasDC;
+    if (sp !== 0.0) {
+        dominant = spx / sp;
+        nextHasDC = true;
+    }
+    if (!Number.isFinite(dominant)) {
+        throw new Error('centroid arithmetic overflowed');
+    }
+    const values = enhance
+        ? normalized.map((value) => value * value * value)
+        : normalized;
+    return { maximum, dominant, hasDC: nextHasDC, values };
+}
+
+/** Ehlers' Discrete Fourier Transform Spectrum indicator (2013 Book Listing 9-1). */
 export class DiscreteFourierTransformSpectrum implements Indicator {
-  private readonly estimator: DiscreteFourierTransformSpectrumEstimator;
-  private readonly lastIndex: number;
-  private readonly floatingNormalization: boolean;
-  private readonly minParameterValue: number;
-  private readonly maxParameterValue: number;
-  private readonly parameterResolution: number;
+    public readonly parameters: ResolvedDiscreteFourierTransformSpectrumParams;
+    private readonly roof: RoofFilter;
+    private readonly periods: number[];
+    private readonly cosines: number[][];
+    private readonly sines: number[][];
+    private readonly mnemonicValue: string;
+    private readonly descriptionValue: string;
+    private readonly mnemonicDC: string;
+    private readonly descriptionDC: string;
+    private readonly barComponentFunc: (bar: Bar) => number;
+    private readonly quoteComponentFunc: (quote: Quote) => number;
+    private readonly tradeComponentFunc: (trade: Trade) => number;
 
-  private readonly mnemonicValue: string;
-  private readonly descriptionValue: string;
+    private count = 0;
+    private history: number[] = [];
+    private raw: number[] = [];
+    private maximum = 0.0;
+    private dominant = 0.0;
+    private hasDominant = false;
+    private lastOutput!: SpectrumOutput;
 
-  private readonly barComponentFunc: (bar: Bar) => number;
-  private readonly quoteComponentFunc: (quote: Quote) => number;
-  private readonly tradeComponentFunc: (trade: Trade) => number;
-
-  private windowCount = 0;
-  private primed = false;
-
-  /** Creates an instance with default parameters
-   * (length=48, minPeriod=10, maxPeriod=48, spectrumResolution=1, SDC on, AGC on
-   * (decay=0.995), floating normalization, BarComponent.Median). */
-  public static default(): DiscreteFourierTransformSpectrum {
-    return new DiscreteFourierTransformSpectrum({});
-  }
-
-  /** Creates an instance based on the given parameters. */
-  public static fromParams(params: DiscreteFourierTransformSpectrumParams): DiscreteFourierTransformSpectrum {
-    return new DiscreteFourierTransformSpectrum(params);
-  }
-
-  private constructor(params: DiscreteFourierTransformSpectrumParams) {
-    const invalid = 'invalid discrete Fourier transform spectrum parameters';
-
-    const length = params.length !== undefined && params.length !== 0
-      ? params.length : DEFAULT_LENGTH;
-    const minPeriod = params.minPeriod !== undefined && params.minPeriod !== 0
-      ? params.minPeriod : DEFAULT_MIN_PERIOD;
-    const maxPeriod = params.maxPeriod !== undefined && params.maxPeriod !== 0
-      ? params.maxPeriod : DEFAULT_MAX_PERIOD;
-    const spectrumResolution = params.spectrumResolution !== undefined && params.spectrumResolution !== 0
-      ? params.spectrumResolution : DEFAULT_SPECTRUM_RESOLUTION;
-    const agcDecayFactor = params.automaticGainControlDecayFactor !== undefined
-      && params.automaticGainControlDecayFactor !== 0
-      ? params.automaticGainControlDecayFactor : DEFAULT_AGC_DECAY_FACTOR;
-
-    const sdcOn = !params.disableSpectralDilationCompensation;
-    const agcOn = !params.disableAutomaticGainControl;
-    const floatingNorm = !params.fixedNormalization;
-
-    if (length < 2) {
-      throw new Error(`${invalid}: Length should be >= 2`);
-    }
-    if (minPeriod < 2) {
-      throw new Error(`${invalid}: MinPeriod should be >= 2`);
-    }
-    if (maxPeriod <= minPeriod) {
-      throw new Error(`${invalid}: MaxPeriod should be > MinPeriod`);
-    }
-    if (maxPeriod > 2 * length) {
-      throw new Error(`${invalid}: MaxPeriod should be <= 2 * Length`);
-    }
-    if (spectrumResolution < 1) {
-      throw new Error(`${invalid}: SpectrumResolution should be >= 1`);
-    }
-    if (agcOn && (agcDecayFactor <= 0 || agcDecayFactor >= 1)) {
-      throw new Error(`${invalid}: AutomaticGainControlDecayFactor should be in (0, 1)`);
+    public static default(): DiscreteFourierTransformSpectrum {
+        return new DiscreteFourierTransformSpectrum(defaultParams());
     }
 
-    // DiscreteFourierTransformSpectrum mirrors MBST's reference: BarComponent.Median default.
-    const bc = params.barComponent ?? BarComponent.Median;
-    const qc = params.quoteComponent ?? DefaultQuoteComponent;
-    const tc = params.tradeComponent ?? DefaultTradeComponent;
-
-    this.barComponentFunc = barComponentValue(bc);
-    this.quoteComponentFunc = quoteComponentValue(qc);
-    this.tradeComponentFunc = tradeComponentValue(tc);
-
-    this.estimator = new DiscreteFourierTransformSpectrumEstimator(
-      length, minPeriod, maxPeriod, spectrumResolution,
-      sdcOn, agcOn, agcDecayFactor,
-    );
-    this.lastIndex = length - 1;
-    this.floatingNormalization = floatingNorm;
-    this.minParameterValue = minPeriod;
-    this.maxParameterValue = maxPeriod;
-    this.parameterResolution = spectrumResolution;
-
-    const cm = componentTripleMnemonic(bc, qc, tc);
-    const flags = buildFlagTags(sdcOn, agcOn, floatingNorm, agcDecayFactor);
-    this.mnemonicValue = `dftps(${length}, ${formatNum(minPeriod)}, ${formatNum(maxPeriod)}, ${spectrumResolution}${flags}${cm})`;
-    this.descriptionValue = 'Discrete Fourier transform spectrum ' + this.mnemonicValue;
-  }
-
-  /** Indicates whether the indicator is primed. */
-  public isPrimed(): boolean { return this.primed; }
-
-  /** Describes the output data of the indicator. */
-  public metadata(): IndicatorMetadata {
-    return buildMetadata(
-      IndicatorIdentifier.DiscreteFourierTransformSpectrum,
-      this.mnemonicValue,
-      this.descriptionValue,
-      [
-        { mnemonic: this.mnemonicValue, description: this.descriptionValue },
-      ],
-    );
-  }
-
-  /** Feeds the next sample to the engine and returns the heatmap column.
-   *
-   * Before priming the heatmap is empty (with the indicator's parameter axis).
-   * On a NaN input sample the state is left unchanged and an empty heatmap is returned. */
-  public update(sample: number, time: Date): Heatmap {
-    if (Number.isNaN(sample)) {
-      return Heatmap.newEmptyHeatmap(time, this.minParameterValue, this.maxParameterValue, this.parameterResolution);
+    public static fromParams(params?: DiscreteFourierTransformSpectrumParams): DiscreteFourierTransformSpectrum {
+        return new DiscreteFourierTransformSpectrum(params);
     }
 
-    const window = this.estimator.inputSeries;
+    public constructor(params?: DiscreteFourierTransformSpectrumParams) {
+        if (params !== undefined && params !== null) {
+            if (typeof params !== 'object' || Array.isArray(params)) {
+                throw new Error('params must be an object');
+            }
+            for (const key of Object.keys(params)) {
+                if (!ALLOWED_KEYS.has(key)) {
+                    throw new Error(`unsupported parameter '${key}'`);
+                }
+                if ((params as Record<string, unknown>)[key] === null) {
+                    throw new Error(`parameter '${key}' cannot be null`);
+                }
+            }
+        }
 
-    if (this.primed) {
-      for (let i = 0; i < this.lastIndex; i++) {
-        window[i] = window[i + 1];
-      }
-      window[this.lastIndex] = sample;
-    } else {
-      window[this.windowCount] = sample;
-      this.windowCount++;
-      if (this.windowCount === this.estimator.length) {
-        this.primed = true;
-      }
+        const minPeriod = validateInteger(params?.minPeriod ?? 10, 'minPeriod', 3);
+        const maxPeriod = validateInteger(params?.maxPeriod ?? 48, 'maxPeriod', minPeriod);
+        const windowLength = validateInteger(params?.windowLength ?? 48, 'windowLength', 2);
+        const highpassPeriod = validateReal(params?.highpassPeriod ?? 48, 'highpassPeriod', 5.0);
+        const smoothingPeriod = validateReal(params?.smoothingPeriod ?? 10, 'smoothingPeriod', 2.0);
+        const sdc = validateBoolean(
+            params?.spectralDilationCompensation ?? true,
+            'spectralDilationCompensation',
+        );
+        const enhance = validateBoolean(
+            params?.enhanceResolution ?? false,
+            'enhanceResolution',
+        );
+
+        const barComp = params?.barComponent ?? DefaultBarComponent;
+        const quoteComp = params?.quoteComponent ?? DefaultQuoteComponent;
+        const tradeComp = params?.tradeComponent ?? DefaultTradeComponent;
+        if (typeof barComp !== 'number' || barComponentMnemonic(barComp) === '??') {
+            throw new Error('invalid barComponent');
+        }
+        if (typeof quoteComp !== 'number' || quoteComponentMnemonic(quoteComp) === '??') {
+            throw new Error('invalid quoteComponent');
+        }
+        if (typeof tradeComp !== 'number' || tradeComponentMnemonic(tradeComp) === '??') {
+            throw new Error('invalid tradeComponent');
+        }
+
+        this.roof = new RoofFilter(highpassPeriod, smoothingPeriod);
+        this.parameters = {
+            minPeriod,
+            maxPeriod,
+            windowLength,
+            highpassPeriod,
+            smoothingPeriod,
+            spectralDilationCompensation: sdc,
+            enhanceResolution: enhance,
+        };
+
+        const cells = maxPeriod - minPeriod + 1;
+        this.periods = [];
+        this.cosines = [];
+        this.sines = [];
+        for (let index = 0; index < cells; index++) {
+            const period = minPeriod + index;
+            this.periods.push(period);
+            const cosRow: number[] = [];
+            const sinRow: number[] = [];
+            for (let n = 0; n < windowLength; n++) {
+                const angle = (TWO_PI * n) / period;
+                cosRow.push(Math.cos(angle));
+                sinRow.push(Math.sin(angle));
+            }
+            this.cosines.push(cosRow);
+            this.sines.push(sinRow);
+        }
+
+        this.barComponentFunc = barComponentValue(barComp);
+        this.quoteComponentFunc = quoteComponentValue(quoteComp);
+        this.tradeComponentFunc = tradeComponentValue(tradeComp);
+
+        const resolvedParams: DiscreteFourierTransformSpectrumParams = {
+            minPeriod,
+            maxPeriod,
+            windowLength,
+            highpassPeriod,
+            smoothingPeriod,
+            spectralDilationCompensation: sdc,
+            enhanceResolution: enhance,
+            barComponent: barComp,
+            quoteComponent: quoteComp,
+            tradeComponent: tradeComp,
+        };
+        this.mnemonicValue = discreteFourierTransformSpectrumMnemonic(resolvedParams);
+        this.descriptionValue = `Discrete Fourier transform spectrum ${this.mnemonicValue}`;
+        this.mnemonicDC = discreteFourierTransformSpectrumDominantCycleMnemonic(resolvedParams);
+        this.descriptionDC = `Discrete Fourier transform spectrum dominant cycle ${this.mnemonicDC}`;
+
+        this.reset();
     }
 
-    if (!this.primed) {
-      return Heatmap.newEmptyHeatmap(time, this.minParameterValue, this.maxParameterValue, this.parameterResolution);
+    public get minPeriod(): number {
+        return this.parameters.minPeriod;
     }
 
-    this.estimator.calculate();
-
-    const lengthSpectrum = this.estimator.lengthSpectrum;
-
-    const minRef = this.floatingNormalization ? this.estimator.spectrumMin : 0;
-    const maxRef = this.estimator.spectrumMax;
-    const spectrumRange = maxRef - minRef;
-
-    // MBST fills spectrum[0] at MaxPeriod and spectrum[last] at MinPeriod.
-    // The heatmap axis runs MinPeriod -> MaxPeriod, so reverse on output.
-    const values = new Array<number>(lengthSpectrum);
-    let valueMin = Number.POSITIVE_INFINITY;
-    let valueMax = Number.NEGATIVE_INFINITY;
-
-    for (let i = 0; i < lengthSpectrum; i++) {
-      const v = (this.estimator.spectrum[lengthSpectrum - 1 - i] - minRef) / spectrumRange;
-      values[i] = v;
-      if (v < valueMin) valueMin = v;
-      if (v > valueMax) valueMax = v;
+    public get maxPeriod(): number {
+        return this.parameters.maxPeriod;
     }
 
-    return Heatmap.newHeatmap(
-      time, this.minParameterValue, this.maxParameterValue, this.parameterResolution,
-      valueMin, valueMax, values,
-    );
-  }
+    public get warmupBars(): number {
+        return this.parameters.windowLength - 1;
+    }
 
-  /** Updates the indicator given the next scalar sample. */
-  public updateScalar(sample: Scalar): IndicatorOutput {
-    return this.updateEntity(sample.time, sample.value);
-  }
+    public get samplesSeen(): number {
+        return this.count;
+    }
 
-  /** Updates the indicator given the next bar sample. */
-  public updateBar(sample: Bar): IndicatorOutput {
-    return this.updateEntity(sample.time, this.barComponentFunc(sample));
-  }
+    public get state(): SpectrumState {
+        return {
+            highPass: this.roof.h1,
+            filtered: this.roof.f1,
+            rawPower: this.raw.slice(),
+            normalizationMaximum: this.maximum,
+            internalDominantCycle: this.dominant,
+        };
+    }
 
-  /** Updates the indicator given the next quote sample. */
-  public updateQuote(sample: Quote): IndicatorOutput {
-    return this.updateEntity(sample.time, this.quoteComponentFunc(sample));
-  }
+    public get output(): SpectrumOutput {
+        return this.lastOutput;
+    }
 
-  /** Updates the indicator given the next trade sample. */
-  public updateTrade(sample: Trade): IndicatorOutput {
-    return this.updateEntity(sample.time, this.tradeComponentFunc(sample));
-  }
+    public reset(): void {
+        this.roof.reset();
+        this.count = 0;
+        this.history = new Array<number>(this.parameters.windowLength).fill(0.0);
+        this.raw = new Array<number>(this.periods.length).fill(0.0);
+        this.maximum = 0.0;
+        this.dominant = 0.0;
+        this.hasDominant = false;
+        this.lastOutput = {
+            heatmap: Heatmap.newEmptyHeatmap(new Date(0), this.minPeriod, this.maxPeriod, 1.0),
+            dominantCycle: Number.NaN,
+        };
+    }
 
-  private updateEntity(time: Date, sample: number): IndicatorOutput {
-    return [this.update(sample, time)];
-  }
-}
+    public isPrimed(): boolean {
+        return this.count >= this.parameters.windowLength;
+    }
 
-/** Encodes non-default boolean/decay settings as terse override-only tags. Empty when all
- * flags are at their defaults. */
-function buildFlagTags(sdcOn: boolean, agcOn: boolean, floatingNorm: boolean, agcDecayFactor: number): string {
-  let s = '';
-  if (!sdcOn) s += ', no-sdc';
-  if (!agcOn) s += ', no-agc';
-  if (agcOn && Math.abs(agcDecayFactor - DEFAULT_AGC_DECAY_FACTOR) > AGC_DECAY_EPSILON) {
-    s += `, agc=${formatNum(agcDecayFactor)}`;
-  }
-  if (!floatingNorm) s += ', no-fn';
-  return s;
-}
+    public metadata(): IndicatorMetadata {
+        return buildMetadata(
+            IndicatorIdentifier.DiscreteFourierTransformSpectrum,
+            this.mnemonicValue,
+            this.descriptionValue,
+            [
+                { mnemonic: this.mnemonicValue, description: this.descriptionValue },
+                { mnemonic: this.mnemonicDC, description: this.descriptionDC },
+            ],
+        );
+    }
 
-/** Matches Go fmt.Sprintf("%g") for the common integer and decimal cases used in the mnemonic. */
-function formatNum(n: number): string {
-  return n.toString();
+    public update(sample: number, time: Date = new Date(0)): SpectrumOutput {
+        const price = validateSample(sample);
+        const params = this.parameters;
+        if (Number.isNaN(price)) {
+            return {
+                heatmap: Heatmap.newEmptyHeatmap(time, params.minPeriod, params.maxPeriod, 1.0),
+                dominantCycle: Number.NaN,
+            };
+        }
+
+        const [high, filtered] = this.roof.candidate(price);
+        const history = new Array<number>(params.windowLength);
+        history[0] = filtered;
+        for (let index = 1; index < params.windowLength; index++) {
+            history[index] = this.history[index - 1];
+        }
+
+        const raw = new Array<number>(this.periods.length);
+        for (let index = 0; index < this.periods.length; index++) {
+            const period = this.periods[index];
+            const compensation = params.spectralDilationCompensation ? period : 1.0;
+            let cosinePart = 0.0;
+            let sinePart = 0.0;
+            const cosRow = this.cosines[index];
+            const sinRow = this.sines[index];
+            for (let n = 0; n < params.windowLength; n++) {
+                cosinePart += (history[n] * cosRow[n]) / compensation;
+                sinePart += (history[n] * sinRow[n]) / compensation;
+            }
+            raw[index] = cosinePart * cosinePart + sinePart * sinePart;
+        }
+
+        const normalizedResult = normalizeAndCentroid(
+            this.periods,
+            raw,
+            this.maximum,
+            this.dominant,
+            this.hasDominant,
+            params.enhanceResolution,
+        );
+
+        this.roof.commit(price, high, filtered);
+        this.history = history;
+        this.raw = raw;
+        this.maximum = normalizedResult.maximum;
+        this.dominant = normalizedResult.dominant;
+        this.hasDominant = normalizedResult.hasDC;
+        this.count += 1;
+
+        if (this.isPrimed()) {
+            const clonedValues = normalizedResult.values.slice();
+            let valueMin = clonedValues[0];
+            let valueMax = clonedValues[0];
+            for (let index = 1; index < clonedValues.length; index++) {
+                const value = clonedValues[index];
+                if (value < valueMin) valueMin = value;
+                if (value > valueMax) valueMax = value;
+            }
+            this.lastOutput = {
+                heatmap: Heatmap.newHeatmap(
+                    time,
+                    params.minPeriod,
+                    params.maxPeriod,
+                    1.0,
+                    valueMin,
+                    valueMax,
+                    clonedValues,
+                ),
+                dominantCycle: normalizedResult.hasDC ? normalizedResult.dominant : Number.NaN,
+            };
+        } else {
+            this.lastOutput = {
+                heatmap: Heatmap.newEmptyHeatmap(time, params.minPeriod, params.maxPeriod, 1.0),
+                dominantCycle: Number.NaN,
+            };
+        }
+        return this.lastOutput;
+    }
+
+    private wrapEntity(time: Date, result: SpectrumOutput): IndicatorOutput {
+        const dcScalar = new Scalar();
+        dcScalar.time = time;
+        dcScalar.value = result.dominantCycle;
+        return [result.heatmap, dcScalar];
+    }
+
+    public updateScalar(sample: Scalar): IndicatorOutput {
+        return this.wrapEntity(sample.time, this.update(sample.value, sample.time));
+    }
+
+    public updateBar(sample: Bar): IndicatorOutput {
+        return this.wrapEntity(sample.time, this.update(this.barComponentFunc(sample), sample.time));
+    }
+
+    public updateQuote(sample: Quote): IndicatorOutput {
+        return this.wrapEntity(sample.time, this.update(this.quoteComponentFunc(sample), sample.time));
+    }
+
+    public updateTrade(sample: Trade): IndicatorOutput {
+        return this.wrapEntity(sample.time, this.update(this.tradeComponentFunc(sample), sample.time));
+    }
 }

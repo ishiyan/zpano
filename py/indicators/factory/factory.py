@@ -373,7 +373,46 @@ def create_indicator(
     if identifier == Identifier.DISCRETE_FOURIER_TRANSFORM_SPECTRUM:
         from ..john_ehlers.discrete_fourier_transform_spectrum.params import default_params
         from ..john_ehlers.discrete_fourier_transform_spectrum.discrete_fourier_transform_spectrum import DiscreteFourierTransformSpectrum
-        return DiscreteFourierTransformSpectrum(_apply(default_params(), params))
+        if _is_empty(params):
+            return DiscreteFourierTransformSpectrum.create_default()
+        assert params is not None
+        alias_map = {
+            "minPeriod": "min_period",
+            "maxPeriod": "max_period",
+            "windowLength": "window_length",
+            "highpassPeriod": "highpass_period",
+            "smoothingPeriod": "smoothing_period",
+            "spectralDilationCompensation": "spectral_dilation_compensation",
+            "enhanceResolution": "enhance_resolution",
+            "barComponent": "bar_component",
+            "quoteComponent": "quote_component",
+            "tradeComponent": "trade_component",
+        }
+        allowed_keys = {
+            "min_period",
+            "max_period",
+            "window_length",
+            "highpass_period",
+            "smoothing_period",
+            "spectral_dilation_compensation",
+            "enhance_resolution",
+            "bar_component",
+            "quote_component",
+            "trade_component",
+        }
+        normalized: dict[str, Any] = {}
+        for key, item in params.items():
+            mapped = alias_map.get(key, key)
+            if mapped not in allowed_keys:
+                raise ValueError(
+                    f"invalid discrete Fourier transform spectrum parameters: unsupported key {key!r}"
+                )
+            if mapped in normalized:
+                raise ValueError(
+                    f"invalid discrete Fourier transform spectrum parameters: duplicate key {key!r}"
+                )
+            normalized[mapped] = item
+        return DiscreteFourierTransformSpectrum.create(_apply(default_params(), normalized))
 
     # ── joseph granville ──────────────────────────────────────────────────
 

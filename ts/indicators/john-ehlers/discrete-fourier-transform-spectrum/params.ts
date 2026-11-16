@@ -1,65 +1,91 @@
-import { BarComponent } from '../../../entities/bar-component';
-import { QuoteComponent } from '../../../entities/quote-component';
-import { TradeComponent } from '../../../entities/trade-component';
+import { BarComponent, DefaultBarComponent } from '../../../entities/bar-component';
+import { DefaultQuoteComponent, QuoteComponent } from '../../../entities/quote-component';
+import { DefaultTradeComponent, TradeComponent } from '../../../entities/trade-component';
+import { componentTripleMnemonic } from '../../core/component-triple-mnemonic';
 
-/** Describes parameters to create an instance of the DiscreteFourierTransformSpectrum indicator.
- *
- * All boolean fields are named so that `undefined` / `false` corresponds to the MBST default
- * behavior. This lets an empty params object produce the default indicator. */
+/** Parameters for Ehlers' DiscreteFourierTransformSpectrum (2013 Book Listing 9-1). */
 export interface DiscreteFourierTransformSpectrumParams {
-  /** Number of time periods in the spectrum window. Must be >= 2. The default value is 48.
-   * A zero value is treated as "use default". */
-  length?: number;
+    /** Shortest evaluated integer cycle period in bars (>= 3). Default: 10. */
+    minPeriod?: number;
 
-  /** Minimum cycle period covered by the spectrum. Must be >= 2 (2 corresponds to the Nyquist
-   * frequency). The default value is 10. A zero value is treated as "use default". */
-  minPeriod?: number;
+    /** Longest evaluated integer cycle period in bars (>= minPeriod). Default: 48. */
+    maxPeriod?: number;
 
-  /** Maximum cycle period covered by the spectrum. Must be > minPeriod and <= 2 * length.
-   * The default value is 48. A zero value is treated as "use default". */
-  maxPeriod?: number;
+    /** Sliding roofed DFT window length in bars (>= 2, independent of maxPeriod). Default: 48. */
+    windowLength?: number;
 
-  /** Spectrum resolution (positive integer). A value of 10 means the spectrum is evaluated at
-   * every 0.1 of period amplitude. Must be >= 1. The default value is 1. A zero value is
-   * treated as "use default". */
-  spectrumResolution?: number;
+    /** Two-pole roofing high-pass cutoff period in bars (>= 5.0). Default: 48. */
+    highpassPeriod?: number;
 
-  /** Disables the spectral dilation compensation (division of the squared magnitude by the
-   * evaluated period) when true. MBST default behavior is enabled, so the default value is
-   * false (SDC on). */
-  disableSpectralDilationCompensation?: boolean;
+    /** Two-pole SuperSmoother cutoff period in bars (>= 2.0). Default: 10. */
+    smoothingPeriod?: number;
 
-  /** Disables the fast-attack slow-decay automatic gain control when true. MBST default
-   * behavior is enabled, so the default value is false (AGC on). */
-  disableAutomaticGainControl?: boolean;
+    /** Divide each cosine/sine contribution by period before summing/squaring. Default: true. */
+    spectralDilationCompensation?: boolean;
 
-  /** Decay factor used by the fast-attack slow-decay automatic gain control. Must be in the
-   * open interval (0, 1) when AGC is enabled. The default value is 0.995. A zero value is
-   * treated as "use default". */
-  automaticGainControlDecayFactor?: number;
+    /** Cube normalized display heatmap intensities after centroid extraction. Default: false. */
+    enhanceResolution?: boolean;
 
-  /** Selects fixed (min clamped to 0) normalization when true. MBST default is floating
-   * normalization, so the default value is false (floating normalization). */
-  fixedNormalization?: boolean;
+    /** Bar component used by updateBar(); undefined defaults to Close. */
+    barComponent?: BarComponent;
 
-  /** A component of a bar to use when updating the indicator with a bar sample.
-   *
-   * If _undefined_, the default (BarComponent.Median, hl/2) is used, matching MBST's reference
-   * which operates on (High+Low)/2. Since this differs from the framework default, it is
-   * always shown in the mnemonic. */
-  barComponent?: BarComponent;
+    /** Quote component used by updateQuote(); undefined defaults to Mid. */
+    quoteComponent?: QuoteComponent;
 
-  /** A component of a quote to use when updating the indicator with a quote sample.
-   *
-   * If _undefined_, a default value is used and the component is not shown in the mnemonic. */
-  quoteComponent?: QuoteComponent;
-
-  /** A component of a trade to use when updating the indicator with a trade sample.
-   *
-   * If _undefined_, a default value is used and the component is not shown in the mnemonic. */
-  tradeComponent?: TradeComponent;
+    /** Trade component used by updateTrade(); undefined defaults to Price. */
+    tradeComponent?: TradeComponent;
 }
 
+/** Returns Ehlers' Listing 9-1 default parameters. */
 export function defaultParams(): DiscreteFourierTransformSpectrumParams {
-    return { length: 48, minPeriod: 10, maxPeriod: 48, spectrumResolution: 1, automaticGainControlDecayFactor: 0.995 };
+    return {
+        minPeriod: 10,
+        maxPeriod: 48,
+        windowLength: 48,
+        highpassPeriod: 48,
+        smoothingPeriod: 10,
+        spectralDilationCompensation: true,
+        enhanceResolution: false,
+    };
+}
+
+/** Formats a numeric parameter cleanly without negative zero. */
+export function formatNumber(value: number): string {
+    const normalized = value === 0 ? 0 : value;
+    return String(normalized);
+}
+
+function buildMnemonic(
+    prefix: string,
+    includeEnhance: boolean,
+    params?: DiscreteFourierTransformSpectrumParams,
+): string {
+    const minPeriod = params?.minPeriod ?? 10;
+    const maxPeriod = params?.maxPeriod ?? 48;
+    const windowLength = params?.windowLength ?? 48;
+    const highpassPeriod = params?.highpassPeriod ?? 48;
+    const smoothingPeriod = params?.smoothingPeriod ?? 10;
+    const sdc = params?.spectralDilationCompensation ?? true;
+    const enhance = params?.enhanceResolution ?? false;
+    const barComp = params?.barComponent ?? DefaultBarComponent;
+    const quoteComp = params?.quoteComponent ?? DefaultQuoteComponent;
+    const tradeComp = params?.tradeComponent ?? DefaultTradeComponent;
+    const compSuffix = componentTripleMnemonic(barComp, quoteComp, tradeComp);
+    const sdcSuffix = sdc ? '' : ', no-sdc';
+    const enhSuffix = includeEnhance && enhance ? ', enh' : '';
+    return `${prefix}(${minPeriod}, ${maxPeriod}, ${windowLength}, ${formatNumber(highpassPeriod)}, ${formatNumber(smoothingPeriod)}${sdcSuffix}${enhSuffix}${compSuffix})`;
+}
+
+/** Builds the primary heatmap mnemonic for DiscreteFourierTransformSpectrum. */
+export function discreteFourierTransformSpectrumMnemonic(
+    params?: DiscreteFourierTransformSpectrumParams,
+): string {
+    return buildMnemonic('dftps', true, params);
+}
+
+/** Builds the dominant-cycle mnemonic for DiscreteFourierTransformSpectrum. */
+export function discreteFourierTransformSpectrumDominantCycleMnemonic(
+    params?: DiscreteFourierTransformSpectrumParams,
+): string {
+    return buildMnemonic('dftps-dc', false, params);
 }

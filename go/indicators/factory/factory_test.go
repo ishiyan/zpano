@@ -52,3 +52,57 @@ func TestFactoryZeroLagErrorCorrectingExponentialMovingAverage(t *testing.T) {
 		}
 	}
 }
+
+func TestFactoryDiscreteFourierTransformSpectrum(t *testing.T) {
+	t.Parallel()
+
+	defaultIndicator, err := factory.New(core.DiscreteFourierTransformSpectrum, "{}")
+	if err != nil {
+		t.Fatalf("default factory construction failed: %v", err)
+	}
+	if got := defaultIndicator.Metadata().Mnemonic; got != "dftps(10, 48, 48, 48, 10)" {
+		t.Fatalf("default mnemonic = %q, want %q", got, "dftps(10, 48, 48, 48, 10)")
+	}
+	if got := len(defaultIndicator.Metadata().Outputs); got != 2 {
+		t.Fatalf("len(outputs) = %d, want 2", got)
+	}
+
+	customIndicator, err := factory.New(
+		core.DiscreteFourierTransformSpectrum,
+		`{"minPeriod": 8, "maxPeriod": 32, "windowLength": 24, "highpassPeriod": 40, "smoothingPeriod": 10.5, "spectralDilationCompensation": false, "enhanceResolution": true, "barComponent": "median"}`,
+	)
+	if err != nil {
+		t.Fatalf("custom factory construction failed: %v", err)
+	}
+	if got := customIndicator.Metadata().Mnemonic; got != "dftps(8, 32, 24, 40, 10.5, no-sdc, enh, hl/2)" {
+		t.Fatalf("custom mnemonic = %q, want %q", got, "dftps(8, 32, 24, 40, 10.5, no-sdc, enh, hl/2)")
+	}
+	if got := customIndicator.Metadata().Outputs[1].Mnemonic; got != "dftps-dc(8, 32, 24, 40, 10.5, no-sdc, hl/2)" {
+		t.Fatalf("custom dc mnemonic = %q, want %q", got, "dftps-dc(8, 32, 24, 40, 10.5, no-sdc, hl/2)")
+	}
+
+	invalidJSONCases := []string{
+		`{"length": 48}`,
+		`{"spectrumResolution": 1}`,
+		`{"disableSpectralDilationCompensation": true}`,
+		`{"disableAutomaticGainControl": true}`,
+		`{"automaticGainControlDecayFactor": 0.995}`,
+		`{"fixedNormalization": true}`,
+		`{"unknownField": 1}`,
+		`{"minPeriod": 10.5}`,
+		`{"minPeriod": 2}`,
+		`{"maxPeriod": 9}`,
+		`{"windowLength": 1}`,
+		`{"windowLength": 12.5}`,
+		`{"highpassPeriod": 4}`,
+		`{"smoothingPeriod": 1}`,
+		`{"spectralDilationCompensation": 1}`,
+		`{"enhanceResolution": "yes"}`,
+		`{"minPeriod": null}`,
+	}
+	for _, payload := range invalidJSONCases {
+		if _, err := factory.New(core.DiscreteFourierTransformSpectrum, payload); err == nil {
+			t.Fatalf("expected error for payload %s", payload)
+		}
+	}
+}

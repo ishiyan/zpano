@@ -103,7 +103,10 @@ pub const descriptors = [_]Descriptor{
         .{ .kind = 1, .shape = .scalar, .role = .oscillator, .pane = .own },
         .{ .kind = 2, .shape = .scalar, .role = .signal, .pane = .own },
     } },
-    .{ .identifier = .discrete_fourier_transform_spectrum, .family = "John Ehlers", .adaptivity = .static_, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .heatmap, .role = .spectrum, .pane = .own }} },
+    .{ .identifier = .discrete_fourier_transform_spectrum, .family = "John Ehlers", .adaptivity = .static_, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{
+        .{ .kind = 1, .shape = .heatmap, .role = .spectrum, .pane = .own },
+        .{ .kind = 2, .shape = .scalar, .role = .cycle_period, .pane = .own },
+    } },
     .{ .identifier = .dominant_cycle, .family = "John Ehlers", .adaptivity = .adaptive, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{
         .{ .kind = 1, .shape = .scalar, .role = .cycle_period, .pane = .own },
         .{ .kind = 2, .shape = .scalar, .role = .cycle_period, .pane = .own },

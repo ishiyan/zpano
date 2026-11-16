@@ -1,27 +1,10 @@
-// Package discretefouriertransformspectrum implements MBST's Discrete Fourier
-// Transform Spectrum heatmap indicator.
-//
-// The Discrete Fourier Transform Spectrum (psDft) displays a power heatmap of
-// the cyclic activity over a configurable cycle-period range by evaluating a
-// discrete Fourier transform on a length-N sliding window with its mean
-// subtracted. It supports optional spectral dilation compensation (division of
-// the squared magnitude by the evaluated period), a fast-attack slow-decay
-// automatic gain control, and either floating or fixed (0-clamped) intensity
-// normalization.
-//
-// Note: this is a faithful port of MBST's implementation, which differs from
-// John Ehlers' EasyLanguage listing 9-1 (Ehlers pre-filters the input with a
-// highpass + Super Smoother before the DFT and normalizes by MaxPwr only).
-// MBST's algorithm is in the same family as the Goertzel and Maximum Entropy
-// Spectrum heatmap indicators.
-//
-// Reference: MBST Mbs.Trading.Indicators.JohnEhlers.DiscreteFourierTransformSpectrum.
 package discretefouriertransformspectrum
 
-//nolint: gofumpt
 import (
+	"errors"
 	"fmt"
 	"math"
+	"slices"
 	"sync"
 	"time"
 
@@ -30,190 +13,352 @@ import (
 	"zpano/indicators/core/outputs"
 )
 
-// DiscreteFourierTransformSpectrum is MBST's Discrete Fourier Transform Spectrum heatmap indicator.
+const (
+	twoPi             = 2.0 * math.Pi
+	sqrtTwo           = math.Sqrt2
+	agcDecay          = 0.995
+	centroidThreshold = 0.5
+)
+
+// SpectrumOutput holds the heatmap column and center-of-gravity dominant cycle period.
+type SpectrumOutput struct {
+	Heatmap       *outputs.Heatmap
+	DominantCycle float64
+}
+
+// SpectrumState holds a snapshot of the committed internal spectral state.
+type SpectrumState struct {
+	HighPass              float64
+	Filtered              float64
+	RawPower              []float64
+	NormalizationMaximum  float64
+	InternalDominantCycle float64
+}
+
+type roofFilter struct {
+	hp0 float64
+	hp1 float64
+	hp2 float64
+	ss1 float64
+	ss2 float64
+	ss3 float64
+	x1  float64
+	x2  float64
+	h1  float64
+	h2  float64
+	f1  float64
+	f2  float64
+}
+
+func newRoofFilter(highpassPeriod, smoothingPeriod float64) (*roofFilter, error) {
+	if math.IsNaN(highpassPeriod) || math.IsInf(highpassPeriod, 0) || highpassPeriod < 5.0 {
+		return nil, errors.New("highpassPeriod must be a finite real >= 5")
+	}
+	if math.IsNaN(smoothingPeriod) || math.IsInf(smoothingPeriod, 0) || smoothingPeriod < 2.0 {
+		return nil, errors.New("smoothingPeriod must be a finite real >= 2")
+	}
+
+	angle := twoPi / (sqrtTwo * highpassPeriod)
+	cosine := math.Cos(angle)
+	alpha := (cosine + math.Sin(angle) - 1.0) / cosine
+	pole := 1.0 - alpha
+	a := math.Exp(-sqrtTwo * math.Pi / smoothingPeriod)
+	hp0 := (1.0 - alpha/2.0) * (1.0 - alpha/2.0)
+	hp1 := 2.0 * pole
+	hp2 := pole * pole
+	ss2 := 2.0 * a * math.Cos(sqrtTwo*math.Pi/smoothingPeriod)
+	ss3 := -a * a
+	ss1 := 1.0 - ss2 - ss3
+	if !(pole > 0.0 && pole < 1.0 && a > 0.0 && a < 1.0 && ss1 > 0.0) ||
+		math.IsNaN(hp0) || math.IsInf(hp0, 0) || math.IsNaN(ss1) || math.IsInf(ss1, 0) {
+		return nil, errors.New("periods must produce finite resolvable stable coefficients")
+	}
+
+	return &roofFilter{
+		hp0: hp0,
+		hp1: hp1,
+		hp2: hp2,
+		ss1: ss1,
+		ss2: ss2,
+		ss3: ss3,
+	}, nil
+}
+
+func (r *roofFilter) reset() {
+	r.x1 = 0
+	r.x2 = 0
+	r.h1 = 0
+	r.h2 = 0
+	r.f1 = 0
+	r.f2 = 0
+}
+
+func (r *roofFilter) candidate(price float64) (float64, float64, error) {
+	high := r.hp0*(price-2.0*r.x1+r.x2) + r.hp1*r.h1 - r.hp2*r.h2
+	filtered := r.ss1*(high+r.h1)/2.0 + r.ss2*r.f1 + r.ss3*r.f2
+	if math.IsNaN(high) || math.IsInf(high, 0) || math.IsNaN(filtered) || math.IsInf(filtered, 0) {
+		return 0, 0, errors.New("roofing arithmetic overflowed")
+	}
+	return high, filtered, nil
+}
+
+func (r *roofFilter) commit(price, high, filtered float64) {
+	r.x2, r.x1 = r.x1, price
+	r.h2, r.h1 = r.h1, high
+	r.f2, r.f1 = r.f1, filtered
+}
+
+func normalizeAndCentroid(
+	periods []int,
+	raw []float64,
+	previousMax float64,
+	previousDC float64,
+	hasDC bool,
+	enhance bool,
+) (float64, float64, bool, []float64, error) {
+	maximum := agcDecay * previousMax
+	for _, power := range raw {
+		if math.IsNaN(power) || math.IsInf(power, 0) || power < 0.0 {
+			return 0, 0, false, nil, errors.New("spectral power arithmetic overflowed")
+		}
+		if power > maximum {
+			maximum = power
+		}
+	}
+
+	normalized := make([]float64, len(raw))
+	if maximum > 0.0 {
+		for index, power := range raw {
+			normalized[index] = power / maximum
+		}
+	}
+
+	sp := 0.0
+	spx := 0.0
+	for index, period := range periods {
+		power := normalized[index]
+		if power >= centroidThreshold {
+			spx += float64(period) * power
+			sp += power
+		}
+	}
+
+	dominant := previousDC
+	if sp != 0.0 {
+		dominant = spx / sp
+		hasDC = true
+	}
+	if math.IsNaN(dominant) || math.IsInf(dominant, 0) {
+		return 0, 0, false, nil, errors.New("centroid arithmetic overflowed")
+	}
+
+	values := normalized
+	if enhance {
+		values = make([]float64, len(normalized))
+		for index, value := range normalized {
+			values[index] = value * value * value
+		}
+	}
+	return maximum, dominant, hasDC, values, nil
+}
+
+// DiscreteFourierTransformSpectrum implements Ehlers' 2013 Book Listing 9-1 DFT spectrum indicator.
 type DiscreteFourierTransformSpectrum struct {
-	mu                    sync.RWMutex
-	mnemonic              string
-	description           string
-	estimator             *estimator
-	windowCount           int
-	lastIndex             int
-	primed                bool
-	floatingNormalization bool
-	minParameterValue     float64
-	maxParameterValue     float64
-	parameterResolution   float64
-	barFunc               entities.BarFunc
-	quoteFunc             entities.QuoteFunc
-	tradeFunc             entities.TradeFunc
+	mu            sync.RWMutex
+	params        Params
+	mnemonic      string
+	description   string
+	mnemonicDC    string
+	descriptionDC string
+	roof          *roofFilter
+	periods       []int
+	cosines       [][]float64
+	sines         [][]float64
+	count         int
+	history       []float64
+	raw           []float64
+	maximum       float64
+	dominant      float64
+	hasDominant   bool
+	lastOutput    SpectrumOutput
+	barFunc       entities.BarFunc
+	quoteFunc     entities.QuoteFunc
+	tradeFunc     entities.TradeFunc
 }
 
 // NewDiscreteFourierTransformSpectrumDefault returns an instance created with default parameters.
 func NewDiscreteFourierTransformSpectrumDefault() (*DiscreteFourierTransformSpectrum, error) {
-	return NewDiscreteFourierTransformSpectrumParams(&Params{})
+	return NewDiscreteFourierTransformSpectrumParams(DefaultParams())
+}
+
+// NewDiscreteFourierTransformSpectrum aliases [NewDiscreteFourierTransformSpectrumParams].
+func NewDiscreteFourierTransformSpectrum(p *Params) (*DiscreteFourierTransformSpectrum, error) {
+	return NewDiscreteFourierTransformSpectrumParams(p)
 }
 
 // NewDiscreteFourierTransformSpectrumParams returns an instance created with the supplied parameters.
-//
-//nolint:funlen,cyclop
 func NewDiscreteFourierTransformSpectrumParams(p *Params) (*DiscreteFourierTransformSpectrum, error) {
-	const (
-		invalid           = "invalid discrete Fourier transform spectrum parameters"
-		fmtLength         = "%s: Length should be >= 2"
-		fmtMinPeriod      = "%s: MinPeriod should be >= 2"
-		fmtMaxPeriod      = "%s: MaxPeriod should be > MinPeriod"
-		fmtNyquist        = "%s: MaxPeriod should be <= 2 * Length"
-		fmtResolution     = "%s: SpectrumResolution should be >= 1"
-		fmtAgc            = "%s: AutomaticGainControlDecayFactor should be in (0, 1)"
-		fmtw              = "%s: %w"
-		descrPrefix       = "Discrete Fourier transform spectrum "
-		defLength         = 48
-		defMinPeriod      = 10.0
-		defMaxPeriod      = 48.0
-		defSpectrumResult = 1
-		defAgcDecayFactor = 0.995
-		agcDecayEpsilon   = 1e-12
-	)
+	const invalid = "invalid discrete Fourier transform spectrum parameters"
 
-	cfg := *p
-
-	if cfg.Length == 0 {
-		cfg.Length = defLength
+	source := DefaultParams()
+	if p != nil {
+		copied := *p
+		source = &copied
 	}
 
-	if cfg.MinPeriod == 0 {
-		cfg.MinPeriod = defMinPeriod
+	if source.MinPeriod < 3 {
+		return nil, fmt.Errorf("%s: minPeriod must be >= 3", invalid)
+	}
+	if source.MaxPeriod < source.MinPeriod {
+		return nil, fmt.Errorf("%s: maxPeriod must be >= minPeriod", invalid)
+	}
+	if source.WindowLength < 2 {
+		return nil, fmt.Errorf("%s: windowLength must be >= 2", invalid)
 	}
 
-	if cfg.MaxPeriod == 0 {
-		cfg.MaxPeriod = defMaxPeriod
-	}
-
-	if cfg.SpectrumResolution == 0 {
-		cfg.SpectrumResolution = defSpectrumResult
-	}
-
-	if cfg.AutomaticGainControlDecayFactor == 0 {
-		cfg.AutomaticGainControlDecayFactor = defAgcDecayFactor
-	}
-
-	sdcOn := !cfg.DisableSpectralDilationCompensation
-	agcOn := !cfg.DisableAutomaticGainControl
-	floatingNorm := !cfg.FixedNormalization
-
-	if cfg.Length < 2 {
-		return nil, fmt.Errorf(fmtLength, invalid)
-	}
-
-	if cfg.MinPeriod < 2 {
-		return nil, fmt.Errorf(fmtMinPeriod, invalid)
-	}
-
-	if cfg.MaxPeriod <= cfg.MinPeriod {
-		return nil, fmt.Errorf(fmtMaxPeriod, invalid)
-	}
-
-	if cfg.MaxPeriod > 2*float64(cfg.Length) {
-		return nil, fmt.Errorf(fmtNyquist, invalid)
-	}
-
-	if cfg.SpectrumResolution < 1 {
-		return nil, fmt.Errorf(fmtResolution, invalid)
-	}
-
-	if agcOn &&
-		(cfg.AutomaticGainControlDecayFactor <= 0 || cfg.AutomaticGainControlDecayFactor >= 1) {
-		return nil, fmt.Errorf(fmtAgc, invalid)
-	}
-
-	// DiscreteFourierTransformSpectrum mirrors MBST's reference: BarMedianPrice default.
-	bc := cfg.BarComponent
-	if bc == 0 {
-		bc = entities.BarMedianPrice
-	}
-
-	qc := cfg.QuoteComponent
-	if qc == 0 {
-		qc = entities.DefaultQuoteComponent
-	}
-
-	tc := cfg.TradeComponent
-	if tc == 0 {
-		tc = entities.DefaultTradeComponent
-	}
-
-	barFunc, err := entities.BarComponentFunc(bc)
+	roof, err := newRoofFilter(source.HighpassPeriod, source.SmoothingPeriod)
 	if err != nil {
-		return nil, fmt.Errorf(fmtw, invalid, err)
+		return nil, fmt.Errorf("%s: %w", invalid, err)
 	}
 
-	quoteFunc, err := entities.QuoteComponentFunc(qc)
+	barComp, quoteComp, tradeComp := source.BarComponent, source.QuoteComponent, source.TradeComponent
+	if barComp == 0 {
+		barComp = entities.DefaultBarComponent
+	}
+	if quoteComp == 0 {
+		quoteComp = entities.DefaultQuoteComponent
+	}
+	if tradeComp == 0 {
+		tradeComp = entities.DefaultTradeComponent
+	}
+
+	barFunc, err := entities.BarComponentFunc(barComp)
 	if err != nil {
-		return nil, fmt.Errorf(fmtw, invalid, err)
+		return nil, fmt.Errorf("%s: %w", invalid, err)
 	}
-
-	tradeFunc, err := entities.TradeComponentFunc(tc)
+	quoteFunc, err := entities.QuoteComponentFunc(quoteComp)
 	if err != nil {
-		return nil, fmt.Errorf(fmtw, invalid, err)
+		return nil, fmt.Errorf("%s: %w", invalid, err)
+	}
+	tradeFunc, err := entities.TradeComponentFunc(tradeComp)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", invalid, err)
 	}
 
-	componentMnemonic := core.ComponentTripleMnemonic(bc, qc, tc)
+	cells := source.MaxPeriod - source.MinPeriod + 1
+	periods := make([]int, cells)
+	cosines := make([][]float64, cells)
+	sines := make([][]float64, cells)
+	for index := range cells {
+		period := source.MinPeriod + index
+		periods[index] = period
+		cosRow := make([]float64, source.WindowLength)
+		sinRow := make([]float64, source.WindowLength)
+		for n := range source.WindowLength {
+			angle := twoPi * float64(n) / float64(period)
+			cosRow[n] = math.Cos(angle)
+			sinRow[n] = math.Sin(angle)
+		}
+		cosines[index] = cosRow
+		sines[index] = sinRow
+	}
 
-	flags := buildFlagTags(&cfg, sdcOn, agcOn, floatingNorm, defAgcDecayFactor, agcDecayEpsilon)
-	mnemonic := fmt.Sprintf("dftps(%d, %g, %g, %d%s%s)",
-		cfg.Length, cfg.MinPeriod, cfg.MaxPeriod, cfg.SpectrumResolution,
-		flags, componentMnemonic)
+	mnemonicValue := source.Mnemonic()
+	mnemonicDC := source.DominantCycleMnemonic()
 
-	est := newEstimator(
-		cfg.Length, cfg.MinPeriod, cfg.MaxPeriod, cfg.SpectrumResolution,
-		sdcOn, agcOn, cfg.AutomaticGainControlDecayFactor,
-	)
-
-	return &DiscreteFourierTransformSpectrum{
-		mnemonic:              mnemonic,
-		description:           descrPrefix + mnemonic,
-		estimator:             est,
-		lastIndex:             cfg.Length - 1,
-		floatingNormalization: floatingNorm,
-		minParameterValue:     cfg.MinPeriod,
-		maxParameterValue:     cfg.MaxPeriod,
-		parameterResolution:   float64(cfg.SpectrumResolution),
-		barFunc:               barFunc,
-		quoteFunc:             quoteFunc,
-		tradeFunc:             tradeFunc,
-	}, nil
+	instance := &DiscreteFourierTransformSpectrum{
+		params:        *source,
+		mnemonic:      mnemonicValue,
+		description:   "Discrete Fourier transform spectrum " + mnemonicValue,
+		mnemonicDC:    mnemonicDC,
+		descriptionDC: "Discrete Fourier transform spectrum dominant cycle " + mnemonicDC,
+		roof:          roof,
+		periods:       periods,
+		cosines:       cosines,
+		sines:         sines,
+		barFunc:       barFunc,
+		quoteFunc:     quoteFunc,
+		tradeFunc:     tradeFunc,
+	}
+	instance.resetLocked()
+	return instance, nil
 }
 
-// buildFlagTags encodes non-default boolean/decay settings as terse override-only tags.
-// Returns an empty string when all flags are at their defaults.
-func buildFlagTags(cfg *Params, sdcOn, agcOn, floatingNorm bool, defAgc, eps float64) string {
-	var s string
-
-	if !sdcOn {
-		s += ", no-sdc"
+func (s *DiscreteFourierTransformSpectrum) resetLocked() {
+	s.roof.reset()
+	s.count = 0
+	s.history = make([]float64, s.params.WindowLength)
+	s.raw = make([]float64, len(s.periods))
+	s.maximum = 0
+	s.dominant = 0
+	s.hasDominant = false
+	s.lastOutput = SpectrumOutput{
+		Heatmap:       outputs.NewEmptyHeatmap(time.Time{}, float64(s.params.MinPeriod), float64(s.params.MaxPeriod), 1.0),
+		DominantCycle: math.NaN(),
 	}
-
-	if !agcOn {
-		s += ", no-agc"
-	}
-
-	if agcOn && math.Abs(cfg.AutomaticGainControlDecayFactor-defAgc) > eps {
-		s += fmt.Sprintf(", agc=%g", cfg.AutomaticGainControlDecayFactor)
-	}
-
-	if !floatingNorm {
-		s += ", no-fn"
-	}
-
-	return s
 }
 
-// IsPrimed indicates whether the indicator is primed.
+// Reset resets streaming state while preserving configuration.
+func (s *DiscreteFourierTransformSpectrum) Reset() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.resetLocked()
+}
+
+// Parameters returns a copy of the indicator parameters.
+func (s *DiscreteFourierTransformSpectrum) Parameters() Params {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.params
+}
+
+// MinPeriod returns the shortest evaluated cycle period.
+func (s *DiscreteFourierTransformSpectrum) MinPeriod() int {
+	return s.params.MinPeriod
+}
+
+// MaxPeriod returns the longest evaluated cycle period.
+func (s *DiscreteFourierTransformSpectrum) MaxPeriod() int {
+	return s.params.MaxPeriod
+}
+
+// WarmupBars returns the number of initial unprimed samples (WindowLength - 1).
+func (s *DiscreteFourierTransformSpectrum) WarmupBars() int {
+	return s.params.WindowLength - 1
+}
+
+// SamplesSeen returns the number of accepted finite samples processed so far.
+func (s *DiscreteFourierTransformSpectrum) SamplesSeen() int {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.count
+}
+
+// IsPrimed indicates whether the indicator has accumulated WindowLength valid observations.
 func (s *DiscreteFourierTransformSpectrum) IsPrimed() bool {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
+	return s.count >= s.params.WindowLength
+}
 
-	return s.primed
+// State returns a snapshot of the committed internal spectral state.
+func (s *DiscreteFourierTransformSpectrum) State() SpectrumState {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return SpectrumState{
+		HighPass:              s.roof.h1,
+		Filtered:              s.roof.f1,
+		RawPower:              slices.Clone(s.raw),
+		NormalizationMaximum:  s.maximum,
+		InternalDominantCycle: s.dominant,
+	}
+}
+
+// Output returns the latest committed SpectrumOutput.
+func (s *DiscreteFourierTransformSpectrum) Output() SpectrumOutput {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.lastOutput
 }
 
 // Metadata describes the output data of the indicator.
@@ -224,103 +369,142 @@ func (s *DiscreteFourierTransformSpectrum) Metadata() core.Metadata {
 		s.description,
 		[]core.OutputText{
 			{Mnemonic: s.mnemonic, Description: s.description},
+			{Mnemonic: s.mnemonicDC, Description: s.descriptionDC},
 		},
 	)
 }
 
-// Update feeds the next sample to the engine and returns the heatmap column.
-//
-// Before priming the heatmap is empty (with the indicator's parameter axis).
-// On a NaN input sample the state is left unchanged and an empty heatmap is
-// returned.
-func (s *DiscreteFourierTransformSpectrum) Update(sample float64, t time.Time) *outputs.Heatmap {
+// TryUpdate feeds the next scalar sample and returns SpectrumOutput or an error on invalid/overflowing input.
+func (s *DiscreteFourierTransformSpectrum) TryUpdate(sample float64, t time.Time) (SpectrumOutput, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	if math.IsInf(sample, 0) {
+		return SpectrumOutput{}, errors.New("price must be finite or NaN (missing)")
+	}
 	if math.IsNaN(sample) {
-		return outputs.NewEmptyHeatmap(t, s.minParameterValue, s.maxParameterValue, s.parameterResolution)
+		return SpectrumOutput{
+			Heatmap:       outputs.NewEmptyHeatmap(t, float64(s.params.MinPeriod), float64(s.params.MaxPeriod), 1.0),
+			DominantCycle: math.NaN(),
+		}, nil
 	}
 
-	window := s.estimator.inputSeries
+	high, filtered, err := s.roof.candidate(sample)
+	if err != nil {
+		return SpectrumOutput{}, err
+	}
 
-	if s.primed {
-		copy(window[:s.lastIndex], window[1:])
-		window[s.lastIndex] = sample
+	history := make([]float64, s.params.WindowLength)
+	history[0] = filtered
+	copy(history[1:], s.history[:s.params.WindowLength-1])
+
+	raw := make([]float64, len(s.periods))
+	for index, period := range s.periods {
+		compensation := 1.0
+		if s.params.SpectralDilationCompensation {
+			compensation = float64(period)
+		}
+		cosinePart := 0.0
+		sinePart := 0.0
+		cosRow := s.cosines[index]
+		sinRow := s.sines[index]
+		for n := range s.params.WindowLength {
+			cosinePart += history[n] * cosRow[n] / compensation
+			sinePart += history[n] * sinRow[n] / compensation
+		}
+		raw[index] = cosinePart*cosinePart + sinePart*sinePart
+	}
+
+	maximum, dominant, hasDC, values, err := normalizeAndCentroid(
+		s.periods,
+		raw,
+		s.maximum,
+		s.dominant,
+		s.hasDominant,
+		s.params.EnhanceResolution,
+	)
+	if err != nil {
+		return SpectrumOutput{}, err
+	}
+
+	s.roof.commit(sample, high, filtered)
+	s.history = history
+	s.raw = raw
+	s.maximum = maximum
+	s.dominant = dominant
+	s.hasDominant = hasDC
+	s.count++
+
+	if s.count >= s.params.WindowLength {
+		clonedValues := slices.Clone(values)
+		valueMin := clonedValues[0]
+		valueMax := clonedValues[0]
+		for _, value := range clonedValues[1:] {
+			if value < valueMin {
+				valueMin = value
+			}
+			if value > valueMax {
+				valueMax = value
+			}
+		}
+		dominantOut := math.NaN()
+		if hasDC {
+			dominantOut = dominant
+		}
+		s.lastOutput = SpectrumOutput{
+			Heatmap: outputs.NewHeatmap(
+				t,
+				float64(s.params.MinPeriod),
+				float64(s.params.MaxPeriod),
+				1.0,
+				valueMin,
+				valueMax,
+				clonedValues,
+			),
+			DominantCycle: dominantOut,
+		}
 	} else {
-		window[s.windowCount] = sample
-		s.windowCount++
-
-		if s.windowCount == s.estimator.length {
-			s.primed = true
+		s.lastOutput = SpectrumOutput{
+			Heatmap:       outputs.NewEmptyHeatmap(t, float64(s.params.MinPeriod), float64(s.params.MaxPeriod), 1.0),
+			DominantCycle: math.NaN(),
 		}
 	}
 
-	if !s.primed {
-		return outputs.NewEmptyHeatmap(t, s.minParameterValue, s.maxParameterValue, s.parameterResolution)
+	return s.lastOutput, nil
+}
+
+// Update feeds the next sample and returns SpectrumOutput, panicking on non-NaN invalid/overflowing input.
+func (s *DiscreteFourierTransformSpectrum) Update(sample float64, t time.Time) SpectrumOutput {
+	result, err := s.TryUpdate(sample, t)
+	if err != nil {
+		panic(err)
 	}
+	return result
+}
 
-	s.estimator.calculate()
-
-	lengthSpectrum := s.estimator.lengthSpectrum
-
-	var minRef float64
-	if s.floatingNormalization {
-		minRef = s.estimator.spectrumMin
+func (s *DiscreteFourierTransformSpectrum) wrapEntity(t time.Time, result SpectrumOutput) core.Output {
+	return core.Output{
+		result.Heatmap,
+		entities.Scalar{Time: t, Value: result.DominantCycle},
 	}
-
-	maxRef := s.estimator.spectrumMax
-	spectrumRange := maxRef - minRef
-
-	// MBST fills spectrum[0] at MaxPeriod and spectrum[last] at MinPeriod.
-	// The heatmap axis runs MinPeriod -> MaxPeriod, so reverse on output.
-	values := make([]float64, lengthSpectrum)
-	valueMin := math.Inf(1)
-	valueMax := math.Inf(-1)
-
-	for i := 0; i < lengthSpectrum; i++ {
-		v := (s.estimator.spectrum[lengthSpectrum-1-i] - minRef) / spectrumRange
-		values[i] = v
-
-		if v < valueMin {
-			valueMin = v
-		}
-
-		if v > valueMax {
-			valueMax = v
-		}
-	}
-
-	return outputs.NewHeatmap(t, s.minParameterValue, s.maxParameterValue, s.parameterResolution,
-		valueMin, valueMax, values)
 }
 
 // UpdateScalar updates the indicator given the next scalar sample.
 func (s *DiscreteFourierTransformSpectrum) UpdateScalar(sample *entities.Scalar) core.Output {
-	return s.updateEntity(sample.Time, sample.Value)
+	return s.wrapEntity(sample.Time, s.Update(sample.Value, sample.Time))
 }
 
 // UpdateBar updates the indicator given the next bar sample.
 func (s *DiscreteFourierTransformSpectrum) UpdateBar(sample *entities.Bar) core.Output {
-	return s.updateEntity(sample.Time, s.barFunc(sample))
+	return s.wrapEntity(sample.Time, s.Update(s.barFunc(sample), sample.Time))
 }
 
 // UpdateQuote updates the indicator given the next quote sample.
 func (s *DiscreteFourierTransformSpectrum) UpdateQuote(sample *entities.Quote) core.Output {
-	return s.updateEntity(sample.Time, s.quoteFunc(sample))
+	return s.wrapEntity(sample.Time, s.Update(s.quoteFunc(sample), sample.Time))
 }
 
 // UpdateTrade updates the indicator given the next trade sample.
 func (s *DiscreteFourierTransformSpectrum) UpdateTrade(sample *entities.Trade) core.Output {
-	return s.updateEntity(sample.Time, s.tradeFunc(sample))
-}
-
-func (s *DiscreteFourierTransformSpectrum) updateEntity(t time.Time, sample float64) core.Output {
-	const length = 1
-
-	heatmap := s.Update(sample, t)
-
-	output := make([]any, length)
-	output[0] = heatmap
-
-	return output
+	return s.wrapEntity(sample.Time, s.Update(s.tradeFunc(sample), sample.Time))
 }

@@ -5,27 +5,33 @@ import (
 	"fmt"
 )
 
-// Output describes the outputs of the indicator.
+// Output describes the outputs of the DiscreteFourierTransformSpectrum indicator.
 type Output int
 
 const (
 	// Value is the discrete Fourier transform spectrum heatmap column.
 	Value Output = iota + 1
+	// DominantCycle is the center-of-gravity dominant cycle period estimate.
+	DominantCycle
 	outputLast
 )
 
 const (
-	valueStr   = "value"
-	unknownStr = "unknown"
+	valueStr         = "value"
+	dominantCycleStr = "dominantCycle"
+	unknownStr       = "unknown"
 )
 
 // String implements the Stringer interface.
 func (o Output) String() string {
-	if o == Value {
+	switch o {
+	case Value:
 		return valueStr
+	case DominantCycle:
+		return dominantCycleStr
+	default:
+		return unknownStr
 	}
-
-	return unknownStr
 }
 
 // IsKnown determines if this output is known.
@@ -41,17 +47,17 @@ func (o Output) MarshalJSON() ([]byte, error) {
 		dqc    = '"'
 	)
 
-	s := o.String()
-	if s == unknownStr {
-		return nil, fmt.Errorf(errFmt, s)
+	text := o.String()
+	if text == unknownStr {
+		return nil, fmt.Errorf(errFmt, text)
 	}
 
-	b := make([]byte, 0, len(s)+extra)
-	b = append(b, dqc)
-	b = append(b, s...)
-	b = append(b, dqc)
+	buffer := make([]byte, 0, len(text)+extra)
+	buffer = append(buffer, dqc)
+	buffer = append(buffer, text...)
+	buffer = append(buffer, dqc)
 
-	return b, nil
+	return buffer, nil
 }
 
 // UnmarshalJSON implements the Unmarshaler interface.
@@ -61,14 +67,17 @@ func (o *Output) UnmarshalJSON(data []byte) error {
 		dqs    = "\""
 	)
 
-	d := bytes.Trim(data, dqs)
-	s := string(d)
+	trimmed := bytes.Trim(data, dqs)
+	text := string(trimmed)
 
-	if s == valueStr {
+	switch text {
+	case valueStr:
 		*o = Value
-
-		return nil
+	case dominantCycleStr:
+		*o = DominantCycle
+	default:
+		return fmt.Errorf(errFmt, text)
 	}
 
-	return fmt.Errorf(errFmt, s)
+	return nil
 }
