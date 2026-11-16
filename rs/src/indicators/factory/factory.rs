@@ -120,7 +120,9 @@ use crate::indicators::john_ehlers::corona_signal_to_noise_ratio::corona_signal_
 use crate::indicators::john_ehlers::corona_swing_position::corona_swing_position::{CoronaSwingPosition, CoronaSwingPositionParams};
 use crate::indicators::john_ehlers::corona_trend_vigor::corona_trend_vigor::{CoronaTrendVigor, CoronaTrendVigorParams};
 use crate::indicators::john_ehlers::autocorrelation_indicator::{AutoCorrelationIndicator, AutoCorrelationIndicatorParams};
-use crate::indicators::john_ehlers::autocorrelation_periodogram::autocorrelation_periodogram::{AutoCorrelationPeriodogram, AutoCorrelationPeriodogramParams};
+use crate::indicators::john_ehlers::auto_correlation_periodogram::auto_correlation_periodogram::{
+    AutoCorrelationPeriodogram, AutoCorrelationPeriodogramParams, AutoCorrelationPeriodogramSource,
+};
 use crate::indicators::john_ehlers::comb_band_pass_spectrum::comb_band_pass_spectrum::{CombBandPassSpectrum, CombBandPassSpectrumParams};
 use crate::indicators::john_ehlers::discrete_fourier_transform_spectrum::discrete_fourier_transform_spectrum::{DiscreteFourierTransformSpectrum, DiscreteFourierTransformSpectrumParams};
 
@@ -1243,28 +1245,86 @@ pub fn create_indicator(
         }
 
         Identifier::AutoCorrelationPeriodogram => {
-            let mut p = AutoCorrelationPeriodogramParams::default();
-            if !is_empty_object(&params) {
-                if let Some(v) = get_i32(&params, "minPeriod") {
-                    p.min_period = v;
+            if matches!(params, JsonValue::Null) {
+                return Ok(Box::new(AutoCorrelationPeriodogram::new_default()?));
+            }
+            let pairs = params
+                .as_object()
+                .ok_or_else(|| "params must be a JSON object".to_string())?;
+            let mut options = AutoCorrelationPeriodogramParams::default();
+            let mut seen_keys: Vec<&str> = Vec::with_capacity(pairs.len());
+            for (key, raw) in pairs {
+                if seen_keys.contains(&key.as_str()) {
+                    return Err(format!("duplicate parameter key: {key}"));
                 }
-                if let Some(v) = get_i32(&params, "maxPeriod") {
-                    p.max_period = v;
-                }
-                if let Some(v) = get_i32(&params, "averagingLength") {
-                    p.averaging_length = v;
-                }
-                if let Some(v) = get_bool(&params, "disableAutomaticGainControl") {
-                    p.disable_automatic_gain_control = v;
-                }
-                if let Some(v) = get_f64(&params, "automaticGainControlDecayFactor") {
-                    p.automatic_gain_control_decay_factor = v;
-                }
-                if let Some(v) = get_bool(&params, "fixedNormalization") {
-                    p.fixed_normalization = v;
+                seen_keys.push(key.as_str());
+                match key.as_str() {
+                    "source" => match raw {
+                        JsonValue::Str(source_text) => {
+                            options.source = AutoCorrelationPeriodogramSource::from_str(source_text)
+                                .ok_or_else(|| "source must be \"article\" or \"book\"".to_string())?;
+                        }
+                        _ => return Err("source must be \"article\" or \"book\"".to_string()),
+                    },
+                    "minPeriod" => match raw {
+                        JsonValue::Number(number)
+                            if number.is_finite()
+                                && number.fract() == 0.0
+                                && *number >= i32::MIN as f64
+                                && *number <= i32::MAX as f64 =>
+                        {
+                            options.min_period = Some(*number as i32);
+                        }
+                        _ => return Err("minPeriod must be an integer >= 3".to_string()),
+                    },
+                    "maxPeriod" => match raw {
+                        JsonValue::Number(number)
+                            if number.is_finite()
+                                && number.fract() == 0.0
+                                && *number >= i32::MIN as f64
+                                && *number <= i32::MAX as f64 =>
+                        {
+                            options.max_period = *number as i32;
+                        }
+                        _ => return Err("maxPeriod must be an integer >= 5".to_string()),
+                    },
+                    "averagingLength" => match raw {
+                        JsonValue::Number(number)
+                            if number.is_finite()
+                                && number.fract() == 0.0
+                                && *number >= i32::MIN as f64
+                                && *number <= i32::MAX as f64 =>
+                        {
+                            options.averaging_length = *number as i32;
+                        }
+                        _ => return Err("averagingLength must be 0 or an integer >= 2".to_string()),
+                    },
+                    "enhanceResolution" => match raw {
+                        JsonValue::Bool(flag) => options.enhance_resolution = *flag,
+                        _ => return Err("enhanceResolution must be a boolean".to_string()),
+                    },
+                    "barComponent" => match raw {
+                        JsonValue::Number(number) => {
+                            options.bar_component = Some(lvt_bar_component(*number)?);
+                        }
+                        _ => return Err("invalid component number".to_string()),
+                    },
+                    "quoteComponent" => match raw {
+                        JsonValue::Number(number) => {
+                            options.quote_component = Some(lvt_quote_component(*number)?);
+                        }
+                        _ => return Err("invalid component number".to_string()),
+                    },
+                    "tradeComponent" => match raw {
+                        JsonValue::Number(number) => {
+                            options.trade_component = Some(lvt_trade_component(*number)?);
+                        }
+                        _ => return Err("invalid component number".to_string()),
+                    },
+                    _ => return Err(format!("unknown parameter key: {key}")),
                 }
             }
-            Ok(Box::new(AutoCorrelationPeriodogram::new(&p)?))
+            Ok(Box::new(AutoCorrelationPeriodogram::new(&options)?))
         }
 
         Identifier::CombBandPassSpectrum => {
@@ -2693,6 +2753,45 @@ mod tests {
             assert!(
                 create_indicator(Identifier::DiscreteFourierTransformSpectrum, bad_dft_json).is_err(),
                 "expected error for {bad_dft_json}"
+            );
+        }
+
+        let acp_default = create_indicator(Identifier::AutoCorrelationPeriodogram, "{}").unwrap();
+        assert_eq!(acp_default.metadata().mnemonic, "acp(8, 48, 3)");
+        assert_eq!(acp_default.metadata().outputs.len(), 2);
+
+        let acp_book = create_indicator(
+            Identifier::AutoCorrelationPeriodogram,
+            r#"{"source": "book", "enhanceResolution": true, "barComponent": 5}"#,
+        )
+        .unwrap();
+        assert_eq!(
+            acp_book.metadata().mnemonic,
+            "acp(10, 48, 3, book, enh, hl/2)"
+        );
+        assert_eq!(
+            acp_book.metadata().outputs[1].mnemonic,
+            "acp-dc(10, 48, 3, book, hl/2)"
+        );
+
+        for bad_acp_json in [
+            r#"{"source": "literal370"}"#,
+            r#"{"source": 1}"#,
+            r#"{"minPeriod": 8.5}"#,
+            r#"{"minPeriod": null}"#,
+            r#"{"minPeriod": 0}"#,
+            r#"{"minPeriod": 2}"#,
+            r#"{"maxPeriod": 8}"#,
+            r#"{"averagingLength": 1}"#,
+            r#"{"averagingLength": -1}"#,
+            r#"{"averagingLength": 3.5}"#,
+            r#"{"enhanceResolution": 1}"#,
+            r#"{"disableAutomaticGainControl": true}"#,
+            r#"{"fixedNormalization": true}"#,
+        ] {
+            assert!(
+                create_indicator(Identifier::AutoCorrelationPeriodogram, bad_acp_json).is_err(),
+                "expected error for {bad_acp_json}"
             );
         }
     }

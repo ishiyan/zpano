@@ -185,7 +185,10 @@ var descriptors = map[Identifier]Descriptor{
 	AutoCorrelationPeriodogram: {
 		Identifier: AutoCorrelationPeriodogram, Family: "John Ehlers",
 		Adaptivity: Adaptive, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
-		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Heatmap, Role: Spectrum, Pane: Own}},
+		Outputs: []OutputDescriptor{
+			{Kind: 1 /* Value */, Shape: shape.Heatmap, Role: Spectrum, Pane: Own},
+			{Kind: 2 /* DominantCycle */, Shape: shape.Scalar, Role: CyclePeriod, Pane: Own},
+		},
 	},
 	CenterOfGravityOscillator: {
 		Identifier: CenterOfGravityOscillator, Family: "John Ehlers",

@@ -657,9 +657,22 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 			return autocorrelationperiodogram.NewAutoCorrelationPeriodogramDefault()
 		}
 
-		p := &autocorrelationperiodogram.Params{}
-		if err := unmarshal(b, p); err != nil {
+		allowed := map[string]struct{}{
+			"source":            {},
+			"minPeriod":         {},
+			"maxPeriod":         {},
+			"averagingLength":   {},
+			"enhanceResolution": {},
+			"barComponent":      {},
+			"quoteComponent":    {},
+			"tradeComponent":    {},
+		}
+		p := autocorrelationperiodogram.DefaultParams()
+		if err := unmarshalStrictAllowed(b, p, allowed); err != nil {
 			return nil, err
+		}
+		if hasKey(b, "minPeriod") && p.MinPeriod < 3 {
+			return nil, fmt.Errorf("invalid autocorrelation periodogram parameters: minPeriod must be >= 3")
 		}
 
 		return autocorrelationperiodogram.NewAutoCorrelationPeriodogramParams(p)

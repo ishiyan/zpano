@@ -78,7 +78,7 @@ const csnr_mod = @import("../john_ehlers/corona_signal_to_noise_ratio/corona_sig
 const cswp_mod = @import("../john_ehlers/corona_swing_position/corona_swing_position.zig");
 const ctv_mod = @import("../john_ehlers/corona_trend_vigor/corona_trend_vigor.zig");
 const aci_mod = @import("../john_ehlers/autocorrelation_indicator/autocorrelation_indicator.zig");
-const acp_mod = @import("../john_ehlers/autocorrelation_periodogram/autocorrelation_periodogram.zig");
+const acp_mod = @import("../john_ehlers/auto_correlation_periodogram/auto_correlation_periodogram.zig");
 const cbps_mod = @import("../john_ehlers/comb_band_pass_spectrum/comb_band_pass_spectrum.zig");
 const dfts_mod = @import("../john_ehlers/discrete_fourier_transform_spectrum/discrete_fourier_transform_spectrum.zig");
 
@@ -930,19 +930,55 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
         },
 
         .auto_correlation_periodogram => blk: {
-            const p = acp_mod.Params{
-                .min_period = getInt(obj, "minPeriod", 10),
-                .max_period = getInt(obj, "maxPeriod", 48),
-                .averaging_length = getInt(obj, "averagingLength", 3),
-                .disable_spectral_squaring = getBool(obj, "disableSpectralSquaring", false),
-                .disable_smoothing = getBool(obj, "disableSmoothing", false),
-                .disable_automatic_gain_control = getBool(obj, "disableAutomaticGainControl", false),
-                .automatic_gain_control_decay_factor = getF64(obj, "automaticGainControlDecayFactor", 0.995),
-                .fixed_normalization = getBool(obj, "fixedNormalization", false),
-                .bar_component = getBarComponent(obj),
-                .quote_component = getQuoteComponent(obj),
-                .trade_component = getTradeComponent(obj),
-            };
+            var p = acp_mod.defaultParams();
+            for (obj.keys(), obj.values()) |key, raw| {
+                if (std.mem.eql(u8, key, "source")) {
+                    p.source = switch (raw) {
+                        .string => |text| acp_mod.Source.fromStr(text) orelse return FactoryError.InvalidParams,
+                        else => return FactoryError.InvalidParams,
+                    };
+                } else if (std.mem.eql(u8, key, "minPeriod")) {
+                    p.min_period = switch (raw) {
+                        .integer => |number| if (number >= std.math.minInt(i32) and number <= std.math.maxInt(i32)) @intCast(number) else return FactoryError.InvalidParams,
+                        else => return FactoryError.InvalidParams,
+                    };
+                } else if (std.mem.eql(u8, key, "maxPeriod")) {
+                    p.max_period = switch (raw) {
+                        .integer => |number| if (number >= std.math.minInt(i32) and number <= std.math.maxInt(i32)) @intCast(number) else return FactoryError.InvalidParams,
+                        else => return FactoryError.InvalidParams,
+                    };
+                } else if (std.mem.eql(u8, key, "averagingLength")) {
+                    p.averaging_length = switch (raw) {
+                        .integer => |number| if (number >= std.math.minInt(i32) and number <= std.math.maxInt(i32)) @intCast(number) else return FactoryError.InvalidParams,
+                        else => return FactoryError.InvalidParams,
+                    };
+                } else if (std.mem.eql(u8, key, "enhanceResolution")) {
+                    p.enhance_resolution = switch (raw) {
+                        .bool => |flag| flag,
+                        else => return FactoryError.InvalidParams,
+                    };
+                } else if (std.mem.eql(u8, key, "barComponent")) {
+                    const comp_code: u8 = switch (raw) {
+                        .integer => |number| if (number >= 0 and number <= 8) @intCast(number) else return FactoryError.InvalidParams,
+                        else => return FactoryError.InvalidParams,
+                    };
+                    p.bar_component = @enumFromInt(comp_code);
+                } else if (std.mem.eql(u8, key, "quoteComponent")) {
+                    const comp_code: u8 = switch (raw) {
+                        .integer => |number| if (number >= 0 and number <= 7) @intCast(number) else return FactoryError.InvalidParams,
+                        else => return FactoryError.InvalidParams,
+                    };
+                    p.quote_component = @enumFromInt(comp_code);
+                } else if (std.mem.eql(u8, key, "tradeComponent")) {
+                    const comp_code: u8 = switch (raw) {
+                        .integer => |number| if (number >= 0 and number <= 1) @intCast(number) else return FactoryError.InvalidParams,
+                        else => return FactoryError.InvalidParams,
+                    };
+                    p.trade_component = @enumFromInt(comp_code);
+                } else {
+                    return FactoryError.InvalidParams;
+                }
+            }
             const ind = acp_mod.AutoCorrelationPeriodogram.init(allocator, p) catch return FactoryError.IndicatorInitFailed;
             const ptr = heapAlloc(acp_mod.AutoCorrelationPeriodogram, allocator, ind) catch return FactoryError.OutOfMemory;
             break :blk .{ .indicator = ptr.indicator(), .ctx = ptr, .deinit_fn = DeinitFn(acp_mod.AutoCorrelationPeriodogram) };
@@ -2110,6 +2146,70 @@ test "create corona indicators with defaults, explicit zero threshold, and inval
         try std.testing.expectError(
             FactoryError.IndicatorInitFailed,
             create(allocator, .discrete_fourier_transform_spectrum, bad_json),
+        );
+    }
+}
+
+test "create auto correlation periodogram strict params" {
+    const allocator = std.testing.allocator;
+
+    const acp_default = try create(allocator, .auto_correlation_periodogram, "{}");
+    defer acp_default.deinit(allocator);
+    var md_acp_default: metadata_mod.Metadata = undefined;
+    acp_default.indicator.metadata(&md_acp_default);
+    try std.testing.expectEqualStrings("acp(8, 48, 3)", md_acp_default.mnemonic);
+    try std.testing.expectEqual(@as(usize, 2), md_acp_default.outputs_len);
+
+    const acp_book = try create(allocator, .auto_correlation_periodogram,
+        \\{"source": "book", "enhanceResolution": true, "barComponent": 5}
+    );
+    defer acp_book.deinit(allocator);
+    var md_acp_book: metadata_mod.Metadata = undefined;
+    acp_book.indicator.metadata(&md_acp_book);
+    try std.testing.expectEqualStrings("acp(10, 48, 3, book, enh, hl/2)", md_acp_book.mnemonic);
+    try std.testing.expectEqualStrings("acp-dc(10, 48, 3, book, hl/2)", md_acp_book.outputs_buf[1].mnemonic);
+
+    const invalid_type_acp_jsons = [_][]const u8{
+        \\{"source": "literal370"}
+        ,
+        \\{"source": 1}
+        ,
+        \\{"minPeriod": 8.5}
+        ,
+        \\{"minPeriod": null}
+        ,
+        \\{"averagingLength": 3.5}
+        ,
+        \\{"enhanceResolution": 1}
+        ,
+        \\{"disableAutomaticGainControl": true}
+        ,
+        \\{"fixedNormalization": true}
+        ,
+    };
+    for (invalid_type_acp_jsons) |bad_json| {
+        try std.testing.expectError(
+            FactoryError.InvalidParams,
+            create(allocator, .auto_correlation_periodogram, bad_json),
+        );
+    }
+
+    const invalid_domain_acp_jsons = [_][]const u8{
+        \\{"minPeriod": 0}
+        ,
+        \\{"minPeriod": 2}
+        ,
+        \\{"maxPeriod": 8}
+        ,
+        \\{"averagingLength": 1}
+        ,
+        \\{"averagingLength": -1}
+        ,
+    };
+    for (invalid_domain_acp_jsons) |bad_json| {
+        try std.testing.expectError(
+            FactoryError.IndicatorInitFailed,
+            create(allocator, .auto_correlation_periodogram, bad_json),
         );
     }
 }

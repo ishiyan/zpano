@@ -1,87 +1,128 @@
-"""Parameters for the AutoCorrelation Periodogram."""
+"""Parameters for Ehlers' Autocorrelation Periodogram."""
+
+from __future__ import annotations
 
 from dataclasses import dataclass
+from enum import Enum
 from typing import Optional
 
-from ....entities.bar_component import BarComponent
-from ....entities.quote_component import QuoteComponent
-from ....entities.trade_component import TradeComponent
+from ....entities.bar_component import BarComponent, DEFAULT_BAR_COMPONENT
+from ....entities.quote_component import QuoteComponent, DEFAULT_QUOTE_COMPONENT
+from ....entities.trade_component import TradeComponent, DEFAULT_TRADE_COMPONENT
+from ...core.component_triple_mnemonic import component_triple_mnemonic
+
+
+class AutoCorrelationPeriodogramSource(str, Enum):
+    """Selects the Ehlers source profile for AutoCorrelationPeriodogram."""
+
+    ARTICLE = "article"
+    """TASC September 2016 'Measuring Market Cycles' sidebar profile (default)."""
+
+    BOOK = "book"
+    """Corrected Cycle Analytics for Traders (2013), Listing 8-3 profile."""
+
+
+Source = AutoCorrelationPeriodogramSource
 
 
 @dataclass
-class Params:
-    """Parameters for creating an AutoCorrelationPeriodogram instance."""
+class AutoCorrelationPeriodogramParams:
+    """Parameters for creating an AutoCorrelationPeriodogram instance.
 
-    min_period: int = 0
-    """Minimum (shortest) cycle period covered by the periodogram. Must be >= 2 (Nyquist).
-    Also drives the cutoff of the Super Smoother pre-filter. The default value is 10.
-    A zero value is treated as "use default".
+    ``min_period=None`` selects ``8`` for ``"article"`` and ``10`` for ``"book"``.
+    ``averaging_length=0`` selects lag-dependent Pearson windows (``M = lag``).
     """
 
-    max_period: int = 0
-    """Maximum (longest) cycle period covered by the periodogram. Must be > minPeriod. Also
-    drives the cutoff of the Butterworth highpass pre-filter, the autocorrelation lag
-    range, and the DFT basis length. The default value is 48. A zero value is treated
-    as "use default".
-    """
+    source: AutoCorrelationPeriodogramSource | str = (
+        AutoCorrelationPeriodogramSource.ARTICLE
+    )
+    """Source profile: ``'article'`` (default) or ``'book'``."""
 
-    averaging_length: int = 0
-    """Number of samples (M) used in each Pearson correlation accumulation. Must be >= 1.
-    The default value is 3 (matching Ehlers' EasyLanguage listing 8-3, which hardcodes 3).
-    A zero value is treated as "use default".
-    """
+    min_period: Optional[int] = None
+    """Shortest spectrum bin and SuperSmoother cutoff in bars (>= 3); None selects 8 or 10."""
 
-    disable_spectral_squaring: bool = False
-    """Disables squaring the Fourier magnitude before smoothing when true. Ehlers' default
-    EasyLanguage listing 8-3 squares SqSum (R[P] = 0.2·SqSum² + 0.8·R_previous[P]); the default
-    value is false (squaring on).
-    """
+    max_period: int = 48
+    """Longest spectrum bin, high-pass cutoff, and largest lag (>= 5, > min_period). Default 48."""
 
-    disable_smoothing: bool = False
-    """Disables the per-bin exponential smoothing when true. Ehlers' default is enabled,
-    so the default value is false (smoothing on).
-    """
+    averaging_length: int = 3
+    """Pearson window length: 0 for lag-dependent (M = lag) or >= 2. Default 3."""
 
-    disable_automatic_gain_control: bool = False
-    """Disables the fast-attack slow-decay automatic gain control when true. Ehlers'
-    default is enabled, so the default value is false (AGC on).
-    """
-
-    automatic_gain_control_decay_factor: float = 0.0
-    """Decay factor used by the fast-attack slow-decay automatic gain control. Must be in
-    the open interval (0, 1) when AGC is enabled. The default value is 0.995. A zero
-    value is treated as "use default".
-    """
-
-    fixed_normalization: bool = False
-    """Selects fixed (min clamped to 0) normalization when true. The default is floating
-    normalization, consistent with the other zpano spectrum heatmaps.
-    """
+    enhance_resolution: bool = False
+    """Cube power before centroid in article mode or square display power after centroid in book mode."""
 
     bar_component: Optional[BarComponent] = None
-    """A component of a bar to use when updating the indicator with a bar sample.
-
-    If not set, the bar component defaults to ClosePrice and is not shown in the indicator mnemonic.
-    """
+    """Bar component used by update_bar(); None defaults to Close and is omitted from the mnemonic."""
 
     quote_component: Optional[QuoteComponent] = None
-    """A component of a quote to use when updating the indicator with a quote sample.
-
-    If not set, the quote component defaults to MidPrice and is not shown in the indicator mnemonic.
-    """
+    """Quote component used by update_quote(); None defaults to Mid and is omitted from the mnemonic."""
 
     trade_component: Optional[TradeComponent] = None
-    """A component of a trade to use when updating the indicator with a trade sample.
-
-    If not set, the trade component defaults to Price and is not shown in the indicator mnemonic.
-    """
+    """Trade component used by update_trade(); None defaults to Price and is omitted from the mnemonic."""
 
 
-def default_params() -> Params:
-    """Returns a Params with Ehlers defaults."""
-    return Params(
-        min_period=10,
-        max_period=48,
-        averaging_length=3,
-        automatic_gain_control_decay_factor=0.995,
+Params = AutoCorrelationPeriodogramParams
+
+
+def default_params() -> AutoCorrelationPeriodogramParams:
+    """Return default Ehlers 2016 article parameters."""
+    return AutoCorrelationPeriodogramParams()
+
+
+def resolve_min_period(
+    source: AutoCorrelationPeriodogramSource | str,
+    min_period: Optional[int],
+) -> int:
+    """Resolve None min_period to 8 for article mode or 10 for book mode."""
+    if min_period is not None:
+        return min_period
+    return 10 if source == AutoCorrelationPeriodogramSource.BOOK.value else 8
+
+
+def _format_mnemonic(
+    prefix: str,
+    include_book_enhance: bool,
+    params: Optional[AutoCorrelationPeriodogramParams] = None,
+) -> str:
+    configuration = default_params() if params is None else params
+    bar_comp = (
+        configuration.bar_component
+        if configuration.bar_component is not None
+        else DEFAULT_BAR_COMPONENT
     )
+    quote_comp = (
+        configuration.quote_component
+        if configuration.quote_component is not None
+        else DEFAULT_QUOTE_COMPONENT
+    )
+    trade_comp = (
+        configuration.trade_component
+        if configuration.trade_component is not None
+        else DEFAULT_TRADE_COMPONENT
+    )
+    comp_suffix = component_triple_mnemonic(bar_comp, quote_comp, trade_comp)
+    is_book = configuration.source == AutoCorrelationPeriodogramSource.BOOK.value
+    resolved_min = resolve_min_period(configuration.source, configuration.min_period)
+    source_tag = ", book" if is_book else ""
+    enh_tag = (
+        ", enh"
+        if configuration.enhance_resolution and (not is_book or include_book_enhance)
+        else ""
+    )
+    return (
+        f"{prefix}({resolved_min}, {configuration.max_period}, "
+        f"{configuration.averaging_length}{source_tag}{enh_tag}{comp_suffix})"
+    )
+
+
+def auto_correlation_periodogram_mnemonic(
+    params: Optional[AutoCorrelationPeriodogramParams] = None,
+) -> str:
+    """Build the primary heatmap mnemonic for AutoCorrelationPeriodogram."""
+    return _format_mnemonic("acp", True, params)
+
+
+def auto_correlation_periodogram_dominant_cycle_mnemonic(
+    params: Optional[AutoCorrelationPeriodogramParams] = None,
+) -> str:
+    """Build the dominant-cycle mnemonic for AutoCorrelationPeriodogram."""
+    return _format_mnemonic("acp-dc", False, params)

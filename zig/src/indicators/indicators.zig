@@ -132,7 +132,7 @@ pub const center_of_gravity_oscillator = @import("john_ehlers/center_of_gravity_
 pub const fractal_adaptive_moving_average = @import("john_ehlers/fractal_adaptive_moving_average/fractal_adaptive_moving_average.zig");
 pub const discrete_fourier_transform_spectrum = @import("john_ehlers/discrete_fourier_transform_spectrum/discrete_fourier_transform_spectrum.zig");
 pub const autocorrelation_indicator = @import("john_ehlers/autocorrelation_indicator/autocorrelation_indicator.zig");
-pub const autocorrelation_periodogram = @import("john_ehlers/autocorrelation_periodogram/autocorrelation_periodogram.zig");
+pub const auto_correlation_periodogram = @import("john_ehlers/auto_correlation_periodogram/auto_correlation_periodogram.zig");
 pub const comb_band_pass_spectrum = @import("john_ehlers/comb_band_pass_spectrum/comb_band_pass_spectrum.zig");
 
 // --- Hilbert transformer (helper, not a registered indicator) ---
@@ -276,7 +276,7 @@ comptime {
     _ = fractal_adaptive_moving_average;
     _ = discrete_fourier_transform_spectrum;
     _ = autocorrelation_indicator;
-    _ = autocorrelation_periodogram;
+    _ = auto_correlation_periodogram;
     _ = comb_band_pass_spectrum;
     _ = hilbert_transformer;
     _ = homodyne_discriminator;

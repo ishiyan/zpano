@@ -425,12 +425,20 @@ pub static DESCRIPTORS: &[Descriptor] = &[
         adaptivity: Adaptive,
         input_requirement: ScalarInput,
         volume_usage: NoVolume,
-        outputs: &[OutputDescriptor {
-            kind: 1,
-            shape: Heatmap,
-            role: Spectrum,
-            pane: Own,
-        }],
+        outputs: &[
+            OutputDescriptor {
+                kind: 1,
+                shape: Heatmap,
+                role: Spectrum,
+                pane: Own,
+            },
+            OutputDescriptor {
+                kind: 2,
+                shape: Scalar,
+                role: CyclePeriod,
+                pane: Own,
+            },
+        ],
     },
     Descriptor {
         identifier: CenterOfGravityOscillator,

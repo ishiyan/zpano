@@ -18,6 +18,6 @@ pub mod hilbert_transformer_instantaneous_trendline;
 pub mod mesa_adaptive_moving_average;
 pub mod trend_cycle_mode;
 pub mod sine_wave;
-pub mod autocorrelation_periodogram;
+pub mod auto_correlation_periodogram;
 pub mod comb_band_pass_spectrum;
 pub mod discrete_fourier_transform_spectrum;

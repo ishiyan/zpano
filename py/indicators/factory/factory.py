@@ -363,7 +363,46 @@ def create_indicator(
     if identifier == Identifier.AUTO_CORRELATION_PERIODOGRAM:
         from ..john_ehlers.auto_correlation_periodogram.params import default_params
         from ..john_ehlers.auto_correlation_periodogram.auto_correlation_periodogram import AutoCorrelationPeriodogram
-        return AutoCorrelationPeriodogram(_apply(default_params(), params))
+        if _is_empty(params):
+            return AutoCorrelationPeriodogram.create_default()
+        assert params is not None
+        alias_map = {
+            "source": "source",
+            "minPeriod": "min_period",
+            "maxPeriod": "max_period",
+            "averagingLength": "averaging_length",
+            "enhanceResolution": "enhance_resolution",
+            "barComponent": "bar_component",
+            "quoteComponent": "quote_component",
+            "tradeComponent": "trade_component",
+        }
+        allowed_keys = {
+            "source",
+            "min_period",
+            "max_period",
+            "averaging_length",
+            "enhance_resolution",
+            "bar_component",
+            "quote_component",
+            "trade_component",
+        }
+        normalized: dict[str, Any] = {}
+        for key, item in params.items():
+            mapped = alias_map.get(key, key)
+            if mapped not in allowed_keys:
+                raise ValueError(
+                    f"invalid autocorrelation periodogram parameters: unsupported key {key!r}"
+                )
+            if mapped in normalized:
+                raise ValueError(
+                    f"invalid autocorrelation periodogram parameters: duplicate key {key!r}"
+                )
+            if item is None:
+                raise ValueError(
+                    f"invalid autocorrelation periodogram parameters: {key!r} cannot be None"
+                )
+            normalized[mapped] = item
+        return AutoCorrelationPeriodogram.create(_apply(default_params(), normalized))
 
     if identifier == Identifier.COMB_BAND_PASS_SPECTRUM:
         from ..john_ehlers.comb_band_pass_spectrum.params import default_params

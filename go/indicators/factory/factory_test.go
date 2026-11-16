@@ -106,3 +106,71 @@ func TestFactoryDiscreteFourierTransformSpectrum(t *testing.T) {
 		}
 	}
 }
+
+func TestFactoryAutoCorrelationPeriodogram(t *testing.T) {
+	t.Parallel()
+
+	defaultIndicator, err := factory.New(core.AutoCorrelationPeriodogram, "{}")
+	if err != nil {
+		t.Fatalf("default factory construction failed: %v", err)
+	}
+	if got := defaultIndicator.Metadata().Mnemonic; got != "acp(8, 48, 3)" {
+		t.Fatalf("default mnemonic = %q, want %q", got, "acp(8, 48, 3)")
+	}
+	if got := len(defaultIndicator.Metadata().Outputs); got != 2 {
+		t.Fatalf("len(outputs) = %d, want 2", got)
+	}
+	if got := defaultIndicator.Metadata().Outputs[1].Mnemonic; got != "acp-dc(8, 48, 3)" {
+		t.Fatalf("default dc mnemonic = %q, want %q", got, "acp-dc(8, 48, 3)")
+	}
+
+	bookDefaultIndicator, err := factory.New(core.AutoCorrelationPeriodogram, `{"source": "book", "enhanceResolution": true}`)
+	if err != nil {
+		t.Fatalf("book factory construction failed: %v", err)
+	}
+	if got := bookDefaultIndicator.Metadata().Mnemonic; got != "acp(10, 48, 3, book, enh)" {
+		t.Fatalf("book mnemonic = %q, want %q", got, "acp(10, 48, 3, book, enh)")
+	}
+	if got := bookDefaultIndicator.Metadata().Outputs[1].Mnemonic; got != "acp-dc(10, 48, 3, book)" {
+		t.Fatalf("book dc mnemonic = %q, want %q", got, "acp-dc(10, 48, 3, book)")
+	}
+
+	customIndicator, err := factory.New(
+		core.AutoCorrelationPeriodogram,
+		`{"source": "article", "minPeriod": 10, "maxPeriod": 40, "averagingLength": 0, "enhanceResolution": true, "barComponent": "median"}`,
+	)
+	if err != nil {
+		t.Fatalf("custom factory construction failed: %v", err)
+	}
+	if got := customIndicator.Metadata().Mnemonic; got != "acp(10, 40, 0, enh, hl/2)" {
+		t.Fatalf("custom mnemonic = %q, want %q", got, "acp(10, 40, 0, enh, hl/2)")
+	}
+	if got := customIndicator.Metadata().Outputs[1].Mnemonic; got != "acp-dc(10, 40, 0, enh, hl/2)" {
+		t.Fatalf("custom dc mnemonic = %q, want %q", got, "acp-dc(10, 40, 0, enh, hl/2)")
+	}
+
+	invalidJSONCases := []string{
+		`{"minPeriod": 0}`,
+		`{"minPeriod": 2}`,
+		`{"minPeriod": 8.5}`,
+		`{"minPeriod": null}`,
+		`{"maxPeriod": 4}`,
+		`{"maxPeriod": 8}`,
+		`{"maxPeriod": 48.5}`,
+		`{"averagingLength": 1}`,
+		`{"averagingLength": -1}`,
+		`{"averagingLength": 3.5}`,
+		`{"source": "literal370"}`,
+		`{"source": 1}`,
+		`{"enhanceResolution": 1}`,
+		`{"disableAutomaticGainControl": true}`,
+		`{"automaticGainControlDecayFactor": 0.995}`,
+		`{"fixedNormalization": true}`,
+		`{"unknownField": 1}`,
+	}
+	for _, payload := range invalidJSONCases {
+		if _, err := factory.New(core.AutoCorrelationPeriodogram, payload); err == nil {
+			t.Fatalf("expected error for payload %s", payload)
+		}
+	}
+}

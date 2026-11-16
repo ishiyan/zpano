@@ -76,7 +76,10 @@ pub const descriptors = [_]Descriptor{
     .{ .identifier = .bollinger_bands_trend, .family = "John Bollinger", .adaptivity = .static_, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .oscillator, .pane = .own }} },
     // ── john ehlers ──────────────────────────────────────────────────────────
     .{ .identifier = .auto_correlation_indicator, .family = "John Ehlers", .adaptivity = .static_, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .heatmap, .role = .correlation, .pane = .own }} },
-    .{ .identifier = .auto_correlation_periodogram, .family = "John Ehlers", .adaptivity = .adaptive, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .heatmap, .role = .spectrum, .pane = .own }} },
+    .{ .identifier = .auto_correlation_periodogram, .family = "John Ehlers", .adaptivity = .adaptive, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{
+        .{ .kind = 1, .shape = .heatmap, .role = .spectrum, .pane = .own },
+        .{ .kind = 2, .shape = .scalar, .role = .cycle_period, .pane = .own },
+    } },
     .{ .identifier = .center_of_gravity_oscillator, .family = "John Ehlers", .adaptivity = .static_, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{
         .{ .kind = 1, .shape = .scalar, .role = .oscillator, .pane = .own },
         .{ .kind = 2, .shape = .scalar, .role = .signal, .pane = .own },
