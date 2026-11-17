@@ -1,238 +1,545 @@
-import { buildMetadata } from '../../core/build-metadata';
 import { Bar } from '../../../entities/bar';
-import { BarComponent, barComponentValue } from '../../../entities/bar-component';
+import {
+    BarComponent,
+    DefaultBarComponent,
+    barComponentMnemonic,
+    barComponentValue,
+} from '../../../entities/bar-component';
 import { Quote } from '../../../entities/quote';
-import { DefaultQuoteComponent, quoteComponentValue } from '../../../entities/quote-component';
+import {
+    DefaultQuoteComponent,
+    QuoteComponent,
+    quoteComponentMnemonic,
+    quoteComponentValue,
+} from '../../../entities/quote-component';
 import { Scalar } from '../../../entities/scalar';
 import { Trade } from '../../../entities/trade';
-import { DefaultTradeComponent, tradeComponentValue } from '../../../entities/trade-component';
-import { componentTripleMnemonic } from '../../core/component-triple-mnemonic';
+import {
+    DefaultTradeComponent,
+    TradeComponent,
+    tradeComponentMnemonic,
+    tradeComponentValue,
+} from '../../../entities/trade-component';
+import { buildMetadata } from '../../core/build-metadata';
 import { Indicator } from '../../core/indicator';
+import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { IndicatorMetadata } from '../../core/indicator-metadata';
 import { IndicatorOutput } from '../../core/indicator-output';
-import { IndicatorIdentifier } from '../../core/indicator-identifier';
 import { Heatmap } from '../../core/outputs/heatmap';
-import { CombBandPassSpectrumEstimator } from './estimator';
-import { CombBandPassSpectrumParams } from './params';
+import {
+    CombBandPassSpectrumParams,
+    combBandPassSpectrumDominantCycleMnemonic,
+    combBandPassSpectrumMnemonic,
+    defaultParams,
+} from './params';
 
-const DEFAULT_MIN_PERIOD = 10;
-const DEFAULT_MAX_PERIOD = 48;
-const DEFAULT_BANDWIDTH = 0.3;
-const DEFAULT_AGC_DECAY_FACTOR = 0.995;
-const AGC_DECAY_EPSILON = 1e-12;
-const BANDWIDTH_EPSILON = 1e-12;
+export {
+    CombBandPassSpectrumParams,
+    combBandPassSpectrumDominantCycleMnemonic,
+    combBandPassSpectrumMnemonic,
+    defaultParams,
+};
 
-/** __Comb Band-Pass Spectrum__ heatmap indicator (Ehlers).
- *
- * Displays a power heatmap of cyclic activity over a configurable cycle-period range by
- * running a bank of 2-pole band-pass filters, one per integer period in
- * [minPeriod..maxPeriod]. The input series is pre-conditioned by a 2-pole Butterworth
- * highpass (cutoff = maxPeriod) followed by a 2-pole Super Smoother (cutoff = minPeriod)
- * before entering the comb. Each bin's power is the sum of squared band-pass outputs over
- * the last N samples, optionally compensated for spectral dilation (divide by N) and
- * normalized by a fast-attack slow-decay automatic gain control.
- *
- * This implementation follows John Ehlers' EasyLanguage listing 10-1 from
- * "Cycle Analytics for Traders". It is NOT a port of MBST's CombBandPassSpectrumEstimator,
- * which is misnamed and actually implements a plain DFT (see the
- * DiscreteFourierTransformSpectrum indicator for a faithful MBST DFT port).
- *
- * Reference: John F. Ehlers, "Cycle Analytics for Traders", Code Listing 10-1. */
+const TWO_PI = 2.0 * Math.PI;
+const SQRT_TWO = Math.SQRT2;
+const AGC_DECAY = 0.995;
+const CENTROID_THRESHOLD = 0.5;
+const BANK_STARTUP_BARS = 12;
+
+const ALLOWED_KEYS = new Set<string>([
+    'minPeriod',
+    'maxPeriod',
+    'bandwidth',
+    'highpassPeriod',
+    'smoothingPeriod',
+    'spectralDilationCompensation',
+    'enhanceResolution',
+    'barComponent',
+    'quoteComponent',
+    'tradeComponent',
+]);
+
+export interface SpectrumOutput {
+    readonly heatmap: Heatmap;
+    readonly dominantCycle: number;
+}
+
+export interface SpectrumState {
+    readonly highPass: number;
+    readonly filtered: number;
+    readonly rawPower: readonly number[];
+    readonly normalizationMaximum: number;
+    readonly internalDominantCycle: number;
+}
+
+export interface ResolvedCombBandPassSpectrumParams {
+    readonly minPeriod: number;
+    readonly maxPeriod: number;
+    readonly bandwidth: number;
+    readonly highpassPeriod: number;
+    readonly smoothingPeriod: number;
+    readonly spectralDilationCompensation: boolean;
+    readonly enhanceResolution: boolean;
+}
+
+function validateInteger(value: unknown, name: string, minimum: number): number {
+    if (typeof value !== 'number' || !Number.isInteger(value) || value < minimum) {
+        throw new Error(`${name} must be an integer >= ${minimum}`);
+    }
+    return value;
+}
+
+function validateReal(value: unknown, name: string, minimum: number): number {
+    if (typeof value !== 'number' || !Number.isFinite(value) || value < minimum) {
+        throw new Error(`${name} must be a finite real >= ${minimum}`);
+    }
+    return value;
+}
+
+function validateBoolean(value: unknown, name: string): boolean {
+    if (typeof value !== 'boolean') {
+        throw new Error(`${name} must be a boolean`);
+    }
+    return value;
+}
+
+function validateSample(value: unknown): number {
+    if (typeof value !== 'number') {
+        throw new Error('price must be a real number');
+    }
+    if (!Number.isFinite(value) && !Number.isNaN(value)) {
+        throw new Error('price must be finite or NaN (missing)');
+    }
+    return value;
+}
+
+class RoofFilter {
+    private readonly hp0: number;
+    private readonly hp1: number;
+    private readonly hp2: number;
+    private readonly ss1: number;
+    private readonly ss2: number;
+    private readonly ss3: number;
+    public x1 = 0.0;
+    public x2 = 0.0;
+    public h1 = 0.0;
+    public h2 = 0.0;
+    public f1 = 0.0;
+    public f2 = 0.0;
+
+    public constructor(highpassPeriod: number, smoothingPeriod: number) {
+        const hp = validateReal(highpassPeriod, 'highpassPeriod', 5.0);
+        const lp = validateReal(smoothingPeriod, 'smoothingPeriod', 2.0);
+        const angle = TWO_PI / (SQRT_TWO * hp);
+        const cosine = Math.cos(angle);
+        const alpha = (cosine + Math.sin(angle) - 1.0) / cosine;
+        const pole = 1.0 - alpha;
+        const a = Math.exp((-SQRT_TWO * Math.PI) / lp);
+        this.hp0 = (1.0 - alpha / 2.0) * (1.0 - alpha / 2.0);
+        this.hp1 = 2.0 * pole;
+        this.hp2 = pole * pole;
+        this.ss2 = 2.0 * a * Math.cos((SQRT_TWO * Math.PI) / lp);
+        this.ss3 = -a * a;
+        this.ss1 = 1.0 - this.ss2 - this.ss3;
+        if (
+            !(pole > 0.0 && pole < 1.0 && a > 0.0 && a < 1.0 && this.ss1 > 0.0) ||
+            !Number.isFinite(this.hp0) ||
+            !Number.isFinite(this.ss1)
+        ) {
+            throw new Error('periods must produce finite resolvable stable coefficients');
+        }
+    }
+
+    public reset(): void {
+        this.x1 = 0.0;
+        this.x2 = 0.0;
+        this.h1 = 0.0;
+        this.h2 = 0.0;
+        this.f1 = 0.0;
+        this.f2 = 0.0;
+    }
+
+    public candidate(price: number): [number, number] {
+        const high =
+            this.hp0 * (price - 2.0 * this.x1 + this.x2) +
+            this.hp1 * this.h1 -
+            this.hp2 * this.h2;
+        const filtered =
+            (this.ss1 * (high + this.h1)) / 2.0 +
+            this.ss2 * this.f1 +
+            this.ss3 * this.f2;
+        if (!Number.isFinite(high) || !Number.isFinite(filtered)) {
+            throw new Error('roofing arithmetic overflowed');
+        }
+        return [high, filtered];
+    }
+
+    public commit(price: number, high: number, filtered: number): void {
+        this.x2 = this.x1;
+        this.x1 = price;
+        this.h2 = this.h1;
+        this.h1 = high;
+        this.f2 = this.f1;
+        this.f1 = filtered;
+    }
+}
+
+function normalizeAndCentroid(
+    periods: readonly number[],
+    raw: readonly number[],
+    previousMax: number,
+    previousDC: number,
+    hasDC: boolean,
+    enhance: boolean,
+): { maximum: number; dominant: number; hasDC: boolean; values: number[] } {
+    let maximum = AGC_DECAY * previousMax;
+    for (const power of raw) {
+        if (!Number.isFinite(power) || power < 0.0) {
+            throw new Error('spectral power arithmetic overflowed');
+        }
+        if (power > maximum) {
+            maximum = power;
+        }
+    }
+
+    const normalized = new Array<number>(raw.length);
+    for (let index = 0; index < raw.length; index++) {
+        normalized[index] = maximum > 0.0 ? raw[index] / maximum : 0.0;
+    }
+
+    let sp = 0.0;
+    let spx = 0.0;
+    for (let index = 0; index < periods.length; index++) {
+        const power = normalized[index];
+        if (power >= CENTROID_THRESHOLD) {
+            spx += periods[index] * power;
+            sp += power;
+        }
+    }
+
+    let dominant = previousDC;
+    let nextHasDC = hasDC;
+    if (sp !== 0.0) {
+        dominant = spx / sp;
+        nextHasDC = true;
+    }
+    if (!Number.isFinite(dominant)) {
+        throw new Error('centroid arithmetic overflowed');
+    }
+
+    const values = enhance ? normalized.map((value) => value * value * value) : normalized;
+    return { maximum, dominant, hasDC: nextHasDC, values };
+}
+
+/** Ehlers' Comb Band-Pass Spectrum indicator (2013 Book Listing 10-1). */
 export class CombBandPassSpectrum implements Indicator {
-  private readonly estimator: CombBandPassSpectrumEstimator;
-  private readonly primeCount: number;
-  private readonly floatingNormalization: boolean;
-  private readonly minParameterValue: number;
-  private readonly maxParameterValue: number;
-  private readonly parameterResolution: number;
+    public readonly parameters: ResolvedCombBandPassSpectrumParams;
+    private readonly roof: RoofFilter;
+    private readonly periods: readonly number[];
+    private readonly alpha: readonly number[];
+    private readonly beta: readonly number[];
+    private readonly mnemonicValue: string;
+    private readonly descriptionValue: string;
+    private readonly mnemonicDC: string;
+    private readonly descriptionDC: string;
+    private readonly barComponentFunc: (bar: Bar) => number;
+    private readonly quoteComponentFunc: (quote: Quote) => number;
+    private readonly tradeComponentFunc: (trade: Trade) => number;
 
-  private readonly mnemonicValue: string;
-  private readonly descriptionValue: string;
+    private count = 0;
+    private bp: number[][] = [];
+    private raw: number[] = [];
+    private maximum = 0.0;
+    private dominant = 0.0;
+    private hasDominant = false;
+    private lastOutput!: SpectrumOutput;
 
-  private readonly barComponentFunc: (bar: Bar) => number;
-  private readonly quoteComponentFunc: (quote: Quote) => number;
-  private readonly tradeComponentFunc: (trade: Trade) => number;
-
-  private windowCount = 0;
-  private primed = false;
-
-  /** Creates an instance with default parameters
-   * (minPeriod=10, maxPeriod=48, bandwidth=0.3, SDC on, AGC on (decay=0.995),
-   * floating normalization, BarComponent.Median). */
-  public static default(): CombBandPassSpectrum {
-    return new CombBandPassSpectrum({});
-  }
-
-  /** Creates an instance based on the given parameters. */
-  public static fromParams(params: CombBandPassSpectrumParams): CombBandPassSpectrum {
-    return new CombBandPassSpectrum(params);
-  }
-
-  private constructor(params: CombBandPassSpectrumParams) {
-    const invalid = 'invalid comb band-pass spectrum parameters';
-
-    const minPeriod = params.minPeriod !== undefined && params.minPeriod !== 0
-      ? params.minPeriod : DEFAULT_MIN_PERIOD;
-    const maxPeriod = params.maxPeriod !== undefined && params.maxPeriod !== 0
-      ? params.maxPeriod : DEFAULT_MAX_PERIOD;
-    const bandwidth = params.bandwidth !== undefined && params.bandwidth !== 0
-      ? params.bandwidth : DEFAULT_BANDWIDTH;
-    const agcDecayFactor = params.automaticGainControlDecayFactor !== undefined
-      && params.automaticGainControlDecayFactor !== 0
-      ? params.automaticGainControlDecayFactor : DEFAULT_AGC_DECAY_FACTOR;
-
-    const sdcOn = !params.disableSpectralDilationCompensation;
-    const agcOn = !params.disableAutomaticGainControl;
-    const floatingNorm = !params.fixedNormalization;
-
-    if (minPeriod < 2) {
-      throw new Error(`${invalid}: MinPeriod should be >= 2`);
-    }
-    if (maxPeriod <= minPeriod) {
-      throw new Error(`${invalid}: MaxPeriod should be > MinPeriod`);
-    }
-    if (bandwidth <= 0 || bandwidth >= 1) {
-      throw new Error(`${invalid}: Bandwidth should be in (0, 1)`);
-    }
-    if (agcOn && (agcDecayFactor <= 0 || agcDecayFactor >= 1)) {
-      throw new Error(`${invalid}: AutomaticGainControlDecayFactor should be in (0, 1)`);
+    public static default(): CombBandPassSpectrum {
+        return new CombBandPassSpectrum(defaultParams());
     }
 
-    // CombBandPassSpectrum mirrors Ehlers' reference: BarComponent.Median default.
-    const bc = params.barComponent ?? BarComponent.Median;
-    const qc = params.quoteComponent ?? DefaultQuoteComponent;
-    const tc = params.tradeComponent ?? DefaultTradeComponent;
-
-    this.barComponentFunc = barComponentValue(bc);
-    this.quoteComponentFunc = quoteComponentValue(qc);
-    this.tradeComponentFunc = tradeComponentValue(tc);
-
-    this.estimator = new CombBandPassSpectrumEstimator(
-      minPeriod, maxPeriod, bandwidth, sdcOn, agcOn, agcDecayFactor,
-    );
-    this.primeCount = maxPeriod;
-    this.floatingNormalization = floatingNorm;
-    this.minParameterValue = minPeriod;
-    this.maxParameterValue = maxPeriod;
-    this.parameterResolution = 1;
-
-    const cm = componentTripleMnemonic(bc, qc, tc);
-    const flags = buildFlagTags(bandwidth, sdcOn, agcOn, floatingNorm, agcDecayFactor);
-    this.mnemonicValue = `cbps(${formatNum(minPeriod)}, ${formatNum(maxPeriod)}${flags}${cm})`;
-    this.descriptionValue = 'Comb band-pass spectrum ' + this.mnemonicValue;
-  }
-
-  /** Indicates whether the indicator is primed. */
-  public isPrimed(): boolean { return this.primed; }
-
-  /** Describes the output data of the indicator. */
-  public metadata(): IndicatorMetadata {
-    return buildMetadata(
-      IndicatorIdentifier.CombBandPassSpectrum,
-      this.mnemonicValue,
-      this.descriptionValue,
-      [
-        { mnemonic: this.mnemonicValue, description: this.descriptionValue },
-      ],
-    );
-  }
-
-  /** Feeds the next sample to the engine and returns the heatmap column.
-   *
-   * Before priming the heatmap is empty (with the indicator's parameter axis).
-   * On a NaN input sample the state is left unchanged and an empty heatmap is returned. */
-  public update(sample: number, time: Date): Heatmap {
-    if (Number.isNaN(sample)) {
-      return Heatmap.newEmptyHeatmap(time, this.minParameterValue, this.maxParameterValue, this.parameterResolution);
+    public static fromParams(params?: CombBandPassSpectrumParams): CombBandPassSpectrum {
+        return new CombBandPassSpectrum(params);
     }
 
-    this.estimator.update(sample);
+    public constructor(params?: CombBandPassSpectrumParams) {
+        if (params !== undefined && params !== null) {
+            if (typeof params !== 'object' || Array.isArray(params)) {
+                throw new Error('params must be an object');
+            }
+            for (const key of Object.keys(params)) {
+                if (!ALLOWED_KEYS.has(key)) {
+                    throw new Error(`unsupported parameter '${key}'`);
+                }
+                if ((params as Record<string, unknown>)[key] === null) {
+                    throw new Error(`parameter '${key}' cannot be null`);
+                }
+            }
+        }
 
-    if (!this.primed) {
-      this.windowCount++;
-      if (this.windowCount >= this.primeCount) {
-        this.primed = true;
-      } else {
-        return Heatmap.newEmptyHeatmap(time, this.minParameterValue, this.maxParameterValue, this.parameterResolution);
-      }
+        const minPeriod = validateInteger(params?.minPeriod ?? 10, 'minPeriod', 3);
+        const maxPeriod = validateInteger(params?.maxPeriod ?? 48, 'maxPeriod', minPeriod);
+        const bandwidth = validateReal(params?.bandwidth ?? 0.3, 'bandwidth', 0.0);
+        if (!(bandwidth > 0.0 && bandwidth < minPeriod / 4.0)) {
+            throw new Error('bandwidth must satisfy 0 < bandwidth < minPeriod / 4');
+        }
+        const highpassPeriod = validateReal(params?.highpassPeriod ?? 48, 'highpassPeriod', 5.0);
+        const smoothingPeriod = validateReal(params?.smoothingPeriod ?? 10, 'smoothingPeriod', 2.0);
+        const sdc = validateBoolean(
+            params?.spectralDilationCompensation ?? true,
+            'spectralDilationCompensation',
+        );
+        const enhance = validateBoolean(
+            params?.enhanceResolution ?? false,
+            'enhanceResolution',
+        );
+
+        const barComp = params?.barComponent ?? DefaultBarComponent;
+        const quoteComp = params?.quoteComponent ?? DefaultQuoteComponent;
+        const tradeComp = params?.tradeComponent ?? DefaultTradeComponent;
+        if (typeof barComp !== 'number' || barComponentMnemonic(barComp) === '??') {
+            throw new Error('invalid barComponent');
+        }
+        if (typeof quoteComp !== 'number' || quoteComponentMnemonic(quoteComp) === '??') {
+            throw new Error('invalid quoteComponent');
+        }
+        if (typeof tradeComp !== 'number' || tradeComponentMnemonic(tradeComp) === '??') {
+            throw new Error('invalid tradeComponent');
+        }
+
+        this.roof = new RoofFilter(highpassPeriod, smoothingPeriod);
+        this.parameters = {
+            minPeriod,
+            maxPeriod,
+            bandwidth,
+            highpassPeriod,
+            smoothingPeriod,
+            spectralDilationCompensation: sdc,
+            enhanceResolution: enhance,
+        };
+
+        const cells = maxPeriod - minPeriod + 1;
+        const periods: number[] = [];
+        const alpha: number[] = [];
+        const beta: number[] = [];
+        for (let index = 0; index < cells; index++) {
+            const period = minPeriod + index;
+            periods.push(period);
+            const betaValue = Math.cos(TWO_PI / period);
+            const gammaValue = 1.0 / Math.cos((TWO_PI * bandwidth) / period);
+            const alphaValue = gammaValue - Math.sqrt(gammaValue * gammaValue - 1.0);
+            if (!Number.isFinite(alphaValue) || !(alphaValue > 0.0 && alphaValue < 1.0)) {
+                throw new Error('bandwidth must yield resolvable stable band-pass poles');
+            }
+            alpha.push(alphaValue);
+            beta.push(betaValue);
+        }
+        this.periods = periods;
+        this.alpha = alpha;
+        this.beta = beta;
+
+        this.barComponentFunc = barComponentValue(barComp);
+        this.quoteComponentFunc = quoteComponentValue(quoteComp);
+        this.tradeComponentFunc = tradeComponentValue(tradeComp);
+
+        const resolvedParams: CombBandPassSpectrumParams = {
+            minPeriod,
+            maxPeriod,
+            bandwidth,
+            highpassPeriod,
+            smoothingPeriod,
+            spectralDilationCompensation: sdc,
+            enhanceResolution: enhance,
+            barComponent: barComp,
+            quoteComponent: quoteComp,
+            tradeComponent: tradeComp,
+        };
+        this.mnemonicValue = combBandPassSpectrumMnemonic(resolvedParams);
+        this.descriptionValue = `Comb band-pass spectrum ${this.mnemonicValue}`;
+        this.mnemonicDC = combBandPassSpectrumDominantCycleMnemonic(resolvedParams);
+        this.descriptionDC = `Comb band-pass spectrum dominant cycle ${this.mnemonicDC}`;
+
+        this.reset();
     }
 
-    const lengthSpectrum = this.estimator.lengthSpectrum;
-
-    const minRef = this.floatingNormalization ? this.estimator.spectrumMin : 0;
-    const maxRef = this.estimator.spectrumMax;
-    const spectrumRange = maxRef - minRef;
-
-    // The estimator's spectrum is already in axis order (bin 0 = MinPeriod,
-    // bin last = MaxPeriod), matching the heatmap axis.
-    const values = new Array<number>(lengthSpectrum);
-    let valueMin = Number.POSITIVE_INFINITY;
-    let valueMax = Number.NEGATIVE_INFINITY;
-
-    for (let i = 0; i < lengthSpectrum; i++) {
-      const v = spectrumRange > 0
-        ? (this.estimator.spectrum[i] - minRef) / spectrumRange
-        : 0;
-      values[i] = v;
-      if (v < valueMin) valueMin = v;
-      if (v > valueMax) valueMax = v;
+    public get minPeriod(): number {
+        return this.parameters.minPeriod;
     }
 
-    return Heatmap.newHeatmap(
-      time, this.minParameterValue, this.maxParameterValue, this.parameterResolution,
-      valueMin, valueMax, values,
-    );
-  }
+    public get maxPeriod(): number {
+        return this.parameters.maxPeriod;
+    }
 
-  /** Updates the indicator given the next scalar sample. */
-  public updateScalar(sample: Scalar): IndicatorOutput {
-    return this.updateEntity(sample.time, sample.value);
-  }
+    public get warmupBars(): number {
+        return BANK_STARTUP_BARS + this.parameters.maxPeriod - 1;
+    }
 
-  /** Updates the indicator given the next bar sample. */
-  public updateBar(sample: Bar): IndicatorOutput {
-    return this.updateEntity(sample.time, this.barComponentFunc(sample));
-  }
+    public get samplesSeen(): number {
+        return this.count;
+    }
 
-  /** Updates the indicator given the next quote sample. */
-  public updateQuote(sample: Quote): IndicatorOutput {
-    return this.updateEntity(sample.time, this.quoteComponentFunc(sample));
-  }
+    public get state(): SpectrumState {
+        return {
+            highPass: this.roof.h1,
+            filtered: this.roof.f1,
+            rawPower: this.raw.slice(),
+            normalizationMaximum: this.maximum,
+            internalDominantCycle: this.dominant,
+        };
+    }
 
-  /** Updates the indicator given the next trade sample. */
-  public updateTrade(sample: Trade): IndicatorOutput {
-    return this.updateEntity(sample.time, this.tradeComponentFunc(sample));
-  }
+    public get bandPassHistory(): readonly (readonly number[])[] {
+        return this.bp.map((row) => row.slice());
+    }
 
-  private updateEntity(time: Date, sample: number): IndicatorOutput {
-    return [this.update(sample, time)];
-  }
-}
+    public get output(): SpectrumOutput {
+        return this.lastOutput;
+    }
 
-/** Encodes non-default boolean/decay/bandwidth settings as terse override-only tags.
- * Empty when all flags are at their defaults. Emission order matches the Params field
- * order. */
-function buildFlagTags(
-  bandwidth: number,
-  sdcOn: boolean,
-  agcOn: boolean,
-  floatingNorm: boolean,
-  agcDecayFactor: number,
-): string {
-  let s = '';
-  if (Math.abs(bandwidth - DEFAULT_BANDWIDTH) > BANDWIDTH_EPSILON) {
-    s += `, bw=${formatNum(bandwidth)}`;
-  }
-  if (!sdcOn) s += ', no-sdc';
-  if (!agcOn) s += ', no-agc';
-  if (agcOn && Math.abs(agcDecayFactor - DEFAULT_AGC_DECAY_FACTOR) > AGC_DECAY_EPSILON) {
-    s += `, agc=${formatNum(agcDecayFactor)}`;
-  }
-  if (!floatingNorm) s += ', no-fn';
-  return s;
-}
+    public reset(): void {
+        this.roof.reset();
+        this.count = 0;
+        this.bp = this.periods.map((period) => new Array<number>(period).fill(0.0));
+        this.raw = new Array<number>(this.periods.length).fill(0.0);
+        this.maximum = 0.0;
+        this.dominant = 0.0;
+        this.hasDominant = false;
+        this.lastOutput = {
+            heatmap: Heatmap.newEmptyHeatmap(new Date(0), this.minPeriod, this.maxPeriod, 1.0),
+            dominantCycle: Number.NaN,
+        };
+    }
 
-/** Matches Go fmt.Sprintf("%g") for the common integer and decimal cases used in the mnemonic. */
-function formatNum(n: number): string {
-  return n.toString();
+    public isPrimed(): boolean {
+        return this.count > this.warmupBars;
+    }
+
+    public metadata(): IndicatorMetadata {
+        return buildMetadata(
+            IndicatorIdentifier.CombBandPassSpectrum,
+            this.mnemonicValue,
+            this.descriptionValue,
+            [
+                { mnemonic: this.mnemonicValue, description: this.descriptionValue },
+                { mnemonic: this.mnemonicDC, description: this.descriptionDC },
+            ],
+        );
+    }
+
+    public update(sample: number, time: Date = new Date(0)): SpectrumOutput {
+        const price = validateSample(sample);
+        const params = this.parameters;
+        if (Number.isNaN(price)) {
+            return {
+                heatmap: Heatmap.newEmptyHeatmap(time, params.minPeriod, params.maxPeriod, 1.0),
+                dominantCycle: Number.NaN,
+            };
+        }
+
+        const [high, filtered] = this.roof.candidate(price);
+        const difference = filtered - this.roof.f2;
+        const nextBP = new Array<number[]>(this.periods.length);
+        const raw = new Array<number>(this.periods.length);
+        for (let index = 0; index < this.periods.length; index++) {
+            const period = this.periods[index];
+            const old = this.bp[index];
+            let current = 0.0;
+            if (this.count + 1 > BANK_STARTUP_BARS) {
+                const alpha = this.alpha[index];
+                const beta = this.beta[index];
+                current =
+                    0.5 * (1.0 - alpha) * difference +
+                    beta * (1.0 + alpha) * old[0] -
+                    alpha * old[1];
+            }
+            if (!Number.isFinite(current)) {
+                throw new Error('band-pass arithmetic overflowed');
+            }
+            const row = new Array<number>(period);
+            row[0] = current;
+            for (let m = 1; m < period; m++) {
+                row[m] = old[m - 1];
+            }
+            nextBP[index] = row;
+
+            let power = 0.0;
+            if (this.count + 1 > BANK_STARTUP_BARS) {
+                const compensation = params.spectralDilationCompensation ? period : 1.0;
+                for (let m = 0; m < period; m++) {
+                    const scaled = row[m] / compensation;
+                    power += scaled * scaled;
+                }
+            }
+            raw[index] = power;
+        }
+
+        const normalizedResult = normalizeAndCentroid(
+            this.periods,
+            raw,
+            this.maximum,
+            this.dominant,
+            this.hasDominant,
+            params.enhanceResolution,
+        );
+
+        this.roof.commit(price, high, filtered);
+        this.bp = nextBP;
+        this.raw = raw;
+        this.maximum = normalizedResult.maximum;
+        this.dominant = normalizedResult.dominant;
+        this.hasDominant = normalizedResult.hasDC;
+        this.count += 1;
+
+        if (this.isPrimed()) {
+            const clonedValues = normalizedResult.values.slice();
+            let valueMin = clonedValues[0];
+            let valueMax = clonedValues[0];
+            for (let index = 1; index < clonedValues.length; index++) {
+                const value = clonedValues[index];
+                if (value < valueMin) valueMin = value;
+                if (value > valueMax) valueMax = value;
+            }
+            this.lastOutput = {
+                heatmap: Heatmap.newHeatmap(
+                    time,
+                    params.minPeriod,
+                    params.maxPeriod,
+                    1.0,
+                    valueMin,
+                    valueMax,
+                    clonedValues,
+                ),
+                dominantCycle: normalizedResult.hasDC ? normalizedResult.dominant : Number.NaN,
+            };
+        } else {
+            this.lastOutput = {
+                heatmap: Heatmap.newEmptyHeatmap(time, params.minPeriod, params.maxPeriod, 1.0),
+                dominantCycle: Number.NaN,
+            };
+        }
+        return this.lastOutput;
+    }
+
+    private wrapEntity(time: Date, result: SpectrumOutput): IndicatorOutput {
+        const dcScalar = new Scalar();
+        dcScalar.time = time;
+        dcScalar.value = result.dominantCycle;
+        return [result.heatmap, dcScalar];
+    }
+
+    public updateScalar(sample: Scalar): IndicatorOutput {
+        return this.wrapEntity(sample.time, this.update(sample.value, sample.time));
+    }
+
+    public updateBar(sample: Bar): IndicatorOutput {
+        return this.wrapEntity(sample.time, this.update(this.barComponentFunc(sample), sample.time));
+    }
+
+    public updateQuote(sample: Quote): IndicatorOutput {
+        return this.wrapEntity(sample.time, this.update(this.quoteComponentFunc(sample), sample.time));
+    }
+
+    public updateTrade(sample: Trade): IndicatorOutput {
+        return this.wrapEntity(sample.time, this.update(this.tradeComponentFunc(sample), sample.time));
+    }
 }

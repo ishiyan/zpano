@@ -1,67 +1,91 @@
-import { BarComponent } from '../../../entities/bar-component';
-import { QuoteComponent } from '../../../entities/quote-component';
-import { TradeComponent } from '../../../entities/trade-component';
+import { BarComponent, DefaultBarComponent } from '../../../entities/bar-component';
+import { DefaultQuoteComponent, QuoteComponent } from '../../../entities/quote-component';
+import { DefaultTradeComponent, TradeComponent } from '../../../entities/trade-component';
+import { componentTripleMnemonic } from '../../core/component-triple-mnemonic';
 
-/** Describes parameters to create an instance of the CombBandPassSpectrum indicator.
- *
- * All boolean fields are named so that `undefined` / `false` corresponds to the Ehlers
- * reference default behavior. This lets an empty params object produce the default
- * indicator. */
+/** Parameters for Ehlers' CombBandPassSpectrum (2013 Book Listing 10-1). */
 export interface CombBandPassSpectrumParams {
-  /** Minimum (shortest) cycle period covered by the spectrum. Must be >= 2 (Nyquist).
-   * Also drives the cutoff of the Super Smoother pre-filter. The default value is 10.
-   * A zero value is treated as "use default". */
-  minPeriod?: number;
+    /** Shortest evaluated integer cycle period in bars (>= 3). Default: 10. */
+    minPeriod?: number;
 
-  /** Maximum (longest) cycle period covered by the spectrum. Must be > minPeriod. Also
-   * drives the cutoff of the Butterworth highpass pre-filter and the band-pass output
-   * history length per bin. The default value is 48. A zero value is treated as "use
-   * default". */
-  maxPeriod?: number;
+    /** Longest evaluated integer cycle period in bars (>= minPeriod). Default: 48. */
+    maxPeriod?: number;
 
-  /** Fractional bandwidth of each band-pass filter in the comb. Must be in (0, 1).
-   * Typical Ehlers values are around 0.3 (default) for medium selectivity. A zero
-   * value is treated as "use default". */
-  bandwidth?: number;
+    /** Fractional bandwidth of each band-pass filter (0 < bandwidth < minPeriod / 4). Default: 0.3. */
+    bandwidth?: number;
 
-  /** Disables the spectral dilation compensation (division of each band-pass output by
-   * its evaluated period before squaring) when true. Ehlers' default is enabled, so the
-   * default value is false (SDC on). */
-  disableSpectralDilationCompensation?: boolean;
+    /** Two-pole roofing high-pass cutoff period in bars (>= 5.0). Default: 48. */
+    highpassPeriod?: number;
 
-  /** Disables the fast-attack slow-decay automatic gain control when true. Ehlers'
-   * default is enabled, so the default value is false (AGC on). */
-  disableAutomaticGainControl?: boolean;
+    /** Two-pole SuperSmoother cutoff period in bars (>= 2.0). Default: 10. */
+    smoothingPeriod?: number;
 
-  /** Decay factor used by the fast-attack slow-decay automatic gain control. Must be in
-   * the open interval (0, 1) when AGC is enabled. The default value is 0.995 (matching
-   * Ehlers' EasyLanguage listing 10-1). A zero value is treated as "use default". */
-  automaticGainControlDecayFactor?: number;
+    /** Divide each band-pass amplitude by period before squaring and summing. Default: true. */
+    spectralDilationCompensation?: boolean;
 
-  /** Selects fixed (min clamped to 0) normalization when true. The default is floating
-   * normalization, consistent with the other zpano spectrum heatmaps. Note that Ehlers'
-   * listing 10-1 uses fixed normalization (MaxPwr only); set this to true for exact
-   * EL-faithful behavior. */
-  fixedNormalization?: boolean;
+    /** Cube normalized display heatmap intensities after centroid extraction. Default: false. */
+    enhanceResolution?: boolean;
 
-  /** A component of a bar to use when updating the indicator with a bar sample.
-   *
-   * If _undefined_, the default (BarComponent.Median, hl/2) is used, matching Ehlers'
-   * reference. Since this differs from the framework default, it is always shown in
-   * the mnemonic. */
-  barComponent?: BarComponent;
+    /** Bar component used by updateBar(); undefined defaults to Close. */
+    barComponent?: BarComponent;
 
-  /** A component of a quote to use when updating the indicator with a quote sample.
-   *
-   * If _undefined_, a default value is used and the component is not shown in the mnemonic. */
-  quoteComponent?: QuoteComponent;
+    /** Quote component used by updateQuote(); undefined defaults to Mid. */
+    quoteComponent?: QuoteComponent;
 
-  /** A component of a trade to use when updating the indicator with a trade sample.
-   *
-   * If _undefined_, a default value is used and the component is not shown in the mnemonic. */
-  tradeComponent?: TradeComponent;
+    /** Trade component used by updateTrade(); undefined defaults to Price. */
+    tradeComponent?: TradeComponent;
 }
 
+/** Returns Ehlers' Listing 10-1 default parameters. */
 export function defaultParams(): CombBandPassSpectrumParams {
-    return { minPeriod: 10, maxPeriod: 48, bandwidth: 0.3, automaticGainControlDecayFactor: 0.995 };
+    return {
+        minPeriod: 10,
+        maxPeriod: 48,
+        bandwidth: 0.3,
+        highpassPeriod: 48,
+        smoothingPeriod: 10,
+        spectralDilationCompensation: true,
+        enhanceResolution: false,
+    };
+}
+
+/** Formats a numeric parameter cleanly without negative zero. */
+export function formatNumber(value: number): string {
+    const normalized = value === 0 ? 0 : value;
+    return String(normalized);
+}
+
+function buildMnemonic(
+    prefix: string,
+    includeEnhance: boolean,
+    params?: CombBandPassSpectrumParams,
+): string {
+    const minPeriod = params?.minPeriod ?? 10;
+    const maxPeriod = params?.maxPeriod ?? 48;
+    const bandwidth = params?.bandwidth ?? 0.3;
+    const highpassPeriod = params?.highpassPeriod ?? 48;
+    const smoothingPeriod = params?.smoothingPeriod ?? 10;
+    const sdc = params?.spectralDilationCompensation ?? true;
+    const enhance = params?.enhanceResolution ?? false;
+    const barComp = params?.barComponent ?? DefaultBarComponent;
+    const quoteComp = params?.quoteComponent ?? DefaultQuoteComponent;
+    const tradeComp = params?.tradeComponent ?? DefaultTradeComponent;
+    const compSuffix = componentTripleMnemonic(barComp, quoteComp, tradeComp);
+    const sdcSuffix = sdc ? '' : ', no-sdc';
+    const enhSuffix = includeEnhance && enhance ? ', enh' : '';
+    return `${prefix}(${minPeriod}, ${maxPeriod}, ${formatNumber(bandwidth)}, ${formatNumber(highpassPeriod)}, ${formatNumber(smoothingPeriod)}${sdcSuffix}${enhSuffix}${compSuffix})`;
+}
+
+/** Builds the primary heatmap mnemonic for CombBandPassSpectrum. */
+export function combBandPassSpectrumMnemonic(
+    params?: CombBandPassSpectrumParams,
+): string {
+    return buildMnemonic('cbps', true, params);
+}
+
+/** Builds the dominant-cycle mnemonic for CombBandPassSpectrum. */
+export function combBandPassSpectrumDominantCycleMnemonic(
+    params?: CombBandPassSpectrumParams,
+): string {
+    return buildMnemonic('cbps-dc', false, params);
 }

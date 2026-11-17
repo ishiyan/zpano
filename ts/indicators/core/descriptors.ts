@@ -117,7 +117,10 @@ const descriptors: Map<IndicatorIdentifier, Descriptor> = new Map<IndicatorIdent
     out(0, S.Scalar, R.Oscillator, P.Own),
     out(1, S.Scalar, R.Signal, P.Own),
   ])],
-  [IndicatorIdentifier.CombBandPassSpectrum, desc(IndicatorIdentifier.CombBandPassSpectrum, 'John Ehlers', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Heatmap, R.Spectrum, P.Own)])],
+  [IndicatorIdentifier.CombBandPassSpectrum, desc(IndicatorIdentifier.CombBandPassSpectrum, 'John Ehlers', A.Static, I.ScalarInput, V.NoVolume, [
+    out(0, S.Heatmap, R.Spectrum, P.Own),
+    out(1, S.Scalar, R.CyclePeriod, P.Own),
+  ])],
   [IndicatorIdentifier.CoronaSignalToNoiseRatio, desc(IndicatorIdentifier.CoronaSignalToNoiseRatio, 'John Ehlers', A.Adaptive, I.BarInput, V.NoVolume, [
     out(0, S.Heatmap, R.Spectrum, P.Own),
     out(1, S.Scalar, R.BoundedOscillator, P.Own),

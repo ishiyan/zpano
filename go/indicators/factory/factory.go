@@ -682,8 +682,20 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 			return combbandpassspectrum.NewCombBandPassSpectrumDefault()
 		}
 
-		p := &combbandpassspectrum.Params{}
-		if err := unmarshal(b, p); err != nil {
+		allowed := map[string]struct{}{
+			"minPeriod":                    {},
+			"maxPeriod":                    {},
+			"bandwidth":                    {},
+			"highpassPeriod":               {},
+			"smoothingPeriod":              {},
+			"spectralDilationCompensation": {},
+			"enhanceResolution":            {},
+			"barComponent":                 {},
+			"quoteComponent":               {},
+			"tradeComponent":               {},
+		}
+		p := combbandpassspectrum.DefaultParams()
+		if err := unmarshalStrictAllowed(b, p, allowed); err != nil {
 			return nil, err
 		}
 

@@ -1,71 +1,111 @@
 package combbandpassspectrum
 
-import "zpano/entities"
+import (
+	"fmt"
 
-// Params describes parameters to create an instance of the CombBandPassSpectrum indicator.
+	"zpano/entities"
+	"zpano/indicators/core"
+)
+
+// Params describes parameters to create an instance of Ehlers' CombBandPassSpectrum indicator.
 //
-// All boolean fields are named so the Go zero value (false) corresponds to the
-// Ehlers reference default behavior. This lets a zero-valued Params{} produce
-// the default indicator.
+// Explicit zero/false values are NOT substituted with defaults; use [DefaultParams]
+// to obtain Ehlers' 2013 Book Listing 10-1 settings.
 type Params struct {
-	// MinPeriod is the minimum (shortest) cycle period covered by the spectrum, must be >= 2
-	// (2 corresponds to the Nyquist frequency). Also drives the cutoff of the Super Smoother
-	// pre-filter. The default value is 10.
-	MinPeriod int
+	// MinPeriod is the shortest evaluated integer cycle period in bars (>= 3). Default: 10.
+	MinPeriod int `json:"minPeriod"`
 
-	// MaxPeriod is the maximum (longest) cycle period covered by the spectrum, must be > MinPeriod.
-	// Also drives the cutoff of the 2-pole Butterworth highpass pre-filter and the length of
-	// the band-pass output history kept per filter. The default value is 48.
-	MaxPeriod int
+	// MaxPeriod is the longest evaluated integer cycle period in bars (>= MinPeriod). Default: 48.
+	MaxPeriod int `json:"maxPeriod"`
 
-	// Bandwidth is the fractional bandwidth of each band-pass filter in the comb. Must be in
-	// (0, 1). Typical Ehlers values are 0.3 (default) for medium selectivity.
-	Bandwidth float64
+	// Bandwidth is the fractional bandwidth of each band-pass filter (0 < Bandwidth < MinPeriod/4). Default: 0.3.
+	Bandwidth float64 `json:"bandwidth"`
 
-	// DisableSpectralDilationCompensation disables the spectral dilation compensation
-	// (division of each band-pass output by its evaluated period before squaring)
-	// when true. Ehlers' default behavior is enabled, so the default value is false (SDC on).
-	DisableSpectralDilationCompensation bool
+	// HighpassPeriod is the two-pole roofing high-pass cutoff period in bars (>= 5.0). Default: 48.
+	HighpassPeriod float64 `json:"highpassPeriod"`
 
-	// DisableAutomaticGainControl disables the fast-attack slow-decay automatic gain control
-	// when true. Ehlers' default behavior is enabled, so the default value is false (AGC on).
-	DisableAutomaticGainControl bool
+	// SmoothingPeriod is the two-pole SuperSmoother cutoff period in bars (>= 2.0). Default: 10.
+	SmoothingPeriod float64 `json:"smoothingPeriod"`
 
-	// AutomaticGainControlDecayFactor is the decay factor used by the fast-attack slow-decay
-	// automatic gain control. Must be in the open interval (0, 1) when AGC is enabled. If zero,
-	// the default value 0.995 is used (the value in Ehlers' EasyLanguage listing 10-1).
-	AutomaticGainControlDecayFactor float64
+	// SpectralDilationCompensation divides each band-pass amplitude by period before squaring and summing. Default: true.
+	SpectralDilationCompensation bool `json:"spectralDilationCompensation"`
 
-	// FixedNormalization selects fixed (min clamped to 0) normalization when true. The default
-	// is floating normalization (consistent with the other zpano spectrum heatmaps). Note that
-	// Ehlers' listing 10-1 uses fixed normalization (MaxPwr only); set this to true for exact
-	// EL-faithful behavior.
-	FixedNormalization bool
+	// EnhanceResolution cubes normalized display heatmap intensities after centroid extraction. Default: false.
+	EnhanceResolution bool `json:"enhanceResolution"`
 
-	// BarComponent indicates the component of a bar to use when updating the indicator with a bar sample.
-	//
-	// If zero, the default (BarMedianPrice) is used, matching the Ehlers reference which operates on
-	// (High+Low)/2. Since this differs from the framework-wide default, it is always shown in the
-	// indicator mnemonic.
-	BarComponent entities.BarComponent
+	// BarComponent indicates the component of a bar to use when updating with a bar sample.
+	// If zero, DefaultBarComponent (Close) is used and omitted from the mnemonic.
+	BarComponent entities.BarComponent `json:"barComponent"`
 
-	// QuoteComponent indicates the component of a quote to use when updating the indicator with a quote sample.
-	//
-	// If zero, the default (QuoteMidPrice) is used and the component is not shown in the indicator mnemonic.
-	QuoteComponent entities.QuoteComponent
+	// QuoteComponent indicates the component of a quote to use when updating with a quote sample.
+	// If zero, DefaultQuoteComponent (Mid) is used and omitted from the mnemonic.
+	QuoteComponent entities.QuoteComponent `json:"quoteComponent"`
 
-	// TradeComponent indicates the component of a trade to use when updating the indicator with a trade sample.
-	//
-	// If zero, the default (TradePrice) is used and the component is not shown in the indicator mnemonic.
-	TradeComponent entities.TradeComponent
+	// TradeComponent indicates the component of a trade to use when updating with a trade sample.
+	// If zero, DefaultTradeComponent (Price) is used and omitted from the mnemonic.
+	TradeComponent entities.TradeComponent `json:"tradeComponent"`
 }
 
-// DefaultParams returns a [Params] value populated with Ehlers defaults.
+// DefaultParams returns a [Params] value populated with Ehlers' Listing 10-1 defaults.
 func DefaultParams() *Params {
 	return &Params{
-		MinPeriod:                       10,
-		MaxPeriod:                       48,
-		Bandwidth:                       0.3,
-		AutomaticGainControlDecayFactor: 0.995,
+		MinPeriod:                    10,
+		MaxPeriod:                    48,
+		Bandwidth:                    0.3,
+		HighpassPeriod:               48,
+		SmoothingPeriod:              10,
+		SpectralDilationCompensation: true,
+		EnhanceResolution:            false,
 	}
+}
+
+// FormatNumber formats a float parameter cleanly without negative zero.
+func FormatNumber(value float64) string {
+	if value == 0 {
+		value = 0
+	}
+	return fmt.Sprintf("%g", value)
+}
+
+func formatMnemonic(prefix string, includeEnhance bool, params Params) string {
+	barComp, quoteComp, tradeComp := params.BarComponent, params.QuoteComponent, params.TradeComponent
+	if barComp == 0 {
+		barComp = entities.DefaultBarComponent
+	}
+	if quoteComp == 0 {
+		quoteComp = entities.DefaultQuoteComponent
+	}
+	if tradeComp == 0 {
+		tradeComp = entities.DefaultTradeComponent
+	}
+	compSuffix := core.ComponentTripleMnemonic(barComp, quoteComp, tradeComp)
+	sdcSuffix := ""
+	if !params.SpectralDilationCompensation {
+		sdcSuffix = ", no-sdc"
+	}
+	enhSuffix := ""
+	if includeEnhance && params.EnhanceResolution {
+		enhSuffix = ", enh"
+	}
+	return fmt.Sprintf("%s(%d, %d, %s, %s, %s%s%s%s)",
+		prefix,
+		params.MinPeriod,
+		params.MaxPeriod,
+		FormatNumber(params.Bandwidth),
+		FormatNumber(params.HighpassPeriod),
+		FormatNumber(params.SmoothingPeriod),
+		sdcSuffix,
+		enhSuffix,
+		compSuffix,
+	)
+}
+
+// Mnemonic returns the primary heatmap mnemonic for p.
+func (p Params) Mnemonic() string {
+	return formatMnemonic("cbps", true, p)
+}
+
+// DominantCycleMnemonic returns the dominant-cycle mnemonic for p.
+func (p Params) DominantCycleMnemonic() string {
+	return formatMnemonic("cbps-dc", false, p)
 }

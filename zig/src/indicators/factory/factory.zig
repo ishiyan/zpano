@@ -985,18 +985,73 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
         },
 
         .comb_band_pass_spectrum => blk: {
-            const p = cbps_mod.Params{
-                .min_period = getInt(obj, "minPeriod", 10),
-                .max_period = getInt(obj, "maxPeriod", 48),
-                .bandwidth = getF64(obj, "bandwidth", 0.3),
-                .disable_spectral_dilation_compensation = getBool(obj, "disableSpectralDilationCompensation", false),
-                .disable_automatic_gain_control = getBool(obj, "disableAutomaticGainControl", false),
-                .automatic_gain_control_decay_factor = getF64(obj, "automaticGainControlDecayFactor", 0.995),
-                .fixed_normalization = getBool(obj, "fixedNormalization", false),
-                .bar_component = getBarComponent(obj),
-                .quote_component = getQuoteComponent(obj),
-                .trade_component = getTradeComponent(obj),
-            };
+            var p = cbps_mod.defaultParams();
+            for (obj.keys(), obj.values()) |key, raw| {
+                if (std.mem.eql(u8, key, "minPeriod")) {
+                    p.min_period = switch (raw) {
+                        .integer => |number| if (number >= std.math.minInt(i32) and number <= std.math.maxInt(i32)) @intCast(number) else return FactoryError.InvalidParams,
+                        .float => |number| if (std.math.isFinite(number) and @trunc(number) == number and number >= @as(f64, @floatFromInt(std.math.minInt(i32))) and number <= @as(f64, @floatFromInt(std.math.maxInt(i32)))) @intFromFloat(number) else return FactoryError.InvalidParams,
+                        else => return FactoryError.InvalidParams,
+                    };
+                } else if (std.mem.eql(u8, key, "maxPeriod")) {
+                    p.max_period = switch (raw) {
+                        .integer => |number| if (number >= std.math.minInt(i32) and number <= std.math.maxInt(i32)) @intCast(number) else return FactoryError.InvalidParams,
+                        .float => |number| if (std.math.isFinite(number) and @trunc(number) == number and number >= @as(f64, @floatFromInt(std.math.minInt(i32))) and number <= @as(f64, @floatFromInt(std.math.maxInt(i32)))) @intFromFloat(number) else return FactoryError.InvalidParams,
+                        else => return FactoryError.InvalidParams,
+                    };
+                } else if (std.mem.eql(u8, key, "bandwidth")) {
+                    p.bandwidth = switch (raw) {
+                        .float => |number| if (std.math.isFinite(number)) number else return FactoryError.InvalidParams,
+                        .integer => |number| @floatFromInt(number),
+                        else => return FactoryError.InvalidParams,
+                    };
+                } else if (std.mem.eql(u8, key, "highpassPeriod")) {
+                    p.highpass_period = switch (raw) {
+                        .float => |number| if (std.math.isFinite(number)) number else return FactoryError.InvalidParams,
+                        .integer => |number| @floatFromInt(number),
+                        else => return FactoryError.InvalidParams,
+                    };
+                } else if (std.mem.eql(u8, key, "smoothingPeriod")) {
+                    p.smoothing_period = switch (raw) {
+                        .float => |number| if (std.math.isFinite(number)) number else return FactoryError.InvalidParams,
+                        .integer => |number| @floatFromInt(number),
+                        else => return FactoryError.InvalidParams,
+                    };
+                } else if (std.mem.eql(u8, key, "spectralDilationCompensation")) {
+                    p.spectral_dilation_compensation = switch (raw) {
+                        .bool => |flag| flag,
+                        else => return FactoryError.InvalidParams,
+                    };
+                } else if (std.mem.eql(u8, key, "enhanceResolution")) {
+                    p.enhance_resolution = switch (raw) {
+                        .bool => |flag| flag,
+                        else => return FactoryError.InvalidParams,
+                    };
+                } else if (std.mem.eql(u8, key, "barComponent")) {
+                    const comp_code: u8 = switch (raw) {
+                        .integer => |number| if (number >= 0 and number <= 8) @intCast(number) else return FactoryError.InvalidParams,
+                        .float => |number| if (std.math.isFinite(number) and @trunc(number) == number and number >= 0 and number <= 8) @intFromFloat(number) else return FactoryError.InvalidParams,
+                        else => return FactoryError.InvalidParams,
+                    };
+                    p.bar_component = @enumFromInt(comp_code);
+                } else if (std.mem.eql(u8, key, "quoteComponent")) {
+                    const comp_code: u8 = switch (raw) {
+                        .integer => |number| if (number >= 0 and number <= 7) @intCast(number) else return FactoryError.InvalidParams,
+                        .float => |number| if (std.math.isFinite(number) and @trunc(number) == number and number >= 0 and number <= 7) @intFromFloat(number) else return FactoryError.InvalidParams,
+                        else => return FactoryError.InvalidParams,
+                    };
+                    p.quote_component = @enumFromInt(comp_code);
+                } else if (std.mem.eql(u8, key, "tradeComponent")) {
+                    const comp_code: u8 = switch (raw) {
+                        .integer => |number| if (number >= 0 and number <= 1) @intCast(number) else return FactoryError.InvalidParams,
+                        .float => |number| if (std.math.isFinite(number) and @trunc(number) == number and number >= 0 and number <= 1) @intFromFloat(number) else return FactoryError.InvalidParams,
+                        else => return FactoryError.InvalidParams,
+                    };
+                    p.trade_component = @enumFromInt(comp_code);
+                } else {
+                    return FactoryError.InvalidParams;
+                }
+            }
             const ind = cbps_mod.CombBandPassSpectrum.init(allocator, p) catch return FactoryError.IndicatorInitFailed;
             const ptr = heapAlloc(cbps_mod.CombBandPassSpectrum, allocator, ind) catch return FactoryError.OutOfMemory;
             break :blk .{ .indicator = ptr.indicator(), .ctx = ptr, .deinit_fn = DeinitFn(cbps_mod.CombBandPassSpectrum) };
@@ -2098,6 +2153,66 @@ test "create corona indicators with defaults, explicit zero threshold, and inval
     dft_default.indicator.metadata(&md_dft_default);
     try std.testing.expectEqualStrings("dftps(10, 48, 48, 48, 10)", md_dft_default.mnemonic);
     try std.testing.expectEqual(@as(usize, 2), md_dft_default.outputs_len);
+
+    const cbps_default = try create(allocator, .comb_band_pass_spectrum, "{}");
+    defer cbps_default.deinit(allocator);
+    var md_cbps_default: metadata_mod.Metadata = undefined;
+    cbps_default.indicator.metadata(&md_cbps_default);
+    try std.testing.expectEqualStrings("cbps(10, 48, 0.3, 48, 10)", md_cbps_default.mnemonic);
+    try std.testing.expectEqual(@as(usize, 2), md_cbps_default.outputs_len);
+
+    const cbps_custom = try create(allocator, .comb_band_pass_spectrum,
+        \\{"minPeriod": 6, "maxPeriod": 24, "bandwidth": 0.4, "highpassPeriod": 60, "smoothingPeriod": 10.5, "spectralDilationCompensation": false, "enhanceResolution": true, "barComponent": 5}
+    );
+    defer cbps_custom.deinit(allocator);
+    var md_cbps_custom: metadata_mod.Metadata = undefined;
+    cbps_custom.indicator.metadata(&md_cbps_custom);
+    try std.testing.expectEqualStrings("cbps(6, 24, 0.4, 60, 10.5, no-sdc, enh, hl/2)", md_cbps_custom.mnemonic);
+    try std.testing.expectEqualStrings("cbps-dc(6, 24, 0.4, 60, 10.5, no-sdc, hl/2)", md_cbps_custom.outputs_buf[1].mnemonic);
+
+    const invalid_type_cbps_jsons = [_][]const u8{
+        \\{"length": 48}
+        ,
+        \\{"windowLength": 48}
+        ,
+        \\{"disableSpectralDilationCompensation": true}
+        ,
+        \\{"minPeriod": 10.5}
+        ,
+        \\{"spectralDilationCompensation": 1}
+        ,
+        \\{"enhanceResolution": "yes"}
+        ,
+        \\{"minPeriod": null}
+        ,
+    };
+    for (invalid_type_cbps_jsons) |bad_json| {
+        try std.testing.expectError(
+            FactoryError.InvalidParams,
+            create(allocator, .comb_band_pass_spectrum, bad_json),
+        );
+    }
+
+    const invalid_domain_cbps_jsons = [_][]const u8{
+        \\{"minPeriod": 2}
+        ,
+        \\{"maxPeriod": 9}
+        ,
+        \\{"bandwidth": 0}
+        ,
+        \\{"bandwidth": 2.5}
+        ,
+        \\{"highpassPeriod": 4}
+        ,
+        \\{"smoothingPeriod": 1}
+        ,
+    };
+    for (invalid_domain_cbps_jsons) |bad_json| {
+        try std.testing.expectError(
+            FactoryError.IndicatorInitFailed,
+            create(allocator, .comb_band_pass_spectrum, bad_json),
+        );
+    }
 
     const dft_custom = try create(allocator, .discrete_fourier_transform_spectrum,
         \\{"minPeriod": 6, "maxPeriod": 24, "windowLength": 30, "highpassPeriod": 60, "smoothingPeriod": 10.5, "spectralDilationCompensation": false, "enhanceResolution": true, "barComponent": 5}

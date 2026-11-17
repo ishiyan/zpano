@@ -152,7 +152,8 @@ _descriptors: dict[Id, Descriptor] = {
          _o(1, S.SCALAR, R.SIGNAL, P.OWN)]),
     Id.COMB_BAND_PASS_SPECTRUM: _d(
         Id.COMB_BAND_PASS_SPECTRUM, "John Ehlers", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
-        [_o(0, S.HEATMAP, R.SPECTRUM, P.OWN)]),
+        [_o(0, S.HEATMAP, R.SPECTRUM, P.OWN),
+         _o(1, S.SCALAR, R.CYCLE_PERIOD, P.OWN)]),
     Id.CORONA_SIGNAL_TO_NOISE_RATIO: _d(
         Id.CORONA_SIGNAL_TO_NOISE_RATIO, "John Ehlers", A.ADAPTIVE, I.BAR_INPUT, V.NO_VOLUME,
         [_o(0, S.HEATMAP, R.SPECTRUM, P.OWN),

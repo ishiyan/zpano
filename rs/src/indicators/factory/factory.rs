@@ -1328,25 +1328,94 @@ pub fn create_indicator(
         }
 
         Identifier::CombBandPassSpectrum => {
-            let mut p = CombBandPassSpectrumParams::default();
-            if !is_empty_object(&params) {
-                if let Some(v) = get_i32(&params, "minPeriod") {
-                    p.min_period = v;
+            if matches!(params, JsonValue::Null) {
+                return Ok(Box::new(CombBandPassSpectrum::new_default()?));
+            }
+            let pairs = params
+                .as_object()
+                .ok_or_else(|| "params must be a JSON object".to_string())?;
+            let mut options = CombBandPassSpectrumParams::default();
+            let mut seen_keys: Vec<&str> = Vec::with_capacity(pairs.len());
+            for (key, raw) in pairs {
+                if seen_keys.contains(&key.as_str()) {
+                    return Err(format!("duplicate parameter key: {key}"));
                 }
-                if let Some(v) = get_i32(&params, "maxPeriod") {
-                    p.max_period = v;
-                }
-                if let Some(v) = get_bool(&params, "disableAutomaticGainControl") {
-                    p.disable_automatic_gain_control = v;
-                }
-                if let Some(v) = get_f64(&params, "automaticGainControlDecayFactor") {
-                    p.automatic_gain_control_decay_factor = v;
-                }
-                if let Some(v) = get_bool(&params, "fixedNormalization") {
-                    p.fixed_normalization = v;
+                seen_keys.push(key.as_str());
+                match key.as_str() {
+                    "minPeriod" => match raw {
+                        JsonValue::Number(number)
+                            if number.is_finite()
+                                && number.fract() == 0.0
+                                && *number >= i32::MIN as f64
+                                && *number <= i32::MAX as f64 =>
+                        {
+                            options.min_period = *number as i32;
+                        }
+                        _ => return Err("minPeriod must be an integer >= 3".to_string()),
+                    },
+                    "maxPeriod" => match raw {
+                        JsonValue::Number(number)
+                            if number.is_finite()
+                                && number.fract() == 0.0
+                                && *number >= i32::MIN as f64
+                                && *number <= i32::MAX as f64 =>
+                        {
+                            options.max_period = *number as i32;
+                        }
+                        _ => return Err("maxPeriod must be an integer >= minPeriod".to_string()),
+                    },
+                    "bandwidth" => match raw {
+                        JsonValue::Number(number) if number.is_finite() => {
+                            options.bandwidth = *number;
+                        }
+                        _ => return Err("bandwidth must be a finite number".to_string()),
+                    },
+                    "highpassPeriod" => match raw {
+                        JsonValue::Number(number) if number.is_finite() => {
+                            options.highpass_period = *number;
+                        }
+                        _ => return Err("highpassPeriod must be a finite number".to_string()),
+                    },
+                    "smoothingPeriod" => match raw {
+                        JsonValue::Number(number) if number.is_finite() => {
+                            options.smoothing_period = *number;
+                        }
+                        _ => return Err("smoothingPeriod must be a finite number".to_string()),
+                    },
+                    "spectralDilationCompensation" => match raw {
+                        JsonValue::Bool(flag) => options.spectral_dilation_compensation = *flag,
+                        _ => {
+                            return Err(
+                                "spectralDilationCompensation must be a boolean".to_string(),
+                            );
+                        }
+                    },
+                    "enhanceResolution" => match raw {
+                        JsonValue::Bool(flag) => options.enhance_resolution = *flag,
+                        _ => return Err("enhanceResolution must be a boolean".to_string()),
+                    },
+                    "barComponent" => match raw {
+                        JsonValue::Number(number) => {
+                            options.bar_component = Some(lvt_bar_component(*number)?);
+                        }
+                        _ => return Err("invalid component number".to_string()),
+                    },
+                    "quoteComponent" => match raw {
+                        JsonValue::Number(number) => {
+                            options.quote_component = Some(lvt_quote_component(*number)?);
+                        }
+                        _ => return Err("invalid component number".to_string()),
+                    },
+                    "tradeComponent" => match raw {
+                        JsonValue::Number(number) => {
+                            options.trade_component = Some(lvt_trade_component(*number)?);
+                        }
+                        _ => return Err("invalid component number".to_string()),
+                    },
+                    _ => return Err(format!("unknown parameter key: {key}")),
                 }
             }
-            Ok(Box::new(CombBandPassSpectrum::new(&p)?))
+            Ok(Box::new(CombBandPassSpectrum::new(&options)?))
         }
 
         Identifier::DiscreteFourierTransformSpectrum => {
@@ -2753,6 +2822,48 @@ mod tests {
             assert!(
                 create_indicator(Identifier::DiscreteFourierTransformSpectrum, bad_dft_json).is_err(),
                 "expected error for {bad_dft_json}"
+            );
+        }
+
+        let cbps_default = create_indicator(Identifier::CombBandPassSpectrum, "{}").unwrap();
+        assert_eq!(cbps_default.metadata().mnemonic, "cbps(10, 48, 0.3, 48, 10)");
+        assert_eq!(cbps_default.metadata().outputs.len(), 2);
+
+        let cbps_custom = create_indicator(
+            Identifier::CombBandPassSpectrum,
+            r#"{"minPeriod": 6, "maxPeriod": 24, "bandwidth": 0.4, "highpassPeriod": 60, "smoothingPeriod": 10.5, "spectralDilationCompensation": false, "enhanceResolution": true, "barComponent": 5}"#,
+        )
+        .unwrap();
+        assert_eq!(
+            cbps_custom.metadata().mnemonic,
+            "cbps(6, 24, 0.4, 60, 10.5, no-sdc, enh, hl/2)"
+        );
+        assert_eq!(
+            cbps_custom.metadata().outputs[1].mnemonic,
+            "cbps-dc(6, 24, 0.4, 60, 10.5, no-sdc, hl/2)"
+        );
+
+        for bad_cbps_json in [
+            r#"{"length": 48}"#,
+            r#"{"windowLength": 48}"#,
+            r#"{"disableSpectralDilationCompensation": true}"#,
+            r#"{"disableAutomaticGainControl": true}"#,
+            r#"{"automaticGainControlDecayFactor": 0.995}"#,
+            r#"{"fixedNormalization": true}"#,
+            r#"{"minPeriod": 10.5}"#,
+            r#"{"spectralDilationCompensation": 1}"#,
+            r#"{"enhanceResolution": "yes"}"#,
+            r#"{"minPeriod": null}"#,
+            r#"{"minPeriod": 2}"#,
+            r#"{"maxPeriod": 9}"#,
+            r#"{"bandwidth": 0}"#,
+            r#"{"bandwidth": 2.5}"#,
+            r#"{"highpassPeriod": 4}"#,
+            r#"{"smoothingPeriod": 1}"#,
+        ] {
+            assert!(
+                create_indicator(Identifier::CombBandPassSpectrum, bad_cbps_json).is_err(),
+                "expected error for {bad_cbps_json}"
             );
         }
 

@@ -53,6 +53,63 @@ func TestFactoryZeroLagErrorCorrectingExponentialMovingAverage(t *testing.T) {
 	}
 }
 
+func TestFactoryCombBandPassSpectrum(t *testing.T) {
+	t.Parallel()
+
+	defaultIndicator, err := factory.New(core.CombBandPassSpectrum, "{}")
+	if err != nil {
+		t.Fatalf("default factory construction failed: %v", err)
+	}
+	if got := defaultIndicator.Metadata().Mnemonic; got != "cbps(10, 48, 0.3, 48, 10)" {
+		t.Fatalf("default mnemonic = %q, want %q", got, "cbps(10, 48, 0.3, 48, 10)")
+	}
+	if got := len(defaultIndicator.Metadata().Outputs); got != 2 {
+		t.Fatalf("len(outputs) = %d, want 2", got)
+	}
+	if got := defaultIndicator.Metadata().Outputs[1].Mnemonic; got != "cbps-dc(10, 48, 0.3, 48, 10)" {
+		t.Fatalf("default dc mnemonic = %q, want %q", got, "cbps-dc(10, 48, 0.3, 48, 10)")
+	}
+
+	customIndicator, err := factory.New(
+		core.CombBandPassSpectrum,
+		`{"minPeriod": 8, "maxPeriod": 32, "bandwidth": 0.4, "highpassPeriod": 40, "smoothingPeriod": 10.5, "spectralDilationCompensation": false, "enhanceResolution": true, "barComponent": "median"}`,
+	)
+	if err != nil {
+		t.Fatalf("custom factory construction failed: %v", err)
+	}
+	if got := customIndicator.Metadata().Mnemonic; got != "cbps(8, 32, 0.4, 40, 10.5, no-sdc, enh, hl/2)" {
+		t.Fatalf("custom mnemonic = %q, want %q", got, "cbps(8, 32, 0.4, 40, 10.5, no-sdc, enh, hl/2)")
+	}
+	if got := customIndicator.Metadata().Outputs[1].Mnemonic; got != "cbps-dc(8, 32, 0.4, 40, 10.5, no-sdc, hl/2)" {
+		t.Fatalf("custom dc mnemonic = %q, want %q", got, "cbps-dc(8, 32, 0.4, 40, 10.5, no-sdc, hl/2)")
+	}
+
+	invalidJSONCases := []string{
+		`{"length": 48}`,
+		`{"windowLength": 48}`,
+		`{"disableSpectralDilationCompensation": true}`,
+		`{"disableAutomaticGainControl": true}`,
+		`{"automaticGainControlDecayFactor": 0.995}`,
+		`{"fixedNormalization": true}`,
+		`{"unknownField": 1}`,
+		`{"minPeriod": 10.5}`,
+		`{"minPeriod": 2}`,
+		`{"maxPeriod": 9}`,
+		`{"bandwidth": 0}`,
+		`{"bandwidth": 2.5}`,
+		`{"highpassPeriod": 4}`,
+		`{"smoothingPeriod": 1}`,
+		`{"spectralDilationCompensation": 1}`,
+		`{"enhanceResolution": "yes"}`,
+		`{"minPeriod": null}`,
+	}
+	for _, payload := range invalidJSONCases {
+		if _, err := factory.New(core.CombBandPassSpectrum, payload); err == nil {
+			t.Fatalf("expected error for payload %s", payload)
+		}
+	}
+}
+
 func TestFactoryDiscreteFourierTransformSpectrum(t *testing.T) {
 	t.Parallel()
 

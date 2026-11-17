@@ -201,7 +201,10 @@ var descriptors = map[Identifier]Descriptor{
 	CombBandPassSpectrum: {
 		Identifier: CombBandPassSpectrum, Family: "John Ehlers",
 		Adaptivity: Static, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
-		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Heatmap, Role: Spectrum, Pane: Own}},
+		Outputs: []OutputDescriptor{
+			{Kind: 1 /* Value */, Shape: shape.Heatmap, Role: Spectrum, Pane: Own},
+			{Kind: 2 /* DominantCycle */, Shape: shape.Scalar, Role: CyclePeriod, Pane: Own},
+		},
 	},
 	CoronaSignalToNoiseRatio: {
 		Identifier: CoronaSignalToNoiseRatio, Family: "John Ehlers",
