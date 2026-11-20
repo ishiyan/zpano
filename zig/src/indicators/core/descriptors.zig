@@ -159,6 +159,10 @@ pub const descriptors = [_]Descriptor{
         .{ .kind = 2, .shape = .scalar, .role = .smoother, .pane = .price },
     } },
     .{ .identifier = .zero_lag_exponential_moving_average, .family = "John Ehlers", .adaptivity = .static_, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .smoother, .pane = .price }} },
+    .{ .identifier = .transformed_discrete_fourier_transform_spectrum, .family = "John Ehlers", .adaptivity = .static_, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{
+        .{ .kind = 1, .shape = .heatmap, .role = .spectrum, .pane = .own },
+        .{ .kind = 2, .shape = .scalar, .role = .cycle_period, .pane = .own },
+    } },
     // ── joseph granville ──────────────────────────────────────────────────────────
     .{ .identifier = .on_balance_volume, .family = "Joseph Granville", .adaptivity = .static_, .input_requirement = .bar_input, .volume_usage = .aggregate_bar_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .volume_flow, .pane = .own }} },
     // ── larry williams ──────────────────────────────────────────────────────────

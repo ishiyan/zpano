@@ -496,6 +496,57 @@ def create_indicator(
             normalized[mapped] = item
         return DiscreteFourierTransformSpectrum.create(_apply(default_params(), normalized))
 
+    if identifier == Identifier.TRANSFORMED_DISCRETE_FOURIER_TRANSFORM_SPECTRUM:
+        from ...entities.bar_component import BarComponent
+        from ...entities.quote_component import QuoteComponent
+        from ...entities.trade_component import TradeComponent
+        from ..john_ehlers.transformed_discrete_fourier_transform_spectrum.params import default_params
+        from ..john_ehlers.transformed_discrete_fourier_transform_spectrum.transformed_discrete_fourier_transform_spectrum import TransformedDiscreteFourierTransformSpectrum
+        if _is_empty(params):
+            return TransformedDiscreteFourierTransformSpectrum.create_default()
+        assert params is not None
+        alias_map = {
+            "minPeriod": "min_period",
+            "maxPeriod": "max_period",
+            "windowLength": "window_length",
+            "highpassPeriod": "highpass_period",
+            "barComponent": "bar_component",
+            "quoteComponent": "quote_component",
+            "tradeComponent": "trade_component",
+        }
+        allowed_keys = {
+            "min_period",
+            "max_period",
+            "window_length",
+            "highpass_period",
+            "bar_component",
+            "quote_component",
+            "trade_component",
+        }
+        normalized: dict[str, Any] = {}
+        for key, item in params.items():
+            mapped = alias_map.get(key, key)
+            if mapped not in allowed_keys:
+                raise ValueError(
+                    f"invalid transformed discrete Fourier transform spectrum parameters: unsupported key {key!r}"
+                )
+            if mapped in normalized:
+                raise ValueError(
+                    f"invalid transformed discrete Fourier transform spectrum parameters: duplicate key {key!r}"
+                )
+            if item is None:
+                raise ValueError(
+                    f"invalid transformed discrete Fourier transform spectrum parameters: {key!r} cannot be None"
+                )
+            if mapped == "bar_component" and isinstance(item, int) and not isinstance(item, bool):
+                item = BarComponent(item)
+            elif mapped == "quote_component" and isinstance(item, int) and not isinstance(item, bool):
+                item = QuoteComponent(item)
+            elif mapped == "trade_component" and isinstance(item, int) and not isinstance(item, bool):
+                item = TradeComponent(item)
+            normalized[mapped] = item
+        return TransformedDiscreteFourierTransformSpectrum.create(_apply(default_params(), normalized))
+
     # ── joseph granville ──────────────────────────────────────────────────
 
     if identifier == Identifier.ON_BALANCE_VOLUME:

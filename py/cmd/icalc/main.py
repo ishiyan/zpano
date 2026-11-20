@@ -101,6 +101,7 @@ _IDENTIFIER_MAP: dict[str, Identifier] = {
     'coronaTrendVigor': Identifier.CORONA_TREND_VIGOR,
     'adaptiveTrendAndCycleFilter': Identifier.ADAPTIVE_TREND_AND_CYCLE_FILTER,
     'discreteFourierTransformSpectrum': Identifier.DISCRETE_FOURIER_TRANSFORM_SPECTRUM,
+    'transformedDiscreteFourierTransformSpectrum': Identifier.TRANSFORMED_DISCRETE_FOURIER_TRANSFORM_SPECTRUM,
     'combBandPassSpectrum': Identifier.COMB_BAND_PASS_SPECTRUM,
     'autoCorrelationIndicator': Identifier.AUTO_CORRELATION_INDICATOR,
     'autoCorrelationPeriodogram': Identifier.AUTO_CORRELATION_PERIODOGRAM,

@@ -81,6 +81,7 @@ const aci_mod = @import("../john_ehlers/autocorrelation_indicator/autocorrelatio
 const acp_mod = @import("../john_ehlers/auto_correlation_periodogram/auto_correlation_periodogram.zig");
 const cbps_mod = @import("../john_ehlers/comb_band_pass_spectrum/comb_band_pass_spectrum.zig");
 const dfts_mod = @import("../john_ehlers/discrete_fourier_transform_spectrum/discrete_fourier_transform_spectrum.zig");
+const tdfts_mod = @import("../john_ehlers/transformed_discrete_fourier_transform_spectrum/transformed_discrete_fourier_transform_spectrum.zig");
 
 // joseph_granville
 const obv_mod = @import("../joseph_granville/on_balance_volume/on_balance_volume.zig");
@@ -1128,6 +1129,63 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
             const ind = dfts_mod.DiscreteFourierTransformSpectrum.init(allocator, p) catch return FactoryError.IndicatorInitFailed;
             const ptr = heapAlloc(dfts_mod.DiscreteFourierTransformSpectrum, allocator, ind) catch return FactoryError.OutOfMemory;
             break :blk .{ .indicator = ptr.indicator(), .ctx = ptr, .deinit_fn = DeinitFn(dfts_mod.DiscreteFourierTransformSpectrum) };
+        },
+
+        .transformed_discrete_fourier_transform_spectrum => blk: {
+            var p = tdfts_mod.defaultParams();
+            for (obj.keys(), obj.values()) |key, raw| {
+                if (std.mem.eql(u8, key, "minPeriod")) {
+                    p.min_period = switch (raw) {
+                        .integer => |number| if (number >= std.math.minInt(i32) and number <= std.math.maxInt(i32)) @intCast(number) else return FactoryError.InvalidParams,
+                        .float => |number| if (std.math.isFinite(number) and @trunc(number) == number and number >= @as(f64, @floatFromInt(std.math.minInt(i32))) and number <= @as(f64, @floatFromInt(std.math.maxInt(i32)))) @intFromFloat(number) else return FactoryError.InvalidParams,
+                        else => return FactoryError.InvalidParams,
+                    };
+                } else if (std.mem.eql(u8, key, "maxPeriod")) {
+                    p.max_period = switch (raw) {
+                        .integer => |number| if (number >= std.math.minInt(i32) and number <= std.math.maxInt(i32)) @intCast(number) else return FactoryError.InvalidParams,
+                        .float => |number| if (std.math.isFinite(number) and @trunc(number) == number and number >= @as(f64, @floatFromInt(std.math.minInt(i32))) and number <= @as(f64, @floatFromInt(std.math.maxInt(i32)))) @intFromFloat(number) else return FactoryError.InvalidParams,
+                        else => return FactoryError.InvalidParams,
+                    };
+                } else if (std.mem.eql(u8, key, "windowLength")) {
+                    p.window_length = switch (raw) {
+                        .integer => |number| if (number >= std.math.minInt(i32) and number <= std.math.maxInt(i32)) @intCast(number) else return FactoryError.InvalidParams,
+                        .float => |number| if (std.math.isFinite(number) and @trunc(number) == number and number >= @as(f64, @floatFromInt(std.math.minInt(i32))) and number <= @as(f64, @floatFromInt(std.math.maxInt(i32)))) @intFromFloat(number) else return FactoryError.InvalidParams,
+                        else => return FactoryError.InvalidParams,
+                    };
+                } else if (std.mem.eql(u8, key, "highpassPeriod")) {
+                    p.highpass_period = switch (raw) {
+                        .float => |number| if (std.math.isFinite(number)) number else return FactoryError.InvalidParams,
+                        .integer => |number| @floatFromInt(number),
+                        else => return FactoryError.InvalidParams,
+                    };
+                } else if (std.mem.eql(u8, key, "barComponent")) {
+                    const comp_code: u8 = switch (raw) {
+                        .integer => |number| if (number >= 0 and number <= 8) @intCast(number) else return FactoryError.InvalidParams,
+                        .float => |number| if (std.math.isFinite(number) and @trunc(number) == number and number >= 0 and number <= 8) @intFromFloat(number) else return FactoryError.InvalidParams,
+                        else => return FactoryError.InvalidParams,
+                    };
+                    p.bar_component = @enumFromInt(comp_code);
+                } else if (std.mem.eql(u8, key, "quoteComponent")) {
+                    const comp_code: u8 = switch (raw) {
+                        .integer => |number| if (number >= 0 and number <= 7) @intCast(number) else return FactoryError.InvalidParams,
+                        .float => |number| if (std.math.isFinite(number) and @trunc(number) == number and number >= 0 and number <= 7) @intFromFloat(number) else return FactoryError.InvalidParams,
+                        else => return FactoryError.InvalidParams,
+                    };
+                    p.quote_component = @enumFromInt(comp_code);
+                } else if (std.mem.eql(u8, key, "tradeComponent")) {
+                    const comp_code: u8 = switch (raw) {
+                        .integer => |number| if (number >= 0 and number <= 1) @intCast(number) else return FactoryError.InvalidParams,
+                        .float => |number| if (std.math.isFinite(number) and @trunc(number) == number and number >= 0 and number <= 1) @intFromFloat(number) else return FactoryError.InvalidParams,
+                        else => return FactoryError.InvalidParams,
+                    };
+                    p.trade_component = @enumFromInt(comp_code);
+                } else {
+                    return FactoryError.InvalidParams;
+                }
+            }
+            const ind = tdfts_mod.TransformedDiscreteFourierTransformSpectrum.init(allocator, p) catch return FactoryError.IndicatorInitFailed;
+            const ptr = heapAlloc(tdfts_mod.TransformedDiscreteFourierTransformSpectrum, allocator, ind) catch return FactoryError.OutOfMemory;
+            break :blk .{ .indicator = ptr.indicator(), .ctx = ptr, .deinit_fn = DeinitFn(tdfts_mod.TransformedDiscreteFourierTransformSpectrum) };
         },
 
         // ── joseph granville ─────────────────────────────────────────────
@@ -2327,6 +2385,35 @@ test "create auto correlation periodogram strict params" {
             create(allocator, .auto_correlation_periodogram, bad_json),
         );
     }
+
+    const tdfts_default = try create(allocator, .transformed_discrete_fourier_transform_spectrum, "{}");
+    defer tdfts_default.deinit(allocator);
+    var md_tdfts_default: metadata_mod.Metadata = undefined;
+    tdfts_default.indicator.metadata(&md_tdfts_default);
+    try std.testing.expectEqualStrings("tdfts(8, 50, 50, 40)", md_tdfts_default.mnemonic);
+    try std.testing.expectEqual(@as(usize, 2), md_tdfts_default.outputs_len);
+    try std.testing.expectEqualStrings("tdfts-dc(8, 50, 50, 40)", md_tdfts_default.outputs_buf[1].mnemonic);
+
+    const tdfts_custom = try create(allocator, .transformed_discrete_fourier_transform_spectrum,
+        \\{"minPeriod": 10, "maxPeriod": 30, "windowLength": 48, "highpassPeriod": 40.5, "barComponent": 5}
+    );
+    defer tdfts_custom.deinit(allocator);
+    var md_tdfts_custom: metadata_mod.Metadata = undefined;
+    tdfts_custom.indicator.metadata(&md_tdfts_custom);
+    try std.testing.expectEqualStrings("tdfts(10, 30, 48, 40.5, hl/2)", md_tdfts_custom.mnemonic);
+
+    try std.testing.expectError(
+        FactoryError.InvalidParams,
+        create(allocator, .transformed_discrete_fourier_transform_spectrum,
+            \\{"unknownKey": 1}
+        ),
+    );
+    try std.testing.expectError(
+        FactoryError.IndicatorInitFailed,
+        create(allocator, .transformed_discrete_fourier_transform_spectrum,
+            \\{"minPeriod": 7}
+        ),
+    );
 }
 
 test "create true range no params" {

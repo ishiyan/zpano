@@ -21,3 +21,4 @@ pub mod sine_wave;
 pub mod auto_correlation_periodogram;
 pub mod comb_band_pass_spectrum;
 pub mod discrete_fourier_transform_spectrum;
+pub mod transformed_discrete_fourier_transform_spectrum;

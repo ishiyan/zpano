@@ -78,6 +78,7 @@
   { "identifier": "coronaTrendVigor", "params": {} },
   { "identifier": "adaptiveTrendAndCycleFilter", "params": {} },
   { "identifier": "discreteFourierTransformSpectrum", "params": {} },
+  { "identifier": "transformedDiscreteFourierTransformSpectrum", "params": {} },
   { "identifier": "combBandPassSpectrum", "params": {} },
   { "identifier": "autoCorrelationIndicator", "params": {} },
   { "identifier": "autoCorrelationPeriodogram", "params": {} },

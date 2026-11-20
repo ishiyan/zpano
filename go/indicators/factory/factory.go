@@ -72,6 +72,7 @@ import (
 	"zpano/indicators/johnehlers/roofingfilter"
 	"zpano/indicators/johnehlers/sinewave"
 	"zpano/indicators/johnehlers/supersmoother"
+	"zpano/indicators/johnehlers/transformeddiscretefouriertransformspectrum"
 	"zpano/indicators/johnehlers/trendcyclemode"
 	"zpano/indicators/johnehlers/zerolagerrorcorrectingexponentialmovingaverage"
 	"zpano/indicators/johnehlers/zerolagexponentialmovingaverage"
@@ -724,6 +725,27 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 		}
 
 		return discretefouriertransformspectrum.NewDiscreteFourierTransformSpectrumParams(p)
+
+	case core.TransformedDiscreteFourierTransformSpectrum:
+		if isEmptyObject(b) {
+			return transformeddiscretefouriertransformspectrum.NewTransformedDiscreteFourierTransformSpectrumDefault()
+		}
+
+		allowed := map[string]struct{}{
+			"minPeriod":      {},
+			"maxPeriod":      {},
+			"windowLength":   {},
+			"highpassPeriod": {},
+			"barComponent":   {},
+			"quoteComponent": {},
+			"tradeComponent": {},
+		}
+		p := transformeddiscretefouriertransformspectrum.DefaultParams()
+		if err := unmarshalStrictAllowed(b, p, allowed); err != nil {
+			return nil, err
+		}
+
+		return transformeddiscretefouriertransformspectrum.NewTransformedDiscreteFourierTransformSpectrumParams(p)
 
 	// ── joseph granville ──────────────────────────────────────────────────
 

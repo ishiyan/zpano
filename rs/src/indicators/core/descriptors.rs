@@ -887,6 +887,27 @@ pub static DESCRIPTORS: &[Descriptor] = &[
             pane: Price,
         }],
     },
+    Descriptor {
+        identifier: TransformedDiscreteFourierTransformSpectrum,
+        family: "John Ehlers",
+        adaptivity: Static,
+        input_requirement: ScalarInput,
+        volume_usage: NoVolume,
+        outputs: &[
+            OutputDescriptor {
+                kind: 1,
+                shape: Heatmap,
+                role: Spectrum,
+                pane: Own,
+            },
+            OutputDescriptor {
+                kind: 2,
+                shape: Scalar,
+                role: CyclePeriod,
+                pane: Own,
+            },
+        ],
+    },
     // ── joseph granville ──────────────────────────────────────────────────────────
     Descriptor {
         identifier: OnBalanceVolume,

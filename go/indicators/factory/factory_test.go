@@ -231,3 +231,48 @@ func TestFactoryAutoCorrelationPeriodogram(t *testing.T) {
 		}
 	}
 }
+
+func TestFactoryTransformedDiscreteFourierTransformSpectrumStrict(t *testing.T) {
+	t.Parallel()
+
+	defaultIndicator, err := factory.New(core.TransformedDiscreteFourierTransformSpectrum, `{}`)
+	if err != nil {
+		t.Fatalf("default factory construction failed: %v", err)
+	}
+	if got := defaultIndicator.Metadata().Mnemonic; got != "tdfts(8, 50, 50, 40)" {
+		t.Fatalf("default mnemonic = %q, want %q", got, "tdfts(8, 50, 50, 40)")
+	}
+	if got := len(defaultIndicator.Metadata().Outputs); got != 2 {
+		t.Fatalf("len(outputs) = %d, want 2", len(defaultIndicator.Metadata().Outputs))
+	}
+	if got := defaultIndicator.Metadata().Outputs[1].Mnemonic; got != "tdfts-dc(8, 50, 50, 40)" {
+		t.Fatalf("default dc mnemonic = %q, want %q", got, "tdfts-dc(8, 50, 50, 40)")
+	}
+
+	customIndicator, err := factory.New(
+		core.TransformedDiscreteFourierTransformSpectrum,
+		`{"minPeriod": 10, "maxPeriod": 30, "windowLength": 48, "highpassPeriod": 40.5, "barComponent": "median"}`,
+	)
+	if err != nil {
+		t.Fatalf("custom factory construction failed: %v", err)
+	}
+	if got := customIndicator.Metadata().Mnemonic; got != "tdfts(10, 30, 48, 40.5, hl/2)" {
+		t.Fatalf("custom mnemonic = %q, want %q", got, "tdfts(10, 30, 48, 40.5, hl/2)")
+	}
+
+	invalidJSONCases := []string{
+		`{"minPeriod": 7}`,
+		`{"minPeriod": 8.5}`,
+		`{"minPeriod": null}`,
+		`{"maxPeriod": 7}`,
+		`{"windowLength": 0}`,
+		`{"windowLength": 10.5}`,
+		`{"highpassPeriod": 4.0}`,
+		`{"unknownField": 1}`,
+	}
+	for _, payload := range invalidJSONCases {
+		if _, err := factory.New(core.TransformedDiscreteFourierTransformSpectrum, payload); err == nil {
+			t.Fatalf("expected error for payload %s", payload)
+		}
+	}
+}

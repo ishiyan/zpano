@@ -189,6 +189,10 @@ const descriptors: Map<IndicatorIdentifier, Descriptor> = new Map<IndicatorIdent
   ])],
   [IndicatorIdentifier.ZeroLagErrorCorrectingExponentialMovingAverage, desc(IndicatorIdentifier.ZeroLagErrorCorrectingExponentialMovingAverage, 'John Ehlers', A.Adaptive, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Smoother, P.Price), out(1, S.Scalar, R.Smoother, P.Price)])],
   [IndicatorIdentifier.ZeroLagExponentialMovingAverage, desc(IndicatorIdentifier.ZeroLagExponentialMovingAverage, 'John Ehlers', A.Static, I.ScalarInput, V.NoVolume, [out(0, S.Scalar, R.Smoother, P.Price)])],
+  [IndicatorIdentifier.TransformedDiscreteFourierTransformSpectrum, desc(IndicatorIdentifier.TransformedDiscreteFourierTransformSpectrum, 'John Ehlers', A.Static, I.ScalarInput, V.NoVolume, [
+    out(0, S.Heatmap, R.Spectrum, P.Own),
+    out(1, S.Scalar, R.CyclePeriod, P.Own),
+  ])],
 
   // ── joseph granville ───────────────────────────────────────────────────
 

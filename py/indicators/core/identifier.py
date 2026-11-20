@@ -173,6 +173,10 @@ class Identifier(IntEnum):
     # Identifies the Ehlers Zero-lag Exponential Moving Average (ZEMA) indicator.
     ZERO_LAG_EXPONENTIAL_MOVING_AVERAGE = 43
 
+    # Identifies the Ehlers Transformed Discrete Fourier Transform Spectrum (TDFTS)
+    # heatmap indicator, exposing the transformed dB spectrum and dominant cycle period.
+    TRANSFORMED_DISCRETE_FOURIER_TRANSFORM_SPECTRUM = 138
+
     # ── joseph granville ───────────────────────────────────────────────────
 
     # Identifies the Joseph Granville On-Balance Volume (OBV) indicator.

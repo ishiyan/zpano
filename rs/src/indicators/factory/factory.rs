@@ -125,6 +125,9 @@ use crate::indicators::john_ehlers::auto_correlation_periodogram::auto_correlati
 };
 use crate::indicators::john_ehlers::comb_band_pass_spectrum::comb_band_pass_spectrum::{CombBandPassSpectrum, CombBandPassSpectrumParams};
 use crate::indicators::john_ehlers::discrete_fourier_transform_spectrum::discrete_fourier_transform_spectrum::{DiscreteFourierTransformSpectrum, DiscreteFourierTransformSpectrumParams};
+use crate::indicators::john_ehlers::transformed_discrete_fourier_transform_spectrum::transformed_discrete_fourier_transform_spectrum::{
+    TransformedDiscreteFourierTransformSpectrum, TransformedDiscreteFourierTransformSpectrumParams,
+};
 
 // ── joseph granville ─────────────────────────────────────────────────────────
 use crate::indicators::joseph_granville::on_balance_volume::{
@@ -1514,6 +1517,88 @@ pub fn create_indicator(
             Ok(Box::new(DiscreteFourierTransformSpectrum::new(&options)?))
         }
 
+        Identifier::TransformedDiscreteFourierTransformSpectrum => {
+            if matches!(params, JsonValue::Null) {
+                return Ok(Box::new(
+                    TransformedDiscreteFourierTransformSpectrum::new_default()?,
+                ));
+            }
+            let pairs = params
+                .as_object()
+                .ok_or_else(|| "params must be a JSON object".to_string())?;
+            let mut options = TransformedDiscreteFourierTransformSpectrumParams::default();
+            let mut seen_keys: Vec<&str> = Vec::with_capacity(pairs.len());
+            for (key, raw) in pairs {
+                if seen_keys.contains(&key.as_str()) {
+                    return Err(format!("duplicate parameter key: {key}"));
+                }
+                seen_keys.push(key.as_str());
+                match key.as_str() {
+                    "minPeriod" => match raw {
+                        JsonValue::Number(number)
+                            if number.is_finite()
+                                && number.fract() == 0.0
+                                && *number >= i32::MIN as f64
+                                && *number <= i32::MAX as f64 =>
+                        {
+                            options.min_period = *number as i32;
+                        }
+                        _ => return Err("minPeriod must be an integer >= 8".to_string()),
+                    },
+                    "maxPeriod" => match raw {
+                        JsonValue::Number(number)
+                            if number.is_finite()
+                                && number.fract() == 0.0
+                                && *number >= i32::MIN as f64
+                                && *number <= i32::MAX as f64 =>
+                        {
+                            options.max_period = *number as i32;
+                        }
+                        _ => return Err("maxPeriod must be an integer >= minPeriod".to_string()),
+                    },
+                    "windowLength" => match raw {
+                        JsonValue::Number(number)
+                            if number.is_finite()
+                                && number.fract() == 0.0
+                                && *number >= i32::MIN as f64
+                                && *number <= i32::MAX as f64 =>
+                        {
+                            options.window_length = *number as i32;
+                        }
+                        _ => return Err("windowLength must be an integer >= 1".to_string()),
+                    },
+                    "highpassPeriod" => match raw {
+                        JsonValue::Number(number) if number.is_finite() => {
+                            options.highpass_period = *number;
+                        }
+                        _ => return Err("highpassPeriod must be a finite number".to_string()),
+                    },
+                    "barComponent" => match raw {
+                        JsonValue::Number(number) => {
+                            options.bar_component = Some(lvt_bar_component(*number)?);
+                        }
+                        _ => return Err("invalid component number".to_string()),
+                    },
+                    "quoteComponent" => match raw {
+                        JsonValue::Number(number) => {
+                            options.quote_component = Some(lvt_quote_component(*number)?);
+                        }
+                        _ => return Err("invalid component number".to_string()),
+                    },
+                    "tradeComponent" => match raw {
+                        JsonValue::Number(number) => {
+                            options.trade_component = Some(lvt_trade_component(*number)?);
+                        }
+                        _ => return Err("invalid component number".to_string()),
+                    },
+                    _ => return Err(format!("unknown parameter key: {key}")),
+                }
+            }
+            Ok(Box::new(TransformedDiscreteFourierTransformSpectrum::new(
+                &options,
+            )?))
+        }
+
         // ── joseph granville ─────────────────────────────────────────────
         Identifier::OnBalanceVolume => {
             let p = OnBalanceVolumeParams::default();
@@ -2660,6 +2745,7 @@ mod tests {
             Identifier::CoronaTrendVigor,
             Identifier::AdaptiveTrendAndCycleFilter,
             Identifier::DiscreteFourierTransformSpectrum,
+            Identifier::TransformedDiscreteFourierTransformSpectrum,
             Identifier::CombBandPassSpectrum,
             Identifier::AutoCorrelationIndicator,
             Identifier::AutoCorrelationPeriodogram,
@@ -2822,6 +2908,48 @@ mod tests {
             assert!(
                 create_indicator(Identifier::DiscreteFourierTransformSpectrum, bad_dft_json).is_err(),
                 "expected error for {bad_dft_json}"
+            );
+        }
+
+        let tdfts_default =
+            create_indicator(Identifier::TransformedDiscreteFourierTransformSpectrum, "{}")
+                .unwrap();
+        assert_eq!(tdfts_default.metadata().mnemonic, "tdfts(8, 50, 50, 40)");
+        assert_eq!(tdfts_default.metadata().outputs.len(), 2);
+
+        let tdfts_custom = create_indicator(
+            Identifier::TransformedDiscreteFourierTransformSpectrum,
+            r#"{"minPeriod": 10, "maxPeriod": 30, "windowLength": 48, "highpassPeriod": 40.5, "barComponent": 5}"#,
+        )
+        .unwrap();
+        assert_eq!(
+            tdfts_custom.metadata().mnemonic,
+            "tdfts(10, 30, 48, 40.5, hl/2)"
+        );
+        assert_eq!(
+            tdfts_custom.metadata().outputs[1].mnemonic,
+            "tdfts-dc(10, 30, 48, 40.5, hl/2)"
+        );
+
+        for bad_tdfts_json in [
+            r#"{"length": 50}"#,
+            r#"{"smoothingPeriod": 10}"#,
+            r#"{"minPeriod": 8.5}"#,
+            r#"{"windowLength": 1.5}"#,
+            r#"{"minPeriod": null}"#,
+            r#"{"minPeriod": 7}"#,
+            r#"{"maxPeriod": 7}"#,
+            r#"{"windowLength": 0}"#,
+            r#"{"highpassPeriod": 4}"#,
+            r#"{"highpassPeriod": "40"}"#,
+        ] {
+            assert!(
+                create_indicator(
+                    Identifier::TransformedDiscreteFourierTransformSpectrum,
+                    bad_tdfts_json
+                )
+                .is_err(),
+                "expected error for {bad_tdfts_json}"
             );
         }
 

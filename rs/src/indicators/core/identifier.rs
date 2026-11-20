@@ -125,6 +125,9 @@ pub enum Identifier {
     ZeroLagErrorCorrectingExponentialMovingAverage = 42,
     /// Identifies the Ehlers Zero-lag Exponential Moving Average (ZEMA) indicator.
     ZeroLagExponentialMovingAverage = 43,
+    /// Identifies the Ehlers Transformed Discrete Fourier Transform Spectrum (TDFTS) heatmap indicator,
+    /// a nonlinearly sharpened DFT decibel spectrum with 3 dB dominant cycle over a configurable range.
+    TransformedDiscreteFourierTransformSpectrum = 138,
 
     // ── joseph granville ───────────────────────────────────────────────────
     /// Identifies the Joseph Granville On-Balance Volume (OBV) indicator.
@@ -405,6 +408,9 @@ impl Identifier {
                 "zeroLagErrorCorrectingExponentialMovingAverage"
             }
             Self::ZeroLagExponentialMovingAverage => "zeroLagExponentialMovingAverage",
+            Self::TransformedDiscreteFourierTransformSpectrum => {
+                "transformedDiscreteFourierTransformSpectrum"
+            }
             Self::OnBalanceVolume => "onBalanceVolume",
             Self::UltimateOscillator => "ultimateOscillator",
             Self::WilliamsPercentR => "williamsPercentR",
@@ -558,6 +564,9 @@ impl Identifier {
                 Some(Self::ZeroLagErrorCorrectingExponentialMovingAverage)
             }
             "zeroLagExponentialMovingAverage" => Some(Self::ZeroLagExponentialMovingAverage),
+            "transformedDiscreteFourierTransformSpectrum" => {
+                Some(Self::TransformedDiscreteFourierTransformSpectrum)
+            }
             "onBalanceVolume" => Some(Self::OnBalanceVolume),
             "ultimateOscillator" => Some(Self::UltimateOscillator),
             "williamsPercentR" => Some(Self::WilliamsPercentR),

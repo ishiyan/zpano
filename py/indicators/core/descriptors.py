@@ -231,6 +231,10 @@ _descriptors: dict[Id, Descriptor] = {
     Id.ZERO_LAG_EXPONENTIAL_MOVING_AVERAGE: _d(
         Id.ZERO_LAG_EXPONENTIAL_MOVING_AVERAGE, "John Ehlers", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
         [_o(0, S.SCALAR, R.SMOOTHER, P.PRICE)]),
+    Id.TRANSFORMED_DISCRETE_FOURIER_TRANSFORM_SPECTRUM: _d(
+        Id.TRANSFORMED_DISCRETE_FOURIER_TRANSFORM_SPECTRUM, "John Ehlers", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
+        [_o(0, S.HEATMAP, R.SPECTRUM, P.OWN),
+         _o(1, S.SCALAR, R.CYCLE_PERIOD, P.OWN)]),
 
     # ── joseph granville ───────────────────────────────────────────────────
 

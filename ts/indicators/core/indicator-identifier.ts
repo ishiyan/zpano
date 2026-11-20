@@ -165,10 +165,13 @@ export enum IndicatorIdentifier {
     /** Identifies the Ehler's __Zero-lag Exponential Moving Average__ (ZEMA) indicator. */
     ZeroLagExponentialMovingAverage,
 
+    /** Identifies Ehlers' __Transformed Discrete Fourier Transform Spectrum__ (TDFTS) indicator. */
+    TransformedDiscreteFourierTransformSpectrum = 138,
+
     // ── joseph granville ───────────────────────────────────────────────────
 
     /** Identifies Joseph Granville's __On-Balance Volume__ (OBV) indicator. */
-    OnBalanceVolume,
+    OnBalanceVolume = 44,
 
     // ── larry williams ─────────────────────────────────────────────────────
 

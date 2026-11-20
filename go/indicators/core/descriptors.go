@@ -345,6 +345,14 @@ var descriptors = map[Identifier]Descriptor{
 		Adaptivity: Static, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
 		Outputs: []OutputDescriptor{{Kind: 1 /* Value */, Shape: shape.Scalar, Role: Smoother, Pane: Price}},
 	},
+	TransformedDiscreteFourierTransformSpectrum: {
+		Identifier: TransformedDiscreteFourierTransformSpectrum, Family: "John Ehlers",
+		Adaptivity: Static, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{
+			{Kind: 1 /* Value */, Shape: shape.Heatmap, Role: Spectrum, Pane: Own},
+			{Kind: 2 /* DominantCycle */, Shape: shape.Scalar, Role: CyclePeriod, Pane: Own},
+		},
+	},
 
 	// ── joseph granville ───────────────────────────────────────────────────
 

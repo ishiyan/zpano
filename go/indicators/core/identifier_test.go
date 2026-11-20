@@ -66,6 +66,7 @@ func TestIdentifierString(t *testing.T) {
 		{TrendCycleMode, trendCycleMode},
 		{ZeroLagErrorCorrectingExponentialMovingAverage, zeroLagErrorCorrectingExponentialMovingAverage},
 		{ZeroLagExponentialMovingAverage, zeroLagExponentialMovingAverage},
+		{TransformedDiscreteFourierTransformSpectrum, transformedDiscreteFourierTransformSpectrum},
 		// ── joseph granville ───────────────────────────────────────────────────
 		{OnBalanceVolume, onBalanceVolume},
 		// ── larry williams ─────────────────────────────────────────────────────
@@ -244,6 +245,7 @@ func TestIdentifierIsKnown(t *testing.T) {
 		{TrendCycleMode, true},
 		{ZeroLagErrorCorrectingExponentialMovingAverage, true},
 		{ZeroLagExponentialMovingAverage, true},
+		{TransformedDiscreteFourierTransformSpectrum, true},
 		// ── joseph granville ───────────────────────────────────────────────────
 		{OnBalanceVolume, true},
 		// ── larry williams ─────────────────────────────────────────────────────
@@ -426,6 +428,7 @@ func TestIdentifierMarshalJSON(t *testing.T) {
 		{TrendCycleMode, dqs + trendCycleMode + dqs, true},
 		{ZeroLagErrorCorrectingExponentialMovingAverage, dqs + zeroLagErrorCorrectingExponentialMovingAverage + dqs, true},
 		{ZeroLagExponentialMovingAverage, dqs + zeroLagExponentialMovingAverage + dqs, true},
+		{TransformedDiscreteFourierTransformSpectrum, dqs + transformedDiscreteFourierTransformSpectrum + dqs, true},
 		// ── joseph granville ───────────────────────────────────────────────────
 		{OnBalanceVolume, dqs + onBalanceVolume + dqs, true},
 		// ── larry williams ─────────────────────────────────────────────────────
@@ -621,6 +624,7 @@ func TestIdentifierUnmarshalJSON(t *testing.T) {
 		{TrendCycleMode, dqs + trendCycleMode + dqs, true},
 		{ZeroLagErrorCorrectingExponentialMovingAverage, dqs + zeroLagErrorCorrectingExponentialMovingAverage + dqs, true},
 		{ZeroLagExponentialMovingAverage, dqs + zeroLagExponentialMovingAverage + dqs, true},
+		{TransformedDiscreteFourierTransformSpectrum, dqs + transformedDiscreteFourierTransformSpectrum + dqs, true},
 		// ── joseph granville ───────────────────────────────────────────────────
 		{OnBalanceVolume, dqs + onBalanceVolume + dqs, true},
 		// ── larry williams ─────────────────────────────────────────────────────
