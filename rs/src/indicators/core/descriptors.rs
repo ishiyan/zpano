@@ -921,6 +921,19 @@ pub static DESCRIPTORS: &[Descriptor] = &[
             pane: Own,
         }],
     },
+    Descriptor {
+        identifier: RoofedAutoCorrelationHeatmap,
+        family: "John Ehlers",
+        adaptivity: Static,
+        input_requirement: ScalarInput,
+        volume_usage: NoVolume,
+        outputs: &[OutputDescriptor {
+            kind: 1,
+            shape: Heatmap,
+            role: Correlation,
+            pane: Own,
+        }],
+    },
     // ── joseph granville ──────────────────────────────────────────────────────────
     Descriptor {
         identifier: OnBalanceVolume,

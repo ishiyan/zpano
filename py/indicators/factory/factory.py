@@ -595,6 +595,61 @@ def create_indicator(
             normalized[mapped] = item
         return AutoCorrelationHeatmap.create(_apply(default_params(), normalized))
 
+    if identifier == Identifier.ROOFED_AUTO_CORRELATION_HEATMAP:
+        from ...entities.bar_component import BarComponent
+        from ...entities.quote_component import QuoteComponent
+        from ...entities.trade_component import TradeComponent
+        from ..john_ehlers.roofed_auto_correlation_heatmap.params import default_params
+        from ..john_ehlers.roofed_auto_correlation_heatmap.roofed_auto_correlation_heatmap import (
+            RoofedAutoCorrelationHeatmap,
+        )
+        if _is_empty(params):
+            return RoofedAutoCorrelationHeatmap.create_default()
+        assert params is not None
+        alias_map = {
+            "minLag": "min_lag",
+            "maxLag": "max_lag",
+            "averagingLength": "averaging_length",
+            "highpassPeriod": "highpass_period",
+            "smoothingPeriod": "smoothing_period",
+            "barComponent": "bar_component",
+            "quoteComponent": "quote_component",
+            "tradeComponent": "trade_component",
+        }
+        allowed_keys = {
+            "min_lag",
+            "max_lag",
+            "averaging_length",
+            "highpass_period",
+            "smoothing_period",
+            "bar_component",
+            "quote_component",
+            "trade_component",
+        }
+        normalized: dict[str, Any] = {}
+        for key, item in params.items():
+            mapped = alias_map.get(key, key)
+            if mapped not in allowed_keys:
+                raise ValueError(
+                    f"invalid roofed autocorrelation heatmap parameters: unsupported key {key!r}"
+                )
+            if mapped in normalized:
+                raise ValueError(
+                    f"invalid roofed autocorrelation heatmap parameters: duplicate key {key!r}"
+                )
+            if item is None:
+                raise ValueError(
+                    f"invalid roofed autocorrelation heatmap parameters: {key!r} cannot be None"
+                )
+            if mapped == "bar_component" and isinstance(item, int) and not isinstance(item, bool):
+                item = BarComponent(item)
+            elif mapped == "quote_component" and isinstance(item, int) and not isinstance(item, bool):
+                item = QuoteComponent(item)
+            elif mapped == "trade_component" and isinstance(item, int) and not isinstance(item, bool):
+                item = TradeComponent(item)
+            normalized[mapped] = item
+        return RoofedAutoCorrelationHeatmap.create(_apply(default_params(), normalized))
+
     # ── joseph granville ──────────────────────────────────────────────────
 
     if identifier == Identifier.ON_BALANCE_VOLUME:

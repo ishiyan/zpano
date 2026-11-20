@@ -131,6 +131,9 @@ use crate::indicators::john_ehlers::transformed_discrete_fourier_transform_spect
 use crate::indicators::john_ehlers::auto_correlation_heatmap::auto_correlation_heatmap::{
     AutoCorrelationHeatmap, AutoCorrelationHeatmapParams,
 };
+use crate::indicators::john_ehlers::roofed_auto_correlation_heatmap::roofed_auto_correlation_heatmap::{
+    RoofedAutoCorrelationHeatmap, RoofedAutoCorrelationHeatmapParams,
+};
 
 // ── joseph granville ─────────────────────────────────────────────────────────
 use crate::indicators::joseph_granville::on_balance_volume::{
@@ -1667,6 +1670,89 @@ pub fn create_indicator(
             }
             Ok(Box::new(AutoCorrelationHeatmap::new(&options)?))
         }
+        Identifier::RoofedAutoCorrelationHeatmap => {
+            if matches!(params, JsonValue::Null) {
+                return Ok(Box::new(RoofedAutoCorrelationHeatmap::new_default()));
+            }
+            let pairs = params
+                .as_object()
+                .ok_or_else(|| "params must be a JSON object".to_string())?;
+            let mut options = RoofedAutoCorrelationHeatmapParams::default();
+            let mut seen_keys: Vec<&str> = Vec::with_capacity(pairs.len());
+            for (key, raw) in pairs {
+                if seen_keys.contains(&key.as_str()) {
+                    return Err(format!("duplicate parameter key: {key}"));
+                }
+                seen_keys.push(key.as_str());
+                match key.as_str() {
+                    "minLag" => match raw {
+                        JsonValue::Number(number)
+                            if number.is_finite()
+                                && number.fract() == 0.0
+                                && *number >= i32::MIN as f64
+                                && *number <= i32::MAX as f64 =>
+                        {
+                            options.min_lag = *number as i32;
+                        }
+                        _ => return Err("minLag must be an integer >= 0".to_string()),
+                    },
+                    "maxLag" => match raw {
+                        JsonValue::Number(number)
+                            if number.is_finite()
+                                && number.fract() == 0.0
+                                && *number >= i32::MIN as f64
+                                && *number <= i32::MAX as f64 =>
+                        {
+                            options.max_lag = *number as i32;
+                        }
+                        _ => return Err("maxLag must be an integer >= minLag".to_string()),
+                    },
+                    "averagingLength" => match raw {
+                        JsonValue::Number(number)
+                            if number.is_finite()
+                                && number.fract() == 0.0
+                                && *number >= i32::MIN as f64
+                                && *number <= i32::MAX as f64 =>
+                        {
+                            options.averaging_length = *number as i32;
+                        }
+                        _ => return Err("averagingLength must be an integer >= 0".to_string()),
+                    },
+                    "highpassPeriod" => match raw {
+                        JsonValue::Number(number) if number.is_finite() => {
+                            options.highpass_period = *number;
+                        }
+                        _ => return Err("highpassPeriod must be a finite number".to_string()),
+                    },
+                    "smoothingPeriod" => match raw {
+                        JsonValue::Number(number) if number.is_finite() => {
+                            options.smoothing_period = *number;
+                        }
+                        _ => return Err("smoothingPeriod must be a finite number".to_string()),
+                    },
+                    "barComponent" => match raw {
+                        JsonValue::Number(number) => {
+                            options.bar_component = Some(lvt_bar_component(*number)?);
+                        }
+                        _ => return Err("invalid component number".to_string()),
+                    },
+                    "quoteComponent" => match raw {
+                        JsonValue::Number(number) => {
+                            options.quote_component = Some(lvt_quote_component(*number)?);
+                        }
+                        _ => return Err("invalid component number".to_string()),
+                    },
+                    "tradeComponent" => match raw {
+                        JsonValue::Number(number) => {
+                            options.trade_component = Some(lvt_trade_component(*number)?);
+                        }
+                        _ => return Err("invalid component number".to_string()),
+                    },
+                    _ => return Err(format!("unknown parameter key: {key}")),
+                }
+            }
+            Ok(Box::new(RoofedAutoCorrelationHeatmap::new(&options)?))
+        }
 
         // ── joseph granville ─────────────────────────────────────────────
         Identifier::OnBalanceVolume => {
@@ -2816,6 +2902,7 @@ mod tests {
             Identifier::DiscreteFourierTransformSpectrum,
             Identifier::TransformedDiscreteFourierTransformSpectrum,
             Identifier::AutoCorrelationHeatmap,
+            Identifier::RoofedAutoCorrelationHeatmap,
             Identifier::CombBandPassSpectrum,
             Identifier::AutoCorrelationIndicator,
             Identifier::AutoCorrelationPeriodogram,
@@ -3048,6 +3135,38 @@ mod tests {
             assert!(
                 create_indicator(Identifier::AutoCorrelationHeatmap, bad_ach_json).is_err(),
                 "expected error for {bad_ach_json}"
+            );
+        }
+
+        let rach_default =
+            create_indicator(Identifier::RoofedAutoCorrelationHeatmap, "{}").unwrap();
+        assert_eq!(rach_default.metadata().mnemonic, "rach(3, 48, 0, 48, 10)");
+        assert_eq!(rach_default.metadata().outputs.len(), 1);
+
+        let rach_custom = create_indicator(
+            Identifier::RoofedAutoCorrelationHeatmap,
+            r#"{"minLag": 0, "maxLag": 0, "averagingLength": 3, "highpassPeriod": 24, "smoothingPeriod": 10.5, "barComponent": 5}"#,
+        )
+        .unwrap();
+        assert_eq!(
+            rach_custom.metadata().mnemonic,
+            "rach(0, 0, 3, 24, 10.5, hl/2)"
+        );
+
+        for bad_rach_json in [
+            r#"{"unknownKey": 1}"#,
+            r#"{"minLag": -1}"#,
+            r#"{"minLag": 1.5}"#,
+            r#"{"minLag": 10, "maxLag": 9}"#,
+            r#"{"averagingLength": -1}"#,
+            r#"{"averagingLength": 2.5}"#,
+            r#"{"highpassPeriod": 4.9}"#,
+            r#"{"smoothingPeriod": 1.9}"#,
+            r#"{"smoothingPeriod": "10"}"#,
+        ] {
+            assert!(
+                create_indicator(Identifier::RoofedAutoCorrelationHeatmap, bad_rach_json).is_err(),
+                "expected error for {bad_rach_json}"
             );
         }
 

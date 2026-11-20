@@ -70,6 +70,7 @@ import (
 	"zpano/indicators/johnehlers/hilberttransformerinstantaneoustrendline"
 	"zpano/indicators/johnehlers/instantaneoustrendline"
 	"zpano/indicators/johnehlers/mesaadaptivemovingaverage"
+	"zpano/indicators/johnehlers/roofedautocorrelationheatmap"
 	"zpano/indicators/johnehlers/roofingfilter"
 	"zpano/indicators/johnehlers/sinewave"
 	"zpano/indicators/johnehlers/supersmoother"
@@ -767,6 +768,28 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 		}
 
 		return autocorrelationheatmap.NewAutoCorrelationHeatmapParams(p)
+
+	case core.RoofedAutoCorrelationHeatmap:
+		if isEmptyObject(b) {
+			return roofedautocorrelationheatmap.NewRoofedAutoCorrelationHeatmapDefault()
+		}
+
+		allowed := map[string]struct{}{
+			"minLag":          {},
+			"maxLag":          {},
+			"averagingLength": {},
+			"highpassPeriod":  {},
+			"smoothingPeriod": {},
+			"barComponent":    {},
+			"quoteComponent":  {},
+			"tradeComponent":  {},
+		}
+		p := roofedautocorrelationheatmap.DefaultParams()
+		if err := unmarshalStrictAllowed(b, p, allowed); err != nil {
+			return nil, err
+		}
+
+		return roofedautocorrelationheatmap.NewRoofedAutoCorrelationHeatmapParams(p)
 
 	// ── joseph granville ──────────────────────────────────────────────────
 

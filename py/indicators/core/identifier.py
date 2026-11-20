@@ -181,6 +181,10 @@ class Identifier(IntEnum):
     # Pearson lag-correlation map of Ultimate-Smoother prices.
     AUTO_CORRELATION_HEATMAP = 139
 
+    # Identifies the Ehlers Roofed Autocorrelation Heatmap (RACH) indicator, a
+    # roofed Pearson lag-correlation map rescaled to [0, 1] across [min_lag, max_lag].
+    ROOFED_AUTO_CORRELATION_HEATMAP = 140
+
     # ── joseph granville ───────────────────────────────────────────────────
 
     # Identifies the Joseph Granville On-Balance Volume (OBV) indicator.

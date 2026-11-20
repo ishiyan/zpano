@@ -360,6 +360,13 @@ var descriptors = map[Identifier]Descriptor{
 			{Kind: 1 /* Value */, Shape: shape.Heatmap, Role: Correlation, Pane: Own},
 		},
 	},
+	RoofedAutoCorrelationHeatmap: {
+		Identifier: RoofedAutoCorrelationHeatmap, Family: "John Ehlers",
+		Adaptivity: Static, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{
+			{Kind: 1 /* Value */, Shape: shape.Heatmap, Role: Correlation, Pane: Own},
+		},
+	},
 
 	// ── joseph granville ───────────────────────────────────────────────────
 

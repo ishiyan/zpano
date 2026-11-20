@@ -106,6 +106,7 @@ _IDENTIFIER_MAP: dict[str, Identifier] = {
     'autoCorrelationIndicator': Identifier.AUTO_CORRELATION_INDICATOR,
     'autoCorrelationPeriodogram': Identifier.AUTO_CORRELATION_PERIODOGRAM,
     'autoCorrelationHeatmap': Identifier.AUTO_CORRELATION_HEATMAP,
+    'roofedAutoCorrelationHeatmap': Identifier.ROOFED_AUTO_CORRELATION_HEATMAP,
     'jurikRelativeTrendStrengthIndex': Identifier.JURIK_RELATIVE_TREND_STRENGTH_INDEX,
     'jurikCompositeFractalBehaviorIndex': Identifier.JURIK_COMPOSITE_FRACTAL_BEHAVIOR_INDEX,
     'jurikZeroLagVelocity': Identifier.JURIK_ZERO_LAG_VELOCITY,

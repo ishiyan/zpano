@@ -238,6 +238,9 @@ _descriptors: dict[Id, Descriptor] = {
     Id.AUTO_CORRELATION_HEATMAP: _d(
         Id.AUTO_CORRELATION_HEATMAP, "John Ehlers", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
         [_o(0, S.HEATMAP, R.CORRELATION, P.OWN)]),
+    Id.ROOFED_AUTO_CORRELATION_HEATMAP: _d(
+        Id.ROOFED_AUTO_CORRELATION_HEATMAP, "John Ehlers", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
+        [_o(0, S.HEATMAP, R.CORRELATION, P.OWN)]),
 
     # ── joseph granville ───────────────────────────────────────────────────
 

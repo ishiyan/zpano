@@ -68,6 +68,7 @@ func TestIdentifierString(t *testing.T) {
 		{ZeroLagExponentialMovingAverage, zeroLagExponentialMovingAverage},
 		{TransformedDiscreteFourierTransformSpectrum, transformedDiscreteFourierTransformSpectrum},
 		{AutoCorrelationHeatmap, autoCorrelationHeatmap},
+		{RoofedAutoCorrelationHeatmap, roofedAutoCorrelationHeatmap},
 		// ── joseph granville ───────────────────────────────────────────────────
 		{OnBalanceVolume, onBalanceVolume},
 		// ── larry williams ─────────────────────────────────────────────────────
@@ -248,6 +249,7 @@ func TestIdentifierIsKnown(t *testing.T) {
 		{ZeroLagExponentialMovingAverage, true},
 		{TransformedDiscreteFourierTransformSpectrum, true},
 		{AutoCorrelationHeatmap, true},
+		{RoofedAutoCorrelationHeatmap, true},
 		// ── joseph granville ───────────────────────────────────────────────────
 		{OnBalanceVolume, true},
 		// ── larry williams ─────────────────────────────────────────────────────
@@ -432,6 +434,7 @@ func TestIdentifierMarshalJSON(t *testing.T) {
 		{ZeroLagExponentialMovingAverage, dqs + zeroLagExponentialMovingAverage + dqs, true},
 		{TransformedDiscreteFourierTransformSpectrum, dqs + transformedDiscreteFourierTransformSpectrum + dqs, true},
 		{AutoCorrelationHeatmap, dqs + autoCorrelationHeatmap + dqs, true},
+		{RoofedAutoCorrelationHeatmap, dqs + roofedAutoCorrelationHeatmap + dqs, true},
 		// ── joseph granville ───────────────────────────────────────────────────
 		{OnBalanceVolume, dqs + onBalanceVolume + dqs, true},
 		// ── larry williams ─────────────────────────────────────────────────────
@@ -629,6 +632,7 @@ func TestIdentifierUnmarshalJSON(t *testing.T) {
 		{ZeroLagExponentialMovingAverage, dqs + zeroLagExponentialMovingAverage + dqs, true},
 		{TransformedDiscreteFourierTransformSpectrum, dqs + transformedDiscreteFourierTransformSpectrum + dqs, true},
 		{AutoCorrelationHeatmap, dqs + autoCorrelationHeatmap + dqs, true},
+		{RoofedAutoCorrelationHeatmap, dqs + roofedAutoCorrelationHeatmap + dqs, true},
 		// ── joseph granville ───────────────────────────────────────────────────
 		{OnBalanceVolume, dqs + onBalanceVolume + dqs, true},
 		// ── larry williams ─────────────────────────────────────────────────────

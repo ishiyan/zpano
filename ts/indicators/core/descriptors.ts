@@ -196,6 +196,9 @@ const descriptors: Map<IndicatorIdentifier, Descriptor> = new Map<IndicatorIdent
   [IndicatorIdentifier.AutoCorrelationHeatmap, desc(IndicatorIdentifier.AutoCorrelationHeatmap, 'John Ehlers', A.Static, I.ScalarInput, V.NoVolume, [
     out(0, S.Heatmap, R.Correlation, P.Own),
   ])],
+  [IndicatorIdentifier.RoofedAutoCorrelationHeatmap, desc(IndicatorIdentifier.RoofedAutoCorrelationHeatmap, 'John Ehlers', A.Static, I.ScalarInput, V.NoVolume, [
+    out(0, S.Heatmap, R.Correlation, P.Own),
+  ])],
 
   // ── joseph granville ───────────────────────────────────────────────────
 

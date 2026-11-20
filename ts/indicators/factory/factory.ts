@@ -155,6 +155,7 @@ import { CombBandPassSpectrum } from '../john-ehlers/comb-band-pass-spectrum/com
 import { DiscreteFourierTransformSpectrum } from '../john-ehlers/discrete-fourier-transform-spectrum/discrete-fourier-transform-spectrum.js';
 import { TransformedDiscreteFourierTransformSpectrum } from '../john-ehlers/transformed-discrete-fourier-transform-spectrum/transformed-discrete-fourier-transform-spectrum.js';
 import { AutoCorrelationHeatmap } from '../john-ehlers/auto-correlation-heatmap/auto-correlation-heatmap.js';
+import { RoofedAutoCorrelationHeatmap } from '../john-ehlers/roofed-auto-correlation-heatmap/roofed-auto-correlation-heatmap.js';
 
 // ── joseph-granville ────────────────────────────────────────────────────────
 import { OnBalanceVolume } from '../joseph-granville/on-balance-volume/on-balance-volume.js';
@@ -564,6 +565,10 @@ export function createIndicator(identifier: IndicatorIdentifier, params?: Record
         case IndicatorIdentifier.AutoCorrelationHeatmap:
             if (isEmpty(p)) return AutoCorrelationHeatmap.default();
             return AutoCorrelationHeatmap.fromParams(p as any);
+
+        case IndicatorIdentifier.RoofedAutoCorrelationHeatmap:
+            if (isEmpty(p)) return RoofedAutoCorrelationHeatmap.default();
+            return RoofedAutoCorrelationHeatmap.fromParams(p as any);
 
         // ── joseph-granville ────────────────────────────────────────────
 

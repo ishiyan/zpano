@@ -23,3 +23,4 @@ pub mod comb_band_pass_spectrum;
 pub mod discrete_fourier_transform_spectrum;
 pub mod transformed_discrete_fourier_transform_spectrum;
 pub mod auto_correlation_heatmap;
+pub mod roofed_auto_correlation_heatmap;

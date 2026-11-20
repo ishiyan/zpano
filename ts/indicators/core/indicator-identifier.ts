@@ -171,6 +171,9 @@ export enum IndicatorIdentifier {
     /** Identifies Ehlers' __Autocorrelation Heatmap__ (ACH) indicator. */
     AutoCorrelationHeatmap = 139,
 
+    /** Identifies Ehlers' __Roofed Autocorrelation Heatmap__ (RACH) indicator. */
+    RoofedAutoCorrelationHeatmap = 140,
+
     // ── joseph granville ───────────────────────────────────────────────────
 
     /** Identifies Joseph Granville's __On-Balance Volume__ (OBV) indicator. */

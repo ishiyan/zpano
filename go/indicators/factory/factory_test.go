@@ -318,3 +318,46 @@ func TestFactoryAutoCorrelationHeatmapStrict(t *testing.T) {
 		}
 	}
 }
+
+func TestFactoryRoofedAutoCorrelationHeatmapStrict(t *testing.T) {
+	t.Parallel()
+
+	defaultIndicator, err := factory.New(core.RoofedAutoCorrelationHeatmap, `{}`)
+	if err != nil {
+		t.Fatalf("default factory construction failed: %v", err)
+	}
+	if got := defaultIndicator.Metadata().Mnemonic; got != "rach(3, 48, 0, 48, 10)" {
+		t.Fatalf("default mnemonic = %q, want %q", got, "rach(3, 48, 0, 48, 10)")
+	}
+	if got := len(defaultIndicator.Metadata().Outputs); got != 1 {
+		t.Fatalf("len(outputs) = %d, want 1", got)
+	}
+
+	customIndicator, err := factory.New(
+		core.RoofedAutoCorrelationHeatmap,
+		`{"minLag": 0, "maxLag": 0, "averagingLength": 3, "highpassPeriod": 24, "smoothingPeriod": 10.5, "barComponent": "median"}`,
+	)
+	if err != nil {
+		t.Fatalf("custom factory construction failed: %v", err)
+	}
+	if got := customIndicator.Metadata().Mnemonic; got != "rach(0, 0, 3, 24, 10.5, hl/2)" {
+		t.Fatalf("custom mnemonic = %q, want %q", got, "rach(0, 0, 3, 24, 10.5, hl/2)")
+	}
+
+	invalidJSONCases := []string{
+		`{"minLag": -1}`,
+		`{"minLag": 2.5}`,
+		`{"minLag": null}`,
+		`{"minLag": 10, "maxLag": 9}`,
+		`{"averagingLength": -1}`,
+		`{"averagingLength": 1.5}`,
+		`{"highpassPeriod": 4.9}`,
+		`{"smoothingPeriod": 1.9}`,
+		`{"unknownField": 1}`,
+	}
+	for _, payload := range invalidJSONCases {
+		if _, err := factory.New(core.RoofedAutoCorrelationHeatmap, payload); err == nil {
+			t.Fatalf("expected error for payload %s", payload)
+		}
+	}
+}

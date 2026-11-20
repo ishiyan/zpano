@@ -131,6 +131,9 @@ pub enum Identifier {
     /// Identifies Ehlers' Autocorrelation Heatmap (ACH) indicator, a signed Pearson
     /// lag-correlation map of Ultimate-Smoother prices across `[0, max_lag]`.
     AutoCorrelationHeatmap = 139,
+    /// Identifies Ehlers' Roofed Autocorrelation Heatmap (RACH) indicator, a `[0, 1]` mapped
+    /// Pearson lag-correlation map of Roofing-Filter prices across `[min_lag, max_lag]`.
+    RoofedAutoCorrelationHeatmap = 140,
 
     // ── joseph granville ───────────────────────────────────────────────────
     /// Identifies the Joseph Granville On-Balance Volume (OBV) indicator.
@@ -415,6 +418,7 @@ impl Identifier {
                 "transformedDiscreteFourierTransformSpectrum"
             }
             Self::AutoCorrelationHeatmap => "autoCorrelationHeatmap",
+            Self::RoofedAutoCorrelationHeatmap => "roofedAutoCorrelationHeatmap",
             Self::OnBalanceVolume => "onBalanceVolume",
             Self::UltimateOscillator => "ultimateOscillator",
             Self::WilliamsPercentR => "williamsPercentR",
@@ -572,6 +576,7 @@ impl Identifier {
                 Some(Self::TransformedDiscreteFourierTransformSpectrum)
             }
             "autoCorrelationHeatmap" => Some(Self::AutoCorrelationHeatmap),
+            "roofedAutoCorrelationHeatmap" => Some(Self::RoofedAutoCorrelationHeatmap),
             "onBalanceVolume" => Some(Self::OnBalanceVolume),
             "ultimateOscillator" => Some(Self::UltimateOscillator),
             "williamsPercentR" => Some(Self::WilliamsPercentR),
