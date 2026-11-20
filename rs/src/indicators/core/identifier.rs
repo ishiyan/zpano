@@ -128,6 +128,9 @@ pub enum Identifier {
     /// Identifies the Ehlers Transformed Discrete Fourier Transform Spectrum (TDFTS) heatmap indicator,
     /// a nonlinearly sharpened DFT decibel spectrum with 3 dB dominant cycle over a configurable range.
     TransformedDiscreteFourierTransformSpectrum = 138,
+    /// Identifies Ehlers' Autocorrelation Heatmap (ACH) indicator, a signed Pearson
+    /// lag-correlation map of Ultimate-Smoother prices across `[0, max_lag]`.
+    AutoCorrelationHeatmap = 139,
 
     // ── joseph granville ───────────────────────────────────────────────────
     /// Identifies the Joseph Granville On-Balance Volume (OBV) indicator.
@@ -411,6 +414,7 @@ impl Identifier {
             Self::TransformedDiscreteFourierTransformSpectrum => {
                 "transformedDiscreteFourierTransformSpectrum"
             }
+            Self::AutoCorrelationHeatmap => "autoCorrelationHeatmap",
             Self::OnBalanceVolume => "onBalanceVolume",
             Self::UltimateOscillator => "ultimateOscillator",
             Self::WilliamsPercentR => "williamsPercentR",
@@ -567,6 +571,7 @@ impl Identifier {
             "transformedDiscreteFourierTransformSpectrum" => {
                 Some(Self::TransformedDiscreteFourierTransformSpectrum)
             }
+            "autoCorrelationHeatmap" => Some(Self::AutoCorrelationHeatmap),
             "onBalanceVolume" => Some(Self::OnBalanceVolume),
             "ultimateOscillator" => Some(Self::UltimateOscillator),
             "williamsPercentR" => Some(Self::WilliamsPercentR),

@@ -168,6 +168,9 @@ export enum IndicatorIdentifier {
     /** Identifies Ehlers' __Transformed Discrete Fourier Transform Spectrum__ (TDFTS) indicator. */
     TransformedDiscreteFourierTransformSpectrum = 138,
 
+    /** Identifies Ehlers' __Autocorrelation Heatmap__ (ACH) indicator. */
+    AutoCorrelationHeatmap = 139,
+
     // ── joseph granville ───────────────────────────────────────────────────
 
     /** Identifies Joseph Granville's __On-Balance Volume__ (OBV) indicator. */

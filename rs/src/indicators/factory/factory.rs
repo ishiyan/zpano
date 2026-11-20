@@ -128,6 +128,9 @@ use crate::indicators::john_ehlers::discrete_fourier_transform_spectrum::discret
 use crate::indicators::john_ehlers::transformed_discrete_fourier_transform_spectrum::transformed_discrete_fourier_transform_spectrum::{
     TransformedDiscreteFourierTransformSpectrum, TransformedDiscreteFourierTransformSpectrumParams,
 };
+use crate::indicators::john_ehlers::auto_correlation_heatmap::auto_correlation_heatmap::{
+    AutoCorrelationHeatmap, AutoCorrelationHeatmapParams,
+};
 
 // ── joseph granville ─────────────────────────────────────────────────────────
 use crate::indicators::joseph_granville::on_balance_volume::{
@@ -1598,6 +1601,72 @@ pub fn create_indicator(
                 &options,
             )?))
         }
+        Identifier::AutoCorrelationHeatmap => {
+            if matches!(params, JsonValue::Null) {
+                return Ok(Box::new(AutoCorrelationHeatmap::new_default()));
+            }
+            let pairs = params
+                .as_object()
+                .ok_or_else(|| "params must be a JSON object".to_string())?;
+            let mut options = AutoCorrelationHeatmapParams::default();
+            let mut seen_keys: Vec<&str> = Vec::with_capacity(pairs.len());
+            for (key, raw) in pairs {
+                if seen_keys.contains(&key.as_str()) {
+                    return Err(format!("duplicate parameter key: {key}"));
+                }
+                seen_keys.push(key.as_str());
+                match key.as_str() {
+                    "length" => match raw {
+                        JsonValue::Number(number)
+                            if number.is_finite()
+                                && number.fract() == 0.0
+                                && *number >= i32::MIN as f64
+                                && *number <= i32::MAX as f64 =>
+                        {
+                            options.length = *number as i32;
+                        }
+                        _ => return Err("length must be an integer >= 2".to_string()),
+                    },
+                    "smoothingPeriod" => match raw {
+                        JsonValue::Number(number) if number.is_finite() => {
+                            options.smoothing_period = *number;
+                        }
+                        _ => return Err("smoothingPeriod must be a finite number".to_string()),
+                    },
+                    "maxLag" => match raw {
+                        JsonValue::Number(number)
+                            if number.is_finite()
+                                && number.fract() == 0.0
+                                && *number >= i32::MIN as f64
+                                && *number <= i32::MAX as f64 =>
+                        {
+                            options.max_lag = *number as i32;
+                        }
+                        _ => return Err("maxLag must be an integer in [0, 99]".to_string()),
+                    },
+                    "barComponent" => match raw {
+                        JsonValue::Number(number) => {
+                            options.bar_component = Some(lvt_bar_component(*number)?);
+                        }
+                        _ => return Err("invalid component number".to_string()),
+                    },
+                    "quoteComponent" => match raw {
+                        JsonValue::Number(number) => {
+                            options.quote_component = Some(lvt_quote_component(*number)?);
+                        }
+                        _ => return Err("invalid component number".to_string()),
+                    },
+                    "tradeComponent" => match raw {
+                        JsonValue::Number(number) => {
+                            options.trade_component = Some(lvt_trade_component(*number)?);
+                        }
+                        _ => return Err("invalid component number".to_string()),
+                    },
+                    _ => return Err(format!("unknown parameter key: {key}")),
+                }
+            }
+            Ok(Box::new(AutoCorrelationHeatmap::new(&options)?))
+        }
 
         // ── joseph granville ─────────────────────────────────────────────
         Identifier::OnBalanceVolume => {
@@ -2746,6 +2815,7 @@ mod tests {
             Identifier::AdaptiveTrendAndCycleFilter,
             Identifier::DiscreteFourierTransformSpectrum,
             Identifier::TransformedDiscreteFourierTransformSpectrum,
+            Identifier::AutoCorrelationHeatmap,
             Identifier::CombBandPassSpectrum,
             Identifier::AutoCorrelationIndicator,
             Identifier::AutoCorrelationPeriodogram,
@@ -2950,6 +3020,34 @@ mod tests {
                 )
                 .is_err(),
                 "expected error for {bad_tdfts_json}"
+            );
+        }
+
+        let ach_default = create_indicator(Identifier::AutoCorrelationHeatmap, "{}").unwrap();
+        assert_eq!(ach_default.metadata().mnemonic, "ach(20, 20, 99)");
+        assert_eq!(ach_default.metadata().outputs.len(), 1);
+
+        let ach_custom = create_indicator(
+            Identifier::AutoCorrelationHeatmap,
+            r#"{"length": 20, "smoothingPeriod": 10.5, "maxLag": 0, "barComponent": 5}"#,
+        )
+        .unwrap();
+        assert_eq!(ach_custom.metadata().mnemonic, "ach(20, 10.5, 0, hl/2)");
+
+        for bad_ach_json in [
+            r#"{"unknownKey": 1}"#,
+            r#"{"length": 1}"#,
+            r#"{"length": 2.5}"#,
+            r#"{"length": null}"#,
+            r#"{"smoothingPeriod": 0.5}"#,
+            r#"{"smoothingPeriod": "20"}"#,
+            r#"{"maxLag": -1}"#,
+            r#"{"maxLag": 100}"#,
+            r#"{"maxLag": 1.5}"#,
+        ] {
+            assert!(
+                create_indicator(Identifier::AutoCorrelationHeatmap, bad_ach_json).is_err(),
+                "expected error for {bad_ach_json}"
             );
         }
 

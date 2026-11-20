@@ -105,6 +105,7 @@ _IDENTIFIER_MAP: dict[str, Identifier] = {
     'combBandPassSpectrum': Identifier.COMB_BAND_PASS_SPECTRUM,
     'autoCorrelationIndicator': Identifier.AUTO_CORRELATION_INDICATOR,
     'autoCorrelationPeriodogram': Identifier.AUTO_CORRELATION_PERIODOGRAM,
+    'autoCorrelationHeatmap': Identifier.AUTO_CORRELATION_HEATMAP,
     'jurikRelativeTrendStrengthIndex': Identifier.JURIK_RELATIVE_TREND_STRENGTH_INDEX,
     'jurikCompositeFractalBehaviorIndex': Identifier.JURIK_COMPOSITE_FRACTAL_BEHAVIOR_INDEX,
     'jurikZeroLagVelocity': Identifier.JURIK_ZERO_LAG_VELOCITY,

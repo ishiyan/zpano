@@ -67,6 +67,7 @@ func TestIdentifierString(t *testing.T) {
 		{ZeroLagErrorCorrectingExponentialMovingAverage, zeroLagErrorCorrectingExponentialMovingAverage},
 		{ZeroLagExponentialMovingAverage, zeroLagExponentialMovingAverage},
 		{TransformedDiscreteFourierTransformSpectrum, transformedDiscreteFourierTransformSpectrum},
+		{AutoCorrelationHeatmap, autoCorrelationHeatmap},
 		// ── joseph granville ───────────────────────────────────────────────────
 		{OnBalanceVolume, onBalanceVolume},
 		// ── larry williams ─────────────────────────────────────────────────────
@@ -246,6 +247,7 @@ func TestIdentifierIsKnown(t *testing.T) {
 		{ZeroLagErrorCorrectingExponentialMovingAverage, true},
 		{ZeroLagExponentialMovingAverage, true},
 		{TransformedDiscreteFourierTransformSpectrum, true},
+		{AutoCorrelationHeatmap, true},
 		// ── joseph granville ───────────────────────────────────────────────────
 		{OnBalanceVolume, true},
 		// ── larry williams ─────────────────────────────────────────────────────
@@ -429,6 +431,7 @@ func TestIdentifierMarshalJSON(t *testing.T) {
 		{ZeroLagErrorCorrectingExponentialMovingAverage, dqs + zeroLagErrorCorrectingExponentialMovingAverage + dqs, true},
 		{ZeroLagExponentialMovingAverage, dqs + zeroLagExponentialMovingAverage + dqs, true},
 		{TransformedDiscreteFourierTransformSpectrum, dqs + transformedDiscreteFourierTransformSpectrum + dqs, true},
+		{AutoCorrelationHeatmap, dqs + autoCorrelationHeatmap + dqs, true},
 		// ── joseph granville ───────────────────────────────────────────────────
 		{OnBalanceVolume, dqs + onBalanceVolume + dqs, true},
 		// ── larry williams ─────────────────────────────────────────────────────
@@ -625,6 +628,7 @@ func TestIdentifierUnmarshalJSON(t *testing.T) {
 		{ZeroLagErrorCorrectingExponentialMovingAverage, dqs + zeroLagErrorCorrectingExponentialMovingAverage + dqs, true},
 		{ZeroLagExponentialMovingAverage, dqs + zeroLagExponentialMovingAverage + dqs, true},
 		{TransformedDiscreteFourierTransformSpectrum, dqs + transformedDiscreteFourierTransformSpectrum + dqs, true},
+		{AutoCorrelationHeatmap, dqs + autoCorrelationHeatmap + dqs, true},
 		// ── joseph granville ───────────────────────────────────────────────────
 		{OnBalanceVolume, dqs + onBalanceVolume + dqs, true},
 		// ── larry williams ─────────────────────────────────────────────────────

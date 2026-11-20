@@ -353,6 +353,13 @@ var descriptors = map[Identifier]Descriptor{
 			{Kind: 2 /* DominantCycle */, Shape: shape.Scalar, Role: CyclePeriod, Pane: Own},
 		},
 	},
+	AutoCorrelationHeatmap: {
+		Identifier: AutoCorrelationHeatmap, Family: "John Ehlers",
+		Adaptivity: Static, InputRequirement: ScalarInput, VolumeUsage: NoVolume,
+		Outputs: []OutputDescriptor{
+			{Kind: 1 /* Value */, Shape: shape.Heatmap, Role: Correlation, Pane: Own},
+		},
+	},
 
 	// ── joseph granville ───────────────────────────────────────────────────
 

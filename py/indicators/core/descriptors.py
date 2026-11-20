@@ -235,6 +235,9 @@ _descriptors: dict[Id, Descriptor] = {
         Id.TRANSFORMED_DISCRETE_FOURIER_TRANSFORM_SPECTRUM, "John Ehlers", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
         [_o(0, S.HEATMAP, R.SPECTRUM, P.OWN),
          _o(1, S.SCALAR, R.CYCLE_PERIOD, P.OWN)]),
+    Id.AUTO_CORRELATION_HEATMAP: _d(
+        Id.AUTO_CORRELATION_HEATMAP, "John Ehlers", A.STATIC, I.SCALAR_INPUT, V.NO_VOLUME,
+        [_o(0, S.HEATMAP, R.CORRELATION, P.OWN)]),
 
     # ── joseph granville ───────────────────────────────────────────────────
 

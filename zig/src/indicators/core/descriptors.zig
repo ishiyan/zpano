@@ -163,6 +163,9 @@ pub const descriptors = [_]Descriptor{
         .{ .kind = 1, .shape = .heatmap, .role = .spectrum, .pane = .own },
         .{ .kind = 2, .shape = .scalar, .role = .cycle_period, .pane = .own },
     } },
+    .{ .identifier = .auto_correlation_heatmap, .family = "John Ehlers", .adaptivity = .static_, .input_requirement = .scalar_input, .volume_usage = .no_volume, .outputs = &[_]OD{
+        .{ .kind = 1, .shape = .heatmap, .role = .correlation, .pane = .own },
+    } },
     // ── joseph granville ──────────────────────────────────────────────────────────
     .{ .identifier = .on_balance_volume, .family = "Joseph Granville", .adaptivity = .static_, .input_requirement = .bar_input, .volume_usage = .aggregate_bar_volume, .outputs = &[_]OD{.{ .kind = 1, .shape = .scalar, .role = .volume_flow, .pane = .own }} },
     // ── larry williams ──────────────────────────────────────────────────────────

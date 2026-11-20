@@ -82,6 +82,7 @@ const acp_mod = @import("../john_ehlers/auto_correlation_periodogram/auto_correl
 const cbps_mod = @import("../john_ehlers/comb_band_pass_spectrum/comb_band_pass_spectrum.zig");
 const dfts_mod = @import("../john_ehlers/discrete_fourier_transform_spectrum/discrete_fourier_transform_spectrum.zig");
 const tdfts_mod = @import("../john_ehlers/transformed_discrete_fourier_transform_spectrum/transformed_discrete_fourier_transform_spectrum.zig");
+const ach_mod = @import("../john_ehlers/auto_correlation_heatmap/auto_correlation_heatmap.zig");
 
 // joseph_granville
 const obv_mod = @import("../joseph_granville/on_balance_volume/on_balance_volume.zig");
@@ -1186,6 +1187,57 @@ pub fn create(allocator: std.mem.Allocator, id: Identifier, params_json: []const
             const ind = tdfts_mod.TransformedDiscreteFourierTransformSpectrum.init(allocator, p) catch return FactoryError.IndicatorInitFailed;
             const ptr = heapAlloc(tdfts_mod.TransformedDiscreteFourierTransformSpectrum, allocator, ind) catch return FactoryError.OutOfMemory;
             break :blk .{ .indicator = ptr.indicator(), .ctx = ptr, .deinit_fn = DeinitFn(tdfts_mod.TransformedDiscreteFourierTransformSpectrum) };
+        },
+
+        .auto_correlation_heatmap => blk: {
+            var p = ach_mod.defaultParams();
+            for (obj.keys(), obj.values()) |key, raw| {
+                if (std.mem.eql(u8, key, "length")) {
+                    p.length = switch (raw) {
+                        .integer => |number| if (number >= std.math.minInt(i32) and number <= std.math.maxInt(i32)) @intCast(number) else return FactoryError.InvalidParams,
+                        .float => |number| if (std.math.isFinite(number) and @trunc(number) == number and number >= @as(f64, @floatFromInt(std.math.minInt(i32))) and number <= @as(f64, @floatFromInt(std.math.maxInt(i32)))) @intFromFloat(number) else return FactoryError.InvalidParams,
+                        else => return FactoryError.InvalidParams,
+                    };
+                } else if (std.mem.eql(u8, key, "smoothingPeriod")) {
+                    p.smoothing_period = switch (raw) {
+                        .float => |number| if (std.math.isFinite(number)) number else return FactoryError.InvalidParams,
+                        .integer => |number| @floatFromInt(number),
+                        else => return FactoryError.InvalidParams,
+                    };
+                } else if (std.mem.eql(u8, key, "maxLag")) {
+                    p.max_lag = switch (raw) {
+                        .integer => |number| if (number >= std.math.minInt(i32) and number <= std.math.maxInt(i32)) @intCast(number) else return FactoryError.InvalidParams,
+                        .float => |number| if (std.math.isFinite(number) and @trunc(number) == number and number >= @as(f64, @floatFromInt(std.math.minInt(i32))) and number <= @as(f64, @floatFromInt(std.math.maxInt(i32)))) @intFromFloat(number) else return FactoryError.InvalidParams,
+                        else => return FactoryError.InvalidParams,
+                    };
+                } else if (std.mem.eql(u8, key, "barComponent")) {
+                    const comp_code: u8 = switch (raw) {
+                        .integer => |number| if (number >= 0 and number <= 8) @intCast(number) else return FactoryError.InvalidParams,
+                        .float => |number| if (std.math.isFinite(number) and @trunc(number) == number and number >= 0 and number <= 8) @intFromFloat(number) else return FactoryError.InvalidParams,
+                        else => return FactoryError.InvalidParams,
+                    };
+                    p.bar_component = @enumFromInt(comp_code);
+                } else if (std.mem.eql(u8, key, "quoteComponent")) {
+                    const comp_code: u8 = switch (raw) {
+                        .integer => |number| if (number >= 0 and number <= 7) @intCast(number) else return FactoryError.InvalidParams,
+                        .float => |number| if (std.math.isFinite(number) and @trunc(number) == number and number >= 0 and number <= 7) @intFromFloat(number) else return FactoryError.InvalidParams,
+                        else => return FactoryError.InvalidParams,
+                    };
+                    p.quote_component = @enumFromInt(comp_code);
+                } else if (std.mem.eql(u8, key, "tradeComponent")) {
+                    const comp_code: u8 = switch (raw) {
+                        .integer => |number| if (number >= 0 and number <= 1) @intCast(number) else return FactoryError.InvalidParams,
+                        .float => |number| if (std.math.isFinite(number) and @trunc(number) == number and number >= 0 and number <= 1) @intFromFloat(number) else return FactoryError.InvalidParams,
+                        else => return FactoryError.InvalidParams,
+                    };
+                    p.trade_component = @enumFromInt(comp_code);
+                } else {
+                    return FactoryError.InvalidParams;
+                }
+            }
+            const ind = ach_mod.AutoCorrelationHeatmap.init(allocator, p) catch return FactoryError.IndicatorInitFailed;
+            const ptr = heapAlloc(ach_mod.AutoCorrelationHeatmap, allocator, ind) catch return FactoryError.OutOfMemory;
+            break :blk .{ .indicator = ptr.indicator(), .ctx = ptr, .deinit_fn = DeinitFn(ach_mod.AutoCorrelationHeatmap) };
         },
 
         // ── joseph granville ─────────────────────────────────────────────
@@ -2412,6 +2464,34 @@ test "create auto correlation periodogram strict params" {
         FactoryError.IndicatorInitFailed,
         create(allocator, .transformed_discrete_fourier_transform_spectrum,
             \\{"minPeriod": 7}
+        ),
+    );
+
+    const ach_default = try create(allocator, .auto_correlation_heatmap, "{}");
+    defer ach_default.deinit(allocator);
+    var md_ach_default: metadata_mod.Metadata = undefined;
+    ach_default.indicator.metadata(&md_ach_default);
+    try std.testing.expectEqualStrings("ach(20, 20, 99)", md_ach_default.mnemonic);
+    try std.testing.expectEqual(@as(usize, 1), md_ach_default.outputs_len);
+
+    const ach_custom = try create(allocator, .auto_correlation_heatmap,
+        \\{"length": 20, "smoothingPeriod": 10.5, "maxLag": 0, "barComponent": 5}
+    );
+    defer ach_custom.deinit(allocator);
+    var md_ach_custom: metadata_mod.Metadata = undefined;
+    ach_custom.indicator.metadata(&md_ach_custom);
+    try std.testing.expectEqualStrings("ach(20, 10.5, 0, hl/2)", md_ach_custom.mnemonic);
+
+    try std.testing.expectError(
+        FactoryError.InvalidParams,
+        create(allocator, .auto_correlation_heatmap,
+            \\{"unknownKey": 1}
+        ),
+    );
+    try std.testing.expectError(
+        FactoryError.IndicatorInitFailed,
+        create(allocator, .auto_correlation_heatmap,
+            \\{"length": 1}
         ),
     );
 }

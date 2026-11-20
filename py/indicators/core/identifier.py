@@ -177,6 +177,10 @@ class Identifier(IntEnum):
     # heatmap indicator, exposing the transformed dB spectrum and dominant cycle period.
     TRANSFORMED_DISCRETE_FOURIER_TRANSFORM_SPECTRUM = 138
 
+    # Identifies the Ehlers Autocorrelation Heatmap (ACH) indicator, a signed
+    # Pearson lag-correlation map of Ultimate-Smoother prices.
+    AUTO_CORRELATION_HEATMAP = 139
+
     # ── joseph granville ───────────────────────────────────────────────────
 
     # Identifies the Joseph Granville On-Balance Volume (OBV) indicator.

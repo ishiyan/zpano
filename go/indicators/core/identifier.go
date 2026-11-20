@@ -179,10 +179,13 @@ const (
 	// TransformedDiscreteFourierTransformSpectrum identifies Ehlers' Transformed Discrete Fourier Transform Spectrum (TDFTS) indicator.
 	TransformedDiscreteFourierTransformSpectrum Identifier = 139
 
+	// AutoCorrelationHeatmap identifies Ehlers' Autocorrelation Heatmap (ACH) indicator.
+	AutoCorrelationHeatmap Identifier = 140
+
 	// ── joseph granville ───────────────────────────────────────────────────
 
 	// OnBalanceVolume identifies the Joseph Granville On-Balance Volume (OBV) indicator.
-	OnBalanceVolume Identifier = iota
+	OnBalanceVolume Identifier = iota - 1
 
 	// ── larry williams ─────────────────────────────────────────────────────
 
@@ -233,7 +236,7 @@ const (
 	// ── manfred durschner ──────────────────────────────────────────────────
 
 	// NewMovingAverage identifies the New Moving Average (NMA) indicator by Dürschner.
-	NewMovingAverage Identifier = iota - 18
+	NewMovingAverage Identifier = iota - 19
 
 	// ── marc chaikin ───────────────────────────────────────────────────────
 
@@ -484,7 +487,7 @@ const (
 	// NonambiguousTrendFilter identifies the William Blau Nonambiguous Trend Filter (NTF) indicator.
 	NonambiguousTrendFilter
 
-	last Identifier = 140
+	last Identifier = 141
 )
 
 const (
@@ -554,6 +557,7 @@ const (
 	zeroLagErrorCorrectingExponentialMovingAverage = "zeroLagErrorCorrectingExponentialMovingAverage"
 	zeroLagExponentialMovingAverage                = "zeroLagExponentialMovingAverage"
 	transformedDiscreteFourierTransformSpectrum    = "transformedDiscreteFourierTransformSpectrum"
+	autoCorrelationHeatmap                         = "autoCorrelationHeatmap"
 
 	// ── joseph granville ───────────────────────────────────────────────────
 	onBalanceVolume = "onBalanceVolume"
@@ -785,6 +789,8 @@ func (i Identifier) String() string {
 		return zeroLagExponentialMovingAverage
 	case TransformedDiscreteFourierTransformSpectrum:
 		return transformedDiscreteFourierTransformSpectrum
+	case AutoCorrelationHeatmap:
+		return autoCorrelationHeatmap
 	// ── joseph granville ───────────────────────────────────────────────────
 	case OnBalanceVolume:
 		return onBalanceVolume
@@ -1130,6 +1136,8 @@ func (i *Identifier) UnmarshalJSON(data []byte) error {
 		*i = ZeroLagExponentialMovingAverage
 	case transformedDiscreteFourierTransformSpectrum:
 		*i = TransformedDiscreteFourierTransformSpectrum
+	case autoCorrelationHeatmap:
+		*i = AutoCorrelationHeatmap
 	// ── joseph granville ───────────────────────────────────────────────────
 	case onBalanceVolume:
 		*i = OnBalanceVolume

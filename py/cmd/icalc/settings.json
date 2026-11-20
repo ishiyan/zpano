@@ -72,6 +72,7 @@
   { "identifier": "combBandPassSpectrum", "params": {} },
   { "identifier": "autoCorrelationIndicator", "params": {} },
   { "identifier": "autoCorrelationPeriodogram", "params": {} },
+  { "identifier": "autoCorrelationHeatmap", "params": {} },
   { "identifier": "jurikRelativeTrendStrengthIndex", "params": { "length": 14 } },
   { "identifier": "jurikCompositeFractalBehaviorIndex", "params": { "fractalType": 2, "smooth": 10 } },
   { "identifier": "jurikZeroLagVelocity", "params": { "depth": 10 } },

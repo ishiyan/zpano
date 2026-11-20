@@ -126,6 +126,8 @@ pub const Identifier = enum(u8) {
     zero_lag_exponential_moving_average = 43,
     /// Identifies Ehlers' Transformed Discrete Fourier Transform Spectrum (TDFTS) indicator.
     transformed_discrete_fourier_transform_spectrum = 138,
+    /// Identifies Ehlers' Autocorrelation Heatmap (ACH) indicator.
+    auto_correlation_heatmap = 139,
 
     // ── joseph granville ───────────────────────────────────────────────────
     /// Identifies the Joseph Granville On-Balance Volume (OBV) indicator.
@@ -421,6 +423,7 @@ pub const Identifier = enum(u8) {
             .zero_lag_error_correcting_exponential_moving_average => "zeroLagErrorCorrectingExponentialMovingAverage",
             .zero_lag_exponential_moving_average => "zeroLagExponentialMovingAverage",
             .transformed_discrete_fourier_transform_spectrum => "transformedDiscreteFourierTransformSpectrum",
+            .auto_correlation_heatmap => "autoCorrelationHeatmap",
 
             // ── joseph granville ───────────────────────────────────────────────────
             .on_balance_volume => "onBalanceVolume",
@@ -613,6 +616,7 @@ pub const Identifier = enum(u8) {
             .{ "zeroLagErrorCorrectingExponentialMovingAverage", Identifier.zero_lag_error_correcting_exponential_moving_average },
             .{ "zeroLagExponentialMovingAverage", Identifier.zero_lag_exponential_moving_average },
             .{ "transformedDiscreteFourierTransformSpectrum", Identifier.transformed_discrete_fourier_transform_spectrum },
+            .{ "autoCorrelationHeatmap", Identifier.auto_correlation_heatmap },
 
             // ── joseph granville ───────────────────────────────────────────────────
             .{ "onBalanceVolume", Identifier.on_balance_volume },

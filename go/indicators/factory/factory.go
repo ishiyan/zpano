@@ -54,6 +54,7 @@ import (
 	"zpano/indicators/jeanphilippepoton/rescaledfractaladaptivesimplemovingaverage"
 	"zpano/indicators/johnbollinger/bollingerbands"
 	"zpano/indicators/johnbollinger/bollingerbandstrend"
+	"zpano/indicators/johnehlers/autocorrelationheatmap"
 	"zpano/indicators/johnehlers/autocorrelationindicator"
 	"zpano/indicators/johnehlers/autocorrelationperiodogram"
 	"zpano/indicators/johnehlers/centerofgravityoscillator"
@@ -746,6 +747,26 @@ func New(identifier core.Identifier, params string) (core.Indicator, error) {
 		}
 
 		return transformeddiscretefouriertransformspectrum.NewTransformedDiscreteFourierTransformSpectrumParams(p)
+
+	case core.AutoCorrelationHeatmap:
+		if isEmptyObject(b) {
+			return autocorrelationheatmap.NewAutoCorrelationHeatmapDefault()
+		}
+
+		allowed := map[string]struct{}{
+			"length":          {},
+			"smoothingPeriod": {},
+			"maxLag":          {},
+			"barComponent":    {},
+			"quoteComponent":  {},
+			"tradeComponent":  {},
+		}
+		p := autocorrelationheatmap.DefaultParams()
+		if err := unmarshalStrictAllowed(b, p, allowed); err != nil {
+			return nil, err
+		}
+
+		return autocorrelationheatmap.NewAutoCorrelationHeatmapParams(p)
 
 	// ── joseph granville ──────────────────────────────────────────────────
 

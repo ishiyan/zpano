@@ -76,6 +76,7 @@
   { "identifier": "combBandPassSpectrum", "params": {} },
   { "identifier": "autoCorrelationIndicator", "params": {} },
   { "identifier": "autoCorrelationPeriodogram", "params": {} },
+  { "identifier": "autoCorrelationHeatmap", "params": {} },
   { "identifier": "jurikCommodityChannelIndex", "params": { "length": 20 } },
   { "identifier": "jurikWaveletSampler", "params": { "index": 12 } },
   { "identifier": "jurikAdaptiveZeroLagVelocity", "params": { "lo_length": 5, "hi_length": 30, "sensitivity": 1.0, "period": 3.0 } },

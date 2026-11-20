@@ -547,6 +547,54 @@ def create_indicator(
             normalized[mapped] = item
         return TransformedDiscreteFourierTransformSpectrum.create(_apply(default_params(), normalized))
 
+    if identifier == Identifier.AUTO_CORRELATION_HEATMAP:
+        from ...entities.bar_component import BarComponent
+        from ...entities.quote_component import QuoteComponent
+        from ...entities.trade_component import TradeComponent
+        from ..john_ehlers.auto_correlation_heatmap.auto_correlation_heatmap import AutoCorrelationHeatmap
+        from ..john_ehlers.auto_correlation_heatmap.params import default_params
+        if _is_empty(params):
+            return AutoCorrelationHeatmap.create_default()
+        assert params is not None
+        alias_map = {
+            "smoothingPeriod": "smoothing_period",
+            "maxLag": "max_lag",
+            "barComponent": "bar_component",
+            "quoteComponent": "quote_component",
+            "tradeComponent": "trade_component",
+        }
+        allowed_keys = {
+            "length",
+            "smoothing_period",
+            "max_lag",
+            "bar_component",
+            "quote_component",
+            "trade_component",
+        }
+        normalized: dict[str, Any] = {}
+        for key, item in params.items():
+            mapped = alias_map.get(key, key)
+            if mapped not in allowed_keys:
+                raise ValueError(
+                    f"invalid autocorrelation heatmap parameters: unsupported key {key!r}"
+                )
+            if mapped in normalized:
+                raise ValueError(
+                    f"invalid autocorrelation heatmap parameters: duplicate key {key!r}"
+                )
+            if item is None:
+                raise ValueError(
+                    f"invalid autocorrelation heatmap parameters: {key!r} cannot be None"
+                )
+            if mapped == "bar_component" and isinstance(item, int) and not isinstance(item, bool):
+                item = BarComponent(item)
+            elif mapped == "quote_component" and isinstance(item, int) and not isinstance(item, bool):
+                item = QuoteComponent(item)
+            elif mapped == "trade_component" and isinstance(item, int) and not isinstance(item, bool):
+                item = TradeComponent(item)
+            normalized[mapped] = item
+        return AutoCorrelationHeatmap.create(_apply(default_params(), normalized))
+
     # ── joseph granville ──────────────────────────────────────────────────
 
     if identifier == Identifier.ON_BALANCE_VOLUME:
